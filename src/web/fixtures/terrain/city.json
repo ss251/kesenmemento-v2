@@ -1,0 +1,20 @@
+{
+ "name": "city",
+ "bbox": [
+  141.5,
+  38.83,
+  141.7,
+  38.99
+ ],
+ "width": 434,
+ "height": 445,
+ "x0": -6505.8,
+ "z0": -9325.18,
+ "dx": 40,
+ "dz": 40,
+ "minH": 0,
+ "maxH": 324.6,
+ "source": "synthetic fixture (scripts/web/make-fixtures.js)",
+ "crs": "ENU origin 38.9060N 141.5750E",
+ "fixture": true
+}

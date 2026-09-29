@@ -1,0 +1,27 @@
+{
+  "note": "Trailer flyover in local ENU metres (BUILD-SPEC section 3: x east, y up, z south). Blender maps bx = x, by = -z, bz = y. Keys are Hermite-interpolated by time (camera_path.py). `stop` names the data/landmarks.json stop the key frames; the test checks each named stop is near the path and in view.",
+  "fps": 24,
+  "frames": 540,
+  "lens": 24,
+  "light": {
+    "goldenUntil": 300,
+    "nightFrom": 420,
+    "sunElevation": [8, -8],
+    "sunAzimuth": 247.5,
+    "windows": [0, 1.2]
+  },
+  "keys": [
+    { "t": 0.0,  "pos": [1700, 560, 5200], "look": [1250, 0, 1300], "label": "bay mouth, south of the Oshima strait" },
+    { "t": 5.0,  "pos": [2020, 360, 3350], "look": [1350, 0, 1150], "stop": "oshima", "label": "Oshima bridge off the right wing" },
+    { "t": 9.5,  "pos": [1600, 190, 1700], "look": [800, 0, 450], "stop": "kanae", "label": "over the Kanae bridge" },
+    { "t": 13.5, "pos": [880, 140, 560], "look": [150, 0, -150], "stop": "market", "label": "past the fish market into the inner bay" },
+    { "t": 17.0, "pos": [230, 115, 40], "look": [-80, 5, -420], "stop": "bay", "label": "over the inner bay" },
+    { "t": 19.8, "pos": [-60, 95, 20], "look": [420, 8, 520], "label": "turn back toward the market" },
+    { "t": 22.5, "pos": [240, 62, 380], "look": [640, 5, 860], "stop": "market", "label": "the fish market at night" }
+  ],
+  "stills": [
+    { "id": "01_inner_bay_golden", "frame": 120, "mode": "model", "pos": [-160, 150, 330], "look": [300, 10, -180], "lens": 28, "label": "inner bay, golden hour, model mode" },
+    { "id": "02_kanae_golden_photo", "frame": 120, "mode": "photo", "pos": [900, 140, 1050], "look": [1560, 25, 1600], "lens": 28, "label": "Kanae bridge over the bay, golden hour, aerial-photo terrain" },
+    { "id": "03_market_night", "frame": 539, "mode": "model", "pos": [420, 85, 520], "look": [660, 5, 900], "lens": 28, "label": "fish market quay at night" }
+  ]
+}

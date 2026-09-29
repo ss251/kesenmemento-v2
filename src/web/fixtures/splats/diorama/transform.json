@@ -1,0 +1,29 @@
+{
+ "frame": "table",
+ "position": [
+  0,
+  0,
+  0
+ ],
+ "quaternion": [
+  0,
+  0,
+  0,
+  1
+ ],
+ "scale": 1,
+ "model": {
+  "center": [
+   300,
+   -150
+  ],
+  "extent": [
+   1800,
+   1400
+  ],
+  "scale": 0.0022222222222222222
+ },
+ "splats": 95962,
+ "source": "synthetic fixture",
+ "fixture": true
+}

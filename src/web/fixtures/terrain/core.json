@@ -1,0 +1,20 @@
+{
+ "name": "core",
+ "bbox": [
+  141.555,
+  38.885,
+  141.605,
+  38.925
+ ],
+ "width": 587,
+ "height": 601,
+ "x0": -1734.88,
+ "z0": -2109.27,
+ "dx": 7.4,
+ "dz": 7.4,
+ "minH": 0,
+ "maxH": 243.6,
+ "source": "synthetic fixture (scripts/web/make-fixtures.js)",
+ "crs": "ENU origin 38.9060N 141.5750E",
+ "fixture": true
+}

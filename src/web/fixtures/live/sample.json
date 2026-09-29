@@ -1,0 +1,107 @@
+{
+ "updated": "2026-09-29T01:10:00Z",
+ "sample": true,
+ "fixture": true,
+ "sun": {
+  "azimuth": 150.2,
+  "elevation": 44.1
+ },
+ "weather": {
+  "source": "JMA (fixture)",
+  "station": "気仙沼",
+  "temp": 21.3,
+  "wind": {
+   "dir": 110,
+   "speed": 3.2
+  },
+  "precip1h": 0,
+  "sky": "cloudy",
+  "forecast": "くもり 時々 晴れ"
+ },
+ "tide": {
+  "source": "JMA 大船渡 (fixture)",
+  "height_cm": 95,
+  "next": [
+   {
+    "t": "2026-09-29T12:48:00+09:00",
+    "type": "high",
+    "cm": 130
+   },
+   {
+    "t": "2026-09-29T19:02:00+09:00",
+    "type": "low",
+    "cm": 38
+   }
+  ]
+ },
+ "port": {
+  "source": "気仙沼漁協 入船情報 (fixture)",
+  "date": "2026-09-29",
+  "arrivals": [
+   {
+    "time": "04:40",
+    "vessel": "サンプル丸 1号",
+    "type": "まき網",
+    "tonnage": 199,
+    "catch": "かつお",
+    "kg": 38000
+   },
+   {
+    "time": "05:30",
+    "vessel": "サンプル丸 2号",
+    "type": "まき網",
+    "tonnage": 135,
+    "catch": "かつお",
+    "kg": 42000
+   },
+   {
+    "time": "06:15",
+    "vessel": "サンプル丸 3号",
+    "type": "一本釣り",
+    "tonnage": 119,
+    "catch": "かつお",
+    "kg": 21000
+   },
+   {
+    "time": "07:05",
+    "vessel": "サンプル丸 5号",
+    "type": "さんま棒受網",
+    "tonnage": 199,
+    "catch": "さんま",
+    "kg": 56000
+   },
+   {
+    "time": "08:20",
+    "vessel": "サンプル丸 8号",
+    "type": "近海まぐろはえ縄",
+    "tonnage": 19,
+    "catch": "めかじき",
+    "kg": 2400
+   },
+   {
+    "time": "09:40",
+    "vessel": "サンプル丸 11号",
+    "type": "一本釣り",
+    "tonnage": 99,
+    "catch": "かつお",
+    "kg": 17000
+   },
+   {
+    "time": "11:10",
+    "vessel": "サンプル丸 12号",
+    "type": "さんま棒受網",
+    "tonnage": 180,
+    "catch": "さんま",
+    "kg": 31000
+   },
+   {
+    "time": "14:30",
+    "vessel": "サンプル丸 15号",
+    "type": "定置網",
+    "tonnage": 12,
+    "catch": "ぶり",
+    "kg": 3200
+   }
+  ]
+ }
+}
