@@ -1,0 +1,140 @@
+{
+ "33877": {
+  "pressure": [
+   1008,
+   0
+  ],
+  "normalPressure": [
+   1012.5,
+   0
+  ],
+  "temp": [
+   17.1,
+   0
+  ],
+  "humidity": [
+   76,
+   0
+  ],
+  "visibility": [
+   20000,
+   0
+  ],
+  "sun10m": [
+   0,
+   0
+  ],
+  "sun1h": [
+   0,
+   0
+  ],
+  "precipitation10m": [
+   0,
+   0
+  ],
+  "precipitation1h": [
+   0,
+   0
+  ],
+  "precipitation3h": [
+   0,
+   0
+  ],
+  "precipitation24h": [
+   0,
+   0
+  ],
+  "windDirection": [
+   3,
+   0
+  ],
+  "wind": [
+   0.6,
+   0
+  ]
+ },
+ "34026": {
+  "temp": [
+   16.4,
+   0
+  ],
+  "humidity": [
+   95,
+   0
+  ],
+  "sun10m": [
+   0,
+   0
+  ],
+  "sun1h": [
+   0,
+   0
+  ],
+  "precipitation10m": [
+   0,
+   0
+  ],
+  "precipitation1h": [
+   0,
+   0
+  ],
+  "precipitation3h": [
+   0,
+   0
+  ],
+  "precipitation24h": [
+   0,
+   0
+  ],
+  "windDirection": [
+   12,
+   0
+  ],
+  "wind": [
+   1.4,
+   0
+  ]
+ },
+ "34186": {
+  "temp": [
+   16.6,
+   0
+  ],
+  "humidity": [
+   95,
+   0
+  ],
+  "sun10m": [
+   0,
+   0
+  ],
+  "sun1h": [
+   0,
+   0
+  ],
+  "precipitation10m": [
+   0,
+   0
+  ],
+  "precipitation1h": [
+   0,
+   0
+  ],
+  "precipitation3h": [
+   0,
+   0
+  ],
+  "precipitation24h": [
+   0,
+   0
+  ],
+  "windDirection": [
+   13,
+   0
+  ],
+  "wind": [
+   1.5,
+   0
+  ]
+ }
+}
