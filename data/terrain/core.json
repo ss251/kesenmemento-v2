@@ -1,0 +1,20 @@
+{
+ "name": "core",
+ "bbox": [
+  141.555,
+  38.885,
+  141.605,
+  38.925
+ ],
+ "width": 1174,
+ "height": 1202,
+ "x0": -1734.88,
+ "z0": -2109.266,
+ "dx": 3.7,
+ "dz": 3.7,
+ "minH": -1.41,
+ "maxH": 307.98,
+ "source": "dem5a_png z15 (gaps from dem_png z14)",
+ "crs": "ENU origin 38.9060N 141.5750E",
+ "format": "float32 LE row-major, row 0 = north (z0), x = x0 + col*dx, z = z0 + row*dz; sea/no-data = 0"
+}

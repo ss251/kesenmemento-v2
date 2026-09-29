@@ -1,0 +1,18 @@
+# model-mode materials
+newmtl wall
+Kd 0.914 0.894 0.863
+
+newmtl roof_white
+Kd 0.925 0.914 0.886
+
+newmtl roof_grey
+Kd 0.596 0.596 0.580
+
+newmtl roof_red
+Kd 0.698 0.337 0.282
+
+newmtl roof_blue
+Kd 0.337 0.471 0.627
+
+newmtl roof_brown
+Kd 0.557 0.416 0.314

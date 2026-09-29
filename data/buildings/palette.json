@@ -1,0 +1,55 @@
+{
+ "note": "Model-mode roof palette (ADDENDUM-model §2). *.attr.bin roof[] and city.json features[].roof use `index`.",
+ "colors": [
+  {
+   "index": 0,
+   "name": "white",
+   "rgb": [
+    236,
+    233,
+    226
+   ],
+   "hex": "#ece9e2"
+  },
+  {
+   "index": 1,
+   "name": "grey",
+   "rgb": [
+    152,
+    152,
+    148
+   ],
+   "hex": "#989894"
+  },
+  {
+   "index": 2,
+   "name": "red",
+   "rgb": [
+    178,
+    86,
+    72
+   ],
+   "hex": "#b25648"
+  },
+  {
+   "index": 3,
+   "name": "blue",
+   "rgb": [
+    86,
+    120,
+    160
+   ],
+   "hex": "#5678a0"
+  },
+  {
+   "index": 4,
+   "name": "brown",
+   "rgb": [
+    142,
+    106,
+    80
+   ],
+   "hex": "#8e6a50"
+  }
+ ]
+}

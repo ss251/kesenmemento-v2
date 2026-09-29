@@ -1,0 +1,411 @@
+{
+ "version": 2,
+ "note": "v2 cameras (package v2:portal-cinema). Stop ids, names and coordinates come from data/landmarks.json (verified); this file adds the beauty framing for the photoreal look at golden hour (low western sun raking across, water in frame, hills behind), the per-stop orbit (deg/s, soft max deg, dolly fraction, rise m) and dwell (s) of the auto tour, and the deterministic film. ENU metres, y up (T.P.).",
+ "golden": {
+  "elev": 4.5,
+  "cap": 17.0833,
+  "note": "opening/tour golden hour = the JST hour the sun sinks to elev degrees on the page date, capped at the 17:05 preset"
+ },
+ "night": 19.6667,
+ "order": [
+  "bay",
+  "market",
+  "pier7",
+  "kanae",
+  "oshima",
+  "anba",
+  "karakuwa"
+ ],
+ "stops": [
+  {
+   "id": "bay",
+   "ja": "内湾",
+   "en": "Inner Bay",
+   "lat": 38.9063,
+   "lon": 141.5768,
+   "splat": null,
+   "cam": {
+    "pos": [
+     -230,
+     150,
+     330
+    ],
+    "look": [
+     330,
+     8,
+     -260
+    ],
+    "fov": 42
+   },
+   "orbit": {
+    "rate": 0.5,
+    "max": 10,
+    "dir": 1,
+    "dolly": 0.05
+   },
+   "dwell": 9,
+   "blurb": {
+    "ja": "気仙沼の街の始まりの場所。港町の暮らしは、この穏やかな内湾に面して広がってきました。",
+    "en": "Where Kesennuma began: the port town grew up around this calm inner bay."
+   }
+  },
+  {
+   "id": "market",
+   "ja": "気仙沼市魚市場",
+   "en": "Kesennuma Fish Market",
+   "lat": 38.899,
+   "lon": 141.58187,
+   "splat": null,
+   "cam": {
+    "pos": [
+     330,
+     105,
+     1010
+    ],
+    "look": [
+     760,
+     4,
+     600
+    ],
+    "fov": 40
+   },
+   "orbit": {
+    "rate": 0.5,
+    "max": 9,
+    "dir": -1,
+    "dolly": 0.05
+   },
+   "dwell": 8,
+   "blurb": {
+    "ja": "生鮮カツオの水揚げで長年日本一を続ける魚市場。岸壁に沿って長い上屋が続きます。",
+    "en": "The fish market that has led Japan in fresh bonito landings for years, its sheds lining the quay."
+   }
+  },
+  {
+   "id": "pier7",
+   "ja": "第7岸壁（撮影地点）",
+   "en": "Pier 7 (capture spot)",
+   "lat": 38.9052,
+   "lon": 141.5754,
+   "splat": "model",
+   "cam": {
+    "pos": [
+     -85,
+     55,
+     235
+    ],
+    "look": [
+     205,
+     2,
+     -45
+    ],
+    "fov": 44
+   },
+   "orbit": {
+    "rate": 0.45,
+    "max": 8,
+    "dir": 1,
+    "dolly": 0.06
+   },
+   "dwell": 7,
+   "blurb": {
+    "ja": "ここで撮影したのは、ガラスの下に広がる内湾の街の模型。その模型が、実物大の街への入口になります。",
+    "en": "Captured here: a scale model of the inner-bay district under glass. The model is the doorway into the full-size city."
+   }
+  },
+  {
+   "id": "kanae",
+   "ja": "気仙沼湾横断橋（かなえ大橋）",
+   "en": "Kesennuma Bay Crossing Bridge (Kanae Ohashi)",
+   "lat": 38.8928,
+   "lon": 141.5922,
+   "splat": null,
+   "cam": {
+    "pos": [
+     1080,
+     115,
+     1000
+    ],
+    "look": [
+     1560,
+     22,
+     1520
+    ],
+    "fov": 42
+   },
+   "orbit": {
+    "rate": 0.55,
+    "max": 10,
+    "dir": -1,
+    "dolly": 0.04
+   },
+   "dwell": 8,
+   "blurb": {
+    "ja": "三陸沿岸道路の斜張橋。湾の入口をまたぎ、夜は街の新しい目印になります。",
+    "en": "The cable-stayed bridge of the Sanriku coastal expressway, striding across the mouth of the bay."
+   }
+  },
+  {
+   "id": "oshima",
+   "ja": "気仙沼大島大橋",
+   "en": "Kesennuma Oshima Bridge",
+   "lat": 38.87875,
+   "lon": 141.60625,
+   "splat": null,
+   "cam": {
+    "pos": [
+     2150,
+     110,
+     3150
+    ],
+    "look": [
+     2760,
+     25,
+     2990
+    ],
+    "fov": 40
+   },
+   "orbit": {
+    "rate": 0.5,
+    "max": 9,
+    "dir": 1,
+    "dolly": 0.04
+   },
+   "dwell": 8,
+   "blurb": {
+    "ja": "本土と大島を結ぶアーチ橋。2019年の開通で、島は初めて陸続きになりました。",
+    "en": "The arch bridge that joined Oshima island to the mainland when it opened in 2019."
+   }
+  },
+  {
+   "id": "anba",
+   "ja": "安波山展望",
+   "en": "Mt. Anba lookout",
+   "lat": 38.91492,
+   "lon": 141.56931,
+   "splat": null,
+   "cam": {
+    "pos": [
+     -560,
+     330,
+     -1080
+    ],
+    "look": [
+     420,
+     0,
+     300
+    ],
+    "fov": 46
+   },
+   "orbit": {
+    "rate": 0.4,
+    "max": 8,
+    "dir": -1,
+    "dolly": 0.03,
+    "rise": 6
+   },
+   "dwell": 8,
+   "blurb": {
+    "ja": "標高239 mの安波山から、港と内湾、大島までを見渡します。",
+    "en": "From 239 m Mt. Anba the whole harbour opens up, out to Oshima."
+   },
+   "vantage": true
+  },
+  {
+   "id": "karakuwa",
+   "ja": "唐桑半島",
+   "en": "Karakuwa Peninsula",
+   "lat": 38.87646,
+   "lon": 141.65898,
+   "splat": null,
+   "cam": {
+    "pos": [
+     7800,
+     700,
+     3400
+    ],
+    "look": [
+     600,
+     0,
+     300
+    ],
+    "fov": 38
+   },
+   "orbit": {
+    "rate": 0.3,
+    "max": 6,
+    "dir": 1,
+    "dolly": 0.03
+   },
+   "dwell": 9,
+   "blurb": {
+    "ja": "リアス海岸の唐桑半島。上空から、湾と街の全体が見えてきます。",
+    "en": "The ria coast of the Karakuwa peninsula, with the whole bay and city beyond."
+   },
+   "vantage": true
+  }
+ ],
+ "film": {
+  "fps": 30,
+  "duration": 30,
+  "width": 3840,
+  "height": 2160,
+  "date": "2026-09-29",
+  "note": "Shot list (V2-SPEC 9): bay mouth high at golden hour -> the channel past the Kanae bridge -> the fish market with boats -> the inner bay as dusk becomes night (time-lapse) -> city lights and the title card. Time-keyed Catmull-Rom, eased ends; hours are monotone.",
+  "shots": [
+   {
+    "from": 0,
+    "to": 6,
+    "name": "bay-mouth"
+   },
+   {
+    "from": 6,
+    "to": 12,
+    "name": "kanae-channel"
+   },
+   {
+    "from": 12,
+    "to": 18,
+    "name": "fish-market"
+   },
+   {
+    "from": 18,
+    "to": 26,
+    "name": "inner-bay-dusk"
+   },
+   {
+    "from": 26,
+    "to": 30,
+    "name": "city-lights-title"
+   }
+  ],
+  "keys": [
+   {
+    "t": 0,
+    "pos": [
+     2750,
+     620,
+     4300
+    ],
+    "look": [
+     900,
+     0,
+     700
+    ],
+    "fov": 40,
+    "hours": 16.85
+   },
+   {
+    "t": 5.5,
+    "pos": [
+     2150,
+     330,
+     2750
+    ],
+    "look": [
+     1100,
+     10,
+     900
+    ],
+    "fov": 40,
+    "hours": 16.9
+   },
+   {
+    "t": 9,
+    "pos": [
+     1720,
+     170,
+     1880
+    ],
+    "look": [
+     1150,
+     20,
+     1100
+    ],
+    "fov": 42,
+    "hours": 16.95
+   },
+   {
+    "t": 12.5,
+    "pos": [
+     1150,
+     110,
+     1150
+    ],
+    "look": [
+     650,
+     6,
+     800
+    ],
+    "fov": 42,
+    "hours": 17
+   },
+   {
+    "t": 17.5,
+    "pos": [
+     870,
+     80,
+     610
+    ],
+    "look": [
+     600,
+     4,
+     820
+    ],
+    "fov": 40,
+    "hours": 17.08
+   },
+   {
+    "t": 20,
+    "pos": [
+     700,
+     150,
+     420
+    ],
+    "look": [
+     150,
+     6,
+     -60
+    ],
+    "fov": 42,
+    "hours": 17.3
+   },
+   {
+    "t": 25.5,
+    "pos": [
+     560,
+     200,
+     330
+    ],
+    "look": [
+     80,
+     6,
+     -120
+    ],
+    "fov": 42,
+    "hours": 19.3
+   },
+   {
+    "t": 30,
+    "pos": [
+     900,
+     480,
+     820
+    ],
+    "look": [
+     60,
+     0,
+     -250
+    ],
+    "fov": 44,
+    "hours": 19.6
+   }
+  ],
+  "title": {
+   "from": 26.6,
+   "fade": 1.4,
+   "ja": "気仙沼 リビングシティ",
+   "en": "Kesennuma Living City"
+  }
+ }
+}

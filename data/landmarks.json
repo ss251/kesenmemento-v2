@@ -1,0 +1,212 @@
+[
+ {
+  "id": "bay",
+  "ja": "内湾",
+  "en": "Inner Bay",
+  "lat": 38.9063,
+  "lon": 141.5768,
+  "enu": [
+   156.1,
+   0,
+   -33.3
+  ],
+  "cam": {
+   "pos": [
+    -27.7,
+    122.2,
+    150.5
+   ],
+   "look": [
+    332.9,
+    16.5,
+    -210.1
+   ]
+  },
+  "splat": null,
+  "blurb": {
+   "ja": "気仙沼の街の始まりの場所。港町の暮らしは、この穏やかな内湾に面して広がってきました。",
+   "en": "Where Kesennuma began: the port town grew up around this calm inner bay."
+  },
+  "verified": "Inner-bay water centre read from data/ortho/core.jpg and data/terrain/core.f32 (h = 0); spec gave 38.905, 141.575 (the quay edge, 150 m SW)."
+ },
+ {
+  "id": "market",
+  "ja": "気仙沼市魚市場",
+  "en": "Kesennuma Fish Market",
+  "lat": 38.899,
+  "lon": 141.58187,
+  "enu": [
+   595.9,
+   1.4,
+   777.1
+  ],
+  "cam": {
+   "pos": [
+    507,
+    80,
+    532.8
+   ],
+   "look": [
+    657.5,
+    6,
+    946.2
+   ]
+  },
+  "splat": null,
+  "blurb": {
+   "ja": "生鮮カツオの水揚げで長年日本一を続ける魚市場。岸壁に沿って長い上屋が続きます。",
+   "en": "The fish market that has led Japan in fresh bonito landings for years, its sheds lining the quay."
+  },
+  "verified": "OSM way 気仙沼魚市場 (amenity=marketplace, building) centre 38.89900, 141.58187 — the quay-side market shed, checked on data/ortho/core.jpg; the OSM 'Kesennuma City Fish Market' way (38.90017, 141.58033) is the landside building 150 m NW; GSI 地名検索 魚市場前 38.8992, 141.5802. Spec gave 38.912, 141.577 (1.4 km north, in Shishiori) — corrected."
+ },
+ {
+  "id": "pier7",
+  "ja": "第7岸壁（撮影地点）",
+  "en": "Pier 7 (capture spot)",
+  "lat": 38.9052,
+  "lon": 141.5754,
+  "enu": [
+   34.7,
+   2.2,
+   88.8
+  ],
+  "cam": {
+   "pos": [
+    34.7,
+    3.8,
+    88.8
+   ],
+   "look": [
+    93.8,
+    1,
+    78.4
+   ]
+  },
+  "splat": "model",
+  "blurb": {
+   "ja": "ここで撮影したのは、ガラスの下に広がる内湾の街の模型。その模型が、実物大の街への入口になります。",
+   "en": "Captured here: a scale model of the inner-bay district under glass. The model is the doorway into the full-size city."
+  },
+  "verified": "Photo EXIF GPS of the 2026-09-29 captures (ADDENDUM-model); 30 m from OSM 南町海岸商業施設「迎」 (38.90577, 141.57475)."
+ },
+ {
+  "id": "kanae",
+  "ja": "気仙沼湾横断橋（かなえ大橋）",
+  "en": "Kesennuma Bay Crossing Bridge (Kanae Ohashi)",
+  "lat": 38.8928,
+  "lon": 141.5922,
+  "enu": [
+   1492,
+   0,
+   1465.4
+  ],
+  "cam": {
+   "pos": [
+    1041.7,
+    60,
+    1205.4
+   ],
+   "look": [
+    1492,
+    20,
+    1465.4
+   ]
+  },
+  "splat": null,
+  "blurb": {
+   "ja": "三陸沿岸道路の斜張橋。湾の入口をまたぎ、夜は街の新しい目印になります。",
+   "en": "The cable-stayed bridge of the Sanriku coastal expressway, striding across the mouth of the bay."
+  },
+  "verified": "Main span over the water, read from data/ortho/core.jpg and the DEM water run along the bridge (mid 38.89267, 141.59239). OSM way 気仙沼湾横断橋 (man_made=bridge) centre 38.88954, 141.59005 lies on the SW land approach; GSI 地名検索 38.8933, 141.5932. Spec gave 38.917, 141.590 (2.7 km north, on land) — corrected."
+ },
+ {
+  "id": "oshima",
+  "ja": "気仙沼大島大橋",
+  "en": "Kesennuma Oshima Bridge",
+  "lat": 38.87875,
+  "lon": 141.60625,
+  "enu": [
+   2710.8,
+   0,
+   3025.1
+  ],
+  "cam": {
+   "pos": [
+    2414.9,
+    150,
+    2390.7
+   ],
+   "look": [
+    2837.5,
+    30,
+    3297
+   ]
+  },
+  "splat": null,
+  "blurb": {
+   "ja": "本土と大島を結ぶアーチ橋。2019年の開通で、島は初めて陸続きになりました。",
+   "en": "The arch bridge that joined Oshima island to the mainland when it opened in 2019."
+  },
+  "verified": "OSM way 気仙沼大島大橋 / Kesennuma Oshima Ohashi Bridge centre 38.87875, 141.60625; GSI 地名検索 38.8802, 141.6075 (N abutment)."
+ },
+ {
+  "id": "anba",
+  "ja": "安波山展望",
+  "en": "Mt. Anba lookout",
+  "lat": 38.91492,
+  "lon": 141.56931,
+  "enu": [
+   -493.6,
+   238.4,
+   -990.2
+  ],
+  "cam": {
+   "pos": [
+    -493.6,
+    250.4,
+    -990.2
+   ],
+   "look": [
+    156.1,
+    0,
+    -33.3
+   ]
+  },
+  "splat": null,
+  "blurb": {
+   "ja": "標高239 mの安波山から、港と内湾、大島までを見渡します。",
+   "en": "From 239 m Mt. Anba the whole harbour opens up, out to Oshima."
+  },
+  "verified": "OSM node 安波山 (natural=peak, ele 238) 38.91492, 141.56931; GSI 地名検索 安波山 38.91496, 141.56914; DEM 238.4 m. Observation deck (OSM 安波山展望台) 38.91223, 141.56909. Spec gave 38.918, 141.566 (450 m NW) — corrected."
+ },
+ {
+  "id": "karakuwa",
+  "ja": "唐桑半島",
+  "en": "Karakuwa Peninsula",
+  "lat": 38.87646,
+  "lon": 141.65898,
+  "enu": [
+   7284.8,
+   58.3,
+   3279.4
+  ],
+  "cam": {
+   "pos": [
+    8694.3,
+    900,
+    3792.4
+   ],
+   "look": [
+    0,
+    2,
+    0
+   ]
+  },
+  "splat": null,
+  "blurb": {
+   "ja": "リアス海岸の唐桑半島。上空から、湾と街の全体が見えてきます。",
+   "en": "The ria coast of the Karakuwa peninsula, with the whole bay and city beyond."
+  },
+  "verified": "OSM node 唐桑半島 / Karakuwa Peninsula (natural=peninsula) 38.87646, 141.65898; spec 38.87, 141.655 (0.8 km)."
+ }
+]

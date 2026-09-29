@@ -1,0 +1,17 @@
+{
+ "bbox": [
+  141.5,
+  38.83,
+  141.7,
+  38.99
+ ],
+ "width": 4096,
+ "height": 4096,
+ "x0": -6505.8,
+ "z0": -9325.176,
+ "dx": 4.235546874999759,
+ "dz": 4.336484375000101,
+ "source": "seamlessphoto z15",
+ "crs": "ENU origin 38.9060N 141.5750E",
+ "uv": "u = (x - x0) / (width*dx), v = (z - z0) / (height*dz); v = 0 is the north edge (image row 0)"
+}

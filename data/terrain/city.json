@@ -1,0 +1,20 @@
+{
+ "name": "city",
+ "bbox": [
+  141.5,
+  38.83,
+  141.7,
+  38.99
+ ],
+ "width": 2170,
+ "height": 2222,
+ "x0": -6505.8,
+ "z0": -9325.176,
+ "dx": 8,
+ "dz": 8,
+ "minH": 0,
+ "maxH": 566.02,
+ "source": "dem_png z14",
+ "crs": "ENU origin 38.9060N 141.5750E",
+ "format": "float32 LE row-major, row 0 = north (z0), x = x0 + col*dx, z = z0 + row*dz; sea/no-data = 0"
+}

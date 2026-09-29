@@ -1,0 +1,29 @@
+{
+ "source": "Forest land cover: GSI optimal_bvmap-v1 Anno vegetation symbols (6321 broadleaf, 6322 conifer, 6323 bamboo, 6327 palm, 6314/6315 orchard; nearest symbol within 320 m), refined by GSI seamlessphoto greenness (7 of 9 neighbourhood probes green; flat ground below 10 m needs dark canopy); unlabelled green slopes/high ground also wooded. Buildings (+2.5 m), roads (4 m) and sea excluded.",
+ "layout": "KLT1: u32 magic 0x4B4C5431, u32 count, f32 [x, y, z, r] * count (ENU; y = ground; r = crown radius m), u8 type[count] (0 broadleaf, 1 conifer, 2 bamboo, 3 orchard). Order is shuffled: draw the first N for a uniform subsample.",
+ "files": {
+  "trees_core.bin": {
+   "count": 175387,
+   "spacing": 7,
+   "bbox": [
+    141.555,
+    38.885,
+    141.605,
+    38.925
+   ]
+  },
+  "trees_city.bin": {
+   "count": 310218,
+   "spacing": 20,
+   "bbox": [
+    141.5,
+    38.83,
+    141.7,
+    38.99
+   ],
+   "excludes": "core bbox"
+  }
+ },
+ "model": "Model mode: green sphere of radius r on a short stem, centre at y + 1.1*r (ADDENDUM-model §3).",
+ "crs": "ENU origin 38.9060N 141.5750E"
+}
