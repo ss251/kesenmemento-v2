@@ -1,0 +1,32 @@
+{
+  "name": "kesennuma-living-city",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A living, explorable 3D Kesennuma built from open government data, citizen captures and today's port activity.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "bun test",
+    "data": "bun run scripts/build-data.js",
+    "live": "bun run scripts/live.js",
+    "build": "bun run scripts/build-web.js",
+    "serve": "bun run scripts/serve.js",
+    "render": "bash blender/render.sh",
+    "all": "bun test && bun run scripts/build-web.js",
+    "stills": "bash tools/anime/gate.sh chrome bun run scripts/render/stills.js",
+    "qa": "bash tools/anime/gate.sh chrome bun tools/anime/qa3.mjs --build 1 --phone 1"
+  },
+  "dependencies": {
+    "3d-tiles-renderer": "0.5.3",
+    "@mapbox/vector-tile": "2",
+    "@sparkjsdev/spark": "2.2.0",
+    "@takram/three-atmosphere": "0.19.1",
+    "@takram/three-clouds": "0.7.6",
+    "@takram/three-geospatial": "0.9.1",
+    "earcut": "3",
+    "pbf": "4",
+    "postprocessing": "6.39.5",
+    "sharp": "^0.35.5",
+    "three": "0.186.1"
+  }
+}

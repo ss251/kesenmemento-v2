@@ -1,0 +1,22 @@
+node_modules/
+raw/
+dist/
+data/cache/
+blender/out/
+*.log
+.DS_Store
+# [v3:docs] root shots/ only: docs/shots/ holds the promoted frames the README shows
+/shots/
+# large regenerable intermediates (rebuild: bun run data, see README)
+data/buildings/*.bin
+data/buildings/*.obj
+data/buildings/city.json
+data/terrain/*.f32
+config/tokens.local.json
+tools/brush-app-*/
+tools/spark-src/
+tools/bin/
+tools/.cargo-home/
+tools/render-test/out/
+tools/**/target/
+tools/*.tar.xz
