@@ -1,0 +1,81 @@
+{
+ "version": 1,
+ "classes": [
+  {
+   "id": "forest",
+   "color": "#6f9a5c"
+  },
+  {
+   "id": "cedar",
+   "color": "#557f5b"
+  },
+  {
+   "id": "grass",
+   "color": "#9fc076"
+  },
+  {
+   "id": "field",
+   "color": "#bccb86"
+  },
+  {
+   "id": "dirt",
+   "color": "#cbb792"
+  },
+  {
+   "id": "sand",
+   "color": "#e2d4ae"
+  },
+  {
+   "id": "paving",
+   "color": "#c9c5bc"
+  },
+  {
+   "id": "town",
+   "color": "#bdb7aa"
+  },
+  {
+   "id": "water",
+   "color": "#6f9fbf"
+  }
+ ],
+ "core": {
+  "file": "landcover_core.png",
+  "forest": "forest_core.png",
+  "size": 2048,
+  "x0": -1734.88,
+  "z0": -2109.266,
+  "x1": 2602.319999998521,
+  "z1": 2331.293999999905,
+  "hist": {
+   "forest": 0.328,
+   "cedar": 0.148,
+   "grass": 0.092,
+   "field": 0.115,
+   "dirt": 0.001,
+   "sand": 0.009,
+   "paving": 0.164,
+   "town": 0.144,
+   "water": 0
+  }
+ },
+ "city": {
+  "file": "landcover_city.png",
+  "forest": "forest_city.png",
+  "size": 1024,
+  "x0": -6505.8,
+  "z0": -9325.176,
+  "x1": 10842.999999999014,
+  "z1": 8437.064000000413,
+  "hist": {
+   "forest": 0.326,
+   "cedar": 0.143,
+   "grass": 0.129,
+   "field": 0.085,
+   "dirt": 0,
+   "sand": 0.002,
+   "paving": 0.02,
+   "town": 0.296,
+   "water": 0
+  }
+ }
+}

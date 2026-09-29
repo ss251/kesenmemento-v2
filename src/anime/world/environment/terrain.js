@@ -1,0 +1,266 @@
+// [v3:foundation] environment/terrain.js — the terrain skin of the whole visual world.
+// Four nested grids (hero 3.5 m · mid 10 m · city 70 m · horizon 450 m) with skirts, heights from L.heightAt
+// (beyond the city bbox: the border height blended into procedural ridges on land, open sea elsewhere).
+// Material: MeshToonMaterial (shadows, fog, cel ramp) patched with
+//   - land-cover colour from the aerial photos (data/anime/landcover_*.png, snapped to the anime palette),
+//   - painted forest crowns where the forest mask is set (dome normals in two scales so hills read as forest
+//     from the promenade and from the drone), cedar / broadleaf patches and scattered early autumn crowns,
+//   - soft slope and height tints, a warm shore band.
+// Crown shading follows Sakura's distantMaterial (Kenton-GMI/sakuragaoka-station, MIT).
+import * as THREE from 'three';
+import { patchSnow, seasonUniform } from '../../core/season.js';   // [v3:integrate]
+import * as L from '../layout.js';
+import { sharedHardShores } from '../layout/hardshore.js';   // [v3:fix]
+
+export const LOD = {
+  hero: { cx: 185, cz: -15, half: 460, step: 3.5 },   // edges on the mid grid lines (multiples of 10 from the mid box)
+  mid: { cx: 250, cz: 150, half: 1295, step: 10 },
+  city: { step: 70, size: 18900 },
+  horizon: { step: 450, size: 54000 },
+};
+
+// ------------------------------------------------------------------ height beyond the city bbox
+const F = L.ZONES.far;
+function h21(x, z) { const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return s - Math.floor(s); }
+function vnoise(x, z) {
+  const i = Math.floor(x), j = Math.floor(z), fx = x - i, fz = z - j, u = fx * fx * (3 - 2 * fx), v = fz * fz * (3 - 2 * fz);
+  const a = h21(i, j), b = h21(i + 1, j), c = h21(i, j + 1), d = h21(i + 1, j + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+function ridges(x, z) { let s = 0, a = 0.5, f = 1 / 2600; for (let o = 0; o < 5; o++) { s += a * (1 - Math.abs(vnoise(x * f, z * f) * 2 - 1)); a *= 0.5; f *= 2.1; } return s; }
+/** Terrain height everywhere (the city bbox from the DEM grids, procedural ridges or sea beyond). */
+export function worldHeight(x, z) {
+  const inside = x >= F.x0 && x <= F.x1 && z >= F.z0 && z <= F.z1;
+  if (inside) return L.heightAt(x, z);
+  const cx = Math.min(F.x1 - 20, Math.max(F.x0 + 20, x)), cz = Math.min(F.z1 - 20, Math.max(F.z0 + 20, z));
+  const d = Math.hypot(x - cx, z - cz);
+  const edge = L.heightAt(cx, cz);
+  const sea = L.shoreDist(cx, cz) > -40;
+  // the Pacific to the east / south-east stays open sea; land beyond the western and northern borders rises into ridges
+  const oceanSide = x > F.x1 - 50 || (z > F.z1 - 50 && x > 1500);
+  if (sea || oceanSide) { const s = Math.min(1, d / 3000); return edge * (1 - s) - 18 * s; }
+  const s = Math.min(1, d / 5000), t = s * s * (3 - 2 * s);
+  const r = ridges(x, z);
+  return edge * (1 - t) + (140 + 620 * r * r) * t;
+}
+
+// ------------------------------------------------------------------ grids
+function gridGeometry({ x0, z0, x1, z1, step, hole, skirt, hfn, dropSeabed = true }) {
+  const nx = Math.max(1, Math.round((x1 - x0) / step)), nz = Math.max(1, Math.round((z1 - z0) / step));
+  const sx = (x1 - x0) / nx, sz = (z1 - z0) / nz;
+  const W = nx + 1;
+  const pos = new Float32Array(W * (nz + 1) * 3);
+  const hs = new Float32Array(W * (nz + 1));
+  for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
+    const x = x0 + i * sx, z = z0 + j * sz, k = j * W + i;
+    const y = hfn(x, z);
+    hs[k] = y; pos[k * 3] = x; pos[k * 3 + 1] = y; pos[k * 3 + 2] = z;
+  }
+  const idx = [];
+  const inHole = (x, z) => hole && x > hole.x0 && x < hole.x1 && z > hole.z0 && z < hole.z1;
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    const a = j * W + i, b = a + 1, c = a + W, d = c + 1;
+    const cx = x0 + (i + 0.5) * sx, cz = z0 + (j + 0.5) * sz;
+    if (inHole(cx - sx * 0.5, cz - sz * 0.5) && inHole(cx + sx * 0.5, cz + sz * 0.5)) continue;
+    if (dropSeabed && hs[a] < -1.2 && hs[b] < -1.2 && hs[c] < -1.2 && hs[d] < -1.2) continue;
+    // split along the shorter diagonal-ish (follow the terrain: avoid bridging valleys)
+    if (Math.abs(hs[a] - hs[d]) < Math.abs(hs[b] - hs[c])) { idx.push(a, c, d, a, d, b); } else { idx.push(a, c, b, b, c, d); }
+  }
+  let positions = Array.from(pos);
+  if (skirt) {
+    // vertical skirt around the border (hides cracks where a finer grid meets a coarser one)
+    const ring = [];
+    for (let i = 0; i <= nx; i++) ring.push(i);
+    for (let j = 1; j <= nz; j++) ring.push(j * W + nx);
+    for (let i = nx - 1; i >= 0; i--) ring.push(nz * W + i);
+    for (let j = nz - 1; j >= 1; j--) ring.push(j * W);
+    const base = positions.length / 3;
+    for (const k of ring) positions.push(pos[k * 3], pos[k * 3 + 1] - skirt, pos[k * 3 + 2]);
+    for (let r = 0; r < ring.length; r++) {
+      const a = ring[r], b = ring[(r + 1) % ring.length], a2 = base + r, b2 = base + (r + 1) % ring.length;
+      idx.push(a, b, a2, b, b2, a2);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+
+// ------------------------------------------------------------------ material
+export async function loadLandcover() {
+  const meta = await L.loadData('landcover.json').catch(() => null);
+  if (!meta || typeof document === 'undefined' || typeof Bun !== 'undefined') return { meta, tex: null };   // no images in bun (check.mjs)
+  const loader = new THREE.TextureLoader();
+  const load = (name, srgb) => loader.loadAsync(L.dataURL(name)).then((t) => {
+    t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    t.flipY = false; t.needsUpdate = true;   // image row 0 = the north edge = v 0
+    t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.anisotropy = 4; t.generateMipmaps = true;
+    t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
+    return t;
+  }).catch(() => null);
+  const [lcCore, lcCity, frCore, frCity] = await Promise.all([load(meta.core.file, true), load(meta.city.file, true), load(meta.core.forest, false), load(meta.city.forest, false)]);
+  return { meta, tex: lcCore && lcCity && frCore && frCity ? { lcCore, lcCity, frCore, frCity } : null };
+}
+
+export function terrainMaterial(ctx, lc, o = {}) {
+  const C = (c) => new THREE.Color(c);
+  const m = new THREE.MeshToonMaterial({ color: C('#ffffff'), gradientMap: ctx.mat.gradientMap });
+  m.name = 'env-terrain';
+  const bb = (b) => new THREE.Vector4(b.x0, b.z0, 1 / (b.x1 - b.x0), 1 / (b.z1 - b.z0));
+  const U = {
+    tLcCore: { value: lc.tex?.lcCore || null }, tLcCity: { value: lc.tex?.lcCity || null },
+    tFrCore: { value: lc.tex?.frCore || null }, tFrCity: { value: lc.tex?.frCity || null },
+    uBbCore: { value: lc.meta ? bb(lc.meta.core) : new THREE.Vector4(0, 0, 1, 1) },
+    uBbCity: { value: lc.meta ? bb(lc.meta.city) : new THREE.Vector4(0, 0, 1, 1) },
+    uHasLc: { value: lc.tex ? 1 : 0 },
+    uForest: { value: C(o.forest || '#6f9a5c') }, uCedar: { value: C(o.cedar || '#4f7a58') }, uBroad: { value: C(o.broad || '#8db26a') },
+    uAutumnA: { value: C(o.autumnA || '#d9853f') }, uAutumnB: { value: C(o.autumnB || '#c65a3c') }, uAutumnC: { value: C(o.autumnC || '#e2b54a') },
+    uAutumn: { value: o.autumn ?? 0.085 },
+    uGrass: { value: C('#9fc076') }, uRock: { value: C('#b3aa98') }, uShore: { value: C('#d9ceb0') }, uFar: { value: C('#7d9a70') },
+    uCrown: { value: o.crown ?? 4.2 },
+    uQuiet: { value: new THREE.Vector3(0, 0, 0) },   // [v3:harbor] (x, z, r): no painted 紅葉 crowns inside (a 3D grove stands there)
+    uSakura: { value: 0 },   // [v3:integrate] spring 山桜 crown fraction (life's season controller drives uAutumn / uSakura)
+  };
+  const uSeason = seasonUniform(ctx.shared);
+  m.userData.uniforms = U;   // [v3:harbor] so other modules can set uQuiet
+  m.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, U);
+    sh.uniforms.uSunDirW = ctx.shared.uSunDir;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWp; varying vec3 vWn;')
+      .replace('#include <fog_vertex>', '#include <fog_vertex>\n vWp = (modelMatrix * vec4(transformed, 1.0)).xyz; vWn = normalize(mat3(modelMatrix) * objectNormal);');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        varying vec3 vWp; varying vec3 vWn;
+        uniform sampler2D tLcCore, tLcCity, tFrCore, tFrCity; uniform vec4 uBbCore, uBbCity; uniform float uHasLc, uAutumn, uCrown, uSakura; uniform vec3 uQuiet;
+        uniform vec3 uForest, uCedar, uBroad, uAutumnA, uAutumnB, uAutumnC, uGrass, uRock, uShore, uFar, uSunDirW;
+        float t_h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+        vec2 t_h22(vec2 p){ float a = t_h21(p); return vec2(a, t_h21(p + a * 17.17 + 3.1)); }
+        float t_vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+          return mix(mix(t_h21(i), t_h21(i + vec2(1, 0)), f.x), mix(t_h21(i + vec2(0, 1)), t_h21(i + vec2(1, 1)), f.x), f.y); }
+        // overlapping round crowns: xy = offset from the winning crown centre (radii), z = dome height (0 = gap), w = id
+        vec4 t_crowns(vec2 p){
+          vec2 i = floor(p), f = fract(p); float best = -9.0; vec4 res = vec4(0.0, 0.0, 0.0, 0.5);
+          for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+            vec2 g = vec2(float(x), float(y)); vec2 h = t_h22(i + g);
+            vec2 c = g + 0.18 + 0.64 * h; float rad = 0.62 + 0.28 * fract(h.x * 7.13 + h.y);
+            vec2 o = (f - c) / rad; float r2 = dot(o, o);
+            if (r2 < 1.0) { float hd = sqrt(1.0 - r2); float score = c.y * 0.55 + h.x * 0.5 + hd * 0.25;
+              if (score > best) { best = score; res = vec4(o, hd, fract(h.x * 0.61 + h.y * 0.39 + 0.13)); } }
+          }
+          return res;
+        }
+        vec3 t_forestTint(float id, vec2 pp){
+          // cedar plantations (dark, in patches), broadleaf (lighter), scattered early 紅葉
+          float pc = t_vn(pp * 0.004 + 3.0) * 0.7 + t_vn(pp * 0.013) * 0.3;
+          vec3 c = mix(uForest, uCedar, smoothstep(0.5, 0.62, pc));
+          c = mix(c, uBroad, smoothstep(0.62, 0.75, t_vn(pp * 0.009 + 11.0)) * 0.6);
+          c *= 0.92 + id * 0.16;
+          float pa = t_vn(pp * 0.006 + 21.0);
+          float autumn = step(id, uAutumn * (0.4 + 1.6 * smoothstep(0.45, 0.75, pa)));
+          autumn *= step(uQuiet.z, length(pp - uQuiet.xy));   // [v3:harbor] quiet zone (the 神明崎 shrine grove)
+          vec3 ac = id < uAutumn * 0.35 ? uAutumnB : (id < uAutumn * 0.75 ? uAutumnA : uAutumnC);
+          vec3 r = mix(c, ac, autumn * (1.0 - smoothstep(0.5, 0.62, pc) * 0.8));
+          // [v3:integrate] seasons: spring 山桜 crowns, summer deep green, winter bare broadleaf (cedar stays green)
+          float broadM = 1.0 - smoothstep(0.5, 0.62, pc);
+          float sak = step(id, uSakura * (0.5 + 1.5 * smoothstep(0.4, 0.7, pa))) * (1.0 - (1.0 - broadM) * 0.9) * step(uQuiet.z, length(pp - uQuiet.xy));
+          r = mix(r, mix(vec3(0.82, 0.43, 0.52), vec3(0.92, 0.63, 0.7), fract(id * 7.13)), sak);
+          r = mix(r, r * vec3(1.0, 1.08, 0.9), uSeasonS.x * (1.0 - sak));
+          r = mix(r, r * vec3(0.8, 0.97, 0.78), uSeasonS.y);
+          r = mix(r, mix(r, vec3(0.2, 0.15, 0.12) * (0.85 + id * 0.3), broadM * 0.8), uSeasonS.w);
+          return r;
+        }
+        float gForest; vec3 gCrownN; float gGap;`)
+      .replace('#include <map_fragment>', `#include <map_fragment>
+        {
+          vec2 xz = vWp.xz;
+          vec2 uvC = (xz - uBbCore.xy) * uBbCore.zw, uvF = (xz - uBbCity.xy) * uBbCity.zw;
+          float inCore = step(0.0, uvC.x) * step(uvC.x, 1.0) * step(0.0, uvC.y) * step(uvC.y, 1.0);
+          float edgeC = inCore * smoothstep(0.0, 0.02, min(min(uvC.x, 1.0 - uvC.x), min(uvC.y, 1.0 - uvC.y)));
+          float inCity = step(0.0, uvF.x) * step(uvF.x, 1.0) * step(0.0, uvF.y) * step(uvF.y, 1.0);
+          vec3 lc = uFar; float fr = 0.6;
+          if (uHasLc > 0.5) {
+            vec3 lcF = texture2D(tLcCity, clamp(uvF, 0.0, 1.0)).rgb; float frF = texture2D(tFrCity, clamp(uvF, 0.0, 1.0)).r;
+            vec3 lcC = texture2D(tLcCore, clamp(uvC, 0.0, 1.0)).rgb; float frC = texture2D(tFrCore, clamp(uvC, 0.0, 1.0)).r;
+            lc = mix(lcF, lcC, edgeC); fr = mix(frF, frC, edgeC);
+            // outside the city bbox: forests on the ridges, fields in the valleys
+            float outside = 1.0 - inCity;
+            lc = mix(lc, mix(uGrass, uForest, smoothstep(40.0, 120.0, vWp.y)), outside);
+            fr = mix(fr, smoothstep(30.0, 110.0, vWp.y), outside);
+          } else { fr = smoothstep(15.0, 60.0, vWp.y); lc = mix(uGrass, uForest, fr); }
+          lc = klcSeasonGround(lc);   // [v3:integrate]
+          vec3 N = normalize(vWn);
+          float slope = 1.0 - N.y;
+          // steep bare slopes read as rock; the warm shore band just above the sea
+          lc = mix(lc, uRock, smoothstep(0.55, 0.8, slope) * (1.0 - fr) * 0.7);
+          lc = mix(lc, uShore, (1.0 - smoothstep(0.5, 1.6, vWp.y)) * 0.35 * (1.0 - fr));
+          // forest crowns: near (uCrown m) and far clusters (uCrown * 3.4)
+          float f = smoothstep(0.32, 0.62, fr);
+          gForest = f; gCrownN = vec3(0.0); gGap = 0.0;
+          vec3 base = lc;
+          if (f > 0.001) {
+            vec2 q1 = xz / uCrown, q2 = xz / (uCrown * 3.4);
+            float fw = length(fwidth(q1));
+            float d1 = 1.0 - smoothstep(0.25, 0.6, fw);
+            float d2 = (1.0 - smoothstep(0.3, 0.75, fw / 3.4)) * (1.0 - d1 * 0.85);
+            vec4 c1 = d1 > 0.001 ? t_crowns(q1) : vec4(0.0, 0.0, 0.0, 0.5);
+            vec4 c2 = d2 > 0.001 ? t_crowns(q2 + 7.3) : vec4(0.0, 0.0, 0.0, 0.5);
+            vec4 c = d1 >= d2 ? c1 : c2; float det = max(d1, d2);
+            float cover = step(0.0001, c.z);
+            vec3 T = vec3(1.0, 0.0, 0.0), B = vec3(0.0, 0.0, 1.0);
+            gCrownN = (T * c.x + B * c.y) * 0.95 * cover * det * f;
+            gGap = (1.0 - cover) * det * f;
+            float id = c.w;
+            vec3 ft = t_forestTint(id, xz);
+            // autumn crowns only where a crown is resolvable (no orange flecks at the fading LOD)
+            ft = mix(t_forestTint(0.5, xz) * (0.92 + id * 0.16), ft, smoothstep(0.55, 0.85, d1));   // big far clusters stay green
+            // far forest without resolvable crowns: blend the patch colours
+            vec3 ftFar = t_forestTint(0.5, xz);
+            base = mix(lc, mix(ftFar, ft, det), f);
+          }
+          diffuseColor.rgb = base;
+        }`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+        if (gForest > 0.001) {
+          vec3 wn = normalize(vWn);
+          vec3 crownN = normalize(wn * 1.25 + gCrownN);
+          normal = normalize(mix(normal, (viewMatrix * vec4(crownN, 0.0)).xyz, 0.75));
+        }`)
+      .replace('#include <lights_fragment_end>', `#include <lights_fragment_end>
+        reflectedLight.directDiffuse *= 1.0 - gGap * 0.55;
+        reflectedLight.indirectDiffuse *= 1.0 - gGap * 0.35;`);
+    patchSnow(sh, uSeason, 'vWp');   // [v3:integrate] seasons (helpers + winter snow on the ground and crown tops)
+  };
+  m.customProgramCacheKey = () => 'klc-terrain';
+  return m;
+}
+
+// ------------------------------------------------------------------ build
+export function buildTerrain(ctx, mat) {
+  const g = new THREE.Group(); g.name = 'env-terrain';
+  const H = LOD.hero, M = LOD.mid;
+  const heroBox = { x0: H.cx - H.half, x1: H.cx + H.half, z0: H.cz - H.half, z1: H.cz + H.half };
+  const midBox = { x0: M.cx - M.half, x1: M.cx + M.half, z0: M.cz - M.half, z1: M.cz + M.half };
+  const add = (geo, name) => { const mesh = new THREE.Mesh(geo, mat); mesh.name = name; mesh.receiveShadow = true; mesh.castShadow = false; g.add(mesh); return mesh; };
+  const stats = {};
+  const t = (name, fn) => { const t0 = performance.now(); const geo = fn(); stats[name] = { tris: geo.index.count / 3, ms: Math.round(performance.now() - t0) }; add(geo, 'terrain-' + name); };
+  // nested boxes share grid lines (each inner box edge lies on the outer grid) so holes cut exactly; skirts hide T-cracks
+  const around = (inner, size, step, cx, cz) => {
+    const x0 = inner.x0 - Math.round((inner.x0 - (cx - size / 2)) / step) * step, z0 = inner.z0 - Math.round((inner.z0 - (cz - size / 2)) / step) * step;
+    return { x0, z0, x1: x0 + size, z1: z0 + size };
+  };
+  const cityBox = around(midBox, LOD.city.size, LOD.city.step, (F.x0 + F.x1) / 2, (F.z0 + F.z1) / 2);
+  const horBox = around(cityBox, LOD.horizon.size, LOD.horizon.step, (F.x0 + F.x1) / 2, (F.z0 + F.z1) / 2);
+  // [v3:fix] in front of a quay / seawall face the ground drops under the sea (no sand slope climbing the wall)
+  const HS = sharedHardShores(L);
+  const hq = (x, z) => HS.clampY(x, z, L.heightAt(x, z));
+  t('hero', () => gridGeometry({ ...heroBox, step: H.step, skirt: 3, hfn: hq }));
+  t('mid', () => gridGeometry({ ...midBox, step: M.step, hole: heroBox, skirt: 6, hfn: hq }));
+  t('city', () => gridGeometry({ ...cityBox, step: LOD.city.step, hole: midBox, skirt: 30, hfn: worldHeight }));
+  t('horizon', () => gridGeometry({ ...horBox, step: LOD.horizon.step, hole: cityBox, hfn: worldHeight }));
+  ctx.noBatch(g);
+  ctx.addStatic(g);
+  return { group: g, stats, boxes: { heroBox, midBox, cityBox, horBox } };
+}

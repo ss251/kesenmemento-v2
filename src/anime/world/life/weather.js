@@ -1,0 +1,66 @@
+// [v3:life] Weather: anime rain (soft white streaks in a box that follows the camera, wind-slanted, one draw call)
+// and the wet factor. Rain strength / cloud cover come from time.weather (live JMA data via ./live.js, or ?weather=).
+// ctx.shared.uRain (0..1) and uWet (0..1) are set by the time service; other materials may read uWet for puddles.
+//
+//   const W = buildWeather(ctx, T)  ->  { update(dt, t), mesh }
+import * as THREE from 'three';
+
+export function buildWeather(ctx, T) {
+  const S = ctx.shared;
+  const q = ctx.quality?.name || 'high';
+  const N = { high: 9000, medium: 5000, low: 2200 }[q] ?? 5000;
+  const BOX = 36;
+  const r = ctx.rng('kesennuma-rain');
+  const base = new THREE.PlaneGeometry(1, 1).translate(0, -0.5, 0);
+  const g = new THREE.InstancedBufferGeometry();
+  g.index = base.index; g.setAttribute('position', base.attributes.position); g.setAttribute('uv', base.attributes.uv);
+  const a = new Float32Array(N * 4);
+  for (let i = 0; i < N; i++) a.set([r() * BOX, r() * BOX, r() * BOX, r()], i * 4);
+  g.setAttribute('iSeed', new THREE.InstancedBufferAttribute(a, 4));
+  g.instanceCount = N;
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { uTime: S.uTime, uRain: S.uRain, uWind: S.uWind, uCam: { value: new THREE.Vector3() }, uBox: { value: BOX }, uLamps: S.uLamps, uNight: S.uNight },
+    vertexShader: /* glsl */`
+      attribute vec4 iSeed; uniform float uTime, uRain, uBox; uniform vec2 uWind; uniform vec3 uCam;
+      varying vec2 vUv; varying float vA;
+      void main(){
+        vUv = uv;
+        float speed = 9.0 + 3.0 * iSeed.w;
+        vec3 drift = vec3(uWind.x * 1.6, -speed, uWind.y * 1.6);
+        vec3 p = iSeed.xyz + drift * uTime;
+        p = mod(p - uCam + uBox * 0.5, uBox) + uCam - uBox * 0.5;     // wraps round the camera
+        vec3 dir = normalize(drift);
+        float len = 0.55 + 0.6 * iSeed.w;
+        float d0 = length(uCam - p);
+        float wid = max(0.008, d0 * 0.0017);          // hair-thin anime streaks (~1-2 px at any distance)
+        // billboard the streak: width across the view, length along the fall direction
+        vec3 toCam = normalize(uCam - p);
+        vec3 side = normalize(cross(dir, toCam));
+        vec3 wp = p + side * (position.x * wid) - dir * (position.y * len);
+        float d = length(uCam - p);
+        vA = uRain * step(iSeed.w, uRain * 1.1 + 0.05) * smoothstep(1.5, 5.0, d) * (1.0 - smoothstep(uBox * 0.35, uBox * 0.5, d));
+        gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0);
+        if (vA < 0.002) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      }`,
+    fragmentShader: /* glsl */`
+      uniform float uLamps, uNight; varying vec2 vUv; varying float vA;
+      void main(){
+        float e = 1.0 - abs(vUv.x * 2.0 - 1.0);
+        float a = e * smoothstep(0.0, 0.35, vUv.y) * vA * 0.36;
+        vec3 c = mix(vec3(0.93, 0.95, 1.0), vec3(0.62, 0.66, 0.8), uNight) + vec3(0.25, 0.18, 0.08) * uLamps * 0.3;
+        gl_FragColor = vec4(c, a);
+      }`,
+    transparent: true, depthWrite: false, side: THREE.DoubleSide,   // billboard winding flips with the view
+  });
+  const mesh = new THREE.Mesh(g, mat);
+  mesh.frustumCulled = false; mesh.renderOrder = 6; mesh.name = 'life:rain';
+  ctx.noOutline ? ctx.noOutline(mesh) : mesh.layers.set(1);
+  ctx.add(mesh);
+  const cam = ctx.camera;
+  function update() {
+    const on = S.uRain.value > 0.01;
+    mesh.visible = on;
+    if (on && cam) mat.uniforms.uCam.value.copy(cam.position);
+  }
+  return { update, mesh };
+}

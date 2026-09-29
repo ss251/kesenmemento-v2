@@ -1,0 +1,61 @@
+{
+ "version": 1,
+ "units": {
+  "h": "decimetres (Int16)",
+  "sdf": "decimetres (Int16), + sea / - land",
+  "wat": "0 land, 1 sea, 2 inland water"
+ },
+ "grids": {
+  "core": {
+   "name": "core",
+   "x0": -1736,
+   "z0": -2112,
+   "d": 4,
+   "w": 1087,
+   "h": 1113,
+   "fields": {
+    "h": {
+     "offset": 0,
+     "type": "Int16Array",
+     "length": 1209831
+    },
+    "sdf": {
+     "offset": 2419664,
+     "type": "Int16Array",
+     "length": 1209831
+    },
+    "wat": {
+     "offset": 4839328,
+     "type": "Uint8Array",
+     "length": 1209831
+    }
+   }
+  },
+  "city": {
+   "name": "city",
+   "x0": -6512,
+   "z0": -9328,
+   "d": 16,
+   "w": 1085,
+   "h": 1111,
+   "fields": {
+    "h": {
+     "offset": 6049160,
+     "type": "Int16Array",
+     "length": 1205435
+    },
+    "sdf": {
+     "offset": 8460032,
+     "type": "Int16Array",
+     "length": 1205435
+    },
+    "wat": {
+     "offset": 10870904,
+     "type": "Uint8Array",
+     "length": 1205435
+    }
+   }
+  }
+ },
+ "bytes": 12076339
+}
