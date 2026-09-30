@@ -128,7 +128,9 @@ describe("tour and capture", () => {
     const names = stillPlan().map((s) => s.name);
     for (const n of ["drone_1630", "promenade_peach", "market_morning", "ukimido_sunset", "night_bay", "whole_city"]) expect(names).toContain(n);
     const p = animePlan({ size: "4k" }); expect(p.frames.length).toBe(900); expect([p.width, p.height]).toEqual([3840, 2160]); expect(p.frames[450].t).toBe(15);
-    expect(sizeAllowed("4k", Date.parse("2026-09-30T12:00:00Z")).ok).toBe(false);
+    expect(sizeAllowed("4k", Date.parse("2026-09-30T12:00:00Z")).ok).toBe(true);   // approved 02:00Z-14:00Z window
+    expect(sizeAllowed("4k", Date.parse("2026-09-30T00:30:00Z")).ok).toBe(false);
+    expect(sizeAllowed("4k", Date.parse("2026-09-30T15:00:00Z")).ok).toBe(false);
     expect(sizeAllowed("4k", Date.parse("2026-10-01T00:00:01Z")).ok).toBe(true);
     expect(sizeAllowed("1080", Date.parse("2026-09-30T12:00:00Z")).ok).toBe(true);
   });

@@ -10,7 +10,9 @@ export const CAPS_UNTIL = Date.parse('2026-10-01T00:00:00Z');
 export function sizeAllowed(size, now = Date.now()) {
   const [w, h] = SIZES[size] || [0, 0];
   if (!w) return { ok: false, reason: `unknown size ${size}` };
-  if (now < CAPS_UNTIL && (w > 1920 || h > 1080)) return { ok: false, reason: `${size} is a GPU job: blocked by the machine caps until 2026-10-01 00:00Z (V3-SPEC section 8); use --size 1080 or preview` };
+  // machine coordinator allowed a GPU window on 2026-09-30 02:00Z-14:00Z (gated: nice 15, one browser, load<=14, mem>=25%)
+  const window0930 = now >= Date.parse('2026-09-30T02:00:00Z') && now < Date.parse('2026-09-30T14:00:00Z');
+  if (now < CAPS_UNTIL && !window0930 && (w > 1920 || h > 1080)) return { ok: false, reason: `${size} is a GPU job: blocked by the machine caps until 2026-10-01 00:00Z (V3-SPEC section 8); use --size 1080 or preview` };
   return { ok: true };
 }
 export function loadAvg5() { const m = Bun.spawnSync(['sysctl', '-n', 'vm.loadavg']).stdout.toString().match(/[\d.]+/g) || []; return Number(m[1] || 0); }
