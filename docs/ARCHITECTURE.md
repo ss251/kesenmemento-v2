@@ -26,8 +26,8 @@ their credit headers, and the licence is at `src/anime/LICENSE-sakuragaoka-stati
 | File | Role |
 |---|---|
 | `renderer.js` | The render pipeline. A normal and depth pre-pass feeds an MSAA HDR colour pass, followed by bloom and a composite step. The composite draws colour-aware outlines and applies grading, light leak and vignette. `render(..., out)` can also draw into a render target, which the tiny planet uses. |
-| `sky.js` | The painted sky dome, cumulus clouds, stars, the sun and hemisphere lights, and the time-of-day palette (`setHours`, `setTime`). `keyLight()` keeps the real sun azimuth but never lets the shadow-casting light drop below 13° while the sun is up, because at 16:30 on Oct 10 the sun is only 5.8° high. |
-| `materials.js` | `ctx.mat.toon / decal / emissive / glass / foliage`, all cel materials. They are cached by their arguments, so equal materials batch together. |
+| `sky.js` | The painted sky dome, cumulus clouds, stars, the sun and hemisphere lights, and the time-of-day palette (`setHours`, `setTime`). `keyLight()` keeps the real sun azimuth but never lets the shadow-casting light drop below 13° while the sun is up, because at 16:30 on Oct 10 the sun is only 5.8° high. The cumulus heaps come in two tiers (low heaps at 2–6.5°, high ones at 11–23°), and each frame the sky fits them to the picture: `update()` passes the top edge of the frame (`uFrame`), and a heap that would cross it shrinks toward its base and fades out, so no drone frame slices a cloud. Rain raises the cover to overcast, which hides the stars and the moon. The 06:30 morning also drives a low-lying mist, a height fog in the composite pass (`renderer.js`, `uMist`), and a paler sheen on the water. |
+| `materials.js` | `ctx.mat.toon / decal / emissive / glass / foliage`, all cel materials. They are cached by their arguments, so equal materials batch together. At night, glass reflects a night sky and thins out. |
 | `ctx.js` | Builds the `ctx` object that every module receives: `kit`, `geo`, `wires`, `physics`, `tex`, `rng`, `shared` uniforms, `services`, `addStatic` / `add`, `onUpdate`. |
 | `batch.js`, `batch2.js` | Static batching. After every module has built, static meshes are merged by material into cells: 400 m near the inner bay and 2,000 m beyond (`BATCH` in `main.js`). Coarse cells won because the renderer is limited by draw calls. `renderer.js` then skips whole cells by distance each frame (beyond the outline range in the pre-pass, fogged out in the colour pass, and beyond 3.5 / 6 km on low / medium). |
 | `player.js`, `physics.js` | Walking and flying: pointer-lock look, WASD, run, jump, fly, touch sticks, and colliders against walk boxes and the terrain. The sea is a wall on foot: `physics.standable()` refuses a step onto the sea, in front of a quay face, or onto the low strip at a hard shore unless a deck (walk box) covers it, and the player slides along the edge. |
@@ -87,7 +87,7 @@ service is missing.
 
 | Module | What it builds | Services it publishes |
 |---|---|---|
-| `environment` | The terrain skin, land-cover colours, painted forest crowns, 7,000 3D trees and the far mountains | `environment` (`groundAt`, `terrainMaterial`, `trees`) |
+| `environment` | The terrain skin, land-cover colours, painted forest crowns, 7,000 3D trees and the far mountains. Beyond the mid grid, a fine 5 m patch sits round each tour walk spot (かなえ大橋, 大島). Its edge follows the city grid's own triangles, so there is no crack, and it replaces the flat 70 m triangles. Hand-placed dressing (`scatter.js`) adds trees below the 安波山 lookout, and grass tufts, rocks, shrubs and trees at the two bridge spots. Beyond the city bbox, land blends into the sea over kilometres, with no wall at the border. | `environment` (`groundAt`, `surfaceAt`, `terrainMaterial`, `trees`) |
 | `water` | The whole bay: depth bands, shore foam, glints, the sky mirror after sunset, night light columns | `water` |
 | `town/` | Hero buildings from Sakura's house kit (houses, 64 fictional shops with interiors, apartment blocks, warehouses), simplified mid buildings, instanced far buildings, streets, markings, poles and wires, parking, gardens and props | `town`, `street` (walk paths), `poles` |
 | `harbor/` | Quays, the seawall with sea-view windows and the promenade; 70 moored boats in rows; boats arriving from the live list; the fish market; かなえ大橋 and 大島大橋; 浮見堂, the torii, the shrine and its grove; the 安波山 lookout; gulls | `harbor` (`boats`, `rows`, `market.workSpots`, `bollards`, `setArrivals`, …) |
@@ -149,6 +149,7 @@ gains would come from merging the remaining distinct materials: harbour night la
 colours.
 
 The medium and low tiers lower the pixel ratio, MSAA, the shadow map size and the hero radius; phones default to low.
+On a portrait screen, the camera keeps about 64° across; the vertical FOV is capped at 88°. The hero stop then uses its own portrait drone pose (`FRAMES.hero.portrait` in `life/tour.js`).
 The browser builds the city in about 20 s under the gate, of which town takes about 8 s, mostly drawing Japanese text
 into canvas textures. Every shader is compiled at load, hidden meshes (season particles, night-only lights) and the
 tiny planet's fold pass included, so the first season or planet toggle no longer hitches.

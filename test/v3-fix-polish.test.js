@@ -25,7 +25,7 @@ describe("sky: clouds and cirrus", () => {
     expect(heaps.split("litK =").length - 1).toBe(2);   // the declaration + the branch assignment
     expect(branch.indexOf("litK =")).toBeLessThan(branch.indexOf("}"));
     expect(heaps).toContain("h21(vec2(fi, fk)) < 0.25");
-    expect(heaps).toContain("W * 0.5");                  // +-0.25 W crown jitter
+    expect(heaps).toContain("(j1 - 0.5) * W * 0.25");    // [v3:polish] +-0.125 W crown jitter (orphan puffs)
     expect(heaps).toContain("(0.6 + 0.8 * j3)");         // +-40 % radii
     expect(heaps).toContain("fwdK");                     // backlit heaps: no crescent shift
   });

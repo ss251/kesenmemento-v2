@@ -23,8 +23,9 @@ export function createPlanet({ renderer, pipeline, scene, camera, sky, quality, 
   // the fold, so the cube-face diagonals no longer show as hard cuts
   const FOV = 96, QS = Math.tan(Math.PI / 4) / Math.tan((FOV / 2) * Math.PI / 180);
   const cam = new THREE.PerspectiveCamera(FOV, 1, 1, 30000);
+  cam.userData.noSkyFrame = true;   // [v3:polish3] the cube faces see the whole sky: no fitting of the cloud heaps to a frame
   const U = {
-    uZoom: { value: 0.62 }, uSpin: { value: 0 }, uAspect: { value: 1 }, uBg: { value: new THREE.Color('#1b2340') },
+    uZoom: { value: 0.44 }, uSpin: { value: 0 }, uAspect: { value: 1 }, uBg: { value: new THREE.Color('#1b2340') },
   };
   const basis = FACES.map((F) => {
     const f = new THREE.Vector3(...F.f), u = new THREE.Vector3(...F.u), r = new THREE.Vector3().crossVectors(f, u);

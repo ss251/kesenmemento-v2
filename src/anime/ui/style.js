@@ -15,7 +15,7 @@ export const CSS = /* css */`
 /* brand + live chip */
 #klc-ui .brand { position: absolute; top: calc(18px + env(safe-area-inset-top, 0px)); left: 20px; display: grid; gap: 10px; justify-items: start; }
 #klc-ui .mark { font: 900 30px/1 var(--k-round); letter-spacing: 0.06em; color: #fff; text-shadow: 0 2px 0 rgba(31, 58, 104, 0.55), 0 0 18px rgba(31, 58, 104, 0.35); white-space: nowrap; }
-#klc-ui .mark small { display: block; margin-top: 6px; font: 700 10.5px/1 var(--k-sans); letter-spacing: 0.34em; color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 2px rgba(31, 58, 104, 0.6); }
+#klc-ui .mark small { display: block; margin-top: 6px; font: 800 11px/1 var(--k-sans); letter-spacing: 0.34em; color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 0 rgba(31, 58, 104, 0.8), 0 0 8px rgba(31, 58, 104, 0.6); }
 #klc-ui .chip { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 12px; border-radius: 999px; font: 500 13px/1 var(--k-sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
 #klc-ui .chip .clock { font: 700 15px/1 var(--k-round); color: var(--k-navy); }
 #klc-ui .chip .sep { width: 1px; height: 14px; background: var(--k-line); }
@@ -86,11 +86,11 @@ export const CSS = /* css */`
 #klc-ui .places .auto[aria-pressed="true"] { background: var(--k-navy); color: #fff; }
 
 #klc-ui .attr a { color: inherit; pointer-events: auto; text-decoration: underline; text-underline-offset: 2px; }   /* [v3:fix] licence link */
-#klc-ui .attr { position: absolute; right: 18px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); font: 500 10px/1.4 var(--k-sans); color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 2px rgba(31, 40, 70, 0.7); text-align: right; max-width: 46vw; }
+#klc-ui .attr { position: absolute; right: 18px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); font: 500 10px/1.4 var(--k-sans); color: #fff; text-shadow: 0 1px 2px rgba(20, 30, 60, 0.45), 0 0 5px rgba(20, 30, 60, 0.5); background: rgba(24, 32, 62, 0.26); border-radius: 999px; padding: 1px 9px; text-align: right; max-width: 46vw; }   /* [v3:polish3] readable on the light planet sky */
 #klc-ui .help { position: absolute; right: 18px; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); font: 500 11px/1.4 var(--k-sans); color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 2px rgba(31, 40, 70, 0.75); text-align: right; }
 #klc-ui .note { position: absolute; left: 50%; top: calc(76px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -6px); padding: 9px 16px; border-radius: 999px; font: 700 13px/1 var(--k-round); color: var(--k-navy); opacity: 0; transition: opacity .3s, transform .3s; }
 #klc-ui .note.show { opacity: 1; transform: translate(-50%, 0); }
-@media (max-width: 1540px) { #klc-ui .help { display: none; } #klc-ui .attr { left: 50%; right: auto; transform: translateX(-50%); text-align: center; max-width: 92vw; white-space: nowrap; bottom: calc(5px + env(safe-area-inset-bottom, 0px)); } #klc-ui .dock { bottom: calc(26px + env(safe-area-inset-bottom, 0px)); } #klc-ui .places { bottom: calc(26px + env(safe-area-inset-bottom, 0px)); } }
+@media (max-width: 1780px) { #klc-ui .help { display: none; } #klc-ui .attr { left: 50%; right: auto; transform: translateX(-50%); text-align: center; max-width: 92vw; white-space: nowrap; bottom: calc(5px + env(safe-area-inset-bottom, 0px)); } #klc-ui .dock { bottom: calc(26px + env(safe-area-inset-bottom, 0px)); } #klc-ui .places { bottom: calc(26px + env(safe-area-inset-bottom, 0px)); } }
 @media (pointer: coarse) { #klc-ui .help .desk { display: none; } }
 @media (pointer: fine) { #klc-ui .help .touch { display: none; } }
 
@@ -122,7 +122,7 @@ export const CSS = /* css */`
   #klc-ui .places li button { padding: 7px 12px 7px 7px; min-height: 44px; border-radius: 999px; white-space: nowrap; font-size: 13px; scroll-snap-align: start; }
   #klc-ui .places li button small { display: none; }
   #klc-ui .places .auto { display: none; }
-  #klc-ui .attr { left: 12px; right: 12px; transform: none; white-space: normal; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); text-align: center; max-width: none; font-size: 9px; }
+  #klc-ui .attr { left: 12px; right: 12px; transform: none; white-space: normal; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); text-align: center; max-width: none; font-size: 9px; border-radius: 10px; }
   #klc-ui .arrivals { max-height: 42vh; }
 }
 /* [v3:fix] narrow phones: the 出典 credit wraps to two lines; lift the dock and the places strip above it (they clipped it) */

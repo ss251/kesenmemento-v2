@@ -33,23 +33,41 @@ export function buildUnloadScene(ctx, market, opts = {}) {
   // sanity: local +X really points at the water
   { const w = toW(6, 0, 0); if (!ctx.L.isWater(w.x, w.z)) { g.rotation.y += Math.PI; g.updateMatrixWorld(true); } }
 
-  // skipjack laid out on blue sheets (auction rows): a painted decal on the apron
-  const fishTex = ctx.tex.draw(512, 256, (x, w, h) => {
+  // skipjack laid out on blue sheets (auction rows)
+  // [v3:polish3] real 3D fish (the painted decal read as pale grey ovals on a blue mat: the silver belly covered the dark
+  // back): per sheet 60 instanced skipjack, 0.65 m long, lying on their side in five columns, a navy back, a silver
+  // belly with the dark lengthwise stripes of 鰹, a white eye and a forked tail
+  const sheetTex = ctx.tex.draw(256, 128, (x, w, h) => {
     x.fillStyle = '#3d6fb0'; x.fillRect(0, 0, w, h);
-    x.fillStyle = '#35609a'; for (let i = 0; i < 6; i++) x.fillRect(0, i * 43, w, 3);
-    for (let row = 0; row < 6; row++) for (let i = 0; i < 9; i++) {
-      const cx = 30 + i * 54 + (row % 2) * 12, cy = 22 + row * 43;
-      x.save(); x.translate(cx, cy); x.rotate((row % 2 ? 0.08 : -0.08));
-      x.fillStyle = '#2f3a57'; x.beginPath(); x.ellipse(0, -2, 24, 8, 0, 0, Math.PI * 2); x.fill();
-      x.fillStyle = '#d7dde6'; x.beginPath(); x.ellipse(0, 3, 21, 5, 0, 0, Math.PI * 2); x.fill();
-      x.strokeStyle = '#6d7b97'; x.lineWidth = 1.5; for (let j = -1; j <= 1; j++) { x.beginPath(); x.moveTo(-12, 3 + j * 2.2); x.lineTo(14, 3 + j * 2.2); x.stroke(); }
-      x.fillStyle = '#2f3a57'; x.beginPath(); x.moveTo(-24, -1); x.lineTo(-33, -8); x.lineTo(-33, 6); x.fill();
-      x.restore();
+    x.fillStyle = '#34609c'; for (let i = 1; i < 4; i++) x.fillRect(0, i * h / 4 - 1, w, 2);   // folds
+    x.fillStyle = 'rgba(255,255,255,0.10)'; for (let i = 0; i < 7; i++) x.fillRect(12 + i * 37, 0, 6, h);   // wet sheen
+  }, { key: 'fix-unload-sheet' });
+  const sheetM = mapMat(ctx, 'toon', '#ffffff', sheetTex, { paint: 0.02 });
+  const fishM = skipjackMaterial(ctx);
+  const tailM = ctx.mat.toon('#1f2a48', { paint: 0, side: 'double' });
+  const sheets = [[-7.2, -6, 0], [-7.2, 1.5, 0], [-11.5, -2.5, 0.02]];
+  const PER = 60, fishN = sheets.length * PER;
+  const bodyI = new THREE.InstancedMesh(G_FISH_BODY(), fishM, fishN), tailI = new THREE.InstancedMesh(G_FISH_TAIL(), tailM, fishN);
+  bodyI.name = 'unload-skipjack'; tailI.name = 'unload-skipjack-tails';
+  {
+    const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), Qs = new THREE.Quaternion(), P = new THREE.Vector3(), S = new THREE.Vector3(), E = new THREE.Euler(), tint = new THREE.Color();
+    let n = 0;
+    for (const [sx, sz, rot] of sheets) {
+      const p = k.plane(6.4, 3.2, sheetM, [sx, top + 0.02, sz], [-Math.PI / 2, 0, rot]); p.receiveShadow = true;
+      for (let c = 0; c < 5; c++) for (let j = 0; j < 12; j++) {
+        const fx = sx - 2.5 + c * 1.25 + r.range(-0.04, 0.04), fz = sz - 1.32 + j * 0.24 + r.range(-0.02, 0.02);
+        const flip = c % 2 ? Math.PI : 0;   // heads alternate by column, like a real auction row
+        // lying on its side (flank up): roll 90 deg about the long axis, then a small yaw jitter
+        Q.setFromEuler(E.set(0, flip - rot + r.range(-0.07, 0.07), 0)); Qs.setFromEuler(E.set(Math.PI / 2, 0, 0)); Q.multiply(Qs);
+        const sc = r.range(0.9, 1.08);
+        P.set(fx, top + 0.02 + 0.075 * sc, fz); S.set(sc, sc, sc);
+        M4.compose(P, Q, S); bodyI.setMatrixAt(n, M4); tailI.setMatrixAt(n, M4);
+        bodyI.setColorAt(n, tint.setScalar(r.range(0.88, 1.0)));
+        n++;
+      }
     }
-  }, { key: 'fix-unload-fish' });
-  const fishM = mapMat(ctx, 'decal', '#ffffff', fishTex, { transparent: false });
-  for (const [x, z, rot] of [[-7.2, -6, 0], [-7.2, 1.5, 0], [-11.5, -2.5, 0.02]]) {
-    const p = k.plane(3.2, 6.4, fishM, [x, top + 0.02, z], [-Math.PI / 2, 0, Math.PI / 2 + rot]); p.receiveShadow = true;
+    for (const m of [bodyI, tailI]) { m.instanceMatrix.needsUpdate = true; m.castShadow = true; m.receiveShadow = true; m.computeBoundingSphere(); g.add(m); }
+    if (bodyI.instanceColor) bodyI.instanceColor.needsUpdate = true;
   }
   // blue box stacks: two rows along the quay, some white and orange
   for (let i = 0; i < 9; i++) boxStack(k, M, -3.2 - (i % 2) * 0.8, top, -13 + i * 1.1, { n: r.int(3, 7), color: i % 5 === 3 ? 'white' : 'blue', rotY: r.range(-0.08, 0.08), lean: 0.02 });
@@ -63,8 +81,10 @@ export function buildUnloadScene(ctx, market, opts = {}) {
     k.box(len, 0.22, 0.8, frame, [cx, cy, -1.2], [0, 0, ang]);
     k.box(len, 0.05, 0.62, belt, [cx, cy + 0.13, -1.2], [0, 0, ang]);
     for (const s of [-0.36, 0.36]) k.box(0.08, 1.2, 0.08, frame, [-2.1, top + 0.6, -1.2 + s]);
-    const fish = ctx.mat.toon('#56627e', { paint: 0 });
-    for (let i = 0; i < 4; i++) { const t = -len / 2 + 0.9 + i * 1.4; k.mesh(G_FISH(), fish, [cx + Math.cos(ang) * t, cy + 0.24 + Math.sin(ang) * t, -1.2 + (i % 2 ? 0.1 : -0.1)], [0, 0, ang], [3.4, 1, 1.1]); }
+    for (let i = 0; i < 4; i++) {   // [v3:polish3] the same skipjack riding the belt, upright
+      const t = -len / 2 + 0.9 + i * 1.4, at = [cx + Math.cos(ang) * t, cy + 0.2 + Math.sin(ang) * t, -1.2 + (i % 2 ? 0.1 : -0.1)];
+      k.mesh(G_FISH_BODY(), fishM, at, [0, 0, ang]); k.mesh(G_FISH_TAIL(), tailM, at, [0, 0, ang]);
+    }
   }
   // a platform scale (はかり) with a digital head, hoses, a pallet
   {
@@ -85,10 +105,17 @@ export function buildUnloadScene(ctx, market, opts = {}) {
     const f = forklift(ctx, M, col, load);
     f.position.set(x, top, z); f.rotation.y = rot; g.add(f); fls.push(f);
   }
+  // [v3:polish] a warm fill under the canopy (the ceiling lamps + light bounced off the wet apron): the unloading
+  // frame was flat grey in the canopy's shade. One point light, no shadows, off on the low tier.
+  if (ctx.quality?.name !== 'low' && opts.fill !== false) {
+    const fill = new THREE.PointLight('#ffd7a8', 14, 22, 0.8);
+    const fp = toW(-7, top + 3.6, -2); fill.position.copy(fp); fill.castShadow = false; fill.name = 'unload-fill';
+    ctx.scene.add(fill);
+  }
   // crew spots (life seats workers here): at the conveyor, the fish rows, the tubs, the scale, by the boxes
   const crew = [
     [-2.4, -2.0, 90, 'work'], [-2.6, -0.2, 110, 'work'], [-6.2, -3.5, 180, 'bend'], [-8.4, -1.2, 0, 'bend'],
-    [-5.6, 4.6, 200, 'carry'], [-9.0, 5.2, -60, 'watch'], [-10.3, 1.8, 40, 'write'], [-4.2, -9.8, 150, 'carry'],
+    [-5.6, 4.6, 200, 'carry'], [-9.0, 5.2, -60, 'watch'], [-10.3, 1.8, 40, 'write'], [-5.4, -9.8, 150, 'carry'],
   ].map(([x, z, yawDeg, pose]) => { const w = toW(x, top, z); return { x: w.x, y: top, z: w.z, rotY: g.rotation.y + yawDeg * Math.PI / 180, pose }; });
   if (ctx.physics?.addBox) {
     const c1 = toW(-3.6, 0, -8.6); ctx.physics.addBox(c1.x, c1.z, 1.8, 10.4, g.rotation.y, top, top + 1.8);
@@ -98,8 +125,33 @@ export function buildUnloadScene(ctx, market, opts = {}) {
   return { crew, at: { x: best.px, z: best.pz }, rotY: g.rotation.y };
 }
 
-let _fish = null, _hose = null;
-function G_FISH() { return _fish || (_fish = new THREE.SphereGeometry(0.1, 8, 6)); }
+let _fishB = null, _fishT = null, _hose = null;
+/** Skipjack body, 0.65 m long along X (head +X), 0.18 m deep along Y (back +Y), 0.15 m thick: the sphere's UV v runs
+ *  back -> belly and u round the body (u 0.5 = the snout), which skipjackMaterial's texture paints. */
+function G_FISH_BODY() { return _fishB || (_fishB = new THREE.SphereGeometry(0.1, 14, 10).scale(3.25, 0.9, 0.75)); }
+/** Forked tail + a small dorsal fin (flat, double sided), in the same fish frame. */
+function G_FISH_TAIL() {
+  if (_fishT) return _fishT;
+  const v = [
+    -0.3, 0, 0, -0.43, 0.12, 0, -0.38, 0, 0,  -0.3, 0, 0, -0.38, 0, 0, -0.43, -0.12, 0,   // the fork
+    0.02, 0.085, 0, -0.1, 0.085, 0, -0.06, 0.15, 0,                                   // first dorsal fin
+  ];
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); g.computeVertexNormals();
+  return (_fishT = g);
+}
+function skipjackMaterial(ctx) {
+  const tex = ctx.tex.draw(128, 64, (x, w, h) => {
+    // canvas top = the sphere's north pole = the fish's back
+    const gr = x.createLinearGradient(0, 0, 0, h);
+    gr.addColorStop(0, '#141b33'); gr.addColorStop(0.42, '#1c2440'); gr.addColorStop(0.5, '#56607a'); gr.addColorStop(0.56, '#aeb8c8'); gr.addColorStop(1, '#c9d1dc');
+    x.fillStyle = gr; x.fillRect(0, 0, w, h);
+    x.strokeStyle = '#3a4666'; x.lineWidth = 2.5;   // the lengthwise belly stripes of 鰹
+    for (const y of [0.64, 0.73, 0.82]) { x.beginPath(); x.moveTo(0, y * h); x.lineTo(w, y * h); x.stroke(); }
+    // eyes just behind the snout on both flanks (u 0.5 +- 0.055), a white dot with a dark pupil
+    for (const u of [0.445, 0.555]) { x.fillStyle = '#ffffff'; x.beginPath(); x.arc(u * w, 0.46 * h, 2.6, 0, Math.PI * 2); x.fill(); x.fillStyle = '#10131f'; x.beginPath(); x.arc(u * w, 0.46 * h, 1.2, 0, Math.PI * 2); x.fill(); }
+  }, { key: 'polish3-skipjack' });
+  return mapMat(ctx, 'toon', '#ffffff', tex, { paint: 0 });
+}
 function G_HOSE() { return _hose || (_hose = new THREE.TorusGeometry(0.45, 0.035, 5, 18)); }
 
 function forklift(ctx, M, color, load) {
@@ -108,13 +160,27 @@ function forklift(ctx, M, color, load) {
   const body = ctx.mat.toon(color, { paint: 0.03 }), dark = ctx.mat.toon('#3f414b', { paint: 0 });
   k.rbox(1.1, 0.8, 2.2, 0.12, body, [0, 0.75, -0.2]);
   k.rbox(1.05, 0.7, 0.6, 0.12, body, [0, 1.0, -1.2]);
-  k.box(0.5, 0.1, 0.5, dark, [0, 1.25, -0.3]);
-  for (const x of [-0.5, 0.5]) for (const z of [-0.8, 0.5]) k.box(0.06, 1.2, 0.06, dark, [x, 1.75, z]);
-  k.box(1.1, 0.06, 1.4, dark, [0, 2.35, -0.15]);
-  for (const x of [-0.35, 0.35]) k.box(0.1, 2.4, 0.12, dark, [x, 1.3, 1.05]);
+  // [v3:polish] a slim overhead guard (the 1.1 x 1.4 roof hid the mast: the forklift read as a black table), a grey
+  // steel mast with cross bars and a carriage plate, and the load sitting on the fork tines
+  const steel = ctx.mat.toon('#5d6370', { paint: 0.02 });
+  // open overhead guard: rear posts upright, front posts raked forward, a slim frame with slats (never a solid plate)
+  for (const x of [-0.42, 0.42]) {
+    k.box(0.05, 1.2, 0.05, dark, [x, 1.75, -0.62]);
+    k.box(0.05, 1.24, 0.05, dark, [x, 1.73, 0.26], [-0.2, 0, 0]);
+    k.box(0.05, 0.05, 1.0, dark, [x, 2.35, -0.15]);
+  }
+  for (const z of [-0.6, -0.3, 0.0, 0.3]) k.box(0.9, 0.035, 0.05, dark, [0, 2.36, z]);
+  // seat, steering column and wheel, a rear counterweight hump
+  k.rbox(0.46, 0.14, 0.42, 0.05, dark, [0, 1.26, -0.4]); k.rbox(0.44, 0.42, 0.1, 0.04, dark, [0, 1.48, -0.64]);
+  k.box(0.05, 0.5, 0.05, dark, [0, 1.35, 0.22], [-0.5, 0, 0]);
+  k.mesh(G_HOSE(), dark, [0, 1.62, 0.1], [Math.PI / 2 - 0.5, 0, 0], [0.42, 0.42, 1.2]);
+  k.rbox(1.1, 0.5, 0.45, 0.16, body, [0, 1.2, -1.28]);
+  for (const x of [-0.35, 0.35]) k.box(0.1, 2.5, 0.12, steel, [x, 1.3, 1.05]);
+  for (const y of [0.35, 1.5, 2.5]) k.box(0.8, 0.08, 0.1, steel, [0, y, 1.05]);
+  k.box(0.8, 0.45, 0.06, steel, [0, 0.68, 1.14]);
   for (const x of [-0.3, 0.3]) k.box(0.1, 0.05, 1.1, dark, [x, 0.42, 1.6]);
-  if (load === 'tub') tub(k, M, 0, 0.45, 1.65, 0);
-  else { k.box(1.1, 0.12, 1.0, ctx.mat.toon('#8a6446', { paint: 0.06 }), [0, 0.5, 1.65]); boxStack(k, M, -0.25, 0.56, 1.65, { n: 4, color: 'blue', rotY: Math.PI / 2 }); boxStack(k, M, 0.28, 0.56, 1.65, { n: 3, color: 'blue', rotY: Math.PI / 2 }); }
+  if (load === 'tub') tub(k, M, 0, 0.445, 1.6, 0);
+  else { k.box(1.1, 0.12, 1.0, ctx.mat.toon('#8a6446', { paint: 0.06 }), [0, 0.505, 1.6]); boxStack(k, M, -0.25, 0.565, 1.6, { n: 4, color: 'blue', rotY: Math.PI / 2 }); boxStack(k, M, 0.28, 0.565, 1.6, { n: 3, color: 'blue', rotY: Math.PI / 2 }); }
   const wg = G_WHEEL();
   for (const x of [-0.55, 0.55]) for (const z of [0.7, -1.0]) k.mesh(wg, dark, [x, 0.3, z]);
   return g;

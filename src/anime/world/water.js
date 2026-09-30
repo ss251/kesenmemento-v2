@@ -39,9 +39,11 @@ export function waterMaterial(ctx, o = {}) {
     uRiver: { value: C(o.river || '#6aa7a4') }, uFoam: { value: C('#f4f8f6') },
     uSkyHorizon: sky?.uHorizon || { value: C('#dfe9f2') }, uSkyMid: sky?.uMid || { value: C('#8fbde9') }, uSkyWarm: sky?.uWarm || { value: C('#fbe3cf') },
     uNightW: sky?.uNight || { value: 0 },
+    uDuskW: sky?.uDusk || { value: 0 },   // [v3:polish] ripple strokes a little stronger at dusk
     // [v3:integrate] mirror sky after sunset + warm light streaks from the lit waterfront at night
     uSkyZenith: sky?.uZenith || { value: C('#4d86cf') }, uSkySun: sky?.uSun || { value: new THREE.Vector3(0, 1, 0) },
     uSeasonW: seasonUniform(ctx.shared),   // [v3:integrate] winter: colder, deeper sea
+    uMornW: sky?.uMorning || { value: 0 },   // [v3:polish3] 朝: a paler pearl sheen
   };
   const m = new THREE.MeshToonMaterial({ color: C('#ffffff'), gradientMap: ctx.mat.gradientMap });
   m.name = 'water-bay';
@@ -59,7 +61,7 @@ export function waterMaterial(ctx, o = {}) {
         varying vec3 vWp;
         uniform sampler2D tCore, tCity, tHard; uniform vec4 uBbCore, uBbCity, uBbHard; uniform float uTime, uNightW;
         uniform vec3 uShallow, uMid, uDeep, uOcean, uRiver, uFoam, uSkyHorizon, uSkyMid, uSkyWarm, uSunW; uniform vec2 uWindW;
-        uniform vec3 uSkyZenith, uSkySun; uniform float uLampsW; uniform vec4 uSeasonW;
+        uniform vec3 uSkyZenith, uSkySun; uniform float uLampsW, uDuskW, uMornW; uniform vec4 uSeasonW;
         float w_h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
         float w_vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
           return mix(mix(w_h21(i), w_h21(i + vec2(1, 0)), f.x), mix(w_h21(i + vec2(0, 1)), w_h21(i + vec2(1, 1)), f.x), f.y); }
@@ -93,8 +95,13 @@ export function waterMaterial(ctx, o = {}) {
           // [v3:fix] hard shores (quays, seawalls) have no shoal: deep harbour water right up to the wall
           vec2 uh = (xz - uBbHard.xy) * uBbHard.zw;
           float hard = texture2D(tHard, clamp(uh, 0.0, 1.0)).r * step(0.0, uh.x) * step(uh.x, 1.0) * step(0.0, uh.y) * step(uh.y, 1.0);
+          // [v3:polish2] the pale shoal is a thin band hugging the real shore (core grid); off the coarse city grid it is
+          // narrower still, and at night it takes the mid tone (it glowed cyan in the dark bay)
+          vec2 ucK = (xz - uBbCore.xy) * uBbCore.zw;
+          float coreK = smoothstep(0.0, 0.015, min(min(ucK.x, 1.0 - ucK.x), min(ucK.y, 1.0 - ucK.y)));
           vec3 col = uShallow;
-          col = mix(col, uMid, max(smoothstep(7.0, 10.0, d), smoothstep(0.15, 0.6, hard)));
+          col = mix(col, uMid, max(max(smoothstep(mix(1.5, 3.0, coreK), mix(3.0, 5.5, coreK), d), smoothstep(0.15, 0.6, hard)), 1.0 - coreK));   // [v3:polish3] the pale shoal only on the fine core grid (the coarse city grid drew hard teal triangles off 大島)
+          col = mix(col, uMid, (1.0 - smoothstep(7.0, 10.0, d)) * uNightW * 0.8);
           col = mix(col, uDeep, smoothstep(30.0, 150.0, d) * 0.85);
           col = mix(col, uOcean, smoothstep(600.0, 900.0, d));
           col = mix(col, uRiver, river);
@@ -105,13 +112,13 @@ export function waterMaterial(ctx, o = {}) {
             float wb = w_vn(xz * 0.0045 + vec2(uTime * 0.004, -uTime * 0.002)) * 0.65 + w_vn(xz * 0.013 + 3.7) * 0.35;
             float ruffle = smoothstep(0.52, 0.72, wb), glassy = 1.0 - smoothstep(0.22, 0.4, wb);
             float farK = 1.0 - smoothstep(1500.0, 5000.0, length(vWp - cameraPosition));
-            col = mix(col, mix(col, vec3(dot(col, vec3(0.33))), 0.25) * 1.08 + 0.02, ruffle * 0.45 * farK);
+            col = mix(col, mix(col, vec3(dot(col, vec3(0.33))), 0.25) * 1.08 + 0.02, ruffle * 0.6 * farK);   // [v3:polish] 0.45 -> 0.6: mid-distance detail
             col = mix(col, col * vec3(0.86, 0.92, 0.97), glassy * 0.4 * farK);
           }
           // painted wave streaks drifting with the wind (long thin lighter/darker dashes), fading with distance
           vec2 wd = normalize(uWindW + vec2(1e-4));
           vec2 q = vec2(dot(xz, wd), dot(xz, vec2(-wd.y, wd.x)));
-          float lod = 1.0 - smoothstep(250.0, 1400.0, dist);
+          float lod = 1.0 - smoothstep(250.0, 2500.0, dist);   // [v3:polish] swell bands carry across the whole bay
           // long soft swell bands (read as gentle waves from the drone) + short painted glints up close
           float sw = w_vn(vec2(q.x * 0.012 - uTime * 0.02, q.y * 0.09));
           float swell = smoothstep(0.55, 0.75, sw) * (1.0 - smoothstep(0.75, 0.95, sw));
@@ -124,25 +131,34 @@ export function waterMaterial(ctx, o = {}) {
           float afterglow = smoothstep(0.06, -0.05, normalize(uSkySun).y) * (1.0 - uNightW);
           float streak = smoothstep(0.8, 0.88, s1 * 0.65 + s2 * 0.45) * near * (1.0 - 0.6 * afterglow);
           float trough = smoothstep(0.62, 0.8, w_vn(vec2(q.x * 0.01 + uTime * 0.01, q.y * 0.06) + 21.0)) * lod;
-          col = mix(col, col * 1.1 + 0.02, swell * 0.35 * lod);
+          col = mix(col, col * 1.1 + 0.02, swell * 0.5 * lod);
           col = mix(col, col * 1.2 + 0.03, streak * 0.45);
           // [v3:fix] painted ripple bands across the view on calm water (strongest in the afterglow mirror), near the camera
+          float ripL = 0.0, ripD = 0.0;
           {
             float rb = w_across(xz, camF, 0.035, 0.55, vec2(uTime * 0.01, -uTime * 0.12), 31.0);
             float band = smoothstep(0.62, 0.72, rb) * (1.0 - smoothstep(0.72, 0.86, rb));
-            float nearR = 1.0 - smoothstep(40.0, 320.0, dist);
-            col = mix(col, col * 1.12 + 0.03, band * nearR * (0.18 + 0.3 * afterglow));
+            float nearR = 1.0 - smoothstep(40.0, 480.0, dist);
+            // [v3:polish] calm-water ripples carry the foreground (the magic-hour mirror read as a dead flat plane): a light
+            // stroke with a deeper shadow stroke just below it, both across the view, fading out by ~480 m
+            float shade = smoothstep(0.34, 0.42, rb) * (1.0 - smoothstep(0.42, 0.52, rb));
+            // applied after the sky mirror mix below (at grazing angles the fresnel sky replaced them entirely)
+            ripL = band * nearR * (0.55 + 0.35 * afterglow + 0.2 * uDuskW);
+            ripD = shade * nearR * (0.22 + 0.25 * uDuskW);
           }
           col = mix(col, col * 0.9, trough * 0.25);
           // foam: a steady line hugging the shore + a lapping line breathing in and out
           float n = w_vn(xz * 0.35 + uTime * 0.2);
           float lap = 0.5 + 0.5 * sin(uTime * 0.9 + n * 3.0 + xz.x * 0.02);
           float line1 = 1.0 - smoothstep(0.55 + n * 0.5, 0.95 + n * 0.5, sdf);
+          // [v3:polish] beyond the mid zone the shore distance comes from the coarse city grid (16 m+ cells): its steady
+          // foam line drew a hard angular white polyline (大島 foreground), so it fades out there and the lapping line thins
+          line1 *= coreK;
           // [v3:harbor] the lapping line thins up close (it read as a thick white noodle from the quay apron) and
           // breaks into dashes along the shore
           float lw = mix(0.1, 0.35, smoothstep(8.0, 90.0, dist));
           float dashes = smoothstep(0.3, 0.55, w_vn(xz * 0.11 + vec2(uTime * 0.05, 0.0) + 5.0));
-          float line2 = smoothstep(lw, 0.0, abs(sdf - (2.2 + lap * 1.6))) * smoothstep(0.35, 0.65, n) * 0.85 * dashes;
+          float line2 = smoothstep(lw, 0.0, abs(sdf - (2.2 + lap * 1.6))) * smoothstep(0.35, 0.65, n) * 0.85 * dashes * mix(0.45, 1.0, coreK);
           float foam = max(line1, line2) * step(0.0, sdf + 0.3) * (1.0 - river) * (1.0 - smoothstep(600.0, 2500.0, dist));
           foam *= 1.0 - smoothstep(0.35, 0.75, hard);   // [v3:fix] quay faces carry their own thin foam strip (harbor quay.js)
           col = mix(col, uFoam, foam);
@@ -155,8 +171,12 @@ export function waterMaterial(ctx, o = {}) {
           vec3 skyC = mix(uSkyHorizon, uSkyMid, smoothstep(0.0, 0.5, R.y));
           skyC = mix(skyC, uSkyZenith, smoothstep(0.45, 1.0, R.y) * afterglow);
           skyC = mix(skyC, uSkyWarm, pow(sd, 3.0) * 0.7);
-          diffuseColor.rgb = mix(col, skyC * 0.92, (fres * (0.42 + 0.4 * afterglow) + afterglow * 0.14) * (1.0 - foam));
+          skyC = mix(skyC, mix(uSkyHorizon, vec3(0.93, 0.88, 0.9), 0.35), uMornW * 0.45);   // [v3:polish3] pearl morning sheen
+          diffuseColor.rgb = mix(col, skyC * 0.92, (fres * (0.42 + 0.4 * afterglow + 0.3 * uMornW) + afterglow * 0.14 + uMornW * 0.16) * (1.0 - foam));
           gWaterEmis = skyC * afterglow * (0.08 + 0.42 * fres) * (1.0 - foam);
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.12 + 0.03, ripL * (1.0 - foam));
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.84, 0.86, 0.94), ripD * (1.0 - foam));
+          gWaterEmis *= 1.0 + 0.35 * ripL - 0.3 * ripD;
           // [v3:integrate] night: warm broken columns of reflected light off the lit waterfront (anime light streaks,
           // anchored in world space across the view, strongest near the shore, fading with distance)
           float nl = smoothstep(0.55, 0.95, uNightW * uLampsW);
@@ -178,7 +198,7 @@ export function waterMaterial(ctx, o = {}) {
             float brk = smoothstep(0.42, 0.7, w_vn(vec2(cid * 1.7, cb * fq + w_vn(vec2(cid * 0.7, cb * 0.08)) * 2.5 - uTime * 0.4)));
             vec3 warmC = mix(vec3(1.0, 0.72, 0.4), vec3(1.0, 0.88, 0.66), w_h21(vec2(cid, 5.0)));
             float fadeD = 1.0 - smoothstep(250.0, 1100.0, dist);
-            gWaterEmis += warmC * colm * brk * shoreK * fadeD * graze * nl * 0.5 * (1.0 - foam) * (1.0 - river);
+            gWaterEmis += warmC * colm * brk * shoreK * fadeD * graze * nl * 0.9 * (1.0 - foam) * (1.0 - river);   // [v3:polish] 0.5 -> 0.9
           }
           // [v3:harbor] sparkles are anime glints (a thin dash across the view + a short vertical cross), not the
           // square 1 m cells they used to be: shape inside each jittered cell, anti-aliased with fwidth, blinking.

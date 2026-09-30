@@ -16,20 +16,30 @@ const ease = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
 // time preset: the drone views keep a landmark, water and a skyline in frame; the walk spots stand on real quays and
 // decks, clear of the townspeople. Anything missing falls back to the layout's own framing.
 export const FRAMES = {
-  hero:   { drone: { pos: [400, 95, 90], look: [80, 10, -220] }, walk: { x: 168, z: -122, yaw: 111, pitch: 2 } },   // [v3:integrate] walk: the promenade deck looking west along the seawall (was blocked by a lamp post)
+  hero:   { drone: { pos: [428, 126, 130], look: [56, -18, -174] }, portrait: { pos: [310, 160, 70], look: [10, -60, -230] },   /* [v3:polish3] portrait (phone, ~48 deg across): closer and steeper, so 安波山 crowns the frame and the town fills its upper half above the dock (the landscape pose left a thin strip over empty bay) */   /* [v3:polish2] higher, further back, tilted down: 浮見堂 + torii whole in the lower-right third, the moored boats whole */ walk: { x: 168, z: -122, yaw: 111, pitch: 2 } },   // [v3:integrate] walk: the promenade deck looking west along the seawall (was blocked by a lamp post)
   ukimido:{ drone: { pos: [420, 30, 40], look: [341, 4, -25] } },
   // [v3:fix] walk spots re-authored by screenshot for every stop (qa3 checks each one: on land, outside every building,
   // no single colour over 45 % of the frame): Pier 7 at the 迎 quay corner looking across the bay, the market apron
   // beside a moored skipjack boat, the shore under かなえ大橋, the mainland slope below the 大島大橋 arch
-  pier7:  { drone: { pos: [-60, 40, 210], look: [150, 8, -80] }, walk: { x: 50, z: 70, yaw: -40, pitch: 4 } },
-  market: { drone: { pos: [820, 70, 1000], look: [640, 4, 780] }, walk: { x: 654.5, z: 836.1, yaw: -155, pitch: 2 } },   // [v3:fix] 15 m back: the unloading scene (harbor/unload.js) now fills the old spot; it lies ahead in view
-  kanae:  { drone: { pos: [1560, 110, 2050], look: [1492, 40, 1465] }, walk: { x: 1513, z: 1742, yaw: 2, pitch: 8 } },
-  oshima: { walk: { x: 2780, z: 3252, yaw: 17, pitch: 5 } },
-  anba:   { walk: { x: -490.22, z: -985.19, yaw: -146, pitch: -12 } },   // [v3:fix] 0.35 m from the rail, square to the bay: the rail beam filled the lower frame
+  pier7:  { drone: { pos: [-60, 40, 210], look: [150, 8, -80] }, walk: { x: 51, z: 69, yaw: -84, pitch: 1 } },   // [v3:polish3] pitch -4 -> 1: less blank concrete slab   // [v3:polish2] down the quay at the moored row and the working buildings (half the frame was sky + blank slab)
+  market: { drone: { pos: [760, 28, 900], look: [575, 8, 715] } /* [v3:polish3] low over the water off the berth: the canopy leads to 安波山, the moored boats in front (a warehouse roof filled a quarter; the review's [880,55,760] looked into the sun at a thin strip) */, walk: { x: 654.5, z: 836.1, yaw: -155, pitch: 2 } },   // [v3:fix] 15 m back: the unloading scene (harbor/unload.js) now fills the old spot; it lies ahead in view
+  kanae:  { drone: { pos: [1560, 110, 2050], look: [1492, 40, 1465] }, walk: { x: 1528, z: 1747, yaw: 14, pitch: 4 } },   // [v3:polish3] pitch 12 -> 4, yaw 6 -> 14: less empty sky, off the bare slope   // [v3:polish] at the water's edge (a flat mustard slope filled 40 %)
+  oshima: { walk: { x: 2776, z: 3244, yaw: 17, pitch: 2 } },   // [v3:polish3] 8 m uphill, pitch 2: off the bare slab
+  anba:   { walk: { x: -490.6, z: -986.1, yaw: -128, pitch: -10 } },   // [v3:polish2] 1.1 m on, ~0.5 m from the rail, looking down: the top bar drops below the bay line
 };
 /** [v3:fix] stops left out of the UI tour: 唐桑 has no forest or villages beyond the city grid yet (a camouflage plain). */
 export const HIDDEN_STOPS = new Set(['karakuwa']);
 const NAMES = { hero: ['内湾（空から）', 'Inner bay (drone)'], ukimido: ['浮見堂', 'Ukimido pavilion'] };
+
+/** True on a portrait viewport (the renderer canvas when there is one, else the window). */
+export function isPortrait() {
+  if (typeof window === 'undefined') return false;
+  try {
+    const c = typeof document !== 'undefined' && typeof document.getElementById === 'function' ? document.getElementById('scene') : null;
+    const w = c?.clientWidth || window.innerWidth, h = c?.clientHeight || window.innerHeight;
+    return !!w && !!h && w / h < 1;
+  } catch { return false; }
+}
 
 /** The tour: the inner bay first, 浮見堂 after Pier 7, then the layout's stops in order, re-framed by FRAMES. */
 export function tourStops(L, harbor = null) {
@@ -44,7 +54,9 @@ export function tourStops(L, harbor = null) {
   }
   return base.map((s) => {
     const f = FRAMES[s.id] || {}, n = NAMES[s.id];
-    return { id: s.id, ja: n?.[0] ?? s.ja, en: n?.[1] ?? s.en, drone: f.drone || s.drone, walk: f.walk || s.walk || null };
+    const land = f.drone || s.drone, port = f.portrait || null;
+    // [v3:polish3] a portrait viewport (phones) takes the stop's portrait framing when it has one
+    return { id: s.id, ja: n?.[0] ?? s.ja, en: n?.[1] ?? s.en, get drone() { return port && isPortrait() ? port : land; }, droneLandscape: land, dronePortrait: port, walk: f.walk || s.walk || null };
   }).filter((s) => s.drone);
 }
 

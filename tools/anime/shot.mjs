@@ -7,6 +7,7 @@
 //          Names are allowed too: "hero" (HERO.drone), "walk" (HERO.walk), "tour:<id>" / "tourwalk:<id>".
 // --only   comma list of world modules (omit = full scene). --t sim seconds. --hours JST hour (16.5) or --preset yugata.
 // --w/--h  size (<= 1920x1080 by machine rule). --bench N  GPU ms/frame per camera. --fov deg. --q high|medium|low.
+// --eval   page JS evaluated after each camera is set (debug probes; the result is printed).
 // --entry  another HTML entry (smoke tests). --nobuild reuse dist/anime-<port>. --keep keep the browser for n seconds (debug only).
 import { join, resolve, relative } from 'node:path';
 import { build, serve, launch, ROOT } from './cdp.mjs';
@@ -40,6 +41,7 @@ try {
   for (let i = 0; i < cams.length; i++) {
     await page.eval(`window.__camSpec(${JSON.stringify(cams[i])})`);
     await page.frames(5);
+    if (args.eval) console.log('eval:', JSON.stringify(await page.eval(args.eval)));   // [v3:polish2] debug probe after the camera is set
     const file = resolve(ROOT, `${out}_${i}.png`);
     await page.shot(file);
     const st = await page.eval('({ calls: window.__stats.calls, triangles: window.__stats.triangles })');

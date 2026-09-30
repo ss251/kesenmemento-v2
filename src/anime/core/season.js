@@ -39,7 +39,7 @@ export const SEASON_GLSL = /* glsl */`
   vec3 klcSeasonGround(vec3 c){
     float l = dot(c, vec3(0.299, 0.587, 0.114));
     vec3 spr = c * vec3(1.0, 1.1, 0.9);
-    vec3 sum = c * vec3(0.8, 1.02, 0.78);
+    vec3 sum = c * vec3(0.72, 1.06, 0.70);   // [v3:polish] deeper, lusher summer green
     vec3 win = mix(c, vec3(l), 0.55) * vec3(0.97, 0.97, 1.02);
     return c * uSeasonS.z + spr * uSeasonS.x + sum * uSeasonS.y + win * uSeasonS.w;
   }

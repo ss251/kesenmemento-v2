@@ -17,24 +17,28 @@ export function stillPlan() {
   // bay), plus the tiny planet and two seasons. pre / post: page JS run before / after the frame.
   const WET = '__life.time.setWeather({ wet: 0.8 })', DRY = '__life.time.setWeather({ wet: 0 })';
   return [
-    { name: 'drone_1630', time: 'yugata', cam: 'hero', t: 14, note: '1. drone over the inner bay, 16:30 autumn afternoon' },
+    { name: 'drone_1630', time: 'yugata', cam: '428,126,130>56,-18,-174' /* [v3:polish2] = FRAMES.hero.drone (life/tour.js) */, t: 14, note: '1. drone over the inner bay, 16:30 autumn afternoon' },
     // [v3:fix] 1b. the classic 安波山 postcard: town, 内湾, 神明崎 and the bay out to かなえ大橋's pylons and the 大島 arch
     // (the hero drone looks north-west at 安波山, so the bridge towers, south-east, cannot share its frame)
     { name: 'drone_kanae', time: 'yugata', cam: '-100,180,-450>450,0,450', t: 14, note: '1b. over 安波山: the town, the inner bay and かなえ大橋 in the distance' },
-    { name: 'promenade_peach', time: 17.05, cam: '165,4.1,-116>150,5.5,-114', t: 20, note: '2. the waterfront promenade: seawall, a cat on a bollard, wires across a peach sky, gulls' },
+    { name: 'promenade_peach', time: 17.05, cam: '166,4.4,-117>150,5.2,-112' /* [v3:polish3] raised onto the deck: less flat seawall face */, t: 20, note: '2. the waterfront promenade: seawall, a cat on a bollard, wires across a peach sky, gulls' },
     { name: 'promenade_deck', time: 17.05, cam: '168,4.4,-122>120,5,-104', t: 20, note: '2b. the promenade deck leading into the sunset' },
-    { name: 'market_morning', time: 'asa', cam: '735,22,905>665,3,830', t: 9, note: '3. the fish market at morning' },
+    // [v3:polish] 3. from the water beside the berth, looking back up the quay: hulls, the canopy and the crew (water < 30 %)
+    { name: 'market_morning', time: 'asa', cam: '690.2,8.1,890.8>662.2,4,834' /* [v3:polish2] 2 m to the right: the 78福徳丸 気仙沼 hull name whole */, t: 9, note: '3. the fish market at morning' },
     // [v3:fix] 3b. under the market canopy beside the skipjack boat: fish rows, blue boxes, forklifts, the crew in aprons
-    { name: 'market_unload', time: 'asa', cam: '668.5,6.8,867>655.1,0.5,853.3', t: 9, note: '3b. the unloading: skipjack on blue sheets, fish boxes, forklifts, people in rubber aprons' },
-    { name: 'ukimido_sunset', time: 'yuyake', cam: '368,3.2,-8>339,3.0,-25', t: 17,   /* [v3:fix] lower and 30 m closer: the pavilion carries the frame */ note: '4. 浮見堂 at magic hour, the sky mirrored in the calm bay' },
+    { name: 'market_unload', time: 'asa', cam: '665,4.6,853.2>652.6,2.4,850.8' /* [v3:polish3] from the quay edge by the conveyor: the skipjack rows and the crew fill the frame, not the box stacks */, t: 9, note: '3b. the unloading: skipjack on blue sheets, fish boxes, forklifts, people in rubber aprons' },
+    { name: 'ukimido_sunset', time: 'yuyake', cam: '368,3.2,-8>339,5.4,-25' /* [v3:polish2] tilted up ~4 deg: less flat water under the reflection */, t: 70,   /* [v3:polish] t 70: a small boat fishing its loop left of the pavilion, wake on the mirror */   /* [v3:fix] lower and 30 m closer: the pavilion carries the frame */ note: '4. 浮見堂 at magic hour, the sky mirrored in the calm bay' },
     { name: 'night_bay', time: 'yoru', cam: 'hero', t: 30, pre: WET, post: DRY, note: '5. night: warm windows, lamp streaks on wet streets and water, boat lights' },
-    { name: 'night_rows', time: 'yoru', cam: '610,12,-200>545,5,-300', t: 30, pre: WET, post: DRY, note: '5b. night: the lit longliners in rows, their lights on the water' },
+    { name: 'night_rows', time: 'yoru', cam: '610,12,-200>545,15,-300' /* [v3:polish2] tilted up ~5 deg: the lit rows sit lower, less empty dark water */, t: 30, pre: WET, post: DRY, note: '5b. night: the lit longliners in rows, their lights on the water' },
     { name: 'ukimido_night', time: 'yoru', cam: '341.6,-29.9,180,1', t: 30, note: '5c. night on the 浮見堂 walkway, lanterns lit, the bridges beyond' },
     // [v3:fix] 5d. a 南町 izakaya at night: red 提灯, a lit 行灯, a string of lanterns under the eave
     { name: 'night_izakaya', time: 'yoru', cam: '245.1,187.8,60,6', t: 30, note: '5d. night in 南町: red lanterns and an 行灯 at a sushi counter' },
-    { name: 'whole_city', time: 'yugata', cam: '900,700,900>150,0,-50', t: 14, note: '6. the whole of Kesennuma bay from very high' },
+    // [v3:polish] 6. re-composed from the north-west, high over the hills: the whole bay out to かなえ大橋, 大島 and the open sea
+    { name: 'whole_city', time: 'yugata', cam: '-300,1500,-1800>1400,0,1600', t: 14, note: '6. the whole of Kesennuma bay from very high' },
     { name: 'tiny_planet', time: 'yugata', cam: 'hero', t: 14, pre: '__planet(true)', post: '__planet(false)', note: '6b. the tiny planet: all of the bay as one little world' },
     { name: 'spring_drone', time: 'yugata', cam: 'hero', t: 14, pre: "__season('spring')", post: "__season('autumn')", note: '7. spring: sakura on 神明崎 and 山桜 on the hills' },
+    // [v3:polish] 7c. summer at noon: a deep clear blue, bright white towering cumulus, lush green hills
+    { name: 'summer_drone', time: 'hiru', cam: 'hero', t: 14, pre: "__season('summer')", post: "__season('autumn')", note: '7c. summer: a deep blue noon sky, towering cumulus, lush green hills' },
     { name: 'winter_drone', time: 'yugata', cam: 'hero', t: 14, pre: "__season('winter')", post: "__season('autumn')", note: '7b. winter: snow on the roofs and 安波山' },
   ];
 }

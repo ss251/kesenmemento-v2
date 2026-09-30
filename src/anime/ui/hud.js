@@ -103,7 +103,14 @@ export function mountHud(ctx, life, o = {}) {
     const w = s.weather;
     // [v3:fix] a clear night shows the moon, not the sun
     const icon = w && (w.sky || 'clear') === 'clear' && (T.state?.night ?? T.night ?? 0) > 0.5 ? '☾' : WX[w?.sky] || '';
-    const wx = $('wx'); if (wx) wx.textContent = w ? `${icon} ${t('v3.weather.' + (w.sky || 'clear'))}${w.temp != null ? ' ' + Math.round(w.temp) + '℃' : ''}` : t('v3.loadingLive');
+    // [v3:polish3] a season view (春 / 夏 / 冬) is not today's weather: the chip names the view instead of the live sky and
+    // temperature (snow under '☀ 晴れ 16℃ ライブ' contradicted itself); the ライブ tag then belongs to the arrivals only
+    const sid = life.season?.id, seasonView = !!sid && sid !== 'autumn';
+    const wx = $('wx');
+    if (wx) {
+      wx.textContent = seasonView ? t('v3.season.view.' + sid) : w ? `${icon} ${t('v3.weather.' + (w.sky || 'clear'))}${w.temp != null ? ' ' + Math.round(w.temp) + '℃' : ''}` : t('v3.loadingLive');
+      wx.classList.toggle('seasonview', seasonView); wx.title = seasonView ? t('v3.season.view.hint') : '';
+    }
     const n = s.arrivals?.length ?? 0;
     const bo = $('boats'); if (bo) bo.innerHTML = s.status === 'ok' ? esc(t('v3.arrivals.count', { n })).replace(String(n), `<b>${n}</b>`) : '';
     // [v3:fix] old cached data is labelled キャッシュ with its time, never ライブ
@@ -143,7 +150,8 @@ export function mountHud(ctx, life, o = {}) {
     const b = e.target.closest('button[data-act]'); if (!b) return;
     const act = b.dataset.act;
     if (act === 'preset') { T.set(b.dataset.id); render(); }
-    else if (act === 'stop') { tour.stop(); if (ui.view === 'walk' && tour.walkTo(b.dataset.id)) { /* walk */ } else { ui.view = 'drone'; tour.flyTo(b.dataset.id); } render(); }
+    else if (act === 'stop') { ui.placesOpen = false; tour.stop();   // [v3:polish2] fold the list once a stop is picked (the stored preference stays)
+      if (ui.view === 'walk' && tour.walkTo(b.dataset.id)) { /* walk */ } else { ui.view = 'drone'; tour.flyTo(b.dataset.id); } render(); }
     else if (act === 'auto') { if (tour.playing) tour.stop(); else { ui.view = 'drone'; tour.play(); } render(); }
     else if (act === 'view') setView(ui.view === 'drone' ? 'walk' : 'drone');
     else if (act === 'photo') photo(1);

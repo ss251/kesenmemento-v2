@@ -112,8 +112,41 @@ export function createMaterials(shared) {
     patchPaint(m, opts.paint ?? 0.05, opts.grime ?? 0, opts.noSnow ? null : uSeason);
     m.userData.toon = { paint: opts.paint ?? 0.05, grime: opts.grime ?? 0, polygonOffset: opts.polygonOffset || 0 };
     Object.defineProperty(m.userData.toon, 'obc', { value: m.onBeforeCompile, enumerable: false });
+    if (opts.nightGlow) nightGlow(m, opts.nightGlow);
+    if (opts.winterHide && uSeason) winterHide(m);
     cache.set(key, m);
     return m;
+  }
+  /** [v3:polish] opts.nightGlow = k: the surface lights itself by k x its own (mapped) colour as shared.uNight rises, so
+   *  painted signs and plaques stay readable at night (they were dark-on-dark). A custom onBeforeCompile keeps the
+   *  material out of batch2's colour baking / atlas merge (it keeps its own material object and uniforms). */
+  function nightGlow(m, k) {
+    if (shared && !shared.uNight) shared.uNight = { value: 0 };
+    const base = m.onBeforeCompile, uN = shared?.uNight || { value: 0 }, uG = { value: k }, ck = m.customProgramCacheKey;
+    m.onBeforeCompile = (sh, r) => {
+      base(sh, r);
+      sh.uniforms.uNightG = uN; sh.uniforms.uNightGlow = uG;
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', '#include <common>\nuniform float uNightG, uNightGlow;')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += diffuseColor.rgb * uNightGlow * uNightG;');
+    };
+    m.customProgramCacheKey = () => ck.call(m) + '|nglow';
+    m.defines = { ...(m.defines || {}), USE_CUSTOM: '' };
+  }
+
+  /** [v3:polish] opts.winterHide: the surface vanishes in winter (uSeason.w > 0.5): flowers in planters under the snow.
+   *  The vertices collapse (degenerate triangles draw nothing), so it stays one batched draw call. */
+  function winterHide(m) {
+    const base = m.onBeforeCompile, ck = m.customProgramCacheKey;
+    m.onBeforeCompile = (sh, r) => {
+      base(sh, r);
+      sh.uniforms.uSeasonH = uSeason;
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nuniform vec4 uSeasonH;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed *= step(uSeasonH.w, 0.5);');
+    };
+    m.customProgramCacheKey = () => ck.call(m) + '|whide';
+    m.defines = { ...(m.defines || {}), USE_CUSTOM: '' };
   }
 
   /** Decal on top of a surface (road markings, posters, stains). Pulls toward the camera
@@ -140,6 +173,8 @@ export function createMaterials(shared) {
   function glass(opts = {}) {
     const key = 'glass|' + JSON.stringify(opts);
     if (cache.has(key)) return cache.get(key);
+    // [v3:polish] night fades the daytime diagonal streaks out of lit panes (shared uNight; life's time drives it)
+    if (shared && !shared.uNight) shared.uNight = { value: 0 };
     const m = new THREE.ShaderMaterial({
       uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
         uTint: { value: color(opts.tint || '#9fb6c8') },
@@ -172,27 +207,30 @@ export function createMaterials(shared) {
       fragmentShader: /* glsl */`
         #include <common>
         #include <fog_pars_fragment>
-        uniform vec3 uTint; uniform vec3 uSkyTop; uniform vec3 uSkyLow; uniform float uOpacity; uniform float uStreaks; uniform float uFrost;
+        uniform vec3 uTint; uniform vec3 uSkyTop; uniform vec3 uSkyLow; uniform float uOpacity; uniform float uStreaks; uniform float uFrost; uniform float uNight;
         varying vec3 vW; varying vec3 vN;
         void main(){
           vec3 V = normalize(cameraPosition - vW);
           vec3 N = normalize(vN); if (dot(N,V) < 0.0) N = -N;
           float fres = pow(1.0 - clamp(dot(N,V),0.0,1.0), 3.0);
           vec3 R = reflect(-V, N);
-          vec3 sky = mix(uSkyLow, uSkyTop, smoothstep(-0.1, 0.6, R.y));
+          vec3 sky = mix(uSkyLow, uSkyTop, smoothstep(-0.1, 0.6, R.y)) * mix(1.0, 0.16, uNight);   // [v3:polish3] a night sky in the glass, not the day's (grazing panes bloomed to flat white)
           vec3 col = mix(uTint * 0.55, sky, 0.35 + 0.45 * fres);
           // diagonal highlight streaks, world-anchored on the pane
           float s = dot(vW, normalize(vec3(0.62, 0.78, 0.62))) * 0.9;
           float band = abs(fract(s * 0.5) - 0.5);
           float streak = (smoothstep(0.035, 0.0, abs(band - 0.18)) * 0.9 + smoothstep(0.012, 0.0, abs(band - 0.25)) * 0.6) * uStreaks;
+          streak *= 1.0 - 0.9 * uNight;
           col += vec3(1.0) * streak * 0.55;
           float a = uOpacity + fres * 0.35 + streak * 0.35;
           col = mix(col, vec3(0.86,0.9,0.92), uFrost * 0.7); a = mix(a, 0.88, uFrost);
+          a *= mix(1.0, 0.7, uNight);
           gl_FragColor = vec4(col, clamp(a, 0.0, 1.0));
           #include <fog_fragment>
         }`,
       transparent: true, depthWrite: false, fog: true, side: THREE.DoubleSide,
     });
+    m.uniforms.uNight = shared?.uNight || { value: 0 };   // shared object (UniformsUtils.merge clones values)
     cache.set(key, m);
     return m;
   }

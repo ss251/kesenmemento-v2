@@ -264,10 +264,10 @@ function tour(S, LM) {
     // stood inside a hall, Pier 7 faced 60 % empty asphalt, 安波山 an empty deck; the bridges had none
     bay: { pos: [400, 95, 90], look: [80, 10, -220], walk: { x: 168, z: -122, yaw: 111, pitch: 2 } },
     market: { pos: [980, 150, 1080], look: [560, 5, 700], walk: { x: 654.5, z: 836.1, yaw: -155, pitch: 2 } },   // [v3:fix] behind the unloading scene
-    pier7: { pos: [240, 70, 230], look: [40, 6, 60], walk: { x: 50, z: 70, yaw: -40, pitch: 4 } },
-    kanae: { pos: [1560, 110, 2050], look: [1492, 40, 1465], walk: { x: 1513, z: 1742, yaw: 2, pitch: 8 } },
-    oshima: { pos: [2300, 180, 2600], look: [2760, 30, 3060], walk: { x: 2780, z: 3252, yaw: 17, pitch: 5 } },
-    anba: { pos: [-470, 290, -1040], look: [200, 0, 40], walk: { x: -490.22, z: -985.19, yaw: -146, pitch: -12 } },   // [v3:fix] rail out of frame
+    pier7: { pos: [240, 70, 230], look: [40, 6, 60], walk: { x: 51, z: 69, yaw: -84, pitch: 1 } },   // [v3:polish2] down the quay at the moored row  [v3:polish3] pitch 1
+    kanae: { pos: [1560, 110, 2050], look: [1492, 40, 1465], walk: { x: 1528, z: 1747, yaw: 14, pitch: 4 } },   // [v3:polish] at the water's edge  [v3:polish3] yaw 14 pitch 4
+    oshima: { pos: [2300, 180, 2600], look: [2760, 30, 3060], walk: { x: 2776, z: 3244, yaw: 17, pitch: 2 } },   // [v3:polish3] 8 m uphill, off the bare slab (= life/tour.js FRAMES)
+    anba: { pos: [-470, 290, -1040], look: [200, 0, 40], walk: { x: -490.6, z: -986.1, yaw: -128, pitch: -10 } },   // [v3:polish2] near the rail, looking down: the bar below the bay line
     karakuwa: { pos: [5200, 700, 5200], look: [7200, 60, 3300], walk: null },
   };
   return Object.values(LM).map((l) => {

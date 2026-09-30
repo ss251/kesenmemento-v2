@@ -65,7 +65,11 @@ window.__ctx = ctx; window.THREE = THREE; window.__L = L;
 function resize() {
   const w = SHOT ? Number(params.get('w') || 1280) : innerWidth, h = SHOT ? Number(params.get('h') || 720) : innerHeight;
   renderer.setSize(w, h, !SHOT);
-  camera.aspect = w / h; camera.updateProjectionMatrix();
+  camera.aspect = w / h;
+  // [v3:polish3] portrait screens keep a ~64 deg horizontal view (a fixed 55 deg vertical FOV left a phone only ~28 deg
+  // across: the town a thin strip over empty bay); ?fov= still pins it for the shot tools
+  camera.fov = params.get('fov') ? Number(params.get('fov')) : camera.aspect < 1 ? Math.min(88, 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(64) / 2) / camera.aspect) * 180 / Math.PI) : 55;
+  camera.updateProjectionMatrix();
   pipeline.setSize(w, h, quality.pixelRatio);
   ctx.wires.setResolution(pipeline.size.x, pipeline.size.y);
 }
@@ -146,7 +150,9 @@ function lookAt(pos, look) {
 /** "hero" | "walk" | "tour:<id>" | "tourwalk:<id>" | "x,z,yaw,pitch" | "x,y,z,yaw,pitch" | "x,y,z>lx,ly,lz" */
 function camSpec(s) {
   s = String(s).trim();
-  if (s === 'hero') return lookAt(L.HERO.drone.pos, L.HERO.drone.look);
+  // [v3:polish2] the hero drone is the tour's re-framed one (life/tour.js FRAMES.hero) when life is loaded, so the
+  // opening HUD view, the stills and the 内湾 tour stop are one framing
+  if (s === 'hero') { const hd = ctx.services.life?.tour?.stops?.find((x) => x.id === 'hero')?.drone || L.HERO.drone; return lookAt(hd.pos, hd.look); }
   if (s === 'walk') { player.fly = false; return player.setPose(L.HERO.walk.x, L.HERO.walk.z, L.HERO.walk.yaw, L.HERO.walk.pitch); }
   const m = s.match(/^tour(walk)?:(\w+)$/);
   if (m) {

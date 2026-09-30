@@ -12,8 +12,8 @@ export function shopMaterials(ctx, signs) {
   const atlas = (tex, o = {}) => m.toon('#ffffff', { map: tex, paint: 0.015, ...o });
   return {
     atlas,
-    board: (i) => atlas(signs.boardOf(i).tex),
-    tall: (i) => atlas(signs.tallOf(i).tex),
+    board: (i) => atlas(signs.boardOf(i).tex, { nightGlow: 0.4 }),   // [v3:polish] fascia boards read at night
+    tall: (i) => atlas(signs.tallOf(i).tex, { nightGlow: 0.45 }),
     noren: atlas(signs.norenTex, { side: 'double', paint: 0.02 }),
     inter: m.toon('#ffffff', { map: signs.inter, paint: 0.0 }),
     tops: atlas(signs.tops),

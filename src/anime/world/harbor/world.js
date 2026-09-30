@@ -8,13 +8,14 @@ import { bridgeExtras } from './traffic.js';   // [v3:fix]
 import * as THREE from 'three';
 import { buildQuay } from './quay.js';
 import { buildBoat, BOAT_SPECS, mooringLines } from './boats.js';
-import { buildFishMarketLots } from './market.js';
+import { buildBayLife } from './traffic.js';   // [v3:polish]
+import { buildFishMarketLots, finishConveyors } from './market.js';
 import { buildUkimido, buildIsuzuTorii, buildIsuzuShrine, buildAnbaLookout } from './shrine.js';
 import { buildBridgeKanae, buildBridgeOshima } from './bridges.js';
 import { buildGulls } from './gulls.js';
 import { hmats, buoy } from './props.js';
 import { nightUniform, registry, addGlint } from './lights.js';   // [v3:fix] registry, addGlint: channel lights
-import { buildMooringRows, rowDist } from './rows.js';
+import { buildMooringRows, rowDist, buildRafts } from './rows.js';
 import { createArrivals, slotAvoid } from './arrivals.js';
 import { buildShrineGrove } from './grove.js';
 import { buildReflection } from './reflect.js';
@@ -150,6 +151,8 @@ export function buildHarbor(ctx, opts = {}) {
     const len = D2(bth.a, bth.b);
     out.boats.push(...moorRun(ctx, { a: bth.a, b: bth.b, len, top: bth.top }, marketTypes, r, { fender: 1.0, gap: 5, isWater, max: Math.min(low ? 6 : 10, maxBoats - out.boats.length), avoid: opts.arrivals === false ? [] : slotAvoid() }));   // [v3:fix] up to 10 per berth
   }
+  // [v3:polish2] market conveyors only over a moored hull, tub rows at the empty berths
+  if (out.market) out.stats.conveyors = finishConveyors(ctx, out.market, out.boats);
   // [v3:fix] the 内湾 south quay (南町, east of Pier 7): working boats moored alongside in a row, as on the aerial photo
   // (data/ortho/core.jpg: eight to ten hulls between x 168 and 400)
   const SOUTH = { a: [170, 60], b: [398, 101] };   // shared with the hero-run filter below
@@ -239,7 +242,7 @@ export function buildHarbor(ctx, opts = {}) {
   if (opts.reflections !== false && !low) {
     const bay = SP.innerBay || { x: 156, z: -33 };
     const src = [out.ukimido?.group, ...out.boats.filter((b) => (b.type === 'small' || b.type === 'ferry') && Math.hypot(b.group.position.x - bay.x, b.group.position.z - bay.z) < 320).map((b) => b.group)];
-    const rf = buildReflection(ctx, src, { name: 'harbor-reflections', fade: 17, strength: 0.7 });   // [v3:fix] fade 9 -> 17 m: the pavilion's roof mirrors too
+    const rf = buildReflection(ctx, src, { name: 'harbor-reflections', fade: 17, strength: 0.85 });   // [v3:polish] 0.7 -> 0.85   // [v3:fix] fade 9 -> 17 m: the pavilion's roof mirrors too
     out.stats.reflectionTris = rf?.tris || 0;
   }
   if (SP.anbaLookout) {
@@ -294,6 +297,12 @@ export function buildHarbor(ctx, opts = {}) {
       registry(ctx)?.point({ x, y: 2.6, z, color: col, size: 0.6, intensity: 2.4, mode: 'night' });
       addGlint(ctx, x, 0, z + 2, col, 0.45, 8, 0.8);
     }
+  }
+
+  // ---- [v3:polish] life on the inner bay: small boats at buoys and fishing slow loops, a line of 養殖筏
+  if (opts.bayLife !== false && SP.innerBay) {
+    try { const bl = buildBayLife(ctx, { isWater, low }); out.bayBoats = bl.boats; out.stats.bayLife = { moored: bl.moored, moving: bl.moving }; } catch (e) { console.warn('[harbor] bay life', e); }
+    try { out.stats.rafts = buildRafts(ctx, { isWater }).rafts; } catch (e) { console.warn('[harbor] rafts', e); }
   }
 
   // ---- gulls: circling flocks over the inner bay and the market, sitters on bollards, masts and the pavilion

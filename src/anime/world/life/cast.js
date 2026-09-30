@@ -136,6 +136,29 @@ const LOOKS = {
   },
 };
 
+/** [v3:polish] 冬 outfit for the townspeople (V3-SPEC 9: every season intentional; they walked the snow in skirts and bare
+ *  legs): a wool coat to mid-thigh closed high over a scarf, dark trousers and short winter boots. Work clothes (aprons,
+ *  rubber boots) are already winter-proof and stay. Returns null when the look needs no change. */
+const COATS = ['#3d4760', '#7a5a48', '#5d4250', '#4d5a50', '#8c7a64', '#34405a', '#6b3f3f'];
+const SCARVES = ['#c8505a', '#e0c38a', '#e4dfd4', '#8aa0c0', '#b0584a', '#d98d4f'];
+const TROUSERS_W = ['#3f4150', '#4d4a52', '#5a5048', '#3a4458'];
+export function winterLook(spec) {
+  const o = spec?.outfit;
+  if (!o || o.apron || o.boots) return null;
+  const n = Math.abs(spec.seed | 0), kid = String(spec.key).startsWith('kid');
+  const coat = COATS[n % COATS.length];
+  const lapel = '#' + [1, 3, 5].map((i) => Math.round(parseInt(coat.slice(i, i + 2), 16) * 0.82).toString(16).padStart(2, '0')).join('');
+  return {
+    ...spec, key: spec.key + '_w',
+    outfit: {
+      top: 'jacket', topColor: coat, lapel, shirt: SCARVES[(n >> 1) % SCARVES.length], vAng: 16, vY: 0.97, buttons: '#2e2d36',
+      jHemY: kid ? undefined : 0.64, cuffColor: lapel,
+      bottom: 'trousers', bottomColor: TROUSERS_W[(n >> 2) % TROUSERS_W.length],
+      boots: { color: kid ? '#c8505a' : '#4a3c38', band: kid ? '#b0404a' : '#5e4c44', sole: '#2f2828', top: 0.3 },
+    },
+  };
+}
+
 // ------------------------------------------------------------------ helpers
 function groundY(ctx, x, z, hint = -1e9) {
   const g0 = Math.max(ctx.L.heightAt(x, z), hint);
@@ -211,6 +234,33 @@ export function buildCast(ctx, P) {
   const actors = [];
   const stats = { people: 0, cats: 0, triangles: 0, walkers: 0 };
   const person = (spec) => { const h = new Human(ctx, spec); ctx.add(h.group); stats.people++; stats.triangles += h.triangles || 0; return h; };
+  // [v3:polish] a townsperson with a winter double: { h, d } getters return the figure for the current season. The coat
+  // version is built on the first winter frame (no cost for the other seasons) and takes over the summer one's pose.
+  // They are built one per frame as soon as 冬 is chosen (the 2.5 s blend hides it; building all at once stalled the
+  // season blend by ~0.5 s), and synchronously only if the swap point arrives first.
+  const isWinter = () => (ctx.shared.uSeason?.value?.w ?? 0) > 0.5;
+  const winterQueue = [];
+  const figure = (spec) => {
+    const N = { h: person(spec) }; N.d = new Driver(ctx, N.h, { seed: spec.seed });
+    const ws = winterLook(spec);
+    if (!ws) return N;
+    let W = null;
+    const build = () => {
+      if (W) return;
+      W = { h: person(ws) }; W.d = new Driver(ctx, W.h, { seed: spec.seed });
+      W.h.group.position.copy(N.h.group.position); W.h.group.quaternion.copy(N.h.group.quaternion);
+      W.h.group.visible = false;
+    };
+    winterQueue.push(build);
+    const cur = () => {
+      const w = isWinter();
+      if (w && !W) build();
+      const c = w ? W : N, o = w ? N : W;
+      if (o && o.h.group.visible) { c.h.group.visible = true; o.h.group.visible = false; }   // the cast loop sets c's LOD visibility each frame
+      return c;
+    };
+    return { get h() { return cur().h; }, get d() { return cur().d; }, seasonal: true };
+  };
 
   // ============================================================ 1. walkers on sidewalks and the promenade
   const paths = P.paths.filter((p) => p.len > 25);
@@ -236,8 +286,7 @@ export function buildCast(ctx, P) {
     const kid = pl.kind === 'kid' ? 2 * i + (i % 2) : i;
     const spec = LOOKS[pl.kind](r, kid);
     // a pair of kids walks together: hands-free, faster
-    const h = person(spec);
-    const d = new Driver(ctx, h, { seed: spec.seed });
+    const F = figure(spec);
     const p = pl.path;
     const v = pl.kind === 'elder' ? 0.55 : pl.kind === 'kid' ? 1.25 : r.range(1.0, 1.3);
     const pause = r.range(1.5, 5);
@@ -248,7 +297,8 @@ export function buildCast(ctx, P) {
     ctx.physics.addDynamic?.(() => [{ cx: st.x, cz: st.z, w: 0.46, d: 0.46, rotY: st.yaw, y0: st.y, y1: st.y + 1.5 }]);
     const phone = pl.kind === 'visitor';
     stats.walkers++;
-    actors.push({ h, kind: pl.kind, slot: i, update(t, dt) {
+    actors.push({ get h() { return F.h; }, kind: pl.kind, slot: i, update(t, dt) {
+      const { h, d } = F;
       const c = (t + t0) % period;
       let s, walking = 0, dirSign = 1, turning = 0;
       if (c < legT) { s = c * v; walking = 1; }
@@ -310,15 +360,15 @@ export function buildCast(ctx, P) {
     const mx = ring.reduce((a, p) => a + p.x, 0) / ring.length, mz = ring.reduce((a, p) => a + p.z, 0) / ring.length;
     const figs = ring.map((p, k) => {
       const spec = LOOKS[k === 0 ? gp.kind : (k % 2 ? 'fisherman' : 'marketWorker')](r, 20 + gi * 4 + k);
-      const h = person(spec); const d = new Driver(ctx, h, { seed: spec.seed });
+      const F = figure(spec);
       const y = groundY(ctx, p.x, p.z, gp.y != null ? gp.y - 0.4 : -1e9);
       ctx.physics.addCylinder(p.x, p.z, 0.26, y, y + 1.7);
-      return { h, d, x: p.x, y, z: p.z, rotY: Math.atan2(mx - p.x, mz - p.z) };
+      return { get h() { return F.h; }, get d() { return F.d; }, x: p.x, y, z: p.z, rotY: Math.atan2(mx - p.x, mz - p.z) };
     });
     const heads = figs.map((f) => new THREE.Vector3(f.x, f.y + 1.55, f.z));
     const slots = [0, 1, 1, 2, 0, 2, 1, 0];
     const tmp = new THREE.Vector3();
-    actors.push({ h: figs[0].h, group: figs.map((f) => f.h), slot: 100 + gi, update(t, dt) {
+    actors.push({ get h() { return figs[0].h; }, get group() { return figs.map((f) => f.h); }, slot: 100 + gi, update(t, dt) {
       const sp = slots[Math.floor((t + gi * 3) / 1.7) % slots.length] % figs.length;
       const laugh = smooth(9.2, 9.5, (t + gi * 5) % 14) * (1 - smooth(10.6, 11.2, (t + gi * 5) % 14));
       figs.forEach((f, k) => {
@@ -391,15 +441,15 @@ export function buildCast(ctx, P) {
     const fx = Math.sin(face), fz = Math.cos(face);
     const kids = [0, 1].map((k) => {
       const spec = LOOKS.kid(r, 40 + k);
-      const h = person(spec); const d = new Driver(ctx, h, { seed: spec.seed });
+      const F = figure(spec);
       const lx = (k ? -0.45 : 0.3);
       const x = vx + fx * 1.05 + fz * lx, z = vz + fz * 1.05 - fx * lx;
       const y = groundY(ctx, x, z, (vm.y ?? -1e9) - 0.4);
       ctx.physics.addCylinder(x, z, 0.22, y, y + 1.4);
-      return { h, d, x, y, z, rotY: face + Math.PI + (k ? 0.35 : -0.1) };
+      return { get h() { return F.h; }, get d() { return F.d; }, x, y, z, rotY: face + Math.PI + (k ? 0.35 : -0.1) };
     });
     const btn = new THREE.Vector3(), look = new THREE.Vector3(), pole = new THREE.Vector3(), rest = new THREE.Vector3();
-    actors.push({ h: kids[0].h, group: kids.map((k) => k.h), slot: 200, update(t, dt) {
+    actors.push({ get h() { return kids[0].h; }, get group() { return kids.map((k) => k.h); }, slot: 200, update(t, dt) {
       kids.forEach((o, k) => {
         const { h, d } = o;
         d.place(o.x, o.y, o.z, o.rotY); d.reset();
@@ -429,13 +479,14 @@ export function buildCast(ctx, P) {
   if (SP.ukimido) { const [x, z] = landward(L, SP.ukimido.x - 4, SP.ukimido.z - 26, 2.5); watchers.push({ x, z, kind: 'visitor', pose: 'photo', target: [SP.ukimido.x, (SP.ukimido.y || 1.6) + 2, SP.ukimido.z] }); }
   watchers.forEach((w, i) => {
     const spec = LOOKS[w.kind](r, 60 + i); if (w.kind === 'elder') spec.sex = 'm';
-    const h = person(spec); const d = new Driver(ctx, h, { seed: spec.seed });
+    const F = figure(spec);
     const [x, z] = landward(L, w.x, w.z, 1.6);
     const y = groundY(ctx, x, z, w.top != null ? w.top - 0.4 : -1e9);
     const rotY = w.target ? Math.atan2(w.target[0] - x, w.target[2] - z) : nearestWaterDir(L, x, z);
     ctx.physics.addCylinder(x, z, 0.24, y, y + 1.6);
     const tgt = new THREE.Vector3(...(w.target || [x + Math.sin(rotY) * 40, y + 1, z + Math.cos(rotY) * 40]));
-    actors.push({ h, slot: 300 + i, update(t, dt) {
+    actors.push({ get h() { return F.h; }, slot: 300 + i, update(t, dt) {
+      const { h, d } = F;
       d.place(x, y, z, rotY); d.reset();
       const sh = Math.sin(t * 0.3 + i);
       d.stand({ hx: 0.015 * sh, hrz: 0.015 * sh });
@@ -541,6 +592,7 @@ export function buildCast(ctx, P) {
   let frame = 0;
   function update(dt, t) {
     frame++;
+    if (winterQueue.length && (ctx.services.season?.id === 'winter' || isWinter())) winterQueue.shift()();   // [v3:polish] one coat double per frame
     if (cam) { cam.updateMatrixWorld(); pm.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse); frustum.setFromProjectionMatrix(pm); }
     for (const a of actors) {
       const g = (a.h.group || a.h).position;

@@ -92,11 +92,16 @@ export function createRenderPipeline(renderer, quality) {
       uSunScreen: { value: new THREE.Vector3(0.2, 0.9, 0) }, uLeak: { value: 1.0 }, uTime: { value: 0 },
       uVignette: { value: 0.22 },
       uLineRange: { value: new THREE.Vector2(35, 190) }, uLeakK: { value: 1.0 }, uNight: { value: 0.0 },
+      // [v3:polish3] low-lying mist (the 06:30 morning): a height fog hugging the bay and the valley floors; sky.js drives
+      // uMist / uMistCol, render() fills the camera terms
+      uMist: { value: 0.0 }, uMistCol: { value: new THREE.Color('#e8d8dc') }, uMistH: { value: 26.0 }, uCamY: { value: 0 },
+      uInvProj: { value: new THREE.Matrix4() }, uCamRot: { value: new THREE.Matrix3() },
     },
     vertexShader: FS_VERT,
     fragmentShader: /* glsl */`
       uniform sampler2D tColor, tND, tBloom, tBloom2; uniform vec2 uRes; uniform float uFar, uPx, uOutline, uBloom, uGlow, uExposure, uLeak, uTime, uVignette, uLeakK, uNight; uniform vec2 uLineRange;
       uniform vec3 uLine; uniform vec3 uSunScreen; varying vec2 vUv;
+      uniform float uMist, uMistH, uCamY; uniform vec3 uMistCol; uniform mat4 uInvProj; uniform mat3 uCamRot;
       vec4 nd(vec2 uv){ return texture2D(tND, uv); }
       float lum(vec3 c){ return dot(c, vec3(0.2126,0.7152,0.0722)); }
       vec3 softClip(vec3 c){ vec3 k = vec3(0.78); vec3 over = max(c - k, 0.0); return min(c, k) + (1.0-k) * (1.0 - exp(-over/(1.0-k))); }
@@ -132,6 +137,18 @@ export function createRenderPipeline(renderer, quality) {
         // ---------- bloom & soft glow (anime film diffusion)
         vec3 b1 = texture2D(tBloom, vUv).rgb, b2 = texture2D(tBloom2, vUv).rgb;
         col += b1 * uBloom + b2 * uGlow;
+        // ---------- [v3:polish3] low-lying morning mist: world height of this pixel from the depth pre-pass (beyond the
+        // outline range there is no depth: a 2.4 km ray, so the far bay and the horizon band sink into the mist too)
+        if (uMist > 0.001) {
+          vec4 vr = uInvProj * vec4(vUv * 2.0 - 1.0, 1.0, 1.0); vec3 vd = vr.xyz / vr.w;
+          float dz = d0 < uFar * 0.995 ? d0 : 2400.0;
+          vec3 pv = vd * (dz / max(-vd.z, 1e-4));
+          float wy = uCamY + (uCamRot * pv).y, dist = length(pv);
+          float lowK = 1.0 - smoothstep(-2.0, uMistH, wy);
+          float mist = uMist * lowK * (1.0 - exp(-dist / 520.0));
+          float band = 0.5 + 0.5 * sin(wy * 0.35 + (uCamRot * pv).x * 0.004 + uTime * 0.05);   // soft painted strata
+          col = mix(col, uMistCol, clamp(mist * (0.85 + 0.15 * band), 0.0, 0.85));
+        }
         // ---------- exposure / tone
         col *= uExposure;
         col = softClip(col);
@@ -254,6 +271,7 @@ export function createRenderPipeline(renderer, quality) {
     compMat.uniforms.uSunScreen.value.set(inFront ? THREE.MathUtils.clamp(sx, -0.3, 1.3) : (sx < 0.5 ? 1.4 : -0.4), inFront ? THREE.MathUtils.clamp(sy, -0.2, 1.3) : 1.2, onScreen);
     compMat.uniforms.uLeak.value = inFront ? 1.0 : 0.25;
     compMat.uniforms.uTime.value = t;
+    if (compMat.uniforms.uMist.value > 0.001) { compMat.uniforms.uInvProj.value.copy(camera.projectionMatrixInverse); compMat.uniforms.uCamRot.value.setFromMatrix4(camera.matrixWorld); compMat.uniforms.uCamY.value = _cp.setFromMatrixPosition(camera.matrixWorld).y; }
     compMat.uniforms.tBloom.value = rtB2.texture; compMat.uniforms.tBloom2.value = rtB4.texture;
     pass(compMat, out);
   }

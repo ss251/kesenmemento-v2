@@ -47,18 +47,20 @@ export function buildQuay(ctx, a, b, opts = {}) {
   // ---------------------------------------------------------------- body: fill + face + lip
   const deck = kind === 'promenade';
   const topM = deck ? M.concreteLight : M.concrete;
+  // [v3:polish2] the boxes that share the run's end planes are inset a few cm each (fill > slab > face > lip): where a
+  // run's end is exposed at an angled corner (Pier 7) their coplanar end caps z-fought as a blocky stair-step pattern
   if (!opts.noLand) k.box(apron, top - base, L, M.concreteDark, [-apron / 2, (top + base) / 2, 0]);
-  k.box(apron - 0.35, 0.3, L, topM, [-apron / 2 - 0.17, top - 0.15 + 0.004, 0]);
-  const mp = metricPlane(apron - 0.4, L, 6, 'up'), sm = slabMat(ctx, deck);
+  k.box(apron - 0.35, 0.3, L - 0.03, topM, [-apron / 2 - 0.17, top - 0.15 + 0.004, 0]);
+  const mp = metricPlane(apron - 0.4, L - 0.03, 6, 'up'), sm = slabMat(ctx, deck);
   k.mesh(mp, sm, [-apron / 2 - 0.2, top + 0.008, 0]);
   // face (sea side) with a wet band and a thin algae line at the tide line
-  k.box(0.5, top - base, L, M.concreteDark, [-0.25, (top + base) / 2, 0]);
-  k.box(0.04, 0.75, L, M.wet, [0.02, -0.05, 0]);
-  k.box(0.045, 0.14, L, M.algae, [0.025, 0.36, 0]);
+  k.box(0.5, top - base, opts.noLand ? L : L - 0.06, M.concreteDark, [-0.25, (top + base) / 2, 0]);
+  k.box(0.04, 0.75, L - 0.06, M.wet, [0.02, -0.05, 0]);
+  k.box(0.045, 0.14, L - 0.06, M.algae, [0.025, 0.36, 0]);
   // [v3:fix] a crisp foam strip where the water meets the face (the water shader drops its shore foam at hard shores)
-  k.box(0.45, 0.02, L, ctx.mat.toon('#eef4f1', { paint: 0 }), [0.24, 0.035, 0]);
+  k.box(0.45, 0.02, L - 0.06, ctx.mat.toon('#eef4f1', { paint: 0 }), [0.24, 0.035, 0]);
   // edge lip (lighter, slightly proud)
-  k.box(0.42, 0.14, L, M.concreteLight, [-0.21, top + 0.07, 0]);
+  k.box(0.42, 0.14, L - 0.09, M.concreteLight, [-0.21, top + 0.07, 0]);
   // expansion joints every 10 m (top + face) — gives scale rhythm
   const jm = ctx.mat.toon('#85837c', { paint: 0 });
   const mid = opts.lod === 'mid';
@@ -192,6 +194,12 @@ function promenade(ctx, k, M, r, L, top, apron, out, toW, opts) {
   const deckM = mapMat(ctx, 'toon', '#ffffff', boards, { paint: 0.05 });
   k.box(deckW, 0.12, L, ctx.mat.toon('#8e6d52', { paint: 0.04 }), [-0.45 - deckW / 2, top + 0.06, 0]);
   k.mesh(metricPlane(deckW, L, 1.6, 'up'), deckM, [-0.45 - deckW / 2, top + 0.125, 0]);
+  // [v3:polish] the deck is walkable at its own height: walkers stood on the apron under it, their shoes sunk 12 cm into
+  // the boards (they read barefoot) and the player's eye sat low on the promenade
+  if (ctx.physics?.addWalkBox) {
+    const rotY = Math.atan2(toW(0, 0, hz).x - toW(0, 0, -hz).x, toW(0, 0, hz).z - toW(0, 0, -hz).z);
+    chunks(L, 16, (zc, len) => { const c = toW(-0.45 - deckW / 2, 0, zc); ctx.physics.addWalkBox(c.x, c.z, deckW, len, rotY, top + 0.125); });
+  }
   // edge rail: low steel posts + two bars (Japanese waterfront railing, navy)
   const railM = ctx.mat.toon('#46566e', { paint: 0 });
   const rh = 1.05, xr = -0.32;
@@ -222,7 +230,7 @@ function promenade(ctx, k, M, r, L, top, apron, out, toW, opts) {
   }
   // planters with grasses + cosmos accents
   const planterM = ctx.mat.toon('#b9b1a2', { paint: 0.08 }), soil = ctx.mat.toon('#7d8f5a', { paint: 0.08 });
-  const cosmos = [ctx.mat.toon('#f0a3c4'), ctx.mat.toon('#f4f0f2'), ctx.mat.toon('#d9608f')];
+  const cosmos = ['#f0a3c4', '#f4f0f2', '#d9608f'].map((c) => ctx.mat.toon(c, { winterHide: true }));   // [v3:polish] no pink blooms under the snow
   for (let z = -hz + 9; z < hz - 3; z += 18) {
     const x = -0.45 - deckW - 0.9;
     k.box(1.3, 0.5, 2.6, planterM, [x, top + 0.25, z]);

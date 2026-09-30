@@ -95,3 +95,53 @@ export function rowDist(x, z, rows = MOORING_ROWS) {
   }
   return best;
 }
+
+// ---------------------------------------------------------------------------------------------- [v3:polish] 養殖筏
+// A line of aquaculture rafts (カキ・ホタテ筏) moored across the south side of the inner bay: bamboo lattices on rows
+// of black floats, an orange marker buoy at each end of the line, anchor lines slanting into the water. Static geometry
+// (batched with the harbour, ~2k triangles in all). Every raft corner is checked on water, 8 m clear of the shore.
+export const RAFT_LINE = { a: [196, 30], b: [300, 14], n: 5, w: 9, len: 15 };
+export function planRafts(isWater, line = RAFT_LINE) {
+  const [ax, az] = line.a, [bx, bz] = line.b, dx = bx - ax, dz = bz - az, l = Math.hypot(dx, dz), ux = dx / l, uz = dz / l;
+  const yaw = Math.atan2(ux, uz), out = [];
+  for (let i = 0; i < line.n; i++) {
+    const t = line.n > 1 ? i / (line.n - 1) : 0.5, x = ax + dx * t, z = az + dz * t;
+    const ok = [[1, 1], [1, -1], [-1, 1], [-1, -1], [0, 0]].every(([s1, s2]) => {
+      const cx = x + ux * s1 * (line.len / 2 + 8) + uz * s2 * (line.w / 2 + 8), cz = z + uz * s1 * (line.len / 2 + 8) - ux * s2 * (line.w / 2 + 8);
+      return isWater(cx, cz);
+    });
+    if (ok) out.push({ x, z, yaw });
+  }
+  return out;
+}
+export function buildRafts(ctx, opts = {}) {
+  const plan = planRafts(opts.isWater || ctx.L.isWater, opts.line || RAFT_LINE);
+  if (!plan.length) return { rafts: 0 };
+  const { w, len } = opts.line || RAFT_LINE;
+  const bamboo = ctx.mat.toon('#c9b27a', { paint: 0.06 }), bamboo2 = ctx.mat.toon('#b39b66', { paint: 0.06 });
+  const floatM = ctx.mat.toon('#474d5e', { paint: 0.02 }), marker = ctx.mat.toon('#ee7a3a', { paint: 0.03 }), rope = ctx.mat.toon('#d8cba2', { paint: 0 });
+  for (const p of plan) {
+    const g = new THREE.Group(); g.name = 'kaki-raft'; g.position.set(p.x, 0, p.z); g.rotation.y = p.yaw;
+    ctx.addStatic(g); g.updateMatrixWorld(true);
+    const k = ctx.kit(g);
+    // lattice: 4 long poles, crossbars every ~1.9 m, lashed on top of the floats (0.35 m above the water)
+    for (let j = 0; j < 4; j++) k.cyl(0.07, 0.07, len, j % 2 ? bamboo2 : bamboo, [-w / 2 + (j + 0.5) * (w / 4), 0.42, 0], [Math.PI / 2, 0, 0], 5);
+    const nb = Math.round(len / 1.9);
+    for (let j = 0; j <= nb; j++) k.cyl(0.06, 0.06, w + 0.4, j % 2 ? bamboo : bamboo2, [0, 0.36, -len / 2 + j * (len / nb)], [0, 0, Math.PI / 2], 5);
+    // floats: two rows of black drums under the lattice
+    for (const fx of [-w / 4, w / 4]) for (let j = 0; j < 5; j++) k.cyl(0.42, 0.42, 1.6, floatM, [fx, 0.1, -len / 2 + 1.4 + j * ((len - 2.8) / 4)], [0, 0, Math.PI / 2], 10);
+    // hanging lines (the culture ropes) show as short pale stubs at the crossbars
+    for (let j = 1; j < nb; j += 2) for (let q = -1; q <= 1; q += 2) k.box(0.04, 0.5, 0.04, rope, [q * w * 0.12, 0.12, -len / 2 + j * (len / nb)]);
+  }
+  // orange marker buoys and anchor lines at both ends of the line
+  const first = plan[0], last = plan[plan.length - 1], kk = ctx.kit(ctx.staticRoot);
+  for (const [p, s] of [[first, -1], [last, 1]]) {
+    const fx = Math.sin(p.yaw), fz = Math.cos(p.yaw), x = p.x + fx * s * (len / 2 + 6), z = p.z + fz * s * (len / 2 + 6);
+    if (!(opts.isWater || ctx.L.isWater)(x, z)) continue;
+    kk.sphere(0.55, marker, [x, 0.25, z], 12);
+    kk.cyl(0.05, 0.05, 1.1, floatM, [x, 0.95, z], null, 5);
+    const ex = p.x + fx * s * (len / 2), ez = p.z + fz * s * (len / 2), mx = (x + ex) / 2, mz = (z + ez) / 2, l = Math.hypot(x - ex, z - ez);
+    kk.cyl(0.03, 0.03, l, rope, [mx, 0.28, mz], [0, Math.atan2(z - ez, -(x - ex)), Math.PI / 2], 4);   // Y axis laid along the line
+  }
+  return { rafts: plan.length };
+}

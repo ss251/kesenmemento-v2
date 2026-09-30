@@ -102,7 +102,8 @@ try {
   await click('#klc-ui [data-act="stop"][data-id="market"]');
   await page.eval('new Promise((r) => setTimeout(r, 12000))');
   const c1 = await cam();
-  check('fly to the market stop', Math.hypot(c1[0] - 820, c1[2] - 1000) < 80, { from: c0, to: c1 });
+  const mk = await page.eval("__life.tour.stops.find((s) => s.id === 'market').drone.pos");   // [v3:polish3] the stop's own framing (life/tour.js FRAMES)
+  check('fly to the market stop', Math.hypot(c1[0] - mk[0], c1[2] - mk[2]) < 80, { from: c0, to: c1, want: mk });
   await shot('04_tour_market');
   await key('KeyG'); await page.eval('new Promise((r) => setTimeout(r, 2500))');
   const playing = await page.eval('__life.tour.playing');

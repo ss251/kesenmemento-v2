@@ -234,7 +234,7 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
   const hg = _hullCache.get(hkey) || _hullCache.set(hkey, type === 'small' ? hullGeometry(S, H, trim, { bandLo: 0.42, bandHi: 0.18, bulwarkT: 0.1, nu: 36, deck: opts.deck || '#9fb3ad', inner: '#dfe6e2', cut: 0.6 })
     : type === 'ferry' ? hullGeometry(S, H, trim, { bandLo: 1.2, bandHi: 0.55, deck: '#8d9994', inner: HULL.white })
     : hullGeometry(S, H, trim, { deck: opts.deck })).get(hkey);
-  const hull = new THREE.Mesh(hg, M.hull); hull.castShadow = true; hull.receiveShadow = true; group.add(hull);
+  const hull = new THREE.Mesh(hg, M.hull); hull.castShadow = true; hull.receiveShadow = true; hull.userData.hull = true; group.add(hull);   // [v3:polish3] tag: reflect.js keeps white hulls white
   if (opts.foam !== false) { const f = foamRing(H, M.foam, group, 0.37, type); ctx.noOutline(f); }
 
   // names: bow (both sides) + stern

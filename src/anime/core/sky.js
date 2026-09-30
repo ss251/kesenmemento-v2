@@ -18,7 +18,7 @@ const K = [
   { h: 0.0, zenith: '#0d1631', mid: '#1a2850', horizon: '#33406b', warm: '#3d4674', fog: '#27315a', sun: '#8fa6e6', sunI: 0.6, hemiSky: '#51639e', hemiGround: '#2b2842', hemiI: 1.05, cloudLit: '#56628f', cloudShade: '#2c3358', exposure: 1.02, bloom: 0.55, glow: 0.3, leak: 0.0, night: 1 },
   { h: 4.7, zenith: '#152044', mid: '#233466', horizon: '#46507e', warm: '#5a5a86', fog: '#2e3864', sun: '#8fa6e6', sunI: 0.55, hemiSky: '#56679f', hemiGround: '#2d2a44', hemiI: 1.05, cloudLit: '#5d6795', cloudShade: '#303860', exposure: 1.02, bloom: 0.52, glow: 0.28, leak: 0.0, night: 1 },
   { h: 5.4, zenith: '#3a4f8c', mid: '#8a8dbd', horizon: '#f0b6a4', warm: '#ffc59c', fog: '#b6a8c0', sun: '#ffb487', sunI: 0.9, hemiSky: '#9c9fd6', hemiGround: '#b7a0a8', hemiI: 1.25, cloudLit: '#ffc3a8', cloudShade: '#8e89b8', exposure: 1.0, bloom: 0.42, glow: 0.22, leak: 0.7, night: 0.3 },
-  { h: 6.5, zenith: '#6f9ad2', mid: '#b3c7e4', horizon: '#e6e2ea', warm: '#ffe0bf', fog: '#cfd6e4', sun: '#ffe6c8', sunI: 2.15, hemiSky: '#b2bdec', hemiGround: '#c9c3d2', hemiI: 1.58, cloudLit: '#fff4ea', cloudShade: '#b8c0e0', exposure: 1.02, bloom: 0.36, glow: 0.18, leak: 0.8, night: 0 },   // [v3:fix] cool morning haze
+  { h: 6.5, zenith: '#5f8fcf', mid: '#b4c2e2', horizon: '#f5cdbf', warm: '#ffc9ae', fog: '#e8d8dc', sun: '#ffe6c8', sunI: 2.5, hemiSky: '#b2bdec', hemiGround: '#c9c3d2', hemiI: 1.58, cloudLit: '#fff4ea', cloudShade: '#b8c0e0', exposure: 1.02, bloom: 0.36, glow: 0.18, leak: 0.55, night: 0 },   // [v3:polish] clear warm peach morning (was a washed-out cool haze)  [v3:polish3] cooler zenith, pink horizon, pearl fog + low mist (renderer uMist): 朝 must not read as 16:30
   { h: 9.0, zenith: '#3f86d8', mid: '#8dbdeb', horizon: '#dbe8f3', warm: '#f7e8d6', fog: '#d3dfed', sun: '#fff2df', sunI: 2.75, hemiSky: '#a9b3ee', hemiGround: '#d9c6c8', hemiI: 1.62, cloudLit: '#fbfbf7', cloudShade: '#c3cbe6', exposure: 1.0, bloom: 0.3, glow: 0.13, leak: 0.8, night: 0 },
   { h: 12.0, zenith: '#2f7ddc', mid: '#86bdf0', horizon: '#e9f2fa', warm: '#f7f3ea', fog: '#dbe6f2', sun: '#fffaf0', sunI: 3.15, hemiSky: '#a2b0ee', hemiGround: '#cdc3c6', hemiI: 1.45, cloudLit: '#ffffff', cloudShade: '#bcc6e8', exposure: 1.0, bloom: 0.26, glow: 0.1, leak: 0.45, night: 0 },   // [v3:fix] white-blue noon, crisper shadows
   { h: 15.2, zenith: '#4389d6', mid: '#91bde8', horizon: '#e4e5ea', warm: '#fbe1c6', fog: '#d8dce8', sun: '#ffecd2', sunI: 2.8, hemiSky: '#a9b2ec', hemiGround: '#dbc5c3', hemiI: 1.6, cloudLit: '#fff8ee', cloudShade: '#c1c3e4', exposure: 1.0, bloom: 0.32, glow: 0.14, leak: 1.0, night: 0 },
@@ -57,6 +57,7 @@ export function keyLight(sunDir, out = new THREE.Vector3()) {
   return out.set(-sunDir.x * 0.6, 0.55, -sunDir.z * 0.6).normalize();
 }
 
+const MOON_AZ = -47 * Math.PI / 180, MOON_EL = 7.5 * Math.PI / 180;
 export function createSky(scene, sunDir, quality) {
   const uniforms = {
     uSun: { value: sunDir.clone() },
@@ -69,11 +70,17 @@ export function createSky(scene, sunDir, quality) {
     uCloudLit: { value: new THREE.Color('#fff4e6') },
     uCloudShade: { value: new THREE.Color('#bdbfe0') },
     uCloud: { value: 0.55 },          // coverage 0..1 (weather)
+    uSummerK: { value: 0 },           // [v3:polish] summer weight: taller low cumulus towers (入道雲)
+    uMorning: { value: 0 },
+    // [v3:polish3] the frame's top edge (update() from the camera): x = camera azimuth, y/z = the A/B terms of the top
+    // edge elevation atan(A cos(phi) / B) at relative azimuth phi, w = the horizontal half-FOV at the top edge (0 = off)
+    uFrame: { value: new THREE.Vector4(0, 0, 1, 0) },           // [v3:polish3] early-morning weight (water.js: a paler pearl sheen; renderer: low mist)
     uNight: { value: 0 },
     uDusk: { value: 0 },
     uWind: { value: new THREE.Vector2(0.93, 0.36) },
-    // [v3:fix] the moon: west-north-west, 13 deg up (in the hero drone's night frame, over the hills behind the bay)
-    uMoon: { value: new THREE.Vector3(Math.sin(-72 * Math.PI / 180) * Math.cos(13 * Math.PI / 180), Math.sin(13 * Math.PI / 180), -Math.cos(-72 * Math.PI / 180) * Math.cos(13 * Math.PI / 180)).normalize() },
+    // [v3:fix] the moon over the hills behind the bay. [v3:polish] turned 25 deg (az -72 -> -47) and 3 deg lower so it
+    // hangs over 安波山 in the hero drone's night frame (5.5 deg lower) instead of behind the HUD wordmark
+    uMoon: { value: new THREE.Vector3(Math.sin(MOON_AZ) * Math.cos(MOON_EL), Math.sin(MOON_EL), -Math.cos(MOON_AZ) * Math.cos(MOON_EL)).normalize() },
   };
   const mat = new THREE.ShaderMaterial({
     uniforms,
@@ -81,7 +88,7 @@ export function createSky(scene, sunDir, quality) {
       varying vec3 vDir;
       void main(){ vDir = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position = p.xyww; }`,
     fragmentShader: /* glsl */`
-      uniform vec3 uSun, uZenith, uMid, uHorizon, uWarm, uFog, uCloudLit, uCloudShade, uMoon; uniform float uTime, uCloud, uNight, uDusk; uniform vec2 uWind;
+      uniform vec3 uSun, uZenith, uMid, uHorizon, uWarm, uFog, uCloudLit, uCloudShade, uMoon; uniform float uTime, uCloud, uNight, uDusk, uSummerK; uniform vec2 uWind; uniform vec4 uFrame;
       varying vec3 vDir;
       float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
       float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
@@ -131,12 +138,30 @@ export function createSky(scene, sunDir, quality) {
           float a0 = fi * 2.39996 + (s1 - 0.5) * 0.4 + t * (0.0005 + 0.0006 * s2);   // golden-angle spread: no regular pattern
           bool high = s5 > 0.62;
           // low towering heaps sit on the horizon; a few flatter fair-weather cumulus float higher up
-          float e0 = high ? 0.16 + 0.42 * s2 : 0.004 + 0.07 * s2;
-          float W = high ? (0.05 + 0.06 * s3) : (0.06 + 0.12 * s3);
-          float Hh = high ? W * (0.55 + 0.25 * s1) : W * (0.8 + 0.55 * s1);
+          // [v3:polish3] two tiers of fair-weather heaps: a few float low (2-6.5 deg: whole inside the drone frames, whose top
+          // edge is ~8-11 deg), the rest high (11-23 deg: above every drone frame, in the sky of the eye-level shots)
+          bool upper = h21(vec2(fi, 87.3)) < 0.8;
+          float e0 = high ? (upper ? 0.195 + 0.2 * s2 : 0.03 + 0.08 * s2) : 0.004 + 0.07 * s2;
+          float W = high ? (0.08 + 0.08 * s3) * (upper ? 1.3 : 1.0) : (0.06 + 0.12 * s3) * (1.0 + 0.35 * uSummerK);   // [v3:polish] bigger high heaps; summer towers
+          float Hh = high ? W * (upper ? 0.5 + 0.2 * s1 : 0.45 + 0.15 * s1) : W * (0.8 + 0.55 * s1) * (1.0 + 0.45 * uSummerK);
+          // [v3:polish3] fit to the frame: a heap never straddles the top edge of the picture (the hero drone frame's top
+          // is ~8-11 deg up, the heaps reach 25 deg: they were sliced off). A heap whose top would cross the edge shrinks
+          // toward its base, and fades out before it becomes a sliver; heaps wholly above the frame are untouched (they
+          // are out of view). Continuous in the camera pitch, so a drone flight never pops a cloud.
+          float fitA = 1.0;
+          if (uFrame.w > 0.0) {
+            float phi = abs(wrapA(a0 - uFrame.x));
+            if (phi - W < uFrame.w && phi < 1.5) {
+              float phE = min(phi + W, uFrame.w);
+              float topEl = atan(uFrame.y * cos(phE) / uFrame.z) - 0.012;
+              float fs = clamp((topEl - e0) / (1.45 * Hh), 0.0, 1.0);
+              if (e0 < topEl + 0.05 && fs < 1.0) { W *= fs; Hh *= fs; fitA = smoothstep(0.3, 0.5, fs); }
+              if (fitA <= 0.0) continue;
+            }
+          }
           float x = wrapA(az - a0) * cos(el);
           float y = el - e0;
-          if (abs(x) > W * 1.3 || y < -0.01 || y > Hh * 1.3) continue;
+          if (abs(x) > W * 1.3 + Hh * 0.45 || y < -0.01 || y > Hh * 1.6) continue;   // [v3:polish2] wide enough for the biggest crown / end puffs (tall heaps had sliced-off flat tops)
           vec2 L2 = normalize(vec2(sin(wrapA(sunAz - a0)), 0.6 + max(sunEl, -0.1) * 1.5));
           float front = cos(wrapA(sunAz - a0));
           // [v3:fix] backlit heaps: no crescent at all, a flat shade tone plus the rim. Note the sign: front = cos(sun
@@ -151,16 +176,16 @@ export function createSky(scene, sunDir, quality) {
             float j1 = h21(vec2(fi * 13.0 + fk, 3.1)), j2 = h21(vec2(fi * 13.0 + fk, 8.3)), j3 = h21(vec2(fi * 13.0 + fk, 19.7));
             // [v3:fix] a seeded puff count per heap (the heaps were 5-crown / 6-base clones); the centre crown and the
             // two middle base puffs always stay so every heap keeps a body
-            if (k != 2 && k != 7 && k != 8 && h21(vec2(fi, fk)) < 0.25) continue;
+            if ((k == 5 && h21(vec2(fi, fk)) < 0.25) || (k == 11 && h21(vec2(fi, fk)) < 0.5)) continue;   // [v3:polish3] k 11 drops more often (an orphan puff hung under a heap)   // [v3:polish] only the base-row ends drop out: no orphan crown puffs
             vec2 c; float r;
             if (k < 5) {            // upper cauliflower crown (behind)
               float u = fk / 4.0 * 2.0 - 1.0; float hf = sqrt(max(0.0, 1.0 - u * u * 0.8));
-              c = vec2(u * W * 0.4 + (j1 - 0.5) * W * 0.5, Hh * (0.5 + 0.26 * hf) + (j2 - 0.5) * Hh * 0.16);   // [v3:fix] +-0.25 W
-              r = Hh * (0.25 + 0.16 * hf) * (0.6 + 0.8 * j3);                                                    // [v3:fix] +-40 %
+              c = vec2(u * W * 0.4 + (j1 - 0.5) * W * 0.25, Hh * (0.5 + 0.26 * hf) + (j2 - 0.5) * Hh * 0.16);   // [v3:fix] +-0.25 W
+              r = Hh * (0.25 + 0.16 * hf) * ((k == 0 || k == 4) ? (0.85 + 0.4 * j3) : (0.6 + 0.8 * j3));                                                    // [v3:fix] +-40 %
             } else {                // base row (in front)
               float u = (fk - 5.0) / 6.0 * 2.0 - 1.0; float hf = max(0.4, sqrt(max(0.0, 1.0 - u * u)));
-              c = vec2(u * W * 0.66 + (j1 - 0.5) * W * 0.3, Hh * (0.25 + 0.13 * hf) + (j2 - 0.5) * Hh * 0.08);
-              r = Hh * (0.2 + 0.14 * hf) * (0.6 + 0.8 * j3);
+              c = vec2(u * W * 0.66 + (j1 - 0.5) * W * 0.2, Hh * (0.25 + 0.13 * hf) + (j2 - 0.5) * Hh * 0.08);
+              r = Hh * (0.2 + 0.14 * hf) * ((k == 5 || k == 11) ? (0.85 + 0.4 * j3) : (0.6 + 0.8 * j3));   // [v3:polish] no tiny end bubbles
             }
             vec2 dp = vec2(x, y) - c;
             float dd = 1.0 - length(dp) / r;
@@ -176,8 +201,14 @@ export function createSky(scene, sunDir, quality) {
           float fw = max(pxA / rr, 1e-4);
           float a = smoothstep(0.0, fw * 1.5, dens) * smoothstep(-pxA, pxA, y - Hh * 0.08);   // crisp edge, flat base
           if (a <= 0.0) continue;
+          // [v3:polish2] a backlit heap keeps an internal tone: light leaks through the thin puff edges and the seams
+          // between puffs (dens is low there) and the upper crown, the thick cores and the base stay deeper, so the
+          // cauliflower structure reads instead of one flat lavender sticker
+          float leak = (1.0 - smoothstep(0.0, 0.10, dens)) * 0.18 + smoothstep(Hh * 0.35, Hh * 1.05, y) * 0.15;   // [v3:polish3] low: no inner puff outlines showing through (soap bubbles)
+          litK += (1.0 - fwdK) * leak;
           litK *= mix(0.55, 1.0, smoothstep(Hh * 0.1, Hh * 0.32, y));                         // lavender underside
-          float rim = (1.0 - smoothstep(0.0, 0.1 + 0.08 * (1.0 - fwdK), dens)) * max(front, 0.0);   // the warm silver lining of a backlit heap
+          float rim = (1.0 - smoothstep(0.0, 0.025 + 0.015 * (1.0 - fwdK), dens)) * max(front, 0.0);   // [v3:polish3] narrow: the lining traces the outer silhouette only   // the warm silver lining of a backlit heap
+          a *= fitA;
           acc = mix(acc, vec4(litK, 1.0 - fwdK, rim, 1.0), a);   // [v3:fix] g = backlit weight
         }
         return acc;
@@ -202,11 +233,12 @@ export function createSky(scene, sunDir, quality) {
           vec2 sp = d.xz / (h + 0.25) * 90.0;
           vec2 cell = floor(sp); vec2 f = fract(sp) - 0.5;
           float r = h21(cell);
-          float star = step(0.975, r) * smoothstep(0.09, 0.0, length(f + (vec2(h21(cell+3.1), h21(cell+7.7)) - 0.5) * 0.6));
-          col += vec3(0.9, 0.93, 1.0) * star * uNight * (0.5 + 0.5 * sin(uTime * 2.0 + r * 60.0)) * smoothstep(0.02, 0.3, h);
+          float star = step(0.955, r) * smoothstep(0.09, 0.0, length(f + (vec2(h21(cell+3.1), h21(cell+7.7)) - 0.5) * 0.6));
+          col += vec3(0.9, 0.93, 1.0) * star * uNight * (0.7 + 0.3 * sin(uTime * 2.0 + r * 60.0)) * smoothstep(0.02, 0.3, h) * (1.0 - smoothstep(0.55, 0.85, uCloud));   // [v3:polish3] overcast / rain hides the stars
         }
         // [v3:fix] a waxing crescent in the west after dusk (sets over the hills behind the bay), with a soft halo
-        if (uNight > 0.01) {
+        if (uNight > 0.01 && uCloud < 0.85) {
+          float moonK = uNight * (1.0 - smoothstep(0.55, 0.85, uCloud));   // [v3:polish3] behind the rain clouds too
           vec3 mz = normalize(uMoon);
           float md = acos(clamp(dot(d, mz), -1.0, 1.0));
           vec3 mr = normalize(cross(mz, vec3(0.0, 1.0, 0.0))), mu = cross(mr, mz);
@@ -215,8 +247,8 @@ export function createSky(scene, sunDir, quality) {
           float disc = 1.0 - smoothstep(R - 0.0012, R + 0.0012, length(mp));
           float bite = 1.0 - smoothstep(R - 0.0012, R + 0.0012, length(mp - vec2(-0.012, 0.004)));
           float cres = disc * (1.0 - bite);
-          col = mix(col, vec3(1.0, 0.96, 0.84), cres * uNight);
-          col += vec3(0.55, 0.62, 0.9) * (disc * 0.06 + exp(-md * md * 900.0) * 0.1) * uNight;
+          col = mix(col, vec3(1.0, 0.96, 0.84), cres * moonK);
+          col += vec3(0.55, 0.62, 0.9) * (disc * 0.06 + exp(-md * md * 900.0) * 0.1) * moonK;
         }
         vec2 wind = normalize(uWind);
         float cov = clamp(uCloud, 0.0, 1.0);
@@ -248,8 +280,8 @@ export function createSky(scene, sunDir, quality) {
             if (hp.a > 0.0) {
               // [v3:fix] soft painted two-tone; a backlit heap is one flat, deeper body tone (it vanished into the dusk
               // sky as a pale outline) with a strong warm silver lining
-              vec3 cc = mix(mix(uCloudShade, uCloudLit, 0.3 - 0.22 * hp.g), uCloudLit, hp.r) * (1.0 - 0.1 * hp.g);
-              cc += uWarm * hp.b * (0.35 + 0.5 * uDusk) * (1.0 + 1.2 * hp.g);
+              vec3 cc = mix(mix(uCloudShade, uCloudLit, 0.45 - 0.1 * hp.g), uCloudLit, hp.r) * (1.0 - 0.1 * hp.g);
+              cc += uWarm * hp.b * (0.18 + 0.25 * uDusk) * (1.0 + 1.2 * hp.g);   // [v3:polish] a thin lining, not a glowing sticker outline
               cc += uWarm * pow(sd, 4.0) * 0.25;
               cc = mix(cc, mix(uHorizon, uCloudShade, 0.35), (1.0 - smoothstep(0.0, 0.08, el)) * 0.45);   // haze near the horizon
               col = mix(col, cc, hp.a * fadeH);
@@ -326,7 +358,15 @@ export function createSky(scene, sunDir, quality) {
     scene.fog.color.copy(p.fog);
   }
   // [v3:fix] morning mist over the bay (06:00-08:30): denser, cooler haze so 朝 reads differently from 夕方
-  const haze = (h) => { const a = Math.min(1, Math.max(0, (h - 5.2) / 1.0)), b = Math.min(1, Math.max(0, (9.0 - h) / 1.6)); return a * b; };
+  // [v3:polish] thinner (x0.45) and it peaks around 07:30, so 06:30 reads clear and warm, not washed out
+  const haze = (h) => { const a = Math.min(1, Math.max(0, (h - 5.8) / 1.7)), b = Math.min(1, Math.max(0, (9.0 - h) / 1.4)); return 0.45 * a * b; };
+  // [v3:polish3] early-morning weight: rises from first light, full 06:00-07:10, gone by 08:40 (low mist + pale sheen)
+  const morning = (h) => { const a = Math.min(1, Math.max(0, (h - 5.1) / 0.9)), b = Math.min(1, Math.max(0, (8.7 - h) / 1.5)); const k = a * b; return k * k * (3 - 2 * k); };
+  function applyMorning(h) {
+    const k = morning(wrap24(h)); uniforms.uMorning.value = k;
+    const cm = state.ctx?.pipeline?.compMat?.uniforms;
+    if (cm?.uMist) { cm.uMist.value = 0.4 * k * (1 - 0.8 * (state.ctx?.shared?.uSeason?.value?.y ?? 0)); cm.uMistCol.value.copy(uniforms.uFog.value).lerp(uniforms.uHorizon.value, 0.35); }
+  }
   const dusk01 = (el) => { const a = Math.min(1, Math.max(0, (20 - el) / 16)); const b = Math.min(1, Math.max(0, (el + 10) / 8.5)); return a * b; };
   /** Standalone time of day (the life package calls setTime instead once it is built). */
   function setHours(h) {
@@ -342,7 +382,7 @@ export function createSky(scene, sunDir, quality) {
     sun.color.copy(pal.sun); sun.intensity = pal.sunI; hemi.color.copy(pal.hemiSky); hemi.groundColor.copy(pal.hemiGround); hemi.intensity = pal.hemiI;
     state.lightDir = lightDir;
     state.haze = haze(h);
-    applyGrading(pal);
+    applyGrading(pal); applyMorning(h);
   }
   /** Driven by life's time service: T.palette, T.sunDir, T.night, T.dusk, T.weather. */
   // [v3:fix] winter grade: a cool, softly overcast sky (the warm peach autumn sky stayed on under the snow)
@@ -355,16 +395,31 @@ export function createSky(scene, sunDir, quality) {
     scene.fog.color.copy(uniforms.uFog.value);
     return w;
   }
+  // [v3:polish] summer grade: a deep clear blue with bright white towering cumulus (summer read like autumn)
+  const SUMMER = { zenith: new THREE.Color('#2f78d8'), mid: new THREE.Color('#86bdf0'), horizon: new THREE.Color('#eef3f8'), cloudLit: new THREE.Color('#ffffff'), cloudShade: new THREE.Color('#b9c6ea'), warm: new THREE.Color('#fff0dc'), fog: new THREE.Color('#dde7f3') };
+  function summerGrade(night) {
+    const y = state.ctx?.shared?.uSeason?.value?.y ?? 0;
+    uniforms.uSummerK.value = y * (1 - night);
+    if (y <= 0.001) return 0;
+    const k = y * 0.6 * (1 - night);
+    for (const [key, u] of [['zenith', uniforms.uZenith], ['mid', uniforms.uMid], ['horizon', uniforms.uHorizon], ['cloudLit', uniforms.uCloudLit], ['cloudShade', uniforms.uCloudShade]]) u.value.lerp(SUMMER[key], k);
+    uniforms.uWarm.value.lerp(SUMMER.warm, k * 0.6); uniforms.uFog.value.lerp(SUMMER.fog, k * 0.5); scene.fog.color.copy(uniforms.uFog.value);   // a cleaner, less peach haze
+    return y;
+  }
   function setTime(T) {
     state.driven = true; state.hours = T.hours;
     const p = T.palette || skyPaletteAt(T.hours, pal);
     uniforms.uSun.value.copy(T.sunDir);
     applyPalette(p, T.night ?? 0, T.dusk ?? 0);
-    const wk = winterGrade(T.night ?? 0);
-    if (T.weather) { uniforms.uCloud.value = 0.3 + 0.6 * Math.min(1, T.weather.cloud ?? 0.35); state.weatherFog = (T.weather.fog || 0) * 2.2 + (T.weather.rain || 0) * 0.8; }
+    const wk = winterGrade(T.night ?? 0), sk = summerGrade(T.night ?? 0);
+    if (T.weather) {
+      uniforms.uCloud.value = 0.3 + 0.6 * Math.min(1, T.weather.cloud ?? 0.35); state.weatherFog = (T.weather.fog || 0) * 2.2 + (T.weather.rain || 0) * 0.8;
+      if ((T.weather.rain || 0) > 0) uniforms.uCloud.value = Math.max(uniforms.uCloud.value, 0.6 + 0.35 * Math.min(1, T.weather.rain));   // [v3:polish3] rain = overcast: no stars, no moon
+    }
+    if (sk > 0) uniforms.uCloud.value = Math.min(1, uniforms.uCloud.value + 0.25 * sk);   // [v3:polish] summer: more heaps
     if (wk > 0) { uniforms.uCloud.value = Math.min(1, uniforms.uCloud.value + 0.3 * wk); state.weatherFog += 0.6 * wk; }   // [v3:fix] winter: more cloud, a little haze
     state.haze = haze(((T.hours % 24) + 24) % 24);   // [v3:fix]
-    applyGrading(p);
+    applyGrading(p); applyMorning(T.hours);
   }
   function setView(alt) {
     state.alt = alt;
@@ -379,8 +434,17 @@ export function createSky(scene, sunDir, quality) {
   function attach(ctx) { state.ctx = ctx; }
 
   const _c = new THREE.Vector3(), _fwd = new THREE.Vector3(), _lx = new THREE.Vector3(), _ly = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0);
+  const _fr = new THREE.Vector3();
   function update(t, camera) {
     uniforms.uTime.value = t;
+    // [v3:polish3] the frame's top edge for the heap fit (see uFrame)
+    if (camera.isPerspectiveCamera && !camera.userData.noSkyFrame) {
+      camera.getWorldDirection(_fr);
+      const p = Math.asin(Math.max(-1, Math.min(1, _fr.y))), tv = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) / (camera.zoom || 1);
+      const A = Math.sin(p) + tv * Math.cos(p), B = Math.cos(p) - tv * Math.sin(p);
+      if (B > 1e-3 && Math.abs(p) < 1.2) uniforms.uFrame.value.set(Math.atan2(_fr.x, -_fr.z), A, B, Math.atan(camera.aspect * tv / B));
+      else uniforms.uFrame.value.w = 0;
+    } else uniforms.uFrame.value.w = 0;
     mesh.position.copy(camera.position);
     const ld = state.driven ? (state.ctx?.shared?.uSunDir?.value || sunDir) : (state.lightDir || sunDir);
     // shadow box follows the camera, pushed forward, snapped to texels to avoid shimmering

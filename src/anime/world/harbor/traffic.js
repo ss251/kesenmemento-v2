@@ -3,6 +3,9 @@
 // trucks gliding along both lanes as a pure function of t (deterministic for stills), headlights / tail lights at night.
 import * as THREE from 'three';
 import { nightMat } from './lights.js';
+import { buildBoat, BOAT_SPECS } from './boats.js';
+import { batchStatic } from '../../core/batch2.js';
+import { wakeTexture } from './arrivals.js';
 
 export function bridgeExtras(ctx, br, opts = {}) {
   if (!br?.deck?.length) return null;
@@ -120,5 +123,65 @@ export function bridgeExtras(ctx, br, opts = {}) {
   place(0);
   ctx.onUpdate((dt, t) => place(t));
   out.cars = cars.length;
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------- [v3:polish] bay life
+// The inner bay was a dead flat plane in the hero frames (V3-SPEC wow 1 / 5). Small 漁船 working it: three swung to
+// mooring buoys, bows into the wind (static, batched with the harbour), and three fishing slowly round long loops with
+// a painted wake (dynamic, a pure function of t so stills are deterministic). Every hull point is checked on water.
+export const BAY_MOORED = [[116, -3], [216, -53], [268, 62]];
+export const BAY_LOOPS = [
+  { c: [272, -22], a: 30, b: 13, rot: 0.2, speed: 1.3, phase: 0.4 },
+  { c: [150, -45], a: 30, b: 18, rot: -0.3, speed: 1.1, phase: 2.6 },
+  { c: [405, 25], a: 40, b: 20, rot: -0.5, speed: 1.7, phase: 1.0 },
+];
+/** Point / tangent on a loop at time t (pure). */
+export function loopPose(l, t) {
+  const R = (l.a + l.b) / 2, th = l.phase + (l.speed / R) * t, c = Math.cos(l.rot), s = Math.sin(l.rot);
+  const ex = l.a * Math.cos(th), ez = l.b * Math.sin(th), tx = -l.a * Math.sin(th), tz = l.b * Math.cos(th);
+  return { x: l.c[0] + ex * c - ez * s, z: l.c[1] + ex * s + ez * c, yaw: Math.atan2(tx * c - tz * s, tx * s + tz * c) };
+}
+function hullOnWater(isWater, x, z, yaw, S, margin = 3) {
+  const fx = Math.sin(yaw), fz = Math.cos(yaw), px = fz, pz = -fx, hl = S.L / 2 + margin, hb = S.B / 2 + margin;
+  for (const [u, v] of [[hl, 0], [-hl, 0], [0, hb], [0, -hb], [hl * 0.7, hb], [-hl * 0.7, -hb], [hl * 0.7, -hb], [-hl * 0.7, hb]]) if (!isWater(x + fx * u + px * v, z + fz * u + pz * v)) return false;
+  return true;
+}
+
+export function buildBayLife(ctx, opts = {}) {
+  const L = ctx.L, isWater = opts.isWater || L.isWater, S = BOAT_SPECS.small;
+  const out = { moored: 0, moving: 0, boats: [] };
+  const w = ctx.shared?.uWind?.value || new THREE.Vector2(0.9, 0.35), wl = Math.hypot(w.x, w.y) || 1, wx = w.x / wl, wz = w.y / wl;
+  // moored: the bow points upwind at the buoy, the hull lies downwind on a 4 m pennant
+  BAY_MOORED.forEach(([bx, bz], i) => {
+    const yaw = Math.atan2(-wx, -wz) + (i - 1) * 0.18, x = bx - Math.sin(yaw) * (S.L / 2 + 4), z = bz - Math.cos(yaw) * (S.L / 2 + 4);
+    if (!isWater(bx, bz) || !hullOnWater(isWater, x, z, yaw, S)) return;
+    const b = buildBoat(ctx, 'small', { x, y: 0, z, rotY: yaw }, { seed: `bay-moored|${i}`, idle: true, glints: true });
+    out.boats.push(b); out.moored++;
+  });
+  if (opts.low) return out;
+  // moving: slow fishing loops with a painted wake
+  const wakeTex = wakeTexture(ctx), movers = [];
+  BAY_LOOPS.forEach((l, i) => {
+    for (let k = 0; k < 24; k++) { const p = loopPose(l, (k / 24) * 2 * Math.PI * ((l.a + l.b) / 2) / l.speed); if (!hullOnWater(isWater, p.x, p.z, p.yaw, S, 4)) return; }
+    const b = buildBoat(ctx, 'small', { x: 0, y: 0, z: 0, rotY: 0 }, { seed: `bay-loop|${i}`, dynamic: true });
+    b.group.updateMatrixWorld(true);
+    try { batchStatic(b.group, { mat: ctx.mat, nearCell: 4000, farCell: 4000, farR: 1e9 }); } catch (e) { /* unbatched still renders */ }
+    b.group.traverse((o) => { o.userData.dynamic = true; o.matrixAutoUpdate = true; });
+    const carrier = new THREE.Group(); carrier.name = 'bay-boat:' + b.name; ctx.add(carrier); carrier.add(b.group);
+    const wm = new THREE.MeshBasicMaterial({ map: wakeTex, transparent: true, depthWrite: false, opacity: 0.55, toneMapped: false, color: 0xffffff, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const wlen = S.L * 1.6, ww = S.B * 3.0;
+    const wake = new THREE.Mesh(new THREE.PlaneGeometry(ww, wlen).rotateX(-Math.PI / 2), wm);
+    wake.position.set(0, 0.06, -S.L * 0.36 - wlen / 2); wake.renderOrder = 2; wake.name = 'wake'; ctx.noOutline(wake); carrier.add(wake);
+    movers.push({ l, i, carrier, group: b.group }); out.boats.push(b); out.moving++;
+  });
+  if (movers.length) ctx.onUpdate((dt, t) => {
+    for (const m of movers) {
+      const p = loopPose(m.l, t);
+      m.carrier.position.set(p.x, L?.SEA?.level ?? 0, p.z); m.carrier.rotation.set(0, p.yaw, 0);
+      m.group.rotation.set(Math.sin(t * 0.8 + m.i) * 0.01, 0, Math.sin(t * 1.1 + m.i * 2) * 0.03);
+      m.group.position.y = Math.sin(t * 1.3 + m.i) * 0.07;
+    }
+  });
   return out;
 }

@@ -16,6 +16,7 @@ export const LOD = {
   hero: { cx: 185, cz: -15, half: 460, step: 3.5 },   // edges on the mid grid lines (multiples of 10 from the mid box)
   mid: { cx: 250, cz: 150, half: 1295, step: 10 },
   city: { step: 70, size: 18900 },
+  patch: { step: 5, around: 150, ahead: 330 },   // [v3:polish3] walk-spot patches beyond the mid grid
   horizon: { step: 450, size: 54000 },
 };
 
@@ -35,17 +36,21 @@ export function worldHeight(x, z) {
   const cx = Math.min(F.x1 - 20, Math.max(F.x0 + 20, x)), cz = Math.min(F.z1 - 20, Math.max(F.z0 + 20, z));
   const d = Math.hypot(x - cx, z - cz);
   const edge = L.heightAt(cx, cz);
-  const sea = L.shoreDist(cx, cz) > -40;
-  // the Pacific to the east / south-east stays open sea; land beyond the western and northern borders rises into ridges
-  const oceanSide = x > F.x1 - 50 || (z > F.z1 - 50 && x > 1500);
-  if (sea || oceanSide) { const s = Math.min(1, d / 3000); return edge * (1 - s) - 18 * s; }
+  // the Pacific to the east / south-east stays open sea; land beyond the western and northern borders rises into ridges.
+  // [v3:polish3] blended, not switched: the hard `x > 1500` test raised a vertical wall out of the sea at the south border
+  const seaW = smooth(-110 - 0.5 * d, 30, L.shoreDist(cx, cz));   // the border point is water (was: shoreDist > -40); the coast widens with the distance out, so it never stands as a cliff
+  const oceanW = Math.max(smooth(F.x1 - 650, F.x1 - 50, x), z > F.z1 - 50 ? smooth(300, 3400, x) : 0, seaW);   // a 3 km fall to the sea (1.2 km still read as a cliff)
+  const ss = Math.min(1, d / 3000), seaH = edge * (1 - ss) - 18 * ss;
+  if (oceanW >= 1) return seaH;
   const s = Math.min(1, d / 5000), t = s * s * (3 - 2 * s);
   const r = ridges(x, z);
-  return edge * (1 - t) + (140 + 620 * r * r) * t;
+  const landH = edge * (1 - t) + (140 + 620 * r * r) * t;
+  return landH + (seaH - landH) * oceanW;
 }
+function smooth(e0, e1, v) { const t = Math.min(1, Math.max(0, (v - e0) / (e1 - e0))); return t * t * (3 - 2 * t); }
 
 // ------------------------------------------------------------------ grids
-function gridGeometry({ x0, z0, x1, z1, step, hole, skirt, hfn, dropSeabed = true }) {
+function gridGeometry({ x0, z0, x1, z1, step, hole, cut = [], skirt, hfn, dropSeabed = true }) {
   const nx = Math.max(1, Math.round((x1 - x0) / step)), nz = Math.max(1, Math.round((z1 - z0) / step));
   const sx = (x1 - x0) / nx, sz = (z1 - z0) / nz;
   const W = nx + 1;
@@ -62,6 +67,8 @@ function gridGeometry({ x0, z0, x1, z1, step, hole, skirt, hfn, dropSeabed = tru
     const a = j * W + i, b = a + 1, c = a + W, d = c + 1;
     const cx = x0 + (i + 0.5) * sx, cz = z0 + (j + 0.5) * sz;
     if (inHole(cx - sx * 0.5, cz - sz * 0.5) && inHole(cx + sx * 0.5, cz + sz * 0.5)) continue;
+    // [v3:polish3] walk-spot patches: every cell inside is dropped (the patch edge matches this grid exactly, see patchHeight)
+    if (cut.some((h) => cx - sx * 0.5 > h.x0 - 1e-3 && cx + sx * 0.5 < h.x1 + 1e-3 && cz - sz * 0.5 > h.z0 - 1e-3 && cz + sz * 0.5 < h.z1 + 1e-3)) continue;
     if (dropSeabed && hs[a] < -1.2 && hs[b] < -1.2 && hs[c] < -1.2 && hs[d] < -1.2) continue;
     // split along the shorter diagonal-ish (follow the terrain: avoid bridging valleys)
     if (Math.abs(hs[a] - hs[d]) < Math.abs(hs[b] - hs[c])) { idx.push(a, c, d, a, d, b); } else { idx.push(a, c, b, b, c, d); }
@@ -159,8 +166,9 @@ export function terrainMaterial(ctx, lc, o = {}) {
           c = mix(c, uBroad, smoothstep(0.62, 0.75, t_vn(pp * 0.009 + 11.0)) * 0.6);
           c *= 0.92 + id * 0.16;
           float pa = t_vn(pp * 0.006 + 21.0);
-          float autumn = step(id, uAutumn * (0.4 + 1.6 * smoothstep(0.45, 0.75, pa)));
+          float autumn = step(id, uAutumn * (0.4 + 1.6 * smoothstep(0.45, 0.75, pa)) * mix(0.5, 1.0, smoothstep(180.0, 420.0, length(vWp - cameraPosition))));   // [v3:polish3] half as many painted flecks near the eye (under the 安波山 rail they read as floating fish)
           autumn *= step(uQuiet.z, length(pp - uQuiet.xy));   // [v3:harbor] quiet zone (the 神明崎 shrine grove)
+          autumn *= smoothstep(25.0, 80.0, length(vWp - cameraPosition));   // [v3:polish] up close the painted crowns smear into red streaks on steep slopes (安波山 lookout); the 3D trees carry the colour there
           vec3 ac = id < uAutumn * 0.35 ? uAutumnB : (id < uAutumn * 0.75 ? uAutumnA : uAutumnC);
           vec3 r = mix(c, ac, autumn * (1.0 - smoothstep(0.5, 0.62, pc) * 0.8));
           // [v3:integrate] seasons: spring 山桜 crowns, summer deep green, winter bare broadleaf (cedar stays green)
@@ -237,6 +245,41 @@ export function terrainMaterial(ctx, lc, o = {}) {
   return m;
 }
 
+/** [v3:polish3] Height of the drawn triangle of a gridGeometry grid at (x, z): same cells, same diagonal rule. */
+export function gridSurfaceAt(b, step, hfn, x, z) {
+  const nx = Math.max(1, Math.round((b.x1 - b.x0) / step)), nz = Math.max(1, Math.round((b.z1 - b.z0) / step));
+  const sx = (b.x1 - b.x0) / nx, sz = (b.z1 - b.z0) / nz;
+  const i = Math.max(0, Math.min(nx - 1, Math.floor((x - b.x0) / sx))), j = Math.max(0, Math.min(nz - 1, Math.floor((z - b.z0) / sz)));
+  const x0 = b.x0 + i * sx, z0 = b.z0 + j * sz, u = (x - x0) / sx, v = (z - z0) / sz;
+  const ha = hfn(x0, z0), hb = hfn(x0 + sx, z0), hc = hfn(x0, z0 + sz), hd = hfn(x0 + sx, z0 + sz);
+  if (Math.abs(ha - hd) < Math.abs(hb - hc)) return u >= v ? ha + (hb - ha) * u + (hd - hb) * v : ha + (hc - ha) * v + (hd - hc) * u;   // split a-d
+  return u + v <= 1 ? ha + (hb - ha) * u + (hc - ha) * v : hd + (hc - hd) * (1 - u) + (hb - hd) * (1 - v);                           // split b-c
+}
+
+// ------------------------------------------------------------------ walk-spot patches
+/** [v3:polish3] Boxes (on the city grid lines) round every tour walk spot outside the mid box: `around` metres each way,
+ *  plus `ahead` metres toward the view; clipped off the mid box so no cell is drawn twice. */
+export function walkPatches(midBox, cityBox, spots = L.TOUR.map((t) => t.walk).filter(Boolean)) {
+  const P = LOD.patch, st = LOD.city.step, out = [];
+  const snapLo = (v, o) => o + Math.floor((v - o) / st) * st, snapHi = (v, o) => o + Math.ceil((v - o) / st) * st;
+  for (const w of spots) {
+    if (w.x >= midBox.x0 && w.x <= midBox.x1 && w.z >= midBox.z0 && w.z <= midBox.z1) continue;
+    const fx = -Math.sin(w.yaw * Math.PI / 180), fz = -Math.cos(w.yaw * Math.PI / 180);
+    const b = {
+      x0: snapLo(Math.min(w.x - P.around, w.x + fx * P.ahead - P.around * 0.6), cityBox.x0), x1: snapHi(Math.max(w.x + P.around, w.x + fx * P.ahead + P.around * 0.6), cityBox.x0),
+      z0: snapLo(Math.min(w.z - P.around, w.z + fz * P.ahead - P.around * 0.6), cityBox.z0), z1: snapHi(Math.max(w.z + P.around, w.z + fz * P.ahead + P.around * 0.6), cityBox.z0),
+    };
+    // clip off the mid box on the side the spot is on (the mid box edges lie on city grid lines too)
+    const ox = Math.min(b.x1, midBox.x1) - Math.max(b.x0, midBox.x0), oz = Math.min(b.z1, midBox.z1) - Math.max(b.z0, midBox.z0);
+    if (ox > 0 && oz > 0) {
+      if (w.z > midBox.z1) b.z0 = Math.max(b.z0, midBox.z1); else if (w.z < midBox.z0) b.z1 = Math.min(b.z1, midBox.z0);
+      else if (w.x > midBox.x1) b.x0 = Math.max(b.x0, midBox.x1); else b.x1 = Math.min(b.x1, midBox.x0);
+    }
+    if (b.x1 - b.x0 >= st && b.z1 - b.z0 >= st && !out.some((o) => b.x0 < o.x1 && b.x1 > o.x0 && b.z0 < o.z1 && b.z1 > o.z0)) out.push(b);
+  }
+  return out;
+}
+
 // ------------------------------------------------------------------ build
 export function buildTerrain(ctx, mat) {
   const g = new THREE.Group(); g.name = 'env-terrain';
@@ -258,9 +301,32 @@ export function buildTerrain(ctx, mat) {
   const hq = (x, z) => HS.clampY(x, z, L.heightAt(x, z));
   t('hero', () => gridGeometry({ ...heroBox, step: H.step, skirt: 3, hfn: hq }));
   t('mid', () => gridGeometry({ ...midBox, step: M.step, hole: heroBox, skirt: 6, hfn: hq }));
-  t('city', () => gridGeometry({ ...cityBox, step: LOD.city.step, hole: midBox, skirt: 30, hfn: worldHeight }));
+  // [v3:polish3] fine patches round the walk spots beyond the mid grid (かなえ大橋, 大島): on the 70 m city grid the
+  // walker stood on bare, flat triangles up to 9 m off the DEM. Each patch lies on city grid lines (cut from the city
+  // grid like the mid box), reaches toward the view, and never overlaps the mid box.
+  const patches = walkPatches(midBox, cityBox);
+  // the patch follows the DEM inside and the city grid's own triangles along its edge (no crack, no step)
+  const cityAt = (x, z) => gridSurfaceAt(cityBox, LOD.city.step, worldHeight, x, z);
+  // (a side shared with the mid box keeps the DEM: the mid grid samples the same heights along it)
+  const patchHeight = (b) => {
+    const onMid = { x0: b.x0 === midBox.x1, x1: b.x1 === midBox.x0, z0: b.z0 === midBox.z1, z1: b.z1 === midBox.z0 };
+    return (x, z) => {
+      const e = Math.min(onMid.x0 ? 1e9 : x - b.x0, onMid.x1 ? 1e9 : b.x1 - x, onMid.z0 ? 1e9 : z - b.z0, onMid.z1 ? 1e9 : b.z1 - z);
+      const k = smooth(0, 40, e); if (k >= 1) return hq(x, z);
+      const c = cityAt(x, z); return c + (hq(x, z) - c) * k;
+    };
+  };
+  patches.forEach((b, i) => t('patch' + i, () => gridGeometry({ ...b, step: LOD.patch.step, skirt: 4, hfn: patchHeight(b) })));
+  t('city', () => gridGeometry({ ...cityBox, step: LOD.city.step, hole: midBox, cut: patches, skirt: 30, hfn: worldHeight }));
   t('horizon', () => gridGeometry({ ...horBox, step: LOD.horizon.step, hole: cityBox, hfn: worldHeight }));
   ctx.noBatch(g);
   ctx.addStatic(g);
-  return { group: g, stats, boxes: { heroBox, midBox, cityBox, horBox } };
+  // [v3:polish3] the rendered surface height (the same grid + diagonal rule as gridGeometry), so props scattered on the
+  // coarse grids (大島, かなえ大橋: 70 m cells) sit on the drawn triangles, not on the DEM that the triangles skip
+  const grids = [[heroBox, H.step, hq], [midBox, M.step, hq], ...patches.map((b) => [b, LOD.patch.step, patchHeight(b)]), [cityBox, LOD.city.step, worldHeight], [horBox, LOD.horizon.step, worldHeight]];
+  function surfaceAt(x, z) {
+    for (const [b, step, hfn] of grids) if (x >= b.x0 && x <= b.x1 && z >= b.z0 && z <= b.z1) return gridSurfaceAt(b, step, hfn, x, z);
+    return worldHeight(x, z);
+  }
+  return { group: g, stats, boxes: { heroBox, midBox, cityBox, horBox, patches }, surfaceAt };
 }

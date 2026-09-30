@@ -202,16 +202,29 @@ function windowMaterial(ctx, o, cache) {
         vec3 day = mix(uTint * 0.62, uSkyLow, 0.28 + 0.5 * uv.y + 0.25 * fres);
         float s = dot(vW, normalize(vec3(0.62, 0.78, 0.62))) * 0.9;
         float band = abs(fract(s * 0.5) - 0.5);
-        day += vec3(0.9) * (smoothstep(0.035, 0.0, abs(band - 0.18)) * 0.5 + smoothstep(0.012, 0.0, abs(band - 0.25)) * 0.35);
+        day += vec3(0.9) * (smoothstep(0.035, 0.0, abs(band - 0.18)) * 0.5 + smoothstep(0.012, 0.0, abs(band - 0.25)) * 0.35) * (1.0 - 0.9 * uNight);   // [v3:polish] no daytime streaks at night
         float cur = uCurtain * (smoothstep(0.2, 0.17, uv.x) + smoothstep(0.8, 0.83, uv.x));
         day = mix(day, vec3(0.93, 0.89, 0.8), cur * 0.55);
         day *= 0.86 + 0.14 * clamp(dot(N, uSunDir), 0.0, 1.0);
         // ---- night: a lit fraction per building (coarse cell) and per pane (flat provoking-vertex cell)
         float hb = lh_hash(floor(vW.xzx / vec3(11.0, 11.0, 1e6)) + 17.0);
         float frac = uLit * mix(0.55, 1.25, hb) * uLamps;
-        float hw = lh_hash(vCell);
+        // [v3:polish] one cell per PANE: the flat provoking-vertex cell differed between a quad's two triangles (every
+        // lit office pane was split along its diagonal into a lit and an unlit half). Reconstruct the pane centre from
+        // the screen derivatives of the world position and the pane uv (coplanar, linear), fall back to vCell edge-on.
+        vec3 pcell = vCell;
+        {
+          vec2 ux = dFdx(uv), uy = dFdy(uv); vec3 wx = dFdx(vW), wy = dFdy(vW);
+          float det = ux.x * uy.y - ux.y * uy.x;
+          if (abs(det) > 1e-12) {
+            vec3 ju = (wx * uy.y - wy * ux.y) / det, jv = (wy * ux.x - wx * uy.x) / det;
+            vec3 ctr = vW - ju * (uv.x - 0.5) - jv * (uv.y - 0.5);
+            pcell = floor(ctr + 0.5);
+          }
+        }
+        float hw = lh_hash(pcell);
         float lit = step(hw, frac);
-        float hc = lh_hash(vCell + 91.7);
+        float hc = lh_hash(pcell + 91.7);
         vec3 warm = vec3(1.0, 0.70, 0.36);                       // #ffd9a0 in linear
         vec3 room = hc < 0.72 ? warm * mix(0.85, 1.25, hc / 0.72)
                   : hc < 0.86 ? vec3(1.0, 0.86, 0.66)                  // soft white
@@ -328,9 +341,15 @@ export function buildLights(ctx) {
             float bld = klc_h(floor(vW / vec3(14.0, 1000.0, 14.0)) + 5.0);
             float lit = step(klc_h(cell + 0.5), 0.66 * mix(0.55, 1.3, bld) * uKlcLamps) * (1.0 - uFrost * 0.4);
             float hc = klc_h(cell + 91.7);
-            vec3 room = hc < 0.7 ? vec3(1.0, 0.70, 0.36) * mix(0.9, 1.25, hc / 0.7) : hc < 0.85 ? vec3(1.0, 0.86, 0.66) : hc < 0.94 ? vec3(1.0, 0.56, 0.26) : vec3(0.55, 0.7, 1.0);
+            vec3 room = hc < 0.7 ? vec3(1.0, 0.70, 0.36) * mix(0.9, 1.25, hc / 0.7) : hc < 0.85 ? vec3(1.0, 0.76, 0.5) : hc < 0.94 ? vec3(1.0, 0.56, 0.26) : vec3(0.55, 0.7, 1.0);
             float yy = fract(vW.y / 2.9);
-            vec3 glow = room * (0.85 + 0.55 * smoothstep(0.15, 0.95, yy)) * 1.55;
+            vec3 glow = room * (0.85 + 0.55 * smoothstep(0.15, 0.95, yy)) * 1.4;   // [v3:polish3] 1.55 -> 1.4
+            // [v3:polish3] a room, not a light box: desk / counter silhouettes in the lower third, blinds, and less glow at a
+            // grazing angle (the reflection wins there). Big entrance panes bloomed into flat white panels (night_izakaya).
+            float across = dot(vW.xz, vec2(0.7071, 0.7071)) * 1.9;
+            glow *= mix(0.42, 1.0, smoothstep(0.24, 0.32, yy + 0.04 * sin(across * 1.3)));
+            glow *= 0.9 + 0.1 * step(0.5, fract(across));
+            glow *= 1.0 - 0.55 * fres;
             col = mix(col * (1.0 - 0.55 * uKlcNight), glow, lit);
             a = mix(a, 0.94, lit);
           }

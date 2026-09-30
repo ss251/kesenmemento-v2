@@ -39,7 +39,7 @@ given. The screenshots are in `shots/docs/demo_*.png` (not committed). All steps
 | 1:15 | Press **4**. Number keys follow the view, and you are walking, so you step onto the vermilion walkway of 浮見堂. | "浮見堂 at magic hour." |
 | 1:35 | Click **夜 19:30**. Then click **空から** to rise to the drone and press **1** to fly back over the inner bay. | "At night, windows light up, streetlights come on, and boat and bridge lights show on the water." |
 | 1:55 | Click **歩く**, then the **めぐる** panel at the bottom left, then **2 魚市場**. Because you are in walk mode, you land on foot on the market quay beside a moored boat. Click **朝 06:30**. | "Six-thirty at the fish market. The label on that boat, for example 18清龍丸 · 入港04:30 · カツオ 16t, is a real boat on today's list." (Say サンプル if you chose the sample.) Click めぐる again to close the list. |
-| 2:20 | Press **K** (冬: snow on the quay and roofs), then **K** again (春: sakura colours). Then press **K** twice to return to 秋. | "All four seasons." |
+| 2:20 | Press **K** (冬: snow on the quay and roofs), then **K** again (春: sakura colours). Then press **K** twice to return to 秋. While a season view is on, the chip shows 冬のすがた or 春のすがた in place of the live weather; the ライブ tag stays with the arrivals. | "All four seasons." |
 | 2:35 | Click **夕方 16:30**, then press **O**. | "And the whole of Kesennuma bay as one little planet." Press **O** again to return. |
 | 2:50 | Press **H** to hide the UI and let the frame sit. | "Everything you saw is the real Kesennuma. We'd like to make it the city's." Press **H** again to bring the UI back. |
 
@@ -67,7 +67,7 @@ live.
 
 **If the demo Mac or its GPU fails, show the stills.**
 
-1. Before the day, render the 15 wow stills:
+1. Before the day, render the 16 wow stills:
    ```sh
    tools/anime/gate.sh chrome env -u NODE_OPTIONS bun scripts/render/stills.js --size 1080
    ```
@@ -75,10 +75,12 @@ live.
 2. The stills are written to `dist/renders/v3_*.png`. `dist/` is not committed, so copy them to the Desktop and to a
    USB stick.
 3. Show them full screen in Preview or Quick Look (space, then the arrow keys), in this order: drone_1630,
-   drone_kanae (the 安波山 view out to かなえ大橋), promenade_deck (the fish stall, the vending machine and the cat on
-   its bollard), ukimido_sunset, market_unload, night_bay, night_izakaya, spring_drone, winter_drone, tiny_planet.
+   drone_kanae (the 安波山 view out to かなえ大橋), whole_city (the whole bay out to 大島 and the open sea),
+   promenade_deck (the fish stall, the vending machine and the cat on its bollard), market_morning (the berth from the
+   water), ukimido_sunset, market_unload, night_bay, night_izakaya, spring_drone, summer_drone, winter_drone,
+   tiny_planet.
    Stills hide the floating boat labels (`?labels=0`), so no サンプル tag shows even with the sample data.
-4. The same frames are also in the repo as `docs/shots/v3_wow*.png`.
+4. The same frames are also in the repo as `docs/shots/v3_wow*.png` and `docs/shots/v3_season_*.png`.
 
 **Optional: a film for a looping screen.** Render the 30 s film:
 

@@ -75,7 +75,7 @@ export function routeFor(berth, isWater = () => true) {
 }
 
 // ---------------------------------------------------------------------------------------------- visuals
-function wakeTexture(ctx) {
+export function wakeTexture(ctx) {   // [v3:polish] shared with traffic.js (the inner bay's working boats)
   return ctx.tex.draw(256, 512, (g) => {
     g.clearRect(0, 0, 256, 512);
     // painted V wake: two broken foam arms + a churned centre streak, fading aft. t = 0 at the stern: canvas bottom,

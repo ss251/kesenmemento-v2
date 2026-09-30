@@ -9,12 +9,13 @@ import * as THREE from 'three';
 const VERT = /* glsl */`
   attribute vec3 color;
   uniform float uLevel;
-  varying vec3 vCol; varying vec3 vP; varying float vDepth;
+  varying vec3 vCol; varying vec3 vP; varying float vDepth; varying vec3 vW;
   #include <fog_pars_vertex>
   void main() {
     vec4 w = modelMatrix * vec4(position, 1.0);
     vCol = color;
     vDepth = uLevel - w.y;                       // how far below the waterline the mirrored point sits
+    vW = w.xyz;
     vec4 clip = projectionMatrix * viewMatrix * w;
     vec3 cam = cameraPosition;
     float t = clamp((cam.y - uLevel - 0.02) / max(cam.y - w.y, 1e-3), 0.0, 1.0);
@@ -29,7 +30,7 @@ const VERT = /* glsl */`
 const FRAG = /* glsl */`
   uniform float uTime, uStrength, uNight, uFade, uDusk;
   uniform vec3 uSky;
-  varying vec3 vCol; varying vec3 vP; varying float vDepth;
+  varying vec3 vCol; varying vec3 vP; varying float vDepth; varying vec3 vW;
   #include <fog_pars_fragment>
   float h21(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
   void main() {
@@ -42,11 +43,45 @@ const FRAG = /* glsl */`
     if (band < gap) discard;
     float a = uStrength * (1.0 - smoothstep(0.0, uFade, vDepth)) * (1.0 - uNight * 0.35);
     // the mirrored object as the eye sees it: backlit and dimmer at sunset, a dark silhouette at night
-    float lit = mix(0.62, 0.36, uDusk) * (1.0 - 0.82 * uNight);
-    vec3 col = mix(vCol * lit, uSky * 0.55, 0.34 + 0.2 * uNight);
+    float lit = mix(0.7, 0.55, uDusk) * (1.0 - 0.82 * uNight);   // [v3:polish] keep the red and the roof colour  [v3:polish3] darker than the object, never lighter
+    // [v3:polish2] the mirror shows the undersides (deck floor, eaves): they are in shade, not lit like the deck top.
+    // The screen-space normal of the mirrored surface faces the eye; pointing up = an underside in the real object.
+    vec3 nW = normalize(cross(dFdx(vW), dFdy(vW)));
+    float under = smoothstep(0.55, 0.9, abs(nW.y));
+    lit *= mix(1.0, 0.36, under);
+    vec3 col = mix(vCol * lit, uSky * 0.55, 0.18 + 0.2 * uNight);
+    col = mix(col, uSky * 0.3, under * 0.3);                        // cool shade under the deck and the eaves
     gl_FragColor = vec4(col, a);
     #include <fog_fragment>
   }`;
+
+// [v3:polish3] A textured material's white base colour stood in for the whole mesh (the dark 浮見堂 stilts reflected as
+// white-grey bars): use the map's average tone instead, measured once on an 8x8 downsample and kept on the material.
+const _avgCanvas = { c: null };
+function mapAverage(m) {
+  if (m.userData.avg) return m.userData.avg;
+  let out = null;
+  try {
+    const img = m.map?.image;
+    if (img && (img.width || img.naturalWidth) && typeof document !== 'undefined') {
+      const cv = _avgCanvas.c || (_avgCanvas.c = document.createElement('canvas')); cv.width = cv.height = 8;
+      const g = cv.getContext('2d', { willReadFrequently: true }); g.clearRect(0, 0, 8, 8); g.drawImage(img, 0, 0, 8, 8);
+      const d = g.getImageData(0, 0, 8, 8).data; let r = 0, gg = 0, b = 0, w = 0;
+      for (let i = 0; i < d.length; i += 4) { const a = d[i + 3] / 255; r += d[i] * a; gg += d[i + 1] * a; b += d[i + 2] * a; w += a; }
+      if (w > 0.5) out = new THREE.Color().setRGB(r / w / 255, gg / w / 255, b / w / 255, THREE.SRGBColorSpace);
+    } else if (img?.data && img.width) {   // DataTexture (RGBA bytes)
+      const d = img.data, st = Math.max(4, Math.floor(d.length / 256 / 4) * 4); let r = 0, gg = 0, b = 0, w = 0;
+      for (let i = 0; i + 3 < d.length; i += st) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; w++; }
+      if (w) out = new THREE.Color().setRGB(r / w / 255, gg / w / 255, b / w / 255, THREE.SRGBColorSpace);
+    }
+  } catch { out = null; }
+  m.userData.avg = out || REFL_FALLBACK;
+  return m.userData.avg;
+}
+const REFL_FALLBACK = new THREE.Color('#5a4a40');
+const lum = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b;   // linear; 0.6 linear ~ L 0.8 in sRGB
+/** True for a boat hull mesh (boats.js tags it): white hulls legitimately mirror pale. */
+const isHull = (o) => !!o.userData?.hull;
 
 /** Mirror the meshes of `sources` (Object3D[]) about the sea level into one reflection mesh added with ctx.add. */
 export function buildReflection(ctx, sources, opts = {}) {
@@ -64,6 +99,11 @@ export function buildReflection(ctx, sources, opts = {}) {
       const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry;
       const P = g.attributes.position, C = m.vertexColors ? g.attributes.color : null;
       const base = m.color ? c.copy(m.color) : c.set('#e8e2d6');
+      if (m.map) base.multiply(mapAverage(m));
+      // [v3:polish3] a near-white result with nothing else to go on (no vertex colours) is a white default, not paint:
+      // mirror it as the dark timber tone (hulls excepted: they really are white)
+      const hull = isHull(o);
+      if (!C && !hull && lum(base.r, base.g, base.b) > 0.6) base.copy(REFL_FALLBACK);
       const br = base.r, bg = base.g, bb = base.b;
       const n = P.count; if (n > 60000) return;
       for (let i = 0; i < n; i++) {
@@ -71,7 +111,9 @@ export function buildReflection(ctx, sources, opts = {}) {
         if (v.y < level - 0.05) { /* underwater part mirrors above water: keep, the shader discards it */ }
         pos.push(v.x, 2 * level - v.y, v.z);
         const r = C ? C.getX(i) : 1, gg = C ? C.getY(i) : 1, b = C ? C.getZ(i) : 1;
-        col.push(br * r, bg * gg, bb * b);
+        let cr = br * r, cg = bg * gg, cb = bb * b;
+        if (C && !hull && lum(cr, cg, cb) > 0.6) { cr = REFL_FALLBACK.r; cg = REFL_FALLBACK.g; cb = REFL_FALLBACK.b; }
+        col.push(cr, cg, cb);
       }
       tris += n / 3;
     });
@@ -87,7 +129,7 @@ export function buildReflection(ctx, sources, opts = {}) {
       uLevel: { value: level }, uStrength: { value: opts.strength ?? 0.62 }, uFade: { value: opts.fade ?? 9 },
       uTime: { value: 0 }, uNight: { value: 0 }, uDusk: { value: 0 }, uSky: { value: new THREE.Color('#c9b8c8') },
     }]),
-    vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
+    vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: true, side: THREE.BackSide, fog: true,   // [v3:polish2] mirroring flips the winding: BackSide culls the faces turned away (the lit deck top floated in the water)
   });
   // share the live uniforms (time, night, horizon colour)
   if (ctx.shared?.uTime) mat.uniforms.uTime = ctx.shared.uTime;

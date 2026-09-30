@@ -102,8 +102,9 @@ export function buildUkimido(ctx, pose, opts = {}) {
   k.cyl(0.18, 0.28, 0.35, m.tile, [0, roofY + 2.2, 0], null, 10);
   k.sphere(0.2, m.gold, [0, roofY + 2.55, 0], 10);
   // a hanging plaque 浮見堂 under the eave facing the walkway (-Z)
-  const plaque = vTextTex(ctx, '浮見堂', { w: 96, h: 256, color: '#f1e3b8', bg: '#3b3740', font: FONT.brush, border: '#d9b44a' });
-  k.plane(0.42, 1.1, mapMat(ctx, 'toon', '#ffffff', plaque, { paint: 0 }), [0, roofY - 0.75, -size / 2 - 0.12], [0, Math.PI, 0]);
+  // [v3:polish] warm gold lettering that glows a little at night (dark-on-dark before)
+  const plaque = vTextTex(ctx, '浮見堂', { w: 96, h: 256, color: '#e8d9a8', bg: '#3b3740', font: FONT.brush, border: '#d9b44a' });
+  k.plane(0.42, 1.1, mapMat(ctx, 'toon', '#ffffff', plaque, { paint: 0, nightGlow: 0.4 }), [0, roofY - 0.75, -size / 2 - 0.12], [0, Math.PI, 0]);
   // walkway to the shore (-Z): slightly arched deck, rails, piles
   const nSeg = 10, arch = 0.5;
   const zS = -size / 2 - 0.45, zE = zS - Lb;

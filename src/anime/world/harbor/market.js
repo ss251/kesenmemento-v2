@@ -39,6 +39,7 @@ export function buildFishMarket(ctx, a, b, opts = {}) {
   }
 
   apronLife(ctx, k, M, r, { z0, used, top, apron, toW, out, rotY: F.rotY, L, opts });
+  finishConveyors(ctx, out, opts.boats ?? null);   // a stand-alone market: no boat list, every conveyor stands
   return out;
 }
 
@@ -158,7 +159,9 @@ function apronLife(ctx, k, M, r, E) {
     const kind = i % 4;
     if (kind === 0) { for (let q = 0; q < 6; q++) tub(k, M, -4.5 - (q % 3) * 1.5, top, z + Math.floor(q / 3) * 1.3, r.range(-0.1, 0.1)); }
     if (kind === 1) boxYard(k, M, -6, top, z, { cols: 4, rows: 3, rng: r, colors: ['blue', 'blue', 'white', 'white', 'orange'] });
-    if (kind === 2) conveyor(ctx, k, M, z, top);
+    // [v3:polish2] a conveyor only makes sense over a moored boat's rail: the slot is decided after the boats are moored
+    // (finishConveyors), a tub row otherwise (the belts stuck out over empty water with nothing under their far end)
+    if (kind === 2) (out.conveyorSlots ||= []).push({ k, M, z, top, toW, r });
     if (kind === 3) jibCrane(ctx, k, M, -2.2, top, z, r);
     out.workSpots.push(toW(-4, top, z + 3));
   });
@@ -215,18 +218,40 @@ function forklift(ctx, M, r, i) {
   return g;
 }
 
+/**
+ * [v3:polish2] Place the deferred apron conveyors: a belt where a boat lies moored alongside that stretch of quay (its
+ * far end rests over the hull's rail), a row of fish tubs where the berth is empty. boats = harbor boats
+ * ({ group, dims }) or null to stand every conveyor (the stand-alone dev market).
+ */
+export function finishConveyors(ctx, out, boats) {
+  const slots = out.conveyorSlots || []; out.conveyorSlots = [];
+  const stats = { conveyors: 0, tubRows: 0 };
+  for (const S of slots) {
+    const w = S.toW(2.5, 0, S.z);
+    const moored = !boats || boats.some((b) => {
+      const p = b.group.position; return Math.hypot(p.x - w.x, p.z - w.z) < Math.max(4, b.dims.L / 2 - 1.5);
+    });
+    if (moored) { conveyor(ctx, S.k, S.M, S.z, S.top); stats.conveyors++; }
+    else { for (let q = 0; q < 6; q++) tub(S.k, S.M, -4.5 - (q % 3) * 1.5, S.top, S.z + Math.floor(q / 3) * 1.3, S.r.range(-0.1, 0.1)); stats.tubRows++; }
+  }
+  return stats;
+}
+
 function conveyor(ctx, k, M, z, top) {
   // belt conveyor from the quay edge out over a moored boat's rail (rises toward the water)
+  // [v3:polish2] short and shallow: the belt ends ~1.7 m past the quay edge, over the hull alongside, its outer legs
+  // on the quay edge (it stuck 4 m out over the water on legs standing in the sea)
   const frame = ctx.mat.toon('#d5d8d4', { paint: 0.02 }), belt = ctx.mat.toon('#4a4e58', { paint: 0 });
-  const len = 7, ang = 0.28;
+  const len = 4.2, ang = 0.14;
   const cx = -1.5 + Math.cos(ang) * len / 2 - 1, cy = top + 1.1 + Math.sin(ang) * len / 2;
+  const yAt = (x) => cy + Math.tan(ang) * (x - cx) - 0.12;   // underside of the frame above quay x
   k.box(len, 0.25, 0.9, frame, [cx, cy, z], [0, 0, ang]);
   k.box(len, 0.06, 0.7, belt, [cx, cy + 0.15, z], [0, 0, ang]);
-  for (const s of [-0.4, 0.4]) { k.box(0.1, 1.0, 0.1, frame, [-2.2, top + 0.5, z + s]); k.box(0.1, 2.3, 0.1, frame, [1.8, top + 1.15, z + s]); }
+  for (const s of [-0.4, 0.4]) for (const x of [-2.2, -0.3]) { const h = yAt(x) - top; k.box(0.1, h, 0.1, frame, [x, top + h / 2, z + s]); }
   // fish on the belt: silvery skipjack shapes
   const fish = ctx.mat.toon('#7d8fa6', { paint: 0 });
-  for (let i = 0; i < 4; i++) {
-    const t = -len / 2 + 1 + i * 1.5;
+  for (let i = 0; i < 3; i++) {
+    const t = -1.2 + i * 1.2;
     k.mesh(new THREE.SphereGeometry(0.1, 8, 6), fish, [cx + Math.cos(ang) * t, cy + 0.26 + Math.sin(ang) * t, z + (i % 2 ? 0.12 : -0.12)], [0, 0, ang], [3.6, 1, 1.2]);
   }
   boxStack(k, M, -2.6, top, z - 1.3, { n: 4, color: 'white' });
