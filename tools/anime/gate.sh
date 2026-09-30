@@ -13,7 +13,8 @@ ok() {
   load=$(sysctl -n vm.loadavg | awk '{print $3}')
   free=$(memory_pressure 2>/dev/null | awk -F': ' '/free percentage/{gsub("%","",$2); print $2}')
   swapmb=$(sysctl -n vm.swapusage | sed -E 's/.*used = ([0-9.]+)M.*/\1/')
-  awk -v l="$load" -v f="${free:-100}" -v s="${swapmb:-0}" 'BEGIN{exit !(l<=14 && f>=25 && s<=4096)}'
+  # swap is ignored while free >= 40% (frozen processes' pages don't page back in; coordinator OK until 2026-10-01 00:00Z)
+  awk -v l="$load" -v f="${free:-100}" -v s="${swapmb:-0}" 'BEGIN{exit !(l<=14 && f>=25 && (s<=4096 || f>=40))}'
 }
 for i in $(seq 1 60); do ok && break; sleep 10; done
 ok || { echo "gate: machine busy (load/memory/swap) for 10 min; stop and report" >&2; exit 3; }
