@@ -18,8 +18,9 @@ import { resample, polyLength, clamp } from './common.js';
 const ATILE = 4.0;
 const CURB = 0.15;
 const UP = [0, 1, 0];
+const FOOT = new Set(['footway', 'path', 'pedestrian', 'steps', 'cycleway']);   // [v4:polish3] OSM highway kinds without car markings
 
-export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone }) {
+export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = null }) {
   const { L, mat, physics } = ctx;
   const root = new THREE.Group(); root.name = 'town-streets';
   const T = makeStreetTextures(ctx);
@@ -34,11 +35,12 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone }) {
     glyph: mat.decal('#ffffff', { map: T.glyphs, vertexColors: true }),
     util: mat.decal('#ffffff', { map: T.util }),
   };
+  M.asphalt.userData.acc = 'road';   // [v4:town-accuracy] tools/anime/accuracy.mjs road pass
   const F = buildFurniture(ctx, root, T, { baseLift: () => 0 });
   const out = { edges: [], gutters: [], walkPaths: [], walkKinds: [], crosswalks: [], junctions: [], stops: [], signs: 0, mirrors: 0, guardrails: 0 };
   const hr = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
   const inHero = (x, z) => Math.hypot(x - heroZone.cx, z - heroZone.cz) < heroZone.r + 40;
-  const water = (x, z) => L.shoreDist(x, z) > 0.8;
+  const water = (x, z) => L.shoreDist(x, z) > 0.8 || !!rivers?.at(x, z, -0.2);   // [v4:town-accuracy] river channels too (rivers.js bridges them)
   const LIFT = (x, z) => (inHero(x, z) ? 0.05 : 0.14);
   const roadY = (x, z) => L.heightAt(x, z) + LIFT(x, z);
 
@@ -55,7 +57,14 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone }) {
     n.R = n.deg >= 3 ? n.maxW / 2 * 1.1 + 0.4 : n.maxW / 2;
   }
   const nodeAt = (r, end) => nodes.get(nk(end ? r.pts[r.pts.length - 1] : r.pts[0]));
-  const sidewalkOf = (r) => (r.zone !== 'hero' || r.kind === 'alley' || r.kind === 'bridge' || r.width < 7.5) ? 0 : r.width >= 11 ? 2.5 : r.width >= 9 ? 2.0 : 1.5;
+  // [v4:polish3] carriageway half-width from OSM (enrich/fold.js r.carriage: the way's width, or lanes x 3.0 m) when it
+  // is narrower than the GSI road edges: the rest of the road reserve is pavement, not asphalt
+  const carriageHalf = (r) => (r.carriage && r.kind !== 'alley' && r.kind !== 'bridge' && r.carriage < r.width - 0.8 ? r.carriage / 2 : null);
+  const sidewalkOf = (r) => {
+    if (r.zone !== 'hero' || r.kind === 'alley' || r.kind === 'bridge') return 0;
+    const ch = carriageHalf(r); if (ch) return Math.min(4.5, r.width / 2 - ch);
+    return r.width < 7.5 ? 0 : r.width >= 11 ? 2.5 : r.width >= 9 ? 2.0 : 1.5;
+  };
 
   // ------------------------------------------------------------------ builders
   const roadB = new MeshBuilder(true), paverB = new MeshBuilder(), curbB = new MeshBuilder(), gutB = new MeshBuilder();
@@ -85,7 +94,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone }) {
     const step = hero ? 2.0 : 4.0;
     const S = resample(r.pts, step);
     if (S.length < 2) continue;
-    const hw = r.width / 2, sw = sidewalkOf(r), cw = hw - sw;
+    const hw = r.width / 2, sw = sidewalkOf(r), cw = hero ? hw - sw : (carriageHalf(r) ?? hw);
     const len = S[S.length - 1].s;
     asphaltLen += len;
     const seed = hr(r.width, S[0].x * 0.01 + S[0].z * 0.013) * 100;
@@ -103,6 +112,8 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone }) {
     for (let j = 0; j < lats.length - 1; j++) strip(roadB, Sw, lats[j], lats[j + 1], (x, z) => roadY(x, z), (p) => [p[0] / ATILE, -p[1] / ATILE], tone);
 
     if (!hero) {
+      // [v4:polish3] mid: flat pavements either side of an OSM-width carriageway
+      if (cw < hw - 0.5) for (const side of [-1, 1]) strip(paverB, Sw, side < 0 ? -hw : cw, side < 0 ? -cw : hw, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [o / 1.6, s.s / 1.6]);
       // mid: cheap markings only on the wider roads
       if (r.width >= 7) markCentre(r, S, cw, hw, false);
       continue;
@@ -293,7 +304,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone }) {
           const sx = p.x + nx * (hw - 0.35), sz = p.z + nz * (hw - 0.35);
           if (!lotIdx.at(sx, sz, 0) && !water(sx, sz)) { F.signPost(sx, sz, roadY(sx, sz) + CURB, 2.9, Math.atan2(-tx, -tz), [{ kind: 'rect', cell: SIGN.cross, size: [0.6, 0.6], y: 2.55, double: true }]); out.signs++; }
         }
-      } else if (r.width < 7 && widest >= 7 && len > n.R + 6 && r.width >= 3) {
+      } else if (r.width < 7 && widest >= 7 && len > n.R + 6 && r.width >= 3 && !FOOT.has(r.hw)) {   // [v4:polish3] no 止まれ on footways (神明崎's r12723)
         // minor road entering a main road: stop line + 止まれ
         const s0 = n.R + 1.0;
         const p = pointAtS(S, s0); if (!p || water(p.x, p.z)) continue;
@@ -397,7 +408,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone }) {
   add(utilB, M.util, { name: 'town-util', renderOrder: -3, noOutline: true });
   ctx.addStatic(root);
   out.km = +(asphaltLen / 1000).toFixed(1);
-  out.tex = T;
+  out.tex = T; out.materials = M;   // [v4:town-accuracy] rivers.js paves its bridge decks with the street asphalt
   out.nodes = nodes.size;
   return out;
 }

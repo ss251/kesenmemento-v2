@@ -24,6 +24,12 @@ import { lights } from '../life/lights.js';
 import { buildParking } from './parking.js';
 import { buildGardens } from './gardens.js';
 import { makeNameAtlas } from './blocks.js';
+import { makeRealNames } from './realnames.js';   // [v4:town-accuracy]
+import { channels, channelIndex, buildRivers } from './rivers.js';   // [v4:town-accuracy]
+import { buildLanduse, parkingIndex } from './landuse.js';   // [v4:town-accuracy]
+import { buildSignals } from './signals.js';   // [v4:town-accuracy]
+import { EXPLORE_LOTS } from '../explore/taken.js';   // [v4:explore] lots explore models with a walk-in interior
+import { KAZEMACHI_LOTS } from '../harbor/real.js';   // [v4:polish1] 風待ち heritage buildings (harbor/kazemachi.js)
 
 export async function build(ctx) {
   const L = ctx.L;
@@ -58,7 +64,8 @@ export async function build(ctx) {
   const IM = industrialMaterials(ctx, industrialTextures(ctx));
   const out = { shops: [], shopFronts: [], warehouses: [], lanterns: [], bikeSpots: [], gates: [], buildingNames: [], bigBuildings: [], windowsHint: 0 };
   const names = makeNameAtlas(ctx);
-  const T = { H, SM, IM, signs, awn, out, shopCounter: 0, lotIdx, roadIdx, names, nameMat: ctx.mat.toon('#ffffff', { map: names.tex, paint: 0.01 }) };
+  const real = makeRealNames(ctx, heroLots.concat(midLots));   // [v4:town-accuracy] real names (OSM / GSI) on signs
+  const T = { H, SM, IM, signs, awn, out, shopCounter: 0, lotIdx, roadIdx, names, nameMat: ctx.mat.toon('#ffffff', { map: names.tex, paint: 0.01 }), annex: new Map(), real };
   t = lap('textures', t);
   const cls = classifyHero(L, heroLots, roadIdx);
   const built = new Set(), counts = {};
@@ -67,6 +74,8 @@ export async function build(ctx) {
   // detail focus: the promenade walk spot and the street hearts of 八日町, 魚町, 南町 and the waterfront road
   const FOCI = [[focus.x, focus.z], [-110, -170], [90, -190], [-160, 70], [150, -125], [30, -60], [200, -200]];
   for (const lot of heroLots) {
+    if (EXPLORE_LOTS.has(lot.id)) continue;   // [v4:explore] modelled with its interior by explore/interiors.js
+    if (KAZEMACHI_LOTS.has(lot.id)) continue;   // [v4:polish1] the 風待ち heritage shops: harbor/kazemachi.js
     const d = Math.min(...FOCI.map(([fx, fz]) => Math.hypot(lot.obb.cx - fx, lot.obb.cz - fz)));
     const inR = Math.hypot(lot.obb.cx - heroZone.cx, lot.obb.cz - heroZone.cz) <= heroR;
     const lod = quick !== null ? Number(quick) : !inR ? 0 : d < 100 ? 2 : d < 220 ? 1 : 0;
@@ -81,12 +90,28 @@ export async function build(ctx) {
   t = lap('hero', t);
 
   // ------------------------------------------------------------------ streets, poles, props (hero detail through the kit batcher)
-  const street = buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone });
+  // [v4:town-accuracy] rivers first: streets stop at the channel edge and rivers.js bridges them
+  const HC = L.ZONES.hero, MZ = L.ZONES.mid;
+  const chs = channels(L, { near: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < 3200, step: 4 });
+  const chIdx = channelIndex(chs);
+  const street = buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers: chIdx });
   t = lap('streets', t);
+  let rivers = null;
+  try { rivers = buildRivers(ctx, { chs, index: chIdx, detail: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 120, roads, asphalt: street.materials?.asphalt }); } catch (e) { console.warn('[town] rivers', e); }
+  t = lap('rivers', t);
   const poles = buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades: facadeAnchors(L, heroLots.filter((l) => built.has(l.id))) });
   t = lap('poles', t);
-  const parking = buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex: street.tex.asphalt, lineTex: street.tex.line, signs, SM, foci: FOCI, maxDetailCars: low ? 8 : medium ? 20 : 36 });
+  const inParking = parkingIndex(L);
+  const parking = buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex: street.tex.asphalt, lineTex: street.tex.line, signs, SM, foci: FOCI, maxDetailCars: low ? 8 : medium ? 20 : 36, inParking });
   t = lap('parking', t);
+  // [v4:town-accuracy] OSM land use on the ground: car parks, school yards, pitches, building sites, cemeteries, parks
+  let landuse = null;
+  try { landuse = buildLanduse(ctx, { inside: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 150, heroIn: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < HC.r, lotIdx, roadIdx, low, trees: ctx.services.environment?.trees }); } catch (e) { console.warn('[town] landuse', e); }
+  t = lap('landuse', t);
+  // [v4:town-accuracy] OSM traffic signals + crossings, route shields on the numbered roads
+  let signals = null;
+  try { signals = buildSignals(ctx, { roads, lotIdx, roadIdx, detail: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 150, hero: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < HC.r + 40, low }); } catch (e) { console.warn('[town] signals', e); }
+  t = lap('signals', t);
   const props = buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts: out.shopFronts, bikeSpots: out.bikeSpots, heroZone });
   t = lap('props', t);
   let lanes = null; if (!low) { try { lanes = buildLaneLanterns(ctx, out.shopFronts, out); } catch (e) { console.warn('[town] lane lanterns', e); } }   // [v3:fix] 魚町 / 南町 izakaya lanterns + 行灯
@@ -99,8 +124,16 @@ export async function build(ctx) {
 
   // ------------------------------------------------------------------ mid + far
   // hero lots that the hero builder skipped (odd footprints) fall back to the simplified builder
-  const leftovers = heroLots.filter((l) => !built.has(l.id) && !l.landmark && cls.get(l.id)?.kind !== 'shrine' && L.shoreDist(l.obb.cx, l.obb.cz) <= 0.5);
-  const mid = buildMid(ctx, midLots.concat(leftovers), { H, roadIdx });
+  const leftovers = heroLots.filter((l) => !built.has(l.id) && !EXPLORE_LOTS.has(l.id) && !KAZEMACHI_LOTS.has(l.id) && !l.landmark && cls.get(l.id)?.kind !== 'shrine' && L.shoreDist(l.obb.cx, l.obb.cz) <= 0.5);
+  // [v4:town-accuracy] + the annex wings of L / T-shaped hero lots (the kit building stands on their main wing)
+  const annexLots = heroLots.filter((l) => built.has(l.id) && T.annex.has(l.id));
+  const nameItems = [];
+  // [v4:explore] with the explore module in the build, the mid-zone lots are built by explore/stream.js instead (the
+  // same buildMid, per 100 m tile, packed into BatchedMesh pools so a tile can swap to full kit detail when you walk in)
+  const exploreOwnsMid = !!ctx.plan?.explore;
+  const mid = buildMid(ctx, (exploreOwnsMid ? [] : midLots).concat(leftovers, annexLots), { H, roadIdx, annex: T.annex, names: nameItems });
+  const boards = real.boards(nameItems); ctx.addStatic(boards.group);
+  const realStats = { names: real.count, textures: real.textures, midBoards: boards.count, heroShops: out.shopFronts.filter((s) => s.real).length, heroBoards: out.buildingNames.filter((b) => b.real).length };
   t = lap('mid', t);
   const gardens = buildGardens(ctx, heroLots.concat(midLots), { lotIdx, roadIdx, heroZone, maxDist: low ? 650 : medium ? 900 : 1150 });
   t = lap('gardens', t);
@@ -121,8 +154,10 @@ export async function build(ctx) {
     hero: counts, big: out.bigBuildings.length, heroSimplified: leftovers.length, shops: out.shopFronts.length, warehouses: out.warehouses.length, heroTris,
     mid: { count: mid.count, tris: mid.tris, meshes: mid.meshes, roofs: mid.stats }, far,
     street: { km: street.km, nodes: street.nodes, signs: street.signs, mirrors: street.mirrors, guardrails: street.guardrails, crosswalks: street.crosswalks.length, walkPaths: street.walkPaths.length },
-    poles, props, lanes, parking, gardens, ms, tris, px, kindMs: Object.fromEntries(Object.entries(kindMs).map(([k, v]) => [k, Math.round(v)])), kindTris: Object.fromEntries(Object.entries(kindTris).map(([k, v]) => [k, Math.round(v / kindN[k])])), kindN, total: Math.round(performance.now() - t0),
+    poles, props, lanes, parking, gardens, real: realStats, rivers, landuse, signals, ms, tris, px, kindMs: Object.fromEntries(Object.entries(kindMs).map(([k, v]) => [k, Math.round(v)])), kindTris: Object.fromEntries(Object.entries(kindTris).map(([k, v]) => [k, Math.round(v / kindN[k])])), kindN, total: Math.round(performance.now() - t0),
   };
+  // [v4:explore] the kit context, so explore/stream.js can build hero-grade lots in the tiles around the player
+  ctx.services.town.kit = { T, H, heroZone, chIdx, streetMaterials: street.materials, streetTex: street.tex, exploreOwnsMid };
   if (typeof window !== 'undefined') window.__town = stats;
   return stats;
 }

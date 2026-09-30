@@ -3,8 +3,12 @@ export const MODULE_LOADERS = {
   "_ground": () => import("./_ground.js"),
   "_houses": () => import("./_houses.js"),
   "environment": () => import("./environment.js"),
+  "explore": () => import("./explore/index.js"),
   "harbor": () => import("./harbor/index.js"),
+  "landmarks": () => import("./landmarks/index.js"),
+  "landuse_aerial": () => import("./landuse_aerial.js"),
   "life": () => import("./life/index.js"),
+  "lotfix": () => import("./lotfix.js"),
   "town": () => import("./town/index.js"),
   "water": () => import("./water.js"),
 };

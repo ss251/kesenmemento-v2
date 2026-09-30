@@ -14,17 +14,47 @@ export class Physics {
     this.items = [];
     this.dynamic = [];
     this._dynItems = [];
+    // [v4:explore] colliders of streamed tiles: while `tag` is set, new colliders carry it and removeTag(tag) takes
+    // every one of them out again when the tile unloads (explore/stream.js)
+    this.tag = null;
+    this._tagged = new Map();
   }
   _cells(minx, minz, maxx, maxz, fn) {
     const x0 = Math.floor(minx / CELL), x1 = Math.floor(maxx / CELL), z0 = Math.floor(minz / CELL), z1 = Math.floor(maxz / CELL);
     for (let ix = x0; ix <= x1; ix++) for (let iz = z0; iz <= z1; iz++) fn(ix + ',' + iz);
   }
   _insert(it) {
-    this.items.push(it);
     const r = it.type === 'cyl' ? it.r : Math.hypot(it.hw, it.hd);
+    if (this.tag !== null) {   // [v4:explore] tagged: remember its cells for removeTag (untagged items stay in `items`)
+      it.tag = this.tag; it._cells = [];
+      let list = this._tagged.get(this.tag); if (!list) this._tagged.set(this.tag, (list = [])); list.push(it);
+      this._cells(it.cx - r, it.cz - r, it.cx + r, it.cz + r, (k) => { let a = this.grid.get(k); if (!a) this.grid.set(k, (a = [])); a.push(it); it._cells.push(k); });
+      return it;
+    }
+    this.items.push(it);
     this._cells(it.cx - r, it.cz - r, it.cx + r, it.cz + r, (k) => { let a = this.grid.get(k); if (!a) this.grid.set(k, (a = [])); a.push(it); });
     return it;
   }
+  /** [v4:explore] Remove every collider added while `tag` was set. Returns how many were removed. */
+  removeTag(tag) {
+    const list = this._tagged.get(tag); if (!list) return 0;
+    for (const it of list) for (const k of it._cells) { const a = this.grid.get(k); if (!a) continue; const i = a.indexOf(it); if (i >= 0) { a[i] = a[a.length - 1]; a.pop(); } if (!a.length) this.grid.delete(k); }
+    this._tagged.delete(tag);
+    return list.length;
+  }
+  /** [v4:explore] Remove the colliders near (x, z) (within r of their centre) that `fn(item)` accepts: a doorway cut
+   *  into a wall another module built (the fish market's visitor entrance). Returns the removed colliders. */
+  removeNear(x, z, r, fn = () => true) {
+    const gone = new Set();
+    this._cells(x - r - 20, z - r - 20, x + r + 20, z + r + 20, (k) => { const a = this.grid.get(k); if (a) for (const it of a) if (!gone.has(it) && Math.hypot(it.cx - x, it.cz - z) <= r && fn(it)) gone.add(it); });
+    if (!gone.size) return [];
+    for (const [k, a] of this.grid) { const b = a.filter((it) => !gone.has(it)); if (b.length !== a.length) { if (b.length) this.grid.set(k, b); else this.grid.delete(k); } }
+    this.items = this.items.filter((it) => !gone.has(it));
+    for (const [t, list] of this._tagged) this._tagged.set(t, list.filter((it) => !gone.has(it)));
+    return [...gone];
+  }
+  /** [v4:explore] Number of colliders carrying `tag` (tests, stats). */
+  tagged(tag) { return tag === undefined ? [...this._tagged.values()].reduce((s, l) => s + l.length, 0) : this._tagged.get(tag)?.length || 0; }
   _obb(type, cx, cz, w, d, rotY, extra) {
     return { type, cx, cz, hw: w / 2, hd: d / 2, c: Math.cos(rotY), s: Math.sin(rotY), rotY, ...extra };
   }
@@ -83,6 +113,17 @@ export class Physics {
     return g;
   }
 
+  /** [v4:integrate] Is (x, y, z) inside a solid (box or cylinder collider)? Walk boxes and ramps are floors, not solids. */
+  solidAt(x, z, y) {
+    for (const it of this._query(x, z, 0.01)) {
+      if (it.type === 'cyl') { if (y > it.y0 && y < it.y1 && Math.hypot(x - it.cx, z - it.cz) < it.r) return true; continue; }
+      if (it.type !== 'box' || y <= it.y0 || y >= it.y1) continue;
+      const [lx, lz] = this._local(it, x, z);
+      if (Math.abs(lx) <= it.hw && Math.abs(lz) <= it.hd) return true;
+    }
+    return false;
+  }
+
   /** [v3:fix] Can a walker stand at (x, z)? Land, or a walkable deck (walk box / ramp) over the sea. */
   standable(x, z, feetY = 1e9) {
     if (!this.isWater || !this.isWater(x, z)) return true;
@@ -128,5 +169,5 @@ export class Physics {
     return p;
   }
 
-  get count() { return this.items.length; }
+  get count() { return this.items.length + this.tagged(); }   // [v4:explore] + streamed colliders
 }

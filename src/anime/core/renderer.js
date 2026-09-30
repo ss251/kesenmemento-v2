@@ -26,13 +26,16 @@ export function createRenderPipeline(renderer, quality) {
   const rtB4 = new THREE.WebGLRenderTarget(4, 4, { type: HF });
 
   // normal + linear depth override material (handles instancing & skinning through chunks)
+  // [v4:explore] and batching: the streamed core tiles are THREE.BatchedMesh pools (explore/sbatch.js)
   const ndMat = new THREE.ShaderMaterial({
     uniforms: { uFar: { value: 2000 } },
     vertexShader: /* glsl */`
       #include <common>
+      #include <batching_pars_vertex>
       #include <skinning_pars_vertex>
       varying vec3 vN; varying float vD;
       void main(){
+        #include <batching_vertex>
         #include <beginnormal_vertex>
         #include <skinbase_vertex>
         #include <skinnormal_vertex>
@@ -95,13 +98,16 @@ export function createRenderPipeline(renderer, quality) {
       // [v3:polish3] low-lying mist (the 06:30 morning): a height fog hugging the bay and the valley floors; sky.js drives
       // uMist / uMistCol, render() fills the camera terms
       uMist: { value: 0.0 }, uMistCol: { value: new THREE.Color('#e8d8dc') }, uMistH: { value: 26.0 }, uCamY: { value: 0 },
+      // [v4:polish1] 1 at street level (camera below 40 m above the ground), 0 from 70 m up: less shadow cooling, more
+      // saturation on the ground (street frames measured 0.14 mean saturation against the style sheet's 0.21)
+      uStreet: { value: 0.0 },
       uInvProj: { value: new THREE.Matrix4() }, uCamRot: { value: new THREE.Matrix3() },
     },
     vertexShader: FS_VERT,
     fragmentShader: /* glsl */`
       uniform sampler2D tColor, tND, tBloom, tBloom2; uniform vec2 uRes; uniform float uFar, uPx, uOutline, uBloom, uGlow, uExposure, uLeak, uTime, uVignette, uLeakK, uNight; uniform vec2 uLineRange;
       uniform vec3 uLine; uniform vec3 uSunScreen; varying vec2 vUv;
-      uniform float uMist, uMistH, uCamY; uniform vec3 uMistCol; uniform mat4 uInvProj; uniform mat3 uCamRot;
+      uniform float uMist, uMistH, uCamY; uniform vec3 uMistCol; uniform mat4 uInvProj; uniform mat3 uCamRot; uniform float uStreet;
       vec4 nd(vec2 uv){ return texture2D(tND, uv); }
       float lum(vec3 c){ return dot(c, vec3(0.2126,0.7152,0.0722)); }
       vec3 softClip(vec3 c){ vec3 k = vec3(0.78); vec3 over = max(c - k, 0.0); return min(c, k) + (1.0-k) * (1.0 - exp(-over/(1.0-k))); }
@@ -154,16 +160,25 @@ export function createRenderPipeline(renderer, quality) {
         col = softClip(col);
         float L = lum(col);
         // cool the shadows (blue-violet), warm the highlights
-        col = mix(col, col * vec3(0.9, 0.92, 1.1), (1.0 - smoothstep(0.08, 0.55, L)) * 0.55);
+        // [v4:polish2] drone value 0.55 -> 0.40: from the air the cooled shadows turned the hill roofs grey-lavender
+        // (roof dE2000 bias da +5 / db -6 against the aerial photo)
+        col = mix(col, col * vec3(0.9, 0.92, 1.1), (1.0 - smoothstep(0.08, 0.55, L)) * mix(0.40, 0.35, uStreet));
         col += vec3(0.022, 0.012, -0.012) * smoothstep(0.55, 1.0, L);
-        // gentle saturation lift
-        col = mix(vec3(lum(col)), col, 1.07);
+        // [v4:polish2] drone white balance: from the air the violet sky fill tinted every roof lavender (roof dE2000 bias
+        // da +4.8 / db -5.7 against the GSI aerial photo); a camera-style white balance on the town (not the sky, faded
+        // out with distance so the horizon still meets the sky) and none at street level, where the look is tuned
+        { float wb = (1.0 - uStreet) * (1.0 - step(uFar * 0.995, d0)) * (1.0 - smoothstep(1500.0, 6000.0, d0));
+          col *= mix(vec3(1.0), vec3(0.985, 1.0, 0.93), wb); }
+        // gentle saturation lift (stronger at street level), plus [v4:polish1] a street-level vibrance: the near-grey
+        // surfaces (asphalt, pastel render) gain colour, the already saturated ones barely move
+        float mxc = max(col.r, max(col.g, col.b)), satp = mxc > 1e-4 ? (mxc - min(col.r, min(col.g, col.b))) / mxc : 0.0;
+        col = mix(vec3(lum(col)), col, mix(1.07, 1.15, uStreet) + uStreet * 0.5 * (1.0 - satp) * (1.0 - satp));
         // ---------- light leak from the sun side
         vec2 asp = vec2(uRes.x/uRes.y, 1.0);
         vec2 sp = uSunScreen.xy;
         float ds = length((vUv - sp) * asp);
         float leak = exp(-ds*ds*1.8) * 0.10 + exp(-ds*ds*10.0) * 0.09 * uSunScreen.z;
-        col += vec3(1.0, 0.86, 0.68) * leak * uLeak * uLeakK * (1.0 - uNight) * (0.55 + 0.45*uSunScreen.z);
+        col += vec3(1.0, 0.86, 0.68) * leak * uLeak * uLeakK * (1.0 - uNight) * (0.55 + 0.45*uSunScreen.z) * (1.0 - 0.3 * uStreet);   // [v4:polish1] less wash on foot
         // ---------- vignette
         vec2 q = (vUv - 0.5) * asp * 0.9;
         col *= 1.0 - uVignette * smoothstep(0.35, 1.05, length(q));
@@ -189,6 +204,7 @@ export function createRenderPipeline(renderer, quality) {
   function setView(alt) {
     const k = Math.min(14, Math.max(1, alt / 25));
     compMat.uniforms.uLineRange.value.set(35 * k, 190 * k);
+    compMat.uniforms.uStreet.value = 1 - THREE.MathUtils.smoothstep(alt, 40, 70);   // [v4:polish1]
   }
 
   function pass(mat, target) { quad.material = mat; renderer.setRenderTarget(target); renderer.render(qScene, qCam); }
@@ -276,5 +292,40 @@ export function createRenderPipeline(renderer, quality) {
     pass(compMat, out);
   }
 
-  return { render, setSize, setView, compMat, ndMat, targets: { rtColor, rtND }, size };
+  /**
+   * [v4:polish1] QA: the share of a gw x gh grid of view rays whose first hit (the last pre-pass: linear depth and
+   * normal) lies closer than `near` metres. Ground-like hits (world normal up, > 0.6) are not counted: at eye height the
+   * pavement is always within a few metres in the lower rows. Used by tools/anime/qa3.mjs on every walk spot.
+   */
+  const _h = new Uint16Array(4), _n = new THREE.Vector3(), _m3 = new THREE.Matrix3();
+  function nearShare(camera, near = 6, gw = 16, gh = 9) {
+    const W = rtND.width, H = rtND.height, f = THREE.DataUtils.fromHalfFloat;
+    const ty = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2), tx = ty * camera.aspect;
+    _m3.setFromMatrix4(camera.matrixWorld);
+    let hit = 0, tot = 0;
+    for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) {
+      const u = (i + 0.5) / gw, v = (j + 0.5) / gh;
+      renderer.readRenderTargetPixels(rtND, Math.min(W - 1, Math.floor(u * W)), Math.min(H - 1, Math.floor(v * H)), 1, 1, _h);
+      const depth = f(_h[3]) * camera.far, x = (u * 2 - 1) * tx, y = (v * 2 - 1) * ty;
+      _n.set(f(_h[0]) * 2 - 1, f(_h[1]) * 2 - 1, f(_h[2]) * 2 - 1).applyMatrix3(_m3).normalize();
+      tot++;
+      if (depth * Math.sqrt(1 + x * x + y * y) < near && _n.y < 0.6) hit++;
+    }
+    return hit / tot;
+  }
+
+  /** [v4:polish3] Distance (m, along the view ray) to the first surface at screen point (u, v) of the last pre-pass
+   *  (u, v in 0..1, v = 0 at the top), or Infinity for the sky. qa3's 'place visible' check. */
+  function depthAt(camera, u, v) {
+    const W = rtND.width, H = rtND.height, f = THREE.DataUtils.fromHalfFloat;
+    const ty = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2), tx = ty * camera.aspect;
+    const px = Math.min(W - 1, Math.max(0, Math.floor(u * W))), py = Math.min(H - 1, Math.max(0, Math.floor((1 - v) * H)));
+    renderer.readRenderTargetPixels(rtND, px, py, 1, 1, _h);
+    const d = f(_h[3]);
+    if (!(d > 0) || d >= 0.9999) return Infinity;
+    const x = (u * 2 - 1) * tx, y = (1 - v * 2) * ty;
+    return d * camera.far * Math.sqrt(1 + x * x + y * y);
+  }
+
+  return { render, setSize, setView, compMat, ndMat, targets: { rtColor, rtND }, size, nearShare, depthAt };
 }

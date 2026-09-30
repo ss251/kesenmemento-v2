@@ -114,6 +114,7 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
         }
         shared.set(sig, sm);
       }
+      if (m.userData.acc) sm.userData.acc = m.userData.acc;   // [v4:town-accuracy] class tag for tools/anime/accuracy.mjs
       target = sm; bake = m.color;
     }
     const key = `${target.uuid}|${ix},${iz}|${o.layers.mask}|${o.castShadow ? 1 : 0}${o.receiveShadow ? 1 : 0}|${o.renderOrder}|${o.frustumCulled ? 1 : 0}`;

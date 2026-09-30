@@ -75,7 +75,7 @@ export const CSS = /* css */`
   #klc-ui .places[data-open="false"] h3 { margin-bottom: 2px; }
   #klc-ui .places[data-open="false"] .ph .cur { opacity: 1; }
 }
-#klc-ui .places ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+#klc-ui .places ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; max-height: min(46vh, 420px); overflow-y: auto; overscroll-behavior: contain; pointer-events: auto; }   /* [v4:explore] 7 stops + 40 real places */
 #klc-ui .places li button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; text-align: left; font: 700 14px/1.2 var(--k-round); }
 #klc-ui .places li button .n { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 10px/1 var(--k-sans); background: rgba(31, 58, 104, 0.1); color: var(--k-navy); flex: none; }
 #klc-ui .places li button small { display: block; margin-top: 2px; font: 500 10px/1.2 var(--k-sans); color: var(--k-muted); }

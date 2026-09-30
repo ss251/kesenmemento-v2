@@ -24,6 +24,8 @@ export async function build(ctx) {
     groundAt: L.groundAt, worldHeight, terrainMaterial: mat, landcover: lc.meta,
     forestAt: trees?.forestAt || (() => 0), trees: (trees?.list || []).concat(scatter?.list || []), surfaceAt: terrain.surfaceAt,
   };
+  // [v4:polish3] near-ground detail on the terrain (terrain.js uNearK): full under 45 m of altitude, gone by 80 m
+  if (mat.userData.uniforms?.uNearK) ctx.onUpdate?.(() => { const c = ctx.camera.position, alt = c.y - Math.max(L.heightAt(c.x, c.z), 0); mat.userData.uniforms.uNearK.value = 1 - Math.min(1, Math.max(0, (alt - 45) / 35)); });
   stats.ms = Math.round(performance.now() - t0);
   if (typeof window !== 'undefined') window.__env = stats;
   return stats;

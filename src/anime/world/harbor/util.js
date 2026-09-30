@@ -1,5 +1,6 @@
 // [v3:harbor] Small shared helpers for the harbour kit (geometry between points, lines, poses, labels).
 import * as THREE from 'three';
+import { fitFontSize } from '../../core/textures.js';   // [v4:polish1]
 
 const _up = new THREE.Vector3(0, 1, 0);
 const _geoCache = new Map();
@@ -74,8 +75,7 @@ export function textTex(ctx, text, { w = 512, h = 128, color = '#2b2a33', bg = n
   return ctx.tex.draw(w, h, (g) => {
     if (bg) { g.fillStyle = bg; g.fillRect(0, 0, w, h); }
     g.fillStyle = color; g.textAlign = 'center'; g.textBaseline = 'middle';
-    let s = h * size; g.font = `${weight} ${s}px ${font}`;
-    while (s > 8 && g.measureText(text).width > w * 0.94) { s -= 2; g.font = `${weight} ${s}px ${font}`; }
+    const s = fitFontSize(g, text, w * 0.94, h * size, font, weight, 8);   // [v4:polish1] one cached measurement
     if (stroke) { g.lineWidth = s * 0.12; g.strokeStyle = stroke; g.lineJoin = 'round'; g.strokeText(text, w / 2, h * 0.54); }
     g.fillText(text, w / 2, h * 0.54);
   }, { key: key || `htxt|${text}|${w}|${h}|${color}|${bg}|${weight}|${size}|${stroke}` });

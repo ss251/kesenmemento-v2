@@ -78,6 +78,9 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
   // ---------------------------------------------------------------- front
   const fasciaY0 = fy + 2.28, fasciaH = Math.max(0.55, top + 0.3 - fasciaY0);
   const board = signs.boardOf(shopIdx % SHOPS.length);
+  // [v4:town-accuracy] a shop OpenStreetMap names carries its real name (S.real from realnames.js) on every board
+  const real = S.real || null;
+  const boardCard = (x, y, z, cw, ch, o) => (real ? card(real.mat, real.rect, x, y, z, Math.min(cw, ch * real.aspect), Math.min(ch, cw / real.aspect), o) : card(SM.board(shopIdx), board.rect, x, y, z, cw, ch, o));
   const frameCol = style === 'wa' ? '#4a3528' : '#aeb4ba';
   if (style === 'modern' || style === 'cafe' || style === 'shutter') {
     // aluminium frame + glass, automatic door in the middle bay
@@ -102,7 +105,7 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
     }
     // fascia board
     HF.box(M.plain, s.board[0], w + 0.02, fasciaH, 0.14, 0, fasciaY0 + fasciaH / 2, zF + 0.05);
-    card(SM.board(shopIdx), board.rect, 0, fasciaY0 + fasciaH / 2, zF + 0.125, Math.min(w - 0.2, fasciaH * 4.2), Math.min(fasciaH - 0.08, (w - 0.2) / 4));
+    boardCard(0, fasciaY0 + fasciaH / 2, zF + 0.125, Math.min(w - 0.2, fasciaH * 4.2), Math.min(fasciaH - 0.08, (w - 0.2) / 4));
     if (s.awning && style !== 'shutter') awning(H, HF, SM, awn, shopIdx, inner, fasciaY0 - 0.02, zF + 0.1, style === 'cafe' ? 1.4 : 1.1);
   } else if (style === 'wa') {
     const zg = zF - 0.35;
@@ -132,7 +135,7 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
     const pd = 0.95, y0 = fasciaY0 + 0.35;
     const sl = H.slab([[-w / 2 - 0.1, y0 - pd * 0.35, zF + pd], [w / 2 + 0.1, y0 - pd * 0.35, zF + pd], [w / 2 + 0.1, y0, zF + 0.1], [-w / 2 - 0.1, y0, zF + 0.1]], 0.08, (q) => [q[0] / 1.08, q[2] / 1.02]);
     H.gb.mesh(kawara, S.roof.color, sl.p, sl.n, sl.u, sl.i, HF.M(0, 0, 0));
-    card(SM.board(shopIdx), board.rect, 0, y0 + 0.5, zF + 0.16, Math.min(w - 0.4, 3.4), Math.min(0.85, (w - 0.4) / 4), { ry: 0 });
+    boardCard(0, y0 + 0.5, zF + 0.16, Math.min(w - 0.4, 3.4), Math.min(0.85, (w - 0.4) / 4), { ry: 0 });
     HF.box(M.wood, '#3f2e24', Math.min(w - 0.3, 3.5), Math.min(0.9, (w - 0.3) / 4 + 0.05), 0.06, 0, y0 + 0.5, zF + 0.12, { uv: { world: 1.2 } });
     if (s.lanterns) for (const sx of [-1, 1]) lantern(H, HF, sx * (inner / 2 - 0.35), fasciaY0 - 0.3, zF + 0.28, out);
     if (s.sugidama) { HF.cyl(M.plain, '#4b4d52', 0.01, 0.5, inner / 2 - 0.4, y0 - 0.1, zF + 0.5, { seg: 4 }); H.gb.raw(M.foliage || M.plain, '#556b3a', ...rawSphere(0.38), HF.M(inner / 2 - 0.4, y0 - 0.6, zF + 0.5)); }
@@ -140,7 +143,7 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
     // 'open': rolled-up shutter box, no glass, display tables stepping out onto the pavement
     HF.box(M.plain, '#9aa1a8', inner + 0.1, 0.34, 0.4, 0, fasciaY0 + 0.1, zF - 0.02);
     HF.box(M.plain, s.board[0], w + 0.02, fasciaH, 0.14, 0, fasciaY0 + fasciaH / 2 + 0.1, zF + 0.05);
-    card(SM.board(shopIdx), board.rect, 0, fasciaY0 + fasciaH / 2 + 0.1, zF + 0.125, Math.min(w - 0.2, fasciaH * 4.2), Math.min(fasciaH - 0.08, (w - 0.2) / 4));
+    boardCard(0, fasciaY0 + fasciaH / 2 + 0.1, zF + 0.125, Math.min(w - 0.2, fasciaH * 4.2), Math.min(fasciaH - 0.08, (w - 0.2) / 4));
     if (s.awning) awning(H, HF, SM, awn, shopIdx, inner, fasciaY0, zF + 0.1, 1.6);
     const topKind = s.interior === 'fish' ? pick(r, ['fishTray', 'fishTray2']) : s.interior === 'veg' ? 'vegCrate' : s.interior === 'dry' ? 'dryBags' : s.interior === 'flower' ? 'flowers' : 'boxes';
     const tw = Math.min(inner - 0.6, 3.2), tr = signs.topOf(topKind).rect;
@@ -155,7 +158,7 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
     card(SM.tops, signs.topOf('price').rect, tw / 2 - 0.2, fy + 1.15, zF + 0.9, 0.3, 0.3);
   }
   // projecting vertical sign at the first-floor corner (both faces readable)
-  if (S.floors >= 2 && w > 3.2 && r() < 0.75) {
+  if (S.floors >= 2 && w > 3.2 && r() < 0.75 && !real) {
     const t = signs.tallOf(shopIdx % SHOPS.length), sx = r() < 0.5 ? -1 : 1;
     const x = sx * (w / 2 - 0.25), y = top + 1.1, z = zF + 0.55;
     HF.box(M.plain, '#f2efe8', 0.1, 1.9, 0.5, x, y, z);
@@ -173,8 +176,8 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
   }
   if (r() < 0.7) { const px = (r() < 0.5 ? -1 : 1) * (inner / 2 - 0.25), pz = zF + 0.35; H.props.pot(HF, px, H.gy(HF, px, pz), pz, r, 1.2); }
   if (s.pole) barberPole(H, HF, inner / 2 - 0.15, fy + 1.3, zF + 0.2);
-  out.shops.push({ name: s.name, type: s.type, style });
-  return s;
+  out.shops.push({ name: real ? real.name : s.name, type: s.type, style, real: !!real });
+  return real ? { ...s, name: real.name } : s;
 }
 
 function awning(H, HF, SM, awn, k, width, y0, z0, depth) {

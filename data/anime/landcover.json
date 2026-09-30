@@ -3,11 +3,11 @@
  "classes": [
   {
    "id": "forest",
-   "color": "#6f9a5c"
+   "color": "#3d6b3f"
   },
   {
    "id": "cedar",
-   "color": "#557f5b"
+   "color": "#2f5634"
   },
   {
    "id": "grass",
@@ -49,11 +49,11 @@
   "hist": {
    "forest": 0.328,
    "cedar": 0.148,
-   "grass": 0.092,
-   "field": 0.115,
+   "grass": 0.091,
+   "field": 0.111,
    "dirt": 0.001,
    "sand": 0.009,
-   "paving": 0.164,
+   "paving": 0.169,
    "town": 0.144,
    "water": 0
   }
@@ -69,8 +69,8 @@
   "hist": {
    "forest": 0.326,
    "cedar": 0.143,
-   "grass": 0.129,
-   "field": 0.085,
+   "grass": 0.128,
+   "field": 0.084,
    "dirt": 0,
    "sand": 0.002,
    "paving": 0.02,

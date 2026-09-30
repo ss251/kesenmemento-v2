@@ -166,6 +166,7 @@ export function classifyLot(f) {
     case "house": storeys = A < 28 ? 1 : r() < 0.2 ? 1 : 2; height = storeys * 2.9; roofShape = A < 28 ? "shed" : pickW(r, [["gable", 0.52], ["hip", 0.38], ["shed", 0.1]]); break;
     case "shop": storeys = pickW(r, [[2, 0.6], [3, 0.3], [1, 0.1]]); height = storeys * 2.9 + 0.3; roofShape = pickW(r, [["gable", 0.35], ["flat", 0.35], ["shed", 0.15], ["hip", 0.15]]); break;
     case "apartment": storeys = Math.max(2, Math.min(6, Math.round(2 + A / 260 + r() * 1.2))); height = storeys * 2.9; roofShape = pickW(r, [["flat", 0.55], ["hip", 0.25], ["gable", 0.2]]); break;
+    case "hotel": storeys = Math.max(3, Math.min(10, Math.round(2 + A / 400 + r() * 1.0))); height = storeys * 3.1; roofShape = "flat"; break;   // [v4:polish1]
     case "office": storeys = Math.max(2, Math.min(8, Math.round((f.code === 3102 ? 3 : 2) + A / 350 + r() * 2))); height = storeys * 3.3; roofShape = "flat"; break;
     case "warehouse": storeys = 1; height = Math.min(11, 5.5 + Math.sqrt(A) * 0.08 + r() * 1.5); roofShape = f.code === 3111 ? "shed" : pickW(r, [["gable", 0.5], ["flat", 0.3], ["saw", 0.08], ["shed", 0.12]]); break;
     case "factory": storeys = r() < 0.35 ? 2 : 1; height = Math.min(16, 7.5 + Math.sqrt(A) * 0.07 + r() * 2 + (storeys - 1) * 3); roofShape = pickW(r, [["flat", 0.45], ["gable", 0.3], ["saw", 0.25]]); break;

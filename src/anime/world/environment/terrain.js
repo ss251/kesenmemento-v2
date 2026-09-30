@@ -122,13 +122,15 @@ export function terrainMaterial(ctx, lc, o = {}) {
     uBbCore: { value: lc.meta ? bb(lc.meta.core) : new THREE.Vector4(0, 0, 1, 1) },
     uBbCity: { value: lc.meta ? bb(lc.meta.city) : new THREE.Vector4(0, 0, 1, 1) },
     uHasLc: { value: lc.tex ? 1 : 0 },
-    uForest: { value: C(o.forest || '#6f9a5c') }, uCedar: { value: C(o.cedar || '#4f7a58') }, uBroad: { value: C(o.broad || '#8db26a') },
+    // [v4:polish3] the painted canopy in the aerial photo's dark cedar greens (was #6f9a5c / #4f7a58 / #8db26a: a lime meadow)
+    uForest: { value: C(o.forest || '#3d6b3f') }, uCedar: { value: C(o.cedar || '#2f5634') }, uBroad: { value: C(o.broad || '#5a8a4a') },
     uAutumnA: { value: C(o.autumnA || '#d9853f') }, uAutumnB: { value: C(o.autumnB || '#c65a3c') }, uAutumnC: { value: C(o.autumnC || '#e2b54a') },
     uAutumn: { value: o.autumn ?? 0.085 },
     uGrass: { value: C('#9fc076') }, uRock: { value: C('#b3aa98') }, uShore: { value: C('#d9ceb0') }, uFar: { value: C('#7d9a70') },
     uCrown: { value: o.crown ?? 4.2 },
     uQuiet: { value: new THREE.Vector3(0, 0, 0) },   // [v3:harbor] (x, z, r): no painted 紅葉 crowns inside (a 3D grove stands there)
     uSakura: { value: 0 },   // [v3:integrate] spring 山桜 crown fraction (life's season controller drives uAutumn / uSakura)
+    uNearK: { value: 0 },    // [v4:polish3] 1 with the eye near the ground (< ~60 m): painted ground detail replaces the photo cover up close
   };
   const uSeason = seasonUniform(ctx.shared);
   m.userData.uniforms = U;   // [v3:harbor] so other modules can set uQuiet
@@ -141,7 +143,7 @@ export function terrainMaterial(ctx, lc, o = {}) {
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
         varying vec3 vWp; varying vec3 vWn;
-        uniform sampler2D tLcCore, tLcCity, tFrCore, tFrCity; uniform vec4 uBbCore, uBbCity; uniform float uHasLc, uAutumn, uCrown, uSakura; uniform vec3 uQuiet;
+        uniform sampler2D tLcCore, tLcCity, tFrCore, tFrCity; uniform vec4 uBbCore, uBbCity; uniform float uHasLc, uAutumn, uCrown, uSakura, uNearK; uniform vec3 uQuiet;
         uniform vec3 uForest, uCedar, uBroad, uAutumnA, uAutumnB, uAutumnC, uGrass, uRock, uShore, uFar, uSunDirW;
         float t_h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
         vec2 t_h22(vec2 p){ float a = t_h21(p); return vec2(a, t_h21(p + a * 17.17 + 3.1)); }
@@ -198,6 +200,26 @@ export function terrainMaterial(ctx, lc, o = {}) {
             lc = mix(lc, mix(uGrass, uForest, smoothstep(40.0, 120.0, vWp.y)), outside);
             fr = mix(fr, smoothstep(30.0, 110.0, vWp.y), outside);
           } else { fr = smoothstep(15.0, 60.0, vWp.y); lc = mix(uGrass, uForest, fr); }
+          // [v4:polish3] at eye level the 2 m/px land cover magnified into blurry camouflage blobs: near the eye it fades to
+          // the cover's flat colour over ~20 m (a coarse mip) with painted detail on top: grass blades and clumps on the
+          // green classes, a fine grain on paving and bare ground. The photo-derived cover comes back beyond ~150 m and
+          // above ~60 m of altitude (uNearK, set per frame by environment.js).
+          if (uNearK > 0.001 && uHasLc > 0.5) {
+            float kN = uNearK * (1.0 - smoothstep(70.0, 170.0, length(vWp - cameraPosition))) * edgeC;
+            if (kN > 0.001) {
+              vec3 flatC = texture2D(tLcCore, clamp(uvC, 0.0, 1.0), 3.5).rgb;
+              float green = smoothstep(1.15, 1.45, flatC.g / max(0.001, 0.5 * (flatC.r + flatC.b)));   // linear: grass 2.0, field 1.6, town 1.05
+              // grass: short directional blades (stretched noise), darker clumps and a few sun-dried patches
+              float blade = t_vn(xz * vec2(5.5, 1.6)) * 0.55 + t_vn(xz * vec2(1.7, 4.3) + 9.0) * 0.45;
+              float clump = t_vn(xz * 0.45 + 4.0), dry = smoothstep(0.62, 0.8, t_vn(xz * 0.11 + 17.0));
+              vec3 grassC = flatC * (0.9 + 0.16 * blade) * (1.0 - 0.1 * smoothstep(0.55, 0.8, clump));
+              grassC = mix(grassC, grassC * vec3(1.12, 1.04, 0.78), dry * 0.45);
+              // paving / bare ground: fine grain and faint large stains
+              float grain = t_vn(xz * 7.0) * 0.5 + t_vn(xz * 2.3 + 5.0) * 0.5, stain = t_vn(xz * 0.08 + 2.0);
+              vec3 paveC = flatC * (0.965 + 0.06 * grain) * (0.97 + 0.05 * stain);
+              lc = mix(lc, mix(paveC, grassC, green), kN);
+            }
+          }
           lc = klcSeasonGround(lc);   // [v3:integrate]
           vec3 N = normalize(vWn);
           float slope = 1.0 - N.y;

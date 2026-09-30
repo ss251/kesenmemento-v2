@@ -39,7 +39,15 @@ try {
   const info = await page.eval(`({ errors: window.__errors, stats: window.__stats, gl: (() => { try { const gl = document.getElementById('scene').getContext('webgl2'); const d = gl.getExtension('WEBGL_debug_renderer_info'); return d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : 'unknown'; } catch (e) { return 'n/a'; } })() })`);
   console.log(`ready in ${((Date.now() - t0) / 1000).toFixed(1)} s · gpu: ${info.gl}`);
   for (let i = 0; i < cams.length; i++) {
-    await page.eval(`window.__camSpec(${JSON.stringify(cams[i])})`);
+    // [v4:polish2] explore adds its stops (lm-*, the extra places) to life's tour after __ready: wait for the stop, and
+    // fail (exit non-zero) when a camera spec does not resolve instead of silently reusing the previous camera
+    const tm = String(cams[i]).trim().match(/^tour(?:walk)?:([\w-]+)$/);
+    if (tm && tm[1] !== 'bay' && tm[1] !== 'hero') {
+      try { await page.waitFor(`!!(window.__life?.tour?.stops?.some((s) => s.id === ${JSON.stringify(tm[1])}) || window.__L?.TOUR?.some((s) => s.id === ${JSON.stringify(tm[1])}))`, { timeout: 60000 }); }
+      catch (e) { throw new Error(`camera spec ${cams[i]}: no such tour stop after 60 s`); }
+    }
+    const ok = await page.eval(`(() => { try { window.__camSpec(${JSON.stringify(cams[i])}); return 'ok'; } catch (e) { return 'ERR ' + e.message; } })()`);
+    if (ok !== 'ok') throw new Error(`camera spec ${cams[i]} did not resolve: ${ok}`);
     await page.frames(5);
     if (args.eval) console.log('eval:', JSON.stringify(await page.eval(args.eval)));   // [v3:polish2] debug probe after the camera is set
     const file = resolve(ROOT, `${out}_${i}.png`);

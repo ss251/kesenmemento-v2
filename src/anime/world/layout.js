@@ -6,6 +6,8 @@
 // data/anime/layout.json (zones, water, quays, roads, lots, pole runs, spots, tour; scripts/anime/build-layout.js).
 // Loaded once with top-level await: fetch() in the browser (page-relative data/anime/, or globalThis.__KLC_DATA__),
 // Bun.file() in bun (tests, tools/anime/check.mjs).
+import { AERIAL_LANDUSE } from './landuse_aerial.js';
+import { LOT_FIX, applyLotFix, applyPlaceFix } from './lotfix.js';   // [v4:polish1]
 import { openGrids, makeSampler } from './layout/grids.js';
 import { sunPosition, dayOfYear } from './layout/sun.js';
 
@@ -69,6 +71,9 @@ export const QUAYS = D.quays;
 export const ROADS = D.roads;
 const roadMap = new Map(ROADS.map((r) => [r.id, r]));
 export const roadById = (id) => roadMap.get(id) || null;
+/** [v4:explore] Make extra roads findable by id (explore.json: the far part of the core at full precision, alleys
+ *  included); ROADS itself is left as it is. */
+export function registerRoads(list) { for (const r of list) roadMap.set(r.id, r); }
 
 // ------------------------------------------------------------------ lots (one per GSI building footprint)
 /** Sakura lot convention: lotFrame(lot) puts the origin at the frontage centre with local +Z facing the street;
@@ -76,13 +81,20 @@ export const roadById = (id) => roadMap.get(id) || null;
 function expandFar(F) {
   const out = [];
   for (const r of F.rows) {
-    const [id, cx, cz, w, d, rotY, storeys, height, groundY, k, sh, rc, wc, area] = r;
+    const [id, cx, cz, w, d, rotY, storeys, height, groundY, k, sh, rc, wc, area, sx, rg] = r;
     const c = Math.cos(rotY), s = Math.sin(rotY), hw = w / 2, hd = d / 2;
     // local x axis = (cos, -sin), local z axis = (sin, cos) for three.js rotation.y
     const P = (lx, lz) => [Math.round((cx + lx * c + lz * s) * 10) / 10, Math.round((cz - lx * s + lz * c) * 10) / 10];
-    out.push({ id, zone: 'far', kind: F.kinds[k], poly: [P(-hw, -hd), P(hw, -hd), P(hw, hd), P(-hw, hd)],
+    const lot = { id, zone: 'far', kind: F.kinds[k], poly: [P(-hw, -hd), P(hw, -hd), P(hw, hd), P(-hw, hd)],
       obb: { cx, cz, w, d, rotY }, front: { rotY, roadId: null, x: P(0, hd)[0], z: P(0, hd)[1], dist: null },
-      storeys, height, groundY, roof: { shape: F.shapes[sh], color: F.roofColors[rc] }, wall: F.walls[wc], seed: hashId(id), area });
+      storeys, height, groundY, roof: { shape: F.shapes[sh], color: F.roofColors[rc] }, wall: F.walls[wc], seed: hashId(id), area };
+    // [v4:data] value sources ("h/kind/roof/color"), the aerial ridge axis, and names for the named far buildings
+    if (F.srcs && sx != null) { const [h, kind, roof, color] = F.srcs[sx].split('/'); lot.src = { h, kind, roof, color }; }
+    if (rg) lot.roof.ridge = rg === 1 ? 'x' : 'z';
+    const x = F.extra?.[id];
+    // [v4:landmarks-A] 'landmark' too (a far lot under a harbour landmark, e.g. the fish market's D棟)
+    if (x) { for (const key of ['name', 'nameEn', 'use', 'facility', 'landmark']) if (x[key] != null) lot[key] = x[key]; if (x.nameSrc) (lot.src ||= {}).name = x.nameSrc; if (x.wallSrc) (lot.src ||= {}).wall = x.wallSrc; }
+    out.push(lot);
   }
   return out;
 }
@@ -90,6 +102,8 @@ function hashId(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++
 /** hero + mid lots first (full footprint poly), then far lots (poly = the OBB). */
 export const LOTS = D.lots.concat(expandFar(D.farLots));
 const lotMap = new Map(LOTS.map((l) => [l.id, l]));
+// [v4:polish1] reference corrections (the Plaza Hotel on its bluff, the station's name): world/lotfix.js
+for (const id of Object.keys(LOT_FIX)) { const l = lotMap.get(id); if (l) applyLotFix(l); }
 export const lotById = (id) => lotMap.get(id) || null;
 export const lotsInZone = (zone) => LOTS.filter((l) => l.zone === zone);
 
@@ -137,6 +151,42 @@ export const AREAS = [
   { name: '魚市場', x0: 420, x1: 800, z0: 500, z1: 1000 },
 ];
 export const NAMES = { city: '気仙沼', cityEn: 'Kesennuma', bay: '内湾', market: '気仙沼市魚市場' };
+
+// ------------------------------------------------------------------ [v4:data] real-world layers (OSM + GSI, scripts/anime/enrich)
+// Lot fields added by the enrichment (all optional): name, nameEn, use ('shop:seafood', 'amenity:restaurant', ...),
+// facility (GSI category: school, post_office, ...), osm (OSM id, hero/mid lots), roof.ridge ('x' along the frontage,
+// 'z' front to back; only when measured), roof.photo (the aerial roof colour before grading), roof.conf, and
+// src = { h, kind, roof, color, name?, wall? } with values 'osm' | 'aerial' | 'gsi' | 'landmark' | 'derived'.
+/** Land use areas: { cls: park|field|cemetery|school|parking|sport|forest|grass|scrub|beach|rock|religious|industrial|
+ *  commercial|construction|aquaculture|water, type (OSM tag value), name, ring, holes, area }, painted in array order. */
+export const LANDUSE = (D.landuse || []).concat(AERIAL_LANDUSE);   // [v4:polish2] + areas traced on the aerial photo
+/** Rivers and streams (OSM centre-lines): { name (大川, 神山川, ...), nameEn, kind: river|stream|canal|drain|ditch, pts, width? (m, from the GSI water areas), tunnel? } */
+export const RIVERS = D.rivers || [];
+/** Real named places for labels and search: named buildings, OSM POIs, GSI facilities and place names.
+ *  { id, name, nameEn, cat, group?, x, z, lot (lot id or null), src: 'osm'|'gsi' } */
+export const PLACES = D.places || [];
+applyPlaceFix(PLACES);   // [v4:polish3]
+/** Traffic signals { x, z, roadId } and crossings { x, z, kind, signals, roadId } from OSM. */
+export const SIGNALS = D.signals || [];
+export const CROSSINGS = D.crossings || [];
+/** Named bridges { name, kind, pts } and rail { kind, name, pts, bridge, tunnel } from OSM. */
+export const BRIDGES = D.bridges || [];
+export const RAIL = D.rail || [];
+/** Data credit line required by the sources (OSM: © OpenStreetMap contributors). */
+export const CREDITS = D.credits || '出典：国土地理院';
+const norm = (t) => String(t || '').normalize('NFKC').toLowerCase().replace(/\s+/g, '');
+/** Search PLACES by a JA or EN query (NFKC, case-insensitive substring; exact and prefix matches first). */
+export function findPlaces(query, limit = 20) {
+  const q = norm(query); if (!q) return [];
+  const hits = [];
+  for (const p of PLACES) {
+    const a = norm(p.name), b = norm(p.nameEn);
+    const s = a === q || b === q ? 0 : a.startsWith(q) || b.startsWith(q) ? 1 : a.includes(q) || b.includes(q) ? 2 : -1;
+    if (s >= 0) hits.push([s, a.length, p]);
+  }
+  hits.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+  return hits.slice(0, limit).map((h) => h[2]);
+}
 
 /** Raw terrain/sea grids ({ core, city }: x0, z0, d, w, h, data: { h (dm), sdf (dm), wat }) for GPU textures. */
 export const GRIDS = S.grids;

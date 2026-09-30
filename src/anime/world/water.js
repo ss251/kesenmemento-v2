@@ -131,14 +131,15 @@ export function waterMaterial(ctx, o = {}) {
           float afterglow = smoothstep(0.06, -0.05, normalize(uSkySun).y) * (1.0 - uNightW);
           float streak = smoothstep(0.8, 0.88, s1 * 0.65 + s2 * 0.45) * near * (1.0 - 0.6 * afterglow);
           float trough = smoothstep(0.62, 0.8, w_vn(vec2(q.x * 0.01 + uTime * 0.01, q.y * 0.06) + 21.0)) * lod;
-          col = mix(col, col * 1.1 + 0.02, swell * 0.5 * lod);
+          col = mix(col, col * 1.1 + 0.02, swell * 0.3 * lod);   // [v4:polish2] 0.5 -> 0.3 (grid of pale patches from the air)
           col = mix(col, col * 1.2 + 0.03, streak * 0.45);
           // [v3:fix] painted ripple bands across the view on calm water (strongest in the afterglow mirror), near the camera
           float ripL = 0.0, ripD = 0.0;
           {
             float rb = w_across(xz, camF, 0.035, 0.55, vec2(uTime * 0.01, -uTime * 0.12), 31.0);
             float band = smoothstep(0.62, 0.72, rb) * (1.0 - smoothstep(0.72, 0.86, rb));
-            float nearR = 1.0 - smoothstep(40.0, 480.0, dist);
+            // [v4:polish2] fade the across-view bands out as the camera climbs: from a 60-300 m drone they tiled into pale rectangles
+            float nearR = (1.0 - smoothstep(40.0, 480.0, dist)) * (1.0 - smoothstep(25.0, 70.0, cameraPosition.y));
             // [v3:polish] calm-water ripples carry the foreground (the magic-hour mirror read as a dead flat plane): a light
             // stroke with a deeper shadow stroke just below it, both across the view, fading out by ~480 m
             float shade = smoothstep(0.34, 0.42, rb) * (1.0 - smoothstep(0.42, 0.52, rb));

@@ -24,6 +24,7 @@ export function buildFar(ctx, lots, { centre, maxDist = 7000, ring = 2200, skipS
   for (const l of lots) {
     if (l.obb.w < 1.5 || l.obb.d < 1.5) continue;
     if (ctx.L.shoreDist(l.obb.cx, l.obb.cz) > 0.5) continue;
+    if (l.landmark || l.kind === 'landmark') continue;   // [v4:landmarks-A] harbor builds the landmark (e.g. the fish market's D棟) on its real outline
     const dist = Math.hypot(l.obb.cx - centre.cx, l.obb.cz - centre.cz);
     if (dist > maxDist) continue;
     if (dist > skipSmallBeyond && l.area < 70) continue;
@@ -42,6 +43,7 @@ export function buildFar(ctx, lots, { centre, maxDist = 7000, ring = 2200, skipS
   const group = new THREE.Group(); group.name = 'town-far';
   const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), P = new THREE.Vector3(), S = new THREE.Vector3(), Y = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
   let count = 0, tris = 0;
+  const where = new Map();   // [v4:explore] lot id -> [[instanced mesh, index], ...] (body + roof), for hide / show
   for (const tl of tiles.values()) {
     const cnt = { gable: 0, hip: 0, flat: 0 };
     for (const l of tl) cnt[shapeOf(l)]++;
@@ -55,17 +57,19 @@ export function buildFar(ctx, lots, { centre, maxDist = 7000, ring = 2200, skipS
       Q.setFromAxisAngle(Y, o.rotY);
       P.set(o.cx, base, o.cz); S.set(Math.max(1, o.w - 0.25), h + 0.6, Math.max(1, o.d - 0.25));
       bodies.setMatrixAt(i, M4.compose(P, Q, S));
+      where.set(l.id, [[bodies, i]]);
       bodies.setColorAt(i, col.set(wallOf(l)));
       fac[i * 4] = styleOf(l, false); fac[i * 4 + 1] = (l.seed % 997) / 997; fac[i * 4 + 2] = h; fac[i * 4 + 3] = 0;
       const sh = shapeOf(l), k = fill[sh]++;
       if (sh === 'flat') { P.set(o.cx, base + h + 0.6, o.cz); S.set(o.w - 0.1, 0.35, o.d - 0.1); }
       else {
-        const along = o.w >= o.d;
+        const along = l.roof.ridge ? l.roof.ridge === 'x' : o.w >= o.d;   // [v4:data] the ridge measured on the aerial photo
         Q.setFromAxisAngle(Y, o.rotY + (along ? 0 : Math.PI / 2));
-        const Lr = Math.max(o.w, o.d), D = Math.min(o.w, o.d);
+        const Lr = along ? o.w : o.d, D = along ? o.d : o.w;
         P.set(o.cx, base + h + 0.6, o.cz); S.set(Lr - 0.25, Math.min(3.2, D * 0.32), D - 0.25);
       }
       roofs[sh].setMatrixAt(k, M4.compose(P, Q, S));
+      where.get(l.id).push([roofs[sh], k]);
       roofs[sh].setColorAt(k, col.set(roofCol(l, sh)));
     });
     bodies.geometry = body.clone();
@@ -82,5 +86,20 @@ export function buildFar(ctx, lots, { centre, maxDist = 7000, ring = 2200, skipS
     count += tl.length;
   }
   ctx.add(group);
+  // [v4:explore] the streamed core replaces far instances with street-level buildings: hide(ids) collapses their
+  // instance matrices (kept for show(ids)); the bounding spheres stay those of the whole ring
+  const saved = new Map(), Z = new THREE.Matrix4().makeScale(0, 0, 0), tmp = new THREE.Matrix4();
+  const setHidden = (ids, hide) => {
+    const touched = new Set();
+    for (const id of ids) {
+      const w = where.get(id); if (!w || saved.has(id) === hide) continue;
+      if (hide) { saved.set(id, w.map(([m, i]) => m.getMatrixAt(i, new THREE.Matrix4()))); for (const [m, i] of w) { m.setMatrixAt(i, Z); touched.add(m); } }
+      else { const mats = saved.get(id); w.forEach(([m, i], j) => { m.setMatrixAt(i, mats[j] || tmp.identity()); touched.add(m); }); saved.delete(id); }
+    }
+    for (const m of touched) m.instanceMatrix.needsUpdate = true;
+    return touched.size;
+  };
+  const api = { hide: (ids) => setHidden(ids, true), show: (ids) => setHidden(ids, false), has: (id) => where.has(id), hidden: (id) => saved.has(id), get hiddenCount() { return saved.size; } };
+  if (ctx.services) ctx.services.farTown = api;
   return { count, tiles: tiles.size, tris: Math.round(tris), meshes: group.children.length };
 }

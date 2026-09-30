@@ -13,6 +13,8 @@ function paint(geo, fn) {
   return geo;
 }
 const lin = (h) => new THREE.Color(h);
+// [v4:polish3] crown ramps a step darker, toward the aerial photo's canopy (the hills read yellow-green beside it)
+const CEDAR_LO = '#355e44', CEDAR_HI = '#5f8c5a', BROAD_LO = '#4f7c48', BROAD_HI = '#8fb66a';
 
 /** Unit cedar (height 1, radius ~0.22): trunk + three stacked cones. */
 function cedarGeometry() {
@@ -22,7 +24,7 @@ function cedarGeometry() {
   const tiers = [[0.16, 0.62, 0.23], [0.42, 0.5, 0.18], [0.64, 0.38, 0.13]];
   for (const [y0, h, r] of tiers) {
     const g = new THREE.ConeGeometry(r, h, 7, 1).translate(0, y0 + h / 2, 0);
-    parts.push(paint(g, (x, y, z, c) => { const t = Math.min(1, Math.max(0, (y - y0) / h)); c.copy(lin('#3f6a4d')).lerp(lin('#6f9a66'), t * 0.8); }));
+    parts.push(paint(g, (x, y, z, c) => { const t = Math.min(1, Math.max(0, (y - y0) / h)); c.copy(lin(CEDAR_LO)).lerp(lin(CEDAR_HI), t * 0.8); }));
   }
   const g = mergeGeometries(parts.map((p) => p.toNonIndexed()));
   g.computeVertexNormals();
@@ -39,7 +41,7 @@ function broadGeometry() {
     // merge duplicated vertices -> smooth normals -> round cel shading on a low-poly blob
     s.deleteAttribute('normal'); s.deleteAttribute('uv');
     const m = mergeVerts(s); m.scale(1, 0.86, 1); m.translate(bx, by, bz); m.computeVertexNormals();
-    parts.push(paint(m, (x, y, z, c) => { const t = Math.min(1, Math.max(0, (y - (by - r)) / (2 * r))); c.copy(lin('#5f8c55')).lerp(lin('#a4c77a'), t * 0.9); }));
+    parts.push(paint(m, (x, y, z, c) => { const t = Math.min(1, Math.max(0, (y - (by - r)) / (2 * r))); c.copy(lin(BROAD_LO)).lerp(lin(BROAD_HI), t * 0.9); }));
   }
   const g = mergeGeometries(parts.map((p) => (p.index ? p.toNonIndexed() : p)));
   // keep the blob smooth normals (recomputing on the non-indexed merge would facet them)
@@ -134,17 +136,38 @@ export function treeMaterial(ctx, cedar = false) {
   return m;
 }
 
+/** [v4:polish3] Far LOD crowns: a 6-sided open cone (6 triangles) for the cedars, a squashed octahedron (8) for the
+ *  broadleaves, painted like the near trees (dark skirt, lighter top). No trunk: the crowns touch at that distance. */
+function farCedarGeometry() {
+  const g = new THREE.ConeGeometry(0.24, 0.84, 6, 1, true).translate(0, 0.16 + 0.42, 0);
+  g.deleteAttribute('uv');
+  const m = mergeVerts(g);
+  return paint(m, (x, y, z, c) => { const t = Math.min(1, Math.max(0, (y - 0.16) / 0.84)); c.copy(lin(CEDAR_LO)).lerp(lin(CEDAR_HI), t * 0.8); });
+}
+function farBroadGeometry() {
+  const g = new THREE.OctahedronGeometry(0.46, 0); g.deleteAttribute('uv'); g.deleteAttribute('normal');
+  const m = mergeVerts(g); m.scale(1, 0.8, 1); m.translate(0, 0.6, 0); m.computeVertexNormals();
+  return paint(m, (x, y, z, c) => { const t = Math.min(1, Math.max(0, (y - 0.23) / 0.74)); c.copy(lin(BROAD_LO)).lerp(lin(BROAD_HI), t * 0.9); });
+}
+/** Distance (m) inside which a tree draws with the full model, per quality tier. */
+export const TREE_NEAR = { high: 380, medium: 300, low: 200 };
+
 export async function buildTrees(ctx, lc) {
   const data = await L.loadData('trees.json').catch(() => null);
   if (!data) return null;
   const geos = [cedarGeometry(), broadGeometry(), broadGeometry()];
+  const farGeos = [farCedarGeometry(), farBroadGeometry(), farBroadGeometry()];
   const counts = [0, 0, 0];
   for (const r of data.rows) counts[r[3]]++;
-  // [v3:integrate] seasonal tree materials (treeMaterial)
-  const meshes = geos.map((g, t) => { const m = new THREE.InstancedMesh(g, treeMaterial(ctx, t === 0), Math.max(1, counts[t])); m.count = counts[t]; m.castShadow = true; m.receiveShadow = true; m.name = 'env-trees-' + data.types[t]; return m; });
+  // [v3:integrate] seasonal tree materials (treeMaterial); [v4:polish3] near + far LOD meshes of every type, the
+  // instances re-sorted between them when the camera has moved 25 m (a copy of 16 + 3 floats per tree)
+  const mk = (g, t, far) => { const m = new THREE.InstancedMesh(g, treeMaterial(ctx, t === 0), Math.max(1, counts[t])); m.count = counts[t]; m.castShadow = !far; m.receiveShadow = true; m.name = 'env-trees-' + data.types[t] + (far ? '-far' : ''); return m; };
+  const meshes = geos.map((g, t) => mk(g, t, false));
+  const farMeshes = farGeos.map((g, t) => mk(g, t, true));
   const fill = [0, 0, 0];
   const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), P = new THREE.Vector3(), Sc = new THREE.Vector3(), Y = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
   const list = [];
+  const mats = counts.map((n) => new Float32Array(n * 16)), cols = counts.map((n) => new Float32Array(n * 3)), pos = counts.map((n) => new Float32Array(n * 2));
   for (const r of data.rows) {
     const [x, z, y, t, h, rad, tint] = r;
     const w = t === 0 ? rad / 0.22 : rad / 0.5;
@@ -152,15 +175,42 @@ export async function buildTrees(ctx, lc) {
     P.set(x, y - 0.35, z); Sc.set(w, h, w);
     M4.compose(P, Q, Sc);
     const i = fill[t]++;
-    meshes[t].setMatrixAt(i, M4);
+    M4.toArray(mats[t], i * 16);
     const pal = TINTS[t];
-    col.set(pal[tint % pal.length]);
-    meshes[t].setColorAt(i, col);
+    col.set(pal[tint % pal.length]); col.toArray(cols[t], i * 3);
+    pos[t][i * 2] = x; pos[t][i * 2 + 1] = z;
     list.push({ x, z, y, h, r: rad, type: data.types[t] });
   }
   const g = new THREE.Group(); g.name = 'env-trees';
-  for (const m of meshes) { m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; m.computeBoundingSphere(); g.add(m); }
+  for (const set of [meshes, farMeshes]) for (let t = 0; t < 3; t++) {
+    const m = set[t];
+    m.instanceMatrix.array.set(mats[t]); m.setColorAt(0, col); m.instanceColor.array.set(cols[t]);
+    m.computeBoundingSphere();   // over every tree of the type: a superset of any split, so it stays valid
+    g.add(m);
+  }
   ctx.add(g);
-  let tris = 0; for (let t = 0; t < 3; t++) tris += (geos[t].index ? geos[t].index.count : geos[t].attributes.position.count) / 3 * counts[t];
-  return { list, stats: { trees: data.rows.length, tris }, forestAt: null };
+  const nearR = TREE_NEAR[ctx.quality?.name] || TREE_NEAR.high;
+  const last = { x: 1e9, z: 1e9 }, stats = { trees: data.rows.length, tris: 0, near: 0, far: 0 };
+  const triCount = (geo) => (geo.index ? geo.index.count : geo.attributes.position.count) / 3;
+  /** Split the trees into near (full model) and far (crown) round (cx, cz). */
+  function split(cx, cz) {
+    last.x = cx; last.z = cz;
+    const r2 = nearR * nearR; let tris = 0, nn = 0, nf = 0;
+    for (let t = 0; t < 3; t++) {
+      const A = meshes[t], B = farMeshes[t], am = A.instanceMatrix.array, bm = B.instanceMatrix.array, ac = A.instanceColor.array, bc = B.instanceColor.array, M = mats[t], C = cols[t], p = pos[t];
+      let a = 0, b = 0;
+      for (let i = 0; i < counts[t]; i++) {
+        const dx = p[i * 2] - cx, dz = p[i * 2 + 1] - cz;
+        if (dx * dx + dz * dz < r2) { am.set(M.subarray(i * 16, i * 16 + 16), a * 16); ac.set(C.subarray(i * 3, i * 3 + 3), a * 3); a++; }
+        else { bm.set(M.subarray(i * 16, i * 16 + 16), b * 16); bc.set(C.subarray(i * 3, i * 3 + 3), b * 3); b++; }
+      }
+      A.count = a; B.count = b;
+      A.instanceMatrix.needsUpdate = B.instanceMatrix.needsUpdate = true; A.instanceColor.needsUpdate = B.instanceColor.needsUpdate = true;
+      tris += a * triCount(geos[t]) + b * triCount(farGeos[t]); nn += a; nf += b;
+    }
+    stats.tris = tris; stats.near = nn; stats.far = nf;
+  }
+  split(ctx.camera?.position.x ?? 0, ctx.camera?.position.z ?? 0);
+  ctx.onUpdate?.(() => { const c = ctx.camera.position; if (Math.hypot(c.x - last.x, c.z - last.z) > 25) split(c.x, c.z); });
+  return { list, stats, forestAt: null, split, nearR };
 }

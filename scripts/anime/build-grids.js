@@ -21,6 +21,19 @@ async function loadDem(name) {
   return { g: new Grid(name, meta.x0 - meta.dx / 2, meta.z0 - meta.dz / 2, meta.dx, meta.width, meta.height), h, meta };
 }
 
+/** [v4:town-accuracy] For every inland-water cell, the lowest land DEM value within r cells (Infinity if none). */
+export function riverBanks(g, wat, dem, r) {
+  const n = g.w * g.h, out = new Float32Array(n).fill(Infinity);
+  for (let j = 0; j < g.h; j++) for (let i = 0; i < g.w; i++) {
+    const k = j * g.w + i; if (wat[k] !== 2) continue;
+    let m = Infinity;
+    for (let dj = -r; dj <= r; dj++) { const jj = j + dj; if (jj < 0 || jj >= g.h) continue;
+      for (let di = -r; di <= r; di++) { const ii = i + di; if (ii < 0 || ii >= g.w || di * di + dj * dj > r * r) continue; const q = jj * g.w + ii; if (wat[q] === 0 && dem[q] > 0.2 && dem[q] < m) m = dem[q]; } }
+    out[k] = m;
+  }
+  return out;
+}
+
 export async function buildGrids(vt) {
   const core = await loadDem("core"), city = await loadDem("city");
   const G = {
@@ -42,12 +55,17 @@ export async function buildGrids(vt) {
     const dLand = edt(g.w, g.h, (k) => wat[k] !== 1);
     const dSea = edt(g.w, g.h, (k) => wat[k] === 1);
     const sdf = new Int16Array(n), h = new Int16Array(n);
+    // [v4:town-accuracy] river channels: the DEM over inland water is an interpolated lid (大川 at 気仙沼大橋 reads
+    // 3.3-4.8 m inside the channel against 0.5-2 m banks), which drew the river as a raised grass strip. Carve every
+    // inland-water cell to 2 m under the lowest bank within ~R cells (never below -1.5 m); the water surface itself is
+    // drawn by town/rivers.js 1.2 m under that bank.
+    const bank = riverBanks(g, wat, dem, Math.max(3, Math.round(40 / g.d)));
     for (let k = 0; k < n; k++) {
       const s = wat[k] === 1 ? (dLand[k] - 0.5) * g.d : -(dSea[k] - 0.5) * g.d;
       sdf[k] = Math.max(-3000, Math.min(3000, Math.round(s * 10)));
       let y = dem[k];
       if (wat[k] === 1) y = Math.min(y, -(0.8 + Math.min(13, Math.max(0, s) * 0.09)));   // seabed shelves down from the shore
-      else if (wat[k] === 2) y = Math.min(y, Math.max(dem[k] - 0.8, -0.8));
+      else if (wat[k] === 2) y = Math.min(y, Math.max(dem[k] - 0.8, -0.8), Number.isFinite(bank[k]) ? Math.max(-1.5, bank[k] - 2.0) : Infinity);
       else y = Math.max(y, 0.45);   // land never dips under the sea surface (DEM no-data = 0 along the shore)
       h[k] = Math.max(-32000, Math.min(32000, Math.round(y * 10)));
     }

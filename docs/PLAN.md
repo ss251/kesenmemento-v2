@@ -1,42 +1,56 @@
 # The living-city plan
 
-Kesennuma Living City is the real Kesennuma, drawn as a hand-painted anime town. People can fly over it or walk
-through it, and it is kept alive with today's weather and today's boats. This page covers where it stands, what it
+Kesennuma Living City is the real Kesennuma, drawn as a hand-painted anime town. People can fly over it, walk and
+drive through it, find any place by name and step inside a few buildings, and it is kept alive with today's weather
+and today's boats. This page covers where it stands, what it
 shows on Oct 10, what the city gets from it, and what it needs from the city to become the city's own.
 
-## Where it stands (v3, 2026-09-29)
+## Where it stands (v4, 2026-10-01)
 
-These features are built and checked by `bun test` (242 tests) and by the end-to-end browser QA
-(`tools/anime/qa3.mjs`, 32 of 32 checks passing).
+These features are built and checked by `bun test` (474 tests) and by the end-to-end browser QA
+(`tools/anime/qa3.mjs`, 146 checks including the phone layout).
 
-- **The whole city from GSI open data.** It covers the terrain, the coastline, 14,473 roads and all 50,826 building
-  footprints. The inner bay (内湾) is detailed enough to walk in: 八日町, 魚町, 南町, 神明崎, Pier 7 and the seawall
-  promenade.
-- **The harbour.** 70 boats are moored in rows. The fish market, 浮見堂, 五十鈴神社, the 安波山 lookout, かなえ大橋 and
-  大島大橋 are all modelled.
+- **The whole city from real data.** Terrain, coastline, 14,473 roads and all 50,826 building footprints come from
+  GSI. OpenStreetMap adds building levels, roof shapes, names, land use, rivers, signals and road names, and the GSI
+  aerial photo gives every roof its colour and shape. Each value records its source.
+- **Accuracy, measured.** An automated audit renders the town from straight above and compares it with the aerial
+  photo and the maps. On the core, building coverage IoU is 0.87 (target 0.8), all 15 reference landmarks are within
+  5 m (largest error 3.7 m), and the median roof colour difference is ΔE 7.2. The landmarks are modelled from reference
+  sheets at their true size.
+- **The whole core is explorable.** About 4.3 × 4.4 km, from 気仙沼駅 to the bay and from 鹿折 to 南気仙沼, streams in
+  street-level detail around you. You can walk everywhere (buildings, quay edges and rivers are walls), drive a kei
+  car on the real roads, or fly.
+- **Finding your way.** Place search in Japanese and English over about 3,500 real names, a minimap, a full map, POI
+  labels, and 51 places with a drone framing and a walk spot each: the 7 classic tour stops, 17 civic landmarks and 27
+  places in town.
+- **Walk-in interiors.** The fish market C hall's visitors' gallery over the landing floor, 男山本店's shop on 魚町,
+  and the station's waiting hall with the day's departure board.
+- **Real names.** Public buildings and the shops that OSM or GSI names carry their real names on their signs. Other
+  shops have fictional names for their trade.
+- **The harbour.** Boats in rows, the fish market's four halls and 海の市, 浮見堂, 五十鈴神社, the seawall with its
+  flap gates, PIER7 and 迎, かなえ大橋 and 大島大橋, 亀山's monorail and the 浦の浜 terminal.
 - **Living layers.**
   - Five times of day and four seasons.
-  - Rain and wet streets.
-  - 33 townspeople and 7 cats.
+  - Rain and wet streets, and traffic signals that cycle.
+  - Townspeople and cats, market crews and buyers.
   - Gulls and a harbour soundscape.
   - Weather from 気象庁 and today's arrivals from 気仙沼漁協. Listed boats glide into the market under their real
     names.
-- **Ways to see it.**
-  - Eight tour stops and an auto tour.
-  - A tiny-planet overview.
-  - A photo mode (3840×2160 PNG).
-  - Japanese and English, and a phone layout.
+- **Ways to see it.** An auto tour, a tiny-planet overview, a photo mode (3840×2160 PNG), Japanese and English, and a
+  phone layout.
 
-Every shop name is fictional for now, and anything shown from saved data is labelled サンプル.
+Anything shown from saved data is labelled サンプル.
 
 **Open gaps.**
 
-- Frame times are about 11 to 19 ms on an M2 Max at 1080p under the machine throttle; the fish-market view still
-  misses 60 fps.
-- The first load takes about 20 s.
-- 唐桑 is not a tour stop yet: the peninsula has no villages or detailed land cover.
+- Frame rate on a quiet machine is not yet measured for v4. Under the shared-machine throttle a 1080p frame on high
+  took 20 to 32 ms and the live app ran at 13 to 16 fps at 1600×900; the v3 build ran at 52 fps on the same Mac when
+  it was quieter. 60 fps on high is the target.
+- The first load takes 45 to 55 s under the throttle. The target is 10 s.
+- Street-level streaming covers the core only; 唐桑, the outer 大島 and the far suburbs have terrain, footprints and
+  roads but no street-level detail.
 - 4K output has not been rendered yet.
-- The sun keeps the Oct 10 path in every season.
+- The sun keeps the Oct 10 path in every season, and the sea level does not follow the tide.
 
 ## Oct 10: the demo
 
@@ -45,14 +59,16 @@ The demo shows the town to people who know it and aims for one reaction: "that's
 
 - the drone view over the inner bay at 16:30;
 - today's live chip;
-- a walk along the promenade;
-- 浮見堂 at 夕焼け;
-- the town at night;
+- a walk along the promenade and 浮見堂 at 夕焼け;
+- finding a place by name (the station, or a shop someone in the room calls out);
+- driving a kei car on the real roads;
+- the full map of the city;
 - today's first boat at the fish market at 06:30;
 - winter and spring;
-- the tiny planet.
+- the tiny planet;
+- for questions: the walk-ins (the fish market gallery, 男山本店, the station) and the town at night.
 
-Pier 7 (第7岸壁), the base of the Hackatsuon residency, is tour stop 3.
+PIER7（ピアセブン）, the base of the Hackatsuon residency, is tour stop 3.
 
 **What success looks like on the day:**
 
@@ -69,8 +85,10 @@ The rest of this plan answers those questions.
 A painted Kesennuma at any hour and in any season can be used for posters, social posts, a website header, or a
 screen at the station and at 海の市.
 
-- The tools already exist. `scripts/render/stills.js` renders the 12 hero frames and `scripts/render/film.js` renders
+- The tools already exist. `scripts/render/stills.js` renders the 16 hero frames and `scripts/render/film.js` renders
   a deterministic 30 s film along the inner bay at sunset.
+- Every published frame carries the credit line (© OpenStreetMap contributors · 出典：国土地理院 …) in its caption or
+  on the frame.
 - From Oct 1 the machine can render them at 4K.
 - New frames are camera and time settings in a plan file, not new artwork. A seasonal campaign (sakura on 安波山's
   slopes in April, snow on the harbour in January) is therefore a render job, not a production.
@@ -79,26 +97,28 @@ screen at the station and at 海の市.
 
 Anime fans travel to stand where a scene was drawn. Here, every painted frame is a real place.
 
-- **Stand-here spots.** Each tour stop has a drone framing and a walk spot on a real quay or deck. A printed map and
+- **Stand-here spots.** Each of the 51 places has a drone framing and a walk spot on a real street, quay or deck. A printed map and
   a small plate at each real spot, such as the 浮見堂 walkway, the promenade by the seawall or the market quay, carry
   a QR code. The code opens the app at the same frame and hour. The app already supports this through URL options
   such as `?cam=x,y,z>lx,ly,lz&preset=yuyake`.
 - **Photo mode as the souvenir.** Visitors take the real photo, then save the painted one from the app.
 - **A short film route.** A 30 s film for social media, plus longer cuts for events. The film path is scripted, so a
   new route is a list of camera points.
-- **Next to build:** the QR plates and map (a print job), a "you are here" compare view that puts the phone photo
-  beside the painted frame, and more stand-here spots beyond the inner bay.
+- **Next to build:** the QR plates and map (a print job), and a "you are here" compare view that puts the phone photo
+  beside the painted frame.
 
 ### 3. A digital twin residents can walk
 
-Residents can walk the inner bay today. Next:
+Residents can walk and drive the whole core today, find their street by name and see its real shops. Next:
 
-- **Wider walkable detail.** Grow the full street-level zone beyond its current 380 m radius: first along the market
-  district and 魚町, then 南気仙沼, 鹿折 and 大島. The limit is the draw-call budget (see the engineering track below),
-  not the data. Every footprint is already in the layout.
-- **Better buildings from better data.** Storeys, roof shapes and shop uses are currently *derived* from footprint
-  size, road class and the aerial photo. If the city can share building-use or height data, the derived values are
-  replaced lot by lot.
+- **Wider walkable detail.** Stream street-level detail beyond the core: 大島, 唐桑 and the outer suburbs. Every
+  footprint and road is already in the layout; the work is the tile coverage and the load budget.
+- **Better buildings from better data.** Where OpenStreetMap has no `building:levels` or `height`, storeys are still
+  *derived* from the GSI type, the footprint and the context, and wall colours are chosen. Roof colours and shapes
+  come from the aerial photo. If the city can share building-use or height data (for example a building register or a 3D city
+  model), the derived values are replaced lot by lot, and `lot.src` records the change.
+- **More interiors.** The market gallery, 男山本店 and the station hall are walk-ins today. 海の市, リアス・アーク美術館
+  and PIER7 are the next candidates.
 - **Resident review.** Hold short sessions, for example at Pier 7, where residents fly to their own street and flag
   anything wrong: a missing shop, a wrong roof colour, a building that isn't there any more. Each fix is a small data
   edit keyed to the building.
@@ -133,17 +153,21 @@ best coffee on 八日町". Stories make the model more than a map.
 
 ### Local shops claiming their storefronts
 
-Today the 64 shop fronts in the inner bay carry fictional names such as かき処 波音 and 菅原酒店, generated to feel
-local. A real shop can **claim** its storefront.
+Since v4 a shop that OpenStreetMap or GSI names shows its real name on its signs. Every other shop front carries a
+fictional name for its trade, generated to feel local (such as かき処 波音). A real shop can **claim** its storefront:
+to put its name up where the maps have none, or to choose how it looks.
 
 - **What a claim includes:** the lot, the real name, the sign style and 暖簾 colour, opening hours, a photo, a line
   of text and a link.
-- **How it renders:** the town's shop builder already paints signs and 暖簾 from text and colour (`town/signs.js`), so
-  a claimed shop shows its real name in the same hand-painted style.
+- **How it renders:** the town's shop builder already paints signs and 暖簾 from text and colour (`town/signs.js`,
+  `town/realnames.js`), so a claimed shop shows its real name in the same hand-painted style.
+- **The simplest route:** a shop that adds or fixes its name, shop type and hours in OpenStreetMap appears in the app at
+  the next data build, with no claim process at all.
 - **Verification:** each claim is verified by the shop itself, through the city, the chamber of commerce, or a
   member network such as the 気仙沼クルーカード shops.
-- **What changes in the code:** the brand blocklist test (`test/v3-town.test.js`) must allow names from the verified
-  claims file, and still refuse everything else.
+- **What changes in the code:** the real-name path already exists; a verified claims file becomes one more source in
+  the fold precedence (`scripts/anime/enrich/fold.js`), and the brand blocklist test (`test/v3-town.test.js`) keeps
+  guarding the fictional catalogue.
 - **Other lots:** shops outside the current shop lots can be claimed too; a claim can turn a house lot into a shop
   front.
 - **Benefit for shops:** a shop that claims its front appears in the tour, in stills and in the film, and is easy to
@@ -164,13 +188,17 @@ local. A real shop can **claim** its storefront.
 
 ### Engineering track
 
-- **60 fps at 1080p on an M-series Mac.** The renderer is limited by draw calls (about 800 to 1,100 per frame). The
+- **60 fps at 1080p on an M-series Mac.** First measure v4 on a quiet machine. The renderer is limited by draw calls
+  (about 900 to 1,500 per frame in v4, up from 560 to 1,060 in v3, with the landmarks and the streamed pools). The
   next steps are to merge the harbour's night-lamp materials and the remaining distinct emissive and textured
-  materials into atlases, and to use a coarser batching cell for the harbour.
+  materials into atlases, to use a coarser batching cell for the harbour, and to cap the stream pools per frame.
 - **Load time under 10 s.** About 4 s goes into drawing Japanese text into canvas textures. Bake the sign atlases at
   build time instead.
 - **4K.** Once the build machine allows it (2026-10-01 00:00Z), render the stills, the film and photo mode at full
-  size and review every frame.
+  size and review every frame. Some v3 stills were framed on things v4 removed as inaccurate (the timber promenade
+  deck of `promenade_deck`, for example), so review those frames first.
+- **Accuracy.** Keep the audit in the loop: re-run `tools/anime/accuracy.mjs` after every change to the town, and
+  extend it beyond the core disc (the whole z18 ortho with `--region ortho`).
 - **Hosting.** A public URL: the static `dist/` on a CDN plus the small `/api/live` service, with the same polite
   polling (at most every 10 minutes per source, shared by all visitors).
 - **Phones.** The low tier already loads on a 390×844 phone. Tune the hero radius and props for mid-range Android
@@ -190,18 +218,24 @@ local. A real shop can **claim** its storefront.
    or two.
 5. **Place knowledge.**
    - Where the cherry trees and festival spots are.
-   - Photos of 浮見堂, the market and the lookout for accuracy.
+   - Photos and drawings of public buildings, for accuracy and for more interiors.
    - Permission to model public buildings in more detail.
    - Any building height or use data the city can share.
+   - Residents' corrections. Many can go straight into OpenStreetMap, which the app reads; the rest become data fixes
+     keyed to the building (`src/anime/world/lotfix.js` holds these, each with its source).
 6. **Brand guidance.** How the app may use the city's name, and whether it may use the city's logo or mascot.
    Until we hear back, the app uses only the place name 気仙沼.
 
 ## Principles
 
-- **Real place, fictional business.** The geography is real. A business name appears only when that business has
-  claimed it.
+- **Real place, real public names.** The geography is real, and so are the names of public places and of the shops
+  that the open maps name. Other businesses get fictional names until they claim their storefront. Names that refer
+  to the 2011 disaster are never shown.
+- **Accuracy over invention.** Every value records its source, uncertain things are researched rather than guessed,
+  and the audit measures the result against the aerial photo.
 - **Honest data.** Anything live says ライブ, and anything saved says サンプル. Nothing from a sample is ever shown as
   live.
-- **Credit.** Keep the sources on screen: 国土地理院, 気象庁, 気仙沼漁協, and Sakuragaoka Station (MIT) by Kenton-GMI.
+- **Credit.** Keep the sources on screen: © OpenStreetMap contributors, 国土地理院, 気象庁, 気仙沼漁協, and Sakuragaoka
+  Station (MIT) by Kenton-GMI.
   The terms are in [DATA-SOURCES.md](DATA-SOURCES.md).
 - **A living town.** The tone is everyday life on the bay: morning boats, school kids, cats on bollards, lit windows.

@@ -15,7 +15,7 @@ const V3 = THREE.Vector3;
 const UV = { shaft: uvOf(RA.shaft), sleeve: uvOf(RA.sleeve), cover: uvOf(RA.cover), trans: uvOf(RA.trans) };
 const rectXf = (r) => [r[2] - r[0], r[3] - r[1], r[0], r[1]];   // [su, sv, ou, ov] for unit uvs
 
-export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades }) {
+export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades, runs: givenRuns = null, lanes = null }) {   // [v4:explore] runs / lanes: explore/stream.js poles its streamed tiles
   const L = ctx.L, M = H.M;
   const plates = [], telPlates = [];
   const lineNames = ['内湾幹', '八日町', '魚町支', '南町支', '港町', '神明崎', '入沢', '柏崎'];
@@ -33,15 +33,15 @@ export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades }) {
   // ------------------------------------------------------------------ extra runs along the narrow hero lanes (the layout's
   // POLE_RUNS cover the main streets; Japanese lanes carry poles too, and their wires are half the look)
   const HS = sharedHardShores(L);   // [v3:fix]
-  const runs = L.POLE_RUNS.map((r) => ({ roadId: r.roadId, pts: r.pts }));
+  const runs = (givenRuns || L.POLE_RUNS).map((r) => ({ roadId: r.roadId, pts: r.pts }));
   {
     const have = []; for (const r of runs) for (const p of r.pts) have.push(p);
     const hg = new Map(), HC = 16; const hk = (x, z) => Math.floor(x / HC) + ',' + Math.floor(z / HC);
     const addH = (p) => { const k = hk(p[0], p[1]); if (!hg.has(k)) hg.set(k, []); hg.get(k).push(p); };
     have.forEach(addH);
     const nearPole = (x, z, d) => { const i0 = Math.floor(x / HC), j0 = Math.floor(z / HC); for (let i = i0 - 1; i <= i0 + 1; i++) for (let j = j0 - 1; j <= j0 + 1; j++) for (const p of hg.get(i + ',' + j) || []) if (Math.hypot(p[0] - x, p[1] - z) < d) return true; return false; };
-    for (const r of L.ROADS) {
-      if (r.zone !== 'hero' || r.width < 2.8 || r.kind === 'bridge') continue;
+    for (const r of lanes || L.ROADS) {
+      if ((!lanes && r.zone !== 'hero') || r.width < 2.8 || r.kind === 'bridge') continue;
       let len = 0; for (let i = 1; i < r.pts.length; i++) len += Math.hypot(r.pts[i][0] - r.pts[i - 1][0], r.pts[i][1] - r.pts[i - 1][1]);
       if (len < 22) continue;
       const pts = [];

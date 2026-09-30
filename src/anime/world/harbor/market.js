@@ -43,7 +43,7 @@ export function buildFishMarket(ctx, a, b, opts = {}) {
   return out;
 }
 
-function marketMats(ctx) {
+export function marketMats(ctx) {   // [v4:landmarks-A] exported for market4.js
   if (ctx.__marketMats) return ctx.__marketMats;
   const wallM = ctx.mat.toon('#e9e8e1', { paint: 0.06 });
   const wallLow = ctx.mat.toon('#cfd6d6', { paint: 0.06 });
@@ -149,7 +149,7 @@ function hallInto(ctx, k, H) {
   }
 
 /** Quay-apron life in a frame where x = 0 is the quay edge (+X water), land toward -X, along z in [z0, z0 + used]. */
-function apronLife(ctx, k, M, r, E) {
+export function apronLife(ctx, k, M, r, E) {   // [v4:landmarks-A] exported for market4.js
   const { z0, used, top, apron, toW, out, rotY, L, opts = {} } = E;
   const { lampM } = marketMats(ctx);
   // apron life: tubs rows, box yards, conveyors to the berth, forklifts, jib cranes, a truck crane

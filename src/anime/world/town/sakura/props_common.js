@@ -2,6 +2,7 @@
 // Shared helpers for the props module: floor sampling, placement groups, geometry utilities.
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { fitFontSize } from '../../../core/textures.js';   // [v4:polish1]
 
 export const DEG = Math.PI / 180;
 
@@ -203,8 +204,7 @@ export function vtext(g, text, x, y, size, font, weight = 700, gap = 1.04, color
 export function ftext(g, text, x, y, maxW, size, font, weight = 700, color = null, align = 'center', base = 'middle') {
   if (color) g.fillStyle = color;
   g.textAlign = align; g.textBaseline = base;
-  let s = size; g.font = `${weight} ${s}px ${font}`;
-  while (s > 6 && g.measureText(text).width > maxW) { s -= 1; g.font = `${weight} ${s}px ${font}`; }
+  const s = fitFontSize(g, text, maxW, size, font, weight, 6);   // [v4:polish1] one cached measurement
   g.fillText(text, x, y);
   return s;
 }

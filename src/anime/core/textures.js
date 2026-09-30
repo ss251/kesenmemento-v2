@@ -11,6 +11,26 @@ export const FONTS = {
   en: '"Noto Sans JP", "Segoe UI", Arial, sans-serif',
 };
 
+// [v4:polish1] Text fitting in one measurement: a line's width scales with the font size, so each (weight, font, text)
+// is measured once at 100 px (cached for the session) and the size that fits is solved directly. The old loops shrank
+// the size 1 px at a time with a measureText each, and a measureText of a Japanese web font costs milliseconds in
+// Chrome: town's signage (hundreds of shop and facility names) spent most of its ~8 s there.
+const WIDTH100 = new Map();
+/** Width of `text` at 100 px in `weight font`, measured once. `g` is any 2D context. */
+export function textWidth100(g, text, font, weight = 700) {
+  const k = weight + '|' + font + '|' + text;
+  let w = WIDTH100.get(k);
+  if (w === undefined) { const f0 = g.font; g.font = `${weight} 100px ${font}`; w = g.measureText(text).width || 0; g.font = f0; WIDTH100.set(k, w); }
+  return w;
+}
+/** The largest size <= `size` (and >= `min`) at which `text` fits in `maxW`; sets g.font to it. */
+export function fitFontSize(g, text, maxW, size, font, weight = 700, min = 6) {
+  const w = textWidth100(g, text, font, weight);
+  const s = w > 0 ? Math.max(min, Math.min(size, Math.floor((100 * maxW * 0.99) / w))) : size;
+  g.font = `${weight} ${s}px ${font}`;
+  return s;
+}
+
 export function createTextures() {
   const cache = new Map();
   let pixelBudget = 0;
@@ -46,9 +66,7 @@ export function createTextures() {
 
   /** Fit a single line of text into maxW by shrinking the font. Returns used size. */
   function fitText(g, text, x, y, maxW, size, font, weight = 700, opts = {}) {
-    let s = size;
-    g.font = `${weight} ${s}px ${font}`;
-    while (s > 6 && g.measureText(text).width > maxW) { s -= 1; g.font = `${weight} ${s}px ${font}`; }
+    const s = fitFontSize(g, text, maxW, size, font, weight, 6);   // [v4:polish1] one cached measurement
     if (opts.stroke) { g.lineWidth = opts.stroke; g.strokeStyle = opts.strokeStyle || '#fff'; g.strokeText(text, x, y); }
     g.fillText(text, x, y);
     return s;

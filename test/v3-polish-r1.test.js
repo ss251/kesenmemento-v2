@@ -7,7 +7,7 @@ import { skyPaletteAt } from "../src/anime/core/sky.js";
 import { stillPlan } from "../scripts/render/stills.js";
 import { FRAMES } from "../src/anime/world/life/tour.js";
 import { winterLook } from "../src/anime/world/life/cast.js";
-import { planRafts, RAFT_LINE } from "../src/anime/world/harbor/rows.js";
+import { planRafts, RAFT_LINE, RAFT_FIELDS, RAFT } from "../src/anime/world/harbor/rows.js";
 import { BAY_LOOPS, BAY_MOORED, loopPose } from "../src/anime/world/harbor/traffic.js";
 
 const src = (p) => readFileSync(new URL("../" + p, import.meta.url), "utf8");
@@ -48,10 +48,15 @@ describe("3. composition and bay life", () => {
     const [pos] = plan.market_morning.cam.split(">"); const [x, , z] = pos.split(",").map(Number);
     expect(L.isWater(x, z)).toBe(true);
   });
-  test("the 養殖筏 line: five rafts, every corner 8 m clear on water", () => {
+  // [v4:polish1] rafts only where the aerial photo shows them: two fields outside the port basin, none in the 内湾
+  test("the 養殖筏 fields: outside the inner bay, on water, 8 m clear of the shore", () => {
     const rafts = planRafts(L.isWater);
-    expect(rafts.length).toBe(RAFT_LINE.n);
-    for (const r of rafts) expect(L.shoreDist(r.x, r.z)).toBeGreaterThan(RAFT_LINE.len / 2 + 8);
+    expect(rafts.length).toBeGreaterThan(40);
+    expect(rafts.length).toBeLessThanOrEqual(RAFT_FIELDS.reduce((a, f) => a + f.rows * f.cols, 0));
+    for (const r of rafts) expect(L.shoreDist(r.x, r.z)).toBeGreaterThan(RAFT.len / 2 + 8);
+    // nothing in the inner bay (the v3 line's box, and the whole basin north of 朝日町)
+    for (const r of rafts) expect(r.z > 3000 && r.x > 1000).toBe(true);
+    expect(rafts.some((r) => r.x > RAFT_LINE.a[0] - 50 && r.x < RAFT_LINE.b[0] + 50 && r.z > -50 && r.z < 100)).toBe(false);
   });
   test("small boats: moored at buoys on water; fishing loops stay 12 m off the shore all the way round", () => {
     for (const [x, z] of BAY_MOORED) expect(L.shoreDist(x, z)).toBeGreaterThan(20);
@@ -65,7 +70,7 @@ describe("3. composition and bay life", () => {
   test("water carries mid-distance detail", () => {
     const w = src("src/anime/world/water.js");
     expect(w).toContain("ruffle * 0.6 * farK");
-    expect(w).toContain("swell * 0.5 * lod");
+    expect(w).toContain("swell * 0.3 * lod");   // [v4:polish2] 0.5 -> 0.3 (pale patches from the drone)
     expect(w).toContain("smoothstep(250.0, 2500.0, dist)");
     expect(w).toContain("line1 *= coreK;");
   });

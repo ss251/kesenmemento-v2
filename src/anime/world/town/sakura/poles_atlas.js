@@ -3,6 +3,7 @@
 // Canvas atlases for the poles module (電柱): concrete shaft strip, tiger-stripe sleeve, yellow guard,
 // transformer wrap, enamel pole ads (巻付広告), telecom plates (atlas A, opaque) and pole number plates,
 // stickers, pole-mounted signs (atlas B, alpha-tested die-cuts). All text is fictional-brand Japanese.
+import { fitFontSize } from '../../../core/textures.js';   // [v4:polish1]
 
 export const AW = 1024;
 const TAU = Math.PI * 2;
@@ -72,8 +73,7 @@ function vtext(g, text, cx, top, size, font, weight = 700, gap = 1.04) {
 }
 const vlen = (t) => [...t].reduce((s, c) => s + (c === ' ' ? 0.45 : 1.04), 0);
 function fit(g, text, x, y, maxW, size, font, weight = 700) {
-  let s = size; g.font = `${weight} ${s}px ${font}`;
-  while (s > 6 && g.measureText(text).width > maxW) { s -= 1; g.font = `${weight} ${s}px ${font}`; }
+  const s = fitFontSize(g, text, maxW, size, font, weight, 6);   // [v4:polish1] one cached measurement
   g.fillText(text, x, y); return s;
 }
 function flower(g, x, y, r, col, mid) {

@@ -24,7 +24,7 @@ export function buildLotHouse(H, lot, lod) {
   const F = Frame.at(gb, f.x, f.y, f.z, f.rotY);
   const HF = F.sub(0, 0, -lot.obb.d / 2, 0);
   H.lod = lod;
-  const tall = lot.kind === 'apartment' || lot.kind === 'office' || lot.kind === 'public' || lot.kind === 'school';
+  const tall = lot.kind === 'apartment' || lot.kind === 'office' || lot.kind === 'public' || lot.kind === 'school' || lot.kind === 'hotel';   // [v4:polish1]
   const floors = Math.max(1, Math.min(tall ? 6 : 3, lot.storeys));
   const shape = lot.roof.shape;
   let roofType = shape === 'flat' ? 'flat' : shape === 'hip' ? 'hip' : shape === 'shed' ? 'shed' : 'gable';

@@ -23,13 +23,13 @@ export const FRAMES = {
   // beside a moored skipjack boat, the shore under かなえ大橋, the mainland slope below the 大島大橋 arch
   pier7:  { drone: { pos: [-60, 40, 210], look: [150, 8, -80] }, walk: { x: 51, z: 69, yaw: -84, pitch: 1 } },   // [v3:polish3] pitch -4 -> 1: less blank concrete slab   // [v3:polish2] down the quay at the moored row and the working buildings (half the frame was sky + blank slab)
   market: { drone: { pos: [760, 28, 900], look: [575, 8, 715] } /* [v3:polish3] low over the water off the berth: the canopy leads to 安波山, the moored boats in front (a warehouse roof filled a quarter; the review's [880,55,760] looked into the sun at a thin strip) */, walk: { x: 654.5, z: 836.1, yaw: -155, pitch: 2 } },   // [v3:fix] 15 m back: the unloading scene (harbor/unload.js) now fills the old spot; it lies ahead in view
-  kanae:  { drone: { pos: [1560, 110, 2050], look: [1492, 40, 1465] }, walk: { x: 1528, z: 1747, yaw: 14, pitch: 4 } },   // [v3:polish3] pitch 12 -> 4, yaw 6 -> 14: less empty sky, off the bare slope   // [v3:polish] at the water's edge (a flat mustard slope filled 40 %)
+  kanae:  { drone: { pos: [1560, 110, 2050], look: [1456, 40, 1527] /* [v4:landmarks-A] the measured main-span centre */ }, walk: { x: 1528, z: 1747, yaw: 14, pitch: 4 } },   // [v3:polish3] pitch 12 -> 4, yaw 6 -> 14: less empty sky, off the bare slope   // [v3:polish] at the water's edge (a flat mustard slope filled 40 %)
   oshima: { walk: { x: 2776, z: 3244, yaw: 17, pitch: 2 } },   // [v3:polish3] 8 m uphill, pitch 2: off the bare slab
   anba:   { walk: { x: -490.6, z: -986.1, yaw: -128, pitch: -10 } },   // [v3:polish2] 1.1 m on, ~0.5 m from the rail, looking down: the top bar drops below the bay line
 };
 /** [v3:fix] stops left out of the UI tour: 唐桑 has no forest or villages beyond the city grid yet (a camouflage plain). */
 export const HIDDEN_STOPS = new Set(['karakuwa']);
-const NAMES = { hero: ['内湾（空から）', 'Inner bay (drone)'], ukimido: ['浮見堂', 'Ukimido pavilion'] };
+const NAMES = { hero: ['内湾（空から）', 'Inner bay (drone)'], ukimido: ['浮見堂', 'Ukimido pavilion'], pier7: ['PIER7（ピアセブン）', 'PIER7 (Pier Seven)'] };   // [v4:integrate] the plaza's real name (the layout's 第7岸壁（撮影地点） was the v1 capture label)
 
 /** True on a portrait viewport (the renderer canvas when there is one, else the window). */
 export function isPortrait() {
@@ -163,8 +163,15 @@ export function createTour(ctx) {
   }
   function applyFilm(t, dur) { const p = filmPose(t, dur); setCam(p.pos, p.look); return p; }
 
+  /** [v4:explore] More stops after the built-in ones (explore's real places): { id, ja, en, drone: { pos, look }, walk }. */
+  function add(list) {
+    let n = 0;
+    for (const s of list) { if (!s?.id || byId.has(s.id) || !s.drone) continue; stops.push(s); byId.set(s.id, s); n++; }
+    if (n) emit();
+    return n;
+  }
   const api = {
-    stops, flyTo, jumpTo, walkTo, play, stop, update, filmPose, applyFilm,
+    stops, flyTo, jumpTo, walkTo, play, stop, update, filmPose, applyFilm, add,
     get playing() { return state.playing; }, get flying() { return !!state.flight; }, get current() { return state.current; },
     onChange: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
   };

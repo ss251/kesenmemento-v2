@@ -70,7 +70,8 @@ export function buildWarehouse(H, lot, lod, IM, SM, signs, r, out) {
   const rusty = nearSea ? r() < 0.75 : r() < 0.3;
   const wallMat = rusty ? IM.rust : IM.corr;
   const wall = pick(r, WALLS);
-  const roofCol = lot.roof.color === '#d8dbd6' || lot.roof.color === '#b9bab4' ? pick(r, ROOFS) : (r() < 0.5 ? lot.roof.color : pick(r, ROOFS));
+  const measuredCol = lot.src?.color === 'aerial' || lot.src?.color === 'osm';   // [v4:data] the photo / OSM colour
+  const roofCol = measuredCol ? lot.roof.color : lot.roof.color === '#d8dbd6' || lot.roof.color === '#b9bab4' ? pick(r, ROOFS) : (r() < 0.5 ? lot.roof.color : pick(r, ROOFS));
   // plinth + dock
   HF.boxB(M.concrete, '#bdbcb5', w + 0.1, fy - gmin + 0.35, d + 0.1, 0, gmin - 0.3, 0, { uv: { world: 2 } });
   if (dock > 0.5) {
@@ -142,7 +143,7 @@ export function buildWarehouse(H, lot, lod, IM, SM, signs, r, out) {
     }
   }
   // roof
-  const alongX = w >= d;
+  const alongX = lot.roof.ridge ? lot.roof.ridge === 'x' : w >= d;   // [v4:data] the ridge measured on the aerial photo
   const RF = alongX ? HF : HF.sub(0, 0, 0, Math.PI / 2);
   const hx = (alongX ? w : d) / 2 + 0.35, hz = (alongX ? d : w) / 2 + 0.4;
   const top = fy + h;

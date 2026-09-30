@@ -37,7 +37,9 @@ export function makeSigns(ctx) {
   const nBoardAtl = Math.ceil(SHOPS.length / BPA);
   const boards = [];
   for (let a = 0; a < nBoardAtl; a++) {
-    boards.push(T.draw(AW2, AH2, (g) => {
+    // [v4:town-accuracy] the last atlas holds only the rows it uses (canvas budget: the real-name atlas needs the room)
+    const rowsA = Math.ceil(Math.min(BPA, SHOPS.length - a * BPA) / 2);
+    boards.push(T.draw(AW2, rowsA * BH, (g) => {
       for (let k = 0; k < BPA; k++) {
         const s = SHOPS[a * BPA + k]; if (!s) continue;
         const x = (k % 2) * BW, y = Math.floor(k / 2) * BH, w = BW, h = BH;
@@ -55,7 +57,7 @@ export function makeSigns(ctx) {
       }
     }, { key: 'town-boards-' + a, anisotropy: 8 }));
   }
-  const boardOf = (i) => { const a = Math.floor(i / BPA), k = i % BPA; const x = (k % 2) * BW, y = Math.floor(k / 2) * BH; return { tex: boards[a], rect: [x / AW2, 1 - (y + BH) / AH2, (x + BW) / AW2, 1 - y / AH2] }; };
+  const boardOf = (i) => { const a = Math.floor(i / BPA), k = i % BPA; const x = (k % 2) * BW, y = Math.floor(k / 2) * BH, AH = boards[a].image?.height || AH2; return { tex: boards[a], rect: [x / AW2, 1 - (y + BH) / AH, (x + BW) / AW2, 1 - y / AH] }; };
 
   // ------------------------------------------------------------------ tall projecting signs (袖看板): 64×256 cells, one atlas
   const talls = [T.draw(ATL, ATL, (g) => {

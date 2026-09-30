@@ -15,7 +15,7 @@ import { createAudio } from './core/audio.js';
 import { createPlanet } from './core/planet.js';   // [v3:integrate] tiny-planet overview
 
 /** Build order. A module may read ctx.services of earlier modules at build time (life reads everyone). */
-export const MODULES = ['environment', 'water', 'town', 'harbor', 'life'];
+export const MODULES = ['environment', 'water', 'town', 'harbor', 'landmarks', 'life', 'explore'];   // [v4:explore] streamed core, drive mode, map, search, labels, interiors; [v4:landmarks-B] civic landmarks after harbor
 /** [v3:integrate] static batching cells (m): near the hero zone, beyond it, and the hero half-size. */
 export const BATCH = { nearCell: 400, farCell: 2000, farR: 600 };   // measured vs 48/200: -35 % draw calls, market 25 -> 13 ms, hero 18 -> 16 ms (1080p, gate-throttled); [v3:fix] 300/1000/400 -> 400/2000/600: -10..-16 % calls again (city 1203 -> 1060, drone 837 -> 699)
 
@@ -92,13 +92,14 @@ function setProgress(frac, label) {
   const bar = $('bar'); if (bar) bar.style.transform = `scaleX(${frac})`;
   const lab = $('loadlabel'); if (lab && label !== undefined) lab.textContent = label;   // [v3:fix] '' clears 仕上げ中… (the ready line is CSS)
 }
-const LABELS = { _ground: '下地', environment: '山と地形', water: '内湾の海', town: '町並み', harbor: '港と船', life: '町の暮らし' };
+const LABELS = { _ground: '下地', environment: '山と地形', water: '内湾の海', town: '町並み', harbor: '港と船', landmarks: '名所と施設', life: '町の暮らし', explore: '街の地図' };
 
 async function build() {
   await loadFonts();
   const known = Object.keys(MODULE_LOADERS);
   const list = ONLY ? ONLY.filter((m) => known.includes(m)) : MODULES.filter((m) => known.includes(m));
   if (ONLY) for (const m of ONLY) if (!known.includes(m)) errors.push({ module: m, message: 'no such module (src/anime/world/' + m + '.js)' });
+  ctx.plan = { modules: list, explore: list.includes('explore') && params.get('stream') !== '0' };   // [v4:explore] town leaves the mid-zone lots to explore's tiles
   let i = 0;
   for (const name of list) {
     setProgress(i / (list.length + 1), `${LABELS[name] || name} を準備中…`);
@@ -154,19 +155,22 @@ function camSpec(s) {
   // opening HUD view, the stills and the 内湾 tour stop are one framing
   if (s === 'hero') { const hd = ctx.services.life?.tour?.stops?.find((x) => x.id === 'hero')?.drone || L.HERO.drone; return lookAt(hd.pos, hd.look); }
   if (s === 'walk') { player.fly = false; return player.setPose(L.HERO.walk.x, L.HERO.walk.z, L.HERO.walk.yaw, L.HERO.walk.pitch); }
-  const m = s.match(/^tour(walk)?:(\w+)$/);
+  const m = s.match(/^tour(walk)?:([\w-]+)$/);   // [v4:polish2] ids with a hyphen (explore's lm-* stops) too
   if (m) {
     // [v3:fix] the UI's tour stops (life's tour: hero, market, pier7, ukimido, ...) first, then the layout's; bay = hero
     const id = m[2] === 'bay' ? 'hero' : m[2];
-    const t = ctx.services.life?.tour?.stops?.find((x) => x.id === id) || L.TOUR.find((x) => x.id === m[2] || (id === 'hero' && x.id === 'bay'));
+    const T = ctx.services.life?.tour || window.__life?.tour;
+    const t = T?.stops?.find((x) => x.id === id) || L.TOUR.find((x) => x.id === m[2] || (id === 'hero' && x.id === 'bay'));
     if (!t) throw new Error('no tour stop ' + m[2]);
     if (m[1] && t.walk) { player.fly = false; return player.setPose(t.walk.x, t.walk.z, t.walk.yaw, t.walk.pitch); }
     return lookAt(t.drone.pos, t.drone.look);
   }
   if (s.includes('>')) { const [a, b] = s.split('>').map((p) => p.split(',').map(Number)); return lookAt(a, b); }
   const v = s.split(',').map(Number);
+  // [v4:polish2] a spec that does not resolve is an error (it used to leave the previous camera in place silently)
+  if ((v.length !== 4 && v.length < 5) || v.some((n) => !Number.isFinite(n))) throw new Error('camera spec does not resolve: ' + s);
   if (v.length === 4) { player.fly = false; player.setPose(v[0], v[1], v[2], v[3]); }
-  else if (v.length >= 5) player.setPose(v[0], v[2], v[3], v[4], v[1]);
+  else player.setPose(v[0], v[2], v[3], v[4], v[1]);
 }
 window.__camSpec = camSpec;
 window.__setCam = (x, y, z, yaw, pitch) => { if (y === null || y === undefined) player.setPose(x, z, yaw, pitch); else player.setPose(x, z, yaw, pitch, y); };
@@ -282,7 +286,7 @@ function start() {
 
 async function main() {
   await build();
-  if (params.get('cam')) camSpec(params.get('cam')); else camSpec('hero');
+  if (params.get('cam')) { try { camSpec(params.get('cam')); } catch (e) { console.warn(e.message); camSpec('hero'); } } else camSpec('hero');
   if (params.has('fly')) player.fly = true;
   if (simT > 0) window.__sim(simT); else stepUpdates(0, 0);
   viewTune();

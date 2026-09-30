@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { hmats, bollard, boxStack } from './props.js';
 import { nightMat, registry } from './lights.js';
 import { FONT, mapMat } from './util.js';
+import { wallSide } from './uwall.js';   // [v4:landmarks-A]
 
 // the promenade frame: along the seawall walking west from the hero walk spot, and the landward normal
 export const PROM = { p0: [163.8, -116.6], u: [-0.8316, 0.5555], n: [-0.5555, -0.8316] };
@@ -16,18 +17,22 @@ export const promAt = (s, d) => [PROM.p0[0] + PROM.u[0] * s + PROM.n[0] * d, PRO
 export const PROM_FACE = Math.atan2(-PROM.n[0], -PROM.n[1]);
 /** rotY half-turned toward a walker coming from the hero walk spot (the fronts read in the wow2 frames) */
 export const PROM_WALKER = (() => { const fx = 0.35 * -PROM.n[0] + 0.65 * -PROM.u[0], fz = 0.35 * -PROM.n[1] + 0.65 * -PROM.u[1]; return Math.atan2(fx, fz); })();
-/** where town puts the promenade vending machine (s, d, rotY) */
-export const PROM_VENDING = { s: 15.4, d: 7.5, rotY: PROM_WALKER };
+/** [v4:landmarks-A] width of the waterside apron at s: from the quay edge to the real 魚町 flap-gate wall (harbor/uwall.js) */
+export const wallD = (s) => { const [x, z] = promAt(s, 0); const d = wallSide(x, z); return Math.max(3.5, Math.min(14, Number.isFinite(d) ? d : 9)); };
+/** where town puts the promenade vending machine (s, d, rotY): on the apron, 1.6 m in front of the wall */
+export const PROM_VENDING = { s: 15.4, d: wallD(15.4) - 1.6, rotY: PROM_WALKER };
+/** [v4:landmarks-A] the apron surface: the quay top there (the terrain under the slab can be lower) */
+function surfY(L, x, z) { let top = -1e9; for (const q of L.QUAYS || []) { const mx = (q.a[0] + q.b[0]) / 2, mz = (q.a[1] + q.b[1]) / 2; if (Math.hypot(mx - x, mz - z) < 16) top = Math.max(top, q.top ?? 2); } return Math.max(L.heightAt(x, z), top); }
 
 export function buildPromenadeStall(ctx, out = {}) {
   const L = ctx.L, T = ctx.tex;
   const M = hmats(ctx);
-  const [sx, sz] = promAt(15.2, 10.2);
+  const [sx, sz] = promAt(15.2, wallD(15.2) - 4.4);   // [v4:landmarks-A] on the apron in front of the wall (was 10.2 m in: on the wall line)
   const rot = PROM_WALKER, c = Math.cos(rot), s = Math.sin(rot);
   const W = 3.6, D = 2.3;
   // floor on the highest corner (the lawn slopes up to the road): a low concrete plinth covers the step
   let gMin = 1e9, gMax = -1e9;
-  for (const [lx, lz] of [[-W / 2, 0], [W / 2, 0], [-W / 2, -D], [W / 2, -D]]) { const g = L.heightAt(sx + lx * c + lz * s, sz - lx * s + lz * c); gMin = Math.min(gMin, g); gMax = Math.max(gMax, g); }
+  for (const [lx, lz] of [[-W / 2, 0], [W / 2, 0], [-W / 2, -D], [W / 2, -D]]) { const g = surfY(L, sx + lx * c + lz * s, sz - lx * s + lz * c); gMin = Math.min(gMin, g); gMax = Math.max(gMax, g); }
   const y0 = gMax + 0.12;
   const g = new THREE.Group(); g.name = 'promenade-stall';
   g.position.set(sx, y0, sz); g.rotation.y = rot;
@@ -155,8 +160,8 @@ export function buildPromenadeStall(ctx, out = {}) {
   if (ctx.physics?.addBox) { const cc = wp(0, 0, -D / 2); ctx.physics.addBox(cc.x, cc.z, W + 0.2, D + 0.3, rot, gMin, y0 + 2.6); }
 
   // ---- the 係船柱 on the lawn edge beside the deck (a harbour cat's seat), yellow cap
-  const [bx, bz] = promAt(10.4, 7.1);
-  const by = L.heightAt(bx, bz);
+  const [bx, bz] = promAt(10.4, 0.8);   // [v4:landmarks-A] at the quay edge (a mooring bollard; the lawn it stood on is the wall)
+  const by = surfY(L, bx, bz);
   const bg = new THREE.Group(); bg.name = 'promenade-bollard'; const bk2 = ctx.kit(bg);
   bk2.cyl(0.42, 0.46, Math.max(0.12, by - gMin + 0.1), conc, [bx, by - 0.02, bz], null, 12);
   bollard(bk2, M, bx, by + 0.04, bz, { big: true });

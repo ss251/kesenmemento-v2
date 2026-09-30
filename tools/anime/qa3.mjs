@@ -5,10 +5,12 @@
 // auto tour (G); live chip + arrivals panel; arriving boats at 06:30; characters; audio toggle (button + M); photo mode
 // (1920x1080: the machine caps forbid 4K until 2026-10-01 00:00Z; scale 1 = 3840x2160 is the same path); hide UI (H).
 // --phone 1 also runs the 390x844 touch layout. --bench 1 measures GPU ms/frame per quality tier on the wow cameras.
+// [v4:explore] then the explorable core: streaming in the far core, search (JA / EN), the full map, the car on the real
+// roads, the fish market and 男山本店 interiors, POI labels (--noexplore skips it; --dist <dir> builds privately).
 // Prints a JSON report and exits 1 on any page error or failed check. Never leaves Chrome or the server running.
 import { join, resolve, relative } from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { launch, ROOT } from './cdp.mjs';
+import { launch, ROOT, build as cdpBuild } from './cdp.mjs';
 import { start } from '../../scripts/serve.js';
 import { buildWeb } from '../../scripts/build-web.js';
 import sharp from 'sharp';   // [v3:fix] frame-content checks on the walk spots
@@ -23,8 +25,10 @@ const report = { checks: [], errors: [], timings: {}, bench: {} };
 const check = (name, ok, info) => { report.checks.push({ name, ok: !!ok, ...(info !== undefined && { info }) }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${info !== undefined ? '  ' + JSON.stringify(info) : ''}`); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-if (args.build) { const t0 = Date.now(); await buildWeb({ quiet: true }); report.timings.buildMs = Date.now() - t0; }
-const srv = await start({ port, build: false, quiet: true });
+// [v4:explore] --dist <dir>: build into (and serve) a private directory instead of dist/ (another agent may be using it)
+const distDir = args.dist ? resolve(ROOT, args.dist) : null;
+if (args.build) { const t0 = Date.now(); if (distDir) await cdpBuild({ outdir: distDir, minify: true }); else await buildWeb({ quiet: true }); report.timings.buildMs = Date.now() - t0; }
+const srv = await start({ port, build: false, quiet: true, ...(distDir && { dist: distDir }) });
 let browser;
 try {
   browser = await launch({ quiet: true });
@@ -36,6 +40,7 @@ try {
   };
   const click = (sel) => page.eval(`(() => { const b = document.querySelector(${JSON.stringify(sel)}); if (!b) return false; b.click(); return true; })()`);
   const shot = async (name) => { const f = `${out}_${name}.png`; await page.shot(f); console.log('  saved', relative(ROOT, f)); };
+  const hold0 = async (code, k, vk, ms) => { await page.S('Input.dispatchKeyEvent', { type: 'keyDown', code, key: k, windowsVirtualKeyCode: vk }); await sleep(ms); await page.S('Input.dispatchKeyEvent', { type: 'keyUp', code, key: k, windowsVirtualKeyCode: vk }); };
   const cam = () => page.eval('(() => { const c = window.__ctx.camera.position; return [c.x, c.y, c.z].map((v) => +v.toFixed(1)); })()');
 
   // ---- load
@@ -45,7 +50,8 @@ try {
   report.timings.loadMs = Date.now() - t0;
   const st = await page.eval('({ modules: window.__stats.modules, batch: window.__stats.batch, errors: window.__errors })');
   report.timings.modules = st.modules; report.timings.batch = st.batch;
-  check('all five modules built', ['environment', 'water', 'town', 'harbor', 'life'].every((m) => st.modules[m]), Object.keys(st.modules));
+  // [v4:integrate] the v4 build order: landmarks (civic landmarks) and explore (streamed core, drive, map, search) too
+  check('all seven modules built', ['environment', 'water', 'town', 'harbor', 'landmarks', 'life', 'explore'].every((m) => st.modules[m]), Object.keys(st.modules));
   check('no module errors', !st.errors.length, st.errors.map((e) => e.module + ': ' + e.message.split('\n')[0]));
   await shot('00_intro');
 
@@ -150,19 +156,92 @@ try {
     });
   })()`);
   await page.eval("document.body.classList.add('noui')");
+  // [v4:polish3] wait until the streamed core has built what this view wants and every pool is flushed (max 20 s), so a
+  // walk-spot frame is never a half-streamed one
+  // (idle three polls in a row, and the tile under the player at L0 when it has one: right after a teleport the plan
+  // can still be the old place's, which looks idle)
+  const settled = `new Promise((r) => { const t0 = performance.now(); let ok = 0; const f = () => {
+    const S = window.__explore?.stream; if (!S) return r(1);
+    const sm = S.summary(), p = window.__ctx.playerObj.pos;
+    const t = window.__explore.tiles && [...window.__explore.tiles.values()].find((q) => q.cx - 50 <= p.x && p.x < q.cx + 50 && q.cz - 50 <= p.z && p.z < q.cz + 50);
+    const lv = t && S.level(t.key), atL0 = !t || !(t.mid.length + t.far.length) || (lv && lv.l0 === 'ready');
+    ok = !sm.busy && !sm.pending && !S.sb.pending() && atL0 ? ok + 1 : 0;
+    if (ok >= 3 || performance.now() - t0 > 25000) r(1); else setTimeout(f, 150); }; setTimeout(f, 400); })`;
+  // a coarse picture of the frame (32 x 18 RGB) to compare two visits of the same spot
+  const thumb = async (buf) => (await sharp(buf).resize(32, 18, { fit: 'fill' }).removeAlpha().raw().toBuffer());
+  const nearNow = () => page.eval('window.__ctx.pipeline.nearShare ? +window.__ctx.pipeline.nearShare(window.__ctx.camera, 6, 16, 9).toFixed(3) : -1');
+  // [v4:polish1 -> polish3] the 気仙沼簡易裁判所 spot on an almost fresh stream, before the long walk loop (the reference)
+  let courtRef = null;
+  if (spots.some((q) => q.id === 'court' && q.walk)) {
+    await page.eval("void window.__life.tour.walkTo('court')"); await page.eval(settled); await page.frames(6);
+    courtRef = { img: await thumb(await page.shot(`${out}_walk_court_ref.png`)), near: await nearNow() };
+  }
+  // [v4:polish3] 'place visible': at an extra place's walk spot, the place's aim point (its drone look point) projects
+  // into the frame within 25 deg of the view centre, and the pre-pass depth there is at least min(0.8 d, d - r - 2)
+  // (r = the place's own footprint radius): the frame shows the place, not a wall, a slope or a trunk in front of it
+  const placeVisible = (id) => page.eval(`(() => {
+    const st = window.__life.tour.stops.find((s) => s.id === ${JSON.stringify(id)}); if (!st?.extra || !st.drone?.look) return null;
+    const L = window.__L, cam = window.__ctx.camera, V = cam.position.constructor, [x, y, z] = st.drone.look, t = new V(x, y, z);
+    const inBox = (px, pz, l, m = 0) => { const o = l.obb, c = Math.cos(o.rotY), s = Math.sin(o.rotY), dx = px - o.cx, dz = pz - o.cz; return Math.abs(dx * c - dz * s) < o.w / 2 + m && Math.abs(dx * s + dz * c) < o.d / 2 + m; };
+    // the place's own footprint: the lot under its point (else the biggest within 8 m), with every lot of the same
+    // landmark (a civic landmark is several GSI lots); r = the farthest corner from the aim point
+    const nearL = L.LOTS.filter((l) => Math.abs(l.obb.cx - x) < 160 && Math.abs(l.obb.cz - z) < 160);
+    const own = nearL.find((l) => inBox(x, z, l)) || nearL.filter((l) => inBox(x, z, l, 8)).sort((a, b) => b.obb.w * b.obb.d - a.obb.w * a.obb.d)[0]
+      || nearL.filter((l) => l.landmark && Math.hypot(l.obb.cx - x, l.obb.cz - z) < 40).sort((a, b) => Math.hypot(a.obb.cx - x, a.obb.cz - z) - Math.hypot(b.obb.cx - x, b.obb.cz - z))[0] || null;   // a landmark site round its point
+    const group = own ? (own.landmark ? nearL.filter((l) => l.landmark === own.landmark) : [own]) : [];
+    let r = 0; for (const l of group) { const o = l.obb, c = Math.cos(o.rotY), s = Math.sin(o.rotY); for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { const lx = a * o.w / 2, lz = b * o.d / 2; r = Math.max(r, Math.hypot(o.cx + lx * c + lz * s - x, o.cz - lx * s + lz * c - z)); } }
+    const d = t.distanceTo(cam.position);
+    const fwd = new V(0, 0, -1).applyQuaternion(cam.quaternion), dir = t.clone().sub(cam.position).normalize();
+    const ang = Math.acos(Math.max(-1, Math.min(1, fwd.dot(dir)))) * 180 / Math.PI;
+    const p = t.clone().project(cam), u = (p.x + 1) / 2, v = (1 - p.y) / 2;
+    let depth = 0;
+    if (p.z < 1 && u > 0 && u < 1 && v > 0 && v < 1) for (const [du, dv] of [[0, 0], [0.015, 0], [-0.015, 0], [0, 0.02], [0, -0.02]]) depth = Math.max(depth, window.__ctx.pipeline.depthAt(cam, u + du, v + dv));
+    const need = Math.min(0.8 * d, d - r - 2);
+    return { ang: +ang.toFixed(1), d: +d.toFixed(1), depth: Number.isFinite(depth) ? +depth.toFixed(1) : 9999, need: +need.toFixed(1), ok: ang <= 25 && depth >= need };
+  })()`);
   for (const sp of spots) {
     if (!sp.walk) { check(`walk spot ${sp.id}: exists`, false, sp); continue; }
     await page.eval(`void window.__life.tour.walkTo(${JSON.stringify(sp.id)})`);
-    await page.frames(12);
+    await page.eval(settled);
+    await page.frames(6);
     const buf = await page.shot(`${out}_walk_${sp.id}.png`);
     const { data, info } = await sharp(buf).resize(160, 90, { fit: 'fill' }).raw().toBuffer({ resolveWithObject: true });
     const bins = new Map(); const n = info.width * info.height;
     for (let i = 0; i < n; i++) { const k = ((data[i * info.channels] >> 5) << 6) | ((data[i * info.channels + 1] >> 5) << 3) | (data[i * info.channels + 2] >> 5); bins.set(k, (bins.get(k) || 0) + 1); }
     const top = Math.max(...bins.values()) / n;
-    check(`walk spot ${sp.id}: on land, outside buildings, a real picture`, !sp.water && !sp.lot && !sp.hall && top <= 0.45, { ...sp, topColourShare: +top.toFixed(2) });
+    // [v4:polish1] near-depth: no wall, trunk, pole or facade right in front of the eye (more than 25 % of a 16 x 9 ray
+    // grid hitting closer than 6 m, the pavement not counted; the pre-pass depth of the frame just shot)
+    const near = await page.eval('window.__ctx.pipeline.nearShare ? +window.__ctx.pipeline.nearShare(window.__ctx.camera, 6, 16, 9).toFixed(2) : -1');
+    report.walkNear = { ...(report.walkNear || {}), [sp.id]: near };
+    check(`walk spot ${sp.id}: on land, outside buildings, a real picture, nothing within 6 m`, !sp.water && !sp.lot && !sp.hall && top <= 0.45 && near >= 0 && near <= 0.25, { ...sp, topColourShare: +top.toFixed(2), near6m: near });
+    const pv = await placeVisible(sp.id);
+    if (pv) { report.placeVisible = { ...(report.placeVisible || {}), [sp.id]: pv }; check(`walk spot ${sp.id}: the place is in view (within 25 deg, not hidden)`, pv.ok, pv); }
+  }
+  // [v4:polish3] regression (blocker: after the long loop a kit building drew as floating slabs and windows): back at
+  // 気仙沼簡易裁判所, the settled frame matches the early visit, and every streamed pool is intact
+  if (courtRef) {
+    await page.eval("void window.__life.tour.walkTo('court')"); await page.eval(settled); await page.frames(6);
+    const img = await thumb(await page.shot(`${out}_walk_court_again.png`)), near = await nearNow();
+    let diff = 0; for (let i = 0; i < img.length; i++) diff += Math.abs(img[i] - courtRef.img[i]); diff /= img.length;
+    const v = await page.eval('window.__explore.stream.sb.validate()');
+    check('stream: after the walk loop the court spot draws as on the early visit (frame, near-depth) and every pool is intact', diff < 10 && Math.abs(near - courtRef.near) <= 0.03 && v.nBad === 0, { meanAbsDiff: +diff.toFixed(2), near, nearRef: courtRef.near, pools: v.pools, slots: v.slots, bad: v.bad.slice(0, 4) });
   }
   await page.eval("document.body.classList.remove('noui')");
   await page.eval("void window.__life.tour.walkTo('hero')"); await page.frames(10);   // back on the promenade, still in walk view
+
+  // [v4:integrate] fly mode (F): from the promenade, F lifts off, Space climbs and W flies; F again lands on the ground
+  await key('KeyF'); await page.frames(3);
+  const fy0 = await cam();
+  await hold0('Space', ' ', 32, 1500); await hold0('KeyW', 'w', 87, 1500); await page.frames(4);
+  const fy1 = await cam();
+  const flyOn = await page.eval('window.__ctx.playerObj.fly');
+  const flySpeed = +(Math.hypot(fy1[0] - fy0[0], fy1[2] - fy0[2]) / 1.5).toFixed(1);   // m/s over the 1.5 s of W
+  // [v4:polish3] land: wait until the fall ends (sim time runs slower than real time when the gate throttles the frame rate)
+  await key('KeyF'); await page.eval('new Promise((r) => { const t0 = performance.now(); const f = () => { const c = window.__ctx.camera.position; if (c.y - window.__ctx.physics.groundHeight(c.x, c.z, c.y) < 2.4 || performance.now() - t0 > 12000) r(1); else setTimeout(f, 100); }; setTimeout(f, 500); })');
+  const land = await page.eval('(() => { const p = window.__ctx.playerObj, c = window.__ctx.camera.position; return { fly: p.fly, eye: +(c.y - window.__ctx.physics.groundHeight(c.x, c.z, c.y)).toFixed(2) }; })()');
+  // [v4:polish3] fly is 25 m/s (Shift 70): at least 10 m/s measured over the 1.5 s of W (it accelerates in ~0.3 s)
+  check('fly mode (F): climbs and flies at city speed, F again lands', flyOn && fy1[1] - fy0[1] > 3 && flySpeed >= 10 && !land.fly && land.eye < 2.5, { from: fy0, to: fy1, mps: flySpeed, land });
+  await page.eval("void window.__life.tour.walkTo('hero')"); await page.frames(10);
 
   await key('KeyV'); await page.eval('new Promise((r) => setTimeout(r, 8000))');
   const d = await page.eval('(() => { const c = window.__ctx.camera.position; return { fly: window.__ctx.playerObj.fly, alt: +(c.y - window.__L.groundAt(c.x, c.z)).toFixed(1) }; })()');
@@ -202,11 +281,14 @@ try {
 
   // ---- seasons (button, then K) and the tiny planet (button, then O)
   const s0 = await page.eval('__life.season?.id');
-  await click('#klc-ui [data-act="season"]'); await page.eval('new Promise((r) => setTimeout(r, 3000))');
+  // [v4:integrate] wait for the blend to finish (2.5 s of sim time: slower in real time when the gate throttles the frame rate)
+  // [v4:polish3] wait for the NEW season's weight (the old one already weighs 1 when the click lands: that raced)
+  const seasonDone = 'new Promise((r) => { const t0 = performance.now(); const f = () => { const i = ["spring", "summer", "autumn", "winter"].indexOf(__life.season?.id); const v = __ctx.shared.uSeason.value.toArray(); if ((i >= 0 && v[i] > 0.995) || performance.now() - t0 > 15000) r(1); else setTimeout(f, 100); }; f(); })';
+  await click('#klc-ui [data-act="season"]'); await page.eval('new Promise((r) => setTimeout(r, 300))'); await page.eval(seasonDone);
   const s1 = await page.eval('__life.season?.id');
   const w1 = await page.eval('__ctx.shared.uSeason.value.toArray().map((v) => +v.toFixed(2))');
   await shot('08b_season_' + s1);
-  await key('KeyK'); await page.eval('new Promise((r) => setTimeout(r, 3000))');
+  await key('KeyK'); await page.eval('new Promise((r) => setTimeout(r, 300))'); await page.eval(seasonDone);
   const s2 = await page.eval('__life.season?.id');
   await shot('08c_season_' + s2);
   check('season toggles (button, then K) and blends the materials', s0 === 'autumn' && s1 !== s0 && s2 !== s1 && w1[3] > 0.99, { s0, s1, s2, weights: w1 });
@@ -221,6 +303,115 @@ try {
   const fps = await page.eval('new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { if (++n >= 90) r(+(n * 1000 / (performance.now() - t0)).toFixed(1)); else requestAnimationFrame(f); }; requestAnimationFrame(f); })');
   report.timings.liveFps = fps;
   console.log('  live fps (1600x900, high, gate-throttled):', fps);
+
+  // ---- [v4:explore] the explorable core: streaming, search, map, labels, the car, the interiors, the places
+  if (!args.noexplore) {
+    const keyDown = (code, k, vk) => page.S('Input.dispatchKeyEvent', { type: 'keyDown', code, key: k, windowsVirtualKeyCode: vk });
+    const keyUp = (code, k, vk) => page.S('Input.dispatchKeyEvent', { type: 'keyUp', code, key: k, windowsVirtualKeyCode: vk });
+    const hold = async (code, k, vk, ms) => { await keyDown(code, k, vk); await sleep(ms); await keyUp(code, k, vk); };
+    // [v4:integrate] hold a key until a page condition holds (or maxMs): movement is in sim time, which runs slower than
+    // real time when the gate throttles the frame rate
+    const holdUntil = async (code, k, vk, cond, maxMs) => { await keyDown(code, k, vk); const t0 = Date.now(); while (Date.now() - t0 < maxMs && !(await page.eval(cond))) await sleep(150); await keyUp(code, k, vk); };
+    const ex = await page.eval('({ has: !!window.__explore, stats: window.__explore?.stats, s: window.__explore?.stream?.summary(), stops: window.__life.tour.stops.length, extra: window.__life.tour.stops.filter((s) => s.extra).length })');
+    check('explore: module built, mid-zone base tiles, 20+ extra real places in the tour', ex.has && ex.s?.m1 > 50 && ex.extra >= 20 && ex.stops >= 27, { m1: ex.s?.m1, stops: ex.stops, extra: ex.extra, ms: ex.stats?.ms });
+    // the explore UI is up: the minimap has been painted
+    const mini = await page.eval(`(() => { const c = document.querySelector('#klc-x .mini canvas'); if (!c || !c.width) return null; const g = c.getContext('2d'); const d = g.getImageData(0, 0, c.width, c.height).data; let n = 0; const set = new Set(); for (let i = 0; i < d.length; i += 4 * 97) { if (d[i + 3] > 0) n++; set.add((d[i] >> 4) + '|' + (d[i + 1] >> 4) + '|' + (d[i + 2] >> 4)); } let a = 0, m = 0; const W = c.width, R = W / 2; for (let y = 0; y < W; y += 3) for (let x = 0; x < W; x += 3) { if (Math.hypot(x - R, y - R) < R * 0.8) { a += d[(y * W + x) * 4 + 3]; m++; } } return { w: c.width, painted: n, colours: set.size, alpha: +(a / m / 255).toFixed(2), visible: !document.getElementById('klc-x').hidden }; })()`);
+    // [v4:integrate] + opaque inside the disc (the mask used to fade it out to a smudge round the arrow)
+    check('explore: minimap visible, opaque and painted', mini && mini.visible && mini.colours > 6 && mini.alpha > 0.95, mini);
+    // search (JA): '/', type 気仙沼駅, Enter -> the camera flies to the station
+    await hold('Slash', '/', 191, 60); await page.frames(3);
+    const open = await page.eval("!document.querySelector('#klc-x .xsearch').hidden && document.activeElement?.tagName === 'INPUT'");
+    await page.S('Input.insertText', { text: '気仙沼駅' }); await page.frames(3);
+    const res = await page.eval("[...document.querySelectorAll('#klc-x .xsearch li b')].slice(0, 4).map((b) => b.textContent)");
+    await shot('11_search');
+    await page.S('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Enter', key: 'Enter', windowsVirtualKeyCode: 13 }); await page.S('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Enter', key: 'Enter', windowsVirtualKeyCode: 13 });
+    await page.eval('new Promise((r) => setTimeout(r, 11000))');
+    const atSt = await page.eval('(() => { const c = window.__ctx.camera.position; return { d: +Math.hypot(c.x + 1380, c.z + 420).toFixed(0), pin: window.__explore.labels?.pinned?.ja || null, shown: window.__explore.labels?.stats.shown }; })()');
+    check('explore: search 気仙沼駅 (JA) lists it and flies there, its label pinned', open && res[0] === '気仙沼駅' && atSt.d < 600 && !!atSt.pin, { open, res, ...atSt });
+    await shot('12_search_station');
+    // search (EN kind): hospital
+    await hold('Slash', '/', 191, 60); await page.frames(2);
+    await page.eval("(() => { const i = document.querySelector('#klc-x .xsearch input'); i.value = ''; i.dispatchEvent(new Event('input')); })()");
+    await page.S('Input.insertText', { text: 'hospital' }); await page.frames(3);
+    const hos = await page.eval("[...document.querySelectorAll('#klc-x .xsearch li b')].map((b) => b.textContent)");
+    check('explore: search "hospital" (EN) lists hospitals', hos.length >= 3 && hos.some((t) => /病院/.test(t)), hos.slice(0, 5));
+    await page.S('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Escape', key: 'Escape', windowsVirtualKeyCode: 27 }); await page.S('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Escape', key: 'Escape', windowsVirtualKeyCode: 27 });
+    // the full map (N): opens, draws, closes
+    await key('KeyN'); await page.frames(6);
+    const mapOpen = await page.eval("!document.querySelector('#klc-x .xmap').hidden");
+    await shot('13_map');
+    // [v4:docs] the map's data credit (ODbL: "© OpenStreetMap contributors") is on screen and not under the minimap
+    const mapCredit = await page.eval(`(() => { const c = document.querySelector('#klc-x .xmap .credit'), m = document.querySelector('#klc-x .mini canvas');
+      const r = c.getBoundingClientRect(), q = m ? m.getBoundingClientRect() : null, R = (b) => [b.left, b.top, b.right, b.bottom].map(Math.round);
+      const over = !!q && q.width > 0 && r.left < q.right && r.right > q.left && r.top < q.bottom && r.bottom > q.top;
+      return { text: c.textContent, credit: R(r), mini: q ? R(q) : null, over, inView: r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight }; })()`);
+    check('explore: the map credit shows © OpenStreetMap contributors, clear of the minimap', /© OpenStreetMap contributors/.test(mapCredit.text) && !mapCredit.over && mapCredit.inView, mapCredit);
+    await key('KeyN'); await page.frames(2);
+    check('explore: the full map opens (N) and closes', mapOpen && (await page.eval("document.querySelector('#klc-x .xmap').hidden")));
+    // walk into the far core (新町, 1 km west of the bay): kit detail streams in around you, with colliders
+    await page.eval("(() => { window.__life.tour.stop(); const p = window.__ctx.playerObj; p.fly = false; p.setPose(-961.1, -86.9, 83, 2); return 1; })()");
+    const tStream = Date.now();
+    await page.eval(`new Promise((r) => { const t0 = performance.now(); const f = () => { const S = window.__explore.stream, k = window.__explore.tiles && [...window.__explore.tiles.values()].find((t) => t.cx - 50 <= -961 && -961 < t.cx + 50 && t.cz - 50 <= -87 && -87 < t.cz + 50)?.key; const lv = k && S.level(k), sm = S.summary(); if ((lv && lv.l0 === 'ready' && !sm.busy && !sm.pending) || performance.now() - t0 > 30000) r(1); else requestAnimationFrame(f); }; f(); })`);
+    report.timings.streamL0Ms = Date.now() - tStream;
+    const far = await page.eval('(() => { const S = window.__explore.stream.summary(); return { l0: S.l0, l1: S.l1, colliders: S.colliders, farHidden: S.farHidden, kitMsPerLot: S.kitMsPerLot, failures: S.failures }; })()');
+    check('explore: walking in the far core streams kit tiles (with colliders) and hides the far boxes', far.l0 >= 2 && far.l1 >= 10 && far.colliders > 500 && far.farHidden > 100 && !far.failures, { ...far, ms: report.timings.streamL0Ms });
+    await shot('14_far_core_street');
+    const ffar = await page.eval('new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { if (++n >= 90) r(+(n * 1000 / (performance.now() - t0)).toFixed(1)); else requestAnimationFrame(f); }; requestAnimationFrame(f); })');
+    report.timings.liveFpsFarCore = ffar;
+    console.log('  live fps in the streamed far core:', ffar);
+    // walk forward 4 s: the town's buildings stop you (no walking through them)
+    const w0 = await cam();
+    await hold('KeyW', 'w', 87, 4000); await page.frames(3);
+    const w1 = await cam();
+    const inside = await page.eval('(() => { const p = window.__ctx.playerObj.pos; return window.__L.LOTS.filter((l) => Math.abs(l.obb.cx - p.x) < 40 && Math.abs(l.obb.cz - p.z) < 40).some((l) => { const o = l.obb, c = Math.cos(o.rotY), s = Math.sin(o.rotY), dx = p.x - o.cx, dz = p.z - o.cz; return Math.abs(dx * c - dz * s) < o.w / 2 - 0.8 && Math.abs(dx * s + dz * c) < o.d / 2 - 0.8; }); })()');
+    check('explore: walking the far core moves you and never into a building', Math.hypot(w1[0] - w0[0], w1[2] - w0[2]) > 2 && !inside, { from: w0, to: w1 });
+    // drive (C): the car starts on the nearest road, W drives it along the road, A steers, C gets out
+    await hold('KeyC', 'c', 67, 150); await page.frames(4);
+    const d0 = await page.eval('({ on: window.__explore.drive.active, s: { ...window.__explore.drive.state } })');
+    await holdUntil('KeyW', 'w', 87, 'window.__explore.drive.state.km > 0.03', 12000);
+    await keyDown('KeyW', 'w', 87); await keyDown('KeyA', 'a', 65); await sleep(1200); await keyUp('KeyA', 'a', 65); await sleep(600); await keyUp('KeyW', 'w', 87);
+    await page.frames(4);
+    const d1 = await page.eval('(() => { const D = window.__explore.drive, s = D.state; return { on: D.active, x: +s.x.toFixed(1), z: +s.z.toFixed(1), yaw: +s.yaw.toFixed(2), kmh: +D.kmh.toFixed(1), km: +s.km.toFixed(3), onRoad: window.__explore.net.onRoad(s.x, s.z, -0.2), chip: !document.querySelector("#klc-x .xdrive").hidden }; })()');
+    await shot('15_drive');
+    check('explore: drive mode (C) on the real roads: moves, steers, stays on the road', d0.on && d1.on && d1.km > 0.02 && Math.abs(d1.yaw - d0.s.yaw) > 0.1 && d1.onRoad && d1.chip, { start: { x: +d0.s.x.toFixed(1), z: +d0.s.z.toFixed(1), yaw: +d0.s.yaw.toFixed(2) }, end: d1 });
+    await hold('KeyC', 'c', 67, 150); await page.frames(4);
+    const out = await page.eval('({ on: window.__explore.drive.active, fly: window.__ctx.playerObj.fly })');
+    check('explore: C leaves the car on foot', !out.on && !out.fly, out);
+    // interiors: the fish market C hall (2F gallery over the landing floor) and 男山本店 (walk in through the door)
+    const ints = await page.eval('(window.__explore.interiors?.list || []).map((i) => ({ id: i.id, entrance: i.entrance, inside: i.inside }))');
+    const mk = ints.find((i) => i.id === 'marketC'), ok2 = ints.find((i) => i.id === 'otokoyama');
+    if (mk) {
+      await page.eval(`(() => { const p = window.__ctx.playerObj; p.fly = false; p.setPose(${mk.entrance.x}, ${mk.entrance.z}, ${mk.entrance.yaw}, 0); return 1; })()`);
+      await holdUntil('KeyW', 'w', 87, '(() => { const p = window.__ctx.playerObj.pos, b = window.__explore.interiors.marketC.bounds, c = Math.cos(b.rotY), s = Math.sin(b.rotY), dx = p.x - b.O[0], dz = p.z - b.O[1]; return dx * c - dz * s > 1.5; })()', 9000); await page.frames(3);
+      const inLobby = await page.eval('(() => { const p = window.__ctx.playerObj.pos, b = window.__explore.interiors.marketC.bounds, c = Math.cos(b.rotY), s = Math.sin(b.rotY), dx = p.x - b.O[0], dz = p.z - b.O[1]; return { lx: +(dx * c - dz * s).toFixed(1), lz: +(dx * s + dz * c).toFixed(1) }; })()');
+      await page.eval(`(() => { const p = window.__ctx.playerObj; p.fly = false; p.setPose(${mk.inside.x}, ${mk.inside.z}, ${mk.inside.yaw}, ${mk.inside.pitch}); return 1; })()`);
+      await page.frames(10);
+      const g = await page.eval('({ y: +window.__ctx.playerObj.pos.y.toFixed(2), y2: window.__explore.interiors.marketC.y2 })');
+      await shot('16_market_gallery');
+      check('explore: fish market C hall: in through the visitors’ door, on the 2F gallery over the landing floor', inLobby.lx > 0.5 && Math.abs(g.y - g.y2) < 0.3, { inLobby, ...g });
+    } else check('explore: fish market C hall interior built', false, ints);
+    if (ok2) {
+      await page.eval(`(() => { const p = window.__ctx.playerObj; p.fly = false; p.setPose(${ok2.entrance.x}, ${ok2.entrance.z}, ${ok2.entrance.yaw}, 0); return 1; })()`);
+      await holdUntil('KeyW', 'w', 87, `(() => { const p = window.__ctx.playerObj.pos, l = window.__L.lotById(${JSON.stringify('16/58540/25068/327')}), o = l.obb, c = Math.cos(o.rotY), s = Math.sin(o.rotY), dx = p.x - o.cx, dz = p.z - o.cz; return Math.abs(dx * c - dz * s) < o.w / 2 - 1 && Math.abs(dx * s + dz * c) < o.d / 2 - 1; })()`, 9000); await page.frames(3);
+      const inShop = await page.eval(`(() => { const p = window.__ctx.playerObj.pos, l = window.__L.lotById(${JSON.stringify('16/58540/25068/327')}), o = l.obb, c = Math.cos(o.rotY), s = Math.sin(o.rotY), dx = p.x - o.cx, dz = p.z - o.cz; return { lx: +(dx * c - dz * s).toFixed(2), lz: +(dx * s + dz * c).toFixed(2), w: o.w, d: o.d }; })()`);
+      await shot('17_otokoyama_walkin');
+      await page.eval(`(() => { const p = window.__ctx.playerObj; p.setPose(${ok2.inside.x}, ${ok2.inside.z}, ${ok2.inside.yaw}, ${ok2.inside.pitch}); return 1; })()`); await page.frames(8);
+      await shot('18_otokoyama_inside');
+      check('explore: 男山本店: walk in through the shop door', Math.abs(inShop.lx) < inShop.w / 2 && Math.abs(inShop.lz) < inShop.d / 2, inShop);
+    } else check('explore: 男山本店 interior built', false, ints);
+    const stn = ints.find((i) => i.id === 'station');
+    if (stn?.inside) {
+      await page.eval(`(() => { const p = window.__ctx.playerObj; p.fly = false; p.setPose(${stn.inside.x}, ${stn.inside.z}, ${stn.inside.yaw}, 0); return 1; })()`); await page.frames(10);
+      const sy = await page.eval('+window.__ctx.playerObj.pos.y.toFixed(2)');
+      await shot('18b_station_hall');
+      check('explore: the station waiting hall (landmarks-B) is walkable', Math.abs(sy - stn.inside.y) < 0.6, { y: sy, want: stn.inside.y });
+    }
+    // POI labels at street level in the inner bay
+    await page.eval("void window.__life.tour.walkTo('hero')"); await page.frames(20);
+    const lab = await page.eval('window.__explore.labels?.stats.shown ?? -1');
+    await shot('19_labels');
+    check('explore: POI labels near the promenade', lab >= 2, lab);
+  }
 
   report.errors = page.errors().map((l) => `${l.type}: ${l.text.slice(0, 300)}`);
   check('no console errors', !report.errors.length, report.errors.slice(0, 8));
@@ -241,6 +432,14 @@ try {
     await ph2.frames(10);
     const q = await ph2.eval('({ q: window.__ctx.quality.name, heroR: window.__ctx.quality.heroR, overflow: document.documentElement.scrollWidth > innerWidth })');
     check('phone: low tier, no horizontal overflow', q.q === 'low' && !q.overflow, q);
+    // [v4:explore] the explore UI on the phone: minimap, the search / map / drive buttons in reach
+    const px = await ph2.eval(`(() => { const r = (s) => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)]; }; return { mini: r('#klc-x .mini canvas'), bar: r('#klc-x .xbar'), search: r('#klc-x .xbar [data-act="search"]'), visible: !document.getElementById('klc-x')?.hidden, stream: window.__explore?.stream?.R }; })()`);
+    const inView = (b) => b && b[0] >= 0 && b[1] >= 0 && b[0] + b[2] <= 390 && b[1] + b[3] <= 844;
+    check('phone: explore UI in view (minimap, 44 px buttons), low-tier streaming radii', px.visible && inView(px.mini) && inView(px.bar) && px.search?.[2] >= 44 && px.stream?.l0 <= 60, px);
+    // [v4:polish3] POI labels on the phone: every shown pill inside the screen and off the minimap
+    await ph2.frames(20);
+    const pl = await ph2.eval(`(() => { const m = document.querySelector('#klc-x .mini')?.getBoundingClientRect(); const out = []; for (const e of document.querySelectorAll('#klc-labels .xl')) { if (+e.style.opacity < 0.05) continue; const b = e.getBoundingClientRect(); out.push({ t: e.querySelector('b').textContent, x0: Math.round(b.left), x1: Math.round(b.right), y0: Math.round(b.top), y1: Math.round(b.bottom), mini: !!m && b.left < m.right && b.right > m.left && b.top < m.bottom && b.bottom > m.top }); } return out; })()`);
+    check('phone: POI labels inside the screen and off the minimap', pl.every((b) => b.x0 >= 0 && b.x1 <= 390 && !b.mini), pl);
     await ph2.shot(`${out}_10_phone.png`);
     const perr = ph2.errors().map((l) => `${l.type}: ${l.text.slice(0, 300)}`);
     check('phone: no console errors', !perr.length, perr.slice(0, 6));

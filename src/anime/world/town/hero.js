@@ -8,7 +8,8 @@ import { groundRange, pick, wpick } from './common.js';
 import { buildShop } from './shops.js';
 import { buildWarehouse } from './industrial.js';
 import { SHOPS, OFFICES } from './names.js';
-import { wallOf, pitchedRoofOf, flatRoofOf } from './palette.js';
+import { wallOf, pitchedRoofOf, flatRoofOf, kawaraColour } from './palette.js';
+import { wings } from './wings.js';   // [v4:town-accuracy]
 import { buildApartmentBlock, buildOfficeBlock } from './blocks.js';
 
 /** Decide what each hero lot becomes. Deterministic (seeded by lot id). */
@@ -23,11 +24,25 @@ export function classifyHero(L, lots, roadIdx) {
     const area = areaOf(lot.obb.cx, lot.obb.cz);
     let kind = lot.kind;
     if (lot.landmark) kind = 'landmark';
+    // [v4:town-accuracy] a real shop / restaurant / bank (OSM shop=* or amenity=*) gets a shop front
+    else if (REAL_SHOP.test(lot.use || '') && lot.area >= 25 && lot.area <= 450 && lot.obb.w >= 3.6 && (kind === 'house' || kind === 'shop' || kind === 'office' || kind === 'apartment' && lot.storeys <= 3)) kind = 'shop';
     else if (kind === 'house' && main && shopish.has(area) && lot.area >= 35 && lot.area <= 260 && lot.obb.w >= 4 && r() < 0.55) kind = 'shop';
     else if (kind === 'office' && lot.storeys <= 2 && main && r() < 0.5) kind = 'shop';
     out.set(lot.id, { kind, main, area, road });
   }
   return out;
+}
+
+const REAL_SHOP = /^(shop:|amenity:(restaurant|cafe|bar|pub|fast_food|pharmacy|bank|ice_cream)|tourism:(hotel|guest_house))/;
+/** [v4:town-accuracy] the fictional shop kit (names.js) whose trade matches a real OSM use: its front, interior and
+ *  display suit the real shop; the board then carries the real name. */
+const USE_TYPE = [[/seafood|fish/, '鮮魚'], [/sushi/, '寿司'], [/alcohol|wine|sake/, '酒店'], [/cafe|coffee|tea/, '喫茶'], [/confectionery|pastry|bakery/, '菓子'], [/greengrocer|farm/, '青果'],
+  [/hairdresser|barber/, '理容'], [/pharmacy|chemist/, '薬局'], [/stationery|books|newsagent/, '文具'], [/hardware|doityourself/, '金物'], [/clothes|fabric|shoes/, '呉服'], [/gift|souvenir/, '土産'],
+  [/restaurant|fast_food|food/, '食堂'], [/bar|pub/, '食堂']];
+export function shopIndexFor(use, fallback) {
+  const u = use || '';
+  for (const [re, type] of USE_TYPE) if (re.test(u)) { const i = SHOPS.findIndex((x) => x.type === type); if (i >= 0) return i; }
+  return fallback;
 }
 
 function mulberry(a) { return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -41,37 +56,64 @@ export function buildHeroLot(T, lot, cls, lod) {
   const { ctx, L } = H;
   const r = ctx.rng('klc-town-' + lot.id);
   if (cls.kind === 'landmark' || cls.kind === 'shrine' || lot.landmark) return null;   // harbor builds these
+  if (lot.kind === 'temple') return null;   // [v4:polish3] landmarks/temples.js builds the 入母屋 hall (templeLots)
   if (L.shoreDist(lot.obb.cx, lot.obb.cz) > 0.5) return null;                          // pontoons / piers: harbor's
-  if (cls.kind === 'warehouse' || cls.kind === 'factory') return buildWarehouse(H, lot, lod, IM, SM, signs, r, out) ? 'warehouse' : null;
-  const w = lot.obb.w - 0.3, d = lot.obb.d - 0.3;
-  if (w < 3.2 || d < 3.2 || w / d > 5 || d / w > 5) return null;
+  // [v4:town-accuracy] the real footprint: a near-rectangular lot is one kit building; an L / T / U-shaped one gets the kit
+  // building on its main wing and the other wings from the simplified builder (T.annex); odd shapes go to mid entirely
+  const WG = wings(lot);
+  // [v4:polish1] a big curved / many-sided footprint filling < 0.8 of its box: the simplified builder builds it on its
+  // true polygon (the kit would stand a box on the OBB)
+  if (WG.simple && WG.rect < 0.8 && lot.area >= 250) return null;
+  if (cls.kind === 'warehouse' || cls.kind === 'factory') {
+    if (WG.rect < 0.85) return null;
+    return buildWarehouse(H, lot, lod, IM, SM, signs, r, out) ? 'warehouse' : null;
+  }
+  let wing = WG.rects[0];
+  if (!WG.simple) {
+    const polyA = WG.rects.reduce((a, q) => a + q.area, 0);
+    if (wing.area < 0.4 * polyA || Math.min(wing.w, wing.d) < 3.6) return null;
+    if (WG.rects.length > 1) T.annex?.set(lot.id, { rects: WG.rects });
+  }
   const f = L.lotFrame(lot);
   const F = H.Frame.at(H.gb, f.x, f.y, f.z, f.rotY);
-  const HF = F.sub(0, 0, -lot.obb.d / 2, 0);
+  const HF = F.sub(wing.cx, 0, -lot.obb.d / 2 + wing.cz, 0);
+  // walls stand under the eaves: the roof outline (not the walls) is the footprint edge; the inset is set below once
+  // the spec knows its overhang
+  let w = wing.w - 0.3, d = wing.d - 0.3;
+  if (w < 3.2 || d < 3.2 || w / d > 5 || d / w > 5) { T.annex?.delete(lot.id); return null; }
   H.lod = lod;
   const kind = cls.kind;
-  const tall = kind === 'apartment' || kind === 'office' || kind === 'public' || kind === 'school';
+  const tall = kind === 'apartment' || kind === 'office' || kind === 'public' || kind === 'school' || kind === 'hotel';   // [v4:polish1] hotel
   // big blocks get the dedicated マンション / office builder (blocks.js)
   if (tall && lot.storeys >= 3 && Math.max(w, d) >= 9) {
-    const ok = kind === 'apartment' ? buildApartmentBlock(H, lot, lod, r, T) : buildOfficeBlock(H, lot, lod, r, T);
+    const ok = kind === 'apartment' ? buildApartmentBlock(H, lot, lod, r, T, wing) : buildOfficeBlock(H, lot, lod, r, T, wing);
     if (ok) return kind === 'apartment' ? 'apartment' : 'office';
   }
   const isShop = kind === 'shop' && w >= 3.4 && d >= 5;
-  let floors = Math.max(1, Math.min(tall ? 7 : 3, lot.storeys));
-  if (isShop && floors < 2 && r() < 0.8) floors = 2;
+  // [v4:town-accuracy] real storeys (OSM building:levels / height, or a landmark sheet) are built as they are
+  const realH = lot.src?.h === 'osm' || lot.src?.h === 'landmark';
+  let floors = Math.max(1, Math.min(realH ? (tall ? 14 : 5) : tall ? 7 : 3, lot.storeys));
+  if (isShop && floors < 2 && !realH && r() < 0.8) floors = 2;
   const shape = lot.roof.shape;
   let roofType = shape === 'flat' ? 'flat' : shape === 'hip' ? 'hip' : shape === 'shed' ? 'shed' : 'gable';
   // Kesennuma's town is mostly pitched roofs; GSI "shed" is often a low gable read from above
-  if (roofType === 'shed' && !tall && r() < 0.6) roofType = r() < 0.5 ? 'gable' : 'hip';
-  if (roofType === 'flat' && floors <= 2 && !tall) roofType = r() < 0.5 ? 'gable' : 'hip';
+  // [v4:data] a roof shape measured from the aerial photo or tagged in OSM is kept as it is
+  const measured = lot.src?.roof === 'aerial' || lot.src?.roof === 'osm';
+  if (!measured && roofType === 'shed' && !tall && r() < 0.6) roofType = r() < 0.5 ? 'gable' : 'hip';
+  if (!measured && roofType === 'flat' && floors <= 2 && !tall) roofType = r() < 0.5 ? 'gable' : 'hip';
   const S = makeSpec(r, { floors, roofType, allowFlat: true, antennaP: tall ? 0 : 0.5, traditional: (kind === 'house' || isShop) && r() < (isShop ? 0.3 : 0.12) });
   S.roof.color = roofType === 'flat' ? flatRoofOf(lot) : pitchedRoofOf(lot);
-  if (roofType !== 'flat' && roofType !== 'shed' && r() < 0.55) S.roof.mat = 'kawara';
+  // [v4:town-accuracy] 瓦 only on tile-coloured roofs (the kawara texture would turn a red or blue metal roof grey)
+  if (roofType !== 'flat' && roofType !== 'shed' && kawaraColour(S.roof.color) && r() < 0.7) S.roof.mat = 'kawara';
+  else if (S.roof.mat === 'kawara' && !kawaraColour(S.roof.color)) S.roof.mat = 'metal';
+  S.roof.axis = lot.roof.ridge && wing === WG.rects[0] && WG.simple ? lot.roof.ridge : (w >= d ? 'x' : 'z');   // [v4:town-accuracy] measured ridge, else the long axis (was a coin flip)
   if (S.wall.kind === 'plaster' || S.wall.kind === 'paint') S.wall.color = wallOf(lot);
   if (tall) {
     S.wall = { kind: r() < 0.6 ? 'tile' : 'paint', color: r() < 0.6 ? pick(r, ['#d9d2c6', '#cdd0cd', '#e3dccd', '#c9c3b6', '#dcd6ca', '#d6dde0', '#e6dcc8']) : wallOf(lot) };
     S.wall2 = null; S.antenna = false; S.solar = false;
   }
+  // [v4:town-accuracy] inset the walls by the eave overhang so the roof edge lands on the footprint edge
+  { const ov = roofType === 'flat' ? 0.05 : Math.max(0, (S.roof.over ?? 0.5) - 0.15); w = Math.max(3.0, w - 2 * ov); d = Math.max(3.0, d - 2 * ov); }
   Object.assign(S, { w, d, floors, fh: 2.85, lod });
   const { gmin, gmax } = groundRange(H, HF, w, d);
   S.floorY = gmax + (isShop ? 0.12 : 0.32);
@@ -82,10 +124,13 @@ export function buildHeroLot(T, lot, cls, lod) {
   if (dStyle === 'door_slide') du = Math.sign(du || 1) * Math.min(Math.abs(du), w / 2 - 1.35);
   S.door = { u: du, style: dStyle, canopy: wpick(r, [['slab', 55], ['roof', S.traditional ? 60 : 22], ['posts', 8]]), porchD: 0.9 + r() * 0.25 };
   let shopIdx = -1;
+  const real = T.real?.get(lot) || null;   // [v4:town-accuracy] the real name, when OSM / GSI has one
   if (isShop) {
-    shopIdx = T.shopCounter++ % SHOPS.length;
+    shopIdx = real ? shopIndexFor(lot.use, T.shopCounter % SHOPS.length) : T.shopCounter % SHOPS.length;
+    T.shopCounter++;
     const style = SHOPS[shopIdx].style === 'wa' || SHOPS[shopIdx].style === 'open' ? SHOPS[shopIdx].style : (r() < 0.12 ? 'shutter' : SHOPS[shopIdx].style);
     S.shop = { depth: Math.min(d - 1.6, 3.4 + r() * 1.2), style };
+    if (real) S.real = real;
     if (SHOPS[shopIdx].style === 'wa') { S.roof.mat = 'kawara'; if (S.roof.type === 'flat') S.roof.type = 'gable'; }
     S.door = { u: Math.max(-w / 2 + 1, Math.min(w / 2 - 1, du)), style: 'door_grey', canopy: 'slab', porchD: 0.8, face: 'back' };
     S.balcony = null;
@@ -103,12 +148,20 @@ export function buildHeroLot(T, lot, cls, lod) {
   if (isShop) {
     const sh = buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out);
     const fp = HF.w(0, 0, S.d / 2);
-    out.shopFronts.push({ x: fp.x, y: fp.y, z: fp.z, rotY: HF.ry, w: S.w, type: sh.type, name: sh.name, lotId: lot.id, style: S.shop.style });
+    out.shopFronts.push({ x: fp.x, y: fp.y, z: fp.z, rotY: HF.ry, w: S.w, type: sh.type, name: sh.name, lotId: lot.id, style: S.shop.style, real: !!S.real });
   }
   // office / apartment name plate on the facade
   if (tall && lod >= 1 && floors >= 3) {
-    const name = OFFICES[Math.abs(lot.seed) % OFFICES.length];
-    out.buildingNames.push({ lotId: lot.id, name });
+    const name = real ? real.name : OFFICES[Math.abs(lot.seed) % OFFICES.length];
+    out.buildingNames.push({ lotId: lot.id, name, real: !!real });
+  }
+  // [v4:town-accuracy] a named non-shop building (school, clinic, office, inn, bathhouse) carries its name over the door
+  if (real && !isShop) {
+    const bw = Math.max(1.4, Math.min(S.w - 0.5, 0.55 * [...real.name].length + 0.7, 6)), bh = bw / real.aspect * 1.2;
+    const by = S.floorY + Math.min(2.55 + bh / 2, floors * S.fh - bh / 2 - 0.2);
+    HF.boxB(H.M.plain, real.colors[0], bw + 0.12, bh + 0.12, 0.06, 0, by - bh / 2 - 0.06, S.d / 2 + 0.03);
+    H.card(HF, real.mat, real.rect, 0, by, S.d / 2 + 0.065, bw, bh);
+    out.buildingNames.push({ lotId: lot.id, name: real.name, real: true });
   }
   // front yard: block wall + gate + plants + a bicycle spot when the house stands back from the street
   if (!isShop && !tall && lod >= 1) frontYard(T, lot, HF, S, r, cls);

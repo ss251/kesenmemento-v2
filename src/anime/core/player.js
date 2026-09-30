@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { STEP_HEIGHT } from './physics.js';
 
 const DEG = Math.PI / 180;
+export const FLY = 25, FLY_RUN = 70;   // [v4:polish3] fly speeds, m/s
 
 export class Player {
   constructor(camera, dom, physics, bounds) {
@@ -74,7 +75,9 @@ export class Player {
   }
 
   update(dt) {
-    dt = Math.min(dt, 0.05);
+    // [v4:polish3] fly keeps a 0.1 s step (no ground collisions to keep stable): at a throttled 14 fps the 0.05 cap
+    // halved the flying speed
+    dt = Math.min(dt, this.fly ? 0.1 : 0.05);
     const sens = 0.0022;
     this.yaw -= this.look.dx * sens; this.pitch -= this.look.dy * sens; this.look.dx = this.look.dy = 0;
     this.pitch = THREE.MathUtils.clamp(this.pitch, -85 * DEG, 85 * DEG);
@@ -90,7 +93,8 @@ export class Player {
       f -= this.touchMove.y; s += this.touchMove.x;
     }
     const running = k.has('ShiftLeft') || k.has('ShiftRight') || this.touchMove.length() > 0.95;
-    let speed = (running ? this.run : this.walk) * (this.fly ? 2.6 : 1);
+    // [v4:polish3] fly: 25 m/s, Shift 70 m/s (a 5 km city; walk x 2.6 was 8 m/s)
+    let speed = this.fly ? (running ? FLY_RUN : FLY) : (running ? this.run : this.walk);
     const fx = -Math.sin(this.yaw), fz = -Math.cos(this.yaw); // forward
     const rx = Math.cos(this.yaw), rz = -Math.sin(this.yaw);  // right
     let mx = fx * f + rx * s, mz = fz * f + rz * s;
@@ -102,7 +106,7 @@ export class Player {
 
     if (this.fly) {
       this.pos.x += this.vel.x * dt; this.pos.z += this.vel.z * dt;
-      this.pos.y += u * speed * dt;
+      this.pos.y += u * speed * 0.5 * dt;   // climb / sink at half the flying speed
       this.onGround = false;
     } else {
       // substeps keep collisions stable

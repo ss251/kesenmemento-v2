@@ -1,0 +1,360 @@
+// [v4:explore] Stream batching: everything the streamed core builds (streets, simplified buildings, full kit lots,
+// props) is packed into a few THREE.BatchedMesh pools. A tile is an *entry* in every pool it touches: it can be hidden
+// (a tile swapped to a finer level of detail) or removed (the tile unloaded) without touching its neighbours, and the
+// draw calls stay one per pool however many tiles are loaded (the renderer is draw-call bound; ARCHITECTURE.md
+// Performance).
+//
+// Slots. A pool draws one range per BatchedMesh instance, and ANGLE on Metal runs a multi-draw as a loop of draws, so
+// hundreds of 100 m tiles per pool would cost hundreds of sub-draws per pass. Entries therefore go into *slots*: the
+// coarse levels group their tiles into blocks (`add(key, group, { slot })`, e.g. 5 x 5 tiles), whose visible parts are
+// concatenated into one instance when a part comes, goes or is hidden (`flush()`, once a frame); the kit tiles near the
+// player keep a slot each. `cull(camera)` leaves out the slots wholly outside the view and beyond shadow range.
+//
+// Like the static batcher (core/batch2.js), cel materials that differ only by colour are folded into one shared
+// material with the colour baked into the vertices, so a street's signs, mirrors, poles and guard rails share a pool.
+// Meshes a BatchedMesh cannot draw (custom shaders: lit windows, wires; the vertex-animated laundry) are merged per
+// material across all loaded tiles into one plain mesh, rebuilt when a tile comes or goes.
+//
+//   const sb = new StreamBatch(ctx, { name })
+//   sb.add(key, group, { visible, slot })   pack a built group (world transforms baked) -> { packed, merged, kept, verts }
+//   sb.setVisible(key, bool)   sb.remove(key)   sb.has(key)   sb.flush(size)   sb.cull(camera)   sb.stats()
+import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+/** Materials whose built-in shader chunks understand USE_BATCHING (the cel materials all are MeshToonMaterial). */
+export function packable(o) {
+  if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || o.isBatchedMesh || o.userData?.noStream || o.customDepthMaterial) return false;
+  const m = o.material;
+  if (!m || Array.isArray(m)) return false;
+  if (!(m.isMeshToonMaterial || m.isMeshBasicMaterial || m.isMeshLambertMaterial || m.isMeshStandardMaterial || m.isMeshPhongMaterial)) return false;
+  const g = o.geometry;
+  if (!g || !g.attributes.position || g.morphAttributes?.position || g.attributes.position.count === 0) return false;
+  for (const k in g.attributes) if (g.attributes[k].isInterleavedBufferAttribute) return false;
+  return true;
+}
+/** Cel materials that core/batch2.js would fold by colour (no custom shader patch of their own). */
+export function convertible(m) {
+  return !!((m.isMeshToonMaterial && m.userData.toon && m.onBeforeCompile === m.userData.toon.obc && !m.alphaMap && !m.normalMap && !m.bumpMap && !m.displacementMap && !m.defines?.USE_CUSTOM)
+    || (m.isMeshBasicMaterial && !m.alphaMap && !m.envMap && !m.lightMap && !m.aoMap));
+}
+const sideName = (m) => (m.side === THREE.DoubleSide ? 'double' : m.side === THREE.BackSide ? 'back' : 'front');
+function attrSig(g) { return Object.keys(g.attributes).sort().map((k) => k + g.attributes[k].itemSize).join(','); }
+const nextCap = (need, cur) => { let c = Math.max(cur, 4096); while (c < need) c = Math.ceil(c * 1.6); return c; };
+const IDENTITY = new THREE.Matrix4();
+const _pm = new THREE.Matrix4(), _fr = new THREE.Frustum(), _cp = new THREE.Vector3();
+
+/** One BatchedMesh per material + render flags; its instances are slots (a kit tile, or a block of coarse tiles). */
+class Pool {
+  constructor(root, proto, material, name, mark) {
+    this.material = material; this.mark = mark;   // mark(pool, slot): queue a slot for a rebuild (StreamBatch's FIFO)
+    this.verts = nextCap(proto.v * 3, 1 << 14); this.index = nextCap(proto.i * 3, 1 << 15); this.inst = 32;
+    const bm = new THREE.BatchedMesh(this.inst, this.verts, this.index, material);
+    // no per-instance culling inside three (it re-uploads the draw list once per pool per render pass); the slots are
+    // culled once a frame by StreamBatch.cull instead
+    bm.name = name; bm.frustumCulled = false; bm.perObjectFrustumCulled = false; bm.sortObjects = false;
+    bm.castShadow = proto.cast; bm.receiveShadow = proto.receive; bm.layers.mask = proto.mask; bm.renderOrder = proto.order;
+    bm.userData.noBatch = true; bm.userData.dynamic = true;
+    this.bm = bm; this.slots = new Map(); this.liveV = 0; this.liveI = 0; this.used = 0; this.optimized = 0; this.grown = 0;
+    root.add(bm);
+  }
+  slot(key) { let s = this.slots.get(key); if (!s) this.slots.set(key, (s = { key, parts: new Map(), gid: -1, iid: -1, resV: 0, resI: 0, v: 0, i: 0, sphere: null, culled: false, shown: false })); return s; }
+  addPart(slotKey, entryKey, geo, visible) { const s = this.slot(slotKey); s.parts.set(entryKey, { geo, visible }); this.mark(this, s); }
+  removePart(slotKey, entryKey) { const s = this.slots.get(slotKey); if (s && s.parts.delete(entryKey)) this.mark(this, s); }
+  setPartVisible(slotKey, entryKey, v) { const s = this.slots.get(slotKey), p = s?.parts.get(entryKey); if (p && p.visible !== v) { p.visible = v; this.mark(this, s); } }
+  _ensure(nv, ni) {
+    const bm = this.bm;
+    const fits = () => bm._nextVertexStart + nv <= this.verts && bm._nextIndexStart + ni <= this.index;
+    if (fits()) return;
+    // reclaim the holes first. three's optimize() keeps every geometry id and moves index and vertex ranges in lockstep
+    // (the slots keep gid / resV / resI, which stay valid); StreamBatch.validate() checks the result in qa3
+    if (bm._nextVertexStart > this.liveV * 1.1 || bm._nextIndexStart > this.liveI * 1.1) { bm.optimize(); this.optimized++; }
+    if (fits()) return;
+    this.grown++;
+    this.verts = nextCap(bm._nextVertexStart + nv * 2, this.verts); this.index = nextCap(bm._nextIndexStart + ni * 2, this.index);
+    bm.setGeometrySize(this.verts, this.index);
+  }
+  _drop(s) {
+    if (s.gid < 0) return;
+    this.bm.deleteGeometry(s.gid); this.liveV -= s.resV; this.liveI -= s.resI; this.used--;
+    s.gid = s.iid = -1; s.resV = s.resI = 0; s.shown = false;
+  }
+  /** Rebuild a slot from its visible parts (a block: concatenated; a single part: as it is). */
+  rebuild(s, headroom) {
+    if (!s.parts.size) { this._drop(s); this.slots.delete(s.key); return; }
+    const geos = []; for (const p of s.parts.values()) if (p.visible) geos.push(p.geo);
+    if (!geos.length) { if (s.iid >= 0 && s.shown) { this.bm.setVisibleAt(s.iid, false); s.shown = false; } s.v = s.i = 0; return; }
+    const g = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
+    const nv = g.attributes.position.count, ni = g.index.count;
+    if (s.gid >= 0 && nv <= s.resV && ni <= s.resI) this.bm.setGeometryAt(s.gid, g);
+    else {
+      this._drop(s);
+      const rv = Math.ceil(nv * headroom), ri = Math.ceil(ni * headroom);
+      this._ensure(rv, ri);
+      if (this.used + 1 >= this.inst) { this.inst *= 2; this.bm.setInstanceCount(this.inst); }
+      s.gid = this.bm.addGeometry(g, rv, ri); s.iid = this.bm.addInstance(s.gid);
+      s.resV = rv; s.resI = ri; this.liveV += rv; this.liveI += ri; this.used++; s.shown = true;
+    }
+    if (!g.boundingSphere) g.computeBoundingSphere();
+    s.sphere = g.boundingSphere.clone(); s.v = nv; s.i = ni;
+    const on = !s.culled;
+    if (s.shown !== on) { this.bm.setVisibleAt(s.iid, on); s.shown = on; }
+  }
+  cull(test) {
+    let n = 0;
+    for (const s of this.slots.values()) {
+      if (s.iid < 0 || !s.sphere || !s.v) continue;
+      const c = test ? test(s.sphere) : false;
+      if (c !== s.culled) { s.culled = c; n++; }
+      if (s.shown === !c) continue;
+      this.bm.setVisibleAt(s.iid, !c); s.shown = !c;
+    }
+    return n;
+  }
+}
+
+/** Plain meshes of one custom material, merged across the loaded tiles; rebuilt on change. */
+class Merged {
+  constructor(root, o, name) {
+    this.root = root; this.items = new Map(); this.dirty = false; this.name = name;
+    const m = new THREE.Mesh(new THREE.BufferGeometry(), o.material);
+    m.customDepthMaterial = o.customDepthMaterial; m.castShadow = o.castShadow; m.receiveShadow = o.receiveShadow;
+    m.layers.mask = o.layers.mask; m.renderOrder = o.renderOrder; m.frustumCulled = false; m.name = name;
+    m.userData.noBatch = true; m.userData.dynamic = true; m.visible = false;
+    this.mesh = m; root.add(m);
+  }
+  add(key, geo, visible) { let a = this.items.get(key); if (!a) this.items.set(key, (a = { geos: [], visible })); a.geos.push(geo); this.dirty = true; }
+  remove(key) { if (this.items.delete(key)) this.dirty = true; }
+  setVisible(key, v) { const a = this.items.get(key); if (a && a.visible !== v) { a.visible = v; this.dirty = true; } }
+  flush() {
+    if (!this.dirty) return false;
+    this.dirty = false;
+    const geos = []; for (const a of this.items.values()) if (a.visible) geos.push(...a.geos);
+    const old = this.mesh.geometry;
+    this.mesh.geometry = geos.length ? (geos.length === 1 ? geos[0].clone() : mergeGeometries(geos, false) || new THREE.BufferGeometry()) : new THREE.BufferGeometry();
+    this.mesh.geometry.computeBoundingSphere();
+    this.mesh.visible = geos.length > 0;
+    old.dispose();
+    return true;
+  }
+  get verts() { let n = 0; for (const a of this.items.values()) for (const g of a.geos) n += g.attributes.position.count; return n; }
+}
+
+export class StreamBatch {
+  constructor(ctx, { name = 'explore-stream' } = {}) {
+    this.ctx = ctx;
+    this.root = new THREE.Group(); this.root.name = name;
+    this.root.userData.noBatch = true;
+    ctx.add(this.root);
+    this.pools = new Map(); this.merged = new Map(); this.shared = new Map();
+    this.entries = new Map();   // key -> { slot, pools: Set, merged: Set, holder, visible, verts }
+    // [v4:polish3] one FIFO of slots to rebuild across every pool, tagged with the change (op) that dirtied them first.
+    // flush() under a time budget only stops between ops, so the pools of one change (a tile's kit shown and its
+    // simplified buildings hidden, see group()) flip in the same frame. Iterating pool by pool starved the later pools
+    // after a teleport (qa3's walk loop): walls stayed hidden while their windows and balconies were already drawn.
+    this.queue = new Map(); this.op = 0; this.grouping = 0;
+    // A slot dirtied again by a later change moves to that change (it will show both at once, never the later one early).
+    this._mark = (pool, s) => { const q = this.queue.get(s); if (q && q.op === this.op) return; if (q) this.queue.delete(s); this.queue.set(s, { pool, op: this.op }); };
+    this.name = name;
+    this.lastCull = null;
+  }
+  has(key) { return this.entries.has(key); }
+  /** Run fn() as one change: every slot it dirties is rebuilt in the same flush. */
+  group(fn) { if (!this.grouping) this.op++; this.grouping++; try { return fn(); } finally { this.grouping--; } }
+  _next() { if (!this.grouping) this.op++; }
+
+  /** The shared material and world-space geometry a mesh goes into its pool with (colour baked where foldable). */
+  _convert(o) {
+    const m = o.material, mat = this.ctx.mat;
+    let target = m, bake = null;
+    if (mat && convertible(m)) {
+      let sig;
+      if (m.isMeshToonMaterial) { const t = m.userData.toon; sig = `T|${m.map ? m.map.uuid : 'none'}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${t.paint}|${t.grime}|${t.polygonOffset}|${m.emissive.getHexString()}|${m.emissiveIntensity}`; }
+      else sig = `B|${m.map ? m.map.uuid : 'none'}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${m.fog}|${m.toneMapped}`;
+      let sm = this.shared.get(sig);
+      if (!sm) {
+        const common = { map: m.map || null, transparent: m.transparent, opacity: m.opacity, alphaTest: m.alphaTest, depthWrite: m.depthWrite, vertexColors: true };
+        const side = sideName(m); if (side !== 'front') common.side = side;
+        if (m.isMeshToonMaterial) {
+          const t = m.userData.toon, opts = { ...common, paint: t.paint, grime: t.grime };
+          if (t.polygonOffset) opts.polygonOffset = t.polygonOffset;
+          if (m.emissive && (m.emissive.r || m.emissive.g || m.emissive.b)) { opts.emissive = '#' + m.emissive.getHexString(); opts.emissiveIntensity = m.emissiveIntensity; }
+          sm = mat.toon('#ffffff', opts);
+        } else sm = new THREE.MeshBasicMaterial({ color: 0xffffff, map: m.map || null, transparent: m.transparent, opacity: m.opacity, alphaTest: m.alphaTest, depthWrite: m.depthWrite, side: m.side, fog: m.fog, toneMapped: m.toneMapped, vertexColors: true });
+        this.shared.set(sig, sm);
+      }
+      if (m.userData.acc) sm.userData.acc = m.userData.acc;
+      target = sm; bake = m.color;
+    }
+    const g = o.geometry.clone();
+    const n = g.attributes.position.count;
+    if (!g.attributes.normal) g.computeVertexNormals();
+    if (!g.attributes.uv) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(n * 2), 2));
+    if (target !== m) {
+      const src = g.attributes.color, useSrc = src && m.vertexColors;
+      const a = new Float32Array(n * 3), br = bake.r, bg = bake.g, bb = bake.b;
+      for (let i = 0; i < n; i++) { a[i * 3] = (useSrc ? src.getX(i) : 1) * br; a[i * 3 + 1] = (useSrc ? src.getY(i) : 1) * bg; a[i * 3 + 2] = (useSrc ? src.getZ(i) : 1) * bb; }
+      g.setAttribute('color', new THREE.BufferAttribute(a, 3));
+      for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal' && k !== 'uv' && k !== 'color') g.deleteAttribute(k);
+    }
+    for (const k of Object.keys(g.attributes)) {
+      const at = g.attributes[k];
+      if (at.normalized || !(at.array instanceof Float32Array)) { const a = new Float32Array(at.count * at.itemSize); for (let i = 0; i < at.count; i++) for (let j = 0; j < at.itemSize; j++) a[i * at.itemSize + j] = at.getComponent(i, j); g.setAttribute(k, new THREE.BufferAttribute(a, at.itemSize)); }
+    }
+    if (!g.index) { const idx = new Uint32Array(n); for (let i = 0; i < n; i++) idx[i] = i; g.setIndex(new THREE.BufferAttribute(idx, 1)); }
+    g.clearGroups(); g.morphAttributes = {};
+    if (!o.matrixWorld.equals(IDENTITY)) {
+      g.applyMatrix4(o.matrixWorld);
+      if (o.matrixWorld.determinant() < 0) { const ia = g.index.array; for (let i = 0; i < ia.length; i += 3) { const t = ia[i + 1]; ia[i + 1] = ia[i + 2]; ia[i + 2] = t; } }
+    }
+    return { material: target, geometry: g };
+  }
+  /** Merge key of a custom-shader mesh (null: keep it as it is). World-space meshes only. */
+  _mergeKey(o) {
+    if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || !o.matrixWorld.equals(IDENTITY) || Array.isArray(o.material) || !o.geometry?.attributes?.position) return null;
+    const m = o.material;
+    let mk;
+    if (o.name === 'wires') mk = 'wires';
+    else if (!m.isShaderMaterial && m.customProgramCacheKey !== THREE.Material.prototype.customProgramCacheKey) mk = 'ck:' + m.type + '|' + m.customProgramCacheKey() + '|' + (m.map?.uuid || '') + '|' + m.alphaTest + '|' + m.side;
+    else mk = m.uuid;
+    return [mk, o.castShadow ? 1 : 0, o.receiveShadow ? 1 : 0, o.layers.mask, o.renderOrder | 0, o.geometry.index ? 'i' : 'n', attrSig(o.geometry)].join('|');
+  }
+
+  /** Pack every mesh of `group` under entry `key`; `slot` groups coarse entries into one instance per pool. */
+  add(key, group, { visible = true, slot = null } = {}) {
+    this._next();
+    if (this.entries.has(key)) this.remove(key);
+    group.updateMatrixWorld(true);
+    const bySig = new Map(), byMerge = new Map(), keep = [];
+    group.traverse((o) => {
+      if ((!o.isMesh && !o.isLine && !o.isPoints) || o.visible === false) return;
+      for (let p = o.parent; p && p !== group; p = p.parent) if (p.visible === false) return;
+      if (packable(o)) {
+        const c = this._convert(o);
+        const sig = [c.material.uuid, o.castShadow ? 1 : 0, o.receiveShadow ? 1 : 0, o.layers.mask, o.renderOrder | 0, attrSig(c.geometry)].join('|');
+        let b = bySig.get(sig); if (!b) bySig.set(sig, (b = { o, material: c.material, geos: [] }));
+        b.geos.push(c.geometry);
+        return;
+      }
+      const mk = this._mergeKey(o);
+      if (mk) { let b = byMerge.get(mk); if (!b) byMerge.set(mk, (b = { o, geos: [] })); b.geos.push(o.geometry); return; }
+      keep.push(o);
+    });
+    const e = { slot: slot || key, pools: new Set(), merged: new Set(), holder: null, visible, verts: 0 };
+    for (const [sig, b] of bySig) {
+      const geo = b.geos.length === 1 ? b.geos[0] : mergeGeometries(b.geos, false);
+      if (!geo) continue;
+      let pool = this.pools.get(sig);
+      if (!pool) { pool = new Pool(this.root, { v: geo.attributes.position.count, i: geo.index.count, cast: b.o.castShadow, receive: b.o.receiveShadow, mask: b.o.layers.mask, order: b.o.renderOrder | 0 }, b.material, this.name + ':' + (b.material.name || b.o.name || ''), this._mark); this.pools.set(sig, pool); }
+      pool.addPart(e.slot, key, geo, visible);
+      e.pools.add(pool); e.verts += geo.attributes.position.count;
+    }
+    for (const [mk, b] of byMerge) {
+      let mg = this.merged.get(mk);
+      if (!mg) { mg = new Merged(this.root, b.o, this.name + ':' + (b.o.name || b.o.material.name || 'custom')); this.merged.set(mk, mg); }
+      for (const g of b.geos) { mg.add(key, g, visible); e.verts += g.attributes.position.count; }
+      e.merged.add(mg);
+    }
+    if (keep.length) {
+      const h = new THREE.Group(); h.name = this.name + ':' + key;
+      for (const o of keep) h.attach(o);
+      h.visible = visible;
+      this.root.add(h); e.holder = h;
+    }
+    this.entries.set(key, e);
+    return { packed: bySig.size, merged: byMerge.size, kept: keep.length, verts: e.verts };
+  }
+  setVisible(key, v) {
+    const e = this.entries.get(key); if (!e || e.visible === v) return;
+    this._next();
+    e.visible = v;
+    for (const p of e.pools) p.setPartVisible(e.slot, key, v);
+    for (const m of e.merged) m.setVisible(key, v);
+    if (e.holder) e.holder.visible = v;
+  }
+  remove(key) {
+    const e = this.entries.get(key); if (!e) return;
+    this._next();
+    for (const p of e.pools) p.removePart(e.slot, key);
+    for (const m of e.merged) m.remove(key);
+    // kept meshes: free their GPU buffers (a geometry shared with the static town is simply uploaded again when drawn)
+    if (e.holder) { e.holder.traverse((o) => { o.geometry?.dispose?.(); if (o.isInstancedMesh) o.dispose?.(); }); e.holder.removeFromParent(); }
+    this.entries.delete(key);
+  }
+  /** Rebuild the slots and merged meshes that changed (within `budget` ms; the rest waits for the next frame); keep
+   *  the wires' screen size current. -> slots still dirty */
+  flush(size = null, budget = Infinity) {
+    const t0 = performance.now();
+    let op = null;
+    for (const [s, q] of this.queue) {
+      // over budget: stop, but only between two changes (never half a change drawn)
+      if (op !== null && q.op !== op && performance.now() - t0 > budget) break;
+      op = q.op;
+      this.queue.delete(s);
+      q.pool.rebuild(s, s.parts.size > 1 ? 1.3 : 1.0);
+    }
+    const left = this.queue.size;
+    for (const m of this.merged.values()) { m.flush(); if (size && m.mesh.material.uniforms?.uRes) m.mesh.material.uniforms.uRes.value.set(size.x, size.y); }
+    if (this.lastCull) this._cull(this.lastCull.camera, this.lastCull.keep);
+    return left;
+  }
+  /** View culling per slot, once a frame for the main camera: a slot wholly outside the view frustum and farther than
+   *  `keep` m (it could still throw a shadow into the view closer in) is left out of every pass. camera = null shows
+   *  everything again (the tiny planet looks every way at once). -> slots whose state changed */
+  cull(camera, keep = 90) { this.lastCull = camera ? { camera, keep } : null; return this._cull(camera, keep); }
+  _cull(camera, keep) {
+    let test = null;
+    if (camera) {
+      camera.updateMatrixWorld(); _pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); _fr.setFromProjectionMatrix(_pm); _cp.setFromMatrixPosition(camera.matrixWorld);
+      test = (sp) => !_fr.intersectsSphere(sp) && sp.distanceToPoint(_cp) > keep;
+    }
+    let n = 0; for (const p of this.pools.values()) n += p.cull(test);
+    return n;
+  }
+  /** [v4:polish3] Integrity check (diagnostics, qa3): every drawn slot's index range points inside its own vertex range,
+   *  no two live slots overlap in the batch buffers, and a single-part slot's vertices still equal its source geometry.
+   *  -> { pools, slots, bad: [{ pool, slot, why }] } */
+  validate() {
+    const bad = []; let slots = 0;
+    for (const p of this.pools.values()) {
+      const bm = p.bm, G = bm.geometry, idx = G.index?.array, pos = G.attributes.position?.array, infos = bm._geometryInfo;
+      const ranges = [];
+      for (const s of p.slots.values()) {
+        if (s.gid < 0) continue;
+        slots++;
+        const gi = infos[s.gid];
+        if (!gi || !gi.active) { bad.push({ pool: bm.name, slot: s.key, why: 'inactive geometry' }); continue; }
+        ranges.push([gi.vertexStart, gi.vertexStart + gi.reservedVertexCount, gi.indexStart, gi.indexStart + gi.reservedIndexCount, s.key]);
+        if (!s.v) continue;
+        if (gi.vertexCount !== s.v || gi.indexCount !== s.i) { bad.push({ pool: bm.name, slot: s.key, why: `counts ${gi.vertexCount}/${gi.indexCount} != ${s.v}/${s.i}` }); continue; }
+        let oob = 0;
+        for (let j = gi.indexStart, e = gi.indexStart + gi.indexCount; j < e; j++) { const v = idx[j]; if (v < gi.vertexStart || v >= gi.vertexStart + gi.vertexCount) oob++; }
+        if (oob) { bad.push({ pool: bm.name, slot: s.key, why: `${oob} indices outside the slot's vertices` }); continue; }
+        const vis = [...s.parts.values()].filter((q) => q.visible);
+        if (vis.length === 1) {
+          const src = vis[0].geo.attributes.position.array; let diff = 0;
+          for (let j = 0; j < src.length; j += 7) if (Math.abs(src[j] - pos[gi.vertexStart * 3 + j]) > 1e-3) diff++;
+          if (diff) bad.push({ pool: bm.name, slot: s.key, why: `${diff} vertices differ from the source` });
+        }
+      }
+      ranges.sort((a, b) => a[0] - b[0]);
+      for (let k = 1; k < ranges.length; k++) if (ranges[k][0] < ranges[k - 1][1]) bad.push({ pool: bm.name, slot: ranges[k][4], why: `vertex range overlaps ${ranges[k - 1][4]}` });
+      ranges.sort((a, b) => a[2] - b[2]);
+      for (let k = 1; k < ranges.length; k++) if (ranges[k][2] < ranges[k - 1][3]) bad.push({ pool: bm.name, slot: ranges[k][4], why: `index range overlaps ${ranges[k - 1][4]}` });
+    }
+    return { pools: this.pools.size, slots, bad: bad.slice(0, 20), nBad: bad.length };
+  }
+  /** Slots waiting for a rebuild (diagnostics). */
+  pending() { return this.queue.size; }
+  /** Per-pool detail (diagnostics). */
+  pools_() {
+    return [...this.pools.values()].map((p) => ({ name: p.bm.name, type: p.material.type, map: !!p.material.map, tr: !!p.material.transparent, cast: p.bm.castShadow, layer: p.bm.layers.mask, v: p.liveV, slots: p.slots.size, shown: [...p.slots.values()].filter((s) => s.shown).length }))
+      .concat([...this.merged.values()].map((m) => ({ name: m.name, type: 'merged:' + m.mesh.material.type, v: m.verts, slots: m.items.size, shown: m.mesh.visible ? 1 : 0 })));
+  }
+  stats() {
+    let verts = 0, cap = 0, holders = 0, slots = 0, shown = 0, optimized = 0, grown = 0;
+    for (const p of this.pools.values()) { cap += p.verts; optimized += p.optimized; grown += p.grown; for (const s of p.slots.values()) { verts += s.v; slots++; if (s.shown) shown++; } }
+    for (const m of this.merged.values()) verts += m.verts;
+    for (const e of this.entries.values()) if (e.holder) holders += e.holder.children.length;
+    return { pools: this.pools.size, merged: this.merged.size, entries: this.entries.size, slots, shown, verts, capacity: cap, holders, optimized, grown, pending: this.queue.size };
+  }
+}

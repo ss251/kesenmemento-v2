@@ -12,7 +12,9 @@ import { ROOT } from "../terrain/tiles.js";
 import * as L from "../../src/anime/world/layout.js";
 
 export const CLASSES = [
-  { id: "forest", color: "#6f9a5c" }, { id: "cedar", color: "#557f5b" }, { id: "grass", color: "#9fc076" }, { id: "field", color: "#bccb86" },
+  // [v4:polish3] forest / cedar darkened toward the aerial photo's canopy (dense dark 杉 on every hill; the old #6f9a5c
+  // read as a lime meadow beyond the 3D trees)
+  { id: "forest", color: "#3d6b3f" }, { id: "cedar", color: "#2f5634" }, { id: "grass", color: "#9fc076" }, { id: "field", color: "#bccb86" },
   { id: "dirt", color: "#cbb792" }, { id: "sand", color: "#e2d4ae" }, { id: "paving", color: "#c9c5bc" }, { id: "town", color: "#bdb7aa" }, { id: "water", color: "#6f9fbf" },
 ];
 const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
@@ -79,6 +81,32 @@ async function build(name, size) {
   const RB = Math.max(1, Math.round(50 / (W / size)));
   const bdb = boxBlur(bd, size, RB);
   for (let k = 0; k < n; k++) if ((a[k] === 6 || a[k] === 7 || a[k] === 4) && bdb[k] < 0.002 * (W / size) * (W / size) / 4) a[k] = (k * 2654435761 >>> 0) % 7 === 0 ? 2 : 3;
+  // [v4:polish3] the working quays: the apron between the harbour road and the berths is concrete and asphalt (aerial z18,
+  // 港町 / 魚市場前), but its weedy joints and the photo's green cast read as a lawn strip. Grass / field within 25 m of a
+  // quay or seawall on low ground (< 5 m) is paving; the forest of 神明崎 and the hills stays.
+  const px = W / size, Rq = 25, cellQ = 32;
+  const qh = new Map();
+  for (const q of L.QUAYS) {
+    if (q.kind !== "quay" && q.kind !== "seawall") continue;
+    const x0 = Math.floor((Math.min(q.a[0], q.b[0]) - Rq) / cellQ), x1 = Math.floor((Math.max(q.a[0], q.b[0]) + Rq) / cellQ);
+    const z0 = Math.floor((Math.min(q.a[1], q.b[1]) - Rq) / cellQ), z1 = Math.floor((Math.max(q.a[1], q.b[1]) + Rq) / cellQ);
+    for (let i = x0; i <= x1; i++) for (let j = z0; j <= z1; j++) { const key = i + "," + j; let c = qh.get(key); if (!c) qh.set(key, (c = [])); c.push(q); }
+  }
+  const nearQuay = (x, z) => {
+    for (const q of qh.get(Math.floor(x / cellQ) + "," + Math.floor(z / cellQ)) || []) {
+      const dx = q.b[0] - q.a[0], dz = q.b[1] - q.a[1], l2 = dx * dx + dz * dz || 1;
+      const t = Math.max(0, Math.min(1, ((x - q.a[0]) * dx + (z - q.a[1]) * dz) / l2));
+      if (Math.hypot(q.a[0] + dx * t - x, q.a[1] + dz * t - z) < Rq) return true;
+    }
+    return false;
+  };
+  let apron = 0;
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const k = y * size + x; if (a[k] !== 2 && a[k] !== 3) continue;
+    const wx = meta.x0 + (x + 0.5) * px, wz = meta.z0 + (y + 0.5) / size * H;
+    if (L.heightAt(wx, wz) < 5 && nearQuay(wx, wz)) { a[k] = 6; apron++; }
+  }
+  if (apron) console.error(`[landcover ${name}] quay apron: ${apron} px grass -> paving`);
   // forest density (box blur of the forest classes)
   const fm = new Float32Array(n);
   for (let k = 0; k < n; k++) fm[k] = a[k] === 0 || a[k] === 1 ? 1 : 0;

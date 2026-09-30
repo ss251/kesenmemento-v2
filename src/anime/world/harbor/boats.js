@@ -19,6 +19,9 @@ export const BOAT_SPECS = {
   sanma: { L: 45, B: 8.4, T: 3.2, sheer: [3.0, 2.5, 5.4], bulwark: 1.1, ja: 'さんま棒受網漁船' },
   small: { L: 14, B: 3.7, T: 0.9, sheer: [1.25, 1.05, 1.9], bulwark: 0.55, ja: '小型漁船' },
   ferry: { L: 40, B: 9.6, T: 2.4, sheer: [2.5, 2.3, 3.4], bulwark: 1.1, ja: '大島航路フェリー' },
+  // [v4:landmarks-A] the bay-cruise boat ファンタジー (大島汽船, 1990, 152 GT, 32 × 7 m, 300 passengers; ja.wikipedia
+  // 大島汽船 / oshimakisen.com), moored at the PIER7 pontoon since the Oshima ferry ended in April 2019
+  cruise: { L: 32, B: 7.0, T: 1.6, sheer: [2.3, 2.1, 3.1], bulwark: 0.95, ja: '気仙沼ベイクルーズ' },
 };
 
 export const HULL = {
@@ -32,6 +35,7 @@ const NAME_NUM = ['一', '二', '三', '五', '七', '八', '十一', '十三', 
 const NAME_CORE = ['勝栄丸', '福洋丸', '喜代丸', '明神丸', '寿丸', '豊栄丸', '宝来丸', '幸丸', '晴栄丸', '清福丸', '源栄丸', '海勝丸', '光洋丸', '大栄丸', '千代丸', '長寿丸'];
 export function boatName(r, type) {
   if (type === 'ferry') return r.pick(['うみねこ丸', 'みどり丸', 'おおしま丸']);
+  if (type === 'cruise') return 'ファンタジー';   // [v4:landmarks-A]
   if (type === 'small') return r.pick(NAME_CORE);
   return `第${r.pick(NAME_NUM)}${r.pick(NAME_CORE)}`;
 }
@@ -147,13 +151,13 @@ function mergeAll(geos) {
 }
 
 /** A decal strip that hugs the hull side (names, registry marks). side: +1 port, -1 starboard. */
-function hullDecal(H, side, u0, u1, y0, y1, map, mat, parent) {
+function hullDecal(H, side, u0, u1, y0, y1, map, mat, parent, off = 0.035) {
   const N = 10, pos = [], uv = [], idx = [];
   for (let i = 0; i <= N; i++) {
     const u = u0 + (u1 - u0) * (i / N);
     for (let j = 0; j <= 1; j++) {
       const y = j ? y1 : y0;
-      pos.push(side * (H.half(u, y) + 0.035), y, H.zAt(u, y));
+      pos.push(side * (H.half(u, y) + off), y, H.zAt(u, y));
       // text reads left->right for a viewer outside: on port (+X) that is bow->stern, on starboard stern->bow
       uv.push(side > 0 ? 1 - i / N : i / N, j);
     }
@@ -233,6 +237,7 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
   const hkey = `${type}|${trim}|${opts.deck || ''}`;
   const hg = _hullCache.get(hkey) || _hullCache.set(hkey, type === 'small' ? hullGeometry(S, H, trim, { bandLo: 0.42, bandHi: 0.18, bulwarkT: 0.1, nu: 36, deck: opts.deck || '#9fb3ad', inner: '#dfe6e2', cut: 0.6 })
     : type === 'ferry' ? hullGeometry(S, H, trim, { bandLo: 1.2, bandHi: 0.55, deck: '#8d9994', inner: HULL.white })
+    : type === 'cruise' ? hullGeometry(S, H, '#f0f1ec', { bandLo: 0.3, bandHi: 0.1, deck: '#9aa3a8', inner: HULL.white, cut: 0.8 })   // [v4:landmarks-A]
     : hullGeometry(S, H, trim, { deck: opts.deck })).get(hkey);
   const hull = new THREE.Mesh(hg, M.hull); hull.castShadow = true; hull.receiveShadow = true; hull.userData.hull = true; group.add(hull);   // [v3:polish3] tag: reflect.js keeps white hulls white
   if (opts.foam !== false) { const f = foamRing(H, M.foam, group, 0.37, type); ctx.noOutline(f); }
@@ -240,11 +245,12 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
   // names: bow (both sides) + stern
   const nameTex = textTex(ctx, name, { w: 768, h: 128, color: '#262532', font: FONT.serif, weight: 900, size: 0.78 });
   const nameMat = mapMat(ctx, 'decal', '#ffffff', nameTex, { transparent: true, alphaTest: 0.35, side: 'double' });
-  const nlen = type === 'small' ? 0.26 : 0.16, nu1 = type === 'small' ? 0.86 : 0.9;
+  const nlen = type === 'small' ? 0.26 : type === 'cruise' ? 0.2 : 0.16, nu1 = type === 'small' ? 0.86 : type === 'cruise' ? 0.84 : 0.9;
   for (const side of [1, -1]) {
     const u1 = nu1, u0 = u1 - nlen, ym = H.sheer((u0 + u1) / 2);
     const hgt = type === 'small' ? 0.42 : 1.15;
-    hullDecal(H, side, u0, u1, ym - (type === 'small' ? 0.95 : 2.35) , ym - (type === 'small' ? 0.95 : 2.35) + hgt, nameTex, nameMat, group);
+    const drop = type === 'small' ? 0.95 : type === 'cruise' ? 0.95 : 2.35, hh = type === 'cruise' ? 0.5 : hgt;   // [v4:landmarks-A]
+    hullDecal(H, side, u0, u1, ym - drop, ym - drop + hh, nameTex, nameMat, group);
   }
   {
     const port = type === 'ferry' ? '気仙沼' : '気 仙 沼';
@@ -254,7 +260,7 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
   }
 
   const T = { S, H, k, W, M, r, group, anchors, zU, dY, trim, name, dynamic, ctx, opts };
-  ({ katsuo: buildKatsuo, maguro: buildMaguro, sanma: buildSanma, small: buildSmall, ferry: buildFerry })[type](T);
+  ({ katsuo: buildKatsuo, maguro: buildMaguro, sanma: buildSanma, small: buildSmall, ferry: buildFerry, cruise: buildCruise })[type](T);
 
   // nav lights (port red +X, starboard green -X, masthead + stern white)
   if (opts.lights !== false) navLights(T);
@@ -264,10 +270,12 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
   const reg = opts.lights === false ? null : registry(ctx);
   // opts.idle: laid up in port (the Med-moored rows) -> no running lights; only the anchor light, deck lamps if deckLit
   if (opts.idle) anchors.lights = anchors.lights.filter((L) => L.kind === 'mast' || (opts.deckLit && L.kind === 'deck'));
+  // [v4:polish2] fish lamps are dark in port: no glow sprite, no glint (only a boat fishing at sea lights them)
+  if (!opts.fishing) anchors.lights = anchors.lights.filter((L) => L.kind !== 'fishlamp');
   if (reg) {
     if (dynamic) {
       const nav = {}; const deck = [];
-      for (const L of anchors.lights) { if (L.kind === 'port' || L.kind === 'starboard' || L.kind === 'mast') nav[L.kind] = L.p; else deck.push(L.p); }
+      for (const L of anchors.lights) { if (L.kind === 'port' || L.kind === 'starboard' || L.kind === 'mast') nav[L.kind] = L.p; else if (L.kind !== 'fishlamp' || opts.fishing) deck.push(L.p); }
       anchors.lightHandle = reg.boat(group, { nav, deck });
     } else {
       group.updateMatrixWorld(true);
@@ -275,7 +283,7 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
       for (const L of anchors.lights) {
         v.set(L.p[0], L.p[1], L.p[2]).applyMatrix4(group.matrixWorld);
         const nav = L.kind === 'port' || L.kind === 'starboard' || L.kind === 'mast';
-        reg.point({ x: v.x, y: v.y, z: v.z, color: L.c, size: nav ? 0.45 : L.kind === 'fishlamp' ? 0.6 : 0.7, intensity: nav ? 2.3 : 1.8, mode: nav ? 'night' : 'lamps' });
+        reg.point({ x: v.x, y: v.y, z: v.z, color: L.c, size: nav ? 0.45 : L.kind === 'fishlamp' ? 0.6 : 0.7, intensity: nav ? 2.3 : 1.2, mode: nav ? 'night' : 'lamps' });
       }
     }
   }
@@ -306,6 +314,8 @@ function mats(ctx, trim) {
     glassCool: nightMat(ctx, '#465670', '#dfe9ff', 1.15),
     bulb: nightMat(ctx, '#c9c6bc', '#fff4dc', 2.6),   // [v3:fix] unlit glass by day (the near-white globes bloomed out at dusk)
     bulbRed: nightMat(ctx, '#c9665c', '#ff5a3a', 2.2),
+    // [v4:polish2] 集魚灯 stay OFF in port (they are only lit at sea on the grounds): plain glass day and night
+    bulbOff: t('#c9c6bc'), bulbRedOff: t('#c9665c'),
     navRed: nightMat(ctx, '#b8403a', '#ff3a2a', 2.4, { always: 0.25 }),
     navGreen: nightMat(ctx, '#3f8f5b', '#3aff7a', 2.2, { always: 0.25 }),
     navWhite: nightMat(ctx, '#bfc3c2', '#fffbe8', 2.4),   // [v3:fix]
@@ -560,7 +570,12 @@ function buildSanma(T) {
   // lamp array on the wheelhouse roof (front)
   for (let i = 0; i < 6; i++) bulbsW.push([-2 + i * 0.8, y + 0.9, zU(0.41) + 0.3]);
   // all bulbs as three merged meshes (hundreds of lamps, three draw sources)
-  k.mesh(mergeAt(bulbG, bulbsW), M.bulb); if (bulbsR.length) k.mesh(mergeAt(bulbG, bulbsR), M.bulbRed); k.mesh(mergeAt(capG, caps), M.dark);
+  // [v4:polish2] fish lamps lit only for a boat fishing at sea (opts.fishing); every boat in the app is in port or
+  // arriving, so they stay dark. The tiny globes throw no shadow (under moonlight they drew a row of discs on the apron).
+  const lit = !!T.opts.fishing;
+  const bw = k.mesh(mergeAt(bulbG, bulbsW), lit ? M.bulb : M.bulbOff); if (bw) bw.castShadow = false;
+  if (bulbsR.length) { const br = k.mesh(mergeAt(bulbG, bulbsR), lit ? M.bulbRed : M.bulbRedOff); if (br) br.castShadow = false; }
+  const bc = k.mesh(mergeAt(capG, caps), M.dark); if (bc) bc.castShadow = false;
   // dip-net boom stowed along the starboard side + net pile
   W.line([[-S.B * 0.3, dY(0.5) + 1.5, zU(0.44)], [-S.B * 0.35, dY(0.85) + 3.5, zU(0.9)]], { width: 0.16, color: '#e2e0d6' });
   k.rbox(3.2, 0.9, 4.2, 0.35, T.ctx.mat.toon('#4c6b5a'), [S.B * 0.12, dY(0.62) + 0.45, zU(0.62)]);
@@ -630,6 +645,60 @@ function buildFerry(T) {
   T.navU = 0.5; T.navY = wh - 0.6; T.navX = S.B * 0.27;
   floodLights(T, [[0, c2 + 2.5, zU(0.55), 'f']]);
   anchors.deck.push([0, c2, zU(0.25)], [2, yd, zU(0.7)]);
+}
+
+// [v4:landmarks-A] ファンタジー: white two-deck cruise boat, a deep blue swoosh over the bow, a red panel and blue dots
+// aft, 'Fantasy' in script on the cabin side, a white radar tower, festoon lights mast to bow and stern (Commons
+// "Oshima Kisen Fantasy at Kesennuma Port 202608a/b.jpg", used only as a reference).
+function liveryTex(ctx, bowRight) {
+  return ctx.tex.draw(1024, 128, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    const X = (u) => (bowRight ? u : 1 - u) * w;
+    // blue bow swoosh: a big rounded shape over the lower forward hull (u 0.64 .. 0.97)
+    g.fillStyle = '#1f4fa8'; g.beginPath();
+    const a = X(0.64), b = X(0.97), dir = bowRight ? 1 : -1;
+    g.moveTo(a, h); g.bezierCurveTo(a + dir * 20, h * 0.35, a + dir * 120, h * 0.12, b - dir * 30, h * 0.1); g.lineTo(b, h * 0.22); g.lineTo(b - dir * 8, h); g.closePath(); g.fill();
+    // red stern panel and the blue dot on it
+    g.fillStyle = '#cc2b2b'; g.fillRect(Math.min(X(0.0), X(0.12)), 0, Math.abs(X(0.12) - X(0.0)), h);
+    g.fillStyle = '#1f4fa8'; g.beginPath(); g.ellipse(X(0.03), h * 0.55, 26, h * 0.45, 0, 0, 7); g.fill();
+    g.beginPath(); g.ellipse(X(0.42), h * 0.2, 22, h * 0.3, 0, 0, 7); g.fill();
+  }, { key: 'cruise-livery-' + (bowRight ? 'r' : 'l') });
+}
+function buildCruise(T) {
+  const { k, M, W, H, S, zU, dY, anchors, ctx, group } = T;
+  // hull livery on both sides (under the name decal)
+  for (const side of [1, -1]) { const tex = liveryTex(ctx, side < 0); hullDecal(H, side, 0.005, 0.975, -0.1, H.sheer(0.5) - 0.35, tex, mapMat(ctx, 'decal', '#ffffff', tex, { transparent: true, alphaTest: 0.3, side: 'double' }), group, 0.02); }
+  const yd = dY(0.4), white = M.white, blue = ctx.mat.toon('#1f4fa8'), red = ctx.mat.toon('#cc2b2b');
+  const c1 = tier(T, { w: S.B * 0.94, h: 2.3, z0: zU(0.08), z1: zU(0.7), y: yd, windows: false, roofOver: 0.35 });
+  const c2 = tier(T, { w: S.B * 0.86, h: 2.1, z0: zU(0.22), z1: zU(0.66), y: c1, windows: false, roofOver: 0.4 });
+  // big window bands on both decks, the raked wheelhouse front
+  for (const [yy, w, za, zb, hh] of [[yd + 1.3, S.B * 0.94, zU(0.12), zU(0.68), 1.25], [c1 + 1.15, S.B * 0.86, zU(0.25), zU(0.64), 1.1]]) {
+    const n = Math.floor((zb - za) / 1.6);
+    for (const s of [1, -1]) for (let i = 0; i < n; i++) k.box(0.08, hh, 1.35, M.glassCool, [s * (w / 2 + 0.02), yy, za + 0.8 + i * 1.6]);
+    k.box(w * 0.86, hh, 0.08, M.glassCool, [0, yy, zb + 0.03]);
+  }
+  // red panel + blue dots on the aft cabin sides, 'Fantasy' script mid-cabin
+  const script = textTex(ctx, 'Fantasy', { w: 512, h: 128, color: '#262532', font: '"Snell Roundhand", "Brush Script MT", cursive', weight: 700, size: 0.8 });
+  for (const s of [1, -1]) {
+    k.box(0.06, 2.1, zU(0.2) - zU(0.08), red, [s * (S.B * 0.47 + 0.04), yd + 1.15, (zU(0.08) + zU(0.2)) / 2]);
+    k.mesh(new THREE.CircleGeometry(0.75, 20), blue, [s * (S.B * 0.47 + 0.07), yd + 1.0, zU(0.32)], [0, s * Math.PI / 2, 0]);
+    k.mesh(new THREE.CircleGeometry(0.75, 20), blue, [s * (S.B * 0.43 + 0.07), c1 + 1.2, zU(0.58)], [0, s * Math.PI / 2, 0]);
+    k.plane(3.2, 0.8, mapMat(ctx, 'decal', '#ffffff', script, { transparent: true, alphaTest: 0.3 }), [s * (S.B * 0.43 + 0.08), c1 + 1.85, zU(0.42)], [0, s * Math.PI / 2, 0]);
+  }
+  // open aft deck on the upper level with rails, the white radar tower, lifebuoys
+  railRect(T, -S.B * 0.42, S.B * 0.42, zU(0.1), zU(0.22), c1);
+  k.rbox(1.6, 3.2, 1.8, 0.2, white, [0, c2 + 1.6, zU(0.5)]);
+  k.box(3.2, 0.25, 0.4, white, [0, c2 + 3.0, zU(0.5)]); k.box(1.8, 0.25, 0.4, white, [0.6, c2 + 2.2, zU(0.52)], [0, 0, -0.5]);
+  k.cyl(0.35, 0.35, 0.3, white, [0, c2 + 3.5, zU(0.5)], null, 10);
+  anchors.mastTop = [0, c2 + 3.9, zU(0.5)]; anchors.air = c2 + 4;
+  for (const s of [1, -1]) k.mesh(new THREE.TorusGeometry(0.3, 0.08, 6, 14), M.float, [s * (S.B * 0.47 + 0.08), yd + 2.0, zU(0.18)], [0, Math.PI / 2, 0]);
+  // festoon lights from the tower to the bow and the stern
+  W.line([[0, c2 + 3.6, zU(0.5)], [0, H.sheer(1) + 0.4, H.zAt(1, H.sheer(1)) - 0.3]], { width: 0.025, color: '#3b3a44' });
+  W.line([[0, c2 + 3.6, zU(0.5)], [0, c1 + 0.6, zU(0.1)]], { width: 0.025, color: '#3b3a44' });
+  for (let i = 1; i < 9; i++) { const f = i / 9; anchors.lights.push({ p: [0, c2 + 3.6 + (H.sheer(1) + 0.4 - c2 - 3.6) * f, zU(0.5) + (H.zAt(1, H.sheer(1)) - 0.3 - zU(0.5)) * f], c: '#fff4dc', w: 0.2, s: 0.4, kind: 'deck' }); }
+  T.navU = 0.64; T.navY = c1 + 1.0; T.navX = S.B * 0.43;
+  anchors.deck.push([0, c1, zU(0.15)], [0, yd, zU(0.8)]);
+  anchors.perches.push([0, c2 + 3.9, zU(0.5)]);
 }
 
 // --------------------------------------------------------------------------------------- shared gear

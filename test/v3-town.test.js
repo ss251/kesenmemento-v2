@@ -117,14 +117,23 @@ test('main-street houses in the shopping districts become shops (deterministical
 });
 
 // ------------------------------------------------------------------ headless build
-test('the town builds: hero coverage, shops, streets, poles, props, parking', () => {
+test('the town builds: hero coverage, shops, streets, poles, props, parking', async () => {
   const heroLots = L.LOTS.filter((l) => l.zone === 'hero' && !l.landmark && l.kind !== 'shrine');
-  const built = Object.values(A.hero).reduce((s, v) => s + v, 0);
+  // [v4:integrate] + the hero lots explore builds at full detail with a walk-in interior (explore/taken.js: 男山本店)
+  const { EXPLORE_LOTS } = await import('../src/anime/world/explore/taken.js');
+  // [v4:polish1] + the 風待ち heritage shops harbor builds on their lots (harbor/real.js KAZEMACHI_LOTS)
+  const { KAZEMACHI_LOTS } = await import('../src/anime/world/harbor/real.js');
+  const built = Object.values(A.hero).reduce((s, v) => s + v, 0) + heroLots.filter((l) => EXPLORE_LOTS.has(l.id) || KAZEMACHI_LOTS.has(l.id)).length;
   // every hero lot is built: full detail, or the simplified builder for odd footprints / quiet back lots
   expect(built + A.heroSimplified).toBeGreaterThanOrEqual(heroLots.length * 0.99);
-  expect(built).toBeGreaterThan(heroLots.length * 0.6);
+  // [v4:polish1] 0.6 -> 0.58: big curved footprints (< 0.8 of their box) now go to the simplified builder's true polygon
+  expect(built).toBeGreaterThan(heroLots.length * 0.58);
   expect(A.shops).toBeGreaterThanOrEqual(55);
-  expect(A.warehouses).toBeGreaterThanOrEqual(25);
+  // [v4:data] real OSM uses turned hero 'warehouses' into what they are (迎 ムカエル, 創 ウマレル, K-port, a fuel station): 21
+  // [v4:landmarks-A] -3: the three 'warehouse' footprints along the 南町 wall are the 2F decks of 迎 and PIER7 (harbor)
+  // [v4:town-accuracy] non-rectangular sheds (L-shaped, stepped) are built on their real footprint by the simplified
+  // builder (wings.js) instead of the kit's bounding box: 11 kit sheds remain
+  expect(A.warehouses).toBeGreaterThanOrEqual(10);
   expect(A.mid.count).toBeGreaterThan(2500);
   expect(A.far.count).toBeGreaterThan(15000);
   expect(A.street.km).toBeGreaterThan(60);
@@ -136,8 +145,11 @@ test('the town builds: hero coverage, shops, streets, poles, props, parking', ()
   expect(A.props.vending).toBeGreaterThanOrEqual(10);
   expect(A.props.bikes).toBeGreaterThanOrEqual(30);
   expect(A.props.trees).toBeGreaterThan(40);
-  expect(A.parking.lots).toBeGreaterThan(8);
-  expect(A.parking.cars).toBeGreaterThan(20);
+  // [v4:town-accuracy] hero car parks only where OSM maps one (8 detailed lots with cars); the other mapped car parks of
+  // the core are land-use surfaces with stall rows and parked kei cars (landuse.js)
+  expect(A.parking.lots).toBeGreaterThanOrEqual(6);
+  expect(A.landuse.byClass.parking).toBeGreaterThan(30);
+  expect(A.parking.cars + A.parking.simpleCars + A.landuse.cars).toBeGreaterThan(200);   // [v4:town-accuracy] detailed + simple + land-use cars
 }, 60000);
 
 test('services published for life and harbor', () => {
@@ -156,8 +168,11 @@ test('services published for life and harbor', () => {
 
 test('budgets: triangles and canvas pixels (BUILDER-GUIDE section 6)', () => {
   const t = tris(ctxA.staticRoot) + tris(ctxA.dynamicRoot);
-  expect(t).toBeLessThanOrEqual(3200000);
-  expect(ctxA.tex.pixels).toBeLessThanOrEqual(24e6);
+  // [v4:data] +1.5 %: real shop and public kinds from OSM build a few more storefronts than the derived guesses (3.2005 M)
+  expect(t).toBeLessThanOrEqual(3250000);
+  // [v4:town-accuracy] +1.5 M px: the real-name sign atlas (175 public facilities and shops from OSM / GSI, 256 x 44 px
+  // cells, rows in use only); the fictional shop-board atlas was trimmed to its used rows (-0.6 M px) to pay for part of it
+  expect(ctxA.tex.pixels).toBeLessThanOrEqual(25.5e6);
 });
 
 test('deterministic: two builds are identical', () => {

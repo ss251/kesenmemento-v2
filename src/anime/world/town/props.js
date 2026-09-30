@@ -27,7 +27,9 @@ export function buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts, bikeSp
   const lineups = ['V1a', 'V1b', 'V2', 'V4'];   // four machines' worth of price rails / door art (canvas budget)
   const spots = [];
   const taken = [];
-  const clear = (x, z, d) => !taken.some((t) => Math.hypot(t[0] - x, t[1] - z) < d);
+  // [v4:integrate] no machine on the 五十鈴神社 approach (the torii at the 東浜街道 bend and the stair behind it)
+  const shrineAt = [L.SPOTS.isuzuTorii, L.SPOTS.isuzuShrine].filter(Boolean);
+  const clear = (x, z, d) => !taken.some((t) => Math.hypot(t[0] - x, t[1] - z) < d) && !shrineAt.some((p) => Math.hypot(p.x - x, p.z - z) < 14);
   // layout spots: face the nearest road
   for (const [i, v] of (L.SPOTS.vending || []).entries()) {
     const nr = roadIdx.nearest(v.x, v.z, 30);

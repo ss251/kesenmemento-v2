@@ -1,0 +1,422 @@
+{
+ "generated": "2026-09-30",
+ "enu": "x=(lon-141.575)*86744, z=-(lat-38.906)*111014",
+ "note": "see <id>.md for sources; OSM data © OpenStreetMap contributors (ODbL)",
+ "landmarks": [
+  {
+   "id": "fish-market",
+   "ja": "気仙沼市魚市場",
+   "parts": [
+    {
+     "name": "north block, rooftop parking and ramp",
+     "enu": [
+      458,
+      629
+     ],
+     "osm": "way/761720498"
+    },
+    {
+     "name": "北側施設 (1995), roof car park",
+     "enu": [
+      595,
+      795
+     ],
+     "dims": [
+      359,
+      34
+     ],
+     "osm": "way/105732020",
+     "roof": "flat concrete parking #c3c6c2"
+    },
+    {
+     "name": "C棟 (2019)",
+     "enu": [
+      730,
+      1059
+     ],
+     "dims": [
+      196,
+      75
+     ],
+     "osm": "way/761258023",
+     "roof": "white #e8eae8",
+     "storeys": "2 + roof deck"
+    },
+    {
+     "name": "D棟 (2019), PV roof",
+     "enu": [
+      800,
+      1235
+     ],
+     "dims": [
+      135,
+      70
+     ],
+     "roof": "white + PV #2b3444"
+    }
+   ],
+   "app_error": "C/D not modelled as market; north facility roof wrong; 海の市 drawn as a hall"
+  },
+  {
+   "id": "kanae-ohashi",
+   "ja": "気仙沼湾横断橋",
+   "pylonN": [
+    1543.8,
+    1373.8
+   ],
+   "pylonS": [
+    1367.7,
+    1679.9
+   ],
+   "mainSpanCentre": [
+    1456.4,
+    1527.2
+   ],
+   "axisDeg_atan2dzdx": 120.3,
+   "spans_m": [
+    160,
+    360,
+    160
+   ],
+   "total_m": 1344,
+   "pylonTopAboveSea_m": 115,
+   "rcPier_m": 15,
+   "cablePlanes": 1,
+   "deckWidth_m": [
+    10.5,
+    13.0
+   ],
+   "clearance_m": 32,
+   "colour": "#eef0ee",
+   "app": {
+    "centre": [
+     1492,
+     1465.4
+    ],
+    "towers": [
+     [
+      1582,
+      1309.5
+     ],
+     [
+      1402,
+      1621.3
+     ]
+    ],
+    "errors_m": [
+     74,
+     69
+    ],
+    "cablePlanes": 2,
+    "pylonTop": 100
+   },
+   "pylonN_ortho2020": [
+    1537,
+    1369
+   ],
+   "pylonS_ortho2020": [
+    1361,
+    1676
+   ],
+   "mainSpanCentre_ortho2020": [
+    1449,
+    1522
+   ],
+   "pylonRefNote": "[v4:integrate] pylonN = the pylon footing centre (twin leg bases) on the pre-deck GSI orthos (xyz layers ort and nendophoto2019, z18 tile 234176/100285), 1.6 m off the OSM/GSI deck line; pylonS = the construction-era ortho point projected on that line (the pylons of a single-plane cable-stayed bridge stand on the deck axis; the 8-10 m lateral offsets of the *_ortho2020 points are the lean of the elevated deck and cranes in that photo)."
+  },
+  {
+   "id": "oshima-ohashi",
+   "ja": "気仙沼大島大橋",
+   "endN": [
+    2766,
+    2856
+   ],
+   "endS": [
+    2655,
+    3194
+   ],
+   "centre": [
+    2710,
+    3025
+   ],
+   "axisDeg_atan2dzdx": 108.2,
+   "total_m": 356,
+   "archSpan_m": 297,
+   "rise_m": 54,
+   "spans_m": [
+    24.7,
+    40.5,
+    224.0,
+    40.5,
+    24.7
+   ],
+   "deckWidth_m": 9.5,
+   "clearance_m": 32,
+   "colour": "#eeefec",
+   "app": {
+    "axisDeg": 105,
+    "deckY": 30,
+    "endError_m": [
+     9.3,
+     10.2
+    ]
+   }
+  },
+  {
+   "id": "ukimido",
+   "ja": "浮見堂",
+   "enu": [
+    341.6,
+    -23.4
+   ],
+   "roofSquare_m": 6.8,
+   "colour": "#d2462f",
+   "roof": "#9aa3a2",
+   "rebuilt": "2020-05",
+   "walkway": "ring round the tip (浮見海道)",
+   "app_error_m": 0
+  },
+  {
+   "id": "isuzu-jinja",
+   "ja": "五十鈴神社",
+   "enu": [
+    363.5,
+    -121
+   ],
+   "summitTP_m": 16.3,
+   "hall": "cream RC #efe6cc",
+   "app_error_m": 5
+  },
+  {
+   "id": "ebisu-statue",
+   "ja": "恵比寿像 (3代目, 2020)",
+   "enu": [
+    359,
+    -22
+   ],
+   "osm": "node/7580455850"
+  },
+  {
+   "id": "anbasan",
+   "ja": "安波山",
+   "summit": [
+    -493.6,
+    -990.2
+   ],
+   "heightTP_m": 239,
+   "lowerViewpoint": [
+    -512.7,
+    -691.6
+   ],
+   "app_error_m": 0
+  },
+  {
+   "id": "pier7",
+   "ja": "PIER7 / 創",
+   "enu": [
+    33.5,
+    106.6
+   ],
+   "dims": [
+    85,
+    18.6
+   ],
+   "storeys": 3,
+   "floorArea_m2": 2403,
+   "opened": "2019-04-13",
+   "pontoons": [
+    [
+     40.5,
+     15.3
+    ],
+    [
+     60.7,
+     50.0
+    ]
+   ]
+  },
+  {
+   "id": "mukaeru",
+   "ja": "迎",
+   "enu": [
+    -18.4,
+    33.2
+   ],
+   "dims": [
+    53.3,
+    10.3
+   ],
+   "storeys": 3,
+   "floorArea_m2": 1169
+  },
+  {
+   "id": "uminoichi",
+   "ja": "海の市 / シャークミュージアム",
+   "enu": [
+    397.8,
+    661.3
+   ],
+   "dims": [
+    85.1,
+    44.6
+   ],
+   "facade": "red A-frame #bb5954",
+   "signs": [
+    "気仙沼 海の市",
+    "シャークミュージアム",
+    "UMI ICHI",
+    "氷の水族館"
+   ]
+  },
+  {
+   "id": "city-hall",
+   "ja": "気仙沼市役所",
+   "main": [
+    -433,
+    -241
+   ],
+   "second": [
+    -411,
+    -294
+   ],
+   "oneTen": [
+    -397,
+    -190
+   ],
+   "newSite": [
+    -892,
+    1293
+   ],
+   "newBuilding": "B1+4F, 9,222 m2, completion 2027-10"
+  },
+  {
+   "id": "kesennuma-station",
+   "ja": "気仙沼駅",
+   "enu": [
+    -1382,
+    -418
+   ],
+   "dims": [
+    66.6,
+    14.7
+   ],
+   "storeys": 1
+  },
+  {
+   "id": "rias-ark",
+   "ja": "リアス・アーク美術館",
+   "enu": [
+    -2185,
+    2779
+   ],
+   "dims": [
+    88.6,
+    41.6
+   ],
+   "groundTP_m": [
+    94,
+    104
+   ]
+  },
+  {
+   "id": "seawall-promenade",
+   "ja": "内湾防潮堤",
+   "sakanamachi": {
+    "length_m": 311,
+    "crestTP_m": 4.1,
+    "aboveLand_m": 1.3,
+    "flapGates": 21,
+    "gateWidth_m": 13.7
+   },
+   "minamimachi": {
+    "length_m": 243,
+    "crestTP_m": 6.2,
+    "height_m": 4.4
+   }
+  },
+  {
+   "id": "oshima-kameyama",
+   "ja": "大島・亀山",
+   "summit": [
+    3735,
+    3626
+   ],
+   "heightTP_m": 235,
+   "terrace360": [
+    3484,
+    3385
+   ],
+   "terraceOpened": "2026-07-19"
+  },
+  {
+   "id": "oshima-ferry-pier",
+   "ja": "浦の浜 / PIER7",
+   "uranohama": [
+    3254,
+    4480
+   ],
+   "ferryEnded": "2019-04-07",
+   "cruiseBoats": [
+    "ファンタジー",
+    "やしま丸"
+   ]
+  },
+  {
+   "id": "hospitals",
+   "cityHospital": [
+    -766,
+    2062
+   ],
+   "otomo": [
+    -687,
+    13
+   ],
+   "oldHospitalDemolished": "2022-09..2024-01"
+  },
+  {
+   "id": "schools",
+   "kesennumaES": [
+    -311,
+    357
+   ],
+   "kesennumaJHS": [
+    -289,
+    539
+   ],
+   "kesennumaHS": [
+    -1358,
+    1168
+   ]
+  },
+  {
+   "id": "kesennuma-orthodox-church",
+   "ja": "気仙沼ハリストス正教会 (主の復活聖堂)",
+   "osm": "way/436715760",
+   "enu": [
+    -488,
+    -29
+   ],
+   "footprint_m": [
+    11,
+    23
+   ],
+   "eaves_m": 5.4,
+   "ridge_m": 10.1,
+   "belfry_cross_m": 14.7,
+   "note": "[v4:polish3] one-storey nave with a green copper gable roof (ridge 10.1 m) and the belfry over the entrance (cross at 14.7 m). No published height: the dimensions are read from the Commons photo 気仙沼魚町と安波山 (nave about 2x its eaves height to the ridge) and the OSM outline; the old reference height 3.3 m was one storey without the roof. Rebuilt 1933 (orthodoxjapan.jp/annai/h-kesennuma.html)."
+  },
+  {
+   "id": "kesennuma-post-office",
+   "ja": "気仙沼郵便局",
+   "osm": "way/761265849",
+   "enu": [
+    -509,
+    -143
+   ],
+   "levels": 4,
+   "height_m": 14,
+   "roof": "flat (GSI seamlessphoto z18: grey flat roof with a rooftop light well, a lower teal-roofed back wing)",
+   "note": "[v4:polish3] the derived hip roof over the 41 x 37 m block rose to 17.8 m; the lot is fixed to a flat roof (src/anime/world/lotfix.js)"
+  }
+ ]
+}

@@ -1,0 +1,21 @@
+{
+ "note": "Hand labels read off the GSI seamlessphoto z18 tiles at full zoom (blind: no prediction shown), 2026-09-30, v4:data. Only roofs whose class was unambiguous were labelled.",
+ "labels": {
+  "16/58538/25069/67": "flat",
+  "16/58538/25069/68": "flat",
+  "16/58543/25068/35": "flat",
+  "16/58540/25068/350": "flat",
+  "16/58541/25070/191": "flat",
+  "16/58542/25071/119": "flat",
+  "16/58542/25071/112": "flat",
+  "16/58539/25072/196": "flat",
+  "16/58540/25070/276": "flat",
+  "16/58537/25071/165": "gable",
+  "16/58537/25070/517": "gable",
+  "16/58542/25065/197": "hip",
+  "16/58542/25072/19": "flat",
+  "16/58542/25071/75": "flat",
+  "16/58541/25067/213": "flat",
+  "16/58540/25070/259": "gable"
+ }
+}

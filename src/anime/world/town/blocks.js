@@ -31,11 +31,13 @@ export function makeNameAtlas(ctx) {
 }
 
 /** Frame the block so that local +z is the sunny (balcony) long face and local x runs along it. */
-function blockFrame(H, lot) {
+function blockFrame(H, lot, wing = null) {
   const L = H.L, f = L.lotFrame(lot);
   const F = H.Frame.at(H.gb, f.x, f.y, f.z, f.rotY);
-  const HF = F.sub(0, 0, -lot.obb.d / 2, 0);
-  const w = lot.obb.w - 0.3, d = lot.obb.d - 0.3;
+  // [v4:town-accuracy] on the footprint's main wing (hero.js: the other wings are annexes from the simplified builder)
+  const wg = wing || { cx: 0, cz: 0, w: lot.obb.w, d: lot.obb.d };
+  const HF = F.sub(wg.cx, 0, -lot.obb.d / 2 + wg.cz, 0);
+  const w = wg.w - 0.3, d = wg.d - 0.3;
   const alongX = w >= d;
   const cands = alongX ? [0, Math.PI] : [Math.PI / 2, -Math.PI / 2];
   let best = cands[0], bz = -2;
@@ -43,10 +45,13 @@ function blockFrame(H, lot) {
   return { BF: HF.sub(0, 0, 0, best), Lw: alongX ? w : d, D: alongX ? d : w, HF };
 }
 
-export function buildApartmentBlock(H, lot, lod, r, T) {
+export function buildApartmentBlock(H, lot, lod, r, T, wing = null) {
   const { M } = H;
-  const { BF, Lw, D } = blockFrame(H, lot);
-  if (Lw < 8 || D < 5.5) return false;
+  const bf = blockFrame(H, lot, wing);
+  if (bf.Lw < 8 || bf.D < 5.5) return false;
+  // [v4:town-accuracy] the stair tower stands inside the footprint at one end (it stood 2.7 m outside it)
+  const sx = r() < 0.5 ? 1 : -1;
+  const BF = bf.BF.sub(-sx * 1.4, 0, 0, 0), Lw = bf.Lw - 2.8, D = bf.D;
   const n = Math.max(3, Math.min(14, lot.storeys));
   const FH = 2.9;
   const { gmin, gmax } = groundRange(H, BF, Lw, D);
@@ -63,7 +68,9 @@ export function buildApartmentBlock(H, lot, lod, r, T) {
   BF.boxB(M.plain, '#c9c7c0', Lw - 0.3, 0.05, bd - 0.3, 0, top + 0.6, bz);
   // accent stripe on the end walls (vertical) + the building name
   for (const sx of [-1, 1]) BF.boxB(M.plain, accent, 0.06, n * FH * 0.8, 1.2, sx * (Lw / 2 + 0.03), fy + n * FH * 0.1, bz);
-  if (T.names && lod >= 1) { const k = Math.abs(lot.seed) % OFFICES.length; H.card(BF.sub(Lw / 2 + 0.05, 0, bz + bd / 4, Math.PI / 2), T.nameMat, T.names.rect(k), 0, fy + n * FH * 0.55, 0.02, 0.8, 3.2); }
+  const real = T.real?.get(lot);   // [v4:town-accuracy] the real building name (OSM), on a board over the entrance
+  if (real) { const bw = Math.min(Lw - 1, 0.6 * [...real.name].length + 0.8, 8), bh = bw / real.aspect * 1.2; BF.boxB(M.plain, real.colors[0], bw + 0.12, bh + 0.12, 0.06, 0, fy + 3.1 - 0.06, zFront + 1.3); H.card(BF.sub(0, 0, zFront + 1.335, 0), real.mat, real.rect, 0, fy + 3.1 + bh / 2, 0, bw, bh); }
+  else if (T.names && lod >= 1) { const k = Math.abs(lot.seed) % OFFICES.length; H.card(BF.sub(Lw / 2 + 0.05, 0, bz + bd / 4, Math.PI / 2), T.nameMat, T.names.rect(k), 0, fy + n * FH * 0.55, 0.02, 0.8, 3.2); }
   const units = Math.max(1, Math.round(Lw / 3.8)), uw = Lw / units;
   const FF = BF.sub(0, 0, zFront, 0);                 // front face frame (+z out)
   const BK = BF.sub(0, 0, zBack, Math.PI);            // back face frame
@@ -99,12 +106,11 @@ export function buildApartmentBlock(H, lot, lod, r, T) {
     }
   }
   // stair tower + elevator
-  const sx = r() < 0.5 ? 1 : -1;
   const stX = sx * (Lw / 2 + 1.35);
   const sgy = H.gy(BF, stX, bz);
   BF.boxB(M.tile, body, 2.7, top + 1.4 - sgy, 3.6, stX, sgy, bz, { uv: { world: 0.96 } });
   for (let f = 0; f < n; f++) BF.box(M.frost ?? M.glass, null, 0.02, 1.2, 0.6, stX + sx * 1.36, fy + f * FH + 1.6, bz, { shadow: false });
-  if (n >= 5) { const ex = stX + sx * 2.4; const egy = H.gy(BF, ex, bz); BF.boxB(M.plain, accent, 2.1, top + 2.2 - egy, 2.3, ex, egy, bz); }
+  if (n >= 5) { const ex = stX, ez = bz - 1.2; const egy = H.gy(BF, ex, ez); BF.boxB(M.plain, accent, 2.1, top + 2.2 - egy, 2.3, ex, egy, ez); }   // [v4:town-accuracy] the lift shaft rises out of the stair tower
   // entrance canopy + glass doors at the stair end
   BF.box(M.plain, '#e2ddd2', 3.2, 0.18, 2.0, stX - sx * 0.2, fy + 2.65, zFront + 1.0);
   BF.box(M.glass, null, 1.8, 2.3, 0.02, stX, fy + 1.15, bz + 1.81, { shadow: false, noOutline: true });
@@ -120,9 +126,9 @@ export function buildApartmentBlock(H, lot, lod, r, T) {
   return true;
 }
 
-export function buildOfficeBlock(H, lot, lod, r, T) {
+export function buildOfficeBlock(H, lot, lod, r, T, wing = null) {
   const { M } = H;
-  const { BF, Lw, D } = blockFrame(H, lot);
+  const { BF, Lw, D } = blockFrame(H, lot, wing);
   if (Lw < 6 || D < 5) return false;
   const n = Math.max(2, Math.min(12, lot.storeys));
   const FH = 3.4;
@@ -151,6 +157,8 @@ export function buildOfficeBlock(H, lot, lod, r, T) {
   }
   // entrance: glass wall + canopy
   const FFr = BF.sub(0, 0, D / 2, 0);
+  { const real = T.real?.get(lot);   // [v4:town-accuracy] the real name (OSM / GSI 注記) over the entrance canopy
+    if (real) { const bw = Math.min(Lw - 1, 0.6 * [...real.name].length + 0.8, 10), bh = bw / real.aspect * 1.2; FFr.boxB(M.plain, real.colors[0], bw + 0.12, bh + 0.12, 0.06, 0, fy + 3.25, 0.04); H.card(FFr, real.mat, real.rect, 0, fy + 3.31 + bh / 2, 0.075, bw, bh); } }
   FFr.box(M.glass, null, Math.min(Lw - 1, 8), 2.8, 0.02, 0, fy + 1.4, 0.02, { shadow: false, noOutline: true });
   FFr.box(M.plain, '#dcd8ce', Math.min(Lw - 0.5, 9), 0.25, 2.2, 0, fy + 3.0, 1.1);
   FFr.box(H.ctx.mat.emissive('#ffd9a0', 1.1), null, 1.6, 0.03, 0.4, 0, fy + 2.86, 1.2, { shadow: false });

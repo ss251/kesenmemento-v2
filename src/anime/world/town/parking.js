@@ -54,12 +54,14 @@ function simpleCar() {
 }
 const CAR_COLS = ['#e8e8e3', '#c3c7cc', '#e8e8e3', '#44507a', '#9fd4c2', '#efe3c4', '#94434d', '#4a4753', '#a9c5e2', '#e8e8e3', '#d7c3a6'];
 
-export function buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex, lineTex, signs, SM, foci = [], maxDetailCars = 36 }) {
+export function buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex, lineTex, signs, SM, foci = [], maxDetailCars = 36, inParking = null }) {
   const L = ctx.L;
   const C = 5;   // candidate grid (m)
   const S = L.SPOTS || {};
   const avoid = [S.isuzuShrine, S.isuzuTorii, S.ukimido, S.anbaLookout, S.pier7].filter(Boolean).map((p) => [p.x ?? p[0], p.z ?? p[1]]);
   const ok = (x, z) => {
+    // [v4:town-accuracy] car parks only where OpenStreetMap maps one (the heuristic filled vacant land with cars)
+    if (inParking && !inParking(x, z)) return false;
     if (L.shoreDist(x, z) > -7) return false;
     if (lotIdx.at(x, z, 1.8)) return false;
     if (roadIdx.covering(x, z, 1.2, null).length) return false;
@@ -234,7 +236,7 @@ export function buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex, li
     ctx.add(im);
   }
   stats.simpleCars = simple.length;
-  if (!padB.empty) { const m = padB.mesh(ctx.mat.toon('#ffffff', { map: asphaltTex, vertexColors: true, paint: 0.03, polygonOffset: -1 }), { name: 'town-parking-pads' }); root.add(m); }
+  if (!padB.empty) { const m = padB.mesh(ctx.mat.toon('#ffffff', { map: asphaltTex, vertexColors: true, paint: 0.032, polygonOffset: -1 }), { name: 'town-parking-pads' }); root.add(m); }   // [v4:town-accuracy] own material (paint 0.032): the batcher keeps car parks apart from the roads (accuracy audit)
   if (!lineB.empty) { const m = lineB.mesh(ctx.mat.decal('#ffffff', { map: lineTex, vertexColors: true }), { name: 'town-parking-lines', renderOrder: -2 }); ctx.noOutline(m); root.add(m); }
   ctx.addStatic(root);
   stats.tm = tm; stats.tm.carMs = Math.round(carMs); stats.tm.cloneMs = Math.round(cloneMs); stats.tm.bandMs = Math.round(bandMs);

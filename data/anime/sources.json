@@ -1,0 +1,244 @@
+{
+ "generated": "scripts/anime/enrich/sources.js",
+ "osmBase": "2026-05-06T03:25:00Z",
+ "sources": [
+  {
+   "id": "osm",
+   "name": "OpenStreetMap",
+   "url": "https://www.openstreetmap.org/",
+   "licence": "ODbL 1.0",
+   "licenceUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+   "attribution": "© OpenStreetMap contributors",
+   "attributionUrl": "https://www.openstreetmap.org/copyright",
+   "access": "Overpass API mirror (overpass.kumi.systems; fallbacks overpass.private.coffee, overpass-api.de), bbox 38.83-38.99 N, 141.50-141.70 E; scripts/anime/enrich/fetch-osm.js",
+   "usedFor": [
+    "building levels, height, roof shape and colour, names, amenity and shop tags",
+    "shop and amenity names inside buildings",
+    "landuse polygons (parks, fields, cemeteries, schoolyards, parking, forest)",
+    "river and stream names and centre-lines (大川, 神山川, ...)",
+    "road names, refs, lanes, one-way, speed limits, bridges, tunnels",
+    "traffic signals and crossings",
+    "rail, bridges, points of interest"
+   ],
+   "files": [
+    "data/anime/enrich.json",
+    "data/anime/layout.json"
+   ],
+   "note": "Derived data (a produced work built from the database). The ODbL asks that the attribution is shown wherever the app or its renders are shown; the extract itself is kept in raw/osm (not committed)."
+  },
+  {
+   "id": "gsi-bvmap",
+   "name": "国土地理院 最適化ベクトルタイル (optimal_bvmap-v1, z16)",
+   "url": "https://github.com/gsi-cyberjapan/optimal_bvmap",
+   "licence": "国土地理院コンテンツ利用規約 (公共データ利用規約 第1.0版, PDL1.0 compatible)",
+   "licenceUrl": "https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html",
+   "attribution": "出典：国土地理院（地理院タイル）最適化ベクトルタイルを加工して作成",
+   "usedFor": [
+    "building footprints (BldA)",
+    "road centre-lines and edges (RdCL, RdEdg)",
+    "coast, sea and inland water (Cstline, WA, WL)",
+    "place and facility names and map symbols (Anno)"
+   ],
+   "files": [
+    "data/buildings/*",
+    "data/anime/layout.json",
+    "data/anime/enrich.json"
+   ]
+  },
+  {
+   "id": "gsi-anno-style",
+   "name": "国土地理院 最適化ベクトルタイル 標準地図スタイル (std.json)",
+   "url": "https://github.com/gsi-cyberjapan/optimal_bvmap/blob/main/style/std.json",
+   "licence": "国土地理院コンテンツ利用規約",
+   "licenceUrl": "https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html",
+   "attribution": "出典：国土地理院",
+   "usedFor": [
+    "the meaning of each Anno symbol code (神社 3231, 寺院 3232, 小学校 3214, 郵便局 3218, ...)"
+   ],
+   "files": [
+    "scripts/anime/enrich/gsi-anno-codes.json"
+   ]
+  },
+  {
+   "id": "gsi-photo",
+   "name": "国土地理院 全国最新写真（シームレス） (seamlessphoto z15, z17, z18)",
+   "url": "https://maps.gsi.go.jp/development/ichiran.html#seamlessphoto",
+   "licence": "国土地理院コンテンツ利用規約 (PDL1.0 compatible)",
+   "licenceUrl": "https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html",
+   "attribution": "出典：国土地理院（地理院タイル）全国最新写真（シームレス）を加工して作成",
+   "usedFor": [
+    "roof colour per building (median of the roof facets)",
+    "roof shape class and ridge direction per building (facet brightness models)",
+    "rooftop equipment and vegetation cover per footprint",
+    "land-cover classes and forest"
+   ],
+   "files": [
+    "data/anime/enrich.json",
+    "data/anime/landcover_*.png",
+    "data/anime/forest_*.png"
+   ],
+   "note": "The photo is analysed, never shipped as-is in the anime app (data/ortho is the v1/v2 viewer's copy)."
+  },
+  {
+   "id": "gsi-dem",
+   "name": "国土地理院 標高タイル (dem5a_png z15, dem_png z14)",
+   "url": "https://maps.gsi.go.jp/development/ichiran.html#dem",
+   "licence": "国土地理院コンテンツ利用規約 (PDL1.0 compatible)",
+   "licenceUrl": "https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html",
+   "attribution": "出典：国土地理院（地理院タイル）標高タイルを加工して作成",
+   "usedFor": [
+    "terrain height (3.7 m core, 8 m city)"
+   ],
+   "files": [
+    "data/terrain/*",
+    "data/anime/grids.*"
+   ]
+  },
+  {
+   "id": "jma",
+   "name": "気象庁 (AMeDAS, forecast, tide table)",
+   "url": "https://www.jma.go.jp/",
+   "licence": "気象庁ホームページについて (PDL1.0 compatible)",
+   "licenceUrl": "https://www.jma.go.jp/jma/kishou/info/coment.html",
+   "attribution": "出典：気象庁ホームページ（アメダス・天気予報・潮位表）を加工して作成",
+   "usedFor": [
+    "live weather, forecast and tide"
+   ],
+   "files": [
+    "data/cache/live/*",
+    "data/live/sample.json"
+   ]
+  },
+  {
+   "id": "gyokyou",
+   "name": "気仙沼漁業協同組合 入船情報",
+   "url": "http://www.kesennuma-gyokyou.or.jp/",
+   "licence": "no open licence stated (factual public notices; ask the co-op before a public launch)",
+   "attribution": "入船情報：気仙沼漁業協同組合",
+   "usedFor": [
+    "today's arriving vessels"
+   ],
+   "files": [
+    "data/cache/live/*"
+   ]
+  },
+  {
+   "id": "sakuragaoka",
+   "name": "Sakuragaoka Station (Kenton-GMI)",
+   "url": "https://github.com/Kenton-GMI",
+   "licence": "MIT",
+   "attribution": "Sakuragaoka Station (MIT) by Kenton-GMI",
+   "usedFor": [
+    "the cel-shaded engine and house kit"
+   ],
+   "files": [
+    "src/anime/core/*",
+    "src/anime/LICENSE-sakuragaoka-station"
+   ]
+  },
+  {
+   "id": "landmark-refs",
+   "name": "Landmark reference sheets (docs/anime/landmarks/*.md): official, engineering, tourism and encyclopedia pages; photos used only as shape and colour references",
+   "url": "https://kesennuma-kanko.jp/",
+   "licence": "facts (dimensions, dates, positions) cited from the pages below; no text or image is copied into the app",
+   "attribution": "see each sheet",
+   "usedFor": [
+    "かなえ大橋: spans 160+360+160 m, 115 m pylons on 15 m RC piers, one cable plane, hexagonal girder (土木学会デザイン賞 2024 https://design-prize.sakura.ne.jp/archives/result/2575; 長大 https://www.chodai.co.jp/news/2023/06/015059.html; 大日本ダイヤコンサルタント https://www.dd-con.co.jp/field/bridge/kesennuma-baycrossing.html; https://ja.wikipedia.org/wiki/気仙沼湾横断橋)",
+    "大島大橋: 356 m, arch span 297 m, rise 54 m, spans 24.7+40.5+224+40.5+24.7 m, 9.5 m deck, white (https://www.pref.miyagi.jp/site/oshimakakyozigyo/kakyouhontai.html; https://www.dd-con.co.jp/field/bridge/kesennuma-ooshima.html)",
+    "魚市場: 北側施設 1995 with the rooftop car park, C棟 195 m, D棟 135 m with 250 kW PV (https://kesennuma-uoichiba.jp/fishmarket/history/; https://www2.panasonic.biz/jp/solution/store/works/kesennuma-fishMarket.html)",
+    "海の市: the red A-frame corners and the sign panels (Wikimedia Commons 'Kesennuma uminoiti.jpg', reference only)",
+    "浮見堂 / 浮見海道 / 恵比寿像 (1.8 m, 2020, holding a bonito) (https://kesennuma-kanko.jp/ukimido/; https://kesennuma-kanko.jp/ebisu3_202005/)",
+    "五十鈴神社: cream-painted RC hall, steep stair, red torii (https://ja.wikipedia.org/wiki/五十鈴神社_(気仙沼市); https://4travel.jp/dm_shisetsu/11340236; https://tanji-sendai.blog.jp/archives/shinmei-zaki.kesennuma.html)",
+    "魚町 seawall: crest T.P. 4.1 m, 1.3 m over the pavement, 21 flap gates of 13.7 m, 311 m, rest-deck stairs (https://design-prize.sakura.ne.jp/archives/result/1932; https://imakawa.net/blog/4847.html)",
+    "南町: T.P. 6.2 m wall hidden by PIER7 / 迎 decks, the stepped garden and lawn (https://www.s-onsite.com/works/001340.html); PIER7 3 storeys (RIA); 迎 3 storeys (デザイン賞 2022)",
+    "ファンタジー: 32 x 7 m, 1990, 152 GT (https://ja.wikipedia.org/wiki/大島汽船; http://oshimakisen.com/page-88/); livery from Commons 'Oshima Kisen Fantasy at Kesennuma Port 202608a/b.jpg' (reference only)",
+    "安波山: 239 m, the three terraces (https://kesennuma-kanko.jp/anbasan/; https://yakei.jp/japan/spot.php?i=anbasan_top)"
+   ],
+   "files": [
+    "src/anime/world/harbor/real.js",
+    "docs/anime/landmarks/*.md (the sheets list every URL)"
+   ]
+  },
+  {
+   "id": "landmark-refs-b",
+   "name": "Civic landmark references: 気仙沼市 (new city hall design, 亀山通信, the welcome terminal), JR / Wikipedia (the station), hospital and museum pages; Wikimedia Commons photos as shape and colour references only",
+   "url": "https://www.kesennuma.miyagi.jp/",
+   "licence": "facts (dimensions, dates, positions) cited from the pages below; no text or image is copied into the app",
+   "attribution": "see docs/anime/landmarks/*.md and src/anime/world/landmarks/sites.js",
+   "usedFor": [
+    "新庁舎 (under construction, 田中): S, B1 + 4F, 24.75 m, 3,343.56 m² building area, office box 45.35 x 54.55 m, 1FL T.P. 9.45, the site plan and elevations, completion October 2027 (気仙沼市 実施設計説明書 概要版 2024-09 https://www.kesennuma.miyagi.jp/sec/s014/shinntyousya/jissi-sekkei/jissisekkei_gaiyou.pdf; https://www.kensetsu-sinbun.co.jp/miyagi/article/bukken-area3/11771/)",
+    "亀山テラス360° and the monorail: 409 m, 2 cars x 20, 6-7 min, 亀山駐車場 (92 cars), the summit station, café + toilets, the terraces and sofas, the kept rest houses, the overview map R7.10.10 (気仙沼市 亀山通信 3/5/7 https://www.kesennuma.miyagi.jp/sec/s085/20230221104302.html; https://kesennuma-kanko.jp/kameyama/; https://imakawa.net/blog/7490.html; https://www.jcpress.co.jp/wp01/?p=34115)",
+    "気仙沼大島ウェルカム・ターミナル: timber, one storey, 468.29 m², the terrace (https://www.kesennuma.miyagi.jp/sec/s081/20200319093408.html)",
+    "気仙沼駅: one storey, the five-arch arcade, the swordfish roof mural, the lighthouse welcome tower (https://ja.wikipedia.org/wiki/気仙沼駅; Commons 'JR East Kesennuma Station building, Miyagi Pref.jpg', 'Kesennuma station Front.JPG', reference only)",
+    "市役所 本庁舎 / 第二庁舎 / ワン・テン庁舎 (Commons 'Kesennuma City Hall 01.JPG' and the 2026 photos, reference only; OSM levels and start dates)",
+    "リアス・アーク美術館: 石山修武 1994, 3 levels, the aluminium skin and the pink pods (https://www.smma.jp/contents/rias-ark01/; Commons 'Riasu ark museum.jpg', reference only)",
+    "気仙沼市立病院: 7F legal / 6 storeys + B1, 8,174 m² footprint, heliport (https://www.kesennuma-hospital.jp/introduction/summary/)",
+    "気仙沼小学校: the concrete stair cylinder, the barrel-roofed gym (Commons 'Kesennuma city Kesennuma elementary school 202509.jpg', reference only)"
+   ],
+   "files": [
+    "src/anime/world/landmarks/*.js",
+    "docs/anime/landmarks/*.md"
+   ]
+  },
+  {
+   "id": "explore-refs",
+   "name": "Explore package references (src/anime/world/explore): the street data of the far core and the two walk-in interiors",
+   "url": "https://kesennuma-uoichiba.jp/tourroute/",
+   "licence": "facts (layout, floors, what visitors see) cited from the pages below; no text or image is copied into the app. Street data: GSI optimal_bvmap-v1 (RdCL, RdEdg, BldA) and OSM, as above",
+   "attribution": "出典：国土地理院 · © OpenStreetMap contributors",
+   "usedFor": [
+    "data/anime/explore.json: every GSI road centre-line of the far core at 0.1 m with the width measured from the GSI road edges (alleys included), OSM road names; the real GSI footprint of every far core lot (scripts/anime/build-explore.js)",
+    "27 more real places for the tour, the places list, search and labels: OSM names / GSI annotations and their positions (data/anime/layout.json PLACES)",
+    "魚市場 C棟 visitors' side: the 2F 水産情報等発信施設 with the three-screen theatre (longline tuna fishing) and the electric forklift, the 1F and 2F viewing of the swordfish landings and auction (https://kesennuma-uoichiba.jp/tourroute/; https://kesennuma-kanko.jp/uoishiba_suisanhasshin/; https://4travel.jp/dm_shisetsu/11296910)",
+    "気仙沼図書館: RC 3 storeys, 笹が陣3-30, the junior high to the west and the elementary school to the north, opened 2018-03-31 (https://current.ndl.go.jp/car/35776)",
+    "男山本店 魚町店舗: 1930, 木筋コンクリート造 3 storeys, 173 m², washed-aggregate walls, moulded bands at every floor, parapet with pilasters, balustrade and gable; rebuilt 2020; 1F shop and tasting counter; the brewery's labels 蒼天伝, 美禄, 男山 (https://online.bunka.go.jp/heritages/detail/138818; https://kesennuma-kanko.jp/otokoyama-new2020/; https://www.tohokukanko.jp/attractions/detail_1009337.html; https://www.kesennuma.co.jp/)"
+   ],
+   "files": [
+    "data/anime/explore.json",
+    "src/anime/world/explore/places.js",
+    "src/anime/world/explore/interiors.js"
+   ]
+  },
+  {
+   "id": "polish2-refs",
+   "name": "Polish round 2 references: the 2026 timetables of 気仙沼駅 (JR 大船渡線 to 一ノ関, 大船渡線BRT to 盛, 気仙沼線BRT to 前谷地 / 本吉) for the waiting-hall departure board; bare gravel lots south of 海の市 traced on the GSI seamless aerial photo",
+   "url": "https://transit.yahoo.co.jp/timetable/21022",
+   "licence": "facts (departure times and destinations) only; the aerial tracing as for gsi-photo",
+   "attribution": "時刻：JR東日本の時刻表（Yahoo!路線情報 21022/470・/7751・/490、駅探 167-13、2026-09-30 閲覧）; 出典：国土地理院 全国最新写真（シームレス）を加工して作成",
+   "usedFor": [
+    "the departure board over the ticket gates (src/anime/world/landmarks/station.js)",
+    "gravel lots in src/anime/world/landuse_aerial.js"
+   ],
+   "files": [
+    "src/anime/world/landmarks/station.js",
+    "src/anime/world/landuse_aerial.js"
+   ]
+  },
+  {
+   "id": "polish3-refs",
+   "name": "Polish round 3 references: temple halls, the 五十鈴神社 torii, the quay aprons, the forest colour, the civic hall, two height references",
+   "url": "https://maps.gsi.go.jp/development/ichiran.html#seamlessphoto",
+   "licence": "facts only; the aerial photo as for gsi-photo, OSM as for osm",
+   "attribution": "出典：国土地理院 全国最新写真（シームレス） · © OpenStreetMap contributors",
+   "usedFor": [
+    "the 8 mid-zone temple buildings (GSI facility 寺院: 観音寺, 法玄寺, 青龍禅寺 and the halls round them) as 入母屋 halls with the roof colour of the z18 photo; 観音寺 (天台宗 海岸山, 本町1-4-16, https://ja.wikipedia.org/wiki/観音寺_(気仙沼市))",
+    "五十鈴神社's torii at the foot of the stair (z18 photo: the grove edge and the stair at 345-347, -145), off the footway OSM/GSI r12723",
+    "the quay aprons of 港町 and 魚市場前 are concrete and asphalt (z18 photo): grass within 25 m of a quay or seawall on low ground is painted as paving",
+    "the hills' canopy colour (#3d6b3f / #2f5634) and 3D trees out to 1.5 km and on 亀山 (z18 / z15 photos)",
+    "気仙沼市民会館 at OSM relation 12442922 (community_centre), not at the GSI annotation point on the junior high school",
+    "気仙沼郵便局: flat roof (z18 photo), OSM building:levels 4; 気仙沼ハリストス正教会: nave ridge 10.1 m, cross 14.7 m (no published height; rebuilt 1933, https://www.orthodoxjapan.jp/annai/h-kesennuma.html)",
+    "road carriageways from OSM width / lanes x 3.0 m where tagged (the GSI edges measure the whole road reserve)"
+   ],
+   "files": [
+    "src/anime/world/landmarks/temples.js",
+    "src/anime/world/harbor/shinmei.js",
+    "scripts/anime/build-landcover.js",
+    "scripts/anime/build-trees.js",
+    "src/anime/world/explore/places.js",
+    "src/anime/world/lotfix.js",
+    "scripts/anime/enrich/fold.js",
+    "docs/anime/landmarks/landmarks.json"
+   ]
+  }
+ ]
+}

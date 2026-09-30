@@ -89,7 +89,7 @@ function createRegistry(ctx) {
       if (nav.starboard) add(nav.starboard, '#3dff8a', 0.45, 2.2, 'night');
       if (nav.mast) add(nav.mast, '#fff4e0', 0.5, 2.4, 'night');
       if (nav.stern) add(nav.stern, '#fff4e0', 0.4, 1.8, 'night');
-      for (const d of o.deck || []) add(d, '#ffd9a0', 0.7, 1.8, 'lamps');
+      for (const d of o.deck || []) add(d, '#ffd9a0', 0.7, 1.2, 'lamps');   // [v4:polish2] 1.8 blew out into white blobs
       if (o.lampRow) { const { from, to, n = 8 } = o.lampRow; for (let i = 0; i < n; i++) { const t = n > 1 ? i / (n - 1) : 0; add([from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t, from[2] + (to[2] - from[2]) * t], '#f4ffe6', 0.55, 2.6, 'lamps'); } }
       const h = { obj, items, on: o.on ?? 1, setOn(v) { h.on = v; } };
       boats.push(h); return h;

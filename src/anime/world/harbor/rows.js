@@ -97,27 +97,39 @@ export function rowDist(x, z, rows = MOORING_ROWS) {
 }
 
 // ---------------------------------------------------------------------------------------------- [v3:polish] 養殖筏
-// A line of aquaculture rafts (カキ・ホタテ筏) moored across the south side of the inner bay: bamboo lattices on rows
-// of black floats, an orange marker buoy at each end of the line, anchor lines slanting into the water. Static geometry
-// (batched with the harbour, ~2k triangles in all). Every raft corner is checked on water, 8 m clear of the shore.
+// Aquaculture rafts (カキ・ホタテ筏): bamboo lattices on rows of black floats, an orange marker buoy at each end of a
+// row, anchor lines slanting into the water. Static geometry (batched with the harbour, ~400 triangles a raft). Every
+// raft corner is checked on water, 8 m clear of the shore.
+// [v4:polish1] Only where the aerial photo shows them. The v3 line of five rafts in the middle of the 内湾 was invented:
+// the GSI z18 photo (data/ortho/core.jpg) shows open water there, and the inner bay is a working port basin. The GSI
+// z15 photo (data/ortho/city.jpg, 4.2 m/px) shows two raft fields outside the basin, in the channel south of 朝日町 off
+// the 波路上 breakwater: dark blocks in rows ~30 m apart. RAFT_FIELDS are those blocks, measured on a 100 m grid
+// (±10 m); rows run east-west, the lattices' long side north-south.
+export const RAFT_FIELDS = [
+  { id: 'southA', x0: 1510, x1: 1730, z0: 3598, z1: 3690, cols: 8, rows: 4 },
+  { id: 'southB', x0: 1520, x1: 1790, z0: 3905, z1: 4040, cols: 9, rows: 5 },
+];
+export const RAFT = { w: 9, len: 15 };
+/** @deprecated [v4:polish1] the v3 inner-bay line (not on the aerial photo); kept for the tests' negative check */
 export const RAFT_LINE = { a: [196, 30], b: [300, 14], n: 5, w: 9, len: 15 };
-export function planRafts(isWater, line = RAFT_LINE) {
-  const [ax, az] = line.a, [bx, bz] = line.b, dx = bx - ax, dz = bz - az, l = Math.hypot(dx, dz), ux = dx / l, uz = dz / l;
-  const yaw = Math.atan2(ux, uz), out = [];
-  for (let i = 0; i < line.n; i++) {
-    const t = line.n > 1 ? i / (line.n - 1) : 0.5, x = ax + dx * t, z = az + dz * t;
-    const ok = [[1, 1], [1, -1], [-1, 1], [-1, -1], [0, 0]].every(([s1, s2]) => {
-      const cx = x + ux * s1 * (line.len / 2 + 8) + uz * s2 * (line.w / 2 + 8), cz = z + uz * s1 * (line.len / 2 + 8) - ux * s2 * (line.w / 2 + 8);
-      return isWater(cx, cz);
-    });
-    if (ok) out.push({ x, z, yaw });
+export function planRafts(isWater, fields = RAFT_FIELDS) {
+  const out = [], { w, len } = RAFT;
+  for (const f of fields) for (let r = 0; r < f.rows; r++) {
+    const z = f.rows > 1 ? f.z0 + (f.z1 - f.z0) * r / (f.rows - 1) : (f.z0 + f.z1) / 2;
+    const row = [];
+    for (let c = 0; c < f.cols; c++) {
+      const x = f.cols > 1 ? f.x0 + (f.x1 - f.x0) * c / (f.cols - 1) : (f.x0 + f.x1) / 2;
+      const ok = [[1, 1], [1, -1], [-1, 1], [-1, -1], [0, 0]].every(([s1, s2]) => isWater(x + s2 * (w / 2 + 8), z + s1 * (len / 2 + 8)));
+      if (ok) row.push({ x, z, yaw: 0, field: f.id, row: r });
+    }
+    out.push(...row);
   }
   return out;
 }
 export function buildRafts(ctx, opts = {}) {
-  const plan = planRafts(opts.isWater || ctx.L.isWater, opts.line || RAFT_LINE);
+  const plan = planRafts(opts.isWater || ctx.L.isWater, opts.fields || RAFT_FIELDS);
   if (!plan.length) return { rafts: 0 };
-  const { w, len } = opts.line || RAFT_LINE;
+  const { w, len } = RAFT;
   const bamboo = ctx.mat.toon('#c9b27a', { paint: 0.06 }), bamboo2 = ctx.mat.toon('#b39b66', { paint: 0.06 });
   const floatM = ctx.mat.toon('#474d5e', { paint: 0.02 }), marker = ctx.mat.toon('#ee7a3a', { paint: 0.03 }), rope = ctx.mat.toon('#d8cba2', { paint: 0 });
   for (const p of plan) {
@@ -133,9 +145,11 @@ export function buildRafts(ctx, opts = {}) {
     // hanging lines (the culture ropes) show as short pale stubs at the crossbars
     for (let j = 1; j < nb; j += 2) for (let q = -1; q <= 1; q += 2) k.box(0.04, 0.5, 0.04, rope, [q * w * 0.12, 0.12, -len / 2 + j * (len / nb)]);
   }
-  // orange marker buoys and anchor lines at both ends of the line
-  const first = plan[0], last = plan[plan.length - 1], kk = ctx.kit(ctx.staticRoot);
-  for (const [p, s] of [[first, -1], [last, 1]]) {
+  // orange marker buoys and anchor lines at both ends of every row (along the lattice's long side, north and south)
+  const kk = ctx.kit(ctx.staticRoot), ends = [];
+  const rows = new Map(); for (const p of plan) { const k = p.field + ':' + p.row; if (!rows.has(k)) rows.set(k, []); rows.get(k).push(p); }
+  for (const row of rows.values()) { ends.push([row[0], -1], [row[row.length - 1], 1]); }
+  for (const [p, s] of ends) {
     const fx = Math.sin(p.yaw), fz = Math.cos(p.yaw), x = p.x + fx * s * (len / 2 + 6), z = p.z + fz * s * (len / 2 + 6);
     if (!(opts.isWater || ctx.L.isWater)(x, z)) continue;
     kk.sphere(0.55, marker, [x, 0.25, z], 12);

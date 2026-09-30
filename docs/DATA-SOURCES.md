@@ -1,11 +1,21 @@
 # Data sources, licences and attribution
 
-This page lists everything the v3 app ships or fetches, where it comes from, under which terms, and how it is credited.
+This page lists everything the app ships or fetches, where it comes from, under which terms, and how it is credited.
 
-The app shows this short line on screen and in stills rendered with `?credit=1`. It lives in `data/i18n.json` under
-`v3.attribution`:
+The app shows this short line at the bottom of the screen (with a link to the licence texts) and in stills rendered
+with `?credit=1`. It lives in `data/i18n.json` under `v3.attribution` (JA and EN), and `test/v4-data.test.js` checks
+that every language keeps © OpenStreetMap contributors:
 
-> 出典：国土地理院, 気象庁, 気仙沼漁協 · Sakuragaoka Station (MIT) by Kenton-GMI
+> © OpenStreetMap contributors · 出典：国土地理院, 気象庁, 気仙沼漁協 · Sakuragaoka Station (MIT) by Kenton-GMI
+
+The full map (N) draws OpenStreetMap and GSI data, so it carries its own credit in its bottom-left corner, from
+`layout.credits`:
+
+> © OpenStreetMap contributors (ODbL); 出典：国土地理院（地理院タイル）を加工して作成
+
+[v4] The machine-readable list of every source, its licence and its credit line is `data/anime/sources.json`
+(written by `scripts/anime/enrich/build-enrich.js` from `scripts/anime/enrich/sources.js`). Keep this page and that
+file in step.
 
 The full credit lines below are required wherever the project is published, for example on a web page, in a press
 kit or in a video description.
@@ -28,9 +38,70 @@ kit or in a video description.
   > 出典：国土地理院（地理院タイル）。標高タイル、全国最新写真（シームレス）、最適化ベクトルタイルを加工して作成。
 - The seamless photo page asks for an extra GRUS credit only for tiles inside a small area near 20° N, 136° E. That
   area is outside this project's bbox (38.83–38.99 N, 141.50–141.70 E), so the extra credit does not apply.
-- **What we derived:** every building in the app stands on a real GSI footprint, but its storeys, roof shape, wall
-  colour and shop use are *derived* by our scripts (`scripts/anime/derive.js`) and are not survey data. Roof colours
-  are photo samples snapped to an anime palette.
+- **What we derived:** every building in the app stands on a real GSI footprint. Since v4 each lot records where
+  each value came from in `lot.src` (`osm`, `aerial`, `gsi`, `landmark` or `derived`): real values from OSM and the
+  aerial photo win, and the rest (most storeys, many roof shapes, all pastel wall colours without an OSM colour) are
+  *derived* by `scripts/anime/derive.js` and are not survey data. Measured roof colours are the photo median, white
+  balanced and lightly graded (`lot.roof.photo` keeps the photo value).
+
+## OpenStreetMap: names, uses, land use, rivers, road attributes [v4]
+
+- **Source:** an Overpass API extract of the whole city bbox (38.83–38.99 N, 141.50–141.70 E): every way and relation
+  and every tagged node, with inline geometry. `scripts/anime/enrich/fetch-osm.js` tries the mirrors
+  `overpass.kumi.systems`, `overpass.private.coffee` and `overpass-api.de` in that order; the extract used on
+  2026-09-30 came from kumi.systems with the OSM database state of 2026-05-06 (46,634 elements). It is kept in
+  `raw/osm/overpass.json` (not committed). If every mirror fails, cut the Geofabrik Tohoku extract to the bbox with
+  osmium and save it in the same Overpass JSON form.
+- **Licence:** Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/). `data/anime/enrich.json`,
+  `data/anime/layout.json` and `data/anime/explore.json` are derived databases; the app, the maps and every render built
+  from them are produced works.
+  - A produced work (the app, a screenshot, a still, the film) needs the credit line below where people see it.
+  - The derived databases are share-alike: if they are published or shipped to the public (they are, inside the app's
+    `/data/`), they are offered under the ODbL too. Anyone may take them under the same terms. The rest of the project
+    (code, GSI-derived data) keeps its own terms.
+- **Credit line (required on screen and wherever renders are shown):** `© OpenStreetMap contributors`, linking to
+  https://www.openstreetmap.org/copyright where a link is possible. The on-screen line above includes it.
+- **What we take:** building `building:levels`, `height`, `roof:shape`, `roof:colour`, `building:colour`, names and
+  amenity / shop / tourism tags (matched to the GSI footprints: 33,750 of 54,723 footprints have an OSM outline);
+  named shops and amenities mapped as points inside a building; land use (parks, fields, cemeteries, schoolyards,
+  parking, forest, sport, beaches); rivers and streams with their names (大川, 神山川, 鹿折川, 面瀬川, ...); road names,
+  refs, lanes, one-way and speed limits; traffic signals and crossings; rail; named bridges.
+- Names that refer to the 2011 disaster are never shown (V3-SPEC section 5); `scripts/anime/enrich/fold.js`
+  (`SENSITIVE`) filters them from lot names, places, roads, rivers and land use.
+
+## 国土地理院 Anno (注記) and the aerial photo, per building [v4]
+
+- **GSI Anno** (the annotation layer of the same `optimal_bvmap-v1` tiles): real place names (町名, mountains, capes,
+  islands) and public facility names (市役所, 郵便局, schools, hospitals, shrines and temples). The meaning of each map
+  symbol code comes from GSI's own style file
+  (https://github.com/gsi-cyberjapan/optimal_bvmap/blob/main/style/std.json), saved in
+  `scripts/anime/enrich/gsi-anno-codes.json`. Each facility text is paired with the nearest symbol of its kind.
+- **Aerial photo per footprint** (`scripts/anime/enrich/aerial.js`, GSI seamlessphoto z18 in the core, z17
+  elsewhere): the roof colour (median of the facets), the roof shape class and ridge direction (facet brightness
+  models), rooftop equipment and vegetation cover. The classes are checked against OSM `roof:shape` and hand labels by
+  `scripts/anime/enrich/eval.js`: 35 of 36 calls right (97 % precision). The photo is analysed only; it is not shipped
+  in the anime app.
+
+## How the town uses them, and how accuracy is measured [v4:town-accuracy]
+
+- **Footprints:** hero and mid buildings stand on the real GSI polygon, not its bounding box: flat roofs on the
+  polygon itself, pitched roofs on a rectilinear decomposition (`src/anime/world/town/wings.js`). GSI outlines follow
+  the roof edge on the photo, so walls stand under the eaves (inset by the overhang).
+- **River beds:** the DEM over inland water is an interpolated lid (大川 read 3.3-4.8 m inside the channel against
+  0.5-2 m banks). `scripts/anime/build-grids.js` carves every inland-water cell 2 m under its lowest bank (never below
+  -1.5 m); `town/rivers.js` draws the water 1.2 m under the bank, aligned with the GSI water area.
+- **Trees:** `scripts/anime/build-trees.js` read the forest mask as one byte per pixel from a 3-channel PNG, which
+  scattered trees over the wrong pixels (207 on the 気仙沼小 / 中学校 playing fields). It now reads channel 0 per pixel
+  and keeps OSM pitches, car parks, fields and building sites clear.
+- **Audit truth** (`tools/anime/accuracy.mjs`, V3-SPEC section 10): GSI footprints (building IoU), the GSI z18 photo in
+  `data/ortho/core.jpg` with the per-roof relief offset of `aerial.js` (roof CIEDE2000), OpenStreetMap highways
+  (road overlap; an independent source from the GSI centre lines the streets are built on) and
+  `docs/anime/landmarks/landmarks.json` (landmark positions), plus OSM `height` / `building:levels` and the sheets for
+  heights. Results: `dist/qa4/accuracy.json`; the latest figures are in the README's Accuracy section. The truth data
+  are independent of what they check only in part: the buildings stand on the same GSI footprints the IoU is measured
+  against, so the IoU measures how faithfully the town is built on them (walls under the eaves, wings, landmarks
+  replacing lots), not the footprints themselves. The roads are built on GSI and checked against OSM, which is
+  independent.
 
 ## 気象庁 (JMA): weather and tide
 
@@ -69,10 +140,30 @@ kit or in a video description.
 - **Labelling:** anything built from these files is flagged `sample: true`, and the UI labels it **サンプル**. Nothing
   from a fixture is ever labelled live. Regenerate the browser fallback with `bun run scripts/live/snapshot.js`.
 
+## Reference pages and photos for landmarks and interiors [v4]
+
+Each landmark has a reference sheet in `docs/anime/landmarks/` (`README.md` is the index, `AUDIT.md` the accuracy audit
+of the sheets, `landmarks.json` the machine-readable reference points and heights). Every sheet lists its sources with
+URLs. They are grouped in `data/anime/sources.json` as `landmark-refs`, `landmark-refs-b`, `explore-refs`,
+`polish2-refs` and `polish3-refs`:
+
+- **Official and engineering pages** give the dimensions: 気仙沼市 (the new city hall design summary, 亀山通信, the
+  welcome terminal), the bridge designers and 宮城県 (かなえ大橋 and 大島大橋), the fish market's history and tour pages,
+  文化遺産オンライン (the heritage shops of 魚町), and the tourism pages of kesennuma-kanko.jp.
+- **Photos** from Wikimedia Commons and public tourism pages were used only as references for shape, colour and
+  proportion. None is copied into the app.
+- **The station's departure board** shows the next weekday departures from the 2026 JR East timetables (read on
+  Yahoo!路線情報 and 駅探 on 2026-09-30). Only times and destinations are used.
+- **The client's scale-model photos** (`raw/photos`, not committed) of the inner-bay model were compared with 浮見堂,
+  神明崎, PIER7 and 亀山. They are not shipped.
+
+Facts (dimensions, dates, positions) are cited from these pages; no text or image from them is shipped.
+
 ## Place facts
 
 - **Tour stops:** `data/landmarks.json` places each stop from the aerial photo and the DEM. Its `verified` field
-  records how each position was checked.
+  records how each position was checked. The 44 more places (17 civic landmarks, 27 places in town) take their names
+  and positions from OSM and GSI Anno, and the audit checks 15 landmark positions against `docs/anime/landmarks/landmarks.json`.
 - **Bridge dimensions** come from the pages below. The deck heights (Kanae 34 m, Oshima 30 m) are estimates.
   - かなえ大橋: 360 m main span, 1,344 m total, inverted-Y pylons about 100 m tall
     ([Wikipedia](https://ja.wikipedia.org/wiki/%E6%B0%97%E4%BB%99%E6%B2%BC%E6%B9%BE%E6%A8%AA%E6%96%AD%E6%A9%8B),
@@ -80,9 +171,11 @@ kit or in a video description.
   - 大島大橋: 297 m arch span, 356 m total
     ([Wikipedia](https://ja.wikipedia.org/wiki/%E6%B0%97%E4%BB%99%E6%B2%BC%E5%A4%A7%E5%B3%B6%E5%A4%A7%E6%A9%8B),
     [宮城県](https://www.pref.miyagi.jp/site/oshimakakyozigyo/kakyouhontai.html)).
-- **Shops and companies:** every shop and company name in the town is fictional (`src/anime/world/town/names.js`).
-  `test/v3-town.test.js` checks the names against a blocklist of real brands. Only real *place* names appear as
-  signage: 気仙沼, 魚市場, 浮見堂, 五十鈴神社, and town names such as 八日町.
+- **Shops and companies:** a lot that OSM or GSI Anno names carries its real name in `lot.name` (with `lot.use`, e.g.
+  `shop:seafood`), and its signs show that name (`src/anime/world/town/realnames.js`). Names of administrative
+  buildings (共同化建物, 旧..., JV) and names that refer to the 2011 disaster are dropped. Every other shop takes a name
+  from the town's fictional catalogue (`src/anime/world/town/names.js`), chosen for its trade;
+  `test/v3-town.test.js` checks that catalogue against a blocklist of real brands.
 
 ## Code, engine and fonts
 
@@ -96,7 +189,7 @@ kit or in a video description.
 | Noto Sans JP, Noto Serif JP, Zen Maru Gothic, Yusei Magic, Yuji Syuku | SIL Open Font License 1.1 | loaded from Google Fonts at runtime (`src/anime/index.html`) |
 | This project's own code | MIT (`package.json`) | the repo has no root LICENSE file yet. The build copies the Sakuragaoka Station and three.js licence texts to `dist/licenses/`, and the in-app credit links to them. |
 
-## Not used by v3
+## Not shipped
 
 - `raw/ref/` holds the look references: Sakura Crossing and Sakuragaoka Station frames, the promo sheet, and Google
   Earth screenshots of Kesennuma. They are only for comparison. `raw/` is not committed, and nothing from these
