@@ -9,6 +9,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const PAGE = 4096, PAD = 6, MAXTILE = 2048;
+/** [v4:phone] Atlas limits for every batchStatic call (main.js sets the phone tier's: pages <= 2048, tiles <= 512). */
+export const ATLAS = { page: PAGE, tileMax: MAXTILE };
 
 function uvInUnit(g) {
   const uv = g.attributes.uv; if (!uv) return false;
@@ -25,32 +27,49 @@ function atlasableTex(t) {
   return true;
 }
 
-function buildAtlas(textures) {
+// [v4:phone] Shelf packing of the tiles (w, h already scaled) into square pages of side S: the page count.
+export function shelfPages(list, S) {
+  let pages = 1, x = 0, y = 0, shelf = 0;
+  for (const it of list) {
+    const W = it.w + PAD * 2, H = it.h + PAD * 2;
+    if (W > S || H > S) return Infinity;
+    if (x + W > S) { x = 0; y += shelf; shelf = 0; }
+    if (y + H > S) { pages++; x = 0; y = 0; shelf = 0; }
+    x += W; shelf = Math.max(shelf, H);
+  }
+  return pages;
+}
+
+/** Pack canvas textures into atlas pages. [v4:phone] A page is the smallest power of two (256 .. `page`) that holds
+ *  every tile, so a boat's few name plates no longer take a whole 4096² page (10 arriving boats held ~0.9 GB of
+ *  texture); `tileMax` scales tiles down to at most that many pixels on a side (the phone tier: 512). */
+function buildAtlas(textures, { page: PAGE_MAX = PAGE, tileMax = MAXTILE } = {}) {
   // shelf packing, tallest first
-  const list = [...textures].map(t => ({ t, w: t.image.width, h: t.image.height })).sort((a, b) => b.h - a.h || b.w - a.w);
+  const list = [...textures].map((t) => { const k = Math.min(1, tileMax / Math.max(t.image.width, t.image.height)); return { t, w: Math.max(1, Math.round(t.image.width * k)), h: Math.max(1, Math.round(t.image.height * k)) }; }).sort((a, b) => b.h - a.h || b.w - a.w);
+  let S = 256; while (S < PAGE_MAX && shelfPages(list, S) > 1) S *= 2;
   const pages = []; const map = new Map();
   let page = null, x = 0, y = 0, shelf = 0;
-  const newPage = () => { const c = document.createElement('canvas'); c.width = PAGE; c.height = PAGE; page = { canvas: c, g: c.getContext('2d'), used: 0 }; pages.push(page); x = 0; y = 0; shelf = 0; };
+  const newPage = () => { const c = document.createElement('canvas'); c.width = S; c.height = S; page = { canvas: c, g: c.getContext('2d'), used: 0 }; pages.push(page); x = 0; y = 0; shelf = 0; };
   for (const it of list) {
     const W = it.w + PAD * 2, H = it.h + PAD * 2;
     if (!page) newPage();
-    if (x + W > PAGE) { x = 0; y += shelf; shelf = 0; }
-    if (y + H > PAGE) { newPage(); }
+    if (x + W > S) { x = 0; y += shelf; shelf = 0; }
+    if (y + H > S) { newPage(); }
     const px = x + PAD, py = y + PAD;
     try {
       page.g.drawImage(it.t.image, px - PAD, py - PAD, it.w + PAD * 2, it.h + PAD * 2); // stretched gutter
       page.g.drawImage(it.t.image, px, py, it.w, it.h);
     } catch (e) { continue; }
-    map.set(it.t, { page: pages.length - 1, u0: px / PAGE, v0: 1 - (py + it.h) / PAGE, su: it.w / PAGE, sv: it.h / PAGE });
+    map.set(it.t, { page: pages.length - 1, u0: px / S, v0: 1 - (py + it.h) / S, su: it.w / S, sv: it.h / S });
     x += W; shelf = Math.max(shelf, H); page.used++;
   }
-  const texs = pages.map(p => { const t = new THREE.CanvasTexture(p.canvas); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.needsUpdate = true; return t; });
+  const texs = pages.map(p => { const t = new THREE.CanvasTexture(p.canvas); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.userData.atlas = true; t.needsUpdate = true; return t; });
   return { map, texs };
 }
 
 function sideName(m) { return m.side === THREE.DoubleSide ? 'double' : m.side === THREE.BackSide ? 'back' : 'front'; }
 
-export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, farR = 150, center = [0, 10] } = {}) {   // [v3:integrate] center: the play area (Kesennuma: the hero zone)
+export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, farR = 150, center = [0, 10], atlas: atlasOpts = ATLAS } = {}) {   // [v3:integrate] center: the play area (Kesennuma: the hero zone)
   root.updateMatrixWorld(true);
   const box = new THREE.Box3(), c = new THREE.Vector3();
   const cand = [];
@@ -73,7 +92,7 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
   }
   // texture must be atlasable for ALL its users, otherwise keep it separate
   if (mat) for (const o of cand) { const m = o.material; if (m.map && atlasTex.has(m.map) && !uvOk.get(o.geometry)) atlasTex.delete(m.map); }
-  const atlas = atlasTex.size ? buildAtlas(atlasTex) : { map: new Map(), texs: [] };
+  const atlas = atlasTex.size ? buildAtlas(atlasTex, atlasOpts) : { map: new Map(), texs: [] };
 
   // ---- group
   const groups = new Map(); const shared = new Map();
@@ -187,7 +206,7 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
   root.add(out);
   root.traverse((o) => { if (!o.userData.dynamic) o.updateMatrix(); });
   const hist = {};
-  for (const [, grp] of groups) { const m = grp.mat; let k = m.type; if (m.map) k += m.map.image && m.map.image.width === PAGE ? '+atlas' : '+map'; if (m.transparent) k += '+tr'; if (m.alphaTest) k += '+at'; hist[k] = (hist[k] || 0) + 1; }
+  for (const [, grp] of groups) { const m = grp.mat; let k = m.type; if (m.map) k += m.map.userData?.atlas ? '+atlas' : '+map'; if (m.transparent) k += '+tr'; if (m.alphaTest) k += '+at'; hist[k] = (hist[k] || 0) + 1; }
   const nonAtlas = {}; for (const o of cand) { const m = o.material; if (m.map && !atlas.map.has(m.map)) { const r = !atlasableTex(m.map) ? 'tex:' + (m.map.wrapS !== THREE.ClampToEdgeWrapping ? 'wrap' : m.map.repeat.x !== 1 || m.map.repeat.y !== 1 ? 'repeat' : (m.map.image && (m.map.image.width > MAXTILE || m.map.image.height > MAXTILE)) ? 'big' : 'other') : 'uv'; nonAtlas[r] = (nonAtlas[r] || 0) + 1; } }
   return { merged, sources, sharedMaterials: shared.size, atlasTextures: atlas.map.size, atlasPages: atlas.texs.length, groupsByKind: hist, nonAtlasReasons: nonAtlas };
 }

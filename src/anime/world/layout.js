@@ -101,6 +101,7 @@ function expandFar(F) {
 function hashId(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0; return h >>> 0; }
 /** hero + mid lots first (full footprint poly), then far lots (poly = the OBB). */
 export const LOTS = D.lots.concat(expandFar(D.farLots));
+D.farLots.rows = null;   // [v4:phone] the packed rows are garbage once expanded (layout.js keeps D alive: ~20 MB)
 const lotMap = new Map(LOTS.map((l) => [l.id, l]));
 // [v4:polish1] reference corrections (the Plaza Hotel on its bluff, the station's name): world/lotfix.js
 for (const id of Object.keys(LOT_FIX)) { const l = lotMap.get(id); if (l) applyLotFix(l); }

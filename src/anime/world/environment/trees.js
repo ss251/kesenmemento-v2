@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import * as L from '../layout.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { PHONE } from '../../core/tier.js';   // [v4:phone]
 
 function paint(geo, fn) {
   const p = geo.attributes.position, c = new Float32Array(p.count * 3), col = new THREE.Color();
@@ -150,11 +151,17 @@ function farBroadGeometry() {
   return paint(m, (x, y, z, c) => { const t = Math.min(1, Math.max(0, (y - 0.23) / 0.74)); c.copy(lin(BROAD_LO)).lerp(lin(BROAD_HI), t * 0.9); });
 }
 /** Distance (m) inside which a tree draws with the full model, per quality tier. */
-export const TREE_NEAR = { high: 380, medium: 300, low: 200 };
+export const TREE_NEAR = { high: 380, medium: 300, low: 200, phone: PHONE.treeNear };
 
 export async function buildTrees(ctx, lc) {
   const data = await L.loadData('trees.json').catch(() => null);
   if (!data) return null;
+  // [v4:phone] beyond PHONE.treeNear2 of the hero centre, one tree in ~3 (deterministic): the forest crowns are painted on
+  // the ground, so the slopes keep their look; 25,000 instanced trees cost ~0.5 M triangles a frame over the passes
+  if (ctx.quality?.phone) {
+    const H = L.ZONES.hero, r2 = PHONE.treeNear2 * PHONE.treeNear2;
+    data.rows = data.rows.filter((r, i) => { const dx = r[0] - H.cx, dz = r[1] - H.cz; return dx * dx + dz * dz < r2 || ((i * 2654435761) >>> 0) / 4294967296 < PHONE.treeFarKeep; });
+  }
   const geos = [cedarGeometry(), broadGeometry(), broadGeometry()];
   const farGeos = [farCedarGeometry(), farBroadGeometry(), farBroadGeometry()];
   const counts = [0, 0, 0];
@@ -189,7 +196,7 @@ export async function buildTrees(ctx, lc) {
     g.add(m);
   }
   ctx.add(g);
-  const nearR = TREE_NEAR[ctx.quality?.name] || TREE_NEAR.high;
+  const nearR = TREE_NEAR[ctx.quality?.phone ? 'phone' : ctx.quality?.name] || TREE_NEAR.high;
   const last = { x: 1e9, z: 1e9 }, stats = { trees: data.rows.length, tris: 0, near: 0, far: 0 };
   const triCount = (geo) => (geo.index ? geo.index.count : geo.attributes.position.count) / 3;
   /** Split the trees into near (full model) and far (crown) round (cx, cz). */

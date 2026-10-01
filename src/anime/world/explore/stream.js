@@ -36,6 +36,7 @@ export const RADII = {
   high: { l0: 95, l1: 620, budget: 4.0, still: 2.5 },   // [v4:polish2] still: budget x while the camera stands still
   medium: { l0: 75, l1: 500, budget: 3.2, still: 1.5 },
   low: { l0: 45, l1: 360, budget: 2.4 },
+  phone: { l0: 40, l1: 240, budget: 2.0 },   // [v4:phone]
 };
 const HYST = 70;   // a tile unloads this much farther out than it loads
 

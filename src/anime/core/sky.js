@@ -424,7 +424,7 @@ export function createSky(scene, sunDir, quality) {
   function setView(alt) {
     state.alt = alt;
     // shadow box grows with altitude (4096 map: 0.04 m texels on foot, ~0.3 m over the town)
-    const want = Math.min(700, Math.max(quality.shadowSize || 75, 60 + alt * 1.5));
+    const want = Math.min(quality.shadowMax || 700, Math.max(quality.shadowSize || 75, 60 + alt * 1.5));   // [v4:phone] shadowMax
     if (Math.abs(want - S) > S * 0.1) setShadowBox(want);
     // aerial layering: denser haze on foot (hills 1 km away soften), thinner from the drone (whole bay readable)
     const k = 1 / (1 + Math.max(0, alt - 4) / 160);

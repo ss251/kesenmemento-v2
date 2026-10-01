@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import { patchSnow, seasonUniform } from '../../core/season.js';   // [v3:integrate]
 import * as L from '../layout.js';
 import { sharedHardShores } from '../layout/hardshore.js';   // [v3:fix]
+import { PHONE } from '../../core/tier.js';   // [v4:phone]
 
 export const LOD = {
   hero: { cx: 185, cz: -15, half: 460, step: 3.5 },   // edges on the mid grid lines (multiples of 10 from the mid box)
@@ -305,7 +306,8 @@ export function walkPatches(midBox, cityBox, spots = L.TOUR.map((t) => t.walk).f
 // ------------------------------------------------------------------ build
 export function buildTerrain(ctx, mat) {
   const g = new THREE.Group(); g.name = 'env-terrain';
-  const H = LOD.hero, M = LOD.mid;
+  const M = LOD.mid;
+  const H = ctx.quality?.phone ? { ...LOD.hero, step: PHONE.terrainStep } : LOD.hero;   // [v4:phone] 920 / 5: still on the mid grid lines
   const heroBox = { x0: H.cx - H.half, x1: H.cx + H.half, z0: H.cz - H.half, z1: H.cz + H.half };
   const midBox = { x0: M.cx - M.half, x1: M.cx + M.half, z0: M.cz - M.half, z1: M.cz + M.half };
   const add = (geo, name) => { const mesh = new THREE.Mesh(geo, mat); mesh.name = name; mesh.receiveShadow = true; mesh.castShadow = false; g.add(mesh); return mesh; };

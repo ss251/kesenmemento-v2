@@ -20,7 +20,7 @@ const CURB = 0.15;
 const UP = [0, 1, 0];
 const FOOT = new Set(['footway', 'path', 'pedestrian', 'steps', 'cycleway']);   // [v4:polish3] OSM highway kinds without car markings
 
-export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = null }) {
+export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = null, step: stepHM = [2.0, 4.0] }) {   // [v4:phone] step: drape sampling, hero / mid
   const { L, mat, physics } = ctx;
   const root = new THREE.Group(); root.name = 'town-streets';
   const T = makeStreetTextures(ctx);
@@ -91,7 +91,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
   let asphaltLen = 0;
   for (const r of roads) {
     const hero = r.zone === 'hero';
-    const step = hero ? 2.0 : 4.0;
+    const step = hero ? stepHM[0] : stepHM[1];
     const S = resample(r.pts, step);
     if (S.length < 2) continue;
     const hw = r.width / 2, sw = sidewalkOf(r), cw = hero ? hw - sw : (carriageHalf(r) ?? hw);

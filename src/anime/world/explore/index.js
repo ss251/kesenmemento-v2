@@ -56,7 +56,7 @@ export async function build(ctx) {
     for (const tl of tiles.values()) for (const l of tl.far) farCore.push(l);
     const real2 = makeRealNames(ctx, farCore, { key: 'explore-realnames-' });
     t = lap('index', t);
-    const stream = createStream(ctx, { tiles, kit, farTown: ctx.services.farTown, lotIdx, roadIdx, real2, quality: ctx.quality?.name || 'high' });
+    const stream = createStream(ctx, { tiles, kit, farTown: ctx.services.farTown, lotIdx, roadIdx, real2, quality: ctx.quality?.phone ? 'phone' : ctx.quality?.name || 'high' });   // [v4:phone] its own radii
     api.stream = stream;
     for (const tl of tiles.values()) { try { stream.buildBase(tl); } catch (e) { console.warn('[explore] base', tl.key, e); } }
     stream.flush();

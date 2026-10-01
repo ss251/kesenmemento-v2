@@ -20,7 +20,7 @@ const DECKS = ['#5f9e7c', '#6aa58a', '#879e93', '#5f9e7c', '#7fae9a', '#8fa39a']
  * Plan the stern-to rows (pure; no three.js): every boat is checked hull-corner by hull-corner against isWater and
  * skipped where the water is too narrow. rng(seed) must be a seeded PRNG factory (ctx.rng / mulberry32).
  * Returns [{ row, type, x, z, rotY, dx, dz, qx, qz, top, deck, deckLit, flags, seed }].
- * opts: rows (MOORING_ROWS), isWater, heightAt, max (per row), lite (quality low: every other boat).
+ * opts: rows (MOORING_ROWS), isWater, heightAt, max (per row), lite (quality low: every other boat; a number n: one boat in n, the phone tier).
  */
 export function planMooringRows(rng, opts = {}) {
   const isWater = opts.isWater || (() => true);
@@ -37,9 +37,11 @@ export function planMooringRows(rng, opts = {}) {
     const top = opts.heightAt ? Math.max(1.5, opts.heightAt(mx - nx * 4, mz - nz * 4)) : 2.2;
     let s = row.from, i = 0, n = 0;
     while (s <= Math.min(row.to, len) && n < (opts.max ?? 40)) {
-      const type = TYPES[(i + r.int(0, 2)) % TYPES.length], S = BOAT_SPECS[type];
+      let type = TYPES[(i + r.int(0, 2)) % TYPES.length];
+      if (typeof opts.lite === 'number' && type === 'sanma') type = 'maguro';   // [v4:phone] no 35 k-triangle saury boats
+      const S = BOAT_SPECS[type];
       i++;
-      if (opts.lite && i % 2) { s += row.pitch; continue; }
+      if (opts.lite && i % (opts.lite === true ? 2 : opts.lite)) { s += row.pitch; continue; }
       const skew = row.skew + r.range(-0.035, 0.035);
       const c = Math.cos(skew), sn = Math.sin(skew);
       const dx = nx * c - nz * sn, dz = nx * sn + nz * c;              // bow direction (outward, slightly skewed)

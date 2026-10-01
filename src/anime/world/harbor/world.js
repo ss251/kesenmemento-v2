@@ -30,6 +30,7 @@ import { buildMinami } from './minami.js';
 import { buildAnba4 } from './anba.js';
 import { buildKazemachi } from './kazemachi.js';   // [v4:polish1] 風待ち地区: 角星店舗, 武山米店
 import { buildPlazaHotel } from './plaza.js';   // [v4:polish1] 気仙沼プラザホテル on the 柏崎 bluff
+import { PHONE } from '../../core/tier.js';   // [v4:phone]
 
 const D2 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 
@@ -110,6 +111,7 @@ export function buildHarbor(ctx, opts = {}) {
   const SP = L.SPOTS || {};
   const out = { quays: [], boats: [], perches: [], seats: [], berths: [], stats: {} };
   const low = ctx.quality?.name === 'low';
+  const phone = !!ctx.quality?.phone;   // [v4:phone] fewer moored boats (each is ~4-6 k triangles)
 
   // ---- [v4:landmarks-A] the fish market's real parts (SITES): quays in front of them are working quays, no seawall
   const MARKET = [SITES.marketNorth, SITES.marketShed, SITES.marketC, SITES.marketD].map((s) => s.poly);
@@ -178,8 +180,10 @@ export function buildHarbor(ctx, opts = {}) {
   }
 
   // ---- boats: market berths (big boats), inner-bay quays (small boats + a few big ones)
-  const maxBoats = opts.maxBoats ?? (low ? 18 : 64);   // [v3:fix] a full harbour (was 12 / 30: the quays read empty)
-  const marketTypes = ['katsuo', 'katsuo', 'maguro', 'sanma', 'katsuo', 'maguro'];
+  const maxBoats = opts.maxBoats ?? (phone ? PHONE.maxBoats : low ? 18 : 64);   // [v3:fix] a full harbour (was 12 / 30: the quays read empty)
+  // [v4:phone] a saury boat's lamp rows make it ~35 k triangles (a bonito boat ~10 k): the phone moors bonito boats instead
+  const hull = (list) => (phone ? list.map((t) => (t === 'sanma' ? 'katsuo' : t)) : list);
+  const marketTypes = hull(['katsuo', 'katsuo', 'maguro', 'sanma', 'katsuo', 'maguro']);
   for (const bth of out.berths) {
     if (out.boats.length >= maxBoats) break;
     const len = D2(bth.a, bth.b);
@@ -192,7 +196,7 @@ export function buildHarbor(ctx, opts = {}) {
   const SOUTH = { a: [170, 60], b: [398, 101] };   // shared with the hero-run filter below
   if (opts.southQuay !== false) {
     const run = { a: SOUTH.a, b: SOUTH.b }; run.len = D2(run.a, run.b); run.top = 2.2;
-    out.boats.push(...moorRun(ctx, run, ['sanma', 'small', 'maguro', 'small', 'small', 'sanma', 'small', 'katsuo'], r, { fender: 1.0, gap: 4, isWater, max: low ? 4 : 10, raft: 0.4 }));
+    out.boats.push(...moorRun(ctx, run, hull(['sanma', 'small', 'maguro', 'small', 'small', 'sanma', 'small', 'katsuo']), r, { fender: 1.0, gap: 4, isWater, max: phone ? 2 : low ? 4 : 10, raft: 0.4 }));
   }
   const heroRuns = [];
   const southD = (q) => { const m = { x: (q.a[0] + q.b[0]) / 2, z: (q.a[1] + q.b[1]) / 2 }; return segDist(m, SOUTH); };
@@ -200,7 +204,7 @@ export function buildHarbor(ctx, opts = {}) {
   heroRuns.sort((p, q) => q.len - p.len);
   // [v4:polish3] the first street-level frame (HERO.walk, the promenade) had a さんま boat's lamp booms 1-3 m from the eye
   const heroNear = L.HERO?.walk ? [[L.HERO.walk.x, L.HERO.walk.z, 30]] : [];
-  const heroTypes = ['small', 'sanma', 'small', 'small', 'maguro', 'small', 'katsuo', 'small', 'sanma'];   // [v3:fix] more working hulls in the inner bay
+  const heroTypes = hull(['small', 'sanma', 'small', 'small', 'maguro', 'small', 'katsuo', 'small', 'sanma']);   // [v3:fix] more working hulls in the inner bay
   for (const run of heroRuns) {
     if (out.boats.length >= maxBoats) break;
     out.boats.push(...moorRun(ctx, run, heroTypes.slice(r.int(0, 3)).concat(heroTypes), r, { fender: 0.9, gap: 3, isWater, max: Math.min(low ? 5 : 9, maxBoats - out.boats.length), raft: 0.45, smallNear: heroNear }));   // [v3:fix] 9 per run
@@ -217,7 +221,7 @@ export function buildHarbor(ctx, opts = {}) {
   // the stern-to rows of longliners on the east quays (Kesennuma's signature harbour picture)
   if (opts.rows !== false) {
     const tr = performance.now();
-    out.rows = buildMooringRows(ctx, { isWater, lite: low });
+    out.rows = buildMooringRows(ctx, { isWater, lite: phone ? PHONE.rowsEvery : low });
     for (const { boat } of out.rows) out.boats.push(boat);
     out.stats.rows = out.rows.length; out.stats.rowsMs = Math.round(performance.now() - tr);
   }
@@ -371,7 +375,7 @@ export function buildHarbor(ctx, opts = {}) {
   }
 
   // ---- arriving boats (today's 入船情報 from life's ctx.services.arrivals, or setArrivals(list) directly)
-  if (opts.arrivals !== false) out.arrivals = createArrivals(ctx, { isWater });
+  if (opts.arrivals !== false) out.arrivals = createArrivals(ctx, { isWater, ...(phone && { max: PHONE.arrivals }) });   // [v4:phone] the nearest arrivals only
 
   out.stats.ms = Math.round(performance.now() - t0);
   ctx.services.harbor = {

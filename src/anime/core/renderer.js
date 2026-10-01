@@ -5,6 +5,7 @@
 // (colour-aware anime outlines, soft glow, grading, light leak, vignette, sRGB).
 import * as THREE from 'three';
 import { LAYER_NO_OUTLINE } from './materials.js';
+import { PHONE } from './tier.js';   // [v4:phone]
 
 const FS_VERT = /* glsl */`varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
 
@@ -204,6 +205,8 @@ export function createRenderPipeline(renderer, quality) {
   function setView(alt) {
     const k = Math.min(14, Math.max(1, alt / 25));
     compMat.uniforms.uLineRange.value.set(35 * k, 190 * k);
+    // [v4:phone] outlines fade out by PHONE.lineRange: the pre-pass then skips the cells beyond it
+    if (quality?.phone) { const v = compMat.uniforms.uLineRange.value; v.y = Math.min(v.y, PHONE.lineRange); v.x = Math.min(v.x, v.y * 0.4); }
     compMat.uniforms.uStreet.value = 1 - THREE.MathUtils.smoothstep(alt, 40, 70);   // [v4:polish1]
   }
 
@@ -220,7 +223,7 @@ export function createRenderPipeline(renderer, quality) {
   // [v3:fix] distance culling of the static batches (the renderer is draw-call bound): the outline pre-pass skips cells
   // beyond the outline range (lines fade out there anyway), the colour pass skips cells the fog has swallowed
   // (exp2 fog < 1 % visible) and, on the low / medium tiers, cells beyond 3.5 / 6 km. Visibility is restored each frame.
-  const CULL_PARENTS = new Set(['static-batched', 'town-mid', 'town-far']);
+  const CULL_PARENTS = new Set(['static-batched', 'town-mid', 'town-far', 'static-cells', 'static-nd', 'static-shadow']);   // [v4:phone] + core/phonecells.js
   let cullList = null, cullN = -1;
   const _cp = new THREE.Vector3();
   function cullSetup(scene) {
@@ -236,7 +239,27 @@ export function createRenderPipeline(renderer, quality) {
       cullList.push({ o, c, r, v: true });
     });
   }
-  const tierMax = { low: 3500, medium: 6000 }[quality?.name] ?? Infinity;
+  // [v4:phone] the shadow map is re-rendered every PHONE.shadowEvery-th frame, and at once when the camera has moved
+  // 3 m or the sun has turned (a still drone view then costs no shadow pass); other tiers: every frame
+  let shFrame = 0; const shPos = new THREE.Vector3(1e9, 0, 0), shSun = new THREE.Vector3(), _sp = new THREE.Vector3();
+  // [v4:phone] core/phonecells.js proxies: { cells, nd, shadow, ndHide: [objects left out of the pre-pass] }
+  let proxies = null;
+  function setProxies(p) {
+    proxies = p;
+    if (p?.shadow && !renderer.shadowMap.__phoneWrap) {
+      const sm = renderer.shadowMap, base = sm.render;
+      sm.render = function (...a) { const sh = proxies?.shadow; if (sh) sh.visible = true; try { return base.apply(this, a); } finally { if (sh) sh.visible = false; } };
+      sm.__phoneWrap = true;
+    }
+  }
+  function shadowDue(camera, sunDir, out) {
+    if (!quality?.phone || out) return true;
+    _sp.setFromMatrixPosition(camera.matrixWorld);
+    const due = ++shFrame % PHONE.shadowEvery === 0 || _sp.distanceToSquared(shPos) > 9 || (sunDir && sunDir.distanceToSquared(shSun) > 1e-6);
+    if (due) { shPos.copy(_sp); if (sunDir) shSun.copy(sunDir); }
+    return due;
+  }
+  const tierMax = quality?.phone ? PHONE.drawMax : { low: 3500, medium: 6000 }[quality?.name] ?? Infinity;
   function cullTo(camera, maxD) { _cp.setFromMatrixPosition(camera.matrixWorld); for (const it of cullList) it.o.visible = it.v && it.c.distanceTo(_cp) - it.r < maxD; }
   function render(scene, camera, sunDir, t, out = null) {   // [v3:integrate] out: composite into a render target (tiny planet faces)
     cullSetup(scene);
@@ -256,13 +279,16 @@ export function createRenderPipeline(renderer, quality) {
     renderer.setClearColor(clearND, 1.0);
     renderer.clear();
     renderer.setOpaqueSort(ndSort);
+    const hid = proxies ? proxies.ndHide.map((o) => o.visible) : null;
+    if (proxies) { proxies.cells.visible = false; proxies.nd.visible = true; for (const o of proxies.ndHide) o.visible = false; }
     renderer.render(scene, camera);
+    if (proxies) { proxies.cells.visible = true; proxies.nd.visible = false; proxies.ndHide.forEach((o, i) => { o.visible = hid[i]; }); }
     renderer.setOpaqueSort(null);
     scene.overrideMaterial = null; scene.background = bg; scene.fog = fog;
     // 2. colour pass — all layers
     cullTo(camera, Math.min(fogMax, tierMax));
     camera.layers.enableAll();
-    renderer.shadowMap.needsUpdate = true;
+    renderer.shadowMap.needsUpdate = shadowDue(camera, sunDir, out);
     renderer.setRenderTarget(rtColor);
     renderer.setClearColor(0xdde9f3, 1.0);
     renderer.clear();
@@ -327,5 +353,5 @@ export function createRenderPipeline(renderer, quality) {
     return d * camera.far * Math.sqrt(1 + x * x + y * y);
   }
 
-  return { render, setSize, setView, compMat, ndMat, targets: { rtColor, rtND }, size, nearShare, depthAt };
+  return { render, setSize, setView, setProxies, compMat, ndMat, targets: { rtColor, rtND }, size, nearShare, depthAt };
 }

@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import * as L from '../world/layout.js';
 import { createMaterials, LAYER_NO_OUTLINE, PALETTE } from './materials.js';
 import { createTextures } from './textures.js';
+import { PHONE } from './tier.js';   // [v4:phone]
 import * as geo from './geo.js';
 import { Physics } from './physics.js';
 import { sharedHardShores } from '../world/layout/hardshore.js';   // [v3:fix]
@@ -30,7 +31,7 @@ export function createContext({ scene, camera, renderer = null, audio, quality, 
     uGust: { value: 0.5 },                               // 0..1 slowly varying gust strength (core animates it)
   };
   const mat = createMaterials(shared);
-  const tex = createTextures();
+  const tex = createTextures({ maxSide: quality?.phone ? PHONE.canvasMax : 0 });   // [v4:phone] canvas textures <= 512 px
   const wires = geo.createWireSystem();
   // [v3:fix] the sea is a wall on foot (quays have no parapets); in front of a quay face counts as sea too
   const HS = sharedHardShores(L);

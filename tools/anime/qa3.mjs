@@ -430,8 +430,9 @@ try {
     await ph2.frames(30);
     await ph2.eval('window.__life.live.ready');
     await ph2.frames(10);
-    const q = await ph2.eval('({ q: window.__ctx.quality.name, heroR: window.__ctx.quality.heroR, overflow: document.documentElement.scrollWidth > innerWidth })');
+    const q = await ph2.eval('({ q: window.__ctx.quality.name, tier: window.__ctx.quality.tier, phone: !!window.__ctx.quality.phone, heroR: window.__ctx.quality.heroR, overflow: document.documentElement.scrollWidth > innerWidth })');
     check('phone: low tier, no horizontal overflow', q.q === 'low' && !q.overflow, q);
+    check('phone: a touch screen is forced to the phone tier (v4:phone)', q.tier === 'phone' && q.phone, q);   // [v4:phone]
     // [v4:explore] the explore UI on the phone: minimap, the search / map / drive buttons in reach
     const px = await ph2.eval(`(() => { const r = (s) => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)]; }; return { mini: r('#klc-x .mini canvas'), bar: r('#klc-x .xbar'), search: r('#klc-x .xbar [data-act="search"]'), visible: !document.getElementById('klc-x')?.hidden, stream: window.__explore?.stream?.R }; })()`);
     const inView = (b) => b && b[0] >= 0 && b[1] >= 0 && b[0] + b[2] <= 390 && b[1] + b[3] <= 844;

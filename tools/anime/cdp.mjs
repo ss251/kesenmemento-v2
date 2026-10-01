@@ -111,10 +111,11 @@ export async function launch({ quiet = true, args = [] } = {}) {
   while (!wsUrl) { const { value, done } = await reader.read(); if (done) throw new Error('chrome exited early:\n' + buf); buf += new TextDecoder().decode(value); wsUrl = buf.match(/DevTools listening on (ws:\/\/\S+)/)?.[1]; }
   (async () => { while (!(await reader.read()).done); })();
   const ws = new WebSocket(wsUrl); await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
-  let id = 0; const pending = new Map(), logs = new Map();
+  let id = 0; const pending = new Map(), logs = new Map(), listeners = new Map();   // [v4:phone] listeners: CDP events by method
   ws.onmessage = (ev) => {
     const m = JSON.parse(ev.data);
     if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+    if (m.method && listeners.has(m.method)) for (const fn of listeners.get(m.method)) fn(m.params, m.sessionId);
     const L = m.sessionId && logs.get(m.sessionId);
     if (!L) return;
     if (m.method === 'Runtime.consoleAPICalled') {
@@ -164,7 +165,8 @@ export async function launch({ quiet = true, args = [] } = {}) {
       },
     };
   }
-  return { page, close: async () => { try { ws.close(); } catch { /* ok */ } kill(); } };
+  const on = (method, fn) => { if (!listeners.has(method)) listeners.set(method, []); listeners.get(method).push(fn); };
+  return { page, on, close: async () => { try { ws.close(); } catch { /* ok */ } kill(); } };
 }
 
 export function listWorldModules() {

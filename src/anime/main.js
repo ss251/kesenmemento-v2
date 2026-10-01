@@ -10,9 +10,11 @@ import { createRenderPipeline } from './core/renderer.js';
 import { createSky } from './core/sky.js';
 import { Player } from './core/player.js';
 import { batchStatic } from './core/batch.js';
-import { batchStatic as batchStatic2 } from './core/batch2.js';
+import { batchStatic as batchStatic2, ATLAS } from './core/batch2.js';
 import { createAudio } from './core/audio.js';
 import { createPlanet } from './core/planet.js';   // [v3:integrate] tiny-planet overview
+import { TIER, PHONE } from './core/tier.js';   // [v4:phone]
+import { mergeCells } from './core/phonecells.js';   // [v4:phone]
 
 /** Build order. A module may read ctx.services of earlier modules at build time (life reads everyone). */
 export const MODULES = ['environment', 'water', 'town', 'harbor', 'landmarks', 'life', 'explore'];   // [v4:explore] streamed core, drive mode, map, search, labels, interiors; [v4:landmarks-B] civic landmarks after harbor
@@ -24,16 +26,11 @@ const SHOT = params.has('shot');
 const ONLY = params.get('only') ? params.get('only').split(',').map((s) => s.trim()).filter(Boolean) : null;
 const $ = (id) => document.getElementById(id);
 
-const isTouch = matchMedia('(pointer: coarse)').matches;
-const QUALITY = {
-  high: { name: 'high', pixelRatio: Math.min(devicePixelRatio, 1.5), msaa: 4, shadowMap: 4096, shadowSize: 75, petals: 1.0, heroR: 1.0 },
-  medium: { name: 'medium', pixelRatio: Math.min(devicePixelRatio, 1.0), msaa: 4, shadowMap: 2048, shadowSize: 60, petals: 0.6, heroR: 0.8 },
-  low: { name: 'low', pixelRatio: isTouch ? Math.min(devicePixelRatio, 1.25) : 0.75,   // [v3:fix] phones: 0.75 CSS px looked soft (292x633 on a DPR-3 phone)
-     msaa: 0, shadowMap: 2048, shadowSize: 45, petals: 0.35, heroR: 0.55 },
-};
-let qName = params.get('q') || (() => { try { return localStorage.getItem('klc.q'); } catch (e) { return null; } })() || (isTouch ? 'low' : 'high');
-if (!QUALITY[qName]) qName = 'high';
-const quality = { ...QUALITY[qName] };
+// [v4:phone] tiers live in core/tier.js: a phone or tablet is forced to the phone tier (stored setting and ?q= cannot
+// raise it; ?unsafe=1 for testing), and nothing upgrades it automatically
+const qName = TIER.tier;
+const quality = { ...TIER.quality };
+if (quality.phone) { ATLAS.page = PHONE.atlasPage; ATLAS.tileMax = PHONE.canvasMax; }
 if (SHOT) quality.pixelRatio = 1;
 
 // ------------------------------------------------------------------ renderer & scene
@@ -94,7 +91,71 @@ function setProgress(frac, label) {
 }
 const LABELS = { _ground: '下地', environment: '山と地形', water: '内湾の海', town: '町並み', harbor: '港と船', landmarks: '名所と施設', life: '町の暮らし', explore: '街の地図' };
 
+/** [v4:phone] Triangles in the scene (instanced meshes times their count) and the JS heap (Chrome only; else null). */
+function sceneTris() {
+  let n = 0;
+  scene.traverse((o) => { const g = o.geometry; if (!o.isMesh || !g?.attributes?.position) return; n += (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); });
+  return Math.round(n);
+}
+const heapMB = () => (performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1e6) : null);
+
+/** [v4:phone] The merged static batches are never read again on the CPU (no raycasts; bounds are computed): once a
+ *  buffer is on the GPU its typed array is dropped, so the phone does not hold the geometry twice. -> attributes */
+function releaseOnUpload(root) {
+  let n = 0;
+  const drop = function () { this.array = null; };
+  root.traverse((o) => {
+    if (!o.isMesh || !['static-batched', 'static-cells'].includes(o.parent?.name) || !o.geometry) return;
+    const g = o.geometry;
+    if (!g.boundingSphere) g.computeBoundingSphere();
+    if (!g.boundingBox) g.computeBoundingBox();
+    for (const k in g.attributes) { g.attributes[k].onUpload(drop); n++; }
+    if (g.index) { g.index.onUpload(drop); n++; }
+  });
+  return n;
+}
+
+/** [v4:phone] Before the static batch: the walk-in interiors are batched on their own and drawn only within 220 m
+ *  (they are inside buildings; ~80 k triangles a pass from anywhere else), and the far town casts no shadow. */
+function phonePrep() {
+  const out = {};
+  const interiors = ctx.staticRoot.children.find((c) => c.name === 'explore-interiors');
+  if (interiors) {
+    interiors.updateMatrixWorld(true);
+    const box = new THREE.Box3(), centres = [];
+    for (const c of interiors.children) { box.setFromObject(c); if (!box.isEmpty()) centres.push(box.getCenter(new THREE.Vector3())); }
+    try { out.interiors = batchStatic2(interiors, { mat: ctx.mat, nearCell: 4000, farCell: 4000, farR: 1e9 }).merged; } catch (e) { console.warn(e); }
+    interiors.userData.noBatch = true;
+    const R2 = 220 * 220;
+    ctx.onUpdate(() => { const p = camera.position; interiors.visible = centres.some((c) => (c.x - p.x) ** 2 + (c.z - p.z) ** 2 < R2); });
+  }
+  ctx.dynamicRoot.traverse((o) => { if (o.name === 'town-far') o.traverse((m) => { m.castShadow = false; }); });
+  // parked bicycles (~1.6 k triangles each): the first PHONE.bikes
+  const bikes = []; ctx.staticRoot.traverse((o) => { if (o.name === 'bicycle') bikes.push(...o.children); });
+  for (const o of bikes.slice(PHONE.bikes)) o.parent.remove(o);
+  out.bikes = Math.min(bikes.length, PHONE.bikes);
+  // small static meshes (cans behind vending-machine glass, quay bolts, clutter): < PHONE.tinyR m across
+  ctx.staticRoot.updateMatrixWorld(true);
+  const tiny = [];
+  // only street clutter: a landmark's small parts (浮見堂's gold finial, railing caps) stay
+  const CLUTTER = /^(town-props|town-streets|quay:)/;
+  for (const top of ctx.staticRoot.children) if (CLUTTER.test(top.name)) top.traverse((o) => {
+    const g = o.geometry; if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || !g?.attributes?.position || o.userData.dynamic) return;
+    if (!g.boundingSphere) g.computeBoundingSphere();
+    if (g.boundingSphere.radius * o.matrixWorld.getMaxScaleOnAxis() < PHONE.tinyR) tiny.push(o);
+  });
+  let tris = 0;
+  for (const o of tiny) { const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; o.parent.remove(o); }
+  out.tiny = { meshes: tiny.length, tris: Math.round(tris) };
+  return out;
+}
+
+/** [v4:phone] An idle slot (up to 250 ms): the GC runs in idle time, and a phone tab must not carry one module's
+ *  build garbage into the next (the heap grew to ~0.9 GB over the build on the old low tier). */
+const idle = () => new Promise((r) => (typeof requestIdleCallback === 'function' ? requestIdleCallback(() => setTimeout(r, 30), { timeout: 250 }) : setTimeout(r, 120)));
+
 async function build() {
+  stats.heapLayoutMB = heapMB();   // [v4:phone] after layout.js parsed its data
   await loadFonts();
   const known = Object.keys(MODULE_LOADERS);
   const list = ONLY ? ONLY.filter((m) => known.includes(m)) : MODULES.filter((m) => known.includes(m));
@@ -104,13 +165,16 @@ async function build() {
   for (const name of list) {
     setProgress(i / (list.length + 1), `${LABELS[name] || name} を準備中…`);
     await new Promise((r) => setTimeout(r, 0));
+    if (quality.phone) await idle();   // [v4:phone] let the engine collect the previous module's build garbage
     const t0 = performance.now();
     try {
       const mod = await MODULE_LOADERS[name]();
       const before = ctx.staticRoot.children.length + ctx.dynamicRoot.children.length;
       if (typeof mod.build !== 'function') throw new Error('module has no build(ctx) export');
+      const tris0 = sceneTris();
       await mod.build(ctx);
-      stats.modules[name] = { ms: Math.round(performance.now() - t0), objects: ctx.staticRoot.children.length + ctx.dynamicRoot.children.length - before };
+      // [v4:phone] triangles (instances counted) and the JS heap after each module: the phone budgets
+      stats.modules[name] = { ms: Math.round(performance.now() - t0), objects: ctx.staticRoot.children.length + ctx.dynamicRoot.children.length - before, tris: sceneTris() - tris0, heapMB: heapMB() };
     } catch (e) {
       console.error(`[module ${name}]`, e);
       errors.push({ module: name, message: String((e && e.stack) || e) });
@@ -119,21 +183,35 @@ async function build() {
   }
   setProgress(list.length / (list.length + 1), '仕上げ中…');
   await new Promise((r) => setTimeout(r, 0));
+  if (quality.phone) { await idle(); stats.heapBuiltMB = heapMB(); }
   const wm = ctx.wires.build(); if (wm) { scene.add(wm); ctx.wires.setResolution(pipeline.size.x, pipeline.size.y); }
   const t0 = performance.now();
   // [v3:integrate] batching cells sized for a 3 km town (Sakura's 48 m / 200 m cells were for one station square):
   // the renderer is CPU-bound on draw calls, so coarse cells win; ?cells=near,far,farR overrides (tuning)
   const cp = (params.get('cells') || '').split(',').map(Number);
   const cells = { nearCell: cp[0] || BATCH.nearCell, farCell: cp[1] || BATCH.farCell, farR: cp[2] || BATCH.farR, center: [L.ZONES.hero.cx, L.ZONES.hero.cz] };
-  const b = params.get('batch') === '1' ? batchStatic(ctx.staticRoot) : batchStatic2(ctx.staticRoot, { mat: ctx.mat, ...cells });
+  if (quality.phone) stats.phone = phonePrep();
+  const b = params.get('nobatch') === '1' ? {} : params.get('batch') === '1' ? batchStatic(ctx.staticRoot) : batchStatic2(ctx.staticRoot, { mat: ctx.mat, ...cells });   // [v4:phone] nobatch: diagnostics (triangles per named group)
   stats.batch = { ...b, ms: Math.round(performance.now() - t0) };
+  if (quality.phone) {
+    // [v4:phone] one pre-pass call and one or two shadow calls per cell (core/phonecells.js); the far town and the city /
+    // horizon terrain lie beyond the phone's outline range, so the pre-pass skips them too
+    const sbg = ctx.staticRoot.children.find((c) => c.name === 'static-batched');
+    const px = sbg && mergeCells(ctx.staticRoot, sbg, { cell: cells.nearCell });
+    if (px) {
+      const ndHide = []; scene.traverse((o) => { if (o.name === 'town-far' || o.name === 'terrain-city' || o.name === 'terrain-horizon') ndHide.push(o); });
+      pipeline.setProxies({ ...px, ndHide });
+      stats.batch.cells = px.stats;
+    }
+    stats.batch.released = releaseOnUpload(ctx.staticRoot);
+  }
   // [v3:fix] compile every program up front, hidden ones too (season particles, night-only meshes) and the tiny planet's
   // fold pass: the first season / planet toggle used to hitch ~200 ms compiling shaders
   try {
     const hidden = []; scene.traverse((o) => { if (!o.visible) { hidden.push(o); o.visible = true; } });
     renderer.compile(scene, camera);
     for (const o of hidden) o.visible = false;
-    planet.precompile?.();
+    if (!quality.phone) planet.precompile?.();   // [v4:phone] the tiny planet's six faces only when it is opened
   } catch (e) { console.warn(e); }
   setProgress(1, '');
 }
@@ -211,10 +289,11 @@ window.__bench = (n = 30) => {
   const gl = renderer.getContext(); const px = new Uint8Array(4);
   viewTune(); pipeline.render(scene, camera, sunDir, simT); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
   const t0 = performance.now();
-  for (let i = 0; i < n; i++) { renderer.info.reset(); sky.update(simT, camera); pipeline.render(scene, camera, sunDir, simT); }
+  let sumCalls = 0, sumTris = 0, maxCalls = 0, maxTris = 0;   // [v4:phone] the phone tier skips some shadow updates: report the mean and the worst frame
+  for (let i = 0; i < n; i++) { renderer.info.reset(); sky.update(simT, camera); pipeline.render(scene, camera, sunDir, simT); const c = renderer.info.render.calls, t = renderer.info.render.triangles; sumCalls += c; sumTris += t; maxCalls = Math.max(maxCalls, c); maxTris = Math.max(maxTris, t); }
   gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
   const ms = (performance.now() - t0) / n;
-  return { ms: +ms.toFixed(2), calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, programs: renderer.info.programs?.length };
+  return { ms: +ms.toFixed(2), calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, meanCalls: Math.round(sumCalls / n), meanTriangles: Math.round(sumTris / n), maxCalls, maxTriangles: maxTris, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, programs: renderer.info.programs?.length };
 };
 window.__diag = () => {
   const out = { static: {}, dynamic: {}, other: {} };
@@ -311,6 +390,8 @@ async function main() {
     const v = VIEWS[e.code]; if (v) { camSpec(v.spec); showToast(v.label); }
   });
   const q = $('quality');
+  // [v4:phone] a forced phone keeps only the phone choice (a higher tier is what crashed iOS Safari)
+  if (q && TIER.forced) for (const op of [...q.options]) if (op.value !== 'phone') op.remove();
   if (q) { q.value = qName; q.addEventListener('change', () => { try { localStorage.setItem('klc.q', q.value); } catch (e) { /* private mode */ } location.reload(); }); }
   const mute = $('mute'); if (mute) mute.addEventListener('click', () => { audio.muted = !audio.muted; mute.setAttribute('aria-pressed', String(audio.muted)); });
   if (params.has('stats')) $('stats').hidden = false;

@@ -29,7 +29,8 @@ import { channels, channelIndex, buildRivers } from './rivers.js';   // [v4:town
 import { buildLanduse, parkingIndex } from './landuse.js';   // [v4:town-accuracy]
 import { buildSignals } from './signals.js';   // [v4:town-accuracy]
 import { EXPLORE_LOTS } from '../explore/taken.js';   // [v4:explore] lots explore models with a walk-in interior
-import { KAZEMACHI_LOTS } from '../harbor/real.js';   // [v4:polish1] 風待ち heritage buildings (harbor/kazemachi.js)
+import { KAZEMACHI_LOTS } from '../harbor/real.js';
+import { PHONE } from '../../core/tier.js';   // [v4:phone]   // [v4:polish1] 風待ち heritage buildings (harbor/kazemachi.js)
 
 export async function build(ctx) {
   const L = ctx.L;
@@ -45,6 +46,9 @@ export async function build(ctx) {
   const heroZone = { cx: L.ZONES.hero.cx, cz: L.ZONES.hero.cz, r: L.ZONES.hero.r };
   const focus = L.HERO.walk;
   const low = ctx.quality?.name === 'low', medium = ctx.quality?.name === 'medium';
+  // [v4:phone] the phone tier: poles and wires round the hero centre only, a nearer far town, gardens and land use
+  const phone = !!ctx.quality?.phone;
+  const nearHero = (x, z, r) => Math.hypot(x - L.ZONES.hero.cx, z - L.ZONES.hero.cz) < r;
 
   const H = makeH(ctx);
   const pxKit = ctx.tex.pixels;
@@ -78,9 +82,11 @@ export async function build(ctx) {
     if (KAZEMACHI_LOTS.has(lot.id)) continue;   // [v4:polish1] the 風待ち heritage shops: harbor/kazemachi.js
     const d = Math.min(...FOCI.map(([fx, fz]) => Math.hypot(lot.obb.cx - fx, lot.obb.cz - fz)));
     const inR = Math.hypot(lot.obb.cx - heroZone.cx, lot.obb.cz - heroZone.cz) <= heroR;
-    const lod = quick !== null ? Number(quick) : !inR ? 0 : d < 100 ? 2 : d < 220 ? 1 : 0;
+    const [lod2, lod1] = phone ? PHONE.heroLod : [100, 220];   // [v4:phone]
+    const lod = quick !== null ? Number(quick) : !inR ? 0 : d < lod2 ? 2 : d < lod1 ? 1 : 0;
     // quiet back lots far from every street heart: the simplified builder (same palette, roof shapes, facades)
     if (lod === 0 && quick === null && (lot.kind === 'house' || lot.kind === 'apartment') && cls.get(lot.id)?.kind !== 'shop') { continue; }
+    if (phone && !inR && quick === null) continue;   // [v4:phone] beyond the phone hero radius every lot is a simplified building
     try {
       const tk = performance.now(), g0 = H.gb.tris;
       const k = buildHeroLot(T, lot, cls.get(lot.id), lod);
@@ -92,27 +98,28 @@ export async function build(ctx) {
   // ------------------------------------------------------------------ streets, poles, props (hero detail through the kit batcher)
   // [v4:town-accuracy] rivers first: streets stop at the channel edge and rivers.js bridges them
   const HC = L.ZONES.hero, MZ = L.ZONES.mid;
-  const chs = channels(L, { near: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < 3200, step: 4 });
+  const chs = channels(L, { near: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < 3200, step: phone ? PHONE.riverStep : 4 });
   const chIdx = channelIndex(chs);
-  const street = buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers: chIdx });
+  const street = buildStreets(ctx, { lotIdx, roadIdx, roads: phone ? roads.filter((r) => r.pts.some((p) => nearHero(p[0], p[1], PHONE.streetR))) : roads, heroZone, rivers: chIdx, ...(phone && { step: PHONE.streetStep }) });
   t = lap('streets', t);
   let rivers = null;
   try { rivers = buildRivers(ctx, { chs, index: chIdx, detail: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 120, roads, asphalt: street.materials?.asphalt }); } catch (e) { console.warn('[town] rivers', e); }
   t = lap('rivers', t);
-  const poles = buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades: facadeAnchors(L, heroLots.filter((l) => built.has(l.id))) });
+  const poleOpts = phone ? phoneRuns(L, nearHero) : {};
+  const poles = buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades: facadeAnchors(L, heroLots.filter((l) => built.has(l.id))), ...poleOpts });
   t = lap('poles', t);
   const inParking = parkingIndex(L);
-  const parking = buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex: street.tex.asphalt, lineTex: street.tex.line, signs, SM, foci: FOCI, maxDetailCars: low ? 8 : medium ? 20 : 36, inParking });
+  const parking = buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex: street.tex.asphalt, lineTex: street.tex.line, signs, SM, foci: FOCI, maxDetailCars: phone ? 4 : low ? 8 : medium ? 20 : 36, inParking });
   t = lap('parking', t);
   // [v4:town-accuracy] OSM land use on the ground: car parks, school yards, pitches, building sites, cemeteries, parks
   let landuse = null;
-  try { landuse = buildLanduse(ctx, { inside: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 150, heroIn: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < HC.r, lotIdx, roadIdx, low, trees: ctx.services.environment?.trees }); } catch (e) { console.warn('[town] landuse', e); }
+  try { landuse = buildLanduse(ctx, { inside: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < (phone ? PHONE.landuseR : MZ.r + 150), heroIn: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < HC.r, lotIdx, roadIdx, low, trees: ctx.services.environment?.trees }); } catch (e) { console.warn('[town] landuse', e); }
   t = lap('landuse', t);
   // [v4:town-accuracy] OSM traffic signals + crossings, route shields on the numbered roads
   let signals = null;
   try { signals = buildSignals(ctx, { roads, lotIdx, roadIdx, detail: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 150, hero: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < HC.r + 40, low }); } catch (e) { console.warn('[town] signals', e); }
   t = lap('signals', t);
-  const props = buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts: out.shopFronts, bikeSpots: out.bikeSpots, heroZone });
+  const props = buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts: out.shopFronts, bikeSpots: phone ? out.bikeSpots.slice(0, PHONE.bikes) : out.bikeSpots, heroZone });
   t = lap('props', t);
   let lanes = null; if (!low) { try { lanes = buildLaneLanterns(ctx, out.shopFronts, out); } catch (e) { console.warn('[town] lane lanterns', e); } }   // [v3:fix] 魚町 / 南町 izakaya lanterns + 行灯
   t = lap('lanes', t);
@@ -135,9 +142,9 @@ export async function build(ctx) {
   const boards = real.boards(nameItems); ctx.addStatic(boards.group);
   const realStats = { names: real.count, textures: real.textures, midBoards: boards.count, heroShops: out.shopFronts.filter((s) => s.real).length, heroBoards: out.buildingNames.filter((b) => b.real).length };
   t = lap('mid', t);
-  const gardens = buildGardens(ctx, heroLots.concat(midLots), { lotIdx, roadIdx, heroZone, maxDist: low ? 650 : medium ? 900 : 1150 });
+  const gardens = buildGardens(ctx, heroLots.concat(midLots), { lotIdx, roadIdx, heroZone, maxDist: phone ? PHONE.gardens : low ? 650 : medium ? 900 : 1150 });
   t = lap('gardens', t);
-  const far = buildFar(ctx, farLots, { centre: heroZone, maxDist: Number(params.get('farDist') || 5600) });
+  const far = buildFar(ctx, farLots, { centre: heroZone, maxDist: Number(params.get('farDist') || (phone ? PHONE.farDist : 5600)), ...(phone && { skipSmallBeyond: PHONE.farSmall }) });
   t = lap('far', t);
 
   // ------------------------------------------------------------------ services
@@ -160,4 +167,18 @@ export async function build(ctx) {
   ctx.services.town.kit = { T, H, heroZone, chIdx, streetMaterials: street.materials, streetTex: street.tex, exploreOwnsMid };
   if (typeof window !== 'undefined') window.__town = stats;
   return stats;
+}
+
+/** [v4:phone] Pole runs (the longest stretch of each run inside PHONE.poleR of the hero centre) and the hero lanes
+ *  that carry poles, for buildPoles on the phone tier: poles, their wires and service drops cost ~0.6 M triangles. */
+function phoneRuns(L, nearHero) {
+  const runs = [];
+  for (const r of L.POLE_RUNS) {
+    let best = [], cur = [];
+    for (const p of r.pts) { if (nearHero(p[0], p[1], PHONE.poleR)) cur.push(p); else { if (cur.length > best.length) best = cur; cur = []; } }
+    if (cur.length > best.length) best = cur;
+    if (best.length >= 2) runs.push({ roadId: r.roadId, pts: best });
+  }
+  const lanes = L.ROADS.filter((r) => r.zone === 'hero' && r.pts.some((p) => nearHero(p[0], p[1], PHONE.poleR)));
+  return { runs, lanes };
 }

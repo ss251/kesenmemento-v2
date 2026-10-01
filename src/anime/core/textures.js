@@ -31,7 +31,19 @@ export function fitFontSize(g, text, maxW, size, font, weight = 700, min = 6) {
   return s;
 }
 
-export function createTextures() {
+/** [v4:phone] A canvas drawn at full size, scaled down (aspect kept) so its longer side is at most `max` px; the big
+ *  canvas is dropped (WebKit counts every canvas backing store against the tab). `max` 0 keeps it. */
+export function capCanvas(c, max) {
+  if (!max || !c || !(c.width > max || c.height > max) || typeof document === 'undefined') return c;
+  const k = max / Math.max(c.width, c.height);
+  const d = document.createElement('canvas');
+  d.width = Math.max(1, Math.round(c.width * k)); d.height = Math.max(1, Math.round(c.height * k));
+  const g = d.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(c, 0, 0, d.width, d.height);
+  c.width = c.height = 1;   // release the full-size backing store now
+  return d;
+}
+
+export function createTextures({ maxSide = 0 } = {}) {   // [v4:phone] maxSide: downscale finished canvases to this many px
   const cache = new Map();
   let pixelBudget = 0;
 
@@ -43,6 +55,7 @@ export function createTextures() {
   }
 
   function finish(c, opts = {}) {
+    c = capCanvas(c, maxSide);
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = opts.srgb === false ? THREE.NoColorSpace : THREE.SRGBColorSpace;
     t.anisotropy = opts.anisotropy ?? 4;
