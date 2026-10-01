@@ -83,3 +83,29 @@ All four parts are in service. The 2019 C and D halls replaced the temporary pos
 
 - `app/market_north.jpg`, `app/market_top.jpg`, `app/market_c_oblique.jpg`, `app/market_d.jpg`
 - The four generated white gable halls with skylights stand on the north facility. C棟 and D棟 are generic town boxes.
+
+## v5 fix round 2 (2026-10-01): the roof deck and the land side, against Google Earth (imagery 2026-03-11)
+
+- **Roof deck of the north facility:** Earth shows about 25 cars on the whole deck (review2 c11d / c11e pairs). The app
+  parks 6 % of the bays (`parkCars(..., 0.06)` in `harbor/market4.js`; it was 62 %, packed) in the Japanese colour mix
+  (`town/carcolors.js`: 45 % white or pearl, 20 % black, 15 % silver, 10 % grey, 10 % dark blue or red).
+- **Green walkway stripe** along the land side of the deck, 3 m wide and 2 m in from the parapet, with white edge lines
+  (#6f9a7f); no car stands on it.
+- **Land side** (review2 walk/w_12 showed a 300 m plain white wall over an empty plain): a 1.1 m dock plinth along the
+  land-facing walls with loading-dock shutters every 8.5 m and black rubber bumpers, painted truck bays 12 m long, 4 t
+  trucks backed onto about one bay in five, and 「気仙沼市魚市場」 lettered on the 2F band every 110 m. The bays and trucks
+  stop where the ramp to the north roof runs along the wall, and nothing is drawn on the party wall with the north block.
+- Still open: the inland strip is beige in the land cover where Earth shows asphalt (an `apron` surface in
+  `data/anime/overrides/c11.json`, for the accuracy pass).
+
+## v5 photos (2026-10-01): C棟's roof deck from the author's photos (IMG_0792-0798, 17:07 JST)
+
+The photos were taken on C棟's roof deck: GPS z ≈ 1040 lies inside C棟, at 11 m altitude, looking over the parapet to the
+bay. `harbor/market5.js` (`buildCRoofPhotos`) replaces the v4 equipment boxes there with:
+
+- weathered concrete slabs with saw-cut joints, yellow stall lines and red-and-white cones;
+- the pale-blue penthouse with stepped panel joints, small framed windows, raised white letters
+  「気仙沼市魚市場」, the visitors' entrance with its canopy and rails, and a low white roof with a rounded eave;
+- the COOKING STUDIO cross block at the south end;
+- five glazed observation pavilions with wave-shaped roofs and the white rocket-like stacks with stays;
+- the orange enclosed lifeboat on its trailer, and cars parked nose-in.

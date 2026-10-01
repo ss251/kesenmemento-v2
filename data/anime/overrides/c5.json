@@ -1,0 +1,774 @@
+{
+ "version": 1,
+ "cell": "c5",
+ "bbox": [
+  -700,
+  -200,
+  -200,
+  400
+ ],
+ "note": "八日町・三日町・南町一丁目 and the 沢田 hills down to 気仙沼小学校 and 気仙沼図書館 (ENU x -700..-200, z -200..400). Read block by block from Google Earth 2026-03-11 (raw/ref/earth/c5: full-cell views plus sub-cells sub-a..sub-f, review sheets in sheets/), checked against the GSI photo and OSM.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/c5: top, o0..o270, l45, l225; sub-cells raw/ref/earth/c5/sub-a..sub-f; per-lot sheets raw/ref/earth/c5/sheets)",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo data/ortho/core.jpg (z18, about 2020-2022), crops raw/ref/earth/c5/gsi_*.jpg"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap, raw/osm/overpass.json (OSM base 2026-05-06), © OpenStreetMap contributors (ODbL)",
+   "date": "2026-05-06"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58539/25068/338",
+   "roof": {
+    "shape": "gable",
+    "color": "#b4604e"
+   },
+   "src": "earth: red pitched roof with the ridge along the long side, not a flat white deck (sub-a top, ann_a1_e; GSI agrees)"
+  },
+  {
+   "id": "16/58539/25068/439",
+   "roof": {
+    "color": "#8a5e52"
+   },
+   "src": "earth: brown-red roof, not olive (sub-a top, sheets/a1)"
+  },
+  {
+   "id": "16/58539/25068/353",
+   "kind": "office",
+   "facade": "office",
+   "roof": {
+    "shape": "flat",
+    "color": "#b8bab8"
+   },
+   "src": "earth: 七十七銀行 気仙沼支店 is a flat-roofed pale 2-storey bank block, not a gabled shop (sub-a top, sheets/a1; GSI flat light roof)"
+  },
+  {
+   "id": "16/58539/25068/444",
+   "storeys": 1,
+   "height": 6.5,
+   "facade": "shop",
+   "roof": {
+    "shape": "flat",
+    "color": "#5e5456"
+   },
+   "src": "earth: ツルハドラッグ 八日町店 is a single-storey drugstore box with a dark brown-grey flat roof (sub-a o0 and top, sheets/q_a_o0)"
+  },
+  {
+   "id": "16/58539/25068/343",
+   "remove": true,
+   "src": "earth: bare slope and rubble, no building (sub-a top and o0, sheets/q_a_o0)"
+  },
+  {
+   "id": "16/58539/25068/432",
+   "roof": {
+    "color": "#a85a50"
+   },
+   "src": "earth: red roof (sub-a top, sheets/a2)"
+  },
+  {
+   "id": "16/58539/25068/433",
+   "roof": {
+    "color": "#aa5c50"
+   },
+   "src": "earth: red roof (sub-a top, sheets/a2)"
+  },
+  {
+   "id": "16/58539/25068/359",
+   "roof": {
+    "color": "#b0645a"
+   },
+   "src": "earth: red roof, not pale blue (sub-a top, sheets/a3)"
+  },
+  {
+   "id": "16/58539/25068/360",
+   "roof": {
+    "shape": "gable",
+    "color": "#b05848"
+   },
+   "src": "earth: re-roofed in red since the GSI photo (blue there); pitched (sub-a top, sheets/a4)"
+  },
+  {
+   "id": "16/58539/25068/465",
+   "roof": {
+    "color": "#8e8a8c"
+   },
+   "src": "earth: grey roof now (red on the GSI photo) (sub-a top, sheets/a4; earth-ref roof sample #978e90); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58539/25068/406",
+   "roof": {
+    "shape": "gable",
+    "color": "#a86058"
+   },
+   "src": "earth: red pitched roof, not a white flat deck (sub-a top, sheets/a4); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58539/25068/401",
+   "roof": {
+    "shape": "gable",
+    "color": "#5a6878"
+   },
+   "src": "earth: slate blue-grey pitched roof (sub-a top, sheets/a5, z_a_street.jpg); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58539/25068/407",
+   "roof": {
+    "color": "#5e5858"
+   },
+   "src": "earth: dark grey-brown flat roof (sub-a top, sheets/a5)"
+  },
+  {
+   "id": "16/58539/25068/467",
+   "storeys": 2,
+   "roof": {
+    "shape": "hip",
+    "color": "#b0584c"
+   },
+   "src": "earth: a 2-storey block under a big red hipped roof, not a 3-storey white flat box (sub-a top and o180, sheets/a5, q_a_o180)"
+  },
+  {
+   "id": "16/58539/25068/187",
+   "remove": true,
+   "src": "earth: cleared lot with rubble, no building (sub-a top and o0, sheets/a5, q_a_o0)"
+  },
+  {
+   "id": "16/58539/25068/378",
+   "roof": {
+    "shape": "gable",
+    "color": "#8a8c8e"
+   },
+   "src": "earth: grey pitched roof (sub-a top, sheets/a6, z_a_street.jpg); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58539/25068/193",
+   "roof": {
+    "color": "#a0a2a6"
+   },
+   "src": "earth: light grey roof now (pale blue on the GSI photo) (sub-a top, sheets/a6; earth-ref roof sample #9f9ea4); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58539/25068/404",
+   "roof": {
+    "color": "#b0605a"
+   },
+   "src": "earth: red roof now (cyan on the GSI photo) (sub-a top, sheets/a7); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58539/25068/202",
+   "roof": {
+    "color": "#50545c"
+   },
+   "src": "earth: KAWAI PIANO has a dark grey roof (sub-a top, sheets/a8; roofs.json E #46495a)"
+  },
+  {
+   "id": "16/58539/25068/421",
+   "roof": {
+    "shape": "gable",
+    "color": "#b8604e"
+   },
+   "src": "earth: red pitched roofs, not a white flat deck (sub-a top, sheets/a8; GSI red)"
+  },
+  {
+   "id": "16/58539/25068/383",
+   "roof": {
+    "color": "#a8a6a8"
+   },
+   "src": "earth: 小山大江製菓 roof is pale grey now (red on the GSI photo) (sub-a top, sheets/a8)"
+  },
+  {
+   "id": "16/58539/25068/392",
+   "roof": {
+    "color": "#9a9c9c"
+   },
+   "src": "earth: 猪苗代医院 roof reads mid grey (sub-a top, sheets/a9)"
+  },
+  {
+   "id": "16/58539/25068/418",
+   "roof": {
+    "shape": "gable",
+    "color": "#6a6264"
+   },
+   "src": "earth: dark grey-brown pitched roof with a ridge, not a flat white deck (sub-a top, sheets/a9)"
+  },
+  {
+   "id": "16/58539/25068/396",
+   "remove": true,
+   "src": "earth: open car-park stalls with parked cars, no roof (sub-a top and o0, sheets/a10, q_a_o0; GSI shows the cars too)"
+  },
+  {
+   "id": "16/58539/25068/397",
+   "remove": true,
+   "src": "earth: open car-park stalls with parked cars, no roof (sub-a top and o0, sheets/a10, q_a_o0; GSI shows the cars too)"
+  },
+  {
+   "id": "16/58539/25068/477",
+   "remove": true,
+   "src": "earth: bare ground on the slope, no house (sub-a top and o0, sheets/a11, q_a_o0)"
+  },
+  {
+   "id": "16/58539/25068/503",
+   "remove": true,
+   "src": "earth: bare ground beside the lane, no house (sub-a top and o0, sheets/a11, q_a_o0)"
+  },
+  {
+   "id": "16/58540/25068/115",
+   "storeys": 2,
+   "src": "earth: ASA気仙沼 is a small low building, not a 4-storey tower on 30 m2 (sub-b top, sheets/b1)"
+  },
+  {
+   "id": "16/58540/25068/53",
+   "roof": {
+    "color": "#a85450"
+   },
+   "src": "earth: タカヤ has a red roof (sub-b top, sheets/b1; GSI red)"
+  },
+  {
+   "id": "16/58540/25068/134",
+   "roof": {
+    "shape": "gable"
+   },
+   "src": "earth: 家具ムラデン is under red pitched roofs, not a flat deck (sub-b top, sheets/b3)"
+  },
+  {
+   "id": "16/58540/25068/129",
+   "roof": {
+    "shape": "gable"
+   },
+   "src": "earth: 萬屋呉服部: pitched roof with a solar array, not a flat deck (sub-b top, sheets/b3); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58540/25068/55",
+   "roof": {
+    "shape": "gable",
+    "color": "#b0604e"
+   },
+   "src": "earth: red pitched roof, not a white flat deck (sub-b top, sheets/b5)"
+  },
+  {
+   "id": "16/58540/25068/37",
+   "roof": {
+    "shape": "flat",
+    "color": "#b4b4b0"
+   },
+   "src": "earth: 靴のいわま is a flat-roofed block with rooftop plant at several levels, not a gable (sub-b top, sheets/b5)"
+  },
+  {
+   "id": "16/58540/25068/145",
+   "roof": {
+    "shape": "gable"
+   },
+   "src": "earth: なべしま: long red pitched roof, not a flat deck (sub-b top, sheets/b6); 2 storeys like the street (z_a_street.jpg)",
+   "storeys": 2
+  },
+  {
+   "id": "16/58540/25068/172",
+   "kind": "office",
+   "facade": "office",
+   "src": "earth + OSM: 気仙沼信用金庫 本店 is the bank head office (a pale flat-roofed office block), not a shop (sub-b top, sheets/b6)"
+  },
+  {
+   "id": "16/58540/25068/168",
+   "kind": "office",
+   "facade": "office",
+   "src": "earth + OSM: part of the 気仙沼信用金庫 本店 office block (sub-b top, sheets/b6)"
+  },
+  {
+   "id": "16/58540/25068/162",
+   "roof": {
+    "color": "#b06048"
+   },
+   "src": "earth: orange-red roof (sub-b top, sheets/b8; GSI red)"
+  },
+  {
+   "id": "16/58540/25068/202",
+   "storeys": 2,
+   "src": "earth: Co-ba Kesennuma sits in a low 2-storey building; no 5-storey tower stands here (sub-d top, o0 and l225 pairs)"
+  },
+  {
+   "id": "16/58539/25068/203",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/206",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/344",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/351",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/362",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/363",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/367",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/376",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/377",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/381",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/400",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/402",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/403",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/405",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/408",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/411",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/412",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/422",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/423",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/428",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/429",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/431",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/435",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/446",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/448",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/454",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58540/25068/92",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58540/25068/138",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58540/25068/153",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58539/25068/453",
+   "storeys": 2,
+   "src": "earth: a 2-storey shop house like the rest of the street, not 3 storeys (z_a_street.jpg, sub-a/sub-b o180 and l45 pairs; the 3 was derived)"
+  },
+  {
+   "id": "16/58540/25069/81",
+   "name": "放送大学 気仙沼視聴学習室",
+   "nameEn": "Open University of Japan, Kesennuma study room",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#8a4e44"
+   },
+   "src": "earth: the long red-brown pitched roof carries the 放送大学 気仙沼視聴学習室 label (sub-f top, sheets/f2); OSM node n8660784318 is in it. The 気仙沼図書館 name is out of date: Earth labels the library at about (-311, 413), outside this lot"
+  },
+  {
+   "id": "16/58540/25069/82",
+   "roof": {
+    "color": "#8c8e90"
+   },
+   "src": "earth: (公社)気仙沼市シルバー人材センター has a grey roof now (cyan on the GSI photo) (sub-f top, sheets/f3)"
+  },
+  {
+   "id": "16/58540/25069/42",
+   "roof": {
+    "shape": "gable"
+   },
+   "src": "earth: red pitched roof, not a flat deck (sub-f top, sheets/f3)"
+  },
+  {
+   "id": "16/58540/25069/33",
+   "roof": {
+    "shape": "gable",
+    "color": "#a84c44"
+   },
+   "src": "earth: red pitched roof, not a flat deck (sub-f top, sheets/f3)"
+  },
+  {
+   "id": "16/58540/25068/183",
+   "remove": true,
+   "src": "earth: bare ground beside the road, the house on the GSI photo is gone (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25068/240",
+   "roof": {
+    "shape": "gable",
+    "color": "#7a8288"
+   },
+   "src": "earth: grey pitched roof, not a flat white deck (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25068/236",
+   "roof": {
+    "shape": "gable"
+   },
+   "src": "earth: red-grey pitched roof, not a flat deck (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25068/237",
+   "roof": {
+    "shape": "gable",
+    "color": "#4c5054"
+   },
+   "src": "earth: dark grey pitched roof (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25068/225",
+   "roof": {
+    "shape": "gable",
+    "color": "#4e545a"
+   },
+   "src": "earth: dark grey pitched roof (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25068/228",
+   "roof": {
+    "shape": "gable",
+    "color": "#9a6458"
+   },
+   "src": "earth: brown-red pitched L-shaped roof (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25068/226",
+   "roof": {
+    "shape": "gable",
+    "color": "#3e4a52"
+   },
+   "src": "earth: dark pitched roof, not a flat white deck (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25068/391",
+   "roof": {
+    "shape": "gable",
+    "color": "#3c4650"
+   },
+   "src": "earth: dark pitched roof, not a flat white deck (sub-f top, sheets/f1)"
+  },
+  {
+   "id": "16/58540/25069/56",
+   "roof": {
+    "shape": "gable",
+    "color": "#8a8a88"
+   },
+   "src": "earth: grey pitched roof, not a flat white deck (sub-f top, sheets/f4)"
+  },
+  {
+   "id": "16/58540/25069/51",
+   "storeys": 2,
+   "src": "earth: a low 2-storey building like its neighbours (sub-f top and o180)"
+  },
+  {
+   "id": "16/58539/25068/391",
+   "roof": {
+    "color": "#8c9094"
+   },
+   "src": "earth: grey roof now (cyan on the GSI photo) (sub-c top, sheets/c1)"
+  },
+  {
+   "id": "16/58539/25068/492",
+   "roof": {
+    "color": "#8a5a50"
+   },
+   "src": "earth: brown-red roof (sub-c top, sheets/c2)"
+  },
+  {
+   "id": "16/58539/25068/509",
+   "kind": "house",
+   "storeys": 1,
+   "roof": {
+    "shape": "gable",
+    "color": "#8a8c8c"
+   },
+   "src": "earth: only low sheds along the lane, the rest of the footprint is overgrown; no 4-storey block (sub-c top and o180, sheets/c3; GSI vegetation)"
+  },
+  {
+   "id": "16/58539/25068/494",
+   "roof": {
+    "shape": "gable",
+    "color": "#4a5054"
+   },
+   "src": "earth: dark small roof under trees, not a white flat deck (sub-c top, sheets/c3)"
+  },
+  {
+   "id": "16/58539/25068/520",
+   "roof": {
+    "shape": "gable",
+    "color": "#7a7c80"
+   },
+   "src": "earth: grey pitched roof now (cyan flat on the GSI photo) (sub-c top, sheets/c4)"
+  },
+  {
+   "id": "16/58539/25068/530",
+   "remove": true,
+   "src": "earth: forest canopy, no roof visible; the GSI photo shows trees too (sub-e top, sheets/e1, e2)"
+  },
+  {
+   "id": "16/58539/25069/173",
+   "remove": true,
+   "src": "earth: forest canopy, no roof visible; the GSI photo shows trees too (sub-e top, sheets/e1, e2)"
+  },
+  {
+   "id": "16/58539/25069/174",
+   "remove": true,
+   "src": "earth: forest canopy, no roof visible; the GSI photo shows trees too (sub-e top, sheets/e1, e2)"
+  },
+  {
+   "id": "16/58539/25069/159",
+   "remove": true,
+   "src": "earth: forest canopy, no roof visible; the GSI photo shows trees too (sub-e top, sheets/e1, e2)"
+  },
+  {
+   "id": "16/58539/25069/158",
+   "remove": true,
+   "src": "earth: forest canopy, no roof visible; the GSI photo shows trees too (sub-e top, sheets/e1, e2)"
+  },
+  {
+   "id": "16/58539/25069/160",
+   "remove": true,
+   "src": "earth: forest canopy, no roof visible; the GSI photo shows trees too (sub-e top, sheets/e1, e2)"
+  },
+  {
+   "id": "16/58539/25069/167",
+   "roof": {
+    "shape": "gable",
+    "color": "#3e464e"
+   },
+   "src": "earth: dark pitched roof, not a white flat deck (sub-e top, sheets/e1)"
+  },
+  {
+   "id": "16/58539/25069/157",
+   "roof": {
+    "shape": "gable",
+    "color": "#6a4a48"
+   },
+   "src": "earth: brown pitched roof, not a white flat deck (sub-e top, sheets/e1)"
+  },
+  {
+   "id": "16/58539/25069/185",
+   "roof": {
+    "shape": "gable",
+    "color": "#8a8c8c"
+   },
+   "src": "earth: grey pitched roof (sub-e top, sheets/e2)"
+  },
+  {
+   "id": "16/58539/25068/440",
+   "roof": {
+    "color": "#7c8084"
+   },
+   "src": "earth: grey roof now (cyan on the GSI photo) (sub-a top, sheets/a1)"
+  },
+  {
+   "id": "16/58540/25068/209",
+   "roof": {
+    "color": "#5a6068"
+   },
+   "src": "earth: dark grey roof now (cyan on the GSI photo) (sub-d top, sheets/d2)"
+  },
+  {
+   "id": "16/58540/25068/215",
+   "roof": {
+    "shape": "gable",
+    "color": "#7c7e7c"
+   },
+   "src": "earth: grey pitched roof, not a white flat deck (sub-d top, sheets/d3)"
+  },
+  {
+   "id": "16/58540/25068/242",
+   "roof": {
+    "color": "#5a6066"
+   },
+   "src": "earth: dark grey roof (sub-d top, sheets/d4)"
+  },
+  {
+   "id": "16/58540/25068/233",
+   "roof": {
+    "color": "#8a5040"
+   },
+   "src": "earth: rust-red roof on the small shrine hall (sub-d top, sheets/d4)"
+  },
+  {
+   "id": "16/58540/25068/224",
+   "kind": "shrine",
+   "name": "紫神社",
+   "nameEn": "Murasaki Shrine",
+   "roof": {
+    "color": "#4a4c50"
+   },
+   "src": "earth: the hall under the 紫神社 label with its torii, a dark grey roof (sub-d top, o180, sheets/d4)"
+  },
+  {
+   "id": "16/58540/25068/194",
+   "remove": true,
+   "src": "earth: forest canopy on the slope, no roof visible; the GSI photo shows trees too (sub-d top, sheets/d2, d3)"
+  },
+  {
+   "id": "16/58540/25068/176",
+   "remove": true,
+   "src": "earth: forest canopy on the slope, no roof visible; the GSI photo shows trees too (sub-d top, sheets/d2, d3)"
+  },
+  {
+   "id": "16/58540/25068/179",
+   "remove": true,
+   "src": "earth: forest canopy on the slope, no roof visible; the GSI photo shows trees too (sub-d top, sheets/d2, d3)"
+  },
+  {
+   "id": "16/58540/25068/177",
+   "remove": true,
+   "src": "earth: forest canopy on the slope, no roof visible; the GSI photo shows trees too (sub-d top, sheets/d2, d3)"
+  },
+  {
+   "id": "16/58540/25068/182",
+   "remove": true,
+   "src": "earth: forest canopy on the slope, no roof visible; the GSI photo shows trees too (sub-d top, sheets/d2, d3)"
+  }
+ ],
+ "newLots": [],
+ "landuse": [
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -241,
+     12
+    ],
+    [
+     -223.3,
+     5.3
+    ],
+    [
+     -203,
+     35.9
+    ],
+    [
+     -221,
+     42
+    ]
+   ],
+   "replace": true,
+   "src": "earth: bare earth lot (no lawn) east of the paved square, where OSM maps 2号公園 as a park (sub-d top, z_plaza_top.jpg, z_plaza_o0.jpg)"
+  },
+  {
+   "use": "plaza",
+   "ring": [
+    [
+     -242.9,
+     13.6
+    ],
+    [
+     -220,
+     41.2
+    ],
+    [
+     -226.6,
+     51.1
+    ],
+    [
+     -244.9,
+     30
+    ]
+   ],
+   "src": "earth: a paved square with a bean-shaped dark feature, lined with lamps, between the vacant lot and the 南町 back row (sub-d top, z_plaza_top.jpg)"
+  }
+ ],
+ "roads": [],
+ "props": []
+}

@@ -3,7 +3,8 @@
 //   height / storeys: OSM height > OSM building:levels > derived (GSI code, area, zone: scripts/anime/derive.js)
 //   kind:             OSM tags (building, amenity, shop, religion; or a shop/amenity node inside) > GSI facility > derived
 //   roof shape:       OSM roof:shape > aerial class (scripts/anime/enrich/aerial.js) > derived
-//   roof colour:      OSM roof:colour > aerial median (white-balanced, lightly graded) > derived palette
+//   roof colour:      OSM roof:colour > aerial median (through the GSI -> Earth 2026 transform fitted on the override lots,
+//                     [v5:fix2]; the white balance without overrides) > derived palette
 //   ridge:            aerial ridge direction, when the aerial or OSM shape is pitched
 //   wall colour:      OSM building:colour > derived pastel
 //   name:             OSM building name > named OSM POI inside > GSI Anno facility name
@@ -34,19 +35,47 @@ export function roofWhiteBalance(table) {
   // only half of the correction: the median roof in Kesennuma is a bluish-grey metal roof, not neutral
   return m.map((v) => Math.round((1 + (g / v - 1) * 0.5) * 1000) / 1000);
 }
-/** Photo roof colour -> the rendered roof colour: white balance, then a light anime grade (saturation x1.18, a small
- *  lift of the darks) that keeps the hue, so the roof still matches the photo (the accuracy audit measures the ΔE). */
-export function gradeRoof(photoHex, wb = [1, 1, 1]) {
-  const c = rgbOf(photoHex).map((v, i) => Math.min(255, v * wb[i]));
-  const [h, s, v] = rgbToHsv(c[0], c[1], c[2]);
-  const s2 = Math.min(1, s * 1.18), v2 = Math.min(1, 0.06 + v * 0.97);
-  // quantised to 4-level steps (imperceptible, and it keeps the far-lot colour table small)
-  return hex(hsvToRgb(h, s2, v2).map((x) => Math.min(252, Math.round(x / 4) * 4)));
+/** [v5:fix2] The GSI photo -> Google Earth 2026-03-11 colour transform: a 3x3 matrix plus offset (sRGB 0..255) fitted by
+ *  least squares from each override lot's GSI roof colour (enrich `rgb`) to its Earth override colour (`roof.color` of
+ *  data/anime/overrides). One refit drops the pairs whose residual is over 2.5 robust sigmas (a roof re-clad since the
+ *  GSI photo). `pairs` = [[gsiHex, earthHex], ...]. -> { m: [[r,g,b,1] coefficients per output channel], k, n, dropped, rms } */
+export function fitRoofTransform(pairs, k = 1.3) {
+  const P = pairs.map(([a, b]) => [rgbOf(a), rgbOf(b)]);
+  const solve = (rows) => {
+    const W = [];
+    for (let c = 0; c < 3; c++) {
+      const A = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], y = [0, 0, 0, 0];
+      for (const [x, t] of rows) { const v = [x[0], x[1], x[2], 255]; for (let i = 0; i < 4; i++) { y[i] += v[i] * t[c]; for (let j = 0; j < 4; j++) A[i][j] += v[i] * v[j]; } }
+      // a whisper of ridge toward identity keeps the solve stable for a narrow colour range
+      const lam = 1e-3 * rows.length * 255 * 255; for (let i = 0; i < 3; i++) { A[i][i] += lam; y[i] += lam * (i === c ? 1 : 0); }
+      // Gauss-Jordan
+      const M = A.map((r, i) => [...r, y[i]]);
+      for (let i = 0; i < 4; i++) { let p = i; for (let k = i + 1; k < 4; k++) if (Math.abs(M[k][i]) > Math.abs(M[p][i])) p = k; [M[i], M[p]] = [M[p], M[i]]; for (let k = 0; k < 4; k++) if (k !== i) { const f = M[k][i] / M[i][i]; for (let j = i; j < 5; j++) M[k][j] -= f * M[i][j]; } }
+      W.push(M.map((r, i) => r[4] / r[i]));
+    }
+    return W;
+  };
+  const apply = (W, x) => W.map((w) => w[0] * x[0] + w[1] * x[1] + w[2] * x[2] + w[3] * 255);
+  const res = (W, [x, t]) => Math.hypot(...apply(W, x).map((v, i) => v - t[i]));
+  let W = solve(P);
+  const r0 = P.map((p) => res(W, p)), med = [...r0].sort((a, b) => a - b)[r0.length >> 1] || 0, cut = 2.5 * 1.4826 * med + 1;
+  const keep = P.filter((p, i) => r0[i] <= cut);
+  if (keep.length >= 12) W = solve(keep);
+  const rms = Math.sqrt(keep.reduce((s, p) => s + res(W, p) ** 2, 0) / Math.max(1, keep.length));
+  // least squares pulls every roof toward the mean (L* spread 9.4 vs Earth's 16.0 on the override lots): spread the
+  // output by `k` round its mean (k 1.3: median ΔE2000 10.4 -> 10.1, L* spread 12.3; the v4 grade scored 13.3)
+  const mu = [0, 1, 2].map((c) => keep.reduce((s, [x]) => s + apply(W, x)[c], 0) / Math.max(1, keep.length));
+  const Wk = W.map((w, c) => [w[0] * k, w[1] * k, w[2] * k, w[3] * k + (1 - k) * mu[c] / 255]);
+  return { m: Wk.map((w) => w.map((v) => Math.round(v * 1e4) / 1e4)), k, n: keep.length, dropped: P.length - keep.length, rms: Math.round(rms * 10) / 10 };
 }
-function hsvToRgb(h, s, v) {
-  const c = v * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = v - c;
-  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
-  return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+/** Photo roof colour -> the rendered roof colour. [v5:fix2] `t` is the fitted GSI -> Earth transform (fitRoofTransform);
+ *  an array is the legacy per-channel white balance. No anime lift or saturation boost any more: the v4 grade (+0.06 value,
+ *  saturation x1.18) on top of a white balance that kept the photo's cyan cast made the roofs too light and teal
+ *  (c6: app L* 63.9 vs Earth 51.8; 59 teal roofs vs 4). Quantised to 4-level steps (keeps the far-lot colour table small). */
+export function gradeRoof(photoHex, t = [1, 1, 1]) {
+  const x = rgbOf(photoHex);
+  const c = Array.isArray(t) ? x.map((v, i) => v * t[i]) : t.m.map((w) => w[0] * x[0] + w[1] * x[1] + w[2] * x[2] + w[3] * 255);
+  return hex(c.map((v) => Math.max(0, Math.min(252, Math.round(v / 4) * 4))));
 }
 
 /** Storey height by kind (m), for OSM building:levels. */
@@ -91,10 +120,12 @@ export function enrichLot(e, base, wb, classify) {
   // names and use
   // [v4:polish1] a GSI facility name (気仙沼駅) wins over a shop or café POI matched inside the footprint (NewDays)
   const poiName = /^(shop|amenity):/.test(e.use || "") && showable(e.gsiName) && e.gsiCat;
-  const name = (poiName ? [e.gsiName, e.name] : [e.name, e.gsiName]).find(showable);
+  // [v5] an open-space POI (a park's name node, ドラゴンパーク) names the open ground, not the shed that stands in it
+  const openSpace = /^leisure:(park|garden|pitch|nature_reserve|dog_park|common|track|playground)$/.test(e.use || "");
+  const name = (poiName ? [e.gsiName, e.name] : openSpace ? [e.gsiName] : [e.name, e.gsiName]).find(showable);
   if (name) { out.name = name; out.src.name = name === e.name ? "osm" : "gsi"; }
   if (name && name === e.name && showable(e.nameEn)) out.nameEn = e.nameEn;
-  if (e.use) out.use = e.use;
+  if (e.use && !openSpace) out.use = e.use;
   if (e.gsiCat) out.facility = e.gsiCat;
   if (e.osm) out.osm = e.osm;
   return out;
@@ -172,3 +203,9 @@ export function waterEdges(WA, tileEdge) {
 
 /** Stable, compact ids for places (search / labels): 'p' + hash of name and rounded position. */
 export const placeId = (name, p) => "p" + (hash32(name + "|" + Math.round(p[0]) + "," + Math.round(p[1])) >>> 0).toString(36);
+
+// ------------------------------------------------------------------ [v4:overrides] per-cell reference overrides
+// The last fold step: data/anime/overrides/*.json (docs/anime/OVERRIDES.md), applied by build-layout.js after the
+// enrichment and LOT_FIX, and by build-explore.js to the far-core streets. Implementation: ./overrides.js.
+export { loadOverrides, compileOverrides, validateOverride, overrideFeatures, patchLot, unusedLotPatches, applyRoadOverrides, applyLanduseOverrides, propPlacements, EMPTY as NO_OVERRIDES } from "./overrides.js";
+export const OVERRIDES_DIR = new URL("../../../data/anime/overrides/", import.meta.url).pathname.replace(/\/$/, "");

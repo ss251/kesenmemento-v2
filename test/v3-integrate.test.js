@@ -15,7 +15,7 @@ const ROOT = resolve(import.meta.dir, "..");
 const read = (p) => readFileSync(resolve(ROOT, p), "utf8");
 function rng(seed) { let s = 0; for (const c of String(seed)) s = (s * 31 + c.charCodeAt(0)) >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 function fakeCtx() {
-  const terrainU = { uAutumn: { value: 0.085 }, uSakura: { value: 0 } };
+  const terrainU = { uAutumn: { value: 0.02 }, uSakura: { value: 0 } };   // [v5:fix1] the terrain default
   return {
     L, scene: new THREE.Scene(), camera: new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 30000), quality: { name: "low" },
     services: { environment: { terrainMaterial: { userData: { uniforms: terrainU } } } }, rng, added: [],
@@ -38,7 +38,7 @@ describe("seasons", () => {
     const ctx = fakeCtx();
     const S = createSeason(ctx, {});
     expect(S.id).toBe("autumn");
-    expect(ctx.terrainU.uAutumn.value).toBeCloseTo(0.085, 5);
+    expect(ctx.terrainU.uAutumn.value).toBeCloseTo(0.02, 5);   // [v5:fix1] 2 % painted 紅葉 (was 8.5 %)
     S.set("spring");
     S.update(1.25);
     const mid = ctx.shared.uSeason.value.toArray();

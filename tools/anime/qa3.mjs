@@ -325,7 +325,9 @@ try {
     const res = await page.eval("[...document.querySelectorAll('#klc-x .xsearch li b')].slice(0, 4).map((b) => b.textContent)");
     await shot('11_search');
     await page.S('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Enter', key: 'Enter', windowsVirtualKeyCode: 13 }); await page.S('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Enter', key: 'Enter', windowsVirtualKeyCode: 13 });
-    await page.eval('new Promise((r) => setTimeout(r, 11000))');
+    // [v5] wait for the flight to land (up to 45 s): long frames while tiles stream are clamped to 0.1 s of flight each,
+    // so on a loaded machine the 11 s flight takes longer than 11 s of wall time
+    await page.eval('new Promise((r) => { const t0 = performance.now(); const f = () => { if ((performance.now() - t0 > 4000 && !window.__life.tour.flying) || performance.now() - t0 > 45000) r(1); else setTimeout(f, 250); }; f(); })');
     const atSt = await page.eval('(() => { const c = window.__ctx.camera.position; return { d: +Math.hypot(c.x + 1380, c.z + 420).toFixed(0), pin: window.__explore.labels?.pinned?.ja || null, shown: window.__explore.labels?.stats.shown }; })()');
     check('explore: search 気仙沼駅 (JA) lists it and flies there, its label pinned', open && res[0] === '気仙沼駅' && atSt.d < 600 && !!atSt.pin, { open, res, ...atSt });
     await shot('12_search_station');

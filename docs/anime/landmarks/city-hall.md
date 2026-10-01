@@ -22,7 +22,10 @@
   - A flat roof: ortho median #b7cecd → light grey #c2c4c0.
   - Stairs climb from the street to the forecourt, with a pine tree and a hedge at the entrance.
 - **第二庁舎.** A **2-storey wooden building with weathered dark timber siding** (#5e5448) and white-framed sash windows.
-  - A long **grey gable roof** (#7d8a8e; ortho #7d918f).
+  - A long **dark grey gable roof** (#585d66). The GSI ortho reads #7d918f, but Google Earth (imagery 2026-03-11,
+    `raw/ref/earth/c1/B`, reference only) shows it dark; the newer source wins.
+- **第三庁舎** (1974): a dark grey flat roof (#51575f, Earth 2026). **東分庁舎** (1960): a **red hipped roof** (#ad6f6c,
+  Earth 2026; the GSI ortho had it beige). 第二東分庁舎: pale grey (#c9ccc9).
   - It is a former school building, and it has cars parked along its front.
 - **ワン・テン.** A **mauve-pink 2-storey base** (#b8959c) with a teal band (#3f8f94), shop windows at street level, and
   a big **grey concrete multi-storey car park** above (#bdbdb8).

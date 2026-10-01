@@ -19,8 +19,9 @@ street-level place in town and must be right.
 
 - A low, smooth **light concrete parapet**, #c9c8c1.
 - The flap-gate panels lie flat as a continuous metal-grey band on the crest (#8d9296), in segments of about 13.7 m.
-- The paving between the road and the wall reads as a warm pink-red interlocking-block strip on the ortho (judged by eye;
-  a 2 m sample gives #a0b4b3 because of the cast and the wall shadow). Pick about #c49a8e and verify on a street photo.
+- The paving between the road and the wall: **pale grey concrete blocks, about #b8b6b2**, with brown planter and bench
+  boxes (Google Earth, imagery 2026-03-11, [v5:fix1]). The older ortho read as a warm pink-red strip by eye (a 2 m sample
+  gave #a0b4b3 because of the cast and the wall shadow), so v4 drew #c49a8e; Earth 2026 overrules it.
 - Dark steel handrails.
 - Steps and rest decks lead up and over to the water side, where there are boat berths.
 - The wall sits low enough that **you can see the bay over it from the pavement**. That was the whole point of the design.

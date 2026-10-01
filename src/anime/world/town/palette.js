@@ -13,20 +13,20 @@ const h = (seed, k) => { let x = (seed ^ (k * 0x9e3779b1)) >>> 0; x = Math.imul(
 
 /** Wall colour: keep the layout's pastel 55 % of the time, otherwise a warmer palette colour. */
 export function wallOf(lot) {
-  if (lot.src?.wall === 'osm') return lot.wall;   // [v4:data] OSM building:colour is the real wall colour
+  if (lot.src?.wall === 'osm' || lot.src?.wall === 'override') return lot.wall;   // [v4:data] OSM building:colour is the real wall colour  [v4:overrides] or an override's
   if (lot.kind === 'warehouse' || lot.kind === 'factory') return SHED[Math.floor(h(lot.seed, 1) * SHED.length)];
   return h(lot.seed, 2) < 0.55 ? lot.wall : WALLS[Math.floor(h(lot.seed, 3) * WALLS.length)];
 }
 /** Pitched roof colour: the photo colour unless it is pale / grey (then the anime roof palette). */
 export function pitchedRoofOf(lot) {
   const c = lot.roof.color;
-  if (lot.src?.color === 'aerial' || lot.src?.color === 'osm') return c;   // [v4:data] the measured roof colour (aerial photo / OSM)
+  if (lot.src?.color === 'aerial' || lot.src?.color === 'osm' || lot.src?.color === 'override') return c;   // [v4:data] the measured roof colour (aerial photo / OSM)  [v4:overrides]
   if (PALE_ROOF.has(c) || (GREY_ROOF.has(c) && h(lot.seed, 4) < 0.65)) return PITCHED[Math.floor(h(lot.seed, 5) * PITCHED.length)];
   return c;
 }
 /** Flat roof colour: green waterproof coating, warm grey or the photo colour. */
 export function flatRoofOf(lot) {
-  if (lot.src?.color === 'aerial' || lot.src?.color === 'osm') return lot.roof.color;   // [v4:data] measured
+  if (lot.src?.color === 'aerial' || lot.src?.color === 'osm' || lot.src?.color === 'override') return lot.roof.color;   // [v4:data] measured  [v4:overrides]
   const k = h(lot.seed, 6);
   if (k < 0.45) return FLAT[Math.floor(h(lot.seed, 7) * FLAT.length)];
   return PALE_ROOF.has(lot.roof.color) ? '#c2bfb6' : lot.roof.color;

@@ -6,6 +6,8 @@ import { STEP_HEIGHT } from './physics.js';
 
 const DEG = Math.PI / 180;
 export const FLY = 25, FLY_RUN = 70;   // [v4:polish3] fly speeds, m/s
+/** [v5:fix3] feet height of a walking eye placed over open water (sea level 0 + a small boat deck), m */
+export const SEA_DECK = 0.6;
 
 export class Player {
   constructor(camera, dom, physics, bounds) {
@@ -69,6 +71,9 @@ export class Player {
   setPose(x, z, yawDeg = 0, pitchDeg = 0, y = null) {
     this.pos.set(x, 0, z);
     this.pos.y = y !== null ? y - this.eye : this.physics.groundHeight(x, z, 1e9);
+    // [v5:fix3] a walking eye set over open water stands at boat-deck height on the surface, never on the seabed: the
+    // eye under the sea saw the water plane's culled underside, a white half-frame (review3 walk/p7_prom, sh_ukimi)
+    if (y === null && this.physics.isWater?.(x, z) && this.pos.y < SEA_DECK) this.pos.y = SEA_DECK;
     if (y !== null) this.fly = true;
     this.yaw = yawDeg * DEG; this.pitch = pitchDeg * DEG; this.vy = 0; this.smoothY = null;
     this.applyCamera(0);
@@ -132,7 +137,8 @@ export class Player {
       p.x = THREE.MathUtils.clamp(p.x, b.x0, b.x1); p.z = THREE.MathUtils.clamp(p.z, b.z0, b.z1);
       this.distance += Math.hypot(p.x - this.pos.x, p.z - this.pos.z);
       this.pos.x = p.x; this.pos.z = p.z;
-      const g = this.physics.groundHeight(this.pos.x, this.pos.z, this.pos.y);
+      let g = this.physics.groundHeight(this.pos.x, this.pos.z, this.pos.y);
+      if (g < SEA_DECK && this.physics.isWater?.(this.pos.x, this.pos.z)) g = SEA_DECK;   // [v5:fix3] afloat, not on the seabed
       this.vy -= 12 * dt;
       this.pos.y += this.vy * dt;
       if (this.pos.y <= g) { this.pos.y = g; this.vy = 0; this.onGround = true; }

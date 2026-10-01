@@ -81,9 +81,9 @@ export const SPEC = {
   // 八日町 city hall campus (city-hall.md; Commons "Kesennuma City Hall 01.JPG": 3 storeys of beige-grey render,
   // green-tinted glass, a rooftop penthouse and two lattice radio masts)
   cityHall: { storeys: 3, fh: 3.7, wall: '#cdc9bf', roof: '#c2c4c0', src: 'OSM building:levels=3; core DEM 8.4–11.6 under the outline (the sheet\'s T.P. 10.6 is the uphill side); photo' },
-  cityHall2: { storeys: 2, fh: 3.3, wall: '#5e5448', roof: '#7d8a8e', src: 'OSM start_date 1909 (former wooden school); photo: dark weathered siding, grey gable roof' },
-  cityHall3: { storeys: 2, fh: 3.4, wall: '#d4d0c6', roof: '#8a9796', src: 'OSM start_date 1974; ortho' },
-  cityHallE: { storeys: 2, fh: 3.3, wall: '#d8d2c4', roof: '#b7a8a0', src: 'OSM start_date 1960; ortho' },
+  cityHall2: { storeys: 2, fh: 3.3, wall: '#5e5448', roof: '#585d66', src: 'OSM start_date 1909 (former wooden school); photo: dark weathered siding; [v5] Earth 2026-03-11 (raw/ref/earth/c1/B): a dark grey gable roof' },
+  cityHall3: { storeys: 2, fh: 3.4, wall: '#d4d0c6', roof: '#51575f', src: 'OSM start_date 1974; [v5] Earth 2026-03-11 (raw/ref/earth/c1/B): a dark grey roof' },
+  cityHallE: { storeys: 2, fh: 3.3, wall: '#d8d2c4', roof: '#ad6f6c', src: 'OSM start_date 1960; [v5] Earth 2026-03-11 (raw/ref/earth/c1/B): a red hipped roof' },
   cityHallE2: { storeys: 2, fh: 3.3, wall: '#d8d2c4', roof: '#c9ccc9', src: 'OSM start_date 1960; ortho' },
   oneTen: { storeys: 4, fh: 3.2, base: '#b8959c', band: '#3f8f94', deck: '#bdbdb8', src: 'OSM building:levels=4, start_date 1999; photo: mauve base, teal band, parking deck, One-Ten logo tower' },
   // JR/BRT 気仙沼駅 (kesennuma-station.md; Commons "JR East Kesennuma Station building"): one storey, 5-arch arcade in

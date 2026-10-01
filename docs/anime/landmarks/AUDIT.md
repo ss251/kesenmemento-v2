@@ -292,3 +292,60 @@ welcome terminal's roof colour (the ortho predates it).
     0.863, and 12 of 15 landmarks under 5 m.
   - Carried over: the 5合目 dragons, the 五十鈴神社 roof form, 迎's facade material, やしま丸 and the 海の市 south canopy.
 
+
+## 9. Status after the v5 accuracy sweep (2026-10-01)
+
+Twelve 500 × 600 m cells were checked against Google Earth 3D, which has imagery dated 2026-03-11 and was used for
+reference only. The fixes went into `data/anime/overrides/c1.json` to `c12.json`. Before and after images and the
+metrics are in [../../shots/v5_cells/README.md](../../shots/v5_cells/README.md).
+
+- **Landmarks:** 15 of 15 are within 5 m, before and after (`dist/qa5/v5/accuracy_core_after.json`,
+  `lm_core_after_*.jpg`).
+- **PIER7 / 南町** (`pier7.md`):
+  - The terraced garden between 迎 and PIER7 is now pale grey concrete paving, with three white ring planters
+    holding low planting. It was a brown timber deck with three tall trees, and both Earth and the GSI ortho show
+    white rings with dark centres and no crown.
+  - The landing over the wall is tan stone steps.
+  - The quay yard in front of PIER7 and the strip north of the garden are plain asphalt (override use `apron`, in
+    `c6.json`). Before, they were pale bare ground.
+  - Comparison sheet: `docs/shots/v5_cells/pier7.jpg`.
+- **気仙沼市役所** (`city-hall.md`): 第二庁舎 and 第三庁舎 now have dark grey roofs and 東分庁舎 a red hipped roof, as in
+  Earth 2026. The GSI ortho had them grey and beige.
+- **Still open:**
+  - The Plaza Hotel model (a white 7-storey tower, where Earth shows lower stepped wings with pale green roofs).
+  - The sand beach on 神明崎's west side, where the shore is a concrete revetment.
+  - The pre-reconstruction coastline at 浪板 and 大浦: curved beaches and a false inlet at x 1080–1160, z 50–130.
+  - The 海の市 deck outline and the number of cars on the market roof.
+  - The lawn north of 迎 stays green: it is a lawn, which shows brown in the March imagery.
+
+## 10. Status after v5 fix round 2, part A (2026-10-01)
+
+Review round 2 re-rendered the integrated build from the round-1 Google Earth cameras (imagery 2026-03-11, reference
+only). Part A fixed the accuracy blockers below; the scores are `tools/anime/earth-de.mjs` with one registration per
+cell (before = the review build, after = this round).
+
+| Cell | Roof ΔE2000 median, before → after | Lots over 20, before → after |
+|---|---|---|
+| PIER7 | 14.6 → 13.5 | 4 → 3 of 14 |
+| c5 | 18.0 → 12.0 | 153 → 72 of 371 |
+| c6 | 17.8 → 12.3 | 120 → 58 of 298 |
+| c6-a 魚町 | 18.1 → 10.7 | 26 → 15 of 76 |
+| c6-c 南町 | 15.1 → 12.6 | 16 → 9 of 53 |
+| c6-d | 15.8 → 12.0 | 8 → 8 of 21 |
+| c7n 神明崎 | 12.2 → 11.2 | 6 → 4 of 24 |
+| c1-c 八日町 | 18.7 → 13.3 | 26 → 17 of 58 |
+
+- **PIER7** (`pier7.md`): three white roof blocks along the bar (NW ~9 m, main 3F ~13 m, SE hall ~11 m), a white
+  street face with timber louvers at a 1.1 m pitch, white kerb ring planters with low planting, a #b5ab9f landing.
+- **Roof colours**: a GSI → Earth colour transform fitted on the override lots replaces the white balance and the anime
+  grade (`enrich/fold.js` `fitRoofTransform`). The photo-coloured roofs of the 12 cells averaged RGB (160, 166, 167)
+  with 681 teal roofs; now (151, 146, 148) with 149.
+- **Ground**: grass or field covered 34.5 % of the core town's land cover; now 6.8 %. Car parks, aprons, gravel lots,
+  building sites and footprints are forced to paving or town ground, and the classes are smoothed (5x5 majority, 1 px
+  feather). The 魚市場 land-side strip is an apron (it was pale plaza paving).
+- **Hills**: cedar canopy on the c1, c2 and c5 hills; 81 % of the trees there are cedars (was 34 %). New override uses
+  `forest`, `cedar` and `felled`: the cedar wood behind 法玄寺 (c2), the 赤土山自然公園 ring (cedar, not lawn) and the
+  felled strip above 八日町 (c1).
+- **海の市 walk spot** moved to (350, 690), clear of the new office lots.
+- **Still open**: the summer-green crowns against the March imagery, the 迎 lawn, the hill trails, the cedar crown tone
+  (lighter than Earth's), c1-d's hillside roofs (median 31.8, mostly hidden under crowns).

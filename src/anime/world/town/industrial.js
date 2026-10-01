@@ -70,7 +70,7 @@ export function buildWarehouse(H, lot, lod, IM, SM, signs, r, out) {
   const rusty = nearSea ? r() < 0.75 : r() < 0.3;
   const wallMat = rusty ? IM.rust : IM.corr;
   const wall = pick(r, WALLS);
-  const measuredCol = lot.src?.color === 'aerial' || lot.src?.color === 'osm';   // [v4:data] the photo / OSM colour
+  const measuredCol = lot.src?.color === 'aerial' || lot.src?.color === 'osm' || lot.src?.color === 'override';   // [v4:overrides]   // [v4:data] the photo / OSM colour
   const roofCol = measuredCol ? lot.roof.color : lot.roof.color === '#d8dbd6' || lot.roof.color === '#b9bab4' ? pick(r, ROOFS) : (r() < 0.5 ? lot.roof.color : pick(r, ROOFS));
   // plinth + dock
   HF.boxB(M.concrete, '#bdbcb5', w + 0.1, fy - gmin + 0.35, d + 0.1, 0, gmin - 0.3, 0, { uv: { world: 2 } });
@@ -149,7 +149,7 @@ export function buildWarehouse(H, lot, lod, IM, SM, signs, r, out) {
   const top = fy + h;
   if (lot.roof.shape === 'flat' || (plant && r() < 0.4)) {
     HF.boxB(M.concrete, '#c9c7c0', w + 0.1, 0.5, d + 0.1, 0, top, 0, { uv: { world: 2 } });
-    HF.boxB(M.plain, roofCol, w - 0.5, 0.06, d - 0.5, 0, top + 0.44, 0);
+    HF.boxB(M.plain, roofCol, w - 0.5, 0.06, d - 0.5, 0, top + 0.5, 0);   // [v5] above the parapet's top face (top + 0.5): it z-fought there
   } else if (lot.roof.shape === 'saw' || (plant && w * d > 800 && r() < 0.5)) {
     // saw-tooth roof along the long axis
     const L2 = alongX ? w : d, D2 = alongX ? d : w, teeth = Math.max(2, Math.round(D2 / 6));

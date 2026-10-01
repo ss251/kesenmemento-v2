@@ -1,0 +1,2600 @@
+{
+ "version": 1,
+ "cell": "c2",
+ "bbox": [
+  -200,
+  -800,
+  300,
+  -200
+ ],
+ "note": "太田・入沢・陣山・栄町 (north of the inner bay). Roof colours: the median roof colour per lot on Google Earth top views (imagery 2026-03-11) at ~0.32 m/px (raw/ref/earth/c2/sub/<block>/earth_top.png, registered per block and per lot), with the Earth-vs-app grading measured on asphalt removed (linear x 1/0.90, 1/0.82, 1/0.80); applied where it differs from the app by dE2000 >= 10. Everything else is hand-read from the Earth views and cited per entry.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, reference captures raw/ref/earth/c2 (not shipped)",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo data/ortho/core.jpg (about 2020-2022) and 基盤地図情報 footprints"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap, © OpenStreetMap contributors (ODbL), extract 2026-05-06"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58540/25066/10",
+   "roof": {
+    "color": "#767482"
+   },
+   "src": "earth: roof #767482 on the top view (sub/nw, lot 230); app #a5c7cc"
+  },
+  {
+   "id": "16/58540/25066/11",
+   "roof": {
+    "color": "#96adab"
+   },
+   "src": "earth: roof #96adab on the top view (sub/nw, lot 231); app #305c39"
+  },
+  {
+   "id": "16/58540/25066/12",
+   "roof": {
+    "color": "#d2dcca"
+   },
+   "src": "earth: roof #d2dcca on the top view (sub/nw, lot 232); app #c7bbb3"
+  },
+  {
+   "id": "16/58540/25066/14",
+   "roof": {
+    "color": "#dafbef"
+   },
+   "src": "earth: roof #dafbef on the top view (sub/nw, lot 234); app #acc2bb"
+  },
+  {
+   "id": "16/58540/25066/15",
+   "roof": {
+    "color": "#b99895"
+   },
+   "src": "earth: roof #b99895 on the top view (sub/nw, lot 235); app #f6f4ea"
+  },
+  {
+   "id": "16/58540/25066/16",
+   "roof": {
+    "color": "#7c888e"
+   },
+   "src": "earth: roof #7c888e on the top view (sub/nw, lot 236); app #405650"
+  },
+  {
+   "id": "16/58540/25066/17",
+   "roof": {
+    "color": "#d2d4c0"
+   },
+   "src": "earth: roof #d2d4c0 on the top view (sub/nw, lot 237); app #c7bbb3"
+  },
+  {
+   "id": "16/58540/25066/3",
+   "roof": {
+    "color": "#647477"
+   },
+   "src": "earth: roof #647477 on the top view (sub/nw, lot 245); app #b1beaf"
+  },
+  {
+   "id": "16/58540/25066/31",
+   "roof": {
+    "color": "#d5eee3"
+   },
+   "src": "earth: roof #d5eee3 on the top view (sub/nw, lot 247); app #c3d0da"
+  },
+  {
+   "id": "16/58540/25066/37",
+   "roof": {
+    "color": "#756274"
+   },
+   "src": "earth: roof #756274 on the top view (sub/nw, lot 252); app #a77a71"
+  },
+  {
+   "id": "16/58540/25066/38",
+   "roof": {
+    "color": "#7d858f"
+   },
+   "src": "earth: roof #7d858f on the top view (sub/nw, lot 253); app #2e4854"
+  },
+  {
+   "id": "16/58540/25066/39",
+   "roof": {
+    "color": "#d1ddca"
+   },
+   "src": "earth: roof #d1ddca on the top view (sub/nw, lot 254); app #b7b3ad"
+  },
+  {
+   "id": "16/58540/25066/6",
+   "roof": {
+    "color": "#b09d9d"
+   },
+   "src": "earth: roof #b09d9d on the top view (sub/nw, lot 260); app #60545d"
+  },
+  {
+   "id": "16/58540/25067/101",
+   "roof": {
+    "color": "#848c88"
+   },
+   "src": "earth: roof #848c88 on the top view (sub/mw, lot 265); app #465d54"
+  },
+  {
+   "id": "16/58540/25067/102",
+   "roof": {
+    "color": "#7b7a80"
+   },
+   "src": "earth: roof #7b7a80 on the top view (sub/mw, lot 266); app #a78f81"
+  },
+  {
+   "id": "16/58540/25067/103",
+   "roof": {
+    "color": "#82a2b0"
+   },
+   "src": "earth: roof #82a2b0 on the top view (sub/nw, lot 267); app #5fc4d3"
+  },
+  {
+   "id": "16/58540/25067/104",
+   "roof": {
+    "color": "#b8a7a2"
+   },
+   "src": "earth: roof #b8a7a2 on the top view (sub/nw, lot 268); app #f6f4e9"
+  },
+  {
+   "id": "16/58540/25067/106",
+   "roof": {
+    "color": "#ad989b"
+   },
+   "src": "earth: roof #ad989b on the top view (sub/nw, lot 270); app #907275"
+  },
+  {
+   "id": "16/58540/25067/109",
+   "roof": {
+    "color": "#a2c0c5"
+   },
+   "src": "earth: roof #a2c0c5 on the top view (sub/nw, lot 273); app #62999b"
+  },
+  {
+   "id": "16/58540/25067/110",
+   "roof": {
+    "color": "#6d7d86"
+   },
+   "src": "earth: roof #6d7d86 on the top view (sub/nw, lot 274); app #969b9a"
+  },
+  {
+   "id": "16/58540/25067/111",
+   "roof": {
+    "color": "#c8a39d"
+   },
+   "src": "earth: roof #c8a39d on the top view (sub/mw, lot 275); app #c07a75"
+  },
+  {
+   "id": "16/58540/25067/113",
+   "roof": {
+    "color": "#a6cad2"
+   },
+   "src": "earth: roof #a6cad2 on the top view (sub/nw, lot 277); app #666062"
+  },
+  {
+   "id": "16/58540/25067/116",
+   "roof": {
+    "color": "#7f9797"
+   },
+   "src": "earth: roof #7f9797 on the top view (sub/nw, lot 279); app #b2b7b9"
+  },
+  {
+   "id": "16/58540/25067/117",
+   "roof": {
+    "color": "#a6a89a"
+   },
+   "src": "earth: roof #a6a89a on the top view (sub/mw, lot 280); app #a0c3c8"
+  },
+  {
+   "id": "16/58540/25067/118",
+   "roof": {
+    "color": "#8f9b96"
+   },
+   "src": "earth: roof #8f9b96 on the top view (sub/mw, lot 281); app #8a6662"
+  },
+  {
+   "id": "16/58540/25067/119",
+   "roof": {
+    "color": "#a1a9a1"
+   },
+   "src": "earth: roof #a1a9a1 on the top view (sub/mw, lot 282); app #53657e"
+  },
+  {
+   "id": "16/58540/25067/120",
+   "roof": {
+    "color": "#b2cbc8"
+   },
+   "src": "earth: roof #b2cbc8 on the top view (sub/nw, lot 283); app #869797"
+  },
+  {
+   "id": "16/58540/25067/122",
+   "roof": {
+    "color": "#a99994"
+   },
+   "src": "earth: roof #a99994 on the top view (sub/mw, lot 285); app #7d7f6f"
+  },
+  {
+   "id": "16/58540/25067/125",
+   "roof": {
+    "color": "#828c84"
+   },
+   "src": "earth: roof #828c84 on the top view (sub/mw, lot 287); app #b6c3bc"
+  },
+  {
+   "id": "16/58540/25067/126",
+   "roof": {
+    "color": "#8b948c"
+   },
+   "src": "earth: roof #8b948c on the top view (sub/mw, lot 288); app #adc3c9"
+  },
+  {
+   "id": "16/58540/25067/131",
+   "roof": {
+    "color": "#848981"
+   },
+   "src": "earth: roof #848981 on the top view (sub/mw, lot 291); app #aab3b0"
+  },
+  {
+   "id": "16/58540/25067/132",
+   "roof": {
+    "color": "#435062"
+   },
+   "src": "earth: roof #435062 on the top view (sub/mw, lot 292); app #826e66"
+  },
+  {
+   "id": "16/58540/25067/133",
+   "roof": {
+    "color": "#abb6ad"
+   },
+   "src": "earth: roof #abb6ad on the top view (sub/mw, lot 293); app #f6f4e9"
+  },
+  {
+   "id": "16/58540/25067/139",
+   "roof": {
+    "color": "#9da397"
+   },
+   "src": "earth: roof #9da397 on the top view (sub/mw, lot 295); app #a4c7d1"
+  },
+  {
+   "id": "16/58540/25067/143",
+   "roof": {
+    "color": "#8a9e9e"
+   },
+   "src": "earth: roof #8a9e9e on the top view (sub/mw, lot 298); app #b3cdd7"
+  },
+  {
+   "id": "16/58540/25067/146",
+   "roof": {
+    "color": "#849394"
+   },
+   "src": "earth: roof #849394 on the top view (sub/mw, lot 301); app #3e526c"
+  },
+  {
+   "id": "16/58540/25067/147",
+   "roof": {
+    "color": "#455566"
+   },
+   "src": "earth: roof #455566 on the top view (sub/mw, lot 302); app #c2cfd5"
+  },
+  {
+   "id": "16/58540/25067/148",
+   "roof": {
+    "color": "#626d79"
+   },
+   "src": "earth: roof #626d79 on the top view (sub/mw, lot 303); app #85968e"
+  },
+  {
+   "id": "16/58540/25067/150",
+   "roof": {
+    "color": "#b3bab6"
+   },
+   "src": "earth: roof #b3bab6 on the top view (sub/mw, lot 305); app #725749"
+  },
+  {
+   "id": "16/58540/25067/152",
+   "roof": {
+    "color": "#827272"
+   },
+   "src": "earth: roof #827272 on the top view (sub/mw, lot 307); app #6f7065"
+  },
+  {
+   "id": "16/58540/25067/153",
+   "roof": {
+    "color": "#61777d"
+   },
+   "src": "earth: roof #61777d on the top view (sub/mw, lot 308); app #f6f4e9"
+  },
+  {
+   "id": "16/58540/25067/154",
+   "roof": {
+    "color": "#7d8e94"
+   },
+   "src": "earth: roof #7d8e94 on the top view (sub/mw, lot 309); app #f6f5ea"
+  },
+  {
+   "id": "16/58540/25067/160",
+   "roof": {
+    "color": "#defaeb"
+   },
+   "src": "earth: roof #defaeb on the top view (sub/mw, lot 315); app #dad7e2"
+  },
+  {
+   "id": "16/58540/25067/161",
+   "roof": {
+    "color": "#a1b8ba"
+   },
+   "src": "earth: roof #a1b8ba on the top view (sub/mw, lot 316); app #4d6b7d"
+  },
+  {
+   "id": "16/58540/25067/163",
+   "roof": {
+    "color": "#a8ada2"
+   },
+   "src": "earth: roof #a8ada2 on the top view (sub/mw, lot 318); app #a19a99"
+  },
+  {
+   "id": "16/58540/25067/165",
+   "roof": {
+    "color": "#6f757b"
+   },
+   "src": "earth: roof #6f757b on the top view (sub/mw, lot 320); app #415f70"
+  },
+  {
+   "id": "16/58540/25067/167",
+   "roof": {
+    "color": "#b29b95"
+   },
+   "src": "earth: roof #b29b95 on the top view (sub/mw, lot 322); app #3d5767"
+  },
+  {
+   "id": "16/58540/25067/168",
+   "roof": {
+    "color": "#656d82"
+   },
+   "src": "earth: roof #656d82 on the top view (sub/mw, lot 323); app #a4b6c1"
+  },
+  {
+   "id": "16/58540/25067/169",
+   "roof": {
+    "color": "#adc3b4"
+   },
+   "src": "earth: roof #adc3b4 on the top view (sub/mw, lot 324); app #cac4b5"
+  },
+  {
+   "id": "16/58540/25067/170",
+   "roof": {
+    "color": "#968f8e"
+   },
+   "src": "earth: roof #968f8e on the top view (sub/mw, lot 325); app #7492a3"
+  },
+  {
+   "id": "16/58540/25067/173",
+   "roof": {
+    "color": "#37485f"
+   },
+   "src": "earth: roof #37485f on the top view (sub/mw, lot 328); app #a7827d"
+  },
+  {
+   "id": "16/58540/25067/175",
+   "roof": {
+    "color": "#66757f"
+   },
+   "src": "earth: roof #66757f on the top view (sub/mw, lot 329); app #7d7374"
+  },
+  {
+   "id": "16/58540/25067/176",
+   "roof": {
+    "color": "#9e8e90"
+   },
+   "src": "earth: roof #9e8e90 on the top view (sub/mw, lot 330); app #6f5d62"
+  },
+  {
+   "id": "16/58540/25067/179",
+   "roof": {
+    "color": "#35414f"
+   },
+   "src": "earth: roof #35414f on the top view (sub/mw, lot 332); app #cac6bb"
+  },
+  {
+   "id": "16/58540/25067/180",
+   "roof": {
+    "color": "#a2c1c2"
+   },
+   "src": "earth: roof #a2c1c2 on the top view (sub/mw, lot 333); app #608089"
+  },
+  {
+   "id": "16/58540/25067/183",
+   "roof": {
+    "color": "#90b1a6"
+   },
+   "src": "earth: roof #90b1a6 on the top view (sub/mw, lot 336); app #96928e"
+  },
+  {
+   "id": "16/58540/25067/184",
+   "roof": {
+    "color": "#b4cdc9"
+   },
+   "src": "earth: roof #b4cdc9 on the top view (sub/mw, lot 337); app #b3b4b1"
+  },
+  {
+   "id": "16/58540/25067/185",
+   "roof": {
+    "color": "#a8c0bd"
+   },
+   "src": "earth: roof #a8c0bd on the top view (sub/mw, lot 338); app #9c969c"
+  },
+  {
+   "id": "16/58540/25067/186",
+   "roof": {
+    "color": "#ddeedf"
+   },
+   "src": "earth: roof #ddeedf on the top view (sub/mw, lot 339); app #bad4e2"
+  },
+  {
+   "id": "16/58540/25067/187",
+   "roof": {
+    "color": "#aab1aa"
+   },
+   "src": "earth: roof #aab1aa on the top view (sub/mw, lot 340); app #9cd0c9"
+  },
+  {
+   "id": "16/58540/25067/189",
+   "roof": {
+    "color": "#7c8990"
+   },
+   "src": "earth: roof #7c8990 on the top view (sub/mw, lot 342); app #a9bfbc"
+  },
+  {
+   "id": "16/58540/25067/190",
+   "roof": {
+    "color": "#7c8e90"
+   },
+   "src": "earth: roof #7c8e90 on the top view (sub/mw, lot 343); app #cbc3c5"
+  },
+  {
+   "id": "16/58540/25067/191",
+   "roof": {
+    "color": "#aa9c9d"
+   },
+   "src": "earth: roof #aa9c9d on the top view (sub/mw, lot 344); app #dce1e4"
+  },
+  {
+   "id": "16/58540/25067/192",
+   "roof": {
+    "color": "#ffffff"
+   },
+   "src": "earth: roof #ffffff on the top view (sub/mw, lot 345); app #a2b0aa"
+  },
+  {
+   "id": "16/58540/25067/195",
+   "roof": {
+    "color": "#9ca3a3"
+   },
+   "src": "earth: roof #9ca3a3 on the top view (sub/mw, lot 348); app #365058"
+  },
+  {
+   "id": "16/58540/25067/198",
+   "roof": {
+    "color": "#62747b"
+   },
+   "src": "earth: roof #62747b on the top view (sub/mw, lot 351); app #3d525f"
+  },
+  {
+   "id": "16/58540/25067/199",
+   "roof": {
+    "color": "#91a8ad"
+   },
+   "src": "earth: roof #91a8ad on the top view (sub/mw, lot 352); app #57879d"
+  },
+  {
+   "id": "16/58540/25067/205",
+   "roof": {
+    "color": "#9b858a"
+   },
+   "src": "earth: roof #9b858a on the top view (sub/mw, lot 358); app #b98d7f"
+  },
+  {
+   "id": "16/58540/25067/206",
+   "roof": {
+    "color": "#ccbdb5"
+   },
+   "src": "earth: roof #ccbdb5 on the top view (sub/mw, lot 359); app #4a465a"
+  },
+  {
+   "id": "16/58540/25067/207",
+   "roof": {
+    "color": "#92948c"
+   },
+   "src": "earth: roof #92948c on the top view (sub/mw, lot 360); app #ede8d8"
+  },
+  {
+   "id": "16/58540/25067/209",
+   "roof": {
+    "color": "#d3b7b1"
+   },
+   "src": "earth: roof #d3b7b1 on the top view (sub/sw, lot 362); app #b68988"
+  },
+  {
+   "id": "16/58540/25067/210",
+   "roof": {
+    "color": "#a2aeb3"
+   },
+   "src": "earth: roof #a2aeb3 on the top view (sub/sw, lot 363); app #71868f"
+  },
+  {
+   "id": "16/58540/25067/211",
+   "roof": {
+    "color": "#728387"
+   },
+   "src": "earth: roof #728387 on the top view (sub/sw, lot 364); app #725849"
+  },
+  {
+   "id": "16/58540/25067/212",
+   "roof": {
+    "color": "#8f9c90"
+   },
+   "src": "earth: roof #8f9c90 on the top view (sub/sw, lot 365); app #e3eeec"
+  },
+  {
+   "id": "16/58540/25067/214",
+   "roof": {
+    "color": "#dcf8ee"
+   },
+   "src": "earth: roof #dcf8ee on the top view (sub/mw, lot 366); app #d7dfe4"
+  },
+  {
+   "id": "16/58540/25067/218",
+   "roof": {
+    "color": "#9fa796"
+   },
+   "src": "earth: roof #9fa796 on the top view (sub/sw, lot 369); app #725749"
+  },
+  {
+   "id": "16/58540/25067/219",
+   "roof": {
+    "color": "#aaaea0"
+   },
+   "src": "earth: roof #aaaea0 on the top view (sub/sw, lot 370); app #435472"
+  },
+  {
+   "id": "16/58540/25067/222",
+   "roof": {
+    "color": "#42535d"
+   },
+   "src": "earth: roof #42535d on the top view (sub/sw, lot 372); app #849694"
+  },
+  {
+   "id": "16/58540/25067/231",
+   "roof": {
+    "color": "#738a9a"
+   },
+   "src": "earth: roof #738a9a on the top view (sub/sw, lot 380); app #70a3ab"
+  },
+  {
+   "id": "16/58540/25067/232",
+   "roof": {
+    "color": "#b9cdcb"
+   },
+   "src": "earth: roof #b9cdcb on the top view (sub/sw, lot 381); app #bbbfca"
+  },
+  {
+   "id": "16/58540/25067/233",
+   "roof": {
+    "color": "#89949e"
+   },
+   "src": "earth: roof #89949e on the top view (sub/sw, lot 382); app #5d7b80"
+  },
+  {
+   "id": "16/58540/25067/234",
+   "roof": {
+    "color": "#61646e"
+   },
+   "src": "earth: roof #61646e on the top view (sub/sw, lot 383); app #837879"
+  },
+  {
+   "id": "16/58540/25067/236",
+   "roof": {
+    "color": "#a6c3ca"
+   },
+   "src": "earth: roof #a6c3ca on the top view (sub/sw, lot 385); app #48bcdc"
+  },
+  {
+   "id": "16/58540/25067/238",
+   "roof": {
+    "color": "#50606d"
+   },
+   "src": "earth: roof #50606d on the top view (sub/sw, lot 387); app #443f44"
+  },
+  {
+   "id": "16/58540/25067/240",
+   "roof": {
+    "color": "#848387"
+   },
+   "src": "earth: roof #848387 on the top view (sub/sw, lot 389); app #c0d1d7"
+  },
+  {
+   "id": "16/58540/25067/241",
+   "roof": {
+    "color": "#afa8a3"
+   },
+   "src": "earth: roof #afa8a3 on the top view (sub/sw, lot 390); app #a77a71"
+  },
+  {
+   "id": "16/58540/25067/242",
+   "roof": {
+    "color": "#8ca1a7"
+   },
+   "src": "earth: roof #8ca1a7 on the top view (sub/sw, lot 391); app #576475"
+  },
+  {
+   "id": "16/58540/25067/245",
+   "roof": {
+    "color": "#434460"
+   },
+   "src": "earth: roof #434460 on the top view (sub/sw, lot 394); app #394d5d"
+  },
+  {
+   "id": "16/58540/25067/247",
+   "roof": {
+    "color": "#978e8f"
+   },
+   "src": "earth: roof #978e8f on the top view (sub/sw, lot 396); app #7a6864"
+  },
+  {
+   "id": "16/58540/25067/249",
+   "roof": {
+    "color": "#d6f6e6"
+   },
+   "src": "earth: roof #d6f6e6 on the top view (sub/sw, lot 398); app #b8c9d3"
+  },
+  {
+   "id": "16/58540/25067/250",
+   "roof": {
+    "color": "#8b999a"
+   },
+   "src": "earth: roof #8b999a on the top view (sub/sw, lot 399); app #f5f1ee"
+  },
+  {
+   "id": "16/58540/25067/253",
+   "roof": {
+    "color": "#8d8e8e"
+   },
+   "src": "earth: roof #8d8e8e on the top view (sub/sw, lot 402); app #5e7364"
+  },
+  {
+   "id": "16/58540/25067/256",
+   "roof": {
+    "color": "#9fa79e"
+   },
+   "src": "earth: roof #9fa79e on the top view (sub/sw, lot 405); app #d7dfe9"
+  },
+  {
+   "id": "16/58540/25067/257",
+   "roof": {
+    "color": "#87777f"
+   },
+   "src": "earth: roof #87777f on the top view (sub/sw, lot 406); app #929b9a"
+  },
+  {
+   "id": "16/58540/25067/258",
+   "roof": {
+    "color": "#846a74"
+   },
+   "src": "earth: roof #846a74 on the top view (sub/sw, lot 407); app #b78281"
+  },
+  {
+   "id": "16/58540/25067/260",
+   "roof": {
+    "color": "#aac1ca"
+   },
+   "src": "earth: roof #aac1ca on the top view (sub/sw, lot 409); app #37c4ef"
+  },
+  {
+   "id": "16/58540/25067/261",
+   "roof": {
+    "color": "#def9e9"
+   },
+   "src": "earth: roof #def9e9 on the top view (sub/sw, lot 410); app #bed8e4"
+  },
+  {
+   "id": "16/58540/25067/266",
+   "roof": {
+    "color": "#c9aca4"
+   },
+   "src": "earth: roof #c9aca4 on the top view (sub/sw, lot 414); app #9f7276"
+  },
+  {
+   "id": "16/58540/25067/267",
+   "roof": {
+    "color": "#909394"
+   },
+   "src": "earth: roof #909394 on the top view (sub/sw, lot 1); app #8a7a7a"
+  },
+  {
+   "id": "16/58540/25067/270",
+   "roof": {
+    "color": "#4a5e73"
+   },
+   "src": "earth: roof #4a5e73 on the top view (sub/sw, lot 3); app #aac8d2"
+  },
+  {
+   "id": "16/58540/25067/271",
+   "roof": {
+    "color": "#bbc8c1"
+   },
+   "src": "earth: roof #bbc8c1 on the top view (sub/sw, lot 4); app #f5f3e7"
+  },
+  {
+   "id": "16/58540/25067/275",
+   "roof": {
+    "color": "#bcdfdc"
+   },
+   "src": "earth: roof #bcdfdc on the top view (sub/mw, lot 416); app #85bfc9"
+  },
+  {
+   "id": "16/58540/25067/281",
+   "roof": {
+    "color": "#a1aea9"
+   },
+   "src": "earth: roof #a1aea9 on the top view (sub/mw, lot 422); app #f7f5ea"
+  },
+  {
+   "id": "16/58540/25067/282",
+   "roof": {
+    "color": "#c9a099"
+   },
+   "src": "earth: roof #c9a099 on the top view (sub/mw, lot 423); app #ac7e82"
+  },
+  {
+   "id": "16/58540/25067/285",
+   "roof": {
+    "color": "#b9d0ce"
+   },
+   "src": "earth: roof #b9d0ce on the top view (sub/mw, lot 426); app #f6f4e9"
+  },
+  {
+   "id": "16/58540/25067/286",
+   "roof": {
+    "color": "#d9e6dd"
+   },
+   "src": "earth: roof #d9e6dd on the top view (sub/mw, lot 427); app #aa8286"
+  },
+  {
+   "id": "16/58540/25067/289",
+   "roof": {
+    "color": "#687074"
+   },
+   "src": "earth: roof #687074 on the top view (sub/sw, lot 429); app #455d54"
+  },
+  {
+   "id": "16/58540/25067/290",
+   "roof": {
+    "color": "#767980"
+   },
+   "src": "earth: roof #767980 on the top view (sub/sw, lot 430); app #8b9d8f"
+  },
+  {
+   "id": "16/58540/25067/292",
+   "roof": {
+    "color": "#83a0a6"
+   },
+   "src": "earth: roof #83a0a6 on the top view (sub/sw, lot 432); app #8cc4d7"
+  },
+  {
+   "id": "16/58540/25067/293",
+   "roof": {
+    "color": "#707381"
+   },
+   "src": "earth: roof #707381 on the top view (sub/sw, lot 433); app #8a9d90"
+  },
+  {
+   "id": "16/58540/25067/295",
+   "roof": {
+    "color": "#89989a"
+   },
+   "src": "earth: roof #89989a on the top view (sub/mw, lot 435); app #5b7071"
+  },
+  {
+   "id": "16/58540/25067/299",
+   "roof": {
+    "color": "#314355"
+   },
+   "src": "earth: roof #314355 on the top view (sub/sw, lot 439); app #4b645a"
+  },
+  {
+   "id": "16/58540/25067/305",
+   "roof": {
+    "color": "#b2cfcb"
+   },
+   "src": "earth: roof #b2cfcb on the top view (sub/mw, lot 445); app #c2d3e1"
+  },
+  {
+   "id": "16/58540/25067/307",
+   "roof": {
+    "color": "#a1ac9b"
+   },
+   "src": "earth: roof #a1ac9b on the top view (sub/mw, lot 447); app #bb8e89"
+  },
+  {
+   "id": "16/58540/25067/309",
+   "roof": {
+    "color": "#63737b"
+   },
+   "src": "earth: roof #63737b on the top view (sub/mw, lot 449); app #7b8885"
+  },
+  {
+   "id": "16/58540/25067/310",
+   "roof": {
+    "color": "#71888c"
+   },
+   "src": "earth: roof #71888c on the top view (sub/mw, lot 450); app #d7dce0"
+  },
+  {
+   "id": "16/58540/25067/311",
+   "roof": {
+    "color": "#888f8c"
+   },
+   "src": "earth: roof #888f8c on the top view (sub/mw, lot 451); app #c4d1d3"
+  },
+  {
+   "id": "16/58540/25067/313",
+   "roof": {
+    "color": "#b59194"
+   },
+   "src": "earth: roof #b59194 on the top view (sub/mw, lot 452); app #715648"
+  },
+  {
+   "id": "16/58540/25067/314",
+   "roof": {
+    "color": "#61817a"
+   },
+   "src": "earth: roof #61817a on the top view (sub/mw, lot 453); app #abc9cb"
+  },
+  {
+   "id": "16/58540/25067/316",
+   "roof": {
+    "color": "#919e96"
+   },
+   "src": "earth: roof #919e96 on the top view (sub/sw, lot 455); app #cbb2a7"
+  },
+  {
+   "id": "16/58540/25067/320",
+   "roof": {
+    "color": "#384556"
+   },
+   "src": "earth: roof #384556 on the top view (sub/sw, lot 459); app #7a6f70"
+  },
+  {
+   "id": "16/58540/25067/321",
+   "roof": {
+    "color": "#b48e8f"
+   },
+   "src": "earth: roof #b48e8f on the top view (sub/sw, lot 460); app #465d55"
+  },
+  {
+   "id": "16/58540/25067/322",
+   "roof": {
+    "color": "#bda8a1"
+   },
+   "src": "earth: roof #bda8a1 on the top view (sub/mw, lot 461); app #b38181"
+  },
+  {
+   "id": "16/58540/25067/323",
+   "roof": {
+    "color": "#7e6970"
+   },
+   "src": "earth: roof #7e6970 on the top view (sub/mw, lot 462); app #b9b3ab"
+  },
+  {
+   "id": "16/58540/25067/324",
+   "roof": {
+    "color": "#b49c90"
+   },
+   "src": "earth: roof #b49c90 on the top view (sub/mw, lot 463); app #423d42"
+  },
+  {
+   "id": "16/58540/25067/325",
+   "roof": {
+    "color": "#b9baab"
+   },
+   "src": "earth: roof #b9baab on the top view (sub/sw, lot 464); app #53627f"
+  },
+  {
+   "id": "16/58540/25067/327",
+   "roof": {
+    "color": "#816d75"
+   },
+   "src": "earth: roof #816d75 on the top view (sub/sw, lot 466); app #a69289"
+  },
+  {
+   "id": "16/58540/25067/328",
+   "roof": {
+    "color": "#777f7f"
+   },
+   "src": "earth: roof #777f7f on the top view (sub/sw, lot 8); app #4a6359"
+  },
+  {
+   "id": "16/58540/25067/333",
+   "roof": {
+    "color": "#7c878c"
+   },
+   "src": "earth: roof #7c878c on the top view (sub/sw, lot 12); app #4e6079"
+  },
+  {
+   "id": "16/58540/25067/335",
+   "roof": {
+    "color": "#97acab"
+   },
+   "src": "earth: roof #97acab on the top view (sub/sw, lot 14); app #c2d4d9"
+  },
+  {
+   "id": "16/58540/25067/336",
+   "roof": {
+    "color": "#839494"
+   },
+   "src": "earth: roof #839494 on the top view (sub/sw, lot 15); app #b7c8ca"
+  },
+  {
+   "id": "16/58540/25067/338",
+   "roof": {
+    "color": "#334458"
+   },
+   "src": "earth: roof #334458 on the top view (sub/mw, lot 467); app #6f889a"
+  },
+  {
+   "id": "16/58540/25067/339",
+   "roof": {
+    "color": "#374559"
+   },
+   "src": "earth: roof #374559 on the top view (sub/mw, lot 468); app #5a7378"
+  },
+  {
+   "id": "16/58540/25067/352",
+   "roof": {
+    "color": "#c0d9d4"
+   },
+   "src": "earth: roof #c0d9d4 on the top view (sub/sw, lot 18); app #5e699a"
+  },
+  {
+   "id": "16/58540/25067/58",
+   "roof": {
+    "color": "#5d7d79"
+   },
+   "src": "earth: roof #5d7d79 on the top view (sub/nw, lot 475); app #435a51"
+  },
+  {
+   "id": "16/58540/25067/60",
+   "roof": {
+    "color": "#6c7372"
+   },
+   "src": "earth: roof #6c7372 on the top view (sub/nw, lot 477); app #bdc3d8"
+  },
+  {
+   "id": "16/58540/25067/61",
+   "roof": {
+    "color": "#5f7c74"
+   },
+   "src": "earth: roof #5f7c74 on the top view (sub/nw, lot 478); app #bb8285"
+  },
+  {
+   "id": "16/58540/25067/62",
+   "roof": {
+    "color": "#75737b"
+   },
+   "src": "earth: roof #75737b on the top view (sub/nw, lot 479); app #888a82"
+  },
+  {
+   "id": "16/58540/25067/63",
+   "roof": {
+    "color": "#98998f"
+   },
+   "src": "earth: roof #98998f on the top view (sub/nw, lot 480); app #465d55"
+  },
+  {
+   "id": "16/58540/25067/64",
+   "roof": {
+    "color": "#d9f9ee"
+   },
+   "src": "earth: roof #d9f9ee on the top view (sub/nw, lot 481); app #c3d3dd"
+  },
+  {
+   "id": "16/58540/25067/65",
+   "roof": {
+    "color": "#a5a7a1"
+   },
+   "src": "earth: roof #a5a7a1 on the top view (sub/nw, lot 482); app #96bcbf"
+  },
+  {
+   "id": "16/58540/25067/70",
+   "roof": {
+    "color": "#c8ada9"
+   },
+   "src": "earth: roof #c8ada9 on the top view (sub/nw, lot 486); app #968e7d"
+  },
+  {
+   "id": "16/58540/25067/73",
+   "roof": {
+    "color": "#858881"
+   },
+   "src": "earth: roof #858881 on the top view (sub/nw, lot 489); app #a2c9c6"
+  },
+  {
+   "id": "16/58540/25067/75",
+   "roof": {
+    "color": "#bca4a6"
+   },
+   "src": "earth: roof #bca4a6 on the top view (sub/nw, lot 491); app #a0beb4"
+  },
+  {
+   "id": "16/58540/25067/76",
+   "roof": {
+    "color": "#908f89"
+   },
+   "src": "earth: roof #908f89 on the top view (sub/nw, lot 492); app #455c54"
+  },
+  {
+   "id": "16/58540/25067/77",
+   "roof": {
+    "color": "#768a91"
+   },
+   "src": "earth: roof #768a91 on the top view (sub/nw, lot 493); app #4f6875"
+  },
+  {
+   "id": "16/58540/25067/78",
+   "roof": {
+    "color": "#587773"
+   },
+   "src": "earth: roof #587773 on the top view (sub/nw, lot 494); app #445c53"
+  },
+  {
+   "id": "16/58540/25067/79",
+   "roof": {
+    "color": "#7e7f81"
+   },
+   "src": "earth: roof #7e7f81 on the top view (sub/mw, lot 495); app #4b6373"
+  },
+  {
+   "id": "16/58540/25067/80",
+   "roof": {
+    "color": "#8d8c8d"
+   },
+   "src": "earth: roof #8d8c8d on the top view (sub/mw, lot 496); app #b68d88"
+  },
+  {
+   "id": "16/58540/25067/81",
+   "roof": {
+    "color": "#708183"
+   },
+   "src": "earth: roof #708183 on the top view (sub/nw, lot 497); app #433e44"
+  },
+  {
+   "id": "16/58540/25067/83",
+   "roof": {
+    "color": "#705b6a"
+   },
+   "src": "earth: roof #705b6a on the top view (sub/nw, lot 499); app #97dceb"
+  },
+  {
+   "id": "16/58540/25067/84",
+   "roof": {
+    "color": "#796e7a"
+   },
+   "src": "earth: roof #796e7a on the top view (sub/nw, lot 500); app #b27679"
+  },
+  {
+   "id": "16/58540/25067/85",
+   "roof": {
+    "color": "#2c3a4b"
+   },
+   "src": "earth: roof #2c3a4b on the top view (sub/nw, lot 501); app #accdcb"
+  },
+  {
+   "id": "16/58540/25067/86",
+   "roof": {
+    "color": "#9baeae"
+   },
+   "src": "earth: roof #9baeae on the top view (sub/nw, lot 502); app #f6f5ea"
+  },
+  {
+   "id": "16/58540/25067/87",
+   "roof": {
+    "color": "#97928e"
+   },
+   "src": "earth: roof #97928e on the top view (sub/nw, lot 503); app #835959"
+  },
+  {
+   "id": "16/58540/25067/88",
+   "roof": {
+    "color": "#92a49e"
+   },
+   "src": "earth: roof #92a49e on the top view (sub/nw, lot 504); app #455d54"
+  },
+  {
+   "id": "16/58540/25067/93",
+   "roof": {
+    "color": "#b9dce5"
+   },
+   "src": "earth: roof #b9dce5 on the top view (sub/mw, lot 509); app #5fc4ea"
+  },
+  {
+   "id": "16/58540/25067/98",
+   "roof": {
+    "color": "#9ea3a6"
+   },
+   "src": "earth: roof #9ea3a6 on the top view (sub/mw, lot 514); app #798283"
+  },
+  {
+   "id": "16/58540/25067/99",
+   "roof": {
+    "color": "#6e7c7c"
+   },
+   "src": "earth: roof #6e7c7c on the top view (sub/mw, lot 515); app #8d9f91"
+  },
+  {
+   "id": "16/58540/25068/24",
+   "roof": {
+    "color": "#defff3"
+   },
+   "src": "earth: roof #defff3 on the top view (sub/sw, lot 520); app #3b4e4a"
+  },
+  {
+   "id": "16/58540/25068/247",
+   "roof": {
+    "color": "#d5f1e4"
+   },
+   "src": "earth: roof #d5f1e4 on the top view (sub/sw, lot 522); app #bad4de"
+  },
+  {
+   "id": "16/58540/25068/258",
+   "roof": {
+    "color": "#ccd4c5"
+   },
+   "src": "earth: roof #ccd4c5 on the top view (sub/sw, lot 21); app #a9adab"
+  },
+  {
+   "id": "16/58540/25068/259",
+   "storeys": 2,
+   "src": "earth: a low light-roofed building among 1-2 storey neighbours in every oblique, not 5 storeys (sub/t_t22 strip, sub/sw zoom_22); earth: roof #bedad5 on the top view (sub/sw, lot 22); app #ded8cb",
+   "roof": {
+    "color": "#bedad5"
+   }
+  },
+  {
+   "id": "16/58540/25068/264",
+   "roof": {
+    "color": "#b4d0cb"
+   },
+   "src": "earth: roof #b4d0cb on the top view (sub/sw, lot 27); app #73594b"
+  },
+  {
+   "id": "16/58540/25068/267",
+   "roof": {
+    "color": "#c4ddd7"
+   },
+   "src": "earth: roof #c4ddd7 on the top view (sub/sw, lot 30); app #f7f5ea"
+  },
+  {
+   "id": "16/58540/25068/29",
+   "roof": {
+    "color": "#8d8184"
+   },
+   "src": "earth: roof #8d8184 on the top view (sub/sw, lot 41); app #f5f2e7"
+  },
+  {
+   "id": "16/58540/25068/299",
+   "roof": {
+    "color": "#d2ece1"
+   },
+   "src": "earth: roof #d2ece1 on the top view (sub/sw, lot 43); app #d5d6e3"
+  },
+  {
+   "id": "16/58540/25068/301",
+   "roof": {
+    "color": "#4f5f72"
+   },
+   "src": "earth: roof #4f5f72 on the top view (sub/sw, lot 46); app #69796b"
+  },
+  {
+   "id": "16/58540/25068/302",
+   "roof": {
+    "color": "#6c7e87"
+   },
+   "src": "earth: roof #6c7e87 on the top view (sub/sw, lot 47); app #725749"
+  },
+  {
+   "id": "16/58541/25066/137",
+   "roof": {
+    "color": "#ecffff"
+   },
+   "src": "earth: roof #ecffff on the top view (sub/ne, lot 531); app #cdd9e7"
+  },
+  {
+   "id": "16/58541/25066/141",
+   "roof": {
+    "color": "#a0a8a0"
+   },
+   "src": "earth: roof #a0a8a0 on the top view (sub/ne, lot 535); app #6e7378"
+  },
+  {
+   "id": "16/58541/25066/142",
+   "roof": {
+    "color": "#a89296"
+   },
+   "src": "earth: roof #a89296 on the top view (sub/ne, lot 536); app #75666b"
+  },
+  {
+   "id": "16/58541/25066/148",
+   "roof": {
+    "color": "#677881"
+   },
+   "src": "earth: roof #677881 on the top view (sub/ne, lot 541); app #eaefed"
+  },
+  {
+   "id": "16/58541/25066/151",
+   "roof": {
+    "color": "#73707d"
+   },
+   "src": "earth: roof #73707d on the top view (sub/ne, lot 544); app #eeeeeb"
+  },
+  {
+   "id": "16/58541/25066/37",
+   "roof": {
+    "color": "#9a8989"
+   },
+   "src": "earth: roof #9a8989 on the top view (sub/ne, lot 556); app #756458"
+  },
+  {
+   "id": "16/58541/25066/38",
+   "roof": {
+    "color": "#9fa399"
+   },
+   "src": "earth: roof #9fa399 on the top view (sub/ne, lot 557); app #4a7b4a"
+  },
+  {
+   "id": "16/58541/25066/39",
+   "roof": {
+    "color": "#989e94"
+   },
+   "src": "earth: roof #989e94 on the top view (sub/ne, lot 558); app #75868b"
+  },
+  {
+   "id": "16/58541/25066/46",
+   "roof": {
+    "color": "#e4fbe5"
+   },
+   "src": "earth: roof #e4fbe5 on the top view (sub/ne, lot 564); app #ebe7e8"
+  },
+  {
+   "id": "16/58541/25066/47",
+   "roof": {
+    "color": "#2f2c42"
+   },
+   "src": "earth: roof #2f2c42 on the top view (sub/ne, lot 565); app #716e6a"
+  },
+  {
+   "id": "16/58541/25066/49",
+   "roof": {
+    "color": "#a5b0a8"
+   },
+   "src": "earth: roof #a5b0a8 on the top view (sub/ne, lot 567); app #c0d5df"
+  },
+  {
+   "id": "16/58541/25066/51",
+   "roof": {
+    "color": "#cadcdb"
+   },
+   "src": "earth: roof #cadcdb on the top view (sub/ne, lot 569); app #a28e92"
+  },
+  {
+   "id": "16/58541/25067/10",
+   "roof": {
+    "color": "#a5a79e"
+   },
+   "src": "earth: roof #a5a79e on the top view (sub/mw, lot 575); app #ae9691"
+  },
+  {
+   "id": "16/58541/25067/100",
+   "roof": {
+    "color": "#7a7e80"
+   },
+   "src": "earth: roof #7a7e80 on the top view (sub/ne, lot 576); app #55617c"
+  },
+  {
+   "id": "16/58541/25067/101",
+   "roof": {
+    "color": "#4d6270"
+   },
+   "src": "earth: roof #4d6270 on the top view (sub/ne, lot 577); app #7896a3"
+  },
+  {
+   "id": "16/58541/25067/102",
+   "roof": {
+    "color": "#abc2c0"
+   },
+   "src": "earth: roof #abc2c0 on the top view (sub/ne, lot 578); app #69838c"
+  },
+  {
+   "id": "16/58541/25067/105",
+   "roof": {
+    "color": "#8a9e9d"
+   },
+   "src": "earth: roof #8a9e9d on the top view (sub/ne, lot 580); app #b9c6bf"
+  },
+  {
+   "id": "16/58541/25067/107",
+   "roof": {
+    "color": "#8ea0a3"
+   },
+   "src": "earth: roof #8ea0a3 on the top view (sub/ne, lot 582); app #9bc6c8"
+  },
+  {
+   "id": "16/58541/25067/110",
+   "storeys": 2,
+   "src": "earth: ケアハウスみなみ is two large two-storey blocks with maroon hip roofs (sub/t_t586 strip); earth: roof #735368 on the top view (sub/ne, lot 584); app #cdcfca",
+   "roof": {
+    "color": "#735368"
+   }
+  },
+  {
+   "id": "16/58541/25067/111",
+   "roof": {
+    "color": "#7e8587"
+   },
+   "src": "earth: roof #7e8587 on the top view (sub/ne, lot 585); app #5e6a9a"
+  },
+  {
+   "id": "16/58541/25067/112",
+   "kind": "public",
+   "storeys": 2,
+   "roof": {
+    "shape": "hip"
+   },
+   "facade": "public",
+   "src": "earth: the east block of the ケアハウスみなみ complex, two storeys, maroon hip roof with solar panels, not a 4-storey flat-roofed apartment (sub/t_t586 strip, sub/ne q_640_360)"
+  },
+  {
+   "id": "16/58541/25067/113",
+   "roof": {
+    "color": "#6f7c83"
+   },
+   "src": "earth: roof #6f7c83 on the top view (sub/me, lot 587); app #a8cedc"
+  },
+  {
+   "id": "16/58541/25067/114",
+   "roof": {
+    "color": "#687a81"
+   },
+   "src": "earth: roof #687a81 on the top view (sub/me, lot 588); app #4b645b"
+  },
+  {
+   "id": "16/58541/25067/116",
+   "storeys": 1,
+   "src": "earth: one-storey white shed east of the new car park (sub/t_t699 strip)"
+  },
+  {
+   "id": "16/58541/25067/117",
+   "storeys": 1,
+   "src": "earth: one-storey white shed east of the new car park (sub/t_t699 strip); earth: roof #bbd5cf on the top view (sub/me, lot 590); app #f6f4e9",
+   "roof": {
+    "color": "#bbd5cf"
+   }
+  },
+  {
+   "id": "16/58541/25067/118",
+   "roof": {
+    "color": "#bed7d2"
+   },
+   "src": "earth: roof #bed7d2 on the top view (sub/me, lot 591); app #e7ebee"
+  },
+  {
+   "id": "16/58541/25067/119",
+   "roof": {
+    "color": "#757c75"
+   },
+   "src": "earth: roof #757c75 on the top view (sub/me, lot 592); app #aac8ca"
+  },
+  {
+   "id": "16/58541/25067/121",
+   "roof": {
+    "color": "#707276"
+   },
+   "src": "earth: roof #707276 on the top view (sub/me, lot 594); app #8a977d"
+  },
+  {
+   "id": "16/58541/25067/126",
+   "roof": {
+    "color": "#989c90"
+   },
+   "src": "earth: roof #989c90 on the top view (sub/me, lot 598); app #577075"
+  },
+  {
+   "id": "16/58541/25067/128",
+   "roof": {
+    "color": "#1e2d40"
+   },
+   "src": "earth: roof #1e2d40 on the top view (sub/me, lot 600); app #525c5d"
+  },
+  {
+   "id": "16/58541/25067/129",
+   "roof": {
+    "color": "#2c3f52"
+   },
+   "src": "earth: roof #2c3f52 on the top view (sub/me, lot 601); app #5b6c69"
+  },
+  {
+   "id": "16/58541/25067/130",
+   "roof": {
+    "color": "#969b8a"
+   },
+   "src": "earth: roof #969b8a on the top view (sub/me, lot 603); app #567378"
+  },
+  {
+   "id": "16/58541/25067/132",
+   "roof": {
+    "color": "#f6ffff"
+   },
+   "src": "earth: roof #f6ffff on the top view (sub/mw, lot 605); app #d0c0bd"
+  },
+  {
+   "id": "16/58541/25067/136",
+   "roof": {
+    "color": "#887a83"
+   },
+   "src": "earth: roof #887a83 on the top view (sub/me, lot 607); app #616e67"
+  },
+  {
+   "id": "16/58541/25067/138",
+   "roof": {
+    "color": "#bbdad6"
+   },
+   "src": "earth: roof #bbdad6 on the top view (sub/mw, lot 609); app #645f63"
+  },
+  {
+   "id": "16/58541/25067/14",
+   "roof": {
+    "color": "#c3c6b7"
+   },
+   "src": "earth: roof #c3c6b7 on the top view (sub/sw, lot 611); app #aea29c"
+  },
+  {
+   "id": "16/58541/25067/143",
+   "roof": {
+    "color": "#95b1b3"
+   },
+   "src": "earth: roof #95b1b3 on the top view (sub/sw, lot 615); app #a2a1a9"
+  },
+  {
+   "id": "16/58541/25067/144",
+   "roof": {
+    "color": "#617076"
+   },
+   "src": "earth: roof #617076 on the top view (sub/me, lot 616); app #3e544e"
+  },
+  {
+   "id": "16/58541/25067/145",
+   "roof": {
+    "color": "#586573"
+   },
+   "src": "earth: roof #586573 on the top view (sub/se, lot 62); app #455c54"
+  },
+  {
+   "id": "16/58541/25067/152",
+   "roof": {
+    "color": "#8c94a0"
+   },
+   "src": "earth: roof #8c94a0 on the top view (sub/me, lot 620); app #657677"
+  },
+  {
+   "id": "16/58541/25067/157",
+   "roof": {
+    "color": "#667a7d"
+   },
+   "src": "earth: roof #667a7d on the top view (sub/se, lot 66); app #496158"
+  },
+  {
+   "id": "16/58541/25067/159",
+   "roof": {
+    "color": "#4f5f6a"
+   },
+   "src": "earth: roof #4f5f6a on the top view (sub/se, lot 68); app #465d54"
+  },
+  {
+   "id": "16/58541/25067/160",
+   "roof": {
+    "color": "#334556"
+   },
+   "src": "earth: roof #334556 on the top view (sub/se, lot 69); app #7b999d"
+  },
+  {
+   "id": "16/58541/25067/162",
+   "roof": {
+    "color": "#516775"
+   },
+   "src": "earth: roof #516775 on the top view (sub/se, lot 70); app #455c54"
+  },
+  {
+   "id": "16/58541/25067/165",
+   "roof": {
+    "color": "#c29c9e"
+   },
+   "src": "earth: roof #c29c9e on the top view (sub/sw, lot 73); app #9f7479"
+  },
+  {
+   "id": "16/58541/25067/166",
+   "roof": {
+    "color": "#8f969c"
+   },
+   "src": "earth: roof #8f969c on the top view (sub/sw, lot 74); app #6f7786"
+  },
+  {
+   "id": "16/58541/25067/169",
+   "kind": "factory",
+   "height": 7.5,
+   "storeys": 2,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: 角星両國製造場 is a cluster of low sheds (several shallow gables side by side) with pale grey corrugated roofs, about 2 storeys (sub/t_f77 earth_o90, earth_o0); the app drew a 14.5 m saw-tooth box, and one gable over the 30 m span still read too tall (after/se pair_o0), so a flat 7.5 m mass"
+  },
+  {
+   "id": "16/58541/25067/170",
+   "roof": {
+    "color": "#829396"
+   },
+   "src": "earth: roof #829396 on the top view (sub/se, lot 78); app #52636c"
+  },
+  {
+   "id": "16/58541/25067/171",
+   "roof": {
+    "color": "#849396"
+   },
+   "src": "earth: roof #849396 on the top view (sub/se, lot 79); app #567688"
+  },
+  {
+   "id": "16/58541/25067/172",
+   "roof": {
+    "color": "#677c83"
+   },
+   "src": "earth: roof #677c83 on the top view (sub/se, lot 80); app #3a5469"
+  },
+  {
+   "id": "16/58541/25067/174",
+   "roof": {
+    "color": "#b3b7b7"
+   },
+   "src": "earth: roof #b3b7b7 on the top view (sub/sw, lot 81); app #757781"
+  },
+  {
+   "id": "16/58541/25067/175",
+   "roof": {
+    "color": "#daf6ec"
+   },
+   "src": "earth: roof #daf6ec on the top view (sub/sw, lot 82); app #608d9f"
+  },
+  {
+   "id": "16/58541/25067/176",
+   "roof": {
+    "color": "#38485d"
+   },
+   "src": "earth: roof #38485d on the top view (sub/se, lot 83); app #c0d1de"
+  },
+  {
+   "id": "16/58541/25067/177",
+   "roof": {
+    "color": "#aac1bd"
+   },
+   "src": "earth: roof #aac1bd on the top view (sub/sw, lot 84); app #f5f3e8"
+  },
+  {
+   "id": "16/58541/25067/178",
+   "roof": {
+    "color": "#9ea0a1"
+   },
+   "src": "earth: roof #9ea0a1 on the top view (sub/sw, lot 85); app #42525e"
+  },
+  {
+   "id": "16/58541/25067/179",
+   "roof": {
+    "color": "#ab9b9a"
+   },
+   "src": "earth: roof #ab9b9a on the top view (sub/se, lot 86); app #94585c"
+  },
+  {
+   "id": "16/58541/25067/181",
+   "roof": {
+    "color": "#bd918d"
+   },
+   "src": "earth: roof #bd918d on the top view (sub/se, lot 88); app #b66d68"
+  },
+  {
+   "id": "16/58541/25067/182",
+   "roof": {
+    "color": "#8f939c"
+   },
+   "src": "earth: roof #8f939c on the top view (sub/se, lot 89); app #b1b6b4"
+  },
+  {
+   "id": "16/58541/25067/183",
+   "roof": {
+    "color": "#eafffb"
+   },
+   "src": "earth: roof #eafffb on the top view (sub/se, lot 90); app #d6dfe8"
+  },
+  {
+   "id": "16/58541/25067/188",
+   "roof": {
+    "color": "#bed1bb"
+   },
+   "src": "earth: roof #bed1bb on the top view (sub/se, lot 95); app #725749"
+  },
+  {
+   "id": "16/58541/25067/189",
+   "roof": {
+    "color": "#47535f"
+   },
+   "src": "earth: roof #47535f on the top view (sub/se, lot 96); app #88919a"
+  },
+  {
+   "id": "16/58541/25067/190",
+   "roof": {
+    "color": "#998488"
+   },
+   "src": "earth: roof #998488 on the top view (sub/se, lot 97); app #aeb3b2"
+  },
+  {
+   "id": "16/58541/25067/191",
+   "roof": {
+    "color": "#a68d8e"
+   },
+   "src": "earth: roof #a68d8e on the top view (sub/se, lot 98); app #f6f4e9"
+  },
+  {
+   "id": "16/58541/25067/192",
+   "roof": {
+    "color": "#dff5e6"
+   },
+   "src": "earth: roof #dff5e6 on the top view (sub/se, lot 99); app #b9d3dd"
+  },
+  {
+   "id": "16/58541/25067/193",
+   "roof": {
+    "color": "#b9b7b1"
+   },
+   "src": "earth: roof #b9b7b1 on the top view (sub/se, lot 100); app #645559"
+  },
+  {
+   "id": "16/58541/25067/194",
+   "roof": {
+    "color": "#3e4f65"
+   },
+   "src": "earth: roof #3e4f65 on the top view (sub/se, lot 101); app #6dc0d3"
+  },
+  {
+   "id": "16/58541/25067/195",
+   "roof": {
+    "color": "#aaa3a0"
+   },
+   "src": "earth: roof #aaa3a0 on the top view (sub/se, lot 102); app #735d5d"
+  },
+  {
+   "id": "16/58541/25067/196",
+   "roof": {
+    "color": "#959ea2"
+   },
+   "src": "earth: roof #959ea2 on the top view (sub/se, lot 103); app #8b8892"
+  },
+  {
+   "id": "16/58541/25067/200",
+   "roof": {
+    "color": "#88888a"
+   },
+   "src": "earth: roof #88888a on the top view (sub/se, lot 107); app #aac8ca"
+  },
+  {
+   "id": "16/58541/25067/202",
+   "roof": {
+    "color": "#c19b99"
+   },
+   "src": "earth: roof #c19b99 on the top view (sub/se, lot 623); app #86cbd9"
+  },
+  {
+   "id": "16/58541/25067/203",
+   "roof": {
+    "color": "#3a4c60"
+   },
+   "src": "earth: roof #3a4c60 on the top view (sub/se, lot 108); app #9d7175"
+  },
+  {
+   "id": "16/58541/25067/204",
+   "kind": "public",
+   "storeys": 1,
+   "height": 4.2,
+   "roof": {
+    "shape": "gable",
+    "color": "#c9dccf"
+   },
+   "facade": "public",
+   "name": "気仙沼第二保育所",
+   "nameEn": "Kesennuma Daini Nursery School",
+   "src": "earth: the nursery is this long one-storey building with a pale mint gable roof on the 陣山 hilltop; the Earth label 気仙沼第二保育所 sits on it (sub/t_t112 strip)"
+  },
+  {
+   "id": "16/58541/25067/207",
+   "roof": {
+    "color": "#68727c"
+   },
+   "src": "earth: roof #68727c on the top view (sub/me, lot 625); app #bf8984"
+  },
+  {
+   "id": "16/58541/25067/208",
+   "roof": {
+    "color": "#66747d"
+   },
+   "src": "earth: roof #66747d on the top view (sub/me, lot 626); app #7b99a2"
+  },
+  {
+   "id": "16/58541/25067/210",
+   "roof": {
+    "color": "#738489"
+   },
+   "src": "earth: roof #738489 on the top view (sub/me, lot 628); app #909d94"
+  },
+  {
+   "id": "16/58541/25067/213",
+   "roof": {
+    "color": "#abbbbb"
+   },
+   "src": "earth: roof #abbbbb on the top view (sub/me, lot 631); app #84898a"
+  },
+  {
+   "id": "16/58541/25067/216",
+   "roof": {
+    "color": "#d0f8e5"
+   },
+   "src": "earth: roof #d0f8e5 on the top view (sub/se, lot 110); app #536871"
+  },
+  {
+   "id": "16/58541/25067/217",
+   "roof": {
+    "color": "#abae9c"
+   },
+   "src": "earth: roof #abae9c on the top view (sub/se, lot 111); app #f5f4e9"
+  },
+  {
+   "id": "16/58541/25067/218",
+   "remove": true,
+   "src": "earth: the footprint named 気仙沼第二保育所 on the slope below the hilltop is open dry grass now (sub/t_t112 strip, sub/se q_640_0); the name moves to the hilltop building 16/58541/25067/204"
+  },
+  {
+   "id": "16/58541/25067/219",
+   "remove": true,
+   "src": "earth: open dry grass slope below the nursery (sub/t_t112 strip, sub/se q_640_0)"
+  },
+  {
+   "id": "16/58541/25067/220",
+   "roof": {
+    "color": "#959790"
+   },
+   "src": "earth: roof #959790 on the top view (sub/se, lot 115); app #ebebea"
+  },
+  {
+   "id": "16/58541/25067/221",
+   "roof": {
+    "color": "#707f84"
+   },
+   "src": "earth: roof #707f84 on the top view (sub/se, lot 116); app #9e9fa2"
+  },
+  {
+   "id": "16/58541/25067/222",
+   "roof": {
+    "color": "#8d928d"
+   },
+   "src": "earth: roof #8d928d on the top view (sub/se, lot 117); app #8bcbda"
+  },
+  {
+   "id": "16/58541/25067/223",
+   "roof": {
+    "color": "#e3ffeb"
+   },
+   "src": "earth: roof #e3ffeb on the top view (sub/se, lot 118); app #becbcd"
+  },
+  {
+   "id": "16/58541/25067/225",
+   "roof": {
+    "color": "#938990"
+   },
+   "src": "earth: roof #938990 on the top view (sub/se, lot 119); app #929797"
+  },
+  {
+   "id": "16/58541/25067/227",
+   "roof": {
+    "color": "#c3b3a7"
+   },
+   "src": "earth: roof #c3b3a7 on the top view (sub/se, lot 121); app #a37e82"
+  },
+  {
+   "id": "16/58541/25067/228",
+   "roof": {
+    "color": "#c6c0b4"
+   },
+   "src": "earth: roof #c6c0b4 on the top view (sub/se, lot 122); app #b79f95"
+  },
+  {
+   "id": "16/58541/25067/231",
+   "roof": {
+    "color": "#546d70"
+   },
+   "src": "earth: roof #546d70 on the top view (sub/se, lot 125); app #766e73"
+  },
+  {
+   "id": "16/58541/25067/232",
+   "roof": {
+    "color": "#cedcd1"
+   },
+   "src": "earth: roof #cedcd1 on the top view (sub/se, lot 126); app #bbafad"
+  },
+  {
+   "id": "16/58541/25067/233",
+   "roof": {
+    "color": "#cadcd1"
+   },
+   "src": "earth: roof #cadcd1 on the top view (sub/se, lot 127); app #91a299"
+  },
+  {
+   "id": "16/58541/25067/239",
+   "roof": {
+    "color": "#9f8e8c"
+   },
+   "src": "earth: roof #9f8e8c on the top view (sub/se, lot 131); app #cb7974"
+  },
+  {
+   "id": "16/58541/25067/244",
+   "roof": {
+    "color": "#5d5a63"
+   },
+   "src": "earth: roof #5d5a63 on the top view (sub/se, lot 136); app #60696a"
+  },
+  {
+   "id": "16/58541/25067/245",
+   "roof": {
+    "color": "#d4e7de"
+   },
+   "src": "earth: roof #d4e7de on the top view (sub/se, lot 137); app #79929b"
+  },
+  {
+   "id": "16/58541/25067/246",
+   "roof": {
+    "color": "#979ba0"
+   },
+   "src": "earth: roof #979ba0 on the top view (sub/se, lot 138); app #ab7a7a"
+  },
+  {
+   "id": "16/58541/25067/247",
+   "roof": {
+    "color": "#a1777b"
+   },
+   "src": "earth: roof #a1777b on the top view (sub/se, lot 139); app #cb7974"
+  },
+  {
+   "id": "16/58541/25067/248",
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#859394"
+   },
+   "facade": "house",
+   "src": "earth: a two-storey house compound with grey and brown tiled gable roofs, not a 5-storey office (sub/t_t140 strip, sub/se zoom_140; its shadow is about 3 m); earth: roof #859394 on the top view (sub/se, lot 140); app #dbd4c3"
+  },
+  {
+   "id": "16/58541/25067/249",
+   "roof": {
+    "color": "#798c7b"
+   },
+   "src": "earth: roof #798c7b on the top view (sub/se, lot 141); app #9f8682"
+  },
+  {
+   "id": "16/58541/25067/25",
+   "roof": {
+    "color": "#6f838a"
+   },
+   "src": "earth: roof #6f838a on the top view (sub/ne, lot 633); app #486071"
+  },
+  {
+   "id": "16/58541/25067/251",
+   "roof": {
+    "color": "#919795"
+   },
+   "src": "earth: roof #919795 on the top view (sub/se, lot 143); app #d8dce0"
+  },
+  {
+   "id": "16/58541/25067/253",
+   "roof": {
+    "color": "#cff0e6"
+   },
+   "src": "earth: roof #cff0e6 on the top view (sub/se, lot 145); app #adcbda"
+  },
+  {
+   "id": "16/58541/25067/257",
+   "roof": {
+    "color": "#455a70"
+   },
+   "src": "earth: roof #455a70 on the top view (sub/se, lot 149); app #bdcfd0"
+  },
+  {
+   "id": "16/58541/25067/258",
+   "roof": {
+    "color": "#303f55"
+   },
+   "src": "earth: roof #303f55 on the top view (sub/se, lot 150); app #aa968d"
+  },
+  {
+   "id": "16/58541/25067/261",
+   "roof": {
+    "color": "#5d6470"
+   },
+   "src": "earth: roof #5d6470 on the top view (sub/ne, lot 634); app #6d8290"
+  },
+  {
+   "id": "16/58541/25067/262",
+   "roof": {
+    "color": "#a8cdd1"
+   },
+   "src": "earth: roof #a8cdd1 on the top view (sub/ne, lot 635); app #9ca19c"
+  },
+  {
+   "id": "16/58541/25067/265",
+   "roof": {
+    "color": "#97a9a6"
+   },
+   "src": "earth: roof #97a9a6 on the top view (sub/ne, lot 638); app #f2ebe9"
+  },
+  {
+   "id": "16/58541/25067/267",
+   "roof": {
+    "color": "#567c84"
+   },
+   "src": "earth: roof #567c84 on the top view (sub/ne, lot 640); app #ebeeec"
+  },
+  {
+   "id": "16/58541/25067/269",
+   "roof": {
+    "color": "#41485d"
+   },
+   "src": "earth: roof #41485d on the top view (sub/ne, lot 642); app #705456"
+  },
+  {
+   "id": "16/58541/25067/270",
+   "roof": {
+    "color": "#81949a"
+   },
+   "src": "earth: roof #81949a on the top view (sub/ne, lot 644); app #5b6f74"
+  },
+  {
+   "id": "16/58541/25067/276",
+   "roof": {
+    "color": "#a7918a"
+   },
+   "src": "earth: roof #a7918a on the top view (sub/me, lot 649); app #5a737c"
+  },
+  {
+   "id": "16/58541/25067/277",
+   "roof": {
+    "color": "#2c3b53"
+   },
+   "src": "earth: roof #2c3b53 on the top view (sub/me, lot 650); app #756e6b"
+  },
+  {
+   "id": "16/58541/25067/279",
+   "roof": {
+    "color": "#7d8a8d"
+   },
+   "src": "earth: roof #7d8a8d on the top view (sub/me, lot 652); app #c08a85"
+  },
+  {
+   "id": "16/58541/25067/280",
+   "roof": {
+    "color": "#bb9495"
+   },
+   "src": "earth: roof #bb9495 on the top view (sub/me, lot 653); app #8d9b92"
+  },
+  {
+   "id": "16/58541/25067/295",
+   "roof": {
+    "color": "#6d7981"
+   },
+   "src": "earth: roof #6d7981 on the top view (sub/se, lot 153); app #455d54"
+  },
+  {
+   "id": "16/58541/25067/296",
+   "roof": {
+    "color": "#93989b"
+   },
+   "src": "earth: roof #93989b on the top view (sub/se, lot 154); app #9f553e"
+  },
+  {
+   "id": "16/58541/25067/297",
+   "roof": {
+    "color": "#727a84"
+   },
+   "src": "earth: roof #727a84 on the top view (sub/se, lot 155); app #f5f3e9"
+  },
+  {
+   "id": "16/58541/25067/30",
+   "roof": {
+    "color": "#797e7c"
+   },
+   "src": "earth: roof #797e7c on the top view (sub/ne, lot 660); app #4a6359"
+  },
+  {
+   "id": "16/58541/25067/301",
+   "roof": {
+    "color": "#667e90"
+   },
+   "src": "earth: roof #667e90 on the top view (sub/se, lot 159); app #4c99bb"
+  },
+  {
+   "id": "16/58541/25067/309",
+   "roof": {
+    "color": "#839997"
+   },
+   "src": "earth: roof #839997 on the top view (sub/se, lot 165); app #c7d0d5"
+  },
+  {
+   "id": "16/58541/25067/314",
+   "roof": {
+    "color": "#c6a8a2"
+   },
+   "src": "earth: roof #c6a8a2 on the top view (sub/se, lot 170); app #515c54"
+  },
+  {
+   "id": "16/58541/25067/320",
+   "roof": {
+    "color": "#637e84"
+   },
+   "src": "earth: roof #637e84 on the top view (sub/se, lot 176); app #445d5d"
+  },
+  {
+   "id": "16/58541/25067/323",
+   "roof": {
+    "color": "#bad2c8"
+   },
+   "src": "earth: roof #bad2c8 on the top view (sub/se, lot 179); app #d7dbe3"
+  },
+  {
+   "id": "16/58541/25067/367",
+   "storeys": 1,
+   "src": "earth: a 12 m2 annex of the サンワイ商事 shed, one storey (sub/se zoom_209); earth: roof #71878e on the top view (sub/se, lot 186); app #435159",
+   "roof": {
+    "color": "#71878e"
+   }
+  },
+  {
+   "id": "16/58541/25067/368",
+   "roof": {
+    "color": "#859797"
+   },
+   "src": "earth: roof #859797 on the top view (sub/se, lot 187); app #4c686d"
+  },
+  {
+   "id": "16/58541/25067/38",
+   "roof": {
+    "color": "#7b8d93"
+   },
+   "src": "earth: roof #7b8d93 on the top view (sub/ne, lot 665); app #516f74"
+  },
+  {
+   "id": "16/58541/25067/39",
+   "roof": {
+    "color": "#d3f1e5"
+   },
+   "src": "earth: roof #d3f1e5 on the top view (sub/me, lot 666); app #c6dbe3"
+  },
+  {
+   "id": "16/58541/25067/41",
+   "roof": {
+    "color": "#c3e1db"
+   },
+   "src": "earth: roof #c3e1db on the top view (sub/me, lot 668); app #9fc1cb"
+  },
+  {
+   "id": "16/58541/25067/42",
+   "roof": {
+    "color": "#9aa89b"
+   },
+   "src": "earth: roof #9aa89b on the top view (sub/mw, lot 669); app #5f7a81"
+  },
+  {
+   "id": "16/58541/25067/43",
+   "roof": {
+    "color": "#545166"
+   },
+   "src": "earth: roof #545166 on the top view (sub/me, lot 670); app #826166"
+  },
+  {
+   "id": "16/58541/25067/46",
+   "roof": {
+    "color": "#304158"
+   },
+   "src": "earth: roof #304158 on the top view (sub/me, lot 673); app #89c8ce"
+  },
+  {
+   "id": "16/58541/25067/49",
+   "roof": {
+    "color": "#575b68"
+   },
+   "src": "earth: roof #575b68 on the top view (sub/me, lot 675); app #797376"
+  },
+  {
+   "id": "16/58541/25067/5",
+   "roof": {
+    "color": "#b7cfcd"
+   },
+   "src": "earth: roof #b7cfcd on the top view (sub/mw, lot 676); app #f5f4e9"
+  },
+  {
+   "id": "16/58541/25067/51",
+   "roof": {
+    "color": "#7c8c94"
+   },
+   "src": "earth: roof #7c8c94 on the top view (sub/mw, lot 677); app #495966"
+  },
+  {
+   "id": "16/58541/25067/52",
+   "roof": {
+    "color": "#cce7e1"
+   },
+   "src": "earth: roof #cce7e1 on the top view (sub/me, lot 678); app #a4c7d1"
+  },
+  {
+   "id": "16/58541/25067/54",
+   "roof": {
+    "color": "#71838a"
+   },
+   "src": "earth: roof #71838a on the top view (sub/me, lot 679); app #7b9e9d"
+  },
+  {
+   "id": "16/58541/25067/55",
+   "roof": {
+    "color": "#707e86"
+   },
+   "src": "earth: roof #707e86 on the top view (sub/mw, lot 680); app #505c65"
+  },
+  {
+   "id": "16/58541/25067/58",
+   "roof": {
+    "color": "#6b6f7c"
+   },
+   "src": "earth: roof #6b6f7c on the top view (sub/me, lot 683); app #867b7c"
+  },
+  {
+   "id": "16/58541/25067/60",
+   "roof": {
+    "color": "#7e9ba1"
+   },
+   "src": "earth: roof #7e9ba1 on the top view (sub/me, lot 684); app #a1bfc1"
+  },
+  {
+   "id": "16/58541/25067/61",
+   "roof": {
+    "color": "#738f9b"
+   },
+   "src": "earth: roof #738f9b on the top view (sub/me, lot 685); app #bdd3e1"
+  },
+  {
+   "id": "16/58541/25067/65",
+   "roof": {
+    "color": "#576876"
+   },
+   "src": "earth: roof #576876 on the top view (sub/me, lot 687); app #80969e"
+  },
+  {
+   "id": "16/58541/25067/67",
+   "roof": {
+    "color": "#95b0b1"
+   },
+   "src": "earth: roof #95b0b1 on the top view (sub/me, lot 688); app #597a87"
+  },
+  {
+   "id": "16/58541/25067/69",
+   "roof": {
+    "color": "#828991"
+   },
+   "src": "earth: roof #828991 on the top view (sub/me, lot 690); app #636c74"
+  },
+  {
+   "id": "16/58541/25067/71",
+   "roof": {
+    "color": "#35455b"
+   },
+   "src": "earth: roof #35455b on the top view (sub/me, lot 692); app #7896a7"
+  },
+  {
+   "id": "16/58541/25067/77",
+   "roof": {
+    "color": "#887877"
+   },
+   "src": "earth: roof #887877 on the top view (sub/me, lot 697); app #ab9b95"
+  },
+  {
+   "id": "16/58541/25067/78",
+   "roof": {
+    "color": "#98968d"
+   },
+   "src": "earth: roof #98968d on the top view (sub/me, lot 698); app #b1c2c0"
+  },
+  {
+   "id": "16/58541/25067/79",
+   "storeys": 1,
+   "src": "earth: one-storey white-roofed building beside the new car park (sub/t_t699 strip)"
+  },
+  {
+   "id": "16/58541/25067/8",
+   "roof": {
+    "color": "#9ba3a8"
+   },
+   "src": "earth: roof #9ba3a8 on the top view (sub/mw, lot 700); app #797984"
+  },
+  {
+   "id": "16/58541/25067/82",
+   "kind": "house",
+   "storeys": 1,
+   "roof": {
+    "shape": "gable",
+    "color": "#c2a399"
+   },
+   "facade": "house",
+   "src": "earth: a one-storey building with a red gable roof beside the new car park (sub/t_t699 strip); earth: roof #c2a399 on the top view (sub/me, lot 702); app #b47273"
+  },
+  {
+   "id": "16/58541/25067/84",
+   "roof": {
+    "color": "#ccefe5"
+   },
+   "src": "earth: roof #ccefe5 on the top view (sub/ne, lot 703); app #aeccd6"
+  },
+  {
+   "id": "16/58541/25067/86",
+   "roof": {
+    "color": "#c7c1bc"
+   },
+   "src": "earth: roof #c7c1bc on the top view (sub/ne, lot 705); app #7e7071"
+  },
+  {
+   "id": "16/58541/25067/88",
+   "roof": {
+    "color": "#cfeee5"
+   },
+   "src": "earth: roof #cfeee5 on the top view (sub/ne, lot 707); app #ebebee"
+  },
+  {
+   "id": "16/58541/25067/91",
+   "roof": {
+    "color": "#b8b2b4"
+   },
+   "src": "earth: roof #b8b2b4 on the top view (sub/ne, lot 709); app #99b3be"
+  },
+  {
+   "id": "16/58541/25067/92",
+   "roof": {
+    "color": "#455867"
+   },
+   "src": "earth: roof #455867 on the top view (sub/ne, lot 710); app #f6f5ea"
+  },
+  {
+   "id": "16/58541/25067/94",
+   "roof": {
+    "color": "#bdd6d4"
+   },
+   "src": "earth: roof #bdd6d4 on the top view (sub/ne, lot 712); app #9aab9d"
+  },
+  {
+   "id": "16/58541/25067/99",
+   "roof": {
+    "color": "#6b7c82"
+   },
+   "src": "earth: roof #6b7c82 on the top view (sub/ne, lot 717); app #769699"
+  },
+  {
+   "id": "16/58541/25068/23",
+   "roof": {
+    "color": "#8d9790"
+   },
+   "src": "earth: roof #8d9790 on the top view (sub/sw, lot 195); app #b7c4ba"
+  },
+  {
+   "id": "16/58541/25068/24",
+   "roof": {
+    "color": "#90a4a6"
+   },
+   "src": "earth: roof #90a4a6 on the top view (sub/se, lot 196); app #6f5546"
+  },
+  {
+   "id": "16/58541/25068/28",
+   "roof": {
+    "color": "#75888f"
+   },
+   "src": "earth: roof #75888f on the top view (sub/se, lot 200); app #be7269"
+  },
+  {
+   "id": "16/58541/25068/37",
+   "remove": true,
+   "src": "earth: the 内湾JV site office is gone; the plot is an empty paved lot (sub/sw q_640_360, sub/se top); gsi still shows it"
+  },
+  {
+   "id": "16/58541/25068/38",
+   "remove": true,
+   "src": "earth: gone with the 内湾JV office; paved lot (sub/sw q_640_360)"
+  },
+  {
+   "id": "16/58541/25068/39",
+   "storeys": 2,
+   "src": "earth: サンワイ商事 is a long low grey-roofed building, no 5-storey shadow (sub/se zoom_209, sub/t_t209)"
+  },
+  {
+   "id": "16/58541/25068/91",
+   "roof": {
+    "color": "#b3d0c9"
+   },
+   "src": "earth: roof #b3d0c9 on the top view (sub/se, lot 221); app #f5f3e8"
+  },
+  {
+   "id": "16/58541/25068/94",
+   "roof": {
+    "color": "#d2b6ae"
+   },
+   "src": "earth: roof #d2b6ae on the top view (sub/se, lot 224); app #bd888b"
+  },
+  {
+   "id": "16/58541/25068/95",
+   "roof": {
+    "color": "#5f727a"
+   },
+   "src": "earth: roof #5f727a on the top view (sub/se, lot 225); app #495970"
+  },
+  {
+   "id": "ovr:c2:fukko-park-wc",
+   "roof": {
+    "color": "#626e75"
+   },
+   "src": "earth: roof #626e75 on the top view (sub/se, lot null); app #a1bc7b"
+  }
+ ],
+ "newLots": [
+  {
+   "id": "ovr:c2:fukko-park-wc",
+   "poly": [
+    [
+     264,
+     -402.4
+    ],
+    [
+     272,
+     -400.5
+    ],
+    [
+     270.6,
+     -394.1
+    ],
+    [
+     262.3,
+     -396
+    ]
+   ],
+   "kind": "public",
+   "height": 3.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#7c7888"
+   },
+   "facade": "public",
+   "src": "earth: a small grey-roofed park building (toilets) beside the 復興祈念公園 car park, not in the GSI footprints (sub/se zoom_parkwc.jpg, its shadow ~5 m)"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "parking",
+   "ring": [
+    [
+     84.5,
+     -227
+    ],
+    [
+     92,
+     -213.5
+    ],
+    [
+     100.5,
+     -211
+    ],
+    [
+     108,
+     -224
+    ],
+    [
+     100,
+     -236.5
+    ]
+   ],
+   "name": "駐車場",
+   "src": "earth: paved lot where the 内湾JV office stood (sub/sw q_640_360)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     142,
+     -500
+    ],
+    [
+     183,
+     -500
+    ],
+    [
+     186,
+     -470
+    ],
+    [
+     178,
+     -452
+    ],
+    [
+     146,
+     -448
+    ]
+   ],
+   "name": "駐車場",
+   "replace": true,
+   "src": "earth: the OSM construction site 駐車場 is finished: an asphalt car park with painted stalls east of the 太田 road (sub/me q_0_360, q_640_360)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     129,
+     -518
+    ],
+    [
+     142,
+     -500
+    ],
+    [
+     186,
+     -500
+    ],
+    [
+     190,
+     -505
+    ],
+    [
+     177,
+     -533
+    ]
+   ],
+   "src": "earth: bare yard around the houses south of the new car park (sub/me pair_top)"
+  },
+  {
+   "use": "cedar",
+   "ring": [
+    [
+     -123.4,
+     -330.1
+    ],
+    [
+     -100.8,
+     -353.1
+    ],
+    [
+     -82.2,
+     -351
+    ],
+    [
+     -37.1,
+     -315.8
+    ],
+    [
+     -19.4,
+     -306
+    ],
+    [
+     -13.4,
+     -299.3
+    ],
+    [
+     -16.1,
+     -283.1
+    ],
+    [
+     -42,
+     -268.1
+    ],
+    [
+     -59.9,
+     -262
+    ],
+    [
+     -78.7,
+     -278.9
+    ],
+    [
+     -102.2,
+     -304.9
+    ],
+    [
+     -118.3,
+     -314.2
+    ]
+   ],
+   "replace": true,
+   "src": "earth: the OSM cemetery ring behind 法玄寺 (centre -66, -306) is a closed cedar wood; graves show only on the terraces beside the temple (sub/sw pair_o0, pair_o180, top). [v5:fix2] drawn as a 杉 stand over the whole ring (the OSM ring, © OpenStreetMap contributors); it was a small gravel patch because the schema had no forest use"
+  },
+  {
+   "use": "plaza",
+   "ring": [
+    [
+     -111.3,
+     -349.4
+    ],
+    [
+     -119.9,
+     -346.6
+    ],
+    [
+     -128.9,
+     -345.6
+    ],
+    [
+     -124.5,
+     -375
+    ],
+    [
+     -121.6,
+     -408.7
+    ],
+    [
+     -112.1,
+     -408
+    ],
+    [
+     -109.7,
+     -399
+    ]
+   ],
+   "replace": true,
+   "src": "earth: the OSM construction site at 法玄寺 is finished: temple buildings on a paved precinct (sub/sw ovL, pair_o180)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     256,
+     -402
+    ],
+    [
+     263,
+     -400
+    ],
+    [
+     256.5,
+     -386
+    ],
+    [
+     249,
+     -389
+    ]
+   ],
+   "name": "駐車場",
+   "src": "earth: the 復興祈念公園 car park, two rows of marked stalls (sub/se zoom_parkwc.jpg)"
+  }
+ ],
+ "roads": [],
+ "props": []
+}

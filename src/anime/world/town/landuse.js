@@ -10,14 +10,34 @@
 import * as THREE from 'three';
 import earcut from 'earcut';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { carColor } from './carcolors.js';   // [v5:fix2] the Japanese car-colour mix
 
 export const LOOK = {
   parking: { col: '#8e9197', lift: 0.05 }, school: { col: '#d4c29c', lift: 0.03 }, sport: { col: '#cdb68c', lift: 0.045 },
-  construction: { col: '#c9b690', lift: 0.035 }, cemetery: { col: '#d3cec2', lift: 0.035 }, park: { col: '#9cc07a', lift: 0.03 },
-  grass: { col: '#a3c47f', lift: 0.03 }, religious: { col: '#dad4c6', lift: 0.035 },
-  gravel: { col: '#b3ada1', lift: 0.03 }, weeds: { col: '#7d8556', lift: 0.03 },   // [v4:polish2] bare gravel lots traced on the aerial photo (world/landuse_aerial.js)
+  construction: { col: '#c9b690', lift: 0.035 }, cemetery: { col: '#97938b', lift: 0.035 },   // [v5:fix1] cemetery gravel #d3cec2 -> #97938b: the hillside 墓地 read as white patches (Earth 2026 grey, lum ~100-130)
+  // [v5:fix3] lawns as Google Earth 2026-03-11 shows them (dried, muted turf: 迎 / PIER7 seawall park, the town's parks);
+  // #9cc07a / #a3c47f rendered as saturated lime under the toon light
+  park: { col: '#8f9a6a', lift: 0.03 },
+  grass: { col: '#949e6e', lift: 0.03 }, religious: { col: '#dad4c6', lift: 0.035 },
+  gravel: { col: '#a09a90', lift: 0.03 }, weeds: { col: '#7d8556', lift: 0.03 },   // [v4:polish2] bare gravel lots traced on the aerial photo (world/landuse_aerial.js); [v5:fix1] gravel #b3ada1 -> #a09a90, the mid grey of Earth 2026
+  plaza: { col: '#c9c3b8', lift: 0.04 },   // [v4:overrides] a paved square (data/anime/overrides landuse use 'plaza')
+  apron: { col: '#909197', lift: 0.045 },   // [v5] plain asphalt: a quay apron or a yard (override use 'apron'; no stall lines, no cars)
 };
-const ORDER = ['school', 'park', 'grass', 'weeds', 'gravel', 'religious', 'construction', 'cemetery', 'sport', 'parking'];
+/** [v5:fix2] Parked-car fill of a car park (share of the painted stalls with a car). Google Earth 2026-03-11 shows the
+ *  town's car parks at a fifth or less (they were drawn at 0.45, packed); an override parking surface may carry its own
+ *  `fill` counted on Earth, and EARTH_FILL holds the counted OSM car parks (centroid within 6 m). */
+export const PARK_FILL = 0.2;
+export const EARTH_FILL = [
+  // 魚町 / 南町二丁目, the big open car park west of the 内湾 (Earth c6-a top: ~50 cars on ~200 stalls)
+  { at: [-253, -35], fill: 0.25, src: 'earth 2026-03-11 c6-a top' },
+];
+export function parkFill(lu) {
+  if (Number.isFinite(lu.fill)) return lu.fill;
+  let cx = 0, cz = 0; for (const p of lu.ring) { cx += p[0]; cz += p[1]; } cx /= lu.ring.length; cz /= lu.ring.length;
+  const e = EARTH_FILL.find((q) => Math.hypot(q.at[0] - cx, q.at[1] - cz) < 6);
+  return e ? e.fill : PARK_FILL;
+}
+const ORDER = ['school', 'park', 'grass', 'weeds', 'gravel', 'religious', 'construction', 'cemetery', 'sport', 'plaza', 'apron', 'parking'];
 
 /** Triangulate a ring (+ holes) and split every triangle until its longest edge is <= maxE. -> flat [x, z, ...] tris */
 export function drapeTriangles(ring, holes = [], maxE = 6) {
@@ -77,7 +97,9 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
     stats[lu.cls] = (stats[lu.cls] || 0) + 1;
     const lift = look.lift + k * 0.0004;   // later polygons (smaller classes) sit a hair higher
     const tris = drapeTriangles(lu.ring, lu.holes || [], heroIn(lu.ring[0][0], lu.ring[0][1]) ? 5 : 8);
-    const r = ctx.rng('lu-' + k + '-' + Math.round(lu.ring[0][0]));
+    // [v5] seeded by the polygon's own id and first corner, not its list index: a polygon added by an override no
+    // longer reshuffles the parked cars of every later car park
+    const r = ctx.rng('lu-' + (lu.ovr || lu.osm || '') + '-' + Math.round(lu.ring[0][0]) + ',' + Math.round(lu.ring[0][1]));
     const base = col.set(look.col);
     for (let t = 0; t < tris.length; t += 3) {
       if (lu.cls === 'cemetery' && nearTree((tris[t][0] + tris[t + 1][0] + tris[t + 2][0]) / 3, (tris[t][1] + tris[t + 1][1] + tris[t + 2][1]) / 3, 4.5)) continue;
@@ -98,6 +120,7 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
     };
     const ok = (x, z, pad = 0.5) => inPoly(x, z, lu.ring, lu.holes || []) && !lotIdx?.at(x, z, pad) && !(roadIdx?.covering(x, z, 0.3, null) || []).length && L.shoreDist(x, z) < -1;
     if (lu.cls === 'parking' && !heroIn(fr.cx, fr.cz)) {
+      const fill = parkFill(lu);
       // stall rows along the long side: 2.5 m stalls, 5 m deep, 6 m aisles (hero car parks: parking.js)
       for (let v = fr.v0 + 1; v + 5 <= fr.v1 - 0.5; v += 11) {
         for (const [vv, flip] of [[v, 1], [v + 11 - 5, -1]]) {
@@ -105,7 +128,7 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
           for (let u = fr.u0 + 1; u + 2.5 <= fr.u1 - 1; u += 2.5) {
             const c = W(u + 1.25, vv + 2.5); if (!ok(...c) || !ok(...W(u, vv)) || !ok(...W(u + 2.5, vv + 5))) continue;
             line(W(u, vv), W(u, vv + 5), 0.12);
-            if (!low && r() < 0.45) cars.push({ x: c[0], z: c[1], rot: Math.atan2(fr.vx, fr.vz) * 1 + (flip < 0 ? Math.PI : 0), seed: r() });
+            if (!low && r() < fill) cars.push({ x: c[0], z: c[1], rot: Math.atan2(fr.vx, fr.vz) * 1 + (flip < 0 ? Math.PI : 0), seed: r() });
           }
         }
       }
@@ -165,9 +188,8 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
   }
   if (cars.length) {
     const geo = mergeGeometries([new THREE.BoxGeometry(1.46, 0.62, 3.3).translate(0, 0.55, 0), new THREE.BoxGeometry(1.3, 0.5, 1.9).translate(0, 1.1, -0.25)].map((g) => { g.deleteAttribute('uv'); return g; }));
-    const CC = ['#e8e8e3', '#c3c7cc', '#e8e8e3', '#44507a', '#9fd4c2', '#efe3c4', '#94434d', '#4a4753', '#a9c5e2'];
     const im = new THREE.InstancedMesh(geo, ctx.mat.toon('#ffffff', { paint: 0.02 }), cars.length);
-    cars.forEach((c, i) => { Q.setFromAxisAngle(Y, c.rot); P.set(c.x, L.heightAt(c.x, c.z) + 0.05, c.z); SC.set(1, 1, 1); im.setMatrixAt(i, M4.compose(P, Q, SC)); im.setColorAt(i, col.set(CC[Math.floor(c.seed * CC.length) % CC.length])); });
+    cars.forEach((c, i) => { Q.setFromAxisAngle(Y, c.rot); P.set(c.x, L.heightAt(c.x, c.z) + 0.05, c.z); SC.set(1, 1, 1); im.setMatrixAt(i, M4.compose(P, Q, SC)); im.setColorAt(i, col.set(carColor(c.seed))); });
     im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere();
     dyn.add(im);
   }
@@ -176,7 +198,11 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
 }
 
 /** Parking polygons of the layout, for parking.js (its car parks stand only where OSM maps one). */
-export function parkingIndex(L) {
-  const P = (L.LANDUSE || []).filter((l) => l.cls === 'parking').map((l) => { let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity; for (const [x, z] of l.ring) { x0 = Math.min(x0, x); z0 = Math.min(z0, z); x1 = Math.max(x1, x); z1 = Math.max(z1, z); } return { l, x0, z0, x1, z1 }; });
+function ringIndex(L, classes) {
+  const P = (L.LANDUSE || []).filter((l) => classes.has(l.cls)).map((l) => { let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity; for (const [x, z] of l.ring) { x0 = Math.min(x0, x); z0 = Math.min(z0, z); x1 = Math.max(x1, x); z1 = Math.max(z1, z); } return { l, x0, z0, x1, z1 }; });
   return (x, z) => P.some((p) => x >= p.x0 && x <= p.x1 && z >= p.z0 && z <= p.z1 && inPoly(x, z, p.l.ring, p.l.holes || []));
 }
+export function parkingIndex(L) { return ringIndex(L, new Set(['parking'])); }
+/** [v5:fix3] paved or bare ground (car parks, aprons, squares, gravel, building sites): no vacant-lot grass on it */
+export const PAVED = new Set(['parking', 'apron', 'plaza', 'gravel', 'construction']);
+export function pavedIndex(L) { return ringIndex(L, PAVED); }

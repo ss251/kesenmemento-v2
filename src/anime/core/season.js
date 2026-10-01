@@ -26,11 +26,23 @@ export function seasonWeights(id, out = new THREE.Vector4()) {
 
 export function seasonUniform(shared) {
   if (!shared.uSeason) shared.uSeason = { value: seasonWeights(DEFAULT_SEASON) };
+  seasonExtra(shared.uSeason);
   return shared.uSeason;
+}
+
+/** [v5:fix1] Presets beyond the four HUD seasons (URL only): `early` = 早春 without snow, the look of Google Earth's
+ *  2026-03-11 imagery (bare broadleaf, dormant brown turf and lawns, no snow, no 紅葉), for side-by-side comparisons. */
+export const PRESETS = { early: { base: 'winter', snow: 0, dry: 1, ja: '早春（雪なし）', en: 'Early spring (no snow)' } };
+/** [v5:fix1] The season's extra uniform on the shared season uniform: x = snow amount (1 = winter snow), y = dry
+ *  (dormant brown grass). */
+export function seasonExtra(uSeason) {
+  if (!uSeason.extra) uSeason.extra = { value: new THREE.Vector2(1, 0) };
+  return uSeason.extra;
 }
 
 export const SEASON_GLSL = /* glsl */`
   uniform vec4 uSeasonS;
+  uniform vec2 uSeasonE;   // [v5:fix1] x snow amount, y dormant (dry) grass: the early-spring preset
   float klcS_h(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
   float klcS_vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
     return mix(mix(klcS_h(i), klcS_h(i + vec2(1, 0)), f.x), mix(klcS_h(i + vec2(0, 1)), klcS_h(i + vec2(1, 1)), f.x), f.y); }
@@ -41,11 +53,18 @@ export const SEASON_GLSL = /* glsl */`
     vec3 spr = c * vec3(1.0, 1.1, 0.9);
     vec3 sum = c * vec3(0.72, 1.06, 0.70);   // [v3:polish] deeper, lusher summer green
     vec3 win = mix(c, vec3(l), 0.55) * vec3(0.97, 0.97, 1.02);
+    win = mix(win, mix(c, vec3(l), 0.7) * vec3(1.12, 1.0, 0.8), uSeasonE.y);   // [v5:fix1] early spring: dormant tan turf
     return c * uSeasonS.z + spr * uSeasonS.x + sum * uSeasonS.y + win * uSeasonS.w;
   }
   // winter snow: up-facing surfaces, broken into painted drifts; flat dark surfaces (asphalt) stay clear
   vec3 klcSnowMix(vec3 albedo, vec3 nW, vec3 pW){
-    float w = uSeasonS.w;
+    // [v5:fix1] early spring (no snow): flat green surfaces (lawns, verges) turn dormant tan, as in March imagery
+    if (uSeasonE.y > 0.002) {
+      float gr = smoothstep(0.015, 0.06, albedo.g - max(albedo.r, albedo.b)) * smoothstep(0.85, 0.97, nW.y);
+      float lg = dot(albedo, vec3(0.299, 0.587, 0.114));
+      albedo = mix(albedo, vec3(lg) * vec3(1.25, 1.0, 0.68), gr * uSeasonE.y * 0.85);
+    }
+    float w = uSeasonS.w * uSeasonE.x;
     if (w < 0.002) return albedo;
     float up = smoothstep(0.42, 0.78, nW.y);
     float lum = dot(albedo, vec3(0.299, 0.587, 0.114));
@@ -62,6 +81,7 @@ export const SEASON_GLSL = /* glsl */`
  *  posExpr: a world-position expression available in the fragment shader (e.g. 'vPWorld'). */
 export function patchSnow(sh, uSeason, posExpr) {
   sh.uniforms.uSeasonS = uSeason;
+  sh.uniforms.uSeasonE = seasonExtra(uSeason);
   if (!sh.fragmentShader.includes('uniform vec4 uSeasonS;')) sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + SEASON_GLSL);
   const hook = sh.fragmentShader.includes('#include <lights_toon_fragment>') ? '#include <lights_toon_fragment>' : '#include <lights_fragment_begin>';
   sh.fragmentShader = sh.fragmentShader.replace(hook, `{

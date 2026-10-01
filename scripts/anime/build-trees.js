@@ -15,7 +15,8 @@ import { KAMEYAMA } from "../../src/anime/world/landmarks/sites.js";
 // [v4:polish3] 1500 m and 25 000 trees (was 820 m / 7000): the upper 安波山 slopes, 亀山 and the hills round the core are
 // real trees too; beyond ~380 m from the camera they draw as a cheap crown (environment/trees.js far LOD)
 const NEAR_R = 1500, SPACING = 7.5, MAX = 25000;
-const CEDAR = hexRGB(CLASSES.find((c) => c.id === "cedar").color);
+const PAL = CLASSES.map((c) => hexRGB(c.color)), CEDAR_I = CLASSES.findIndex((c) => c.id === "cedar");
+const nearestClass = (c) => { let b = 0, bd = Infinity; PAL.forEach((p, i) => { const d = (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2 + (p[2] - c[2]) ** 2; if (d < bd) { bd = d; b = i; } }); return b; };
 function hexRGB(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
 
 export async function buildTrees() {
@@ -44,8 +45,13 @@ export async function buildTrees() {
   const onRoad = (x, z) => roads.near(x, z, 12).some((s) => segDist(x, z, s.a, s.b).d < s.data.width / 2 + 1.8);
   // [v4:town-accuracy] OSM land use where no tree stands (© OpenStreetMap contributors)
   const OPEN = new Set(["sport", "parking", "field", "construction", "beach"]);   // cemeteries on the hills stand in woods: the photo decides there
-  const open = (L.LANDUSE || []).filter((l) => OPEN.has(l.cls)).map((l) => { let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity; for (const [x, z] of l.ring) { x0 = Math.min(x0, x); z0 = Math.min(z0, z); x1 = Math.max(x1, x); z1 = Math.max(z1, z); } return { l, x0, z0, x1, z1 }; });
+  // [v5] and every override surface but a park (a car park, gravel, weeds, a plaza or an apron read from newer imagery)
+  // [v5:fix2] but an override wood or 杉 stand (use forest / cedar) is planted, and a clear-cut (felled) stays open
+  const WOOD = new Set(["park", "forest", "cedar"]);
+  const open = (L.LANDUSE || []).filter((l) => OPEN.has(l.cls) || (String(l.type || "").startsWith("override:") && !WOOD.has(l.cls))).map((l) => { let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity; for (const [x, z] of l.ring) { x0 = Math.min(x0, x); z0 = Math.min(z0, z); x1 = Math.max(x1, x); z1 = Math.max(z1, z); } return { l, x0, z0, x1, z1 }; });
   const inRing = (x, z, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, zi] = p[i], [xj, zj] = p[j]; if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) c = !c; } return c; };
+  const stands = (L.LANDUSE || []).filter((l) => l.cls === "cedar" && String(l.type || "").startsWith("override:"));
+  const cedarStand = (x, z) => stands.some((l) => inRing(x, z, l.ring));
   const openGround = (x, z) => open.some((o) => x >= o.x0 && x <= o.x1 && z >= o.z0 && z <= o.z1 && inRing(x, z, o.l.ring) && !(o.l.holes || []).some((h) => inRing(x, z, h)));
   const H = L.ZONES.hero;
   const rows = [];
@@ -83,11 +89,16 @@ export async function buildTrees() {
     if (onRoad(jx, jz) || inLot(jx, jz)) continue;
     if (!G.hero && (kameyamaClear(jx, jz) || inFarLot(jx, jz) || onFarRoad(jx, jz))) continue;
     if (openGround(jx, jz)) continue;   // [v4:town-accuracy] no trees on pitches, car parks, fields, building sites (OSM land use)
+    // [v5:fix2] none on the 五十鈴神社 stone stair (harbor/shinmei.js stairA -> stairB): one stood 1.3 m off its axis and
+    // its trunk filled the middle of the stop's walk frame (review2 walk/w_9)
+    if (segDist(jx, jz, [346.5, -144.6], [362.8, -137.3]).d < 2.8) continue;
     // inside the hero town keep trees to the wooded slopes and 神明崎 (gardens get street trees from town)
     const shinmei = Math.hypot(jx - L.SPOTS.shinmeizaki.x, jz - L.SPOTS.shinmeizaki.z) < 70;
     if (dc < L.ZONES.hero.r + 40 && !shinmei && (f < 0.62 || y < 14 || lotNear(jx, jz, 7) || roadNear(jx, jz, 5))) continue;
-    const cc = colourAt(jx, jz), cedar = Math.abs(cc[0] - CEDAR[0]) + Math.abs(cc[1] - CEDAR[1]) + Math.abs(cc[2] - CEDAR[2]) < 20;
-    const type = cedar ? (r() < 0.85 ? 0 : 1) : r() < 0.1 ? 2 : r() < 0.2 ? 0 : 1;
+    // [v5:fix2] cedar cover = the nearest palette class is cedar (the land cover's 1 px feather blends class edges), or an
+    // override 杉 stand; conifers take 88 % of it (Earth 2026-03-11: dark sugi plantations on 安波山 and behind 八日町)
+    const cc = colourAt(jx, jz), cedar = nearestClass(cc) === CEDAR_I || cedarStand(jx, jz);
+    const type = cedar ? (r() < 0.88 ? 0 : 1) : r() < 0.1 ? 2 : r() < 0.2 ? 0 : 1;
     const hgt = type === 0 ? 11 + r() * 8 : 7 + r() * 6;
     const rad = type === 0 ? hgt * (0.2 + r() * 0.05) : 3.2 + r() * 2.6;
     // nearer trees first (they win when the budget runs out)

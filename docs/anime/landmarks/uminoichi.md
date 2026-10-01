@@ -58,3 +58,13 @@ Open. The Shark Museum reopened in April 2024 after a renewal. The building surv
 - The lot is tagged `landmark: 'fishMarket'` (16/58541/25069/401). harbor builds it as **one of the white fish-market
   halls** (72 × 45 m, 12.7 m high) with skylit gable roofs.
 - There is no red A-frame and no signage.
+
+## v5 fix round 2 (2026-10-01): the walk spot
+
+- The tour stop's street-level spot moved from (381, 732) to **(311.7, 704), yaw −60, pitch 5** on the 魚市場前 road
+  south-west of the block (`WALK_SET.uminoichi` in `explore/places.js`). The new 3-storey office of
+  `overrides/c11.json#newLots/0` at (375, 713) and the 4-storey lots at (404, 716) / (406, 710) left only a 15 m slot
+  onto the front from the old spot (review2 walk/w_11).
+- Chosen with `tools/anime/debug/walkprobe.mjs` (renderer depth: 45 of 49 candidates clear) and checked by screenshot:
+  the whole red A-frame with 「気仙沼 海の市 / シャークミュージアム」 and 「UMI ICHI」, nothing in between. The closer
+  (350, 690) cut the A-frame at the frame's left edge.

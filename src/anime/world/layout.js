@@ -93,7 +93,9 @@ function expandFar(F) {
     if (rg) lot.roof.ridge = rg === 1 ? 'x' : 'z';
     const x = F.extra?.[id];
     // [v4:landmarks-A] 'landmark' too (a far lot under a harbour landmark, e.g. the fish market's D棟)
-    if (x) { for (const key of ['name', 'nameEn', 'use', 'facility', 'landmark']) if (x[key] != null) lot[key] = x[key]; if (x.nameSrc) (lot.src ||= {}).name = x.nameSrc; if (x.wallSrc) (lot.src ||= {}).wall = x.wallSrc; }
+    if (x) { for (const key of ['name', 'nameEn', 'use', 'facility', 'landmark', 'facade']) if (x[key] != null) lot[key] = x[key]; if (x.nameSrc) (lot.src ||= {}).name = x.nameSrc; if (x.wallSrc) (lot.src ||= {}).wall = x.wallSrc; }
+    // [v4:overrides] the provenance of a far lot changed by data/anime/overrides (docs/anime/OVERRIDES.md)
+    if (x?.ovr) { lot.src ||= {}; lot.src.ovr = x.ovr; lot.src.ovrWhy = x.ovrWhy; }
     out.push(lot);
   }
   return out;
@@ -104,7 +106,8 @@ export const LOTS = D.lots.concat(expandFar(D.farLots));
 D.farLots.rows = null;   // [v4:phone] the packed rows are garbage once expanded (layout.js keeps D alive: ~20 MB)
 const lotMap = new Map(LOTS.map((l) => [l.id, l]));
 // [v4:polish1] reference corrections (the Plaza Hotel on its bluff, the station's name): world/lotfix.js
-for (const id of Object.keys(LOT_FIX)) { const l = lotMap.get(id); if (l) applyLotFix(l); }
+// [v4:overrides] a lot changed by an override file keeps the override's values (they were folded in after LOT_FIX)
+for (const id of Object.keys(LOT_FIX)) { const l = lotMap.get(id); if (l && !l.src?.ovr) applyLotFix(l); }
 export const lotById = (id) => lotMap.get(id) || null;
 export const lotsInZone = (zone) => LOTS.filter((l) => l.zone === zone);
 
@@ -157,7 +160,7 @@ export const NAMES = { city: '気仙沼', cityEn: 'Kesennuma', bay: '内湾', ma
 // Lot fields added by the enrichment (all optional): name, nameEn, use ('shop:seafood', 'amenity:restaurant', ...),
 // facility (GSI category: school, post_office, ...), osm (OSM id, hero/mid lots), roof.ridge ('x' along the frontage,
 // 'z' front to back; only when measured), roof.photo (the aerial roof colour before grading), roof.conf, and
-// src = { h, kind, roof, color, name?, wall? } with values 'osm' | 'aerial' | 'gsi' | 'landmark' | 'derived'.
+// src = { h, kind, roof, color, name?, wall? } with values 'osm' | 'aerial' | 'gsi' | 'landmark' | 'derived' | 'ref' (LOT_FIX) | 'override' (data/anime/overrides).
 /** Land use areas: { cls: park|field|cemetery|school|parking|sport|forest|grass|scrub|beach|rock|religious|industrial|
  *  commercial|construction|aquaculture|water, type (OSM tag value), name, ring, holes, area }, painted in array order. */
 export const LANDUSE = (D.landuse || []).concat(AERIAL_LANDUSE);   // [v4:polish2] + areas traced on the aerial photo
@@ -175,6 +178,10 @@ export const BRIDGES = D.bridges || [];
 export const RAIL = D.rail || [];
 /** Data credit line required by the sources (OSM: © OpenStreetMap contributors). */
 export const CREDITS = D.credits || '出典：国土地理院';
+/** [v4:overrides] Prop placements from data/anime/overrides ({ type, x, z, rotY, ovr }; town/props.js builds them). */
+export const PROPS = D.props || [];
+/** [v4:overrides] The override files folded into this layout ({ file, cell, bbox, sources, note, counts }). */
+export const OVERRIDES = D.overrides || [];
 const norm = (t) => String(t || '').normalize('NFKC').toLowerCase().replace(/\s+/g, '');
 /** Search PLACES by a JA or EN query (NFKC, case-insensitive substring; exact and prefix matches first). */
 export function findPlaces(query, limit = 20) {

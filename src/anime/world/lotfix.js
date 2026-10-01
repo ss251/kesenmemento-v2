@@ -32,6 +32,9 @@ export const LOT_FIX = {
   '16/58540/25069/263': { name: '気仙沼市民会館', nameEn: 'Kesennuma Civic Hall', src: 'OSM relation 12442922 市民会館 (community_centre); z18 photo' },
   '16/58540/25069/128': { clearName: true, src: 'a school building of 気仙沼中学校 (z18 photo): the GSI 市民会館 annotation belongs to OSM relation 12442922' },
   '16/58539/25068/442': { roofShape: 'flat', src: 'GSI seamlessphoto z18: flat grey roof, rooftop light well; OSM building:levels 4' },
+  // [v5:fix3] 五十鈴神社: the GSI footprint at the porch's door (17 m², OSM relation r10841412, the shrine's own) is the
+  // 向拝 in front of the hall, built by harbor/shinmei.js; town drew it as a house with windows across the entrance
+  '16/58541/25068/119': { kind: 'shrine', landmark: 'isuzuShrine', src: 'GSI footprint at the hall door, inside the shrine relation (OSM r10841412); isuzu-jinja.md' },
 };
 
 /** [v4:polish3] Place corrections by place id (the GSI annotation that sat on the wrong building). */

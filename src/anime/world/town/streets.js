@@ -14,6 +14,7 @@ import { MeshBuilder } from './sakura/street_mesh.js';
 import { makeStreetTextures, GLYPH, UTIL, SIGN, uvOf } from './sakura/street_textures.js';
 import { buildFurniture } from './sakura/street_furniture.js';
 import { resample, polyLength, clamp } from './common.js';
+const inRing = (x, z, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, zi] = p[i], [xj, zj] = p[j]; if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) c = !c; } return c; };
 
 const ATILE = 4.0;
 const CURB = 0.15;
@@ -26,7 +27,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
   const T = makeStreetTextures(ctx);
   const M = {
     asphalt: mat.toon('#ffffff', { map: T.asphalt, vertexColors: true, paint: 0.03, polygonOffset: -1 }),
-    pavers: mat.toon('#dcd8d2', { map: T.pavers, paint: 0.035 }),
+    pavers: mat.toon('#bcbbba', { map: T.pavers, paint: 0.035 }),   // [v5:fix1] greyer, darker (#dcd8d2): Earth 2026 sidewalks are mid-grey concrete blocks
     curb: mat.toon('#ffffff', { map: T.curb, paint: 0.03 }),
     lgutter: mat.toon('#ffffff', { map: T.lid, paint: 0.03, polygonOffset: -2 }),
     dots: mat.toon('#ffffff', { map: T.dots, paint: 0.02, polygonOffset: -2 }),
@@ -36,6 +37,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
     util: mat.decal('#ffffff', { map: T.util }),
   };
   M.asphalt.userData.acc = 'road';   // [v4:town-accuracy] tools/anime/accuracy.mjs road pass
+  roads = roads.filter((r) => !r.tunnel);   // [v5] tunnels (OSM tunnel=yes, GSI 2714) run under the hill: no asphalt over it (roadnet.js and basemap.js skip them too)
   const F = buildFurniture(ctx, root, T, { baseLift: () => 0 });
   const out = { edges: [], gutters: [], walkPaths: [], walkKinds: [], crosswalks: [], junctions: [], stops: [], signs: 0, mirrors: 0, guardrails: 0 };
   const hr = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -57,6 +59,28 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
     n.R = n.deg >= 3 ? n.maxW / 2 * 1.1 + 0.4 : n.maxW / 2;
   }
   const nodeAt = (r, end) => nodes.get(nk(end ? r.pts[r.pts.length - 1] : r.pts[0]));
+  // [v5:fix1] each approach's outgoing direction, so a hero sidewalk stops at the cross street's edge (it stopped at the
+  // widest road's half-width x 1.1 + 1.2 m, leaving raised paver islands that ended mid-road beside an asphalt blob)
+  for (const n of nodes.values()) for (const a of n.roads) {
+    const P = a.end ? a.r.pts.slice().reverse() : a.r.pts; let k = 1;
+    while (k < P.length - 1 && Math.hypot(P[k][0] - P[0][0], P[k][1] - P[0][1]) < 4) k++;
+    const dx = P[k][0] - P[0][0], dz = P[k][1] - P[0][1], l = Math.hypot(dx, dz) || 1; a.d = [dx / l, dz / l];
+  }
+  /** [v5:fix1] how far from node n road r's sidewalks stop: clear of every crossing approach's edge, never past the old cut.
+   *  `lat` (optional) = the sidewalk side's outward direction: only the approaches on that side count, so the far
+   *  sidewalk of a T-junction runs straight on (it stopped too, leaving a paver island beside the seawall at 魚町) */
+  const sidewalkCut = (n, r, lat = null) => {
+    const me = n.roads.find((a) => a.r === r); if (!me?.d) return n.R + 0.8;
+    let need = lat ? 0 : 2.0;
+    for (const q of n.roads) {
+      if (q === me || !q.d) continue;
+      if (lat && q.d[0] * lat[0] + q.d[1] * lat[1] < 0.15) continue;
+      const cos = me.d[0] * q.d[0] + me.d[1] * q.d[1], sin = Math.abs(me.d[0] * q.d[1] - me.d[1] * q.d[0]);
+      if (sin < 0.35) continue;   // the street's own continuation
+      need = Math.max(need, q.r.width / 2 / sin + r.width / 2 * Math.abs(cos) / sin + 0.6);
+    }
+    return Math.min(n.R + 0.8, need);
+  };
   // [v4:polish3] carriageway half-width from OSM (enrich/fold.js r.carriage: the way's width, or lanes x 3.0 m) when it
   // is narrower than the GSI road edges: the rest of the road reserve is pavement, not asphalt
   const carriageHalf = (r) => (r.carriage && r.kind !== 'alley' && r.kind !== 'bridge' && r.carriage < r.width - 0.8 ? r.carriage / 2 : null);
@@ -89,6 +113,10 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
   const runs = (S, keep) => S.map((s, i) => (keep(s, i) ? s : null));
 
   let asphaltLen = 0;
+  // [v5:fix1] a service way across a quay apron (an override 'apron' polygon, e.g. r12698 on PIER7's yard) is open
+  // asphalt in Google Earth 2026: no gutter covers or edge lines on it
+  const APRONS = (L.LANDUSE || []).filter((l) => l.cls === 'apron' && l.ring?.length > 2);
+  const onApron = (r) => r.hw === 'service' && APRONS.length > 0 && (() => { const m = r.pts[Math.floor(r.pts.length / 2)], q = r.pts.length > 2 ? m : [(r.pts[0][0] + r.pts[1][0]) / 2, (r.pts[0][1] + r.pts[1][1]) / 2]; return APRONS.some((a) => inRing(q[0], q[1], a.ring)); })();
   for (const r of roads) {
     const hero = r.zone === 'hero';
     const step = hero ? stepHM[0] : stepHM[1];
@@ -111,21 +139,26 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
     const Sw = runs(S, (s) => !water(s.x, s.z));
     for (let j = 0; j < lats.length - 1; j++) strip(roadB, Sw, lats[j], lats[j + 1], (x, z) => roadY(x, z), (p) => [p[0] / ATILE, -p[1] / ATILE], tone);
 
+    const startN = nodeAt(r, 0), endN = nodeAt(r, 1);
+    // the cuts at each end, for both sides (undefined) and per side (-1 / 1: lateral (-tz, tx) x side in the samples' frame)
+    const t0 = [S[0].tx, S[0].tz], t1 = [S[S.length - 1].tx, S[S.length - 1].tz];
+    const cutsAt = (N, t) => (N && N.deg >= 3 ? { all: sidewalkCut(N, r), [-1]: sidewalkCut(N, r, [t[1], -t[0]]), [1]: sidewalkCut(N, r, [-t[1], t[0]]) } : { all: 0, [-1]: 0, [1]: 0 });
+    const C0 = cutsAt(startN, t0), C1 = cutsAt(endN, t1);
+    const nearJunction = (s, side) => { const a = side ? C0[side] : C0.all, b = side ? C1[side] : C1.all; return (a > 0 && s.s < a) || (b > 0 && len - s.s < b); };
+    const nearJunctionEnd = (s, side) => { const a = side ? C0[side] : C0.all, b = side ? C1[side] : C1.all; return (a > 0 && s.s < a + 2.7) || (b > 0 && len - s.s < b + 2.7); };
     if (!hero) {
-      // [v4:polish3] mid: flat pavements either side of an OSM-width carriageway
-      if (cw < hw - 0.5) for (const side of [-1, 1]) strip(paverB, Sw, side < 0 ? -hw : cw, side < 0 ? -cw : hw, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [o / 1.6, s.s / 1.6]);
+      // [v4:polish3] mid: flat pavements either side of an OSM-width carriageway ([v5:fix1] they stop at the cross
+      // street's edge: they ran through the junction over the crossing carriageway)
+      if (cw < hw - 0.5) for (const side of [-1, 1]) { const Kp = runs(S, (s) => !water(s.x, s.z) && !nearJunction(s, side)); strip(paverB, Kp, side < 0 ? -hw : cw, side < 0 ? -cw : hw, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [o / 1.6, s.s / 1.6]); }
       // mid: cheap markings only on the wider roads
       if (r.width >= 7) markCentre(r, S, cw, hw, false);
       continue;
     }
     // ---- sidewalks + curbs
-    const startN = nodeAt(r, 0), endN = nodeAt(r, 1);
-    const nearJunction = (s) => (startN && startN.deg >= 3 && s.s < startN.R + 0.8) || (endN && endN.deg >= 3 && len - s.s < endN.R + 0.8);
-    const nearJunctionEnd = (s) => (startN && startN.deg >= 3 && s.s < startN.R + 3.5) || (endN && endN.deg >= 3 && len - s.s < endN.R + 3.5);
     if (sw > 0) {
       for (const side of [-1, 1]) {
         const keep = (s) => {
-          if (nearJunction(s)) return false;
+          if (nearJunction(s, side)) return false;
           const nx = -s.tz * side, nz = s.tx * side;
           const px = s.x + nx * (cw + sw / 2), pz = s.z + nz * (cw + sw / 2);
           if (water(px, pz) || water(s.x + nx * hw, s.z + nz * hw)) return false;
@@ -172,7 +205,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
             const i2 = curbB.vert(b[0], top(...b), b[1], 0.5, 0.45, dirn), i3 = curbB.vert(a[0], top(...a), a[1], 0, 0.45, dirn);
             curbB.quad(i0, i1, i2, i3, dirn);
             // tactile warning blocks at crossings
-            if (nearJunctionEnd(s)) {
+            if (nearJunctionEnd(s, side)) {
               const k = s === run[0] ? 1 : -1;
               const w0 = sw - 0.35;
               const c0 = [a[0] + nx * 0.2, a[1] + nz * 0.2], c1 = [a[0] + nx * (0.2 + w0), a[1] + nz * (0.2 + w0)];
@@ -202,11 +235,11 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
         for (const s of K) { if (s) run.push(s); else flush(); }
         flush();
       }
-    } else {
+    } else if (!onApron(r)) {
       // ---- narrow streets: concrete gutter covers along both edges (側溝の蓋) + white edge lines
       for (const side of [-1, 1]) {
         const keep = (s) => {
-          if (nearJunction(s)) return false;
+          if (nearJunction(s, side)) return false;
           const nx = -s.tz * side, nz = s.tx * side, px = s.x + nx * (hw - 0.2), pz = s.z + nz * (hw - 0.2);
           if (water(px, pz)) return false;
           if (roadIdx.covering(px, pz, -0.3, r).length) return false;
@@ -226,7 +259,7 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
     if (cw * 2 >= 5.4) markCentre(r, S, cw, hw, true);
     if (sw > 0) for (const side of [-1, 1]) {
       const e = side * (cw - 0.3);
-      const K = runs(S, (s) => !nearJunction(s) && !roadIdx.covering(s.x - s.tz * e, s.z + s.tx * e, -0.3, r).length && !water(s.x, s.z));
+      const K = runs(S, (s) => !nearJunction(s, side) && !roadIdx.covering(s.x - s.tz * e, s.z + s.tx * e, -0.3, r).length && !water(s.x, s.z));
       strip(lineB, K, e - 0.075, e + 0.075, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [s.s / 0.8, (o - e) / 0.8], () => WHITE);
     }
     // manholes + repair patches
@@ -270,8 +303,10 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
     const hero = inHero(n.x, n.z);
     if (water(n.x, n.z)) continue;
     if (n.deg >= 2 || n.maxW > 5) {
-      // fan disc (draped)
-      const seg = n.R > 5 ? 18 : 10, R = n.R + 0.1;
+      // fan disc (draped). [v5:fix1] it stops at the widest carriageway (+0.5 m): it reached the widest road's full
+      // reserve x 1.1 and painted asphalt blobs over the pavements and the corners (魚町, 八日町)
+      const cwMax = Math.max(...n.roads.map((q) => (hero ? q.r.width / 2 - sidewalkOf(q.r) : (carriageHalf(q.r) ?? q.r.width / 2))));
+      const R = Math.min(n.R + 0.1, cwMax + 0.5), seg = R > 5 ? 18 : 10;
       const dk = hero ? 1 : 0.84;
       const c = roadB.vert(n.x, roadY(n.x, n.z), n.z, n.x / ATILE, -n.z / ATILE, UP, [0.97 * dk, 0.97 * dk, 0.98 * dk]);
       const ring = [];

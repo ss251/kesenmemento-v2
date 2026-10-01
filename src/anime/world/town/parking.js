@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { MeshBuilder } from './sakura/street_mesh.js';
 import { makeKeiCar, makeKeiVan } from './sakura/vehicles_cars.js';
+import { JP_CAR_COLS } from './carcolors.js';
+import { pavedIndex } from './landuse.js';
 
 const UP = [0, 1, 0];
 
@@ -52,7 +54,9 @@ function simpleCar() {
   const g = mergeGeometries(parts); g.computeVertexNormals();
   return g;
 }
-const CAR_COLS = ['#e8e8e3', '#c3c7cc', '#e8e8e3', '#44507a', '#9fd4c2', '#efe3c4', '#94434d', '#4a4753', '#a9c5e2', '#e8e8e3', '#d7c3a6'];
+// [v5:fix2] the Japanese car-colour mix (town/carcolors.js): 14 variants, the car body colour of variant v is every other
+// entry of JP_CAR_COLS (5 white / pearl, 2 black, 1 silver, 1 grey, 1 dark blue in 10); it was a rainbow with mint and baby blue
+const CAR_COLS = Array.from({ length: 10 }, (_, i) => JP_CAR_COLS[i * 2]);
 
 export function buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex, lineTex, signs, SM, foci = [], maxDetailCars = 36, inParking = null }) {
   const L = ctx.L;
@@ -143,7 +147,8 @@ export function buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex, li
         lotStalls++;
         for (const [a, c2] of [[u, b.v], [u + 2.5, b.v], [u + 2.5, b.v + 5], [u, b.v + 5], [u + 1.25, b.v + 2.5], [u + 1.25, b.v - 3], [u + 1.25, b.v + 8]]) { const p = W(a, c2); covered.add(Math.floor((p[1] - z0) / C) * n + Math.floor((p[0] - x0) / C)); }
         if (!signAt) { const sp = W(u + 0.3, b.flip ? b.v + 4.7 : b.v + 0.3); if (!lotIdx.at(sp[0], sp[1], 0.6)) signAt = sp; }
-        if (r() < 0.36) carSpots.push({ p: W(u + 1.25, b.v + 2.5), rot: Math.atan2(vx, vz) + (b.flip ? 0 : Math.PI) + (r() < 0.3 ? Math.PI : 0) + (r() - 0.5) * 0.06 });
+        // [v5:fix2] 30 % of the stalls (was 36 %): Google Earth 2026-03-11 shows the core's car parks a third full or less
+        if (r() < 0.3) carSpots.push({ p: W(u + 1.25, b.v + 2.5), rot: Math.atan2(vx, vz) + (b.flip ? 0 : Math.PI) + (r() < 0.3 ? Math.PI : 0) + (r() - 0.5) * 0.06 });
       }
       if (b.aisle !== undefined) {
         // aisle pad
@@ -183,10 +188,15 @@ export function buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex, li
   // ---- the rest of the open land: grassy vacant lots (空き地) with weed tufts and the odd 売地 sign
   const grassB = new MeshBuilder(true); const tufts = [];
   let vacant = 0;
+  // [v5:fix3] no vacant-lot grass inside a car park or any paved / bare landuse ring: the stall-less cells of a used car
+  // park drew lime-green triangles through the asphalt (town-vacant's polygonOffset -1 beat landuse's -0.6; PIER7 south
+  // lot, 南町, the market). Google Earth 2026-03-11 and the GSI photo show plain asphalt there.
+  const inPaved = pavedIndex(L);
   comps.forEach((cells0, id) => {
     let cells = cells0;
     if (cells.length < 3) return;
-    if (usedComp.has(id)) cells = cells.filter((c) => !covered.has(c));
+    if (usedComp.has(id)) return;
+    cells = cells.filter((c) => !inPaved(x0 + (c % n + 0.5) * C, z0 + (((c / n) | 0) + 0.5) * C));
     if (cells.length < 2) return;
     const r = ctx.rng('vacant-' + id);
     vacant++;
@@ -216,7 +226,8 @@ export function buildParking(ctx, H, { lotIdx, roadIdx, heroZone, asphaltTex, li
       if (nr) { const F = H.Frame.at(H.gb, x, L.heightAt(x, z), z, Math.atan2(nr.a[0] - x, nr.a[1] - z)); F.cyl(H.M.plain, '#9aa1a8', 0.04, 1.6, -0.5, 0.8, 0, { seg: 6 }); F.cyl(H.M.plain, '#9aa1a8', 0.04, 1.6, 0.5, 0.8, 0, { seg: 6 }); H.card(F, SM.tops, signs.topOf('forSale').rect, 0, 1.3, 0.05, 1.2, 0.8, { shadow: true }); H.card(F.sub(0, 0, 0, Math.PI), SM.tops, signs.topOf('forSale').rect, 0, 1.3, 0.05, 1.2, 0.8, { shadow: true }); }
     }
   });
-  if (!grassB.empty) { const m = grassB.mesh(ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.12, polygonOffset: -1 }), { name: 'town-vacant' }); root.add(m); }
+  // [v5:fix3] a weaker offset than the landuse surfaces (-0.6): where the two still meet, the paved surface wins
+  if (!grassB.empty) { const m = grassB.mesh(ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.12, polygonOffset: -0.3 }), { name: 'town-vacant' }); root.add(m); }
   if (tufts.length) {
     // susuki (pampas grass) clumps: thin blades + silver plumes, the autumn accent of every vacant lot
     const im = new THREE.InstancedMesh(susukiGeometry(), ctx.mat.toon('#ffffff', { vertexColors: true, side: 'double', paint: 0.04 }), tufts.length);

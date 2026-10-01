@@ -86,8 +86,9 @@ test('fish market: the four real parts and 海の市 as their own models, nothin
     const hit = halls.some((h) => { const c = Math.cos(h.rotY), s = Math.sin(h.rotY), dx = o.cx - h.x, dz = o.cz - h.z; return Math.abs(dx * c - dz * s) < h.depth / 2 + 6 && Math.abs(dx * s + dz * c) < h.len / 2 + 6; });
     expect([id, hit]).toEqual([id, true]);
   }
-  // the shed's roof is the car park: parked cars, a ramp from the street
-  expect(H.market.cars).toBeGreaterThan(200);
+  // the shed's roof is the car park: parked cars, a ramp from the street. [v5:fix2] Google Earth 2026-03-11 shows about
+  // 25 cars on the shed's deck and the north roof ~10-15 % full (it was packed with 200+)
+  expect(H.market.cars).toBeGreaterThan(20); expect(H.market.cars).toBeLessThan(90);
   expect(H.market.ramp.len).toBeGreaterThan(80);
   expect(H.market.stats.shed.roofY - H.market.stats.shed.g0).toBeGreaterThan(9);
   // every footprint under a landmark is tagged, so town builds nothing there

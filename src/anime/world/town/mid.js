@@ -71,6 +71,7 @@ function frameOf(o) {
 }
 
 export function styleOf(lot, main) {
+  if (lot.facade && STYLE[lot.facade] != null) return STYLE[lot.facade];   // [v4:overrides] a facade style read from the imagery
   const k = lot.kind;
   if (k === 'warehouse' || k === 'factory') return STYLE.warehouse;
   if (k === 'apartment') return STYLE.apartment;
@@ -119,7 +120,7 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
     const u0 = (lot.seed % 13) * 0.37;
     // roof shape (measured shapes are kept, [v4:data])
     let shape = lot.roof.shape;
-    const measured = lot.src?.roof === 'aerial' || lot.src?.roof === 'osm' || lot.src?.roof === 'landmark';
+    const measured = lot.src?.roof === 'aerial' || lot.src?.roof === 'osm' || lot.src?.roof === 'landmark' || lot.src?.roof === 'override';   // [v4:overrides]
     if (!measured && shape === 'shed' && !isWh && r() < 0.55) shape = r() < 0.5 ? 'gable' : 'hip';
     if (!measured && shape === 'flat' && h < 7.5 && !isWh && lot.area < 220 && r() < 0.6) shape = 'gable';
     if (isWh && shape === 'hip') shape = 'gable';
@@ -128,7 +129,7 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
     // drawn as boxes)
     const oddBig = !isAnnex && W.simple && W.rect < 0.8 && lot.area >= 250;
     if (oddBig) shape = 'flat';
-    const colMeasured = lot.src?.color === 'aerial' || lot.src?.color === 'osm' || lot.src?.color === 'landmark';
+    const colMeasured = lot.src?.color === 'aerial' || lot.src?.color === 'osm' || lot.src?.color === 'landmark' || lot.src?.color === 'override';   // [v4:overrides]
     let roofCol = shape === 'flat' ? flatRoofOf(lot) : pitchedRoofOf(lot);
     if (isWh && shape !== 'flat' && !colMeasured && r() < 0.5) roofCol = pick(r, ['#56677a', '#4a78a0', '#8e4540', '#7b8691', '#6f8f8a']);   // [v4:data] measured colours stay
     rc.set(roofCol);

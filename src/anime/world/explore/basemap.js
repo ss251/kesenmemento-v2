@@ -12,7 +12,7 @@ export const MAP_COLORS = {
   // [v4:polish1] darker road edges and buildings: the minimap read as blank paper at street scale
   building: '#c9b595', buildingEdge: '#bba88c', road: '#ffffff', roadEdge: '#a39a88', national: '#ffe08a', nationalEdge: '#d7b35a', pref: '#fff2c2',
   rail: '#8b8f9a',
-  landuse: { park: '#cfe6b4', grass: '#d9ecc2', forest: '#bfdca6', scrub: '#cfe2b2', field: '#e6efc4', cemetery: '#d9dfcc', school: '#f0dcb4', sport: '#cfe9bd', parking: '#e1e2e5', gravel: '#e3dfd6', weeds: '#d6dcbf', religious: '#ecd9c9', industrial: '#e6e1ea', commercial: '#f4e0d6', construction: '#eadfcf', beach: '#f3e6c0', rock: '#dedad2', aquaculture: '#a9d4e6', water: '#9ccfe6' },
+  landuse: { park: '#cfe6b4', grass: '#d9ecc2', forest: '#bfdca6', cedar: '#b2d39c', felled: '#e4dccb', scrub: '#cfe2b2', field: '#e6efc4', cemetery: '#d9dfcc', school: '#f0dcb4', sport: '#cfe9bd', parking: '#e1e2e5', gravel: '#e3dfd6', plaza: '#ebe7df', apron: '#e1e2e5', weeds: '#d6dcbf', religious: '#ecd9c9', industrial: '#e6e1ea', commercial: '#f4e0d6', construction: '#eadfcf', beach: '#f3e6c0', rock: '#dedad2', aquaculture: '#a9d4e6', water: '#9ccfe6' },
 };
 
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
@@ -64,7 +64,7 @@ export function createBaseMap(L, { roads, core, quality = 'high', doc = typeof d
       for (const u of L.LANDUSE) {
         const col = MAP_COLORS.landuse[u.cls]; if (!col || u.cls === 'water' || !u.ring?.length) continue;
         g.beginPath(); ring(V, g, u.ring); for (const hole of u.holes || []) ring(V, g, hole);
-        g.fillStyle = col; g.globalAlpha = u.cls === 'forest' || u.cls === 'grass' ? 0.55 : 0.9; g.fill('evenodd');
+        g.fillStyle = col; g.globalAlpha = u.cls === 'forest' || u.cls === 'cedar' || u.cls === 'grass' ? 0.55 : 0.9; g.fill('evenodd');
       }
       g.globalAlpha = 1;
     }

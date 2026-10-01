@@ -130,7 +130,8 @@ export async function buildEnrich({ log = console.error, forceAerial = false } =
     const poi = pois[0], site = siteAt.get(i);
     const facFirst = !t.name && fac[0]?.name && (t.building === "train_station" || t.railway === "station" || t.public_transport === "station" || poi);
     const name = t.name || (facFirst ? fac[0].name : null) || poi?.name || site?.name || null;
-    const nameEn = t["name:en"] || (t.name ? null : poi?.["name:en"]) || (t.name || poi?.name ? null : site?.nameEn) || null;
+    // [v4:overrides] the POI's English name only when the name is the POI's (気仙沼仲町郵便局 got "Katsuya" from a shop inside)
+    const nameEn = t["name:en"] || (t.name || name !== poi?.name ? null : poi?.["name:en"]) || (t.name || poi?.name ? null : site?.nameEn) || null;
     const st = site?.tags || {};
     const use = t.amenity || t.shop ? (t.shop ? "shop:" + t.shop : "amenity:" + t.amenity) : poi ? `${poi.cat}:${poi.type}` : t.tourism ? "tourism:" + t.tourism
       : st.amenity ? "amenity:" + st.amenity : st.tourism ? "tourism:" + st.tourism : null;

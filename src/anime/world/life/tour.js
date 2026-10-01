@@ -21,7 +21,7 @@ export const FRAMES = {
   // [v3:fix] walk spots re-authored by screenshot for every stop (qa3 checks each one: on land, outside every building,
   // no single colour over 45 % of the frame): Pier 7 at the 迎 quay corner looking across the bay, the market apron
   // beside a moored skipjack boat, the shore under かなえ大橋, the mainland slope below the 大島大橋 arch
-  pier7:  { drone: { pos: [-60, 40, 210], look: [150, 8, -80] }, walk: { x: 51, z: 69, yaw: -84, pitch: 1 } },   // [v3:polish3] pitch -4 -> 1: less blank concrete slab   // [v3:polish2] down the quay at the moored row and the working buildings (half the frame was sky + blank slab)
+  pier7:  { drone: { pos: [-60, 40, 210], look: [150, 8, -80] }, walk: { x: 5, z: 40, yaw: -130, pitch: 1 } },   // [v5:fix1] at the head of the stepped garden: the ring planters, the pontoons and PIER7's bay face (it stood nose-to-glass at (51, 69))   // [v3:polish3] pitch -4 -> 1: less blank concrete slab   // [v3:polish2] down the quay at the moored row and the working buildings (half the frame was sky + blank slab)
   market: { drone: { pos: [760, 28, 900], look: [575, 8, 715] } /* [v3:polish3] low over the water off the berth: the canopy leads to 安波山, the moored boats in front (a warehouse roof filled a quarter; the review's [880,55,760] looked into the sun at a thin strip) */, walk: { x: 654.5, z: 836.1, yaw: -155, pitch: 2 } },   // [v3:fix] 15 m back: the unloading scene (harbor/unload.js) now fills the old spot; it lies ahead in view
   kanae:  { drone: { pos: [1560, 110, 2050], look: [1456, 40, 1527] /* [v4:landmarks-A] the measured main-span centre */ }, walk: { x: 1528, z: 1747, yaw: 14, pitch: 4 } },   // [v3:polish3] pitch 12 -> 4, yaw 6 -> 14: less empty sky, off the bare slope   // [v3:polish] at the water's edge (a flat mustard slope filled 40 %)
   oshima: { walk: { x: 2776, z: 3244, yaw: 17, pitch: 2 } },   // [v3:polish3] 8 m uphill, pitch 2: off the bare slab
@@ -137,7 +137,9 @@ export function createTour(ctx) {
     }
   }
   function play() { state.playing = true; const i = stops.findIndex((s) => s.id === state.current); flyTo(stops[(i + 1) % stops.length].id); emit(); }
-  function stop() { state.playing = false; state.orbit = null; emit(); }
+  // [v5] stop() ends a flight in progress too: a pose set right after it (explore's walk-to-place, the far-core walk)
+  // was overwritten by the rest of the flight
+  function stop() { state.playing = false; state.orbit = null; state.flight = null; emit(); }
 
   // ------------------------------------------------------------------ deterministic film path (scripts/render/film.js)
   // 30 s: high over the bay -> down along the inner bay -> 浮見堂 -> Pier 7 -> rise to the whole-bay view.

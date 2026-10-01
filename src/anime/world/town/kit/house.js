@@ -487,7 +487,8 @@ function buildRoof(H, F, v, R, S, out, isMain) {
     downpipe(H, RF, (R.reverse ? -1 : 1) * (hx - 0.1), s * (hz + 0.06), (R.reverse ? -1 : 1) * W / 2, s * D / 2, yE - tv - 0.06, S, s);
   } else if (type === 'flat') {
     // parapet roof (apartments / modern boxes)
-    RF.boxB(M.plain, S.trim, W + 0.1, 0.12, D + 0.1, 0, top + 0.9, 0);
+    // [v5] the roof colour (hero.js: flatRoofOf, the measured / override colour); it was S.trim (random white / brown / black)
+    RF.boxB(M.plain, col || S.trim, W + 0.1, 0.12, D + 0.1, 0, top + 0.9, 0);
     ridgeY = top + 1.0;
   }
   // solar panels on the sunny (front/back) plane

@@ -22,6 +22,8 @@ import { nightMat, addGlint, registry, lightupMat } from './lights.js';
 import { mapMat, textTex, FONT } from './util.js';
 import { apronLife } from './market.js';
 import { fitFontSize } from '../../core/textures.js';   // [v4:polish1]
+import { carColor } from '../town/carcolors.js';
+import { buildCRoofPhotos } from './market5.js';   // [v5:photos]   // [v5:fix2] the Japanese car-colour mix
 
 const C = {
   wall: '#e9ebe8', wallShade: '#d9dcd9', concrete: '#c3c6c2', slab: '#b9bcb8', dark: '#4d5462', interior: '#5b6170',
@@ -77,7 +79,8 @@ function M4(ctx) {
     rail: t(C.rail, { paint: 0 }), blue: t(C.blue, { paint: 0 }),
     board: mapMat(ctx, 'toon', '#ffffff', board, { paint: 0.05, side: 'double' }), redPlain: t(C.red, { paint: 0.05 }),
     beige: t(C.beige, { paint: 0.05 }), deck: mapMat(ctx, 'toon', '#ffffff', deckTex, { paint: 0.04 }), steel: t(C.steel, { paint: 0 }),
-    roofGrey: t('#a9aca7', { paint: 0.04, side: 'double' }),
+    roofGrey: t('#a9aca7', { paint: 0.04, side: 'double' }), umiDeck: t('#8f7a68', { paint: 0.05 }),
+    walkway: t('#6f9a7f', { paint: 0.05 }),   // [v5:fix2] the green walkway stripe on the roof deck (Earth 2026-03-11)
     win: nightMat(ctx, '#7d93a8', '#ffe4b8', 1.3), winCool: nightMat(ctx, '#86a0b4', '#e6f0ff', 1.1),
     lamp: nightMat(ctx, '#e8e6dc', '#fff0d0', 2.2), hall: nightMat(ctx, '#56606f', '#ffe9c4', 0.9),
   };
@@ -138,7 +141,6 @@ function parkCars(poly, y, r, fill = 0.6, avoid = () => false) {
   }
   return cars;
 }
-const CAR_COLS = ['#f1efe8', '#e8e6df', '#3f4a63', '#b8433a', '#d8d9d4', '#6f7c8a', '#2f3440', '#9aa3ad', '#f1efe8', '#c9b48a', '#4f6d8f', '#e2e0d8'];
 function carMesh(ctx, list, name) {
   if (!list.length) return null;
   const body = new THREE.BoxGeometry(1.72, 0.72, 4.2).translate(0, 0.62, 0);
@@ -147,7 +149,7 @@ function carMesh(ctx, list, name) {
   const im = new THREE.InstancedMesh(geo, ctx.mat.toon('#ffffff', { paint: 0.02 }), list.length);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), col = new THREE.Color();
   const r = ctx.rng(name);
-  list.forEach((c, i) => { q.setFromEuler(e.set(0, c.rot, 0)); m4.compose(new THREE.Vector3(c.x, c.y, c.z), q, new THREE.Vector3(1, 1, 1)); im.setMatrixAt(i, m4); im.setColorAt(i, col.set(r.pick(CAR_COLS))); });
+  list.forEach((c, i) => { q.setFromEuler(e.set(0, c.rot, 0)); m4.compose(new THREE.Vector3(c.x, c.y, c.z), q, new THREE.Vector3(1, 1, 1)); im.setMatrixAt(i, m4); im.setColorAt(i, col.set(carColor(r()))); });
   im.name = name; im.castShadow = true; im.receiveShadow = true;
   im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true;
   im.computeBoundingSphere();
@@ -197,9 +199,54 @@ export function buildMarket4(ctx, opts = {}) {
     bandRing(k, poly, y1F + 1.5, 1.1, m.win, { every: 6, gap: 1.6 });
     const pyr = [];
     { const o = obbOf(poly); for (let s = -o.d / 2 + 14; s < o.d / 2 - 10; s += 26) pyr.push([o.cx + o.ux * s, o.cz + o.uz * s]); }
-    const shedCars = parkCars(poly, roofY, r, 0.62, (x, z) => pyr.some(([px, pz]) => Math.hypot(x - px, z - pz) < 4.2));
+    // [v5:fix2] the green walkway stripe along the land side of the deck (Google Earth 2026-03-11 c11d / c11e), 3 m wide,
+    // 2 m in from the parapet; Earth shows about 25 cars on the whole deck, so 6 % of the bays (it was 62 %, packed)
+    const landEdges = [];
+    edges(poly, (a, b, len, n, i, u) => {
+      if (sea.has(i) || len < 18) return;
+      const mx = (a[0] + b[0]) / 2 + n[0] * 4, mz = (a[1] + b[1]) / 2 + n[1] * 4;   // not the party wall with the north block
+      // (the north block's main bar, not its OSM outline: that runs on along the ramp beside this wall)
+      if (!inside(mx, mz, NORTH_MAIN) && !['marketC', 'marketD'].some((id) => inside(mx, mz, SITES[id].poly))) landEdges.push({ a, b, len, n, u });
+    });
+    const onStripe = (x, z) => landEdges.some(({ a, len, n, u }) => { const dx = x - a[0], dz = z - a[1], s = dx * u[0] + dz * u[1], d = -(dx * n[0] + dz * n[1]); return s > -2 && s < len + 2 && d > 1 && d < 7.5; });
+    const shedCars = parkCars(poly, roofY, r, 0.06, (x, z) => pyr.some(([px, pz]) => Math.hypot(x - px, z - pz) < 4.2) || onStripe(x, z));
     k.mesh(capGeo(poly, roofY, { uvFrame: shedCars.frame, tile: 20 }), m.park);
+    for (const { a, b, len, n, u } of landEdges) {
+      const at = (s, d) => [a[0] + u[0] * s - n[0] * d, a[1] + u[1] * s - n[1] * d];
+      barAlong(k, at(2, 3.7), at(len - 2, 3.7), roofY + 0.025, 3.0, 0.05, m.walkway);
+      for (const d of [2.15, 5.25]) barAlong(k, at(2, d), at(len - 2, d), roofY + 0.03, 0.15, 0.06, m.roofWhite);
+    }
     parapet(k, poly, roofY, 1.05, m.wall, m.wallPlain);
+    // [v5:fix2] the land side (walk/w_12 showed a 300 m plain white wall with tiny windows over an empty plain): a dock
+    // plinth with loading-dock shutters and black rubber bumpers, painted truck bays with 4 t trucks backed onto a few of
+    // them, and 「気仙沼市魚市場」 lettered on the 2F band (Google Earth 2026-03-11 c11d o0: the trucks load on this side)
+    {
+      const tr = ctx.rng('shed-land'), wlab = textTex(ctx, '気仙沼市魚市場', { w: 1024, h: 160, color: C.blue, bg: C.wall, font: FONT.sans, weight: 900, size: 0.78 });
+      const wlabM = mapMat(ctx, 'toon', '#ffffff', wlab, { paint: 0 });
+      for (const { a, len, n, u } of landEdges) {
+        const at = (s, d) => [a[0] + u[0] * s + n[0] * d, a[1] + u[1] * s + n[1] * d], ry = Math.atan2(u[0], u[1]), rn = Math.atan2(n[0], n[1]);
+        const plinth = g0 + 1.1;
+        barAlong(k, at(0.5, 0.8), at(len - 0.5, 0.8), (g0 - 0.5 + plinth) / 2, 1.6, plinth - g0 + 0.5, m.concrete);
+        if (phys?.addBox) { const pcs = Math.max(1, Math.ceil(len / 16)); for (let q = 0; q < pcs; q++) { const [x, z] = at((q + 0.5) * len / pcs, 0.8); phys.addBox(x, z, 1.6, len / pcs, ry, g0 - 0.5, plinth); } }
+        for (let s = 4; s + 4 <= len - 3; s += 8.5) {
+          const c = s + 2;
+          const [x, z] = at(c, 0.07); k.box(0.1, 3.9, 3.5, m.shutter, [x, plinth + 1.95, z], [0, ry, 0]);
+          for (const e of [-2.05, 2.05]) { const [bx, bz] = at(c + e, 0.25); k.box(0.3, 0.5, 0.25, m.dark, [bx, plinth - 0.1, bz], [0, ry, 0]); }
+          if (nearRamp(...at(c, 6))) continue;   // the roof ramp runs along the north part of this side
+          // truck bay lines, 12 m out from the plinth
+          const [l0x, l0z] = at(c - 2.1, 8.6); k.box(12, 0.03, 0.14, m.roofWhite, [l0x, L.heightAt(l0x, l0z) + 0.04, l0z], [0, ry, 0]);
+          if (tr() < 0.22) {
+            const gy = L.heightAt(...at(c, 6)), cab = tr() < 0.6 ? m.wallPlain : m.blue;
+            const [bx, bz] = at(c, 1.9 + 3.3); k.box(2.3, 2.6, 6.6, m.slab, [bx, gy + 0.9 + 1.3, bz], [0, rn, 0]);
+            const [cx2, cz2] = at(c, 1.9 + 6.6 + 1.1); k.box(2.2, 2.2, 1.9, cab, [cx2, gy + 0.55 + 1.1, cz2], [0, rn, 0]);
+            const [wx, wz] = at(c, 1.9 + 6.6 + 2.0); k.box(1.9, 0.9, 0.08, m.dark, [wx, gy + 2.05, wz], [0, rn, 0]);
+            const [fx, fz] = at(c, 1.9 + 4.5); k.box(2.0, 0.45, 9.0, m.dark, [fx, gy + 0.55, fz], [0, rn, 0]);
+            if (phys?.addBox) { const [px, pz] = at(c, 1.9 + 4.5); phys.addBox(px, pz, 2.4, 9.4, rn, gy, gy + 3.6); }
+          }
+        }
+        for (let s = len * 0.22; s < len - 20; s += 110) { const [x, z] = at(s, 0.16); k.plane(26, 4.06, wlabM, [x, y1F + 1.8, z], [0, rn, 0]); }
+      }
+    }
     // the open quay side: columns every 7.5 m, the dark hall behind, hanging lamps, a fascia sign
     const sign = textTex(ctx, '気仙沼市魚市場', { w: 1024, h: 160, color: C.blue, font: FONT.sans, weight: 900, size: 0.78 });
     const signM = mapMat(ctx, 'decal', '#ffffff', sign, { transparent: true, alphaTest: 0.3 });
@@ -247,7 +294,7 @@ export function buildMarket4(ctx, opts = {}) {
   // ============================================================== north block (roof car park, vault, ramp)
   {
     const P = SITES.marketNorth.poly;
-    const main = [[538.2, 607.5], [535.5, 602.8], [395.4, 568.2], [394, 575.2], [386.9, 573.4], [384.9, 580.6], [375.6, 578.4], [374.2, 583.9], [370.6, 598.2], [380.9, 601], [378.6, 608.7], [416.6, 617.9], [505.4, 639.5], [506.7, 620.3]];
+    const main = NORTH_MAIN;
     void P;
     const g0 = baseY(L, main), roofY = out.shed ? out.shed.roofY : g0 + 10.6, y1F = g0 + 7.0;
     k.mesh(prismWalls(main, g0 - 1.5, roofY), m.wall);
@@ -257,7 +304,8 @@ export function buildMarket4(ctx, opts = {}) {
     const PYR = [[397, 587, 3.8], [418, 592, 3.8], [441, 598, 3.8], [461, 603, 3.8], [481, 608, 3.8], [505, 614, 3.8], [529, 617, 3.8], [488, 624, 7.5]];
     const W = [[372, 583], [388, 587], [383, 606], [368, 602]];
     const inW = (x, z) => inside(x, z, offsetRing(W, 2));
-    const nCars = parkCars(main, roofY, r, 0.66, (x, z) => inW(x, z) || PYR.some(([px, pz, s]) => Math.hypot(x - px, z - pz) < s * 0.8 + 2.4));
+    // [v5:fix1] Google Earth 2026-03-11 shows the north roof car park ~10-15 % occupied (it was packed at 0.66)
+    const nCars = parkCars(main, roofY, r, 0.15, (x, z) => inW(x, z) || PYR.some(([px, pz, s]) => Math.hypot(x - px, z - pz) < s * 0.8 + 2.4));
     k.mesh(capGeo(main, roofY, { uvFrame: nCars.frame, tile: 20 }), m.park);
     parapet(k, main, roofY, 1.05, m.wall, m.wallPlain);
     for (const [x, z, s] of PYR) pyramid(k, m.pyramid, x, roofY, z, s, s * 0.62);
@@ -274,7 +322,7 @@ export function buildMarket4(ctx, opts = {}) {
     solid(main, g0, roofY + 1);
     roofWalk(main, roofY, roofY - 0.8);
     // the ramp: up from the street (474, 706) round the curve and north along the shed's west side onto the deck
-    const path = [[474, 707], [492, 711], [512, 714], [528, 714], [538, 709], [543, 701], [541, 690], [531, 670], [521, 648], [514, 632]];
+    const path = RAMP_PATH;
     const smp = resample(path, 3); const tot = smp[smp.length - 1].s;
     const gStart = Math.max(g0, L.heightAt(474, 707));
     for (const p of smp) { const t = p.s / tot; p.y = gStart + (roofY - gStart) * (t * t * (3 - 2 * t) * 0.35 + t * 0.65); }
@@ -316,10 +364,9 @@ export function buildMarket4(ctx, opts = {}) {
       for (let s = 12; s < len - 8; s += 30) { const [lx, lz] = at(s, 5); registry(ctx)?.point({ x: lx, y: g0 + 1, z: lz, color: ['#6fa8ff', '#b48bff', '#5fd9c9'][Math.round(s / 30) % 3], size: 1.2, intensity: 1.6, mode: 'night' }); }
     });
     ctx.noOutline(k.mesh(prismWalls(offsetRing(poly, 0.12), g0 + 0.5, roofY - 0.5), lightupMat(ctx, '#8fb6ff', 0.32, g0, 18)));
-    // rooftop: equipment boxes, the public view terrace with rails at the north end
-    const o = obbOf(poly), rr = ctx.rng('marketC-roof');
-    for (let s = -o.d / 2 + 30; s < o.d / 2 - 12; s += rr.range(14, 22)) { const v = rr.range(-o.w / 2 + 12, o.w / 2 - 12); k.box(rr.range(4, 9), rr.range(1.4, 2.6), rr.range(3, 6), m.wallPlain, [o.cx + o.ux * s - o.uz * v, roofY + 1, o.cz + o.uz * s + o.ux * v], [0, o.rotY, 0]); }
-    { const s = -o.d / 2 + 14, cx = o.cx + o.ux * s, cz = o.cz + o.uz * s; k.box(o.w * 0.6, 0.15, 18, m.deck, [cx, roofY + 0.08, cz], [0, o.rotY, 0]); for (const sd of [-1, 1]) { const x = cx - o.uz * sd * o.w * 0.3, z = cz + o.ux * sd * o.w * 0.3; k.box(0.1, 1.1, 18, m.rail, [x, roofY + 0.6, z], [0, o.rotY, 0]); } }
+    // [v5:photos] the roof deck as the author's photos show it (IMG_0792-0798: a visitors' car park with the pale-blue lettered
+    // penthouse, the wave-roofed observation pavilions, the lifeboat; harbor/market5.js), replacing the v4 equipment boxes
+    out.stats.Croof = buildCRoofPhotos(ctx, k, { poly, roofY, cars, r: ctx.rng('marketC-roof5') });
     hallOf(poly, roofY - g0);
     solid(poly, g0, roofY + 1);
     out.stats.C = { g0, roofY };
@@ -378,6 +425,11 @@ export function buildMarket4(ctx, opts = {}) {
   return out;
 }
 
+/** The north block's main bar (the OSM outline minus the strip along the ramp). */
+const NORTH_MAIN = [[538.2, 607.5], [535.5, 602.8], [395.4, 568.2], [394, 575.2], [386.9, 573.4], [384.9, 580.6], [375.6, 578.4], [374.2, 583.9], [370.6, 598.2], [380.9, 601], [378.6, 608.7], [416.6, 617.9], [505.4, 639.5], [506.7, 620.3]];
+/** The curved ramp from the street (474, 707) up onto the north block's roof deck. */
+const RAMP_PATH = [[474, 707], [492, 711], [512, 714], [528, 714], [538, 709], [543, 701], [541, 690], [531, 670], [521, 648], [514, 632]];
+function nearRamp(x, z, r = 10) { for (let i = 1; i < RAMP_PATH.length; i++) { const [ax, az] = RAMP_PATH[i - 1], [bx, bz] = RAMP_PATH[i], dx = bx - ax, dz = bz - az, t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz))); if (Math.hypot(ax + dx * t - x, az + dz * t - z) < r) return true; } return false; }
 function inside(x, z, poly) { let c = false; for (let i = 0, k = poly.length - 1; i < poly.length; k = i++) { const [xi, zi] = poly[i], [xk, zk] = poly[k]; if ((zi > z) !== (zk > z) && x < (xk - xi) * (z - zi) / (zk - zi) + xi) c = !c; } return c; }
 
 // ------------------------------------------------------------------------------------------------ 海の市
@@ -395,6 +447,21 @@ function buildUminoichi(ctx, k, m, out) {
   ];
   const tri = (pts, want) => { const g = new THREE.BufferGeometry(); const [a, b, c] = pts; const e1 = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), e2 = new THREE.Vector3(c[0] - a[0], c[1] - a[1], c[2] - a[2]); const n = e1.cross(e2); const o = n.y * want >= 0 ? [a, b, c] : [a, c, b]; g.setAttribute('position', new THREE.Float32BufferAttribute(o.flat(), 3)); g.computeVertexNormals(); return g; };
   for (const q of roofQ) { k.mesh(tri(q, 1), m.roofGrey); }
+  // [v5:fix1] PV rows on the SE roof plane (Google Earth 2026-03-11 top: dark panel arrays on the triangle south-east of
+  // the diagonal ridge): rows parallel to the ridge, lying on the plane
+  {
+    const r0 = new THREE.Vector3(SW[0], ridge, SW[1]), r1 = new THREE.Vector3(NE[0], ridge, NE[1]), ap = new THREE.Vector3(SE[0], eave, SE[1]);
+    const ux = r1.clone().sub(r0).normalize(), foot = r0.clone().add(ux.clone().multiplyScalar(ap.clone().sub(r0).dot(ux)));
+    const uz = ap.clone().sub(foot).normalize(), uy = new THREE.Vector3().crossVectors(uz, ux).normalize();
+    if (uy.y < 0) uy.negate();
+    const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(ux, uy, new THREE.Vector3().crossVectors(ux, uy)));
+    const RL = r1.distanceTo(r0);
+    for (const f of [0.2, 0.32, 0.44, 0.56]) {
+      const a = r0.clone().lerp(ap, f), b = r1.clone().lerp(ap, f), c = a.clone().add(b).multiplyScalar(0.5).add(uy.clone().multiplyScalar(0.12));
+      const mesh = k.box((1 - f) * RL * 0.62, 0.1, 1.9, m.pv, [c.x, c.y, c.z]);
+      mesh.quaternion.copy(q);
+    }
+  }
   // a thin eave lip on the roof edges
   for (const [a, b] of [[NW, NE], [NE, SE], [SE, SW], [SW, NW]]) {
     const s = seg(a, b), ya = Y(a), yb = Y(b);
@@ -474,12 +541,13 @@ function buildUminoichi(ctx, k, m, out) {
   bandRing(k, east, g0 + 1.6, 2.5, m.win, { every: 5.5, gap: 1.2, minLen: 8 });
   bandRing(k, east, g0 + 6.0, 1.6, m.win, { every: 4.5, gap: 1.4, minLen: 8 });
   const deckL = [[383, 657], [431, 669.5], [428.5, 678], [381, 666.5]], deckN = [[405, 628], [415, 630.5], [407, 667], [397, 664.5]];
-  for (const d of [deckL, deckN]) k.mesh(capGeo(d, eTop + 0.18, { tile: 3 }), m.deck);
+  // [v5:fix1] the roof deck is grey-brown (Earth 2026 top: a grey roof, no saturated orange T)
+  for (const d of [deckL, deckN]) k.mesh(capGeo(d, eTop + 0.18, { tile: 3 }), m.umiDeck);
   // footbridge from the roof deck north over the road to the market block (the brown band on the ortho)
   {
     const a = [410.5, 634], b = [414.5, 614.5], s = seg(a, b), y = eTop + 0.2;
     k.box(4.2, 0.6, s.len, m.wallPlain, [s.x, y - 0.3, s.z], [0, s.rotY, 0]);
-    k.box(4.0, 0.08, s.len, m.deck, [s.x, y + 0.02, s.z], [0, s.rotY, 0]);
+    k.box(4.0, 0.08, s.len, m.umiDeck, [s.x, y + 0.02, s.z], [0, s.rotY, 0]);
     for (const sd of [-1, 1]) k.box(0.12, 1.2, s.len, m.rail, [s.x + Math.cos(s.rotY) * sd * 2.0, y + 0.6, s.z - Math.sin(s.rotY) * sd * 2.0], [0, s.rotY, 0]);
     for (const p of [a, b]) k.box(0.8, y - g0, 0.8, m.wallPlain, [p[0], (y + g0) / 2, p[1]]);
   }

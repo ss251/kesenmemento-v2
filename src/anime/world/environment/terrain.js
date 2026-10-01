@@ -126,8 +126,9 @@ export function terrainMaterial(ctx, lc, o = {}) {
     // [v4:polish3] the painted canopy in the aerial photo's dark cedar greens (was #6f9a5c / #4f7a58 / #8db26a: a lime meadow)
     uForest: { value: C(o.forest || '#3d6b3f') }, uCedar: { value: C(o.cedar || '#2f5634') }, uBroad: { value: C(o.broad || '#5a8a4a') },
     uAutumnA: { value: C(o.autumnA || '#d9853f') }, uAutumnB: { value: C(o.autumnB || '#c65a3c') }, uAutumnC: { value: C(o.autumnC || '#e2b54a') },
-    uAutumn: { value: o.autumn ?? 0.085 },
-    uGrass: { value: C('#9fc076') }, uRock: { value: C('#b3aa98') }, uShore: { value: C('#d9ceb0') }, uFar: { value: C('#7d9a70') },
+    uAutumn: { value: o.autumn ?? 0.02 },   // [v5:fix1] 2 % painted 紅葉 crowns (was 8.5 %: orange flecks on every hillside; Earth 2026-03 is bare)
+    // [v5:fix1] bare steep slopes #b3aa98 -> #8f877a (pale streaks on the hills; Earth 2026 shows them dark)
+    uGrass: { value: C('#9fc076') }, uRock: { value: C('#8f877a') }, uShore: { value: C('#d9ceb0') }, uFar: { value: C('#7d9a70') },
     uCrown: { value: o.crown ?? 4.2 },
     uQuiet: { value: new THREE.Vector3(0, 0, 0) },   // [v3:harbor] (x, z, r): no painted 紅葉 crowns inside (a 3D grove stands there)
     uSakura: { value: 0 },   // [v3:integrate] spring 山桜 crown fraction (life's season controller drives uAutumn / uSakura)

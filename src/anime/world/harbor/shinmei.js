@@ -17,7 +17,7 @@ import { vTextTex, FONT, mapMat, textTex } from './util.js';
 import { toriiInto } from './shrine.js';
 
 const C = {
-  shu: '#d2462f', shuLit: '#e05a3a', shuDark: '#a93a28', deck: '#9a6a55', pile: '#b9b6ad', wall: '#c4c6bf', wallDark: '#a4a69f',
+  shu: '#d2462f', shuLit: '#e05a3a', shuDark: '#a93a28', deck: '#9a6a55', walkDeck: '#b9b6ad', pile: '#b9b6ad', wall: '#c4c6bf', wallDark: '#a4a69f',
   roof: '#9aa3a2', roofDark: '#7f898a', cream: '#efe6cc', creamShade: '#ddd2b4', stone: '#b9b5aa', stoneDark: '#8e8a80',
   bronze: '#6f5a3e', bronzeLit: '#9a7d52', gold: '#d9b44a', black: '#3b3740', wood: '#8a6446', hall: '#6a4a42', white: '#f1ede2',
 };
@@ -29,7 +29,7 @@ export function buildShinmei(ctx, opts = {}) {
   const { k } = worldKit(ctx, 'shinmeizaki4');
   const t = (c, o) => ctx.mat.toon(c, o);
   const m = {
-    shu: t(C.shu, { paint: 0.04 }), shuDark: t(C.shuDark, { paint: 0.04 }), deck: t(C.deck, { paint: 0.06 }), pile: t(C.pile, { paint: 0.08 }),
+    shu: t(C.shu, { paint: 0.04 }), shuDark: t(C.shuDark, { paint: 0.04 }), deck: t(C.deck, { paint: 0.06 }), walkDeck: t(C.walkDeck, { paint: 0.07 }), pile: t(C.pile, { paint: 0.08 }),
     wall: t(C.wall, { paint: 0.08 }), wallDark: t(C.wallDark, { paint: 0.08 }), roof: t(C.roof, { paint: 0.05, side: 'double' }), roofDark: t(C.roofDark, { paint: 0.04 }),
     cream: t(C.cream, { paint: 0.05 }), creamShade: t(C.creamShade, { paint: 0.05 }), stone: t(C.stone, { paint: 0.1 }), stoneDark: t(C.stoneDark, { paint: 0.1 }),
     bronze: t(C.bronze, { paint: 0.04 }), gold: t(C.gold, { paint: 0.03 }), black: t(C.black, { paint: 0 }), wood: t(C.wood, { paint: 0.08 }), hall: t(C.hall, { paint: 0.05, side: 'double' }),
@@ -42,7 +42,9 @@ export function buildShinmei(ctx, opts = {}) {
   const ring = resample(S.ring, 1.5);
   for (const p of ring) p.y = deckY;
   const W = 2.4, hw = W / 2;   // + = sea side (right of travel: the ring runs west -> tip -> east with the land on the left)
-  k.mesh(sweepSlab(ring, { l0: -hw, l1: hw, th: 0.28, tile: 2 }), m.deck);
+  // [v5:fix1] the 浮見海道 walkway is pale concrete (Google Earth 2026-03-11): the timber-brown #9a6a55 read as a terracotta
+  // rim round the cape from above. The 朱 rails stay; the pavilion floor keeps its timber
+  k.mesh(sweepSlab(ring, { l0: -hw, l1: hw, th: 0.28, tile: 2 }), m.walkDeck);
   k.mesh(sweepSlab(ring.map((p) => ({ ...p, y: p.y - 0.28 })), { l0: -hw - 0.08, l1: hw + 0.08, th: 0.22, tile: 2 }), m.shuDark);   // 朱 fascia
   // land side: a concrete seawall face from the deck into the sea, and a fill up to the rock line (no gap under the deck)
   k.mesh(sweepSlab(ring.map((p) => ({ ...p, y: p.y - 0.05 })), { l0: -hw - 1.2, l1: -hw, th: 7.5, tile: 3 }), m.wall);
@@ -155,6 +157,33 @@ export function buildShinmei(ctx, opts = {}) {
       return o;
     };
     roofOn(body, 2.6, 0.9); const po = roofOn(porch, 2.2, 0.8);
+    // [v5:fix3] natural-wood framing on the cream walls: corner and bay posts, a 貫 rail at door height, a dark lattice
+    // band under the eaves, timber sills (the hall read as a blank lavender-grey box from the stair, review3 walk/sh_isuzu)
+    for (const P of [body, porch]) {
+      const R = P.length;
+      for (let i = 0; i < R; i++) {
+        const a = P[i], b = P[(i + 1) % R], len = Math.hypot(b[0] - a[0], b[1] - a[1]), u = [(b[0] - a[0]) / len, (b[1] - a[1]) / len], ry = Math.atan2(u[0], u[1]);
+        const nb = Math.max(1, Math.round(len / 2.4));
+        for (let j = 0; j <= nb; j++) { const f = j / nb; k.box(0.26, eave - fy, 0.26, m.wood, [a[0] + (b[0] - a[0]) * f, (fy + eave) / 2, a[1] + (b[1] - a[1]) * f]); }
+        const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        k.box(0.14, 0.2, len, m.wood, [mid[0], fy + 2.25, mid[1]], [0, ry, 0]);          // 貫
+        k.box(0.16, 0.24, len, m.wood, [mid[0], fy + 0.12, mid[1]], [0, ry, 0]);          // sill
+        k.box(0.12, 0.55, len, m.hall, [mid[0], eave - 0.3, mid[1]], [0, ry, 0]);          // lattice band under the eaves
+      }
+    }
+    // the 向拝 (worship canopy) in front of the porch on its GSI footprint (lot 16/58541/25068/119, which town drew as
+    // a house with windows): a timber floor and four natural-wood posts under a grey gable on the approach axis
+    {
+      const c = [365.42, -137.27], hw = 4.69 / 2, hd = 3.73 / 2, r = 3.043, cs = Math.cos(r), sn = Math.sin(r);
+      const W2 = (lx, lz) => [c[0] + lx * cs + lz * sn, c[1] - lx * sn + lz * cs];
+      const hp = [W2(-hw, -hd), W2(hw, -hd), W2(hw, hd), W2(-hw, hd)];
+      k.mesh(prismWalls(hp, gy - 1.2, fy, { tile: 2 }), m.stone); k.mesh(capGeo(hp, fy + 0.02, { tile: 2 }), m.wood);
+      for (const p of hp) k.box(0.28, eave - fy, 0.28, m.wood, [p[0], (fy + eave) / 2, p[1]]);
+      for (let i = 0; i < 4; i++) { const a = hp[i], b = hp[(i + 1) % 4], sg = seg(a, b); k.box(0.22, 0.32, sg.len + 0.3, m.wood, [sg.x, eave - 0.2, sg.z], [0, sg.rotY, 0]); }
+      roofOn(hp, 1.5, 0.5);
+      if (ctx.physics?.addCylinder) for (const p of hp) ctx.physics.addCylinder(p[0], p[1], 0.2, fy, eave);
+      if (ctx.physics?.addWalkBox) { const o = obbOf(hp); ctx.physics.addWalkBox(o.cx, o.cz, o.w, o.d, o.rotY, fy, gy - 1); }
+    }
     // the entrance on the porch's north face: doors, 賽銭箱, bell rope, shimenawa, the 社号 plaque
     const front = [(360.9 + 366.4) / 2, -134.6], fg = k.group([front[0], fy, front[1]], Math.PI + po.rotY * 0), fk = ctx.kit(fg);
     fk.box(2.4, 2.4, 0.1, m.wood, [0, 1.2, 0.05]);

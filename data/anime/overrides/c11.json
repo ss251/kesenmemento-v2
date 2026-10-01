@@ -1,0 +1,618 @@
+{
+ "version": 1,
+ "cell": "c11",
+ "bbox": [
+  300,
+  400,
+  800,
+  1000
+ ],
+ "note": "港町 (the quay block south of the 港町 boat berths), 海の市 and the fish market's north block, 魚市場前 (the post-2011 blocks with vacant lots) and the landward side of the market's north facility. Read block by block from Earth top views of the cell and five sub-cells (raw/ref/earth/c11/{full,A,B,C,D,E}; zooms z_*.jpg) against the GSI photo and footprints. Earth here is draped 2D imagery (no 3D meshes), so heights come from shadow lengths (sun about 40 deg high, from 146 deg: 177 and the hotel); the landmark lots (market, 海の市) keep their harbour models.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth web, imagery dated 2026-03-11, top and oblique views via tools/anime/earth-ref.mjs in raw/ref/earth/c11 (full = the cell; A x 295..555 z 395..605; B z 595..805; C z 795..1005; D x 545..805 z 595..805; E z 795..1005), reference only",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo z18 (data/ortho/core.jpg, about 2020-2022) and the GSI building footprints (raw/ref/earth/c11/gsi_*.jpg)"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58541/25069/352",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#a0573f"
+   },
+   "src": "earth: A top (z_A1), a terracotta-red pitched roof (Earth #ab7578) over a white two-storey block, not a pale flat-roofed 3-storey apartment"
+  },
+  {
+   "id": "16/58541/25069/359",
+   "roof": {
+    "color": "#7a5450"
+   },
+   "src": "earth: A top (z_A1), a maroon-brown roof (Earth #80707d); the app drew it pale blue-grey"
+  },
+  {
+   "id": "16/58541/25069/362",
+   "roof": {
+    "color": "#b9bab4"
+   },
+   "src": "earth: A top (z_A1), a light concrete flat roof (Earth #9d9ca0); the app rendered it dark navy"
+  },
+  {
+   "id": "16/58541/25069/367",
+   "roof": {
+    "color": "#9fb5a2"
+   },
+   "src": "earth: A top (z_A1), the pale green roof of the 日新興業 block (Earth #aeb8af)"
+  },
+  {
+   "id": "16/58541/25069/372",
+   "roof": {
+    "color": "#8a929e"
+   },
+   "src": "earth: A top (z_A1, sheet1), a grey hip roof (Earth #9e9faf); the GSI photo's cyan is the sky reflected on bare metal (Earth renders the painted blue roofs of the same block blue)"
+  },
+  {
+   "id": "16/58541/25069/383",
+   "roof": {
+    "color": "#b9bab4"
+   },
+   "src": "earth: A top (z_A2), ローソン 気仙沼港町店 has a grey concrete flat roof (Earth #a2a1a6); the app drew it light blue"
+  },
+  {
+   "id": "16/58541/25069/385",
+   "roof": {
+    "color": "#a9aaa8"
+   },
+   "src": "earth: B top (z_B3), a grey flat roof; the app drew it brown"
+  },
+  {
+   "id": "16/58541/25069/391",
+   "roof": {
+    "shape": "flat",
+    "color": "#aab0b6"
+   },
+   "src": "earth: B top (z_B3, sheet2), （有）中秀商店 has a light grey flat roof, not a cyan pitched one (the GSI cyan is sky reflected on metal)"
+  },
+  {
+   "id": "16/58541/25069/397",
+   "kind": "office",
+   "storeys": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9cac6"
+   },
+   "src": "earth: B top (z_B1), 山代水産 is one white three-storey flat-roofed block with lot 25070/11 (the shadow is as long as the new block east of it)"
+  },
+  {
+   "id": "16/58541/25070/11",
+   "kind": "office",
+   "storeys": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9cac6"
+   },
+   "src": "earth: B top (z_B1), the south end of the 山代水産 block, the same white flat roof, not a separate brown-roofed house"
+  },
+  {
+   "id": "16/58541/25070/12",
+   "storeys": 4,
+   "roof": {
+    "color": "#d8dbd6"
+   },
+   "src": "earth: B top (z_B1, z_B2), one white four-storey block with lot 25069/400"
+  },
+  {
+   "id": "16/58541/25069/400",
+   "roof": {
+    "color": "#d8dbd6"
+   },
+   "src": "earth: B top (z_B1, z_B2), the white flat roof of the four-storey block"
+  },
+  {
+   "id": "16/58541/25070/121",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9cac6"
+   },
+   "src": "earth: B top (z_B1), 酒のサイシン 魚市場前店 is a pale flat-roofed two-storey shop, not a 3-storey hip roof"
+  },
+  {
+   "id": "16/58541/25070/108",
+   "remove": true,
+   "src": "earth: B top (z_B1), three cars parked on the spot, no roof (the GSI photo still shows a small hut)"
+  },
+  {
+   "id": "16/58541/25070/125",
+   "kind": "office",
+   "storeys": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8dbd6"
+   },
+   "src": "earth: B top (z_B2), a white flat-roofed three-storey building with a long shadow, not a 2-storey gabled house"
+  },
+  {
+   "id": "16/58541/25070/137",
+   "roof": {
+    "color": "#5a5e68"
+   },
+   "src": "earth: B top (z_B2), 鶴亀の湯 has a dark grey roof (Earth #575965), not pale"
+  },
+  {
+   "id": "16/58541/25070/111",
+   "roof": {
+    "color": "#8a909a"
+   },
+   "src": "earth: C top (z_C1), a grey roof (Earth #9c9da8), not light blue"
+  },
+  {
+   "id": "16/58541/25070/112",
+   "roof": {
+    "color": "#94524a"
+   },
+   "src": "earth: C top (z_C1), （有）鈴正 has a long brick-red roof"
+  },
+  {
+   "id": "16/58541/25070/147",
+   "kind": "apartment",
+   "storeys": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9cac6"
+   },
+   "src": "earth: C top (z_C4), a light flat-roofed three-storey block with an outside stair, not a 2-storey gabled house"
+  },
+  {
+   "id": "16/58541/25070/150",
+   "roof": {
+    "shape": "flat",
+    "color": "#4a4f58"
+   },
+   "src": "earth: C top (z_C2), a dark flat roof (the tall narrow block labelled 3), not a gable"
+  },
+  {
+   "id": "16/58541/25070/152",
+   "storeys": 2,
+   "roof": {
+    "color": "#d8dbd6"
+   },
+   "src": "earth: C top (z_C4), a white flat-roofed two-storey building with a stair"
+  },
+  {
+   "id": "16/58541/25070/167",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 9,
+   "roof": {
+    "shape": "flat",
+    "color": "#a9adb0"
+   },
+   "facade": "warehouse",
+   "src": "earth: C top (z_C3) and the obliques, 大島水産 is a low processing plant of grey metal-roofed sheds with short shadows, not a 7-storey office"
+  },
+  {
+   "id": "16/58541/25070/175",
+   "storeys": 2,
+   "height": 7,
+   "src": "earth: C top (z_C3), a small two-storey annex of the 大島水産 plant (no tall tower)"
+  },
+  {
+   "id": "16/58541/25070/177",
+   "kind": "apartment",
+   "storeys": 6,
+   "height": 18.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#9a9a98"
+   },
+   "src": "earth: C top (z_C4), a tall block: its shadow runs about 23 m north-west (sun about 40 deg high), so about 6 storeys, not a 2-storey house"
+  },
+  {
+   "id": "16/58542/25070/14",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8dbd6"
+   },
+   "src": "earth: E top, a white flat-roofed two-storey building next to the old post office"
+  },
+  {
+   "id": "16/58542/25070/17",
+   "roof": {
+    "shape": "flat",
+    "color": "#7d8590"
+   },
+   "src": "earth: E top (z_E2, sheet4), a grey flat roof with a parapet, not a light blue hip"
+  },
+  {
+   "id": "16/58542/25070/18",
+   "roof": {
+    "shape": "flat",
+    "color": "#5a606c"
+   },
+   "src": "earth: E top (z_E2, sheet4), （有）丸虎商店 has a dark grey flat roof (Earth #5c5f72), not a light blue hip"
+  },
+  {
+   "id": "16/58542/25070/20",
+   "storeys": 7,
+   "height": 22,
+   "src": "earth: E top (z_E2), 気仙沼パークホテル: its shadow runs about 28 m north-west (sun about 40 deg high), and the aerial shows its balconied facade, so about 7 storeys, not 4"
+  },
+  {
+   "id": "16/58542/25070/22",
+   "kind": "hotel",
+   "storeys": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9c3b8"
+   },
+   "src": "earth: E top (z_E2), the lower beige east wing of 気仙沼パークホテル, not a separate gabled shop"
+  },
+  {
+   "id": "16/58542/25070/32",
+   "roof": {
+    "shape": "flat",
+    "color": "#c9cac6"
+   },
+   "src": "earth: E top (z_E2, sheet4), （有）まるきた商店 has a pale flat roof with solar panels (the GSI photo agrees), not a gable"
+  }
+ ],
+ "newLots": [
+  {
+   "id": "ovr:c11:office-uoichibamae",
+   "poly": [
+    [
+     367,
+     701.5
+    ],
+    [
+     384.5,
+     703
+    ],
+    [
+     381.5,
+     725
+    ],
+    [
+     365.5,
+     723
+    ]
+   ],
+   "kind": "office",
+   "storeys": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8dbd6"
+   },
+   "facade": "office",
+   "src": "earth: B top (z_B1), a new white flat-roofed three-storey building east of 山代水産; the GSI photo shows brush on the lot"
+  },
+  {
+   "id": "ovr:c11:prefab-yard",
+   "poly": [
+    [
+     421,
+     751
+    ],
+    [
+     431.5,
+     751.5
+    ],
+    [
+     431,
+     757
+    ],
+    [
+     421,
+     756.5
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8dbd6"
+   },
+   "facade": "plain",
+   "src": "earth: B top (z_B2), a white prefab hut in the gravel car park"
+  },
+  {
+   "id": "ovr:c11:shed-yard",
+   "poly": [
+    [
+     452,
+     770
+    ],
+    [
+     461,
+     771
+    ],
+    [
+     460.5,
+     778.5
+    ],
+    [
+     451.5,
+     777.5
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 4,
+   "roof": {
+    "shape": "flat",
+    "color": "#7b8691"
+   },
+   "facade": "plain",
+   "src": "earth: B top (z_B2), a small grey shed at the south edge of the gravel car park"
+  },
+  {
+   "id": "ovr:c11:shed-sw",
+   "poly": [
+    [
+     344,
+     957
+    ],
+    [
+     357,
+     957
+    ],
+    [
+     356.5,
+     967
+    ],
+    [
+     344,
+     966.5
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 4,
+   "roof": {
+    "shape": "flat",
+    "color": "#4a4f58"
+   },
+   "facade": "plain",
+   "src": "earth: C top (z_C3), a dark-roofed shed in the gravel yard south of the car park"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "apron",
+   "ring": [
+    [
+     509,
+     721
+    ],
+    [
+     556,
+     820
+    ],
+    [
+     581,
+     875
+    ],
+    [
+     618,
+     958
+    ],
+    [
+     645,
+     948
+    ],
+    [
+     611,
+     865
+    ],
+    [
+     563,
+     750
+    ],
+    [
+     546,
+     700
+    ],
+    [
+     526,
+     700
+    ]
+   ],
+   "src": "earth: D and E top + o0 (z_D1, z_E1), the band between 魚市場朝日町線 and the market's north facility is paving (the BRT strip, the yard and the deck's shadow), not the lawn the app drew; the GSI photo shows paving too. [v5:fix2] apron (plain asphalt), not plaza: Earth 2026-03-11 c11d pair_o0 shows asphalt with a truck lane; the pale plaza paving rendered as a beige sand strip (walk/w_12)"
+  },
+  {
+   "use": "apron",
+   "ring": [
+    [
+     488,
+     668
+    ],
+    [
+     540,
+     660
+    ],
+    [
+     548,
+     700
+    ],
+    [
+     530,
+     708
+    ],
+    [
+     500,
+     704
+    ]
+   ],
+   "src": "earth: B and D top, paving round the ramp to the market's roof car park, not lawn. [v5:fix2] apron (asphalt round the ramp, Earth c11d top), not the pale plaza paving"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     420,
+     722
+    ],
+    [
+     480,
+     736
+    ],
+    [
+     478,
+     800
+    ],
+    [
+     404,
+     786
+    ],
+    [
+     412,
+     742
+    ]
+   ],
+   "src": "earth: B top (z_B2), a bare gravel lot used as an informal car park (cars parked loose, no stall lines)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     348,
+     802
+    ],
+    [
+     398,
+     804
+    ],
+    [
+     392,
+     842
+    ],
+    [
+     350,
+     842
+    ]
+   ],
+   "src": "earth: C top (z_C1), a bare dirt lot with tracks"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     392,
+     908
+    ],
+    [
+     432,
+     920
+    ],
+    [
+     432,
+     946
+    ],
+    [
+     398,
+     958
+    ]
+   ],
+   "src": "earth: C top (z_C3), a gravel yard with stacked materials"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     300,
+     960
+    ],
+    [
+     364,
+     960
+    ],
+    [
+     360,
+     1002
+    ],
+    [
+     300,
+     1002
+    ]
+   ],
+   "src": "earth: C top (z_C3), a gravel yard with sheds and machinery"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     512,
+     800
+    ],
+    [
+     546,
+     806
+    ],
+    [
+     544,
+     818
+    ],
+    [
+     510,
+     818
+    ]
+   ],
+   "src": "earth: E top, a bare dirt lot north of the old post office"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     316,
+     897
+    ],
+    [
+     338,
+     893
+    ],
+    [
+     331,
+     948
+    ],
+    [
+     313,
+     946
+    ]
+   ],
+   "src": "earth: C top (z_C3), the car park with white stall lines reaches west to x 313 (OSM maps only its east half)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     502,
+     950
+    ],
+    [
+     518,
+     953
+    ],
+    [
+     516,
+     984
+    ],
+    [
+     500,
+     982
+    ]
+   ],
+   "src": "earth: C top (z_C4), a small car park with white stall lines"
+  }
+ ]
+}

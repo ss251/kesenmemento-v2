@@ -129,7 +129,11 @@ export function treeMaterial(ctx, cedar = false) {
           vec3 spr = (vTreeSeed < 0.3 || koyo > 0.5) ? sak : fresh;
           vec3 sum = mix(vec3(0.07, 0.23, 0.045), vec3(0.2, 0.43, 0.1), lt) * vr;
           vec3 win = mix(vec3(0.14, 0.1, 0.08), vec3(0.34, 0.28, 0.24), lt) * vr;`}
-          vec3 sc = cur * uSeasonS.z + spr * uSeasonS.x + sum * uSeasonS.y + win * uSeasonS.w;
+          // [v5:fix1] autumn: only a fifth of the 紅葉 trees (seed < 0.2, ~1.7 % of all trees) keep their orange; the rest
+          // show their green (the vertex shading without the orange instance tint)
+          vec3 aut = cur;
+          ${cedar ? '' : `if (koyo > 0.5 && vTreeSeed >= 0.2) aut = cur / max(vTreeInst, vec3(0.05)) * vec3(0.78, 0.92, 0.7);`}
+          vec3 sc = aut * uSeasonS.z + spr * uSeasonS.x + sum * uSeasonS.y + win * uSeasonS.w;
           diffuseColor.rgb = mix(cur, sc, leaf);
         }`);
   };

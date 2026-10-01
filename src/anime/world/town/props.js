@@ -13,7 +13,7 @@ const stripUD = (g) => { g.traverse((o) => { o.userData = {}; }); return g; };
 export function buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts, bikeSpots, heroZone }) {
   const L = ctx.L;
   const root = new THREE.Group(); root.name = 'town-props';
-  const stats = { vending: 0, bikes: 0, trees: 0, clutter: 0 };
+  const stats = { vending: 0, bikes: 0, trees: 0, clutter: 0, overrides: 0 };
   const r = ctx.rng('town-props');
   const water = (x, z) => L.shoreDist(x, z) > -0.5;
   const free = (x, z, pad = 0.3) => !lotIdx.at(x, z, pad) && !water(x, z) && !roadIdx.covering(x, z, 0.2, null).some((q) => q.kind !== 'alley' || q.width > 3);
@@ -65,13 +65,15 @@ export function buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts, bikeSp
       }
     }
   }
+  // [v4:overrides] vending machines placed by data/anime/overrides (layout PROPS): the real positions from the imagery
+  const OVP = (L.PROPS || []).filter((p) => L.shoreDist(p.x, p.z) <= 0);
+  for (const [i, p] of OVP.entries()) if (p.type === 'vending') { spots.push({ id: 'OV' + i, x: p.x, z: p.z, rotY: p.rotY, lineup: lineups[i % lineups.length], ...(p.y != null ? { y: p.y } : {}) }); taken.push([p.x, p.z]); }
   if (spots.length) { buildVending(ctx, VH, spots); stats.vending = spots.length; }
 
   // ------------------------------------------------------------------ bicycles
   const bikeCols = Object.values(BIKE_COLORS);
   const bikeCache = new Map();
-  const placeBike = (x, z, rot, seed, lod) => {
-    const y = L.heightAt(x, z);
+  const placeBike = (x, z, rot, seed, lod, y = L.heightAt(x, z)) => {   // [v4:overrides] y: a placed bike on a deck
     const v = seed % 12, key = v + '|' + lod;
     if (!bikeCache.has(key)) bikeCache.set(key, stripUD(makeBicycle(ctx, { color: bikeCols[(v * 5) % bikeCols.length], seed: v + 1, lod, stand: 'down', basket: v % 5 ? 'wire' : 'none', contents: v % 7 === 0 ? 'groceries' : 'none', childSeat: v === 11 ? 'rear' : null, umbrella: v === 9 })));
     const b = bikeCache.get(key).clone();
@@ -154,6 +156,31 @@ export function buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts, bikeSp
     H.props.gomiStation?.(F, 0, 0, 0, ctx.rng('gomi' + i));
     stats.clutter++;
   }
+  // ------------------------------------------------------------------ [v4:overrides] the other placed props
+  // bikes, street trees, benches (a slatted park bench, seat toward local +z) and bollards, anywhere in the town
+  for (const [i, p] of OVP.entries()) {
+    // the surface: the op's y (a harbour deck or seawall garden is above the terrain; town builds before harbor), else the terrain
+    const y = p.y ?? L.heightAt(p.x, p.z), tr = ctx.rng('ovr-prop-' + i + '-' + p.type);
+    if (p.type === 'bike') placeBike(p.x, p.z, p.rotY, 17 + i * 7, 0, y);
+    else if (p.type === 'tree') {
+      const F = H.Frame.at(H.gb, p.x, y + 0.15, p.z, 0);
+      F.box(H.M.plain, '#6d6a66', 1.1, 0.03, 1.1, 0, 0.0, 0);
+      avenueTree(H, F, 0, 0, 0, 0.85 + tr() * 0.3, tr);
+      ctx.physics.addCylinder(p.x, p.z, 0.25, y - 0.2, y + 3); stats.trees++;
+    } else if (p.type === 'bench') {
+      const F = H.Frame.at(H.gb, p.x, y, p.z, p.rotY);
+      for (const u of [-0.7, 0.7]) { F.boxB(H.M.plain, '#4a4d55', 0.06, 0.42, 0.44, u, 0, 0); F.boxB(H.M.plain, '#4a4d55', 0.06, 0.4, 0.05, u, 0.42, -0.2); }
+      for (let k = 0; k < 3; k++) F.boxB(H.M.plain, '#9a7350', 1.7, 0.035, 0.12, 0, 0.42, -0.14 + k * 0.14);
+      for (let k = 0; k < 2; k++) F.boxB(H.M.plain, '#9a7350', 1.7, 0.1, 0.03, 0, 0.58 + k * 0.14, -0.22);
+      ctx.physics.addBox(p.x, p.z, 1.7, 0.5, p.rotY, y, y + 0.8);
+    } else if (p.type === 'bollard') {
+      const F = H.Frame.at(H.gb, p.x, y, p.z, 0);
+      F.cyl(H.M.plain, '#8f949a', 0.09, 0.8, 0, 0.4, 0, { seg: 8 });
+      F.boxB(H.M.plain, '#e0b43c', 0.19, 0.06, 0.19, 0, 0.62, 0);
+      ctx.physics.addCylinder(p.x, p.z, 0.12, y, y + 0.8);
+    }
+    stats.overrides++;
+  }
   ctx.addStatic(root);
   return stats;
 }
@@ -171,7 +198,7 @@ export function avenueTree(H, F, x, y, z, s, r) {
     ends.push(e);
   }
   const greens = ['#6f9a5a', '#7aa564', '#5f8c5c', '#86ad6a', '#6a9660'];
-  const autumn = r() < 0.35 ? ['#d9853f', '#e2b54a', '#c65a3c'] : null;
+  const autumn = r() < 0.06 ? ['#d9853f', '#e2b54a', '#c65a3c'] : null;   // [v5:fix1] 6 % of the avenue trees (was 35 %)
   const n = 9;
   const cy = y + th + 2.4 * s, R = 2.4 * s;
   for (let i = 0; i < n; i++) {

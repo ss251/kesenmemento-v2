@@ -1,0 +1,1167 @@
+{
+ "version": 1,
+ "cell": "c3",
+ "bbox": [
+  300,
+  -800,
+  800,
+  -200
+ ],
+ "note": "c3: 魚浜町 / 浜町 / 本浜町 / 新浜町 / 栄町 edge, the post-2011 raised fish-processing district. Read from Google Earth 3D (imagery 2026-03-11) in raw/ref/earth/c3 (the whole cell plus five 250 m sub-cells n1 n2 m1 m2 s1 with top and four 60-degree obliques each), checked against the GSI photo. Main fixes: the fish plants were 5-8 storey offices (up to 26 m) and are 1-3 storey plants (8-12 m) with solar roofs; the empty raised blocks are bare earth and dry weeds, not lawn; two demolished buildings; new builds.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured with tools/anime/earth-ref.mjs into raw/ref/earth/c3 (cell) and raw/ref/earth/c3/{n1,n2,m1,m2,s1} (sub-cells)",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo z18 (data/ortho/core.jpg, about 2020-2022), the older reference",
+   "ref": "data/ortho/core.jpg"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap names and tags (© OpenStreetMap contributors, ODbL), as already in the layout"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58541/25066/139",
+   "kind": "house",
+   "storeys": 2,
+   "height": 6.0,
+   "roof": {
+    "shape": "gable",
+    "color": "#8a6a66"
+   },
+   "src": "earth: n1 top + o0, a two-storey house with a brown-red pitched roof, not a 4-storey block (GSI roof #816f68)"
+  },
+  {
+   "id": "16/58541/25066/167",
+   "storeys": 1,
+   "height": 5.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dedfe2"
+   },
+   "src": "earth: n1 top + o0, the gas station's long single-storey service building, light grey roof (the app drew 3 storeys and a brown roof)"
+  },
+  {
+   "id": "16/58541/25066/168",
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#dedfe2"
+   },
+   "src": "earth: n1 top + o0, the station's single-storey sales building (昭和シェル), light grey roof"
+  },
+  {
+   "id": "16/58541/25067/287",
+   "storeys": 2,
+   "height": 7.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#eeeef0"
+   },
+   "src": "earth: n1 top + m1 o0, a two-storey box with a flat white roof (was 3 storeys, hip)"
+  },
+  {
+   "id": "16/58542/25066/110",
+   "roof": {
+    "shape": "gable",
+    "color": "#77757d"
+   },
+   "src": "earth: n2 top + o0, the company housing's long roof reads dark grey now (GSI blue-grey)"
+  },
+  {
+   "id": "16/58542/25066/114",
+   "storeys": 2,
+   "height": 6.5,
+   "src": "earth: n2 o180, a two-storey annex (was 3 storeys)"
+  },
+  {
+   "id": "16/58542/25066/117",
+   "kind": "warehouse",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dedfe2"
+   },
+   "src": "earth: n2 o0 / o180, a two-storey warehouse with a light grey roof (was a 6-storey office, 19.8 m)"
+  },
+  {
+   "id": "16/58542/25066/118",
+   "roof": {
+    "shape": "flat",
+    "color": "#dedfe2"
+   },
+   "src": "earth: n2 top, the low wing of the same warehouse, light grey roof"
+  },
+  {
+   "id": "16/58542/25066/119",
+   "roof": {
+    "shape": "shed",
+    "color": "#5f6b80"
+   },
+   "src": "earth: n2 top, a dark blue-grey roof (Earth #525b6e; GSI #97b0b5)"
+  },
+  {
+   "id": "16/58542/25066/177",
+   "storeys": 2,
+   "height": 7.0,
+   "src": "earth: n2 top + o180, a small two-storey office (was 4 storeys)"
+  },
+  {
+   "id": "16/58542/25066/200",
+   "kind": "factory",
+   "storeys": 1,
+   "height": 6.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9c8ca"
+   },
+   "src": "earth: n2 top + o0 / o90 / o180, the low service wing of the 気仙沼ほてい plant, a flat roof with tanks and plant (was a 6-storey apartment block, 17.4 m)"
+  },
+  {
+   "id": "16/58542/25066/201",
+   "kind": "warehouse",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dcdcde"
+   },
+   "src": "earth: n2 o0 / o180, a two-storey depot with a ribbed light grey metal roof (was a 6-storey office, 19.8 m)"
+  },
+  {
+   "id": "16/58542/25067/37",
+   "kind": "warehouse",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dcdcde"
+   },
+   "src": "earth: n2 top, the south bay of the same depot under one roof (was a gabled house)"
+  },
+  {
+   "id": "16/58542/25067/27",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 8.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#eeeef0"
+   },
+   "src": "earth: n2 o0, part of the 気仙沼ほてい plant (was a 3-storey shop)"
+  },
+  {
+   "id": "16/58542/25067/31",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#a9adb8"
+   },
+   "facade": "warehouse",
+   "src": "earth: n2 top + o0 / o90, a two-storey plant with solar panels on the south half of its roof (was a 6-storey apartment block)"
+  },
+  {
+   "id": "16/58542/25067/33",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 11.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#7d8596"
+   },
+   "src": "earth: n2 top + o0 / o90 / o180, 気仙沼ほてい's main plant, about 11 m, the roof covered in solar panels (was an 8-storey office, 26.4 m)"
+  },
+  {
+   "id": "16/58542/25067/35",
+   "height": 7.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c6c5c9"
+   },
+   "src": "earth: n2 o0 / o180, a low plant (was 9.3 m)"
+  },
+  {
+   "id": "16/58542/25067/36",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 8.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dedfe2"
+   },
+   "src": "earth: n2 o0 / o180, 村東商店's two-storey plant (was a 4-storey office)"
+  },
+  {
+   "id": "16/58542/25067/38",
+   "height": 8.0,
+   "src": "earth: n2 o0 / o180, two storeys (was 11.7 m)"
+  },
+  {
+   "id": "16/58542/25067/39",
+   "height": 7.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#6c6c74"
+   },
+   "src": "earth: n2 top + o0, a dark grey flat roof, two low storeys"
+  },
+  {
+   "id": "16/58542/25067/40",
+   "height": 8.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#5f7aa0"
+   },
+   "src": "earth: n2 top + o0, a blue roof, two low storeys (was 13.4 m)"
+  },
+  {
+   "id": "16/58542/25067/62",
+   "roof": {
+    "shape": "gable",
+    "color": "#626b7c"
+   },
+   "src": "earth: n2 top, the north annex of 加和喜フーズ has a dark roof now (GSI pale)"
+  },
+  {
+   "id": "16/58542/25067/63",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 11.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dedcdc"
+   },
+   "src": "earth: n2 o90 / o180, 加和喜フーズ's plant, about 11 m, pale roof (was a 6-storey office, 19.8 m)"
+  },
+  {
+   "id": "16/58542/25067/65",
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dedfe2"
+   },
+   "src": "earth: n2 o90, about 10 m (was 14.7 m)"
+  },
+  {
+   "id": "16/58541/25067/289",
+   "roof": {
+    "shape": "hip",
+    "color": "#7c7c84"
+   },
+   "src": "earth: m1 top, a dark grey roof now (GSI white)"
+  },
+  {
+   "id": "16/58541/25067/290",
+   "roof": {
+    "shape": "gable",
+    "color": "#7c7c84"
+   },
+   "src": "earth: m1 top, a dark grey roof now (GSI white)"
+  },
+  {
+   "id": "16/58541/25067/291",
+   "storeys": 2,
+   "height": 7.0,
+   "src": "earth: m1 o270, 五十番タクシー's office is two storeys (was 3)"
+  },
+  {
+   "id": "16/58541/25067/346",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 8.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8d8dc"
+   },
+   "src": "earth: m1 o270 + s1 o0, 福寿水産's long two-storey plant (was a 5-storey office, 16.5 m)"
+  },
+  {
+   "id": "16/58542/25067/1",
+   "kind": "factory",
+   "storeys": 3,
+   "height": 12.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#9da3b0"
+   },
+   "src": "earth: m1 o0 / o90 / o180 / o270, 気仙沼ほてい 魚浜工場, a white plant about 12 m with solar panels over most of the roof (was a 7-storey office, 23.1 m)"
+  },
+  {
+   "id": "16/58542/25067/52",
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#9da3b0"
+   },
+   "src": "earth: m1 o0 / o270, the plant's lower north block, solar panels on the roof"
+  },
+  {
+   "id": "16/58542/25067/18",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c8c6ca"
+   },
+   "src": "earth: m2 top + o0, 勝漁水産's plant, flat grey roof about 9 m (was a 4-storey office with a hip roof)"
+  },
+  {
+   "id": "16/58542/25067/42",
+   "kind": "factory",
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#7d8596"
+   },
+   "src": "earth: m2 top + o0, the north bay of the ムラタ plant under the same solar roof"
+  },
+  {
+   "id": "16/58542/25067/43",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#7d8596"
+   },
+   "src": "earth: m2 top + o0, (株)ムラタ's plant, about 10 m, the whole roof under solar panels (was an 8-storey office, 26.4 m)"
+  },
+  {
+   "id": "16/58542/25067/45",
+   "height": 9.0,
+   "src": "earth: m2 o0, part of 蝠寿水産 (was 11.1 m)"
+  },
+  {
+   "id": "16/58542/25067/46",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#d6d6d8"
+   },
+   "src": "earth: m2 top + o0, 蝠寿水産's plant, about 9 m (was a 5-storey office)"
+  },
+  {
+   "id": "16/58542/25067/47",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#cfd3d3"
+   },
+   "src": "earth: m2 top + o0, (株)一番's plant, about 10 m, pale grey roof with a green-painted bay (was a 5-storey office)"
+  },
+  {
+   "id": "16/58542/25067/48",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#cfd0d4"
+   },
+   "src": "earth: m2 top + o0, あかふさ食品's plant, grey roof now (GSI pale blue), about 9 m (was a 5-storey office)"
+  },
+  {
+   "id": "16/58542/25067/59",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#8a92a2"
+   },
+   "src": "earth: m2 top + o0, マルトヨ食品's plant, about 10 m, solar panels over most of a flat roof (was an 8-storey office with a saw roof, 26.4 m)"
+  },
+  {
+   "id": "16/58542/25067/78",
+   "storeys": 2,
+   "height": 7.0,
+   "src": "earth: m2 o0, テックサワイ's office is two storeys"
+  },
+  {
+   "id": "16/58542/25067/80",
+   "height": 9.0,
+   "src": "earth: m2 o0 / o270, about 9 m (was 12.2 m)"
+  },
+  {
+   "id": "16/58542/25067/95",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dadada"
+   },
+   "src": "earth: m2 top + o0, 新和エンジンサービス's works, a two-storey shed about 9 m (was a 6-storey office, 19.8 m)"
+  },
+  {
+   "id": "16/58541/25067/332",
+   "kind": "hotel",
+   "storeys": 3,
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#b0aeb2"
+   },
+   "src": "earth: s1 top + o0 / o180, the former hotel steps down the slope in terraces under grey roofs, about three storeys above each step (was a 6-storey block, 21 m, with a saw roof)"
+  },
+  {
+   "id": "16/58541/25068/16",
+   "storeys": 3,
+   "height": 10.0,
+   "src": "earth: s1 o0 / o180, the hotel's upper wing is no taller than the terraces (was 6 storeys, 17.4 m)"
+  },
+  {
+   "id": "16/58541/25067/381",
+   "remove": true,
+   "src": "earth: s1 top + o0 / o180, demolished: the site beside the road is a grass slope (GSI still shows the building)"
+  },
+  {
+   "id": "16/58541/25068/125",
+   "remove": true,
+   "src": "earth: s1 top + o0 / o180, demolished: the long building by the road is gone, a grass slope and a lay-by now (GSI still shows it)"
+  },
+  {
+   "id": "16/58541/25068/97",
+   "kind": "house",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#6c6e78"
+   },
+   "src": "earth: s1 top + o0, a two-storey house with a dark roof (was a 4-storey office)"
+  },
+  {
+   "id": "16/58541/25067/337",
+   "storeys": 2,
+   "height": 7.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#7a8490"
+   },
+   "src": "earth: s1 top + o180, a two-storey row with blue-grey roofs (was 4 storeys, 13.2 m)"
+  },
+  {
+   "id": "16/58541/25067/363",
+   "kind": "factory",
+   "storeys": 2,
+   "height": 9.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#8a92a2"
+   },
+   "src": "earth: s1 top + m1 o180, the plant by the quay has solar panels over its roof, about 9 m"
+  }
+ ],
+ "newLots": [
+  {
+   "id": "ovr:c3:sakae-house-a",
+   "poly": [
+    [
+     321,
+     -697
+    ],
+    [
+     337,
+     -697
+    ],
+    [
+     337,
+     -683
+    ],
+    [
+     321,
+     -683
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "hip",
+    "color": "#6e6c72",
+    "ridge": "x"
+   },
+   "src": "earth: n1 top + o0, a new two-storey house with a grey hip roof on what GSI shows as an empty plot"
+  },
+  {
+   "id": "ovr:c3:sakae-house-b",
+   "poly": [
+    [
+     319,
+     -677
+    ],
+    [
+     338,
+     -677
+    ],
+    [
+     338,
+     -662
+    ],
+    [
+     319,
+     -662
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#6a676d",
+    "ridge": "x"
+   },
+   "src": "earth: n1 top + o0, a new two-storey house, dark gabled roof, on a plot GSI shows empty"
+  },
+  {
+   "id": "ovr:c3:shinhama-shop",
+   "poly": [
+    [
+     419,
+     -661
+    ],
+    [
+     447,
+     -661
+    ],
+    [
+     447,
+     -647
+    ],
+    [
+     419,
+     -647
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 1,
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#d0d0d2"
+   },
+   "src": "earth: n1 top + m1 o0, a new single-storey shop with a light grey roof and marked parking in front, on a plot GSI shows as weeds"
+  },
+  {
+   "id": "ovr:c3:yard-shed-1",
+   "poly": [
+    [
+     371,
+     -682
+    ],
+    [
+     376,
+     -682
+    ],
+    [
+     376,
+     -675
+    ],
+    [
+     371,
+     -675
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 2.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#cfd0d2"
+   },
+   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard"
+  },
+  {
+   "id": "ovr:c3:yard-shed-2",
+   "poly": [
+    [
+     379,
+     -682
+    ],
+    [
+     384,
+     -682
+    ],
+    [
+     384,
+     -675
+    ],
+    [
+     379,
+     -675
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 2.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#cfd0d2"
+   },
+   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard"
+  },
+  {
+   "id": "ovr:c3:yard-shed-3",
+   "poly": [
+    [
+     389,
+     -682
+    ],
+    [
+     394,
+     -682
+    ],
+    [
+     394,
+     -675
+    ],
+    [
+     389,
+     -675
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 2.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#cfd0d2"
+   },
+   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard"
+  },
+  {
+   "id": "ovr:c3:hamacho-plant-n",
+   "poly": [
+    [
+     731,
+     -476
+    ],
+    [
+     752,
+     -470
+    ],
+    [
+     749,
+     -459
+    ],
+    [
+     728,
+     -465
+    ]
+   ],
+   "kind": "factory",
+   "storeys": 2,
+   "height": 8.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c4c4c8"
+   },
+   "src": "earth: m2 top + o0, a new two-storey plant east of あかふさ食品, on what GSI shows as a truck yard"
+  },
+  {
+   "id": "ovr:c3:hamacho-plant-s",
+   "poly": [
+    [
+     719,
+     -440
+    ],
+    [
+     737,
+     -437
+    ],
+    [
+     736,
+     -424
+    ],
+    [
+     718,
+     -426
+    ]
+   ],
+   "kind": "factory",
+   "storeys": 2,
+   "height": 7.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9c6bc"
+   },
+   "src": "earth: m2 top + o0, a new low plant by the quay road (a tan and a grey roof bay), on what GSI shows as open paving"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     322,
+     -795
+    ],
+    [
+     366,
+     -795
+    ],
+    [
+     366,
+     -712
+    ],
+    [
+     340,
+     -706
+    ],
+    [
+     322,
+     -712
+    ]
+   ],
+   "src": "earth: n1 top, an empty raised plot of dry weeds (the app drew lawn)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     374,
+     -798
+    ],
+    [
+     402,
+     -798
+    ],
+    [
+     402,
+     -724
+    ],
+    [
+     374,
+     -724
+    ]
+   ],
+   "src": "earth: n1 top, bare pale ground with a tarp-covered heap"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     410,
+     -783
+    ],
+    [
+     452,
+     -783
+    ],
+    [
+     452,
+     -664
+    ],
+    [
+     410,
+     -664
+    ]
+   ],
+   "src": "earth: n1 top, an empty block of dry weeds between the two streets"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     350,
+     -683
+    ],
+    [
+     398,
+     -683
+    ],
+    [
+     398,
+     -643
+    ],
+    [
+     350,
+     -643
+    ]
+   ],
+   "src": "earth: n1 top, a bare gravel yard with prefab sheds"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     350,
+     -638
+    ],
+    [
+     399,
+     -638
+    ],
+    [
+     399,
+     -600
+    ],
+    [
+     350,
+     -600
+    ]
+   ],
+   "src": "earth: n1 top, an empty plot, weeds and bare earth"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     464,
+     -690
+    ],
+    [
+     509,
+     -690
+    ],
+    [
+     509,
+     -646
+    ],
+    [
+     464,
+     -646
+    ]
+   ],
+   "src": "earth: n1 top, an empty plot of dry weeds"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     515,
+     -758
+    ],
+    [
+     560,
+     -758
+    ],
+    [
+     560,
+     -647
+    ],
+    [
+     515,
+     -647
+    ]
+   ],
+   "src": "earth: n1 top, an empty block of dry weeds"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     584,
+     -799
+    ],
+    [
+     631,
+     -799
+    ],
+    [
+     631,
+     -762
+    ],
+    [
+     584,
+     -762
+    ]
+   ],
+   "src": "earth: n2 top, the plot GSI shows as sand is now paved, with parked trucks and cars"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     552,
+     -757
+    ],
+    [
+     598,
+     -757
+    ],
+    [
+     598,
+     -722
+    ],
+    [
+     552,
+     -722
+    ]
+   ],
+   "src": "earth: n2 top, an empty plot of dry weeds"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     722,
+     -757
+    ],
+    [
+     749,
+     -757
+    ],
+    [
+     749,
+     -704
+    ],
+    [
+     722,
+     -704
+    ]
+   ],
+   "src": "earth: n2 top, an empty plot of dry weeds east of the depot"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     558,
+     -698
+    ],
+    [
+     606,
+     -698
+    ],
+    [
+     606,
+     -650
+    ],
+    [
+     558,
+     -650
+    ]
+   ],
+   "src": "earth: n2 top, a staff car park, full of cars"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     610,
+     -636
+    ],
+    [
+     645,
+     -636
+    ],
+    [
+     645,
+     -590
+    ],
+    [
+     610,
+     -590
+    ]
+   ],
+   "src": "earth: n2 top + m2 top, an empty plot of dry weeds"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     515,
+     -632
+    ],
+    [
+     606,
+     -632
+    ],
+    [
+     606,
+     -588
+    ],
+    [
+     515,
+     -588
+    ]
+   ],
+   "src": "earth: n2 top + m1 top, an open storage yard, gravel with stacked materials"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     402,
+     -600
+    ],
+    [
+     450,
+     -600
+    ],
+    [
+     450,
+     -573
+    ],
+    [
+     402,
+     -573
+    ]
+   ],
+   "src": "earth: m1 top, an empty plot of dry weeds"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     346,
+     -572
+    ],
+    [
+     412,
+     -572
+    ],
+    [
+     412,
+     -532
+    ],
+    [
+     346,
+     -532
+    ]
+   ],
+   "src": "earth: m1 top, the bare levelled ground below 陣山"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     416,
+     -553
+    ],
+    [
+     447,
+     -553
+    ],
+    [
+     447,
+     -527
+    ],
+    [
+     416,
+     -527
+    ]
+   ],
+   "src": "earth: m1 top, a bare earth plot"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     516,
+     -586
+    ],
+    [
+     585,
+     -586
+    ],
+    [
+     585,
+     -500
+    ],
+    [
+     540,
+     -500
+    ],
+    [
+     516,
+     -520
+    ]
+   ],
+   "src": "earth: m1 top + m2 top, a big empty plot of dry weeds, cars parked along its west side"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     473,
+     -522
+    ],
+    [
+     504,
+     -522
+    ],
+    [
+     504,
+     -478
+    ],
+    [
+     473,
+     -478
+    ]
+   ],
+   "src": "earth: m1 top, 五十番タクシー's car park"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     697,
+     -610
+    ],
+    [
+     727,
+     -610
+    ],
+    [
+     727,
+     -575
+    ],
+    [
+     697,
+     -575
+    ]
+   ],
+   "src": "earth: m2 top, an empty plot of dry weeds"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     462,
+     -345
+    ],
+    [
+     500,
+     -345
+    ],
+    [
+     500,
+     -302
+    ],
+    [
+     462,
+     -302
+    ]
+   ],
+   "src": "earth: s1 top, a contractor's gravel yard with stacked materials"
+  }
+ ]
+}

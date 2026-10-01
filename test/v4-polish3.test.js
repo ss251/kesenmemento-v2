@@ -43,8 +43,8 @@ describe("harbour and ground", () => {
     const { data, info } = await sharp(join(ROOT, "data/anime", lc.file)).removeAlpha().raw().toBuffer({ resolveWithObject: true });
     const at = (x, z) => { const i = Math.floor((x - lc.x0) / (lc.x1 - lc.x0) * info.width), j = Math.floor((z - lc.z0) / (lc.z1 - lc.z0) * info.height), k = (j * info.width + i) * 3; return "#" + [data[k], data[k + 1], data[k + 2]].map((v) => v.toString(16).padStart(2, "0")).join(""); };
     // the strip between the harbour road and the berths north of the fish market (z18 photo), 10-20 m from the seawall
-    let paving = 0, green = 0;
-    for (let z = 300; z <= 460; z += 8) { const c = at(473.4 - 0.259 * (z - 237.8) - 12, z); if (c === "#c9c5bc") paving++; if (c === "#9fc076" || c === "#bccb86") green++; }
+    let paving = 0, green = 0; const PAVING = JSON.parse(readFileSync(join(ROOT, "data/anime/landcover.json"), "utf8")).classes.find((c) => c.id === "paving").color;
+    for (let z = 300; z <= 460; z += 8) { const c = at(473.4 - 0.259 * (z - 237.8) - 12, z); if (c === PAVING) paving++; if (c === "#9fc076" || c === "#bccb86") green++; }
     expect(green).toBe(0);
     expect(paving).toBeGreaterThan(5);
   });

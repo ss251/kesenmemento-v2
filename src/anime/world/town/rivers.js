@@ -165,7 +165,9 @@ export function buildRivers(ctx, { chs, index, detail, roads, asphalt }) {
   const foamMat = ctx.mat.toon('#f2f7f5', { paint: 0.0, polygonOffset: -2 });
   const conc = ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.06, side: 'double' });   // banks run both ways round
   const W = { p: [], n: [], u: [], c: [], i: [] }, Fm = { p: [], n: [], i: [] }, C = { p: [], n: [], c: [], i: [] };
-  const deep = new THREE.Color('#3f8791'), mid = new THREE.Color('#5ea3a3'), edge = new THREE.Color('#8cc2b8');
+  // [v5:fix1] the bay's harbour blues (鹿折川 and 大川 are tidal here; Google Earth 2026 shows them as dark as the bay, the
+  // turquoise #3f8791 / #5ea3a3 / #8cc2b8 read as a different water)
+  const deep = new THREE.Color('#336d95'), mid = new THREE.Color('#4a8fac'), edge = new THREE.Color('#6f9fb4');
   const cc = new THREE.Color();
   const put = (B, x, y, z, n = [0, 1, 0], col = null, uv = null) => { B.p.push(x, y, z); B.n.push(n[0], n[1], n[2]); if (B.c) { const c = col || { r: 1, g: 1, b: 1 }; B.c.push(c.r, c.g, c.b); } if (B.u) B.u.push(uv ? uv[0] : 0, uv ? uv[1] : 0); return B.p.length / 3 - 1; };
   const quad = (B, a, b, c, d) => B.i.push(a, b, c, a, c, d);

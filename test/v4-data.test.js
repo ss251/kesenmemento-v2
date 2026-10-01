@@ -287,7 +287,7 @@ describe("data: produced files", () => {
     for (const l of L.LOTS) if (l.name) expect(SENSITIVE.test(l.name), l.name).toBe(false);
   });
   test("every lot records its sources; far lots keep names and ridges", () => {
-    const ok = new Set(["osm", "aerial", "gsi", "landmark", "derived", "ref"]);   // [v4:polish1] ref: world/lotfix.js
+    const ok = new Set(["osm", "aerial", "gsi", "landmark", "derived", "ref", "override"]);   // [v4:polish1] ref: world/lotfix.js  [v5] override: data/anime/overrides (docs/anime/OVERRIDES.md)
     for (const l of L.LOTS) { expect(l.src, l.id).toBeTruthy(); for (const k of ["h", "kind", "roof", "color"]) expect(ok.has(l.src[k]), `${l.id} ${k}`).toBe(true); }
     const far = L.LOTS.filter((l) => l.zone === "far");
     expect(far.some((l) => l.name)).toBe(true);

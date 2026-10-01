@@ -110,7 +110,7 @@ describe("framings", () => {
   });
   test("Pier 7 looks down the quay at the moored row, level ([v3:polish3] -4 -> +1: the blank slab left the frame)", () => {
     expect(FRAMES.pier7.walk.pitch).toBe(1);
-    expect(FRAMES.pier7.walk.yaw).toBeLessThan(-75);   // east, along the 南町 south quay's boats
+    expect(FRAMES.pier7.walk.yaw).toBeLessThan(-75);   // [v5:fix1] south-east from the garden head over the ring planters to PIER7's bay face
   });
   test("market morning moved 2 m to the right of its old camera", () => {
     const [a] = plan.market_morning.cam.split(">").map((p) => p.split(",").map(Number));

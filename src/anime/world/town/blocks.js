@@ -65,7 +65,8 @@ export function buildApartmentBlock(H, lot, lod, r, T, wing = null) {
   BF.boxB(M.concrete, '#bdbcb5', Lw + 0.1, fy - gmin + 0.3, D + 0.1, 0, gmin - 0.3, 0, { uv: { world: 2 } });
   BF.boxB(M.tile, body, Lw, n * FH, bd, 0, fy, bz, { uv: { world: 0.96 } });
   BF.boxB(M.plain, body, Lw + 0.1, 0.9, bd + 0.1, 0, top, bz);
-  BF.boxB(M.plain, '#c9c7c0', Lw - 0.3, 0.05, bd - 0.3, 0, top + 0.6, bz);
+  // [v5] the roof deck sits ON the parapet box (it was at top + 0.6, inside it, so no roof colour showed): the measured colour
+  BF.boxB(M.plain, flatRoofOf(lot), Lw - 0.3, 0.05, bd - 0.3, 0, top + 0.9, bz);
   // accent stripe on the end walls (vertical) + the building name
   for (const sx of [-1, 1]) BF.boxB(M.plain, accent, 0.06, n * FH * 0.8, 1.2, sx * (Lw / 2 + 0.03), fy + n * FH * 0.1, bz);
   const real = T.real?.get(lot);   // [v4:town-accuracy] the real building name (OSM), on a board over the entrance
@@ -163,9 +164,10 @@ export function buildOfficeBlock(H, lot, lod, r, T, wing = null) {
   FFr.box(M.plain, '#dcd8ce', Math.min(Lw - 0.5, 9), 0.25, 2.2, 0, fy + 3.0, 1.1);
   FFr.box(H.ctx.mat.emissive('#ffd9a0', 1.1), null, 1.6, 0.03, 0.4, 0, fy + 2.86, 1.2, { shadow: false });
   // roof plant + parapet
-  BF.boxB(M.plain, flatRoofOf(lot), Lw - 0.4, 0.05, D - 0.4, 0, top + 0.4, 0);
+  // [v5] the body box rises to top + 0.9: the deck goes on it (at top + 0.4 it was hidden inside the body)
+  BF.boxB(M.plain, flatRoofOf(lot), Lw - 0.4, 0.05, D - 0.4, 0, top + 0.9, 0);
   const nu = 1 + Math.floor(Lw * D / 250);
-  for (let k = 0; k < Math.min(5, nu); k++) BF.boxB(M.plain, pick(r, ['#c9cdd0', '#d9dcdc', '#aeb4ba']), 1.6 + r() * 2, 1.0 + r() * 1.2, 1.2 + r() * 1.5, (r() - 0.5) * (Lw - 4), top + 0.45, (r() - 0.5) * (D - 4));
+  for (let k = 0; k < Math.min(5, nu); k++) BF.boxB(M.plain, pick(r, ['#c9cdd0', '#d9dcdc', '#aeb4ba']), 1.6 + r() * 2, 1.0 + r() * 1.2, 1.2 + r() * 1.5, (r() - 0.5) * (Lw - 4), top + 0.95, (r() - 0.5) * (D - 4));
   H.col(BF, 0, 0, Lw, D, 0, gmin - 1, top + 2);
   T.out.bigBuildings.push({ id: lot.id, kind: lot.kind, floors: n });
   return true;

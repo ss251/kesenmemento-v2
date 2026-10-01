@@ -37,11 +37,15 @@ describe('walk spots', () => {
   const walkOf = (id) => LANDMARK_PLACES.find((p) => p.id === id)?.walk;
   // forward = (-sin yaw, -cos yaw) (player.js / drive.js)
   const facing = (w, x, z) => { const y = w.yaw * Math.PI / 180, fx = -Math.sin(y), fz = -Math.cos(y), dx = x - w.x, dz = z - w.z, d = Math.hypot(dx, dz); return (fx * dx + fz * dz) / d; };
-  test('五十鈴神社: on the stair, 4 m lower, facing the hall (362.4, -125)', () => {
-    const w = WALK_SET.isuzu;
-    expect(facing(w, 362.4, -125)).toBeGreaterThan(0.999);
-    expect(Math.hypot(w.x - 355.5, w.z + 140.6)).toBeCloseTo(4, 0);
-    expect(w.pitch).toBe(12);
+  // [v5:fix3] on the upper flight, the hall (362.4, -125) and its 向拝 (365.4, -137.3) both well inside the frame (qa3's
+  // aim rule: within 25 deg of the view direction)
+  test('五十鈴神社: on the stone stair, facing the hall front and its 向拝', () => {
+    const w = WALK_SET.isuzu, A = [346.5, -144.6], B = [362.8, -137.3];
+    expect(facing(w, 362.4, -125)).toBeGreaterThan(Math.cos(25 * Math.PI / 180));
+    expect(facing(w, 365.4, -137.3)).toBeGreaterThan(Math.cos(30 * Math.PI / 180));
+    const L2 = Math.hypot(B[0] - A[0], B[1] - A[1]), off = Math.abs(((w.x - A[0]) * (B[1] - A[1]) - (w.z - A[1]) * (B[0] - A[0])) / L2);
+    expect(off).toBeLessThan(0.6);   // on the flight's centre line
+    expect(w.pitch).toBe(13);
   });
   test('亀山テラス past the sofa table, 気仙沼駅 on the square facing the arcade', () => {
     expect(walkOf('kameyama')).toMatchObject({ x: 3723.9, z: 3621.7, yaw: 46.2, pitch: 1 });

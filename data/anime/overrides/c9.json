@@ -1,0 +1,2875 @@
+{
+ "version": 1,
+ "cell": "c9",
+ "bbox": [
+  -700,
+  400,
+  -200,
+  1000
+ ],
+ "note": "c9: 笹が陣 (気仙沼中学校, 気仙沼市図書館, 気仙沼公園), the 大川 bend with 本郷 on the west bank, and 幸町 1-2丁目 with the ガス課 works and the 区画整理 housing zone south of the main road. Read from Google Earth 3D (imagery 2026-03-11) in raw/ref/earth/c9 (full = the whole cell, A..E = sub-cells), checked against the GSI photo and OSM. Roof colours of the aerial-coloured lots are the GSI photo's with its measured colour cast removed.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured with tools/anime/earth-ref.mjs into raw/ref/earth/c9 (full = x -700..-200 z 400..1000; A x -470..-200 z 400..640; B x -500..-200 z 620..840; C x -500..-200 z 820..1000; D x -710..-470 z 400..700; E x -710..-480 z 680..1000)",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo z18 (data/ortho/core.jpg, about 2020-2022), with its colour cast measured on the cell's asphalt (raw/ref/earth/c9/roadcast.mjs, labfix.py)"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap, raw/osm/overpass.json (© OpenStreetMap contributors, ODbL)",
+   "date": "2026-05-06"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58539/25069/125",
+   "roof": {
+    "color": "#a47b7f"
+   },
+   "src": "gsi: roof colour #98807c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/127",
+   "roof": {
+    "color": "#7d747b"
+   },
+   "src": "gsi: roof colour #707878 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/128",
+   "roof": {
+    "color": "#b19ba0"
+   },
+   "src": "gsi: roof colour #a4a09c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/129",
+   "roof": {
+    "color": "#73787f"
+   },
+   "src": "gsi: roof colour #647c7c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/134",
+   "roof": {
+    "color": "#969093"
+   },
+   "src": "gsi: roof colour #889490 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/135",
+   "roof": {
+    "color": "#abb0bc"
+   },
+   "src": "gsi: roof colour #9cb4b8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/136",
+   "roof": {
+    "color": "#8f98a3"
+   },
+   "src": "gsi: roof colour #809ca0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/161",
+   "roof": {
+    "color": "#5e606f"
+   },
+   "src": "gsi: roof colour #50646c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/162",
+   "roof": {
+    "color": "#7c636f"
+   },
+   "src": "gsi: roof colour #70686c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/163",
+   "roof": {
+    "color": "#917f7f"
+   },
+   "src": "gsi: roof colour #84847c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/164",
+   "roof": {
+    "color": "#3e404f"
+   },
+   "src": "gsi: roof colour #30444c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/183",
+   "roof": {
+    "color": "#857c83"
+   },
+   "src": "gsi: roof colour #788080 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/184",
+   "roof": {
+    "color": "#838c93"
+   },
+   "src": "gsi: roof colour #749090 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/189",
+   "roof": {
+    "color": "#9fa0a0"
+   },
+   "src": "gsi: roof colour #90a49c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/190",
+   "roof": {
+    "color": "#a3626b"
+   },
+   "src": "gsi: roof colour #986868 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/191",
+   "roof": {
+    "color": "#4f5467"
+   },
+   "src": "gsi: roof colour #405864 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/193",
+   "roof": {
+    "color": "#474c63"
+   },
+   "src": "gsi: roof colour #385060 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/194",
+   "roof": {
+    "color": "#8a888b"
+   },
+   "src": "gsi: roof colour #7c8c88 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/196",
+   "roof": {
+    "color": "#adccdc"
+   },
+   "src": "gsi: roof colour #9cd0d8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/197",
+   "roof": {
+    "color": "#b0d0e7"
+   },
+   "src": "gsi: roof colour #a0d4e4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/198",
+   "roof": {
+    "color": "#8f5f67"
+   },
+   "src": "gsi: roof colour #846464 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/199",
+   "roof": {
+    "color": "#a76e6f"
+   },
+   "src": "gsi: roof colour #9c746c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/200",
+   "roof": {
+    "color": "#9b9c9c"
+   },
+   "src": "gsi: roof colour #8ca098 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/201",
+   "roof": {
+    "color": "#96908c"
+   },
+   "src": "gsi: roof colour #889488 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/202",
+   "roof": {
+    "color": "#7d7077"
+   },
+   "src": "gsi: roof colour #707474 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/204",
+   "roof": {
+    "color": "#946b77"
+   },
+   "src": "gsi: roof colour #887074 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/205",
+   "roof": {
+    "color": "#4a4c57"
+   },
+   "src": "gsi: roof colour #3c5054 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/206",
+   "roof": {
+    "color": "#84676f"
+   },
+   "src": "gsi: roof colour #786c6c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/207",
+   "roof": {
+    "color": "#8a8887"
+   },
+   "src": "gsi: roof colour #7c8c84 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/208",
+   "roof": {
+    "color": "#66686f"
+   },
+   "src": "gsi: roof colour #586c6c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/209",
+   "roof": {
+    "color": "#57606f"
+   },
+   "src": "gsi: roof colour #48646c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/210",
+   "roof": {
+    "color": "#abb0b8"
+   },
+   "src": "gsi: roof colour #9cb4b4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/211",
+   "roof": {
+    "color": "#c8d5e3"
+   },
+   "src": "gsi: roof colour #bcd8e0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/212",
+   "roof": {
+    "color": "#777c87"
+   },
+   "src": "gsi: roof colour #688084 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/213",
+   "roof": {
+    "color": "#a3a4b8"
+   },
+   "src": "gsi: roof colour #94a8b4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/218",
+   "roof": {
+    "color": "#c9ccdb"
+   },
+   "src": "gsi: roof colour #bcd0d8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/219",
+   "roof": {
+    "color": "#525867"
+   },
+   "src": "gsi: roof colour #445c64 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/220",
+   "roof": {
+    "color": "#b3b49c"
+   },
+   "src": "gsi: roof colour #a4b898 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/221",
+   "roof": {
+    "color": "#bab8a0"
+   },
+   "src": "gsi: roof colour #acbc9c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/222",
+   "roof": {
+    "color": "#d5d9d6"
+   },
+   "src": "gsi: roof colour #ccdcd4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/224",
+   "roof": {
+    "color": "#e5e6f1"
+   },
+   "src": "gsi: roof colour #e0e8f0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/225",
+   "roof": {
+    "color": "#7e7883"
+   },
+   "src": "gsi: roof colour #707c80 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/228",
+   "roof": {
+    "color": "#b7b3bc"
+   },
+   "src": "gsi: roof colour #a8b8b8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/229",
+   "roof": {
+    "color": "#b19b9c"
+   },
+   "src": "gsi: roof colour #a4a098 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/230",
+   "roof": {
+    "color": "#8d8077"
+   },
+   "src": "gsi: roof colour #808474 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/231",
+   "roof": {
+    "color": "#475063"
+   },
+   "src": "gsi: roof colour #385460 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/232",
+   "roof": {
+    "color": "#57606f"
+   },
+   "src": "gsi: roof colour #48646c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/233",
+   "roof": {
+    "color": "#8a8c93"
+   },
+   "src": "gsi: roof colour #7c9090 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/234",
+   "roof": {
+    "color": "#d0d0d3"
+   },
+   "src": "gsi: roof colour #c4d4d0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/235",
+   "roof": {
+    "color": "#4b5467"
+   },
+   "src": "gsi: roof colour #3c5864 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/250",
+   "roof": {
+    "color": "#73535b"
+   },
+   "src": "gsi: roof colour #685858 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/253",
+   "roof": {
+    "color": "#46485b"
+   },
+   "src": "gsi: roof colour #384c58 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/254",
+   "roof": {
+    "color": "#5b606f"
+   },
+   "src": "gsi: roof colour #4c646c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/255",
+   "roof": {
+    "color": "#cac8df"
+   },
+   "src": "gsi: roof colour #bcccdc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25069/74",
+   "roof": {
+    "color": "#b18f98"
+   },
+   "src": "gsi: roof colour #a49494 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/331",
+   "roof": {
+    "color": "#a29398"
+   },
+   "src": "gsi: roof colour #949894 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/333",
+   "roof": {
+    "color": "#666873"
+   },
+   "src": "gsi: roof colour #586c70 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/334",
+   "roof": {
+    "color": "#82808f"
+   },
+   "src": "gsi: roof colour #74848c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/335",
+   "roof": {
+    "color": "#91838b"
+   },
+   "src": "gsi: roof colour #848888 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/336",
+   "roof": {
+    "color": "#cabfc4"
+   },
+   "src": "gsi: roof colour #bcc4c0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/337",
+   "roof": {
+    "color": "#4f5467"
+   },
+   "src": "gsi: roof colour #405864 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/338",
+   "roof": {
+    "color": "#6e707f"
+   },
+   "src": "gsi: roof colour #60747c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/339",
+   "roof": {
+    "color": "#5b606f"
+   },
+   "src": "gsi: roof colour #4c646c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/340",
+   "roof": {
+    "color": "#8b5b63"
+   },
+   "src": "gsi: roof colour #806060 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/341",
+   "roof": {
+    "color": "#aea3a8"
+   },
+   "src": "gsi: roof colour #a0a8a4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/342",
+   "roof": {
+    "color": "#ced9e6"
+   },
+   "src": "gsi: roof colour #c4dce4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/343",
+   "roof": {
+    "color": "#9e93a0"
+   },
+   "src": "gsi: roof colour #90989c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/345",
+   "roof": {
+    "color": "#969498"
+   },
+   "src": "gsi: roof colour #889894 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/346",
+   "roof": {
+    "color": "#cc9b9c"
+   },
+   "src": "gsi: roof colour #c0a098 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/347",
+   "roof": {
+    "color": "#d9a7a8"
+   },
+   "src": "gsi: roof colour #ccaca4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/7",
+   "roof": {
+    "color": "#575c6f"
+   },
+   "src": "gsi: roof colour #48606c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/102",
+   "roof": {
+    "color": "#7d98b3"
+   },
+   "src": "gsi: roof colour #6c9cb0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/103",
+   "roof": {
+    "color": "#e09ea4"
+   },
+   "src": "gsi: roof colour #d4a4a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/104",
+   "roof": {
+    "color": "#bbb7c0"
+   },
+   "src": "gsi: roof colour #acbcbc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/105",
+   "roof": {
+    "color": "#828493"
+   },
+   "src": "gsi: roof colour #748890 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/106",
+   "roof": {
+    "color": "#a87b7c"
+   },
+   "src": "gsi: roof colour #9c8078 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/107",
+   "roof": {
+    "color": "#4f5467"
+   },
+   "src": "gsi: roof colour #405864 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/108",
+   "roof": {
+    "color": "#72787b"
+   },
+   "src": "gsi: roof colour #647c78 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/111",
+   "roof": {
+    "color": "#87909b"
+   },
+   "src": "gsi: roof colour #789498 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/112",
+   "roof": {
+    "color": "#b8c4d4"
+   },
+   "src": "gsi: roof colour #a8c8d0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/113",
+   "roof": {
+    "color": "#5b646f"
+   },
+   "src": "gsi: roof colour #4c686c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/114",
+   "roof": {
+    "color": "#d9d9ea"
+   },
+   "src": "gsi: roof colour #d0dce8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/116",
+   "roof": {
+    "color": "#b29fac"
+   },
+   "src": "gsi: roof colour #a4a4a8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/117",
+   "roof": {
+    "color": "#a18f94"
+   },
+   "src": "gsi: roof colour #949490 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/118",
+   "roof": {
+    "color": "#d2b3bc"
+   },
+   "src": "gsi: roof colour #c4b8b8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/119",
+   "roof": {
+    "color": "#8f98a7"
+   },
+   "src": "gsi: roof colour #809ca4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/120",
+   "roof": {
+    "color": "#78888b"
+   },
+   "src": "gsi: roof colour #688c88 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/121",
+   "roof": {
+    "color": "#83889b"
+   },
+   "src": "gsi: roof colour #748c98 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/122",
+   "roof": {
+    "color": "#cfd5e3"
+   },
+   "src": "gsi: roof colour #c4d8e0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/123",
+   "roof": {
+    "color": "#bfbfc8"
+   },
+   "src": "gsi: roof colour #b0c4c4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/13",
+   "roof": {
+    "color": "#cdab9c"
+   },
+   "src": "gsi: roof colour #c0b098 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/130",
+   "roof": {
+    "color": "#5b6473"
+   },
+   "src": "gsi: roof colour #4c6870 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/131",
+   "roof": {
+    "color": "#69a8e0"
+   },
+   "src": "gsi: roof colour #50acdc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/132",
+   "roof": {
+    "color": "#97c4e8"
+   },
+   "src": "gsi: roof colour #84c8e4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/133",
+   "roof": {
+    "color": "#879093"
+   },
+   "src": "gsi: roof colour #789490 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/134",
+   "roof": {
+    "color": "#8bd9fb"
+   },
+   "src": "gsi: roof colour #78dcf8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/136",
+   "roof": {
+    "color": "#d0d0df"
+   },
+   "src": "gsi: roof colour #c4d4dc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/138",
+   "roof": {
+    "color": "#94a0b0"
+   },
+   "src": "gsi: roof colour #84a4ac from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/140",
+   "roof": {
+    "color": "#4e5063"
+   },
+   "src": "gsi: roof colour #405460 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/141",
+   "roof": {
+    "color": "#e7effd"
+   },
+   "src": "gsi: roof colour #e4f0fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/142",
+   "roof": {
+    "color": "#505c6b"
+   },
+   "src": "gsi: roof colour #406068 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/143",
+   "roof": {
+    "color": "#917b87"
+   },
+   "src": "gsi: roof colour #848084 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/144",
+   "roof": {
+    "color": "#767483"
+   },
+   "src": "gsi: roof colour #687880 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/145",
+   "roof": {
+    "color": "#835f63"
+   },
+   "src": "gsi: roof colour #786460 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/146",
+   "roof": {
+    "color": "#b3b4b8"
+   },
+   "src": "gsi: roof colour #a4b8b4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/148",
+   "roof": {
+    "color": "#b2a3a4"
+   },
+   "src": "gsi: roof colour #a4a8a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/149",
+   "roof": {
+    "color": "#97a0a4"
+   },
+   "src": "gsi: roof colour #88a4a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/150",
+   "roof": {
+    "color": "#838897"
+   },
+   "src": "gsi: roof colour #748c94 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/153",
+   "roof": {
+    "color": "#d7d0d7"
+   },
+   "src": "gsi: roof colour #ccd4d4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/154",
+   "roof": {
+    "color": "#626477"
+   },
+   "src": "gsi: roof colour #546874 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/155",
+   "roof": {
+    "color": "#9a9498"
+   },
+   "src": "gsi: roof colour #8c9894 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/156",
+   "roof": {
+    "color": "#f5f4fc"
+   },
+   "src": "gsi: roof colour #f4f4fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/157",
+   "roof": {
+    "color": "#f2eff4"
+   },
+   "src": "gsi: roof colour #f0f0f4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/158",
+   "roof": {
+    "color": "#c1d5df"
+   },
+   "src": "gsi: roof colour #b4d8dc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/159",
+   "roof": {
+    "color": "#a2a0a8"
+   },
+   "src": "gsi: roof colour #94a4a4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/167",
+   "roof": {
+    "color": "#898477"
+   },
+   "src": "gsi: roof colour #7c8874 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/168",
+   "roof": {
+    "color": "#beb7b8"
+   },
+   "src": "gsi: roof colour #b0bcb4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/437",
+   "roof": {
+    "color": "#8a8c8f"
+   },
+   "src": "gsi: roof colour #7c908c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/6",
+   "roof": {
+    "color": "#565c5f"
+   },
+   "src": "gsi: roof colour #48605c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/63",
+   "roof": {
+    "color": "#9e9898"
+   },
+   "src": "gsi: roof colour #909c94 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/65",
+   "roof": {
+    "color": "#d2d5ea"
+   },
+   "src": "gsi: roof colour #c8d8e8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/66",
+   "roof": {
+    "color": "#d89694"
+   },
+   "src": "gsi: roof colour #cc9c90 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/67",
+   "roof": {
+    "color": "#5a5c6b"
+   },
+   "src": "gsi: roof colour #4c6068 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/68",
+   "roof": {
+    "color": "#6c7c8f"
+   },
+   "src": "gsi: roof colour #5c808c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/69",
+   "roof": {
+    "color": "#a07b7b"
+   },
+   "src": "gsi: roof colour #948078 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/7",
+   "roof": {
+    "color": "#aaa4a4"
+   },
+   "src": "gsi: roof colour #9ca8a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/70",
+   "roof": {
+    "color": "#8c7377"
+   },
+   "src": "gsi: roof colour #807874 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/71",
+   "roof": {
+    "color": "#8d7b87"
+   },
+   "src": "gsi: roof colour #808084 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/76",
+   "roof": {
+    "color": "#b8838c"
+   },
+   "src": "gsi: roof colour #ac8888 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/77",
+   "roof": {
+    "color": "#929093"
+   },
+   "src": "gsi: roof colour #849490 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/78",
+   "roof": {
+    "color": "#9f6667"
+   },
+   "src": "gsi: roof colour #946c64 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/79",
+   "roof": {
+    "color": "#7e7487"
+   },
+   "src": "gsi: roof colour #707884 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/8",
+   "roof": {
+    "color": "#9e9490"
+   },
+   "src": "gsi: roof colour #90988c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/11",
+   "roof": {
+    "color": "#beb3b0"
+   },
+   "src": "gsi: roof colour #b0b8ac from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/117",
+   "roof": {
+    "color": "#867c8b"
+   },
+   "src": "gsi: roof colour #788088 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/118",
+   "roof": {
+    "color": "#8e848f"
+   },
+   "src": "gsi: roof colour #80888c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/119",
+   "roof": {
+    "color": "#8f909b"
+   },
+   "src": "gsi: roof colour #809498 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/120",
+   "roof": {
+    "color": "#f1f4fc"
+   },
+   "src": "gsi: roof colour #f0f4fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/122",
+   "roof": {
+    "color": "#6c7c8b"
+   },
+   "src": "gsi: roof colour #5c8088 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/127",
+   "roof": {
+    "color": "#5b6073"
+   },
+   "src": "gsi: roof colour #4c6470 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/137",
+   "roof": {
+    "color": "#c48a90"
+   },
+   "src": "gsi: roof colour #b8908c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/139",
+   "roof": {
+    "color": "#b3b3c4"
+   },
+   "src": "gsi: roof colour #a4b8c0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/141",
+   "roof": {
+    "color": "#c08f90"
+   },
+   "src": "gsi: roof colour #b4948c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/142",
+   "roof": {
+    "color": "#c9d0cf"
+   },
+   "src": "gsi: roof colour #bcd4cc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/18",
+   "roof": {
+    "color": "#b3abc4"
+   },
+   "src": "gsi: roof colour #a4b0c0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/239",
+   "roof": {
+    "color": "#b6afb0"
+   },
+   "src": "gsi: roof colour #a8b4ac from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/35",
+   "roof": {
+    "color": "#a0b0ac"
+   },
+   "src": "gsi: roof colour #90b4a8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/36",
+   "roof": {
+    "color": "#e9f4fc"
+   },
+   "src": "gsi: roof colour #e8f4fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/37",
+   "roof": {
+    "color": "#676c7f"
+   },
+   "src": "gsi: roof colour #58707c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/38",
+   "roof": {
+    "color": "#8b5f5f"
+   },
+   "src": "gsi: roof colour #80645c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/39",
+   "roof": {
+    "color": "#f6ebfd"
+   },
+   "src": "gsi: roof colour #f4ecfc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/41",
+   "roof": {
+    "color": "#b3b7cc"
+   },
+   "src": "gsi: roof colour #a4bcc8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/42",
+   "roof": {
+    "color": "#788497"
+   },
+   "src": "gsi: roof colour #688894 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/43",
+   "roof": {
+    "color": "#a29ca0"
+   },
+   "src": "gsi: roof colour #94a09c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/44",
+   "roof": {
+    "color": "#e1ab9c"
+   },
+   "src": "gsi: roof colour #d4b098 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/45",
+   "roof": {
+    "color": "#d1cccf"
+   },
+   "src": "gsi: roof colour #c4d0cc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/46",
+   "roof": {
+    "color": "#eeeffc"
+   },
+   "src": "gsi: roof colour #ecf0fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/47",
+   "roof": {
+    "color": "#575c73"
+   },
+   "src": "gsi: roof colour #486070 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/48",
+   "roof": {
+    "color": "#b597a0"
+   },
+   "src": "gsi: roof colour #a89c9c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/49",
+   "roof": {
+    "color": "#d4ccd3"
+   },
+   "src": "gsi: roof colour #c8d0d0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/50",
+   "roof": {
+    "color": "#d6d5df"
+   },
+   "src": "gsi: roof colour #ccd8dc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/51",
+   "roof": {
+    "color": "#c2b3bc"
+   },
+   "src": "gsi: roof colour #b4b8b8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/52",
+   "roof": {
+    "color": "#9398a4"
+   },
+   "src": "gsi: roof colour #849ca0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/53",
+   "roof": {
+    "color": "#55505f"
+   },
+   "src": "gsi: roof colour #48545c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/54",
+   "roof": {
+    "color": "#a29ca4"
+   },
+   "src": "gsi: roof colour #94a0a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/55",
+   "roof": {
+    "color": "#4e4c5f"
+   },
+   "src": "gsi: roof colour #40505c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/56",
+   "roof": {
+    "color": "#a693a0"
+   },
+   "src": "gsi: roof colour #98989c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/57",
+   "roof": {
+    "color": "#6f788b"
+   },
+   "src": "gsi: roof colour #607c88 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/58",
+   "roof": {
+    "color": "#67707f"
+   },
+   "src": "gsi: roof colour #58747c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/60",
+   "roof": {
+    "color": "#53586f"
+   },
+   "src": "gsi: roof colour #445c6c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/61",
+   "roof": {
+    "color": "#f1f4fc"
+   },
+   "src": "gsi: roof colour #f0f4fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/62",
+   "roof": {
+    "color": "#abb0bc"
+   },
+   "src": "gsi: roof colour #9cb4b8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/63",
+   "roof": {
+    "color": "#777c8b"
+   },
+   "src": "gsi: roof colour #688088 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/64",
+   "roof": {
+    "color": "#6a6c7b"
+   },
+   "src": "gsi: roof colour #5c7078 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/66",
+   "roof": {
+    "color": "#86888f"
+   },
+   "src": "gsi: roof colour #788c8c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/67",
+   "roof": {
+    "color": "#eaeffd"
+   },
+   "src": "gsi: roof colour #e8f0fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/69",
+   "roof": {
+    "color": "#d1ddee"
+   },
+   "src": "gsi: roof colour #c8e0ec from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/70",
+   "roof": {
+    "color": "#f1f4fc"
+   },
+   "src": "gsi: roof colour #f0f4fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/72",
+   "roof": {
+    "color": "#f9f0f8"
+   },
+   "src": "gsi: roof colour #f8f0f8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/73",
+   "roof": {
+    "color": "#6f7883"
+   },
+   "src": "gsi: roof colour #607c80 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/74",
+   "roof": {
+    "color": "#e2e2ea"
+   },
+   "src": "gsi: roof colour #dce4e8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/75",
+   "roof": {
+    "color": "#7b848b"
+   },
+   "src": "gsi: roof colour #6c8888 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/76",
+   "roof": {
+    "color": "#7e7c8b"
+   },
+   "src": "gsi: roof colour #708088 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/78",
+   "roof": {
+    "color": "#d4ccc7"
+   },
+   "src": "gsi: roof colour #c8d0c4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/79",
+   "roof": {
+    "color": "#d3d0db"
+   },
+   "src": "gsi: roof colour #c8d4d8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/82",
+   "roof": {
+    "color": "#9db4bc"
+   },
+   "src": "gsi: roof colour #8cb8b8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/83",
+   "roof": {
+    "color": "#7f8897"
+   },
+   "src": "gsi: roof colour #708c94 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/84",
+   "roof": {
+    "color": "#838893"
+   },
+   "src": "gsi: roof colour #748c90 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/86",
+   "roof": {
+    "color": "#b47f84"
+   },
+   "src": "gsi: roof colour #a88480 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/87",
+   "roof": {
+    "color": "#856f7b"
+   },
+   "src": "gsi: roof colour #787478 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/89",
+   "roof": {
+    "color": "#8b909b"
+   },
+   "src": "gsi: roof colour #7c9498 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/9",
+   "roof": {
+    "color": "#b87e8c"
+   },
+   "src": "gsi: roof colour #ac8488 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/90",
+   "roof": {
+    "color": "#9c7783"
+   },
+   "src": "gsi: roof colour #907c80 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/91",
+   "roof": {
+    "color": "#d0868c"
+   },
+   "src": "gsi: roof colour #c48c88 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/92",
+   "roof": {
+    "color": "#a5878c"
+   },
+   "src": "gsi: roof colour #988c88 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/93",
+   "roof": {
+    "color": "#a07f7f"
+   },
+   "src": "gsi: roof colour #94847c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/94",
+   "roof": {
+    "color": "#d9c3c4"
+   },
+   "src": "gsi: roof colour #ccc8c0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/95",
+   "roof": {
+    "color": "#aea7b8"
+   },
+   "src": "gsi: roof colour #a0acb4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/96",
+   "roof": {
+    "color": "#6b748b"
+   },
+   "src": "gsi: roof colour #5c7888 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/97",
+   "roof": {
+    "color": "#a8b0c4"
+   },
+   "src": "gsi: roof colour #98b4c0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25070/98",
+   "roof": {
+    "color": "#979cb0"
+   },
+   "src": "gsi: roof colour #88a0ac from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/116",
+   "roof": {
+    "color": "#575c6f"
+   },
+   "src": "gsi: roof colour #48606c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/117",
+   "roof": {
+    "color": "#cfd5eb"
+   },
+   "src": "gsi: roof colour #c4d8e8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/121",
+   "roof": {
+    "color": "#9e97a8"
+   },
+   "src": "gsi: roof colour #909ca4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/124",
+   "roof": {
+    "color": "#ddd9da"
+   },
+   "src": "gsi: roof colour #d4dcd8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/143",
+   "roof": {
+    "color": "#a7a3b4"
+   },
+   "src": "gsi: roof colour #98a8b0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/145",
+   "roof": {
+    "color": "#777c87"
+   },
+   "src": "gsi: roof colour #688084 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/146",
+   "roof": {
+    "color": "#86848f"
+   },
+   "src": "gsi: roof colour #78888c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/147",
+   "roof": {
+    "color": "#baafb8"
+   },
+   "src": "gsi: roof colour #acb4b4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/158",
+   "roof": {
+    "color": "#c7bfc8"
+   },
+   "src": "gsi: roof colour #b8c4c4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/161",
+   "roof": {
+    "color": "#94a8bc"
+   },
+   "src": "gsi: roof colour #84acb8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/162",
+   "roof": {
+    "color": "#93565f"
+   },
+   "src": "gsi: roof colour #885c5c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/275",
+   "roof": {
+    "color": "#72707f"
+   },
+   "src": "gsi: roof colour #64747c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/276",
+   "roof": {
+    "color": "#8898af"
+   },
+   "src": "gsi: roof colour #789cac from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/277",
+   "roof": {
+    "color": "#a3a4b4"
+   },
+   "src": "gsi: roof colour #94a8b0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/278",
+   "roof": {
+    "color": "#4e5067"
+   },
+   "src": "gsi: roof colour #405464 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/280",
+   "roof": {
+    "color": "#6f747f"
+   },
+   "src": "gsi: roof colour #60787c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/283",
+   "roof": {
+    "color": "#c4828c"
+   },
+   "src": "gsi: roof colour #b88888 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/286",
+   "roof": {
+    "color": "#e7ebfd"
+   },
+   "src": "gsi: roof colour #e4ecfc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/287",
+   "roof": {
+    "color": "#eaeffd"
+   },
+   "src": "gsi: roof colour #e8f0fc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/288",
+   "roof": {
+    "color": "#cc828c"
+   },
+   "src": "gsi: roof colour #c08888 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/289",
+   "roof": {
+    "color": "#a36a6f"
+   },
+   "src": "gsi: roof colour #98706c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/290",
+   "roof": {
+    "color": "#b19ba4"
+   },
+   "src": "gsi: roof colour #a4a0a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/291",
+   "roof": {
+    "color": "#a8777b"
+   },
+   "src": "gsi: roof colour #9c7c78 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/292",
+   "roof": {
+    "color": "#c07e8c"
+   },
+   "src": "gsi: roof colour #b48488 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/293",
+   "roof": {
+    "color": "#c2abb4"
+   },
+   "src": "gsi: roof colour #b4b0b0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/295",
+   "roof": {
+    "color": "#878c9b"
+   },
+   "src": "gsi: roof colour #789098 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/296",
+   "roof": {
+    "color": "#9398a8"
+   },
+   "src": "gsi: roof colour #849ca4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/298",
+   "roof": {
+    "color": "#bfbfcc"
+   },
+   "src": "gsi: roof colour #b0c4c8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/299",
+   "roof": {
+    "color": "#c2ccdb"
+   },
+   "src": "gsi: roof colour #b4d0d8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/300",
+   "roof": {
+    "color": "#a6979c"
+   },
+   "src": "gsi: roof colour #989c98 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/302",
+   "roof": {
+    "color": "#e4d9ee"
+   },
+   "src": "gsi: roof colour #dcdcec from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/303",
+   "roof": {
+    "color": "#677483"
+   },
+   "src": "gsi: roof colour #587880 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/305",
+   "roof": {
+    "color": "#ddaba4"
+   },
+   "src": "gsi: roof colour #d0b0a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/306",
+   "roof": {
+    "color": "#ad8b94"
+   },
+   "src": "gsi: roof colour #a09090 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/307",
+   "roof": {
+    "color": "#727487"
+   },
+   "src": "gsi: roof colour #647884 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/309",
+   "roof": {
+    "color": "#828493"
+   },
+   "src": "gsi: roof colour #748890 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/310",
+   "roof": {
+    "color": "#9e9898"
+   },
+   "src": "gsi: roof colour #909c94 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/312",
+   "roof": {
+    "color": "#c3bfc4"
+   },
+   "src": "gsi: roof colour #b4c4c0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/313",
+   "roof": {
+    "color": "#929097"
+   },
+   "src": "gsi: roof colour #849494 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/316",
+   "roof": {
+    "color": "#6e7087"
+   },
+   "src": "gsi: roof colour #607484 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/317",
+   "roof": {
+    "color": "#b2a7bc"
+   },
+   "src": "gsi: roof colour #a4acb8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/319",
+   "roof": {
+    "color": "#607087"
+   },
+   "src": "gsi: roof colour #507484 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/320",
+   "roof": {
+    "color": "#727483"
+   },
+   "src": "gsi: roof colour #647880 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/321",
+   "roof": {
+    "color": "#a7acbc"
+   },
+   "src": "gsi: roof colour #98b0b8 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/322",
+   "roof": {
+    "color": "#baa3a8"
+   },
+   "src": "gsi: roof colour #aca8a4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/323",
+   "roof": {
+    "color": "#efebfd"
+   },
+   "src": "gsi: roof colour #ececfc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/324",
+   "roof": {
+    "color": "#857383"
+   },
+   "src": "gsi: roof colour #787880 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/326",
+   "roof": {
+    "color": "#ad8b90"
+   },
+   "src": "gsi: roof colour #a0908c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/328",
+   "roof": {
+    "color": "#838893"
+   },
+   "src": "gsi: roof colour #748c90 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/329",
+   "roof": {
+    "color": "#bb727f"
+   },
+   "src": "gsi: roof colour #b0787c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/330",
+   "roof": {
+    "color": "#727483"
+   },
+   "src": "gsi: roof colour #647880 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/349",
+   "roof": {
+    "color": "#486487"
+   },
+   "src": "gsi: roof colour #346884 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/350",
+   "roof": {
+    "color": "#5794bf"
+   },
+   "src": "gsi: roof colour #3c98bc from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/351",
+   "roof": {
+    "color": "#9fa0a4"
+   },
+   "src": "gsi: roof colour #90a4a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/366",
+   "roof": {
+    "color": "#a8b0c8"
+   },
+   "src": "gsi: roof colour #98b4c4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/367",
+   "roof": {
+    "color": "#d2d5e7"
+   },
+   "src": "gsi: roof colour #c8d8e4 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/371",
+   "roof": {
+    "color": "#82848f"
+   },
+   "src": "gsi: roof colour #74888c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58539/25070/428",
+   "roof": {
+    "color": "#92908f"
+   },
+   "src": "gsi: roof colour #84948c from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+  },
+  {
+   "id": "16/58540/25069/191",
+   "storeys": 2,
+   "height": 9.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#b4b2b0"
+   },
+   "facade": "public",
+   "src": "earth: A top + A o0/o180, 気仙沼市図書館 is a wide 2-storey building with a flat light-grey roof and rooftop plant, not a 5-storey white saw-tooth block"
+  },
+  {
+   "id": "16/58540/25069/80",
+   "kind": "public",
+   "storeys": 1,
+   "height": 4.5,
+   "roof": {
+    "shape": "gable",
+    "color": "#5a5e66"
+   },
+   "wall": "#e4e0d8",
+   "facade": "public",
+   "name": "気仙沼小学校区学童保育センター",
+   "nameEn": "Kesennuma Elementary School District After-School Care Centre",
+   "src": "earth: A top + o0, the labelled 学童保育センター is a long single-storey building with a dark-grey gable roof (the app drew a 4-storey apartment block)"
+  },
+  {
+   "id": "16/58540/25069/100",
+   "roof": {
+    "color": "#a9adb3"
+   },
+   "src": "earth: A top + o0, the 気仙沼中学校 gym roof reads light grey (#9699a4 in Earth; the GSI photo's #85b9c0 is the photo's cyan cast), not dark navy"
+  },
+  {
+   "id": "16/58540/25069/126",
+   "roof": {
+    "color": "#6f7178"
+   },
+   "src": "earth: A top, the main classroom block of 気仙沼中学校 is covered in dark solar panels (Earth #63636f)"
+  },
+  {
+   "id": "16/58540/25069/162",
+   "roof": {
+    "color": "#74767c"
+   },
+   "src": "earth: A top, the east classroom block of 気仙沼中学校: dark grey roof with solar panels (Earth #686974)"
+  },
+  {
+   "id": "16/58540/25069/128",
+   "roof": {
+    "color": "#6d7078"
+   },
+   "src": "earth: A top + o0, the long west block of 気仙沼中学校 has a dark roof with solar panels (Earth #74747c), not pale grey"
+  },
+  {
+   "id": "16/58540/25069/161",
+   "storeys": 1,
+   "height": 3.5,
+   "src": "earth: A o0, no 14 m tower stands here, a small shed by the pool (the 5 x 2 m footprint was built 4 storeys)"
+  },
+  {
+   "id": "16/58540/25069/164",
+   "storeys": 1,
+   "height": 3.5,
+   "src": "earth: A o0, a small shed by the pool, not a 4-storey tower; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#abacb0"
+   }
+  },
+  {
+   "id": "16/58540/25069/166",
+   "storeys": 1,
+   "height": 3.5,
+   "src": "earth: A o0, a small annex between the school and the gym, not a 3-storey tower; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#c5d0e3"
+   }
+  },
+  {
+   "id": "16/58540/25069/125",
+   "storeys": 2,
+   "height": 6,
+   "src": "earth: A o0, part of the low 2-storey wing of 気仙沼中学校, not a 14 m tower; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#e2e2f1"
+   }
+  },
+  {
+   "id": "16/58540/25069/127",
+   "storeys": 1,
+   "height": 3.5,
+   "src": "earth: A top, a small structure at the west end of the school, not a 4-storey tower; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#4c586f"
+   }
+  },
+  {
+   "id": "16/58540/25069/115",
+   "storeys": 1,
+   "height": 3.5,
+   "src": "earth: A top, a small structure by the tree row west of the field, not a 3-storey block; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#d9d9e6"
+   }
+  },
+  {
+   "id": "16/58539/25069/195",
+   "storeys": 2,
+   "src": "earth: A o0, two-storey houses along the 沢田 lane, no 3-storey shop; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#c89390"
+   }
+  },
+  {
+   "id": "16/58539/25069/227",
+   "storeys": 2,
+   "src": "earth: A o0 + B top, a wide two-storey building with a dark roof, not 3 storeys; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#7b808b"
+   }
+  },
+  {
+   "id": "16/58540/25069/137",
+   "storeys": 2,
+   "src": "earth: B o0, two-storey houses, no 3-storey shop; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#875b67"
+   }
+  },
+  {
+   "id": "16/58540/25069/147",
+   "storeys": 2,
+   "src": "earth: B o0 + top, a large two-storey building with a dark roof, not 3 storeys; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#92888b"
+   }
+  },
+  {
+   "id": "16/58540/25069/169",
+   "remove": true,
+   "src": "earth: B top, the lot is open gravel in the 気仙沼公園 ground (a building of the temporary-housing years on the GSI photo)"
+  },
+  {
+   "id": "16/58540/25070/68",
+   "storeys": 2,
+   "height": 7.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#a9aaa8"
+   },
+   "name": "気仙沼市ガス水道部ガス課",
+   "nameEn": "Kesennuma City Gas Section",
+   "src": "earth: C top + o0, the gas office is a wide low building with a flat grey roof (Earth labels it 気仙沼市 ガス水道部ガス課; OSM has 市ガス課事務所), not 3 storeys"
+  },
+  {
+   "id": "16/58540/25070/100",
+   "storeys": 2,
+   "src": "earth: C o0, a two-storey building with a dark flat roof, not 3 storeys; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#777c8b"
+   }
+  },
+  {
+   "id": "16/58540/25070/81",
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#585c64"
+   },
+   "src": "earth: C o0 + top, a long two-storey house with a dark gable roof, not a 3-storey flat-roofed shop"
+  },
+  {
+   "id": "16/58540/25070/101",
+   "remove": true,
+   "src": "earth: C top, nothing stands on this 1 x 5 m sliver (open field, a fence line)"
+  },
+  {
+   "id": "16/58540/25070/103",
+   "remove": true,
+   "src": "earth: C top, bare ground in the housing zone, no building"
+  },
+  {
+   "id": "16/58540/25070/102",
+   "roof": {
+    "color": "#c9c6c0"
+   },
+   "src": "earth: C top + o0, a pale grey roof (the dark band north of it in the Earth top view is its shadow)"
+  },
+  {
+   "id": "16/58539/25069/214",
+   "remove": true,
+   "src": "earth: D top, demolished; the lot is the bare slope beside the widened main road (the GSI photo shows the building and the road works)"
+  },
+  {
+   "id": "16/58539/25069/215",
+   "remove": true,
+   "src": "earth: D top + o0, demolished with its neighbour for the road widening; no building stands here"
+  },
+  {
+   "id": "16/58539/25070/344",
+   "kind": "warehouse",
+   "storeys": 2,
+   "height": 7.5,
+   "roof": {
+    "shape": "gable",
+    "color": "#a65a55"
+   },
+   "wall": "#d9d4cc",
+   "facade": "warehouse",
+   "src": "earth: E top + o0, the riverside buildings here are long red-roofed two-storey sheds, not a 5-storey office block"
+  },
+  {
+   "id": "16/58539/25070/279",
+   "storeys": 2,
+   "src": "earth: E o0, a two-storey building, no 3-storey block; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#dad5de"
+   }
+  },
+  {
+   "id": "16/58539/25070/281",
+   "kind": "house",
+   "storeys": 2,
+   "src": "earth: E o0, two-storey houses by the river bank road, no 3-storey apartment block; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#9b9ca8"
+   }
+  },
+  {
+   "id": "16/58539/25070/282",
+   "storeys": 2,
+   "src": "earth: E o0, a two-storey building, not a 4-storey apartment block; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#777c8f"
+   }
+  },
+  {
+   "id": "16/58539/25070/294",
+   "storeys": 2,
+   "src": "earth: E o0, a two-storey building, not 3 storeys; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#979ca8"
+   }
+  },
+  {
+   "id": "16/58539/25070/308",
+   "storeys": 2,
+   "src": "earth: E o0, a two-storey building in the 本郷 blocks, not a 4-storey tower; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#9fa4b4"
+   }
+  },
+  {
+   "id": "16/58539/25070/376",
+   "storeys": 2,
+   "src": "earth: E o0, two-storey houses, not a 4-storey apartment block; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#bfb7c0"
+   }
+  },
+  {
+   "id": "16/58539/25070/353",
+   "storeys": 1,
+   "height": 7,
+   "roof": {
+    "shape": "flat",
+    "color": "#5d6470"
+   },
+   "src": "earth: E top + o0, Big House is a single-storey supermarket hall whose roof is covered in dark solar panels, not a 3-storey white block"
+  },
+  {
+   "id": "16/58539/25070/348",
+   "storeys": 1,
+   "height": 4,
+   "src": "earth: E top, a small roof structure of Big House, not 3 storeys; roof colour: the GSI photo colour with its cast removed",
+   "roof": {
+    "color": "#cbbfd0"
+   }
+  }
+ ],
+ "newLots": [
+  {
+   "id": "ovr:c9:gas-holder",
+   "poly": [
+    [
+     -344.5,
+     889
+    ],
+    [
+     -345.1,
+     891.9
+    ],
+    [
+     -346.7,
+     894.3
+    ],
+    [
+     -349.1,
+     895.9
+    ],
+    [
+     -352,
+     896.5
+    ],
+    [
+     -354.9,
+     895.9
+    ],
+    [
+     -357.3,
+     894.3
+    ],
+    [
+     -358.9,
+     891.9
+    ],
+    [
+     -359.5,
+     889
+    ],
+    [
+     -358.9,
+     886.1
+    ],
+    [
+     -357.3,
+     883.7
+    ],
+    [
+     -354.9,
+     882.1
+    ],
+    [
+     -352,
+     881.5
+    ],
+    [
+     -349.1,
+     882.1
+    ],
+    [
+     -346.7,
+     883.7
+    ],
+    [
+     -345.1,
+     886.1
+    ]
+   ],
+   "kind": "factory",
+   "height": 14,
+   "roof": {
+    "shape": "flat",
+    "color": "#c9d3da"
+   },
+   "wall": "#d3dce2",
+   "facade": "plain",
+   "src": "earth: C top + o0 + o180, the remaining spherical gas holder of the ガス課 works (about 15 m across, pale blue-white); the GSI photo shows two, the south one is now an empty round pad. Drawn as a 14 m drum (no sphere primitive)"
+  },
+  {
+   "id": "ovr:c9:hall-2chome",
+   "poly": [
+    [
+     -294.5,
+     940
+    ],
+    [
+     -272.5,
+     940
+    ],
+    [
+     -272.5,
+     951.5
+    ],
+    [
+     -294.5,
+     951.5
+    ]
+   ],
+   "kind": "office",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#8e9196"
+   },
+   "wall": "#e2dfd8",
+   "facade": "office",
+   "src": "earth: C top + o0 + o180, a new wide two-storey building with solar panels on a flat roof (the dark band north of it in the top view is its shadow); bare ground on the GSI photo"
+  },
+  {
+   "id": "ovr:c9:house-2chome-w",
+   "poly": [
+    [
+     -359,
+     938.5
+    ],
+    [
+     -347,
+     938.5
+    ],
+    [
+     -347,
+     951.5
+    ],
+    [
+     -359,
+     951.5
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#d4d4d0"
+   },
+   "src": "earth: C top + o0, a new two-storey house with a pale flat roof; bare ground on the GSI photo"
+  },
+  {
+   "id": "ovr:c9:house-2chome-a",
+   "poly": [
+    [
+     -270.8,
+     965
+    ],
+    [
+     -260.3,
+     965
+    ],
+    [
+     -260.3,
+     975.2
+    ],
+    [
+     -270.8,
+     975.2
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8d6d0"
+   },
+   "src": "earth: C top + o0, a new two-storey house with a white flat roof in the 区画整理 zone"
+  },
+  {
+   "id": "ovr:c9:house-2chome-b",
+   "poly": [
+    [
+     -259,
+     967.5
+    ],
+    [
+     -249.7,
+     967.5
+    ],
+    [
+     -249.7,
+     975.8
+    ],
+    [
+     -259,
+     975.8
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#80838a"
+   },
+   "src": "earth: C top + o0, a new two-storey house with a grey roof"
+  },
+  {
+   "id": "ovr:c9:house-2chome-c",
+   "poly": [
+    [
+     -248.4,
+     964
+    ],
+    [
+     -236,
+     964
+    ],
+    [
+     -236,
+     975.8
+    ],
+    [
+     -248.4,
+     975.8
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "shed",
+    "color": "#5d626c"
+   },
+   "src": "earth: C top + o0, a new two-storey house, dark roof with solar panels"
+  },
+  {
+   "id": "ovr:c9:house-2chome-d",
+   "poly": [
+    [
+     -220,
+     976
+    ],
+    [
+     -204,
+     976
+    ],
+    [
+     -204,
+     991.5
+    ],
+    [
+     -220,
+     991.5
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#5e6168"
+   },
+   "src": "earth: C top + o0, a new two-storey house with a dark roof and a lower wing (block 6)"
+  },
+  {
+   "id": "ovr:c9:house-1chome-n",
+   "poly": [
+    [
+     -233,
+     901
+    ],
+    [
+     -225,
+     901
+    ],
+    [
+     -225,
+     910
+    ],
+    [
+     -233,
+     910
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "hip",
+    "color": "#50545c"
+   },
+   "src": "earth: C top + o0, a new two-storey house with a dark hip roof north of the main road"
+  },
+  {
+   "id": "ovr:c9:park-pavilion",
+   "poly": [
+    [
+     -369,
+     657
+    ],
+    [
+     -359.5,
+     657
+    ],
+    [
+     -359.5,
+     666
+    ],
+    [
+     -369,
+     666
+    ]
+   ],
+   "kind": "public",
+   "storeys": 1,
+   "height": 4,
+   "roof": {
+    "shape": "hip",
+    "color": "#dcdcd8"
+   },
+   "src": "earth: B top, a small single-storey building with a white pyramid roof at the north-west corner of the 気仙沼公園 ground (not on the GSI photo)"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "name": "気仙沼公園",
+   "replace": true,
+   "ring": [
+    [
+     -344,
+     690
+    ],
+    [
+     -252,
+     662
+    ],
+    [
+     -218,
+     709
+    ],
+    [
+     -299,
+     774
+    ]
+   ],
+   "src": "earth: B top + o0, the former temporary-housing site of 気仙沼公園 is a bare gravel ground (north) and a dirt sports field (south), not a mown lawn (OSM park polygon 気仙沼公園, the GSI photo still shows the prefab rows)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "replace": true,
+   "ring": [
+    [
+     -367,
+     596
+    ],
+    [
+     -273,
+     530
+    ],
+    [
+     -228,
+     594
+    ],
+    [
+     -353,
+     682
+    ],
+    [
+     -380,
+     645
+    ],
+    [
+     -348,
+     622
+    ]
+   ],
+   "src": "earth: A top + o0, the 気仙沼中学校 playing field is bare earth (Earth #958a86), not patchy lawn (OSM recreation_ground)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -258,
+     633
+    ],
+    [
+     -216,
+     606
+    ],
+    [
+     -209,
+     612
+    ],
+    [
+     -210,
+     630
+    ],
+    [
+     -236,
+     648
+    ],
+    [
+     -250,
+     641
+    ]
+   ],
+   "src": "earth: A top, a marked car park with stall lines south-east of the 気仙沼中学校 field"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -445,
+     869.5
+    ],
+    [
+     -420,
+     866
+    ],
+    [
+     -413,
+     878
+    ],
+    [
+     -413,
+     895
+    ],
+    [
+     -428,
+     895
+    ],
+    [
+     -444,
+     878
+    ]
+   ],
+   "src": "earth: C top + o0, the ガス課 works car park with stall lines and parked cars"
+  },
+  {
+   "use": "plaza",
+   "ring": [
+    [
+     -343.5,
+     903
+    ],
+    [
+     -344.4,
+     906.5
+    ],
+    [
+     -347,
+     909.1
+    ],
+    [
+     -350.5,
+     910
+    ],
+    [
+     -354,
+     909.1
+    ],
+    [
+     -356.6,
+     906.5
+    ],
+    [
+     -357.5,
+     903
+    ],
+    [
+     -356.6,
+     899.5
+    ],
+    [
+     -354,
+     896.9
+    ],
+    [
+     -350.5,
+     896
+    ],
+    [
+     -347,
+     896.9
+    ],
+    [
+     -344.4,
+     899.5
+    ]
+   ],
+   "src": "earth: C top + o0, the round concrete pad of the removed south gas holder"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "replace": true,
+   "ring": [
+    [
+     -397,
+     924
+    ],
+    [
+     -398,
+     951
+    ],
+    [
+     -394,
+     958
+    ],
+    [
+     -357,
+     958
+    ],
+    [
+     -307,
+     965
+    ],
+    [
+     -304,
+     964
+    ],
+    [
+     -301,
+     951
+    ],
+    [
+     -320,
+     950
+    ],
+    [
+     -320,
+     937
+    ],
+    [
+     -346,
+     936
+    ],
+    [
+     -386,
+     929
+    ]
+   ],
+   "src": "earth: C top + o0, the 区画整理 housing zone is built up; its open plots are bare gravel and soil, not a fenced building site (OSM brownfield)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "replace": true,
+   "ring": [
+    [
+     -340,
+     920
+    ],
+    [
+     -324,
+     922
+    ],
+    [
+     -295,
+     920
+    ],
+    [
+     -281,
+     852
+    ],
+    [
+     -302,
+     848
+    ],
+    [
+     -304,
+     864
+    ],
+    [
+     -314,
+     879
+    ],
+    [
+     -316,
+     895
+    ],
+    [
+     -334,
+     896
+    ]
+   ],
+   "src": "earth: C top, open bare ground between the new houses and the hill, not a fenced building site (OSM brownfield)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "replace": true,
+   "ring": [
+    [
+     -171,
+     846
+    ],
+    [
+     -171,
+     907
+    ],
+    [
+     -195,
+     907
+    ],
+    [
+     -242,
+     915
+    ],
+    [
+     -283,
+     920
+    ],
+    [
+     -276,
+     874
+    ],
+    [
+     -250,
+     884
+    ],
+    [
+     -223,
+     884
+    ],
+    [
+     -190,
+     878
+    ]
+   ],
+   "src": "earth: C top + o0, the east part of the 区画整理 housing zone: new houses and bare plots, not a fenced building site (OSM brownfield, clipped to the cell)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "replace": true,
+   "ring": [
+    [
+     -408,
+     920
+    ],
+    [
+     -410,
+     938
+    ],
+    [
+     -428,
+     916
+    ],
+    [
+     -426,
+     912
+    ]
+   ],
+   "src": "earth: C top, an open plot (OSM brownfield)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "replace": true,
+   "ring": [
+    [
+     -491,
+     890
+    ],
+    [
+     -466,
+     916
+    ],
+    [
+     -433,
+     943
+    ],
+    [
+     -425,
+     934
+    ],
+    [
+     -444,
+     914
+    ],
+    [
+     -436,
+     901
+    ],
+    [
+     -445,
+     896
+    ],
+    [
+     -464,
+     896
+    ],
+    [
+     -480,
+     879
+    ]
+   ],
+   "src": "earth: C top + o0, no fire station was built here: the plot is a paved road apron and dry grass by the 大川 bank (OSM construction 消防署)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     -290.5,
+     937.6
+    ],
+    [
+     -248.6,
+     933
+    ],
+    [
+     -245.5,
+     952.4
+    ],
+    [
+     -233.1,
+     952.7
+    ],
+    [
+     -236,
+     930.9
+    ],
+    [
+     -206.9,
+     923.7
+    ],
+    [
+     -200,
+     923.1
+    ],
+    [
+     -200,
+     967.5
+    ],
+    [
+     -204.1,
+     966.3
+    ],
+    [
+     -211.3,
+     992.5
+    ],
+    [
+     -267.6,
+     974.4
+    ],
+    [
+     -295.1,
+     967.3
+    ],
+    [
+     -297.4,
+     963.8
+    ],
+    [
+     -293.5,
+     941.2
+    ]
+   ],
+   "src": "earth: E top (raw/ref/earth/c10/E/top_annot.jpg) + c9 C top: the 幸町 区画整理 zone is finished, new houses on bare soil and gravel plots along new streets; OSM still maps it as a brownfield building site (drawn with hoardings)"
+  }
+ ],
+ "roads": [],
+ "props": []
+}

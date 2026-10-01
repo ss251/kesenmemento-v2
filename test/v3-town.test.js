@@ -169,7 +169,12 @@ test('services published for life and harbor', () => {
 test('budgets: triangles and canvas pixels (BUILDER-GUIDE section 6)', () => {
   const t = tris(ctxA.staticRoot) + tris(ctxA.dynamicRoot);
   // [v4:data] +1.5 %: real shop and public kinds from OSM build a few more storefronts than the derived guesses (3.2005 M)
-  expect(t).toBeLessThanOrEqual(3250000);
+  // [v5] +0.3 %: the accuracy sweep's land-use surfaces (car parks, aprons, gravel and weeds read from the 2026 imagery,
+  // data/anime/overrides) that the cells had held back to fit 3.25 M (3.2575 M with all of them)
+  // [v5:fix1] +0.6 %: hero sidewalks now run on to the cross street's edge, and straight on past a T-junction on the
+  // side without a cross street (they stopped short and left paver islands mid-road at 魚町 / 八日町): about 18 k
+  // triangles of pavers, curbs and edge lines
+  expect(t).toBeLessThanOrEqual(3280000);
   // [v4:town-accuracy] +1.5 M px: the real-name sign atlas (175 public facilities and shops from OSM / GSI, 256 x 44 px
   // cells, rows in use only); the fictional shop-board atlas was trimmed to its used rows (-0.6 M px) to pay for part of it
   expect(ctxA.tex.pixels).toBeLessThanOrEqual(25.5e6);

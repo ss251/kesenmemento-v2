@@ -18,7 +18,7 @@ import { ROOT } from "../terrain/tiles.js";
 import { CACHE } from "./vt.js";
 import { zoneOf } from "./build-layout.js";
 import { minAreaRect, obbSides, rotYFacing, segDist, SegHash, polylineLength, alongPolyline, nominalWidth, roadKind, roadWidthFromEdges, simplify, centroid, polyArea } from "./derive.js";
-import { nameRoads } from "./enrich/fold.js";
+import { nameRoads, OVERRIDES_DIR, loadOverrides, compileOverrides, overrideFeatures, applyRoadOverrides } from "./enrich/fold.js";
 
 /** The streamed core: the extent of data/ortho/core.jpg (z18) and of the 4 m core grid. */
 export const CORE = { x0: -1730, z0: -2100, x1: 2600, z1: 2330 };
@@ -26,7 +26,7 @@ export const inCore = (x, z, pad = 0) => x >= CORE.x0 - pad && x <= CORE.x1 + pa
 const r1 = (v) => Math.round(v * 10) / 10, r2 = (v) => Math.round(v * 100) / 100, r3 = (v) => Math.round(v * 1000) / 1000;
 const P1 = (p) => [r1(p[0]), r1(p[1])];
 
-export async function buildExplore() {
+export async function buildExplore({ overridesDir = OVERRIDES_DIR } = {}) {
   const t0 = performance.now();
   const vt = await Bun.file(join(CACHE, "vt.json")).json();
   const bld = await Bun.file(join(ROOT, "data/buildings/city.json")).json();
@@ -51,6 +51,10 @@ export async function buildExplore() {
     roads.push({ id: "r" + i, pts: simplify(pts, 0.15).map(P1), width: r1(width), kind, zone: "far", rank: f.rnkwidth, code: f.code });
   });
   const named = E ? nameRoads(roads, E.roads) : null;
+  // [v4:overrides] the same road patches as build-layout.js (docs/anime/OVERRIDES.md): here they reach the far alleys too;
+  // new roads are taken when they are far roads of the core (hero / mid ones are in layout.json)
+  const OV = compileOverrides(loadOverrides(overridesDir));
+  const ovRoads = applyRoadOverrides(roads, OV, { zoneOf: (x, z) => zoneOf(x, z, 60), keep: (r) => { const m = alongPolyline(r.pts, polylineLength(r.pts) / 2).p; return r.zone === "far" && inCore(m[0], m[1]); } });
 
   // ---------------------------------------------------------------- frontage against every core road (alleys too)
   const hash = new SegHash(32);
@@ -60,7 +64,7 @@ export async function buildExplore() {
   const farIds = new Set(layout.farLots.rows.map((row) => row[0]));
   const lots = {};
   let n = 0, turned = 0;
-  for (const b of bld.features) {
+  for (const b of bld.features.concat(overrideFeatures(OV))) {   // [v4:overrides] + the new lots (removed lots are not in farIds)
     if (!farIds.has(b.id) || !b.poly || b.poly.length < 3) continue;
     const ring = b.poly, c = centroid(ring);
     if (!inCore(c[0], c[1])) continue;
@@ -82,12 +86,13 @@ export async function buildExplore() {
   // how many far lots now face another side than layout.json's (an alley instead of the street behind)
   const rowById = new Map(layout.farLots.rows.map((row) => [row[0], row]));
   for (const [id, v] of Object.entries(lots)) { const row = rowById.get(id); if (row && Math.abs(Math.atan2(Math.sin(v[1] - row[5]), Math.cos(v[1] - row[5]))) > 0.3) turned++; }
-  const log = { ms: Math.round(performance.now() - t0), roads: roads.length, alleys: roads.filter((r) => r.kind === "alley").length, measured, named, lots: n, turned };
+  const log = { ms: Math.round(performance.now() - t0), roads: roads.length, alleys: roads.filter((r) => r.kind === "alley").length, measured, named, lots: n, turned, overrides: { files: OV.files.length, roads: { patched: ovRoads.patched, removed: ovRoads.removed, added: ovRoads.added } } };
   return { out: { version: 1, core: CORE, fields: { lot: ["poly", "rotY", "w", "d", "roadId", "frontDist"] }, roads, lots }, log };
 }
 
 if (import.meta.main) {
-  const { out, log } = await buildExplore();
+  const ai = process.argv.indexOf("--overrides"), ovArg = ai > 0 ? process.argv[ai + 1] : null;   // as build-layout.js
+  const { out, log } = await buildExplore(ovArg ? { overridesDir: ovArg === "none" ? null : ovArg } : {});
   const txt = JSON.stringify(out);
   await Bun.write(join(ROOT, "data/anime/explore.json"), txt);
   console.log(JSON.stringify({ ok: true, bytes: txt.length, ...log }));

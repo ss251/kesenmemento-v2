@@ -27,15 +27,19 @@
   },
   {
    "id": "paving",
-   "color": "#c9c5bc"
+   "color": "#787577"
   },
   {
    "id": "town",
-   "color": "#bdb7aa"
+   "color": "#6d696b"
   },
   {
    "id": "water",
    "color": "#6f9fbf"
+  },
+  {
+   "id": "felled",
+   "color": "#7f6b57"
   }
  ],
  "core": {
@@ -48,14 +52,15 @@
   "z1": 2331.293999999905,
   "hist": {
    "forest": 0.328,
-   "cedar": 0.148,
-   "grass": 0.091,
-   "field": 0.111,
-   "dirt": 0.001,
-   "sand": 0.009,
-   "paving": 0.169,
-   "town": 0.144,
-   "water": 0
+   "cedar": 0.16,
+   "grass": 0.055,
+   "field": 0.071,
+   "dirt": 0,
+   "sand": 0.007,
+   "paving": 0.167,
+   "town": 0.211,
+   "water": 0,
+   "felled": 0
   }
  },
  "city": {
@@ -67,15 +72,16 @@
   "x1": 10842.999999999014,
   "z1": 8437.064000000413,
   "hist": {
-   "forest": 0.326,
-   "cedar": 0.143,
-   "grass": 0.128,
-   "field": 0.084,
+   "forest": 0.373,
+   "cedar": 0.101,
+   "grass": 0.118,
+   "field": 0.079,
    "dirt": 0,
-   "sand": 0.002,
-   "paving": 0.02,
-   "town": 0.296,
-   "water": 0
+   "sand": 0.001,
+   "paving": 0.019,
+   "town": 0.309,
+   "water": 0,
+   "felled": 0
   }
  }
 }

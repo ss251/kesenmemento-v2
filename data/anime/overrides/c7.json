@@ -1,0 +1,718 @@
+{
+ "version": 1,
+ "cell": "c7",
+ "bbox": [
+  300,
+  -200,
+  800,
+  400
+ ],
+ "note": "c7: 神明崎 (五十鈴神社, 猪狩神社, 浮見堂), the コの字岸壁 quay of 魚町, and 港町 below the 気仙沼プラザホテル down to JFみやぎ; east of x 600 is open water. Read from Google Earth 3D (imagery 2026-03-11) in raw/ref/earth/c7 (the whole cell in full_before/, sub-cells sub-n and sub-s with top, four 60-degree and two low obliques each), checked against the GSI photo (raw/ref/earth/c7/gsi_*.jpg) and OSM. Roof colours are the Earth readings lifted by a neutral gain of 1.17 (Earth renders darker than the GSI photo the town is coloured from: GSI/Earth 1.15-1.32 on unchanged roofs and paving here).",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured with tools/anime/earth-ref.mjs into raw/ref/earth/c7 (full_before = the whole cell; sub-n = 神明崎 and the コの字岸壁, x 290..600 z -215..-20; sub-s = 港町, x 280..480 z 110..410)",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo z18 (data/ortho/core.jpg, about 2020-2022), crops raw/ref/earth/c7/gsi_*.jpg"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap, raw/osm/overpass.json (© OpenStreetMap contributors, ODbL)",
+   "date": "2026-05-06"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58541/25068/138",
+   "roof": {
+    "shape": "flat",
+    "color": "#bec2c9"
+   },
+   "src": "earth: sub-s top + o0 + o180, お魚いちば is a fan-shaped two-storey hall with a flat mid-grey roof (Earth #9da4ab), not a pale-blue hipped roof"
+  },
+  {
+   "id": "16/58541/25068/139",
+   "roof": {
+    "shape": "flat",
+    "color": "#bec2c9"
+   },
+   "src": "earth: sub-s top, the west wing of お魚いちば under the same flat grey roof"
+  },
+  {
+   "id": "16/58541/25068/145",
+   "storeys": 2,
+   "height": 6.1,
+   "roof": {
+    "shape": "flat",
+    "color": "#bfc0c5"
+   },
+   "src": "earth: sub-s top + o0, the east end of お魚いちば: the same two-storey hall (the app drew a 3-storey block with a dark roof)"
+  },
+  {
+   "id": "16/58541/25068/144",
+   "roof": {
+    "shape": "flat",
+    "color": "#a6a6ad"
+   },
+   "src": "earth: sub-s top, a small annex on the お魚いちば roof line, mid grey"
+  },
+  {
+   "id": "16/58541/25068/147",
+   "kind": "office",
+   "storeys": 2,
+   "height": 8.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#d7d5d7"
+   },
+   "wall": "#e4e2dc",
+   "facade": "office",
+   "src": "earth: sub-s top + o0 + o180, a wide two-storey company building with a flat grey roof and rooftop plant, not a 5-storey hipped apartment block"
+  },
+  {
+   "id": "16/58541/25068/148",
+   "storeys": 2,
+   "roof": {
+    "color": "#b4b4be"
+   },
+   "src": "earth: sub-s top + o0, a small two-storey building with a mid-grey roof (the app drew 3 storeys, pale blue)"
+  },
+  {
+   "id": "16/58541/25068/149",
+   "kind": "warehouse",
+   "storeys": 2,
+   "height": 7.0,
+   "roof": {
+    "shape": "gable",
+    "color": "#c9ced4"
+   },
+   "wall": "#dcdcd8",
+   "facade": "warehouse",
+   "src": "earth: sub-s top + o180 + l225, two low grey-roofed sheds of about 7 m, not a 5-storey apartment block"
+  },
+  {
+   "id": "16/58541/25068/153",
+   "storeys": 1,
+   "height": 6.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c0bfc5"
+   },
+   "src": "earth: sub-s top + o180, ENEOS: the forecourt canopy and the sales room under one flat grey roof, about 6 m"
+  },
+  {
+   "id": "16/58541/25068/154",
+   "kind": "shop",
+   "storeys": 1,
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#c0bec3"
+   },
+   "src": "earth: sub-s top, part of the ENEOS block: single storey, grey roof (not a 3-storey apartment)"
+  },
+  {
+   "id": "16/58541/25069/33",
+   "kind": "shop",
+   "storeys": 1,
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#bfbcc2"
+   },
+   "src": "earth: sub-s top, part of the ENEOS block: single storey, grey roof (not a 3-storey apartment)"
+  },
+  {
+   "id": "16/58541/25069/32",
+   "storeys": 1,
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#c1bfc5"
+   },
+   "src": "earth: sub-s top, the ENEOS car-wash shed, single storey, grey roof"
+  },
+  {
+   "id": "16/58541/25069/31",
+   "roof": {
+    "shape": "flat",
+    "color": "#a7a7b0"
+   },
+   "src": "earth: sub-s top, the ENEOS office with rooftop units, dark grey roof"
+  },
+  {
+   "id": "16/58541/25069/344",
+   "kind": "shop",
+   "storeys": 2,
+   "height": 7.0,
+   "roof": {
+    "shape": "gable",
+    "color": "#e8e4e8"
+   },
+   "wall": "#eeece6",
+   "src": "earth: sub-s top + o0 + o180, a long white two-storey building with a low white gable roof (OSM way 1056818888), not a 3-storey apartment"
+  },
+  {
+   "id": "16/58541/25069/342",
+   "roof": {
+    "color": "#e1dcdc"
+   },
+   "src": "earth: sub-s top, a white-roofed shed"
+  },
+  {
+   "id": "16/58541/25069/343",
+   "roof": {
+    "color": "#d7d3d3"
+   },
+   "src": "earth: sub-s top, a white-roofed shed"
+  },
+  {
+   "id": "16/58541/25069/345",
+   "roof": {
+    "color": "#e1dcdc"
+   },
+   "src": "earth: sub-s top, a white-roofed shed"
+  },
+  {
+   "id": "16/58541/25069/355",
+   "storeys": 4,
+   "height": 14.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#b4aeb1"
+   },
+   "wall": "#e8e6e0",
+   "src": "earth: sub-s top + o0 + o180, JFみやぎ is a 4-storey white block with rooftop plant (about 14 m), not 6 storeys; grey roof deck"
+  },
+  {
+   "id": "16/58541/25069/356",
+   "kind": "warehouse",
+   "storeys": 1,
+   "height": 6.0,
+   "roof": {
+    "shape": "gable",
+    "color": "#bcd7df",
+    "ridge": "z"
+   },
+   "facade": "warehouse",
+   "src": "earth: sub-s top + o0, a single-storey shed under a pale blue-green metal roof, not a 2-storey house"
+  },
+  {
+   "id": "16/58541/25069/354",
+   "roof": {
+    "shape": "gable",
+    "color": "#bcd7df",
+    "ridge": "z"
+   },
+   "src": "earth: sub-s top + o0, the east bay of the same pale blue-green metal shed"
+  },
+  {
+   "id": "16/58541/25069/353",
+   "roof": {
+    "shape": "flat",
+    "color": "#eee8ec"
+   },
+   "src": "earth: sub-s top + o0, a white flat-roofed building"
+  },
+  {
+   "id": "16/58541/25069/347",
+   "storeys": 3,
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#82a19a"
+   },
+   "wall": "#e6e4de",
+   "src": "earth: sub-s top + o0 + o180, a 3-storey building with a green roof deck, not 4 storeys with a dark roof"
+  },
+  {
+   "id": "16/58541/25069/346",
+   "kind": "office",
+   "storeys": 3,
+   "height": 10.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#d4ccca"
+   },
+   "wall": "#eeece6",
+   "facade": "office",
+   "src": "earth: sub-s top + o0, the white 3-storey wing of the same building, grey roof"
+  },
+  {
+   "id": "16/58541/25069/336",
+   "kind": "office",
+   "storeys": 2,
+   "height": 7.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#dcdadb"
+   },
+   "facade": "office",
+   "src": "earth: sub-s top + o0, a two-storey commercial building with a flat light-grey roof (not pale blue)"
+  },
+  {
+   "id": "16/58541/25069/339",
+   "roof": {
+    "shape": "flat",
+    "color": "#dcdbde"
+   },
+   "src": "earth: sub-s top + o0, a long low building with a light-grey roof"
+  },
+  {
+   "id": "16/58541/25069/340",
+   "roof": {
+    "color": "#e5e5e8"
+   },
+   "src": "earth: sub-s top, light-grey roof"
+  },
+  {
+   "id": "16/58541/25069/337",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#e5e5e3"
+   },
+   "src": "earth: sub-s top + o0, a white two-storey building, light-grey roof"
+  },
+  {
+   "id": "16/58541/25069/338",
+   "roof": {
+    "color": "#eae5e4"
+   },
+   "src": "earth: sub-s top, light-grey roof"
+  },
+  {
+   "id": "16/58541/25068/105",
+   "roof": {
+    "shape": "gable",
+    "color": "#9da1ab"
+   },
+   "src": "earth: sub-n top + o0, a two-storey house with a mid-grey pitched roof, not pale blue (Earth #81858e)"
+  },
+  {
+   "id": "16/58541/25068/106",
+   "roof": {
+    "shape": "hip",
+    "color": "#b76e65"
+   },
+   "src": "earth: sub-n top + o0, the red-brown hipped roof on the corner of the bend (GSI agrees)"
+  },
+  {
+   "id": "16/58541/25068/108",
+   "roof": {
+    "shape": "hip",
+    "color": "#575f73"
+   },
+   "src": "earth: sub-n top + o0, one dark slate hipped roof over 108 and 116 (Earth #3f475c)"
+  },
+  {
+   "id": "16/58541/25068/116",
+   "kind": "house",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "hip",
+    "color": "#575f73"
+   },
+   "facade": "house",
+   "src": "earth: sub-n top + o0, a two-storey building under the same dark slate hipped roof as 108, not a 3-storey white flat block"
+  },
+  {
+   "id": "16/58541/25068/117",
+   "roof": {
+    "shape": "flat",
+    "color": "#c0b7b7"
+   },
+   "src": "earth: sub-n top, a flat light-grey roof (Earth #a19495), not the brown deck the app drew"
+  },
+  {
+   "id": "16/58541/25068/109",
+   "roof": {
+    "color": "#eae4dc"
+   },
+   "src": "earth: sub-n top + o0, a light warm-grey roof (Earth #cac5be), not pale blue"
+  },
+  {
+   "id": "16/58541/25068/127",
+   "kind": "warehouse",
+   "height": 11.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c7bebb"
+   },
+   "wall": "#e2e0da",
+   "facade": "warehouse",
+   "src": "earth: sub-n top + o0 + l225, 村田漁業 is a flat-roofed white-grey store with a raised plant strip along its east side, not a sawtooth factory; about 11 m"
+  },
+  {
+   "id": "16/58541/25068/128",
+   "kind": "warehouse",
+   "storeys": 1,
+   "height": 5.0,
+   "roof": {
+    "shape": "flat",
+    "color": "#c3b7b7"
+   },
+   "facade": "warehouse",
+   "src": "earth: sub-n top + o0, the single-storey annex on the south-west corner of the store (the app drew a 3-storey shop)"
+  },
+  {
+   "id": "16/58542/25068/1",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: parked cars on the kerb island where GSI had a prefab hut (gsi_pier.jpg vs o_e_pier.jpg)"
+  },
+  {
+   "id": "16/58542/25068/4",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: the prefab hut on the kerb island is now car parking"
+  },
+  {
+   "id": "16/58542/25068/5",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: the prefab hut on the kerb island is now car parking"
+  },
+  {
+   "id": "16/58542/25068/8",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: the prefab hut on the kerb island is now car parking"
+  },
+  {
+   "id": "16/58541/25068/167",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: the prefab hut on the kerb island is now car parking"
+  },
+  {
+   "id": "16/58541/25068/130",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: the white prefab is now parking stalls with cars (the app drew a 3-storey shop)"
+  },
+  {
+   "id": "16/58541/25068/133",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: parked cars where GSI had a white prefab"
+  },
+  {
+   "id": "16/58541/25068/134",
+   "remove": true,
+   "src": "earth: sub-n top + o0, gone: parked cars where GSI had a white prefab (the app drew a 3-storey shop)"
+  }
+ ],
+ "newLots": [
+  {
+   "id": "ovr:c7:suisan-kenshu",
+   "poly": [
+    [
+     382,
+     249.5
+    ],
+    [
+     406.5,
+     251.5
+    ],
+    [
+     405.5,
+     264.5
+    ],
+    [
+     381,
+     262.5
+    ]
+   ],
+   "kind": "public",
+   "storeys": 2,
+   "height": 8.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#bfdcbe"
+   },
+   "wall": "#e8e8e2",
+   "name": "気仙沼市水産研修センター",
+   "nameEn": "Kesennuma Fisheries Training Centre",
+   "facade": "public",
+   "src": "earth: sub-s top + o0 + o180, a new building on the old GSI building site: a two-storey block under a pale green roof (osm: way 1056818889 names it)"
+  },
+  {
+   "id": "ovr:c7:suisan-kenshu-low",
+   "poly": [
+    [
+     406.5,
+     251.5
+    ],
+    [
+     420,
+     253
+    ],
+    [
+     418,
+     271
+    ],
+    [
+     379,
+     268
+    ],
+    [
+     381,
+     262.5
+    ],
+    [
+     405.5,
+     264.5
+    ]
+   ],
+   "kind": "public",
+   "storeys": 1,
+   "height": 4.8,
+   "roof": {
+    "shape": "flat",
+    "color": "#c0bbd5"
+   },
+   "wall": "#e8e8e2",
+   "facade": "public",
+   "src": "earth: sub-s top + o0 + o180, the single-storey wings of the 水産研修センター round the green block, lilac-grey roof"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     360,
+     314
+    ],
+    [
+     404,
+     316
+    ],
+    [
+     402,
+     347
+    ],
+    [
+     358,
+     345
+    ]
+   ],
+   "src": "earth: sub-s top + o0 + o180, the block between JFみやぎ and the parking is bare grey-brown earth (a cleared site), not lawn"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     499,
+     -166
+    ],
+    [
+     572,
+     -146
+    ],
+    [
+     546,
+     -62
+    ],
+    [
+     470,
+     -93
+    ],
+    [
+     478,
+     -111
+    ],
+    [
+     483,
+     -120
+    ],
+    [
+     499,
+     -157
+    ]
+   ],
+   "src": "earth: sub-n top + o0 + l225, the middle of the コの字岸壁 is an asphalt car park with marked stalls and cars, not pale paving"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "name": "神明崎公園",
+   "ring": [
+    [
+     306,
+     -150
+    ],
+    [
+     318,
+     -162
+    ],
+    [
+     334,
+     -158
+    ],
+    [
+     346,
+     -140
+    ],
+    [
+     344,
+     -104
+    ],
+    [
+     330,
+     -96
+    ],
+    [
+     312,
+     -112
+    ],
+    [
+     302,
+     -130
+    ]
+   ],
+   "src": "earth: review1 c7n top + o0 (2026-03-11), 神明崎公園 north of the shrine grove is bare sandy ground with play equipment and a gazebo, no car park and no cars ([v5:fix1])"
+  },
+  {
+   "use": "plaza",
+   "ring": [
+    [
+     287,
+     -132
+    ],
+    [
+     300,
+     -115
+    ],
+    [
+     305,
+     -100
+    ],
+    [
+     314,
+     -85
+    ],
+    [
+     319,
+     -70
+    ],
+    [
+     324,
+     -55
+    ],
+    [
+     326,
+     -45
+    ],
+    [
+     334,
+     -45
+    ],
+    [
+     332,
+     -55
+    ],
+    [
+     327,
+     -70
+    ],
+    [
+     322,
+     -85
+    ],
+    [
+     313,
+     -100
+    ],
+    [
+     308,
+     -115
+    ],
+    [
+     295,
+     -132
+    ]
+   ],
+   "src": "earth: review1 c7n top + o270 (2026-03-11), the west side of 神明崎 along r12722 is a pale concrete revetment walkway, not a sand beach ([v5:fix1]; the land cover read the strip as field and it drew as sand)"
+  }
+ ],
+ "roads": [
+  {
+   "id": "r12728",
+   "kind": "alley",
+   "width": 14,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees (the lane west and south of the store)"
+  },
+  {
+   "id": "r12744",
+   "kind": "alley",
+   "width": 12,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees (north of the store)"
+  },
+  {
+   "id": "r12749",
+   "kind": "alley",
+   "width": 12,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees"
+  },
+  {
+   "id": "r12750",
+   "kind": "alley",
+   "width": 12,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees"
+  },
+  {
+   "id": "r12746",
+   "kind": "alley",
+   "width": 12,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees"
+  },
+  {
+   "id": "r12730",
+   "kind": "alley",
+   "width": 12,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees"
+  },
+  {
+   "id": "r12743",
+   "kind": "alley",
+   "width": 10,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees (between the store and the stalls)"
+  },
+  {
+   "id": "r12747",
+   "kind": "alley",
+   "width": 10,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees"
+  },
+  {
+   "id": "r12745",
+   "kind": "alley",
+   "width": 8,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees"
+  },
+  {
+   "id": "r12748",
+   "kind": "alley",
+   "width": 8,
+   "src": "earth: sub-n top + o0 + l225, the コの字岸壁 is one asphalt apron round the car park: no kerbs, sidewalks or street trees"
+  },
+  {
+   "id": "r12720",
+   "width": 11,
+   "carriage": 9,
+   "src": "earth: sub-n top (o_e_road.jpg), the 気仙沼唐桑線 bend is about 17 m of asphalt with the service road; the app drew 8 m"
+  },
+  {
+   "id": "r12721",
+   "width": 11,
+   "carriage": 9,
+   "src": "earth: sub-n top (o_e_road.jpg), the 気仙沼唐桑線 bend is about 17 m of asphalt with the service road; the app drew 8 m"
+  },
+  {
+   "id": "r12719",
+   "width": 6.4,
+   "src": "earth: sub-n top (o_e_road.jpg), the 魚町 service road runs on the same asphalt as the 県道, about 6 m, not 4.4 m"
+  }
+ ]
+}

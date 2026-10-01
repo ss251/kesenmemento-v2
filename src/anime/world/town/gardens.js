@@ -53,7 +53,7 @@ export function buildGardens(ctx, lots, { lotIdx, roadIdx, heroZone, maxDist = 1
       const y = L.heightAt(x, z);
       const k = r();
       if (k < 0.45) shrubs.push({ x, y, z, s: 0.9 + r() * 0.9, h: 0.7 + r() * 0.6, rot: r() * 6.28 });
-      else if (k < 0.85) trees.push({ x, y, z, s: 2.8 + r() * 2.4, rot: r() * 6.28, autumn: r() < 0.22 });
+      else if (k < 0.85) trees.push({ x, y, z, s: 2.8 + r() * 2.4, rot: r() * 6.28, autumn: r() < 0.05 });   // [v5:fix1] few 紅葉 (was 22 %): the default view keeps the autumn tint <= 2 %
       else cedars.push({ x, y, z, s: 4 + r() * 3, rot: r() * 6.28 });
     }
   }

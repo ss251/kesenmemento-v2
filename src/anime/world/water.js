@@ -36,7 +36,7 @@ export function waterMaterial(ctx, o = {}) {
     uBbCore: { value: box(G.core) }, uBbCity: { value: box(G.city) },
     // [v3:fix] a touch less saturated (the bay read as flat poster blue); depth + wind bands carry the variation
     uShallow: { value: C(o.shallow || '#83c2bd') }, uMid: { value: C(o.mid || '#4a8fac') }, uDeep: { value: C(o.deep || '#336d95') }, uOcean: { value: C(o.ocean || '#2d5f88') },
-    uRiver: { value: C(o.river || '#6aa7a4') }, uFoam: { value: C('#f4f8f6') },
+    uRiver: { value: C(o.river || '#4f8fab') }, uFoam: { value: C('#f4f8f6') },   // [v5:fix1] river mouths in the bay's blue (was teal #6aa7a4)
     uSkyHorizon: sky?.uHorizon || { value: C('#dfe9f2') }, uSkyMid: sky?.uMid || { value: C('#8fbde9') }, uSkyWarm: sky?.uWarm || { value: C('#fbe3cf') },
     uNightW: sky?.uNight || { value: 0 },
     uDuskW: sky?.uDusk || { value: 0 },   // [v3:polish] ripple strokes a little stronger at dusk
@@ -104,6 +104,9 @@ export function waterMaterial(ctx, o = {}) {
           col = mix(col, uMid, (1.0 - smoothstep(7.0, 10.0, d)) * uNightW * 0.8);
           col = mix(col, uDeep, smoothstep(30.0, 150.0, d) * 0.85);
           col = mix(col, uOcean, smoothstep(600.0, 900.0, d));
+          // [v5:fix2] a deeper navy along the quay walls and seawalls (Google Earth 2026-03-11: the bay is darkest at the
+          // walls; the open bay stays the anime blue)
+          col = mix(col, uDeep * vec3(0.78, 0.82, 0.9), smoothstep(0.35, 0.8, hard) * (1.0 - smoothstep(3.0, 36.0, d)) * 0.55);
           col = mix(col, uRiver, river);
           col = mix(col, col * vec3(0.72, 0.84, 0.92), uSeasonW.w);   // [v3:integrate] winter sea
           col = mix(col, vec3(dot(col, vec3(0.3, 0.5, 0.2))) * vec3(0.9, 0.97, 1.08), uSeasonW.w * 0.45);   // [v3:fix] desaturated winter sea
@@ -165,11 +168,15 @@ export function waterMaterial(ctx, o = {}) {
           col = mix(col, uFoam, foam);
           // sky reflection + sun sparkles (emissive, so they survive the cel ramp and bloom)
           vec3 V = normalize(cameraPosition - vWp);
-          float fres = pow(1.0 - clamp(V.y, 0.0, 1.0), 4.0);
+          // [v5:fix2] the view angle is floored at ~5 deg: at an eye on the water line the fresnel sky took the whole
+          // surface and the bay washed out to near-white (review2 walk/w_8)
+          float fres = pow(1.0 - clamp(max(V.y, 0.085), 0.0, 1.0), 4.0);
           vec3 R = reflect(-V, vec3(0.0, 1.0, 0.0));
           vec3 S = normalize(uSunW);
           float sd = max(dot(R, S), 0.0);
-          vec3 skyC = mix(uSkyHorizon, uSkyMid, smoothstep(0.0, 0.5, R.y));
+          // [v5:fix3] the grazing reflection takes a sky-blue horizon (a third of the way to the mid sky), not the near-white
+          // haze line: low promenade / boat / drone views read the lower frame as a pale white sheet
+          vec3 skyC = mix(mix(uSkyHorizon, uSkyMid, 0.35), uSkyMid, smoothstep(0.0, 0.5, R.y));
           skyC = mix(skyC, uSkyZenith, smoothstep(0.45, 1.0, R.y) * afterglow);
           skyC = mix(skyC, uSkyWarm, pow(sd, 3.0) * 0.7);
           skyC = mix(skyC, mix(uSkyHorizon, vec3(0.93, 0.88, 0.9), 0.35), uMornW * 0.45);   // [v3:polish3] pearl morning sheen
@@ -177,6 +184,14 @@ export function waterMaterial(ctx, o = {}) {
           gWaterEmis = skyC * afterglow * (0.08 + 0.42 * fres) * (1.0 - foam);
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.12 + 0.03, ripL * (1.0 - foam));
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.84, 0.86, 0.94), ripD * (1.0 - foam));
+          // [v5:fix2] the quay walls mirror as a dark band at their foot, deeper the lower the view (it read as no
+          // reflection at all: walls standing on a flat pale sheet)
+          {
+            float wallK = smoothstep(0.35, 0.8, hard) * (1.0 - smoothstep(0.4, 7.5, sdf)) * (1.0 - foam) * (1.0 - 0.5 * uNightW);
+            float graze2 = pow(1.0 - clamp(V.y, 0.0, 1.0), 2.0);
+            diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.56, 0.62, 0.72), wallK * (0.3 + 0.5 * graze2));
+            gWaterEmis *= 1.0 - wallK * 0.6;
+          }
           gWaterEmis *= 1.0 + 0.35 * ripL - 0.3 * ripD;
           // [v3:integrate] night: warm broken columns of reflected light off the lit waterfront (anime light streaks,
           // anchored in world space across the view, strongest near the shore, fading with distance)

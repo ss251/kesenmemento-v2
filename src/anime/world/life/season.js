@@ -4,22 +4,26 @@
 // The sun and the time presets keep the demo day (Oct 10): the season is an art toggle, not a calendar.
 //
 //   const S = createSeason(ctx, { season })   ->  { id, list, set(id, { instant }), next(), update(dt), onChange(fn), mesh }
-// URL: ?season=spring|summer|autumn|winter (default autumn). Key: K cycles (the HUD's 季節 button too).
+// URL: ?season=spring|summer|autumn|winter (default autumn), or ?season=early ([v5:fix1] 早春 without snow, for Google
+// Earth comparisons). Key: K cycles the four seasons (the HUD's 季節 button too).
 import * as THREE from 'three';
-import { SEASONS, SEASON_INDEX, DEFAULT_SEASON, seasonUniform, seasonWeights } from '../../core/season.js';
+import { SEASONS, SEASON_INDEX, DEFAULT_SEASON, PRESETS, seasonUniform, seasonWeights, seasonExtra } from '../../core/season.js';
 
 const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
 
 export function createSeason(ctx, o = {}) {
-  const U = seasonUniform(ctx.shared);
-  let id = SEASON_INDEX[o.season] != null ? o.season : DEFAULT_SEASON;
-  seasonWeights(id, U.value);
+  const U = seasonUniform(ctx.shared), E = seasonExtra(U);
+  const known = (s) => SEASON_INDEX[s] != null || !!PRESETS[s];
+  const baseOf = (s) => PRESETS[s]?.base || s;
+  const extraOf = (s) => { const p = PRESETS[s]; E.value.set(p ? p.snow : 1, p ? p.dry : 0); };
+  let id = known(o.season) ? o.season : DEFAULT_SEASON;
+  seasonWeights(baseOf(id), U.value); extraOf(id);
   const from = new THREE.Vector4(), to = new THREE.Vector4();
   let tr = null;
   const listeners = new Set();
   const terrainU = () => ctx.services.environment?.terrainMaterial?.userData?.uniforms || null;
   const tu0 = terrainU();
-  const baseAutumn = tu0?.uAutumn?.value ?? 0.085;
+  const baseAutumn = tu0?.uAutumn?.value ?? 0.02;
   function apply() {
     const tu = terrainU();
     if (tu?.uAutumn) tu.uAutumn.value = baseAutumn * U.value.z;
@@ -29,10 +33,10 @@ export function createSeason(ctx, o = {}) {
   const mesh = buildParticles(ctx, U);
 
   function set(next, { instant = false } = {}) {
-    if (SEASON_INDEX[next] == null) return api;
-    id = next;
-    if (instant) { tr = null; seasonWeights(id, U.value); apply(); }
-    else { from.copy(U.value); seasonWeights(id, to); tr = { t: 0 }; }
+    if (!known(next)) return api;
+    id = next; extraOf(id);
+    if (instant) { tr = null; seasonWeights(baseOf(id), U.value); apply(); }
+    else { from.copy(U.value); seasonWeights(baseOf(id), to); tr = { t: 0 }; }
     for (const f of listeners) try { f(api); } catch (e) { console.error(e); }
     return api;
   }
@@ -47,7 +51,7 @@ export function createSeason(ctx, o = {}) {
   }
   const api = {
     get id() { return id; }, list: SEASONS, set, update, mesh,
-    next() { const i = SEASON_INDEX[id]; return set(SEASONS[(i + 1) % SEASONS.length].id); },
+    next() { const i = SEASON_INDEX[baseOf(id)]; return set(SEASONS[(i + 1) % SEASONS.length].id); },
     onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
   };
   ctx.services.season = api;
@@ -69,14 +73,14 @@ function buildParticles(ctx, U) {
   g.setAttribute('iSeed', new THREE.InstancedBufferAttribute(a, 4));
   g.instanceCount = N;
   const mat = new THREE.ShaderMaterial({
-    uniforms: { uTime: S.uTime, uWind: S.uWind || { value: new THREE.Vector2(0.5, 0) }, uSeasonS: U, uCam: { value: new THREE.Vector3() }, uBox: { value: BOX }, uNight: S.uNight || { value: 0 }, uAlt: { value: 0 } },
+    uniforms: { uTime: S.uTime, uWind: S.uWind || { value: new THREE.Vector2(0.5, 0) }, uSeasonS: U, uSeasonE: seasonExtra(U), uCam: { value: new THREE.Vector3() }, uBox: { value: BOX }, uNight: S.uNight || { value: 0 }, uAlt: { value: 0 } },
     vertexShader: /* glsl */`
-      attribute vec4 iSeed; uniform float uTime, uBox, uAlt; uniform vec2 uWind; uniform vec3 uCam; uniform vec4 uSeasonS;
+      attribute vec4 iSeed; uniform float uTime, uBox, uAlt; uniform vec2 uWind; uniform vec3 uCam; uniform vec4 uSeasonS; uniform vec2 uSeasonE;
       varying vec2 vUv; varying float vA; varying float vPetal; varying float vShade;
       void main(){
         vUv = uv;
         float petal = step(uSeasonS.w, uSeasonS.x);                 // spring petals, else winter snow
-        float amt = petal > 0.5 ? uSeasonS.x : uSeasonS.w;
+        float amt = petal > 0.5 ? uSeasonS.x : uSeasonS.w * uSeasonE.x;   // [v5:fix1] no flakes in the early-spring preset
         float fall = mix(0.9 + 0.5 * iSeed.w, 0.55 + 0.35 * iSeed.w, petal);
         float ph = iSeed.w * 40.0;
         vec3 sway = vec3(sin(uTime * (0.9 + iSeed.w) + ph), 0.0, cos(uTime * (0.7 + iSeed.w * 0.6) + ph * 1.3)) * mix(0.35, 0.8, petal);
@@ -120,7 +124,7 @@ function buildParticles(ctx, U) {
   ctx.add(mesh);
   const cam = ctx.camera;
   mesh.userData.update = () => {
-    const on = U.value.x + U.value.w > 0.01;
+    const on = U.value.x + U.value.w * (U.extra?.value.x ?? 1) > 0.01;
     mesh.visible = on;
     if (on && cam) {
       mat.uniforms.uCam.value.copy(cam.position);

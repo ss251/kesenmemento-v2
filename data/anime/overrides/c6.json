@@ -1,0 +1,1155 @@
+{
+ "version": 1,
+ "cell": "c6",
+ "bbox": [
+  -200,
+  -200,
+  300,
+  400
+ ],
+ "note": "魚町・南町・南町海岸 (PIER7, 迎, the inner-bay south shore) and the 柏崎 / 南町四丁目 hillside (ENU x -200..300, z -200..400). Read block by block from Google Earth 3D, imagery 2026-03-11 (raw/ref/earth/c6: the whole cell plus sub-cells sub-a..sub-f, each with a top view and 60-degree obliques), checked against the GSI photo and OSM.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/c6: top, o0..o270, l45, l225; sub-cells raw/ref/earth/c6/sub-a..sub-f)",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo data/ortho/core.jpg (z18, about 2020-2022), crops raw/ref/earth/c6/gsi_*.jpg"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap, raw/osm/overpass.json (OSM base 2026-05-06), © OpenStreetMap contributors (ODbL)",
+   "date": "2026-05-06"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58540/25068/305",
+   "roof": {
+    "shape": "hip"
+   },
+   "src": "earth: 森産婦人科医院 has an orange-brown hipped roof with clear ridges, not a flat deck (sub-a top p_-116_-200; GSI agrees)"
+  },
+  {
+   "id": "16/58540/25068/330",
+   "roof": {
+    "shape": "flat",
+    "color": "#9c9ea0"
+   },
+   "src": "earth: flat light grey roof (sub-a top t7)"
+  },
+  {
+   "id": "16/58540/25068/322",
+   "roof": {
+    "color": "#b2b4b6"
+   },
+   "src": "earth: 大鍋屋 roof is light grey, not blue (sub-a top, rs_aa)"
+  },
+  {
+   "id": "16/58540/25068/285",
+   "roof": {
+    "color": "#9aa2a4"
+   },
+   "src": "earth: light grey roof (sub-a top, rs_aa)"
+  },
+  {
+   "id": "16/58540/25068/398",
+   "roof": {
+    "color": "#a8a6a2"
+   },
+   "src": "earth: grey deck with marked stalls, not a white roof (sub-a top p_-32_-200)"
+  },
+  {
+   "id": "16/58540/25068/385",
+   "roof": {
+    "color": "#c6c2bc"
+   },
+   "src": "earth: pale grey roof, not dark blue (sub-e top, rs_ab)"
+  },
+  {
+   "id": "16/58541/25068/45",
+   "kind": "office",
+   "storeys": 2,
+   "height": 7,
+   "roof": {
+    "shape": "flat",
+    "color": "#4c505a"
+   },
+   "facade": "office",
+   "src": "earth: a 2-storey flat-roofed block with a dark roof and a pale low annex, not a 7 m green gabled warehouse (sub-b top t9; o180 t10)"
+  },
+  {
+   "id": "16/58541/25068/48",
+   "storeys": 2,
+   "height": 7,
+   "roof": {
+    "shape": "flat",
+    "color": "#b8bab8"
+   },
+   "src": "earth: a low 2-storey flat-roofed building; no 5-storey office stands here (sub-b o180 t11, sub-a o0 t12)"
+  },
+  {
+   "id": "16/58541/25068/20",
+   "roof": {
+    "color": "#9a9a9c"
+   },
+   "src": "earth: light grey pyramid roof (sub-a top t7, rs_ac)"
+  },
+  {
+   "id": "16/58541/25068/53",
+   "roof": {
+    "color": "#6e6460"
+   },
+   "src": "earth: brown-grey roof, not pale blue (sub-b top, rs_ad)"
+  },
+  {
+   "id": "16/58540/25068/343",
+   "roof": {
+    "color": "#6c7076"
+   },
+   "src": "earth: クボタスポーツ has a dark grey roof, not blue (sub-c top t21, rs_aa)"
+  },
+  {
+   "id": "16/58540/25068/341",
+   "roof": {
+    "color": "#464c56"
+   },
+   "src": "earth: 原田新聞店 roof is dark, not pale blue (sub-c top, rs_aa)"
+  },
+  {
+   "id": "16/58540/25068/336",
+   "roof": {
+    "color": "#8e8a86"
+   },
+   "src": "earth: taupe grey roof, not teal (sub-c top, rs_aa)"
+  },
+  {
+   "id": "16/58540/25068/371",
+   "roof": {
+    "color": "#8e9092"
+   },
+   "src": "earth: 南町1丁目共同化建物 has a mid-grey ribbed roof, not pale blue (sub-c top p_-200_70)"
+  },
+  {
+   "id": "16/58540/25068/345",
+   "roof": {
+    "color": "#5a5e64"
+   },
+   "src": "earth: あさひ鮨 roof is dark grey, not teal (sub-c top p_-200_70)"
+  },
+  {
+   "id": "16/58540/25068/296",
+   "roof": {
+    "color": "#9c9c9c"
+   },
+   "src": "earth: a grey ribbed roof, not white (sub-c top p_-200_0, p_-116_0)"
+  },
+  {
+   "id": "16/58540/25068/358",
+   "storeys": 3,
+   "height": 9.9,
+   "src": "earth: its shadow is no longer than that of the 3-storey row across the street; no 4-storey block on this lane (sub-c top t19; o0 obl4)"
+  },
+  {
+   "id": "16/58540/25068/368",
+   "storeys": 3,
+   "height": 9.9,
+   "src": "earth: as 08:358, about three storeys from the shadow (sub-c top t19; o0 obl4)"
+  },
+  {
+   "id": "16/58540/25068/390",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#9ea09e"
+   },
+   "src": "earth: a flat light grey roof in the 内湾地区駐車場, not a dark hipped house (sub-c top p_-32_140)"
+  },
+  {
+   "id": "16/58541/25068/62",
+   "remove": true,
+   "src": "earth: this is the PIER7 bay-cruise pontoon with a low white membrane canopy (drawn by harbor/minami.js), not a 7.8 m warehouse (sub-c top p_-32_0)"
+  },
+  {
+   "id": "16/58541/25068/63",
+   "remove": true,
+   "src": "earth: the second pontoon with a membrane canopy and boats alongside, not a 7.1 m warehouse (sub-d top, rs_ad)"
+  },
+  {
+   "id": "16/58541/25068/66",
+   "remove": true,
+   "src": "earth: open asphalt, no building east of PIER7 (sub-d top p_50_60); the GSI hut was a construction-era cabin"
+  },
+  {
+   "id": "16/58541/25068/85",
+   "kind": "warehouse",
+   "storeys": 1,
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#9a9ea2"
+   },
+   "facade": "plain",
+   "src": "earth: a cluster of single-storey grey-roofed sheds, not a 4-storey office block (sub-d o0 t15, o180 t14)"
+  },
+  {
+   "id": "16/58541/25068/81",
+   "roof": {
+    "color": "#7c625c"
+   },
+   "src": "earth: brown roof, not slate blue (sub-d top p_134_60)"
+  },
+  {
+   "id": "16/58541/25068/79",
+   "roof": {
+    "color": "#a65c50"
+   },
+   "src": "earth: red roof (GSI agrees), not pale grey (sub-d top, rs_ad)"
+  },
+  {
+   "id": "16/58540/25069/230",
+   "roof": {
+    "color": "#62666e"
+   },
+   "src": "earth: dark grey roof, not white (sub-e top, rs_ab)"
+  },
+  {
+   "id": "16/58540/25069/245",
+   "roof": {
+    "color": "#62666c"
+   },
+   "src": "earth: dark grey roof, not white (sub-e top, rs_ab)"
+  },
+  {
+   "id": "16/58541/25068/155",
+   "roof": {
+    "color": "#7c5a54"
+   },
+   "src": "earth: maroon-brown roof, as on the GSI photo (sub-f top, rs_ac)"
+  },
+  {
+   "id": "16/58541/25068/161",
+   "roof": {
+    "color": "#80838a"
+   },
+   "src": "earth: re-roofed grey since the GSI photo (bright blue there) (sub-f top, rs_ac)"
+  },
+  {
+   "id": "16/58541/25068/87",
+   "roof": {
+    "color": "#585c64"
+   },
+   "src": "earth: dark grey roof (sub-f top, rs_ad)"
+  },
+  {
+   "id": "16/58541/25069/111",
+   "roof": {
+    "color": "#d0ccc4"
+   },
+   "src": "earth: off-white roof now (blue on the GSI photo) (sub-f top, rs_ad)"
+  },
+  {
+   "id": "16/58541/25069/114",
+   "roof": {
+    "color": "#8a8c90"
+   },
+   "src": "earth: mid grey roof, not dark blue (sub-f top, rs_ad)"
+  },
+  {
+   "id": "16/58541/25069/129",
+   "roof": {
+    "color": "#7a5652"
+   },
+   "src": "earth: maroon roof (GSI agrees), not grey (sub-f top, rs_ad)"
+  },
+  {
+   "id": "16/58541/25069/146",
+   "roof": {
+    "color": "#8a8a8e"
+   },
+   "src": "earth: mid grey roof (sub-f top, rs_ae)"
+  },
+  {
+   "id": "16/58541/25069/151",
+   "roof": {
+    "color": "#40465a"
+   },
+   "src": "earth: dark navy roof (sub-f top, rs_ae)"
+  },
+  {
+   "id": "16/58541/25069/154",
+   "roof": {
+    "color": "#8a6a62"
+   },
+   "src": "earth: brown roof, not green (sub-f top, rs_ae)"
+  },
+  {
+   "id": "16/58541/25069/162",
+   "roof": {
+    "color": "#9a6a66"
+   },
+   "src": "earth: dull red roof now (cyan on the GSI photo) (sub-f top, rs_ae)"
+  },
+  {
+   "id": "16/58541/25069/182",
+   "roof": {
+    "color": "#a25c52"
+   },
+   "src": "earth: long red roof (GSI agrees) (sub-f top, rs_ae)"
+  },
+  {
+   "id": "16/58541/25069/332",
+   "roof": {
+    "color": "#b4b4b0"
+   },
+   "src": "earth: light grey roof, not dark blue (sub-f top, rs_ae)"
+  },
+  {
+   "id": "16/58541/25069/68",
+   "roof": {
+    "color": "#40485a"
+   },
+   "src": "earth: dark navy roof now (cyan on the GSI photo) (sub-f top, rs_af)"
+  },
+  {
+   "id": "16/58541/25069/70",
+   "roof": {
+    "color": "#4c505c"
+   },
+   "src": "earth: dark roof, not pale (sub-f top, rs_af)"
+  },
+  {
+   "id": "16/58541/25069/81",
+   "roof": {
+    "color": "#8e8e92"
+   },
+   "src": "earth: mid grey roof, not dark slate (sub-f top, rs_af)"
+  }
+ ],
+ "newLots": [
+  {
+   "id": "ovr:c6:uomachi-w1",
+   "poly": [
+    [
+     -70,
+     -68
+    ],
+    [
+     -56,
+     -68
+    ],
+    [
+     -56,
+     -45
+    ],
+    [
+     -70,
+     -45
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 2,
+   "height": 7.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#9a9c9c"
+   },
+   "facade": "shop",
+   "src": "earth: new 2-storey flat-roofed block on the formerly vacant 魚町 lot, light grey roof, its shadow as long as 男山's (sub-a top, t4; o0)"
+  },
+  {
+   "id": "ovr:c6:uomachi-w2",
+   "poly": [
+    [
+     -69,
+     -95
+    ],
+    [
+     -56,
+     -95
+    ],
+    [
+     -56,
+     -80
+    ],
+    [
+     -69,
+     -80
+    ]
+   ],
+   "kind": "office",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#a4a6a4"
+   },
+   "facade": "office",
+   "src": "earth: new 2-storey building with a white rooftop box, north end of the block (sub-a top, t4; o0, o180)"
+  },
+  {
+   "id": "ovr:c6:uomachi-e1",
+   "poly": [
+    [
+     -13.5,
+     -73
+    ],
+    [
+     0.3,
+     -73
+    ],
+    [
+     0.3,
+     -55
+    ],
+    [
+     -13.5,
+     -55
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 1,
+   "height": 4.2,
+   "roof": {
+    "shape": "flat",
+    "color": "#c6bdac"
+   },
+   "facade": "shop",
+   "src": "earth: new single-storey shop with a beige flat roof, not in the footprints (sub-a top, t7; o0 t8)"
+  },
+  {
+   "id": "ovr:c6:uomachi-e2",
+   "poly": [
+    [
+     -14,
+     -85
+    ],
+    [
+     1.4,
+     -85
+    ],
+    [
+     1.4,
+     -73.5
+    ],
+    [
+     -14,
+     -73.5
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 1,
+   "height": 4.8,
+   "roof": {
+    "shape": "flat",
+    "color": "#4c505a"
+   },
+   "facade": "plain",
+   "src": "earth: dark-roofed single-storey annex north of it (sub-a top, t7; o0 t8)"
+  },
+  {
+   "id": "ovr:c6:uomachi-n0",
+   "poly": [
+    [
+     27,
+     -121
+    ],
+    [
+     37,
+     -121
+    ],
+    [
+     37,
+     -113.5
+    ],
+    [
+     27,
+     -113.5
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#55585e"
+   },
+   "facade": "shop",
+   "src": "earth: dark flat-roofed 2-storey building on 魚町 street (sub-a top t7; sub-b o180 t10)"
+  },
+  {
+   "id": "ovr:c6:uomachi-n1",
+   "poly": [
+    [
+     28,
+     -113.5
+    ],
+    [
+     38.6,
+     -113.5
+    ],
+    [
+     38.6,
+     -99.5
+    ],
+    [
+     28,
+     -99.5
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#7c5a5c"
+   },
+   "facade": "house",
+   "src": "earth: 2-storey with a maroon roof (sub-b top t9; o180 t10)"
+  },
+  {
+   "id": "ovr:c6:uomachi-n2",
+   "poly": [
+    [
+     38.5,
+     -106
+    ],
+    [
+     51,
+     -106
+    ],
+    [
+     51,
+     -81
+    ],
+    [
+     38.5,
+     -81
+    ]
+   ],
+   "kind": "office",
+   "storeys": 2,
+   "height": 7,
+   "roof": {
+    "shape": "flat",
+    "color": "#8e9092"
+   },
+   "facade": "office",
+   "src": "earth: 2-storey grey flat-roofed block with a white parapet, east of 18:20 (sub-b top t9; o180 t10)"
+  },
+  {
+   "id": "ovr:c6:uomachi-b5",
+   "poly": [
+    [
+     171,
+     -180.5
+    ],
+    [
+     190,
+     -180.5
+    ],
+    [
+     190,
+     -159.5
+    ],
+    [
+     171,
+     -159.5
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "height": 6.2,
+   "roof": {
+    "shape": "hip",
+    "color": "#3e4452"
+   },
+   "facade": "house",
+   "src": "earth: dark slate hipped house, also on the GSI photo but missing from the footprints (sub-b top p_134_-200; o180 t11)"
+  },
+  {
+   "id": "ovr:c6:uomachi-b4",
+   "poly": [
+    [
+     179,
+     -193
+    ],
+    [
+     192,
+     -193
+    ],
+    [
+     192,
+     -180.5
+    ],
+    [
+     179,
+     -180.5
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 1,
+   "height": 4.2,
+   "roof": {
+    "shape": "shed",
+    "color": "#c4c4c0"
+   },
+   "facade": "shop",
+   "src": "earth: single-storey building with a pale roof north of it (sub-b top p_134_-200; o180 t11)"
+  },
+  {
+   "id": "ovr:c6:minami-solar",
+   "poly": [
+    [
+     -80.8,
+     36
+    ],
+    [
+     -70.3,
+     32.3
+    ],
+    [
+     -62,
+     49.5
+    ],
+    [
+     -72.5,
+     53.3
+    ]
+   ],
+   "kind": "warehouse",
+   "storeys": 1,
+   "height": 3.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#424a60"
+   },
+   "facade": "plain",
+   "src": "earth: a single-storey shed with a solar-panel roof in the middle of the car park (sub-c top p_-116_0)"
+  },
+  {
+   "id": "ovr:c6:kashizaki-h1",
+   "poly": [
+    [
+     188.4,
+     331.8
+    ],
+    [
+     201.6,
+     325.8
+    ],
+    [
+     204.6,
+     341.4
+    ],
+    [
+     191.4,
+     347.4
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "height": 6.2,
+   "roof": {
+    "shape": "hip",
+    "color": "#4e525a"
+   },
+   "facade": "house",
+   "src": "earth: a large house with a dark grey hipped roof on the 柏崎 slope, not in the footprints (sub-f top t22)"
+  },
+  {
+   "id": "ovr:c6:kashizaki-h1g",
+   "poly": [
+    [
+     202.8,
+     328.2
+    ],
+    [
+     213,
+     325.8
+    ],
+    [
+     216.6,
+     339.6
+    ],
+    [
+     205.2,
+     341.4
+    ]
+   ],
+   "kind": "house",
+   "storeys": 1,
+   "height": 3.2,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8d6d0"
+   },
+   "facade": "plain",
+   "src": "earth: its white flat-roofed single-storey wing (sub-f top t22)"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -72,
+     -80
+    ],
+    [
+     -57,
+     -80
+    ],
+    [
+     -57,
+     -69
+    ],
+    [
+     -72,
+     -69
+    ]
+   ],
+   "src": "earth: car park with diagonal stalls between the two new blocks (sub-a top, t4)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -55,
+     -70
+    ],
+    [
+     -46,
+     -70
+    ],
+    [
+     -46,
+     -47
+    ],
+    [
+     -55,
+     -47
+    ]
+   ],
+   "src": "earth: a row of marked stalls east of the new block (sub-a top, t4)"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -52,
+     -100
+    ],
+    [
+     -25,
+     -100
+    ],
+    [
+     -25,
+     -74
+    ],
+    [
+     -45,
+     -74
+    ],
+    [
+     -52,
+     -82
+    ]
+   ],
+   "surface": "weeds",
+   "src": "earth: bare earth and dry weeds, still vacant (sub-a top, t4; o0)"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -20,
+     -108
+    ],
+    [
+     19,
+     -108
+    ],
+    [
+     20,
+     -100
+    ],
+    [
+     10,
+     -86
+    ],
+    [
+     -20,
+     -86
+    ]
+   ],
+   "surface": "gravel",
+   "src": "earth: bare gravel lot with a parked lorry (sub-a top, t7)"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     51,
+     -126
+    ],
+    [
+     68,
+     -126
+    ],
+    [
+     70,
+     -82
+    ],
+    [
+     53,
+     -80
+    ]
+   ],
+   "surface": "gravel",
+   "src": "earth: open gravel lot east of the new row (sub-b top t9)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     20.5,
+     -116
+    ],
+    [
+     27,
+     -116
+    ],
+    [
+     27,
+     -102
+    ],
+    [
+     20.5,
+     -102
+    ]
+   ],
+   "src": "earth: marked stalls beside the new row (sub-b top t9)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -90,
+     -176
+    ],
+    [
+     -79,
+     -176
+    ],
+    [
+     -79,
+     -140
+    ],
+    [
+     -90,
+     -140
+    ]
+   ],
+   "src": "earth: marked stalls with parked cars east of the 魚町 back lane (sub-a top, t20)"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     262,
+     -185
+    ],
+    [
+     302,
+     -189
+    ],
+    [
+     318,
+     -162
+    ],
+    [
+     306,
+     -150
+    ],
+    [
+     281,
+     -150
+    ],
+    [
+     262,
+     -158
+    ]
+   ],
+   "src": "earth: review1 c7n top + o0 (2026-03-11), the root of 神明崎 is two bare grey gravel fields with no stalls and no parked cars ([v5:fix1]; was an open car park from sub-b top p_218_-200)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -90,
+     6
+    ],
+    [
+     -63,
+     4
+    ],
+    [
+     -55,
+     40
+    ],
+    [
+     -57,
+     62
+    ],
+    [
+     -80,
+     66
+    ],
+    [
+     -112,
+     63
+    ],
+    [
+     -112,
+     42
+    ],
+    [
+     -92,
+     40
+    ]
+   ],
+   "holes": [
+    [
+     [
+      -80.8,
+      36
+     ],
+     [
+      -70.3,
+      32.3
+     ],
+     [
+      -62,
+      49.5
+     ],
+     [
+      -72.5,
+      53.3
+     ]
+    ]
+   ],
+   "src": "earth: a full car park with marked stalls between 七十七銀行 and 結, not a lawn (sub-c top p_-116_0)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -164,
+     74
+    ],
+    [
+     -155,
+     69
+    ],
+    [
+     -145,
+     88
+    ],
+    [
+     -152,
+     97
+    ],
+    [
+     -163,
+     100
+    ]
+   ],
+   "src": "earth: car park with angled stalls between クボタスポーツ and 08:348 (sub-c top t21)"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -112,
+     141
+    ],
+    [
+     -58,
+     141
+    ],
+    [
+     -57,
+     160
+    ],
+    [
+     -60,
+     176
+    ],
+    [
+     -108,
+     160
+    ]
+   ],
+   "surface": "gravel",
+   "src": "earth: unpaved gravel lot used for parking, south-west of 拓 (sub-c top p_-116_140)"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     18,
+     236
+    ],
+    [
+     50,
+     182
+    ],
+    [
+     79,
+     148
+    ],
+    [
+     108,
+     174
+    ],
+    [
+     90,
+     198
+    ],
+    [
+     70,
+     214
+    ],
+    [
+     52,
+     212
+    ]
+   ],
+   "surface": "gravel",
+   "replace": true,
+   "src": "earth: the former brownfield is now two levelled grey gravel lots, not bare brown earth (sub-d top t13)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -27,
+     227
+    ],
+    [
+     4,
+     242
+    ],
+    [
+     -6,
+     262
+    ],
+    [
+     -38,
+     247
+    ]
+   ],
+   "src": "earth: car park with angled stalls south of 南町1丁目共同化建物, not bare ground (sub-e top t23)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     33,
+     249
+    ],
+    [
+     50,
+     243
+    ],
+    [
+     50,
+     266
+    ],
+    [
+     35,
+     270
+    ]
+   ],
+   "src": "earth: marked stalls east of the 南町四丁目 road (sub-e top t23)"
+  },
+  {
+   "use": "apron",
+   "ring": [
+    [
+     19,
+     77
+    ],
+    [
+     44,
+     64
+    ],
+    [
+     51,
+     68.6
+    ],
+    [
+     96,
+     87
+    ],
+    [
+     104,
+     100
+    ],
+    [
+     97,
+     110
+    ],
+    [
+     72,
+     116
+    ],
+    [
+     50,
+     110
+    ],
+    [
+     33,
+     95
+    ]
+   ],
+   "src": "earth: pier7 top (raw/ref/earth/pier7/earth_top.png, crop at 3.5 px/m) + o180, the quay yard between PIER7 and the water is plain dark asphalt (Earth #807b83, the same tone as the streets), not pale ground; no stall lines"
+  },
+  {
+   "use": "apron",
+   "ring": [
+    [
+     -14.3,
+     -20
+    ],
+    [
+     1.4,
+     -20
+    ],
+    [
+     20,
+     22.9
+    ],
+    [
+     3.6,
+     30
+    ],
+    [
+     -5.7,
+     14.3
+    ],
+    [
+     -12.9,
+     -8.6
+    ]
+   ],
+   "src": "earth: pier7 top + o180, the strip between the 迎 lawn and the quay edge, north of the stepped garden, is dark asphalt (Earth #817b82)"
+  }
+ ]
+}

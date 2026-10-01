@@ -41,7 +41,7 @@ export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades, runs: g
     have.forEach(addH);
     const nearPole = (x, z, d) => { const i0 = Math.floor(x / HC), j0 = Math.floor(z / HC); for (let i = i0 - 1; i <= i0 + 1; i++) for (let j = j0 - 1; j <= j0 + 1; j++) for (const p of hg.get(i + ',' + j) || []) if (Math.hypot(p[0] - x, p[1] - z) < d) return true; return false; };
     for (const r of lanes || L.ROADS) {
-      if ((!lanes && r.zone !== 'hero') || r.width < 2.8 || r.kind === 'bridge') continue;
+      if ((!lanes && r.zone !== 'hero') || r.width < 2.8 || r.kind === 'bridge' || r.tunnel) continue;
       let len = 0; for (let i = 1; i < r.pts.length; i++) len += Math.hypot(r.pts[i][0] - r.pts[i - 1][0], r.pts[i][1] - r.pts[i - 1][1]);
       if (len < 22) continue;
       const pts = [];

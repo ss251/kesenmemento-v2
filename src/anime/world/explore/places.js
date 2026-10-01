@@ -191,15 +191,21 @@ export function walkFraming(L, net, x, z, { inLot = () => false, lotAt = null, s
  * screenshot, qa3 near-depth check): the place is behind a grove, a skylight roof, a pole or a slope.
  */
 export const WALK_SET = {
-  // 海の市: across the 魚市場前 road from the south, the whole 73 m front with the shark museum wing (the computed spot
-  // stood on the market's skylight roof)
-  uminoichi: { x: 381, z: 732, yaw: -9.8, pitch: 5, dist: 64.9 },
+  // 海の市: [v5:fix2] from the SW corner of the block, the west face (「気仙沼 海の市 / シャークミュージアム」) and the south
+  // face in one view. The v5 spot across the 魚市場前 road (381, 732) was walled in by the new 3-storey office
+  // (c11.json#newLots/0 at (375, 713)) and the 4-storey lots at (404, 716) / (406, 710): a 15 m slot onto the 73 m front
+  // [v5:fix2 art] (350, 690) cut the A-frame off at the left edge (raw/ref/fix2b/s1_2.png); 40 m further back down the same
+  // road (walkprobe's renderer-depth pick, s1_0.png) the whole red block, both panels and the shark wing are in frame
+  uminoichi: { x: 311.7, z: 704, yaw: -60, pitch: 5, dist: 89.2 },
   // 気仙沼市役所 本庁舎: from the forecourt road below ワン・テン, the 74 m front on its terrace, diagonally (the computed
   // spot stood in the grove behind the hall)
   'lm-cityHall': { x: -458, z: -200, yaw: -43.2, pitch: 4, dist: 43.9 },
   // 五十鈴神社: on the stone stair (a walk ramp), 4 m below the old spot, looking up the flight at the hall (362.4, -125)
   // [v4:polish2] (the old yaw -126.5 framed the 社務所 and the stair treads filled the near frame: near6m 0.28)
-  isuzu: { x: 351.8, z: -142.2, yaw: -148.5, pitch: 12, dist: 20.2 },
+  // [v5:fix3] 2.4 m further up the flight, turned 13 deg toward the 向拝 (shinmei.js): the hall front with its timber
+  // posts, lantern and plaque at the top of the stair (review3 walk/sh_isuzu framed a blank wall over the bank with the
+  // handrail filling the frame); renderer check: near6m 0.20, aim 17.7 deg off the stop's look point
+  isuzu: { x: 354, z: -141.3, yaw: -135, pitch: 13, dist: 18.3 },
   // 気仙沼大橋 over 大川: on the south levee road downstream, the bridge across the river (the computed spot stood on the
   // deck itself, looking along it)
   kesennumaOhashi: { x: -233, z: 1267, yaw: 31, pitch: 2, dist: 93.3 },

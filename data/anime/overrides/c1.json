@@ -1,0 +1,391 @@
+{
+ "version": 1,
+ "cell": "c1",
+ "bbox": [
+  -700,
+  -800,
+  -200,
+  -200
+ ],
+ "note": "八日町 city-hall campus, 三日町・福美町 hillside houses, 松尾神社, 愛宕神社, 赤土山 and the 安波山 slope. Read block by block from Earth top views of five sub-cells (raw/ref/earth/c1/{A,B,C,D,N}, contact sheets raw/ref/earth/c1/sheets) against the GSI photo and footprints.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth 3D, imagery dated 2026-03-11, top and oblique views of c1 and its sub-cells A B C D N (raw/ref/earth/c1, reference only)",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "gsi",
+   "what": "GSI seamless aerial photo z18 (data/ortho/core.jpg, about 2020-2022) and the GSI road centre-line class (RdCL code 2714 = in a tunnel)"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap (c) OpenStreetMap contributors, ODbL: tunnel=yes on the 大船渡線BRT ways"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58540/25067/26",
+   "remove": true,
+   "src": "earth: no building; the 180 m2 lot is part of the 第二庁舎 car park with vans and trucks parked on it (sub B top, sheets ABC #70); the GSI photo still shows the old shed"
+  },
+  {
+   "id": "16/58540/25067/20",
+   "remove": true,
+   "src": "earth: bare soil and dry brush between 第三庁舎 and 東分庁舎, no roof (sub B top, crops/B_ne.jpg, sheets ABC #88); demolished after the GSI photo"
+  },
+  {
+   "id": "16/58540/25067/28",
+   "remove": true,
+   "src": "earth: bare soil with a track, no roof (sub C top, sheets ABC #90); the red-roofed house on the GSI photo is gone"
+  },
+  {
+   "id": "16/58539/25067/324",
+   "remove": true,
+   "src": "earth: asphalt with parked cars in the car park north-west of the city hall, no building (crops/B_park1.jpg, sheets ABC #42)"
+  },
+  {
+   "id": "16/58539/25067/338",
+   "remove": true,
+   "src": "earth: brush and rubble where the western of the two cyan-roofed houses stood; its neighbour 58539/25067/337 remains (crops/B_338.jpg vs crops/gsi_338.jpg)"
+  },
+  {
+   "id": "16/58539/25067/290",
+   "remove": true,
+   "src": "earth: bare brush slope, no roof (sub A top, sheets ABC #23); the teal-roofed house on the GSI photo is gone"
+  },
+  {
+   "id": "16/58539/25067/296",
+   "remove": true,
+   "src": "earth: bare ground, no roof where the GSI photo shows a 15 m2 shed (sub A top, sheets ABC #32)"
+  },
+  {
+   "id": "16/58540/25067/19",
+   "remove": true,
+   "src": "earth: the 7 m2 outline lies on the BRT roadway north of 第二庁舎, no structure (sub B top, sheets ABC #64)"
+  },
+  {
+   "id": "16/58540/25067/0",
+   "remove": true,
+   "src": "earth: grass and brush slope below 赤土山, no roof; the GSI photo shows grass too (sub D top, sheets D #15)"
+  },
+  {
+   "id": "16/58539/25067/329",
+   "remove": true,
+   "src": "earth: grass slope, no roof; none on the GSI photo either (sub D top, sheets D #16)"
+  },
+  {
+   "id": "16/58539/25067/279",
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#7a4c44"
+   },
+   "src": "earth: a two-storey house with a dark brown-maroon gable roof, not a 3-storey flat-roofed shop (sub A top, sheets ABC #4); the GSI photo shows the same ridge"
+  },
+  {
+   "id": "16/58539/25067/261",
+   "roof": {
+    "shape": "gable",
+    "color": "#b8645a"
+   },
+   "src": "earth: salmon-red gable roof (sub A top, sheets ABC #49)"
+  },
+  {
+   "id": "16/58539/25067/280",
+   "roof": {
+    "color": "#b8b8bc"
+   },
+   "src": "earth: light grey metal roof; the cyan on the GSI photo is its colour cast (sub A top, sheets ABC #5)"
+  },
+  {
+   "id": "16/58539/25067/291",
+   "roof": {
+    "color": "#c4c4c8"
+   },
+   "src": "earth: pale grey shed roof, not cyan (sub A top, sheets ABC #7)"
+  },
+  {
+   "id": "16/58539/25067/337",
+   "roof": {
+    "color": "#a8b4c0"
+   },
+   "src": "earth: light blue-grey gable roof (crops/B_338.jpg); the saturated cyan came from the GSI photo cast"
+  },
+  {
+   "id": "16/58539/25067/335",
+   "roof": {
+    "color": "#b4b4b0"
+   },
+   "src": "earth: light grey flat roof (crops/B_338.jpg, sheets ABC #101)"
+  },
+  {
+   "id": "16/58539/25067/340",
+   "roof": {
+    "color": "#7a4046"
+   },
+   "src": "earth: maroon low-pitched roof west of 第三庁舎 (sub B top, sheets ABC #87)"
+  },
+  {
+   "id": "16/58539/25067/333",
+   "roof": {
+    "shape": "gable",
+    "color": "#8e4540"
+   },
+   "src": "earth: long red-brown gable roof (sub B top, crops/B_park1.jpg bottom, sheets ABC #76)"
+  },
+  {
+   "id": "16/58539/25068/15",
+   "roof": {
+    "color": "#9ca0a4"
+   },
+   "src": "earth: light grey roof along the west wall of the city hall, not dark slate (sub B top, sheets ABC #136)"
+  },
+  {
+   "id": "16/58540/25067/43",
+   "roof": {
+    "color": "#a4a8ac"
+   },
+   "src": "earth: light grey roof, not dark blue (sub C top, sheets ABC #110)"
+  },
+  {
+   "id": "16/58540/25067/54",
+   "roof": {
+    "color": "#b4bcc8"
+   },
+   "src": "earth: pale blue-grey roof; the neon cyan came from the GSI photo cast (sub C top, sheets ABC #47)"
+  },
+  {
+   "id": "16/58540/25068/20",
+   "roof": {
+    "color": "#c8ccd0"
+   },
+   "src": "earth: white-grey gable roof (sub C top, sheets ABC #138)"
+  },
+  {
+   "id": "16/58540/25068/44",
+   "roof": {
+    "shape": "flat",
+    "color": "#8c9294"
+   },
+   "src": "earth: mid-grey flat roof with a rooftop tank, not a hip roof (sub C top, sheets ABC #159; Earth roof #737d7f); flat roofs render about 1.4x brighter than the layout colour, so the colour is set below the Earth sample"
+  },
+  {
+   "id": "16/58540/25068/81",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#a8584a"
+   },
+   "src": "earth: 安藤ハザマ is a two-storey block under a red gable roof with its car park alongside, not a 4-storey white office (C/earth_o0.png, sub C top, sheets ABC #158)"
+  },
+  {
+   "id": "16/58540/25068/109",
+   "roof": {
+    "shape": "gable",
+    "color": "#b8645a"
+   },
+   "src": "earth: みのり市 has a long salmon-red pitched roof (C/earth_o0.png, sub C top, sheets ABC #156)"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "parking",
+   "name": "市役所北駐車場",
+   "ring": [
+    [
+     -519,
+     -330
+    ],
+    [
+     -504,
+     -343
+    ],
+    [
+     -497,
+     -338
+    ],
+    [
+     -483,
+     -320
+    ],
+    [
+     -482,
+     -306
+    ],
+    [
+     -500,
+     -304
+    ],
+    [
+     -512,
+     -314
+    ]
+   ],
+   "src": "earth: asphalt car park with about 15 cars north-west of the city hall (crops/B_park1.jpg)"
+  },
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -423,
+     -279
+    ],
+    [
+     -380,
+     -304
+    ],
+    [
+     -372,
+     -300
+    ],
+    [
+     -363,
+     -283
+    ],
+    [
+     -368,
+     -277
+    ],
+    [
+     -400,
+     -274
+    ],
+    [
+     -420,
+     -272
+    ]
+   ],
+   "src": "earth: the 第二庁舎 car park, rows of cars along the building and vans and trucks at its east end (crops/B_park2.jpg, crops/B_ne.jpg)"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     -408,
+     -270
+    ],
+    [
+     -372,
+     -276
+    ],
+    [
+     -360,
+     -263
+    ],
+    [
+     -366,
+     -258
+    ],
+    [
+     -398,
+     -259
+    ],
+    [
+     -410,
+     -262
+    ]
+   ],
+   "src": "earth: bare soil and dry brush where two houses stood between 第三庁舎 and 東分庁舎 (crops/B_park2.jpg)"
+  },
+  {
+   "use": "felled",
+   "ring": [
+    [
+     -267.6,
+     -323.8
+    ],
+    [
+     -240.4,
+     -321.1
+    ],
+    [
+     -218.6,
+     -271.9
+    ],
+    [
+     -204.3,
+     -233.6
+    ],
+    [
+     -202.3,
+     -207.0
+    ],
+    [
+     -220.6,
+     -207.0
+    ],
+    [
+     -234.9,
+     -233.6
+    ],
+    [
+     -256.8,
+     -269.1
+    ]
+   ],
+   "src": "earth 2026-03-11 (raw/ref/earth/review2-8851/c1-c top, pair_top; c1-d pair_o0): a felled strip of bare brown ground with stumps and a few standing trees on the slope above 八日町, east of 火除稲荷大明神; the app drew round green crowns over lawn there. Positions read off the top annotation and checked against the same-camera app render (shifted 11 m east to match)"
+  },
+  {
+   "use": "cedar",
+   "ring": [
+    [
+     -415,
+     -434
+    ],
+    [
+     -404,
+     -440
+    ],
+    [
+     -395,
+     -437
+    ],
+    [
+     -377,
+     -408
+    ],
+    [
+     -355,
+     -401
+    ],
+    [
+     -342,
+     -386
+    ],
+    [
+     -334,
+     -370
+    ],
+    [
+     -326,
+     -340
+    ],
+    [
+     -338,
+     -337
+    ],
+    [
+     -355,
+     -355
+    ],
+    [
+     -372,
+     -377
+    ],
+    [
+     -403,
+     -392
+    ],
+    [
+     -415,
+     -413
+    ]
+   ],
+   "replace": true,
+   "src": "earth 2026-03-11 (raw/ref/earth/review2-8851/c1-d pair_o0): the OSM park ring of 赤土山自然公園 (© OpenStreetMap contributors) is dark 杉 wood with only a small clearing round the hut, not the mown lawn strip the app drew"
+  }
+ ]
+}

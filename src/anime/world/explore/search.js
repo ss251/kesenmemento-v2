@@ -41,6 +41,10 @@ export const KINDS = [
   [['橋', 'bridge'], /bridge/],
 ];
 
+/** [v5:fix1] Area categories (町名 / 丁目 / 地区) and an area name without its 丁目 or （二） suffix: 八日町一丁目 -> 八日町. */
+const AREA_CATS = /^(district|neighbourhood|quarter|suburb|locality)$/;
+export const areaBase = (name) => String(name || '').replace(/[（(][^）)]*[）)]\s*$/, '').replace(/[一二三四五六七八九十0-9０-９]+丁目$/, '').trim();
+
 export function createSearch(L, { featured = [], near = () => [0, 0] } = {}) {
   // the named places, one per name and neighbourhood (OSM often maps a school as several buildings)
   const all = [];
@@ -53,7 +57,7 @@ export function createSearch(L, { featured = [], near = () => [0, 0] } = {}) {
     all.push(it); if (!prev) seen.set(k, [it]); else prev.push(it);
   }
   const feat = featured.slice();
-  const index = feat.concat(all).map((it) => ({ it, a: fold(it.ja), b: fold(it.en) }));
+  const index = feat.concat(all).map((it) => ({ it, a: fold(it.ja), b: fold(it.en), area: AREA_CATS.test(it.cat) ? fold(areaBase(it.ja)) : null }));
   function areaIndex() {
     return L.PLACES.filter((p) => p.cat === 'neighbourhood' || p.cat === 'quarter' || p.cat === 'district').map((p) => ({ ja: p.name, en: p.nameEn, x: p.x, z: p.z, w: p.cat === 'neighbourhood' ? 0 : p.cat === 'quarter' ? 40 : 80 }));
   }
@@ -67,8 +71,11 @@ export function createSearch(L, { featured = [], near = () => [0, 0] } = {}) {
       const d = (it) => Math.hypot(it.at[0] - nx, it.at[1] - nz);
       const hits = [];
       for (const e of index) {
-        const s = e.a === f || e.b === f ? 0 : e.a.startsWith(f) || (e.b && e.b.startsWith(f)) ? 1 : e.a.includes(f) || (e.b && e.b.includes(f)) ? 2 : -1;
-        if (s >= 0) hits.push([s - (e.it.group !== 'search' ? 0.5 : 0), d(e.it), e.it]);
+        let s = e.a === f || e.b === f ? 0 : e.a.startsWith(f) || (e.b && e.b.startsWith(f)) ? 1 : e.a.includes(f) || (e.b && e.b.includes(f)) ? 2 : -1;
+        // [v5:fix1] a bare 町名 (八日町) names the district: its 丁目 / （二） areas rank above the shops that carry the name
+        if (s < 0) continue;
+        if (e.area && e.area === f) s = -0.6;
+        hits.push([s - (e.it.group !== 'search' ? 0.5 : 0), d(e.it), e.it]);
       }
       // kind words: the nearest places of that kind (after the name matches)
       for (const [words, re] of KINDS) {

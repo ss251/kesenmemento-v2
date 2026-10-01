@@ -32,7 +32,7 @@ their credit headers, and the licence is at `src/anime/LICENSE-sakuragaoka-stati
 | `ctx.js` | Builds the `ctx` object that every module receives: `kit`, `geo`, `wires`, `physics`, `tex`, `rng`, `shared` uniforms, `services`, `addStatic` / `add`, `onUpdate`. |
 | `batch.js`, `batch2.js` | Static batching. After every module has built, static meshes are merged by material into cells: 400 m near the inner bay and 2,000 m beyond (`BATCH` in `main.js`). Coarse cells won because the renderer is limited by draw calls. `renderer.js` then skips whole cells by distance each frame (beyond the outline range in the pre-pass, fogged out in the colour pass, and beyond 3.5 / 6 km on low / medium). |
 | `player.js`, `physics.js` | Walking and flying: pointer-lock look, WASD, run, jump, fly, touch sticks, and colliders against walk boxes and the terrain. The sea is a wall on foot: `physics.standable()` refuses a step onto the sea, in front of a quay face, or onto the low strip at a hard shore unless a deck (walk box) covers it, and the player slides along the edge. |
-| `season.js` | `ctx.shared.uSeason` and `patchSnow()`, which puts winter snow on every surface that faces up. |
+| `season.js` | `ctx.shared.uSeason` and `patchSnow()`, which puts winter snow on every surface that faces up. [v5:fix1] `?season=early` (`PRESETS.early`): 早春 without snow, bare broadleaf and dormant tan turf, the look of the Google Earth 2026-03-11 imagery for side-by-side comparisons (`uSeason.extra`: snow, dry). The default autumn keeps the 紅葉 tint to about 2 % of the crowns. |
 | `planet.js` | The tiny planet. It renders six 96° views (3° overlap on every side) through the real pipeline without vignette, light leak or bloom, with one fog density and one shadow box for all six, and folds them into a slowly turning stereographic world. The fold adds the only vignette. |
 | `textures.js`, `geo.js`, `audio.js` | Canvas textures (signage and Japanese text), shared geometry, and the WebAudio base. |
 
@@ -66,7 +66,12 @@ tested in `test/v3-layout.test.js`.
        ground floors.
      - Storeys are the height divided by about 2.9 m.
      - The roof colour is the aerial-photo colour inside the footprint, white-balanced and then snapped to an anime
-       roof palette. The wall colour is a pastel chosen by the lot's seed.
+       roof palette. The wall colour is a pastel chosen by the lot's seed. [v5:fix2] With the enrichment, a lot's aerial
+       roof colour goes through a 3x3 colour matrix plus offset fitted by least squares from the GSI roof colours of the
+       ~1,100 override lots to the colours read on Google Earth 2026-03-11 (`fitRoofTransform` in `enrich/fold.js`, spread
+       x1.3 round its mean), with no anime lift or saturation boost: the photo-coloured roofs of the 12 cells averaged
+       RGB (160, 166, 167) with 681 teal-blue roofs, and now (151, 146, 148) with 149, beside (148, 146, 149) for the
+       Earth-checked ones.
    - **Roads.** There are 14,473 roads. Hero and mid road widths are measured from the GSI road-edge lines (RdEdg);
      the rest use the nominal width of their `rnkWidth` class.
    - **Other features.** The layout also holds the quays and seawalls (coastline pieces of at most 24 m), 455
@@ -85,10 +90,20 @@ tested in `test/v3-layout.test.js`.
    - `match.js`: OSM outlines to GSI footprints (overlap), POIs and facilities to the building under or next to them.
    - `fold.js`: the precedence OSM > aerial > GSI facility > derived, recorded per value in `lot.src`; road names from
      the OSM way that runs along each GSI road; river widths from the GSI water areas; disaster names filtered.
+   - [v4:overrides] the last fold step: every `data/anime/overrides/*.json`, in file-name order, patches, removes or
+     adds lots, land use, roads and props for one cell with values read from newer references (the author's photos,
+     Google Earth 2026-03-11 via `tools/anime/earth-ref.mjs`), after `LOT_FIX`; the provenance is `lot.src.ovr` /
+     `ovrWhy`. Schema and workflow: [anime/OVERRIDES.md](anime/OVERRIDES.md).
    The layout gains `landuse`, `rivers`, `places` (search and labels), `signals`, `crossings`, `bridges`, `rail` and
    `credits`; `src/anime/world/layout.js` exports them (`LANDUSE`, `RIVERS`, `PLACES`, `findPlaces`, ...).
 5. **Land cover and trees** (`build-landcover.js`, `build-trees.js`). The aerial photo is classified into forest,
    grass, paved and sand and painted in the anime ground palette, and trees are scattered where the camera gets close.
+   [v5:fix2] In the core town (ground up to 8 m within 1.5 km of (250, 150)) grey ground far from buildings stays town
+   ground (it was turned into grass and field, which painted lawns over the cleared post-2011 lots and car parks). Every
+   footprint is town ground, and every car park, apron, plaza, gravel lot and building site is paving or town ground;
+   the override woods (`forest`, `cedar`) and clear-cuts (`felled`) are painted too. On the hills of cells c1, c2 and c5
+   above 30 m, canopy with a hue over 95 or a value under 0.45 is cedar (Earth 2026: dark 杉 plantations), and 88 % of the
+   trees on cedar cover are cedar cones. The classes are smoothed by a 5x5 majority pass and feathered by 1 px.
 
 6. **Street data for the far core** (`build-explore.js`). `data/anime/explore.json` restores what `layout.json` drops
    for the far part of the core: every GSI road centre-line with its measured width (alleys included, OSM names folded
@@ -106,7 +121,7 @@ env -u NODE_OPTIONS bun run scripts/anime/vt.js                   # decode the G
 env -u NODE_OPTIONS bun run scripts/anime/build-grids.js          # terrain, shore and water grids -> grids.bin
 env -u NODE_OPTIONS bun run scripts/anime/enrich/fetch-osm.js     # once: the OSM extract -> raw/osm/overpass.json
 env -u NODE_OPTIONS bun run scripts/anime/enrich/build-enrich.js  # OSM + Anno + aerial per footprint -> enrich.json, sources.json
-env -u NODE_OPTIONS bun run scripts/anime/build-layout.js         # zones, lots, roads, places, ... -> layout.json
+env -u NODE_OPTIONS bun run scripts/anime/build-layout.js         # zones, lots, roads, places, ... + data/anime/overrides -> layout.json ([v5] --overrides none: without them)
 env -u NODE_OPTIONS bun run scripts/anime/build-landcover.js      # land cover and forest masks -> landcover_*.png, forest_*.png
 env -u NODE_OPTIONS bun run scripts/anime/build-trees.js          # the 3D trees -> trees.json
 env -u NODE_OPTIONS bun run scripts/anime/build-explore.js        # far-core streets and footprints -> explore.json
@@ -116,11 +131,14 @@ env -u NODE_OPTIONS bun run scripts/anime/enrich/eval.js          # optional: ro
 Every step is deterministic: the same inputs give byte-identical outputs, and `bun test` checks the layout contract,
 the enrichment and the determinism. On 2026-09-30 (20:10Z) the whole chain was re-run from the caches. Every output came back
 byte-identical except `enrich.json` and `layout.json`: the enrichment rules changed after those two files were last
-built. The rebuild changes 5 lots and 2 of the 3,524 places, and it gives 気仙沼仲町郵便局 the English name
-"Katsuya" (a shop POI in the same footprint). That is a bug, so the shipped files were kept. Fix the `nameEn` choice
-in `enrich/build-enrich.js` before you rebuild these two files: it takes the shop POI's `name:en` even when the name
-itself comes from the GSI facility. `sources.json` is regenerated by `build-enrich.js`, and it
-matched apart from the edited text.
+built. The rebuild changes 5 lots and 2 of the 3,524 places, and it gave 気仙沼仲町郵便局 the English name
+"Katsuya" (a shop POI in the same footprint); that bug is fixed in `enrich/build-enrich.js` ([v4:overrides]: a POI's
+`name:en` only when the name is the POI's). Re-run on 2026-10-01 with the override step: every output is byte-identical
+except `enrich.json` and `layout.json`, where the GSI-facility-first naming rule of v4:polish1 still differs from the
+shipped files: `src.name` reads `osm` for names that come from the GSI facility (5 hero / mid lots, 8 far lots),
+気仙沼市シルバー人材センター loses its name, and three government offices take the GSI facility name over the OSM one.
+The shipped `enrich.json` and `layout.json` were kept; with them the layout step is byte-identical. `sources.json` is
+regenerated by `build-enrich.js`, and it matched apart from the edited text.
 
 ## 3. World modules (`src/anime/world/`)
 
@@ -146,7 +164,7 @@ service is missing.
 | Fly | `core/player.js` (`FLY` 25 m/s, `FLY_RUN` 70 m/s) | F toggles. There are no colliders in flight, E/Space climb and Q/Ctrl descend, and dt is capped at 0.1 s. |
 | Drive | `explore/drive.js`, `explore/roadnet.js` | C toggles, handled on `keydown` so a short press is never lost. A kinematic bicycle model (`carStep`, 40 km/h, 60 with Shift) runs on the road network built from the GSI centre-lines and their widths. `clampToRoad` keeps the car on the carriageway, and lane assist steers to the left lane when you let go. Town colliders and the sea stop the car; bridge decks carry it. It has a chase camera, lamps at dusk and an engine hum. |
 | Streaming | `explore/tiles.js`, `stream.js`, `sbatch.js` | A 100 m tile grid over the core. Base: simplified mid buildings. L1 (within 620 / 500 / 360 m on high / medium / low): far streets, poles and wires, and far lots on their real footprints. L0 (within 95 / 75 / 45 m, on foot or in the car): every lot with the hero kit. Builds are generators with a per-frame budget, nearest tile first, packed into `BatchedMesh` pools that are rebuilt through one FIFO. |
-| Search | `explore/search.js` | Covers the 3,524 `PLACES` of the layout plus the stops. It folds NFKC, case and katakana to hiragana, and ranks exact matches before prefixes before substrings, nearer first. Kind words in JA or EN (病院, "sushi") list the nearest places of that kind. |
+| Search | `explore/search.js` | Covers the 3,524 `PLACES` of the layout plus the stops. It folds NFKC, case and katakana to hiragana, and ranks exact matches before prefixes before substrings, nearer first. [v5:fix1] A bare 町名 (八日町) ranks its 丁目 / 地区 areas above the shops that carry the name. Kind words in JA or EN (病院, "sushi") list the nearest places of that kind. |
 | Map and minimap | `explore/basemap.js`, `explore/ui.js` | A base map painted once from the same data as the world: the sea and rivers (GSI grids), a hillshade (DEM), OSM land use, every footprint and every road at its measured width (2 m/px over the core, 8 m/px over the city; 3 and 12 on low). The minimap is north up with your heading and view cone and names the 町名 and road. The full map (N) pans, zooms and goes to a clicked place or street. It shows `layout.credits`. |
 | Labels | `explore/labels.js` | POI pills that fade with distance, never overlap, hide behind terrain and buildings, and stay inside the viewport and off the minimap. |
 | Places and tour | `explore/places.js`, `life/tour.js` | `tour.add` appends the 17 civic landmarks and 27 places in town to the 7 built-in stops. Each gets a computed drone framing and a walk spot with a clear sight line (`walkFraming`, or a hand-set spot in `WALK_SET`). |
@@ -183,8 +201,9 @@ holds the single headless-Chrome lock. The tools launch Chrome with the real GPU
 
 | Command | Purpose |
 |---|---|
-| `bun tools/anime/qa3.mjs --port P [--build 1] [--dist <dir>] [--phone 1] [--bench 1] [--out <prefix>]` | The end-to-end QA: builds the bundle (into `dist/`, or a private `--dist` directory), serves it on port P and drives the production page like a visitor. It fails on any console error and saves a screenshot per step. It checks all seven modules, the HUD, every time preset and season, rain, the tiny planet, photo mode, walking (the player stays on land and on the promenade deck) and fly mode. **Every stop's walk spot** (all 51) must stand on land, outside every building, with no single colour over 45 % of the frame and no more than 25 % of a 16 × 9 ray grid closer than 6 m (`pipeline.nearShare`); every extra place must be in view (aim within 25°, pre-pass depth at least min(0.8 d, d − r − 2)). After the loop, 気仙沼簡易裁判所 must draw as before, with every stream pool intact (`sb.validate()`). **The explore flow:** search in JA and EN, the full map and its © OpenStreetMap credit clear of the minimap, streaming in the far core (kit tiles with colliders), walking into buildings (blocked), the car on the roads, the three interiors and the labels. `--phone 1` adds the 390×844 low-tier layout, and `--bench 1` prints per-tier frame times. `--noexplore` skips the explore flow. 146 checks with `--phone 1`. |
-| `bun tools/anime/accuracy.mjs --port P [--region core\|ortho] [--res 0.5] [--tile 500] [--out dist/qa4] [--tag t] [--lmshots 1] [--nobuild]` | The accuracy audit (V3-SPEC section 10). It builds a private bundle in `dist/anime-P`, then renders the app straight down with an orthographic camera: 1000 × 1000 px tiles at 0.5 m/px, first in colour at 12:00 with a clear sky, then as a float height pass and a road pass. It compares them with the GSI footprints (building IoU), the GSI z18 aerial photo with each roof's relief offset (roof CIEDE2000), OSM highways (road precision and recall) and the landmark sheets (positions, heights). It writes `accuracy[_tag].json`, `side_*.jpg` (photo, render, coverage diff), `mosaic_*.jpg` over the whole region, and `lm_*.jpg` with `--lmshots 1`. It takes about 2 minutes. |
+| `bun tools/anime/qa3.mjs --port P [--build 1] [--dist <dir>] [--phone 1] [--bench 1] [--out <prefix>]` | The end-to-end QA: builds the bundle (into `dist/`, or a private `--dist` directory), serves it on port P and drives the production page like a visitor. It fails on any console error and saves a screenshot per step. It checks all seven modules, the HUD, every time preset and season, rain, the tiny planet, photo mode, walking (the player stays on land and on the promenade deck) and fly mode. **Every stop's walk spot** (all 51) must stand on land, outside every building, with no single colour over 45 % of the frame and no more than 25 % of a 16 × 9 ray grid closer than 6 m (`pipeline.nearShare`); every extra place must be in view (aim within 25°, pre-pass depth at least min(0.8 d, d − r − 2)). After the loop, 気仙沼簡易裁判所 must draw as before, with every stream pool intact (`sb.validate()`). **The explore flow:** search in JA and EN, the full map and its © OpenStreetMap credit clear of the minimap, streaming in the far core (kit tiles with colliders), walking into buildings (blocked), the car on the roads, the three interiors and the labels. `--phone 1` adds the 390×844 low-tier layout, and `--bench 1` prints per-tier frame times. `--noexplore` skips the explore flow. 147 checks with `--phone 1`. |
+| `bun tools/anime/accuracy.mjs --port P [--region core\|ortho] [--res 0.5] [--tile 500] [--out dist/qa4] [--tag t] [--lmshots 1] [--nobuild]` | The accuracy audit (V3-SPEC section 10). It builds a private bundle in `dist/anime-P`, then renders the app straight down with an orthographic camera: 1000 × 1000 px tiles at 0.5 m/px, first in colour at 12:00 with a clear sky, then as a float height pass and a road pass. It compares them with the GSI footprints (building IoU), the GSI z18 aerial photo with each roof's relief offset (roof CIEDE2000), OSM highways (road precision and recall) and the landmark sheets (positions, heights). It writes `accuracy[_tag].json`, `side_*.jpg` (photo, render, coverage diff), `mosaic_*.jpg` over the whole region, and `lm_*.jpg` with `--lmshots 1` ([v5] `--saveraw 1` also keeps each tile's full render and photo crop; `--tiles "x,z;..."` audits chosen tiles). It takes about 2 minutes. |
+| `bun tools/anime/earth-ref.mjs --cell C --port P [--views top,o0,...] [--noearth] [--noapp] [--out raw/ref/earth/<dir>]` | [v4:overrides] Reference captures of a cell (`data/anime/cells.json`) from Google Earth web and the app from the same cameras, into `raw/ref/earth/<cell>/` or `--out` (under `raw/` only; never committed or shipped): pairs, a top view annotated with the lot numbers, road ids and a 20 m ENU grid, the registration on the GSI photo, and the per-lot roof ΔE (Earth vs app). [anime/OVERRIDES.md](anime/OVERRIDES.md). [v5] `tools/anime/earth-de.mjs` scores a before / after pair with one registration. The 12-cell sweep's before / after metrics and images: `docs/shots/v5_cells/` and its README. |
 | `bun tools/anime/shot.mjs --port P [--only a,b] --cams "hero;walk;tour:market;tourwalk:lm-station;x,y,z>lx,ly,lz" [--hours 16.5] [--q high] [--w 1920 --h 1080] [--eval js] --out shots/x/y` | Screenshots of chosen cameras (and, with `--only`, chosen modules). It waits up to 60 s for explore's stops, settles the stream per camera, and exits non-zero when a camera spec does not resolve. `--eval` runs page JS after each camera is set (for example to open the map). Add `--bench 30` for frame times. |
 | `bun scripts/render/life-shots.js --cams "yoru@hero;yuyake@ltour:kanae"` | Screenshots with a time preset per camera. It also takes `--ui 1`, `--weather rain` and `--photo 0.5`. |
 | `bun scripts/render/stills.js --size 1080 [--out dist/qa3]` | The wow stills, written to `dist/renders/` (or `--out`). `--size 4k` is the product size. |

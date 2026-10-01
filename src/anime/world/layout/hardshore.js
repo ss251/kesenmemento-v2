@@ -11,11 +11,21 @@
 export const HARD_KINDS = new Set(['quay', 'seawall', 'promenade']);
 /** Apron widths the harbor builds behind each kind of face (harbor/world.js buildQuay calls), metres. */
 export const APRON = { quay: 4, seawall: 3.2, promenade: 7 };
+/** [v5:fix3] Built concrete revetments that the layout carries as `rocks` (natural) shore: the water treats them as a
+ *  hard edge (deep water to the line: no pale shoal, no surf line), but they keep their sloping ground (no terrain
+ *  clamp, no sea wall for walkers). 神明崎's west shore is the sloping concrete revetment under the 浮見海道 promenade
+ *  (Google Earth 2026-03-11 c7n top / o270 and the GSI photo: grey concrete to the water, dark water at the edge; the
+ *  app drew a white sand beach with turquoise shallows). Box = [x0, z0, x1, z1] (ENU m). */
+export const REVETMENTS = [
+  { id: 'shinmei-west', box: [292, -152, 362, -24], src: 'earth 2026-03-11 c7n top + o270; GSI ortho' },
+];
+const inRevetment = (x, z) => REVETMENTS.some(({ box: [x0, z0, x1, z1] }) => x >= x0 && x <= x1 && z >= z0 && z <= z1);
 
 export function hardShores(L, { cell = 24 } = {}) {
-  const segs = [];
+  const segs = [], revets = [];   // [v5:fix3] revets: the REVETMENTS' rocks lines (water mask only)
   for (const q of L.QUAYS || []) {
-    if (!HARD_KINDS.has(q.kind)) continue;
+    const soft = !HARD_KINDS.has(q.kind) && q.kind === 'rocks' && inRevetment((q.a[0] + q.b[0]) / 2, (q.a[1] + q.b[1]) / 2);
+    if (!HARD_KINDS.has(q.kind) && !soft) continue;
     const dx = q.b[0] - q.a[0], dz = q.b[1] - q.a[1], len = Math.hypot(dx, dz);
     if (len < 0.3) continue;
     const ux = dx / len, uz = dz / len;
@@ -23,12 +33,12 @@ export function hardShores(L, { cell = 24 } = {}) {
     const mx = (q.a[0] + q.b[0]) / 2, mz = (q.a[1] + q.b[1]) / 2;
     const w1 = L.isWater(mx + nx * 6, mz + nz * 6), w2 = L.isWater(mx - nx * 6, mz - nz * 6);
     if (!w1 && w2) { nx = -nx; nz = -nz; } else if (!w1 && !w2) continue;
-    segs.push({ ax: q.a[0], az: q.a[1], ux, uz, nx, nz, len, top: q.top ?? 2, apron: APRON[q.kind] ?? 4 });
+    (soft ? revets : segs).push({ ax: q.a[0], az: q.a[1], ux, uz, nx, nz, len, top: q.top ?? 2, apron: APRON[q.kind] ?? 4, soft });
   }
   const grid = new Map();
   const key = (i, j) => i * 100003 + j;
   const pad = 20;
-  for (const s of segs) {
+  for (const s of segs.concat(revets)) {
     const xs = [s.ax, s.ax + s.ux * s.len], zs = [s.az, s.az + s.uz * s.len];
     const i0 = Math.floor((Math.min(...xs) - pad) / cell), i1 = Math.floor((Math.max(...xs) + pad) / cell);
     const j0 = Math.floor((Math.min(...zs) - pad) / cell), j1 = Math.floor((Math.max(...zs) + pad) / cell);
@@ -36,10 +46,11 @@ export function hardShores(L, { cell = 24 } = {}) {
   }
   const cellSegs = (x, z) => grid.get(key(Math.floor(x / cell), Math.floor(z / cell)));
   /** Unsigned distance to the nearest hard line (m), and the signed offset toward its water side. */
-  function nearest(x, z) {
+  function nearest(x, z, withSoft = false) {
     const a = cellSegs(x, z); if (!a) return null;
     let best = null;
     for (const s of a) {
+      if (s.soft && !withSoft) continue;   // [v5:fix3] revetments: water only
       const t = (x - s.ax) * s.ux + (z - s.az) * s.uz;
       const tc = Math.max(0, Math.min(s.len, t));
       const px = s.ax + s.ux * tc, pz = s.az + s.uz * tc;
@@ -50,7 +61,7 @@ export function hardShores(L, { cell = 24 } = {}) {
   }
   const sea = () => (L.SEA?.level ?? 0);
   return {
-    segs,
+    segs, revets,
     clampY(x, z, y) {
       const n = nearest(x, z);
       if (!n || !n.inside || n.d > 8) return y;
@@ -69,6 +80,7 @@ export function hardShores(L, { cell = 24 } = {}) {
     inApron(x, z, pad = 0.5) {
       const a = cellSegs(x, z); if (!a) return false;
       for (const s of a) {
+        if (s.soft) continue;
         const t = (x - s.ax) * s.ux + (z - s.az) * s.uz;
         if (t < -1 || t > s.len + 1) continue;
         const off = (x - s.ax) * s.nx + (z - s.az) * s.nz;
@@ -76,8 +88,8 @@ export function hardShores(L, { cell = 24 } = {}) {
       }
       return false;
     },
-    near(x, z) {
-      const n = nearest(x, z);
+    near(x, z, withSoft = false) {
+      const n = nearest(x, z, withSoft);
       if (!n) return 0;
       return 1 - Math.min(1, Math.max(0, (n.d - 6) / 12));
     },
@@ -87,7 +99,7 @@ export function hardShores(L, { cell = 24 } = {}) {
       for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
         const x = box.x0 + (i + 0.5) * step, z = box.z0 + (j + 0.5) * step;
         if (!cellSegs(x, z)) continue;
-        data[j * w + i] = Math.round(this.near(x, z) * 255);
+        data[j * w + i] = Math.round(this.near(x, z, true) * 255);   // [v5:fix3] the water mask includes the revetments
       }
       const tex = new THREE.DataTexture(data, w, h, THREE.RedFormat, THREE.UnsignedByteType);
       tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter; tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;

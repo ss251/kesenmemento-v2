@@ -59,3 +59,30 @@ garden were finished by 2021–2025.
 - 迎 is lot 16/58540/25068/381: kind `warehouse`, **1 storey, 8.3 m**, 59.3 × 16.6 m. The layout's roof is white, but it
   renders with a **red-orange gable roof**.
 - 拓 is rendered as a 4-storey hip-roofed apartment (11.6 m). 結 is a 2-storey house.
+
+## v5 fix round 1 (2026-10-01): roofline against Google Earth (imagery 2026-03-11)
+
+- Earth top and o180 show a **broken roofline in three sections** (a lower light-grey north wing, a taller dark middle
+  block, a white south block) and **tan stepped decks and stairs (#ae9a90)** off the bay face.
+- The app splits the upper floors along the NNW-SSE axis at 45 % and 72 % (`MUKAERU_SPLIT` in `harbor/minami.js`:
+  roofs -0.7 m / +0.7 m / ±0 against the old 10.7 m roof), draws the 2F bay terrace in tan #ae9a90 (it was timber
+  brown), and adds four tan steps from the terrace down to the turf at the NW end (`MUKAERU_STEPS`).
+
+## v5 photos (2026-10-01): 迎, 結, 拓 and the slow street from the author's photos (IMG_0824-0842)
+
+`harbor/minami5.js` (`buildMukaeruPhotos`, `buildSlowStreetPhotos`); `PHOTOS5` in `harbor/minami.js` switches back to the
+v5:fix3 迎 and garden, which are kept intact.
+
+- **迎:** the SE end is the ANCHOR café: khaki render, a clerestory with ANCHOR letters, café RST neon, the HAVE A NICE
+  COFFEE oval, Lander Blue and SHARKS boards, and a glazed COFFEE DONUTS corner. Behind it rises a tall grey ribbed-metal
+  3F box with an external steel stair. The lower NW wings are charcoal boards on the street (「nine one」) and dark timber
+  on the bay, under a gull-wing wavy roof. Out front stand the purple NAIWAN 迎 WELCOME HOUSE totem on a composite deck.
+- **結:** single-storey cedar-board shops behind a colonnade of weathered posts under a white corrugated fascia, with a
+  taller white back volume. It carries BLACK TIDE BREWING (green), the light-blue 結 totem and the 「Kesennuma slow
+  street 結」 map board. `zz-photos.json` sets the lots to 1 storey.
+- **拓:** white corrugated and grey timber panels, 「Kesennuma Amway House Hirakeru」 and KNEWS, a timber pergola with
+  かつお banners, and bollards.
+- **The slow street** is a paved pedestrian plaza with red and dark bands and string lights overhead. Road r12645 is removed.
+- **Across 魚町港町線:** the convenience store (the c6 solar shed) is drawn as a generic striped storefront with a
+  brick end wall and a "7"-style pole sign (no trademark logo). The junction has zebras, a hatched median, ◇ marks and
+  banded bollards.

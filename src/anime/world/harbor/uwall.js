@@ -2,7 +2,8 @@
 // a low, smooth light-concrete wall on the landward edge of the waterside apron, crest T.P. 4.1 m, only 1.3 m above the
 // pavement behind it (the design kept it low so the bay shows over it), topped by a band of 21 flap gates of 13.7 m that
 // lie flat and rise by themselves with the sea (no power, no operator); stair-shaped rest decks cross it at intervals (their white blocks are
-// on the z18 photo), a strip of warm pink-red block paving runs along the road side, low footlights light it at night.
+// on the z18 photo), a strip of pale grey concrete block paving runs along the road side ([v5:fix1] Google Earth
+// 2026-03-11; it was warm pink-red), low footlights light it at night.
 // There are no windows in the real wall. 311 m, 土木学会デザイン賞 2022; heights: 今川悟 (imakawa.net/blog/4847).
 // Returns { line, crest, gates, stairs, wallDist(x, z) }.
 import * as THREE from 'three';
@@ -11,7 +12,7 @@ import { resample, sweepSlab, worldKit, seg, lineLen, atLen, paint } from './lmk
 import { nightMat, registry } from './lights.js';
 import { mapMat } from './util.js';
 
-const C = { wall: '#c9c8c1', wallShade: '#b3b2ab', gate: '#8d9296', gateDark: '#6f757b', pave: '#c49a8e', paveJoint: '#a97f74', step: '#d6d4cc', timber: '#a98464' };
+const C = { wall: '#c9c8c1', wallShade: '#b3b2ab', gate: '#8d9296', gateDark: '#6f757b', pave: '#b8b6b2', paveJoint: '#9d9b97', step: '#d6d4cc', timber: '#a98464' };
 
 /** Signed distance (m) from (x, z) to the wall line: + on the water side, - on the land side. */
 export function wallSide(x, z) {
@@ -32,7 +33,7 @@ export function buildUwall(ctx) {
   const t = (c, o) => ctx.mat.toon(c, o);
   const paveTex = paint(ctx, 'pave', 256, 256, (g, w, h) => {
     const r = ctx.rng('lm4-pave');
-    for (let y = 0; y < 8; y++) for (let x = 0; x < 4; x++) { g.fillStyle = r.pick(['#c49a8e', '#bb8f83', '#caa296', '#b98a7e', '#c9a69a']); g.fillRect(x * 64 + (y % 2) * 32 - 32, y * 32, 64, 32); g.fillRect(x * 64 + (y % 2) * 32 + 224, y * 32, 64, 32); }
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 4; x++) { g.fillStyle = r.pick(['#b8b6b2', '#b2b0ac', '#bebcb7', '#aeaca8', '#bbb9b5']); g.fillRect(x * 64 + (y % 2) * 32 - 32, y * 32, 64, 32); g.fillRect(x * 64 + (y % 2) * 32 + 224, y * 32, 64, 32); }   // [v5:fix1] pale grey concrete blocks (Google Earth 2026-03-11; was pink-red)
     g.strokeStyle = C.paveJoint; g.lineWidth = 2;
     for (let y = 0; y <= 8; y++) { g.beginPath(); g.moveTo(0, y * 32); g.lineTo(w, y * 32); g.stroke(); for (let x = -1; x <= 4; x++) { const xx = x * 64 + (y % 2) * 32; g.beginPath(); g.moveTo(xx, y * 32); g.lineTo(xx, y * 32 + 32); g.stroke(); } }
   }, [1, 1]);
@@ -63,7 +64,7 @@ export function buildUwall(ctx) {
     k.box(0.25, 0.12, 0.5, m.foot, [x, Math.min(U.crest - 0.6, y + 0.45), z], [0, Math.atan2(p.ux, p.uz), 0]);
     registry(ctx)?.point({ x, y: y + 0.5, z, color: '#ffe2b0', size: 0.45, intensity: 1.3, mode: 'lamps' });
   }
-  // the pink-red block paving on the road side (3.2 m wide), following the ground
+  // the pale grey block paving on the road side (3.2 m wide), following the ground
   k.mesh(sweepSlab(line.map((p) => ({ ...p, y: g(p, -2.0) + 0.04 })), { l0: -3.8, l1: -0.4, th: 0.3, tile: 4, bottom: false }), m.pave);
   // stair-shaped rest decks across the wall: wide concrete steps up from the pavement, a landing on the crest (a timber
   // seat top), steps down to the apron

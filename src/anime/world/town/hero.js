@@ -91,14 +91,14 @@ export function buildHeroLot(T, lot, cls, lod) {
   }
   const isShop = kind === 'shop' && w >= 3.4 && d >= 5;
   // [v4:town-accuracy] real storeys (OSM building:levels / height, or a landmark sheet) are built as they are
-  const realH = lot.src?.h === 'osm' || lot.src?.h === 'landmark';
+  const realH = lot.src?.h === 'osm' || lot.src?.h === 'landmark' || lot.src?.h === 'override';   // [v4:overrides] + override heights
   let floors = Math.max(1, Math.min(realH ? (tall ? 14 : 5) : tall ? 7 : 3, lot.storeys));
   if (isShop && floors < 2 && !realH && r() < 0.8) floors = 2;
   const shape = lot.roof.shape;
   let roofType = shape === 'flat' ? 'flat' : shape === 'hip' ? 'hip' : shape === 'shed' ? 'shed' : 'gable';
   // Kesennuma's town is mostly pitched roofs; GSI "shed" is often a low gable read from above
   // [v4:data] a roof shape measured from the aerial photo or tagged in OSM is kept as it is
-  const measured = lot.src?.roof === 'aerial' || lot.src?.roof === 'osm';
+  const measured = lot.src?.roof === 'aerial' || lot.src?.roof === 'osm' || lot.src?.roof === 'override';   // [v4:overrides]
   if (!measured && roofType === 'shed' && !tall && r() < 0.6) roofType = r() < 0.5 ? 'gable' : 'hip';
   if (!measured && roofType === 'flat' && floors <= 2 && !tall) roofType = r() < 0.5 ? 'gable' : 'hip';
   const S = makeSpec(r, { floors, roofType, allowFlat: true, antennaP: tall ? 0 : 0.5, traditional: (kind === 'house' || isShop) && r() < (isShop ? 0.3 : 0.12) });

@@ -2,7 +2,7 @@
 // camera, against the real town.
 //
 //   tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/accuracy.mjs --port 8824 [--region core|ortho]
-//        [--res 0.5] [--tile 500] [--out dist/qa4] [--nobuild] [--tag before] [--tiles "x,z;x,z"]
+//        [--res 0.5] [--tile 500] [--out dist/qa4] [--nobuild] [--tag before] [--tiles "x,z;x,z"] [--saveraw 1]
 //
 // Two page loads of the production bundle (headless Chrome through the machine gate, 1000 x 1000 px, real GPU):
 //   1. the full scene at 12:00 JST, clear sky, no vignette / light leak / fog: one orthographic colour tile per 500 m
@@ -254,6 +254,7 @@ try {
     for (const t of tiles) {
       const url = await page.eval(`window.__acc.color(${t.cx}, ${t.cz}, ${TILE})`);
       renders.set(t.id, Buffer.from(url.split(',')[1], 'base64'));
+      if (args.saveraw) writeFileSync(join(OUT, `render${TAG}_${t.id}.png`), renders.get(t.id));   // [v5] full-size render per tile
     }
     // [v4:integrate] --lmshots 1: a 200 m top-down render round every reference landmark (photo | app side-by-sides)
     if (args.lmshots) for (const p of LM_SHOTS) if (p.at) lmRenders.set(p.id, Buffer.from((await page.eval(`window.__acc.color(${p.at[0]}, ${p.at[1]}, ${LM_SIZE})`)).split(',')[1], 'base64'));
@@ -367,6 +368,7 @@ for (const t of tiles) {
   const S = 500, row = Buffer.alloc(S * 3 * S * 3);
   const put = (img, k, ch) => { for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) { const si = Math.floor((i * px) / S), sj = Math.floor((j * px) / S), a = (sj * px + si) * ch, b = (j * S * 3 + k * S + i) * 3; row[b] = img ? img[a] : 0; row[b + 1] = img ? img[a + 1] : 0; row[b + 2] = img ? img[a + 2] : 0; } };
   put(photo, 0, 3); put(rimg, 1, 3); put(diff, 2, 3);
+  if (args.saveraw && photo) await sharp(Buffer.from(photo), { raw: { width: px, height: px, channels: 3 } }).jpeg({ quality: 85 }).toFile(join(OUT, `photo_${t.id}.jpg`));
   await sharp(row, { raw: { width: S * 3, height: S, channels: 3 } }).jpeg({ quality: 82 }).toFile(join(OUT, `side${TAG}_${t.id}.jpg`));
   // mosaics
   for (let j = 0; j < MH; j++) for (let i = 0; i < MW; i++) {

@@ -71,3 +71,62 @@
 - `app/pier7_oblique.jpg`, `app/pier7_mukaeru_top.jpg`
 - Lot 16/58541/25068/65 is kind `warehouse`, 1 storey, 8.4 m, 54.6 × 22.1 m OBB. The layout's roof colour is white, but it
   renders as a **red-roofed gable warehouse**.
+
+## v5 (2026-10-01): surfaces checked against Google Earth (imagery 2026-03-11)
+
+- **Stepped garden** (`harbor/real.js` `MINAMI.garden`): pale grey concrete paving with long joints, Earth #ada4a0,
+  drawn as #c6c3b8 and #b9b6ac. It was timber decking.
+- **Three ring planters** (`MINAMI.pits`): white concrete rings about 4.6 m across, around dark soil and low planting.
+  Earth and the GSI ortho show no tree crown in them.
+- **Landing over the wall, toward the street:** tan stone steps, Earth #ae9a90, drawn as #c7b7a6.
+- **Quay yard between PIER7 and the water, and the strip north of the garden:** plain asphalt, Earth #807b83 (the
+  same tone as the streets). They are `apron` surfaces in `data/anime/overrides/c6.json`.
+- Comparison sheet: `docs/shots/v5_cells/pier7.jpg`.
+
+## v5 fix round 1 (2026-10-01): massing against Google Earth (imagery 2026-03-11)
+
+- **Partial 3F.** 2,390 to 2,403 m² of floor on a 1,195 m² footprint is 2.0 floors, so the 3F is not over the whole bar.
+  Earth top and o180 show a **white roof only over the street side** and a **dark grey stepped band on the bay side**
+  (lots 17 and 19 on the annotated top, Earth #6d6664 / #504e57).
+- The app now builds: 1F and 2F glazed over the whole footprint; the 3F (meeting rooms and studios, white roof) on the
+  street-side ~55 % of the depth (`PIER7_SPLIT.upper` in `harbor/minami.js`, 586 m²); the bay-side 2F roof as a dark
+  grey terrace that steps down toward the bay in three strips (#6d6664 / #57545b).
+- Paler glass (#a9bccb) with white solid panels and vertical timber louvers on the street face; the cantilevered 2F deck
+  is pale concrete (#a7a39c) with white rails; a 15 × 3 m 「PIER7」 on the 3F's bay face and 「創 ウマレル」 beside it.
+- It was a 3-storey, 13 m, all-blue-glass box over the whole 85 m bar.
+- The tour stop's walk spot moved from (51, 69) (nose to the glass) to the head of the stepped garden at (5, 40), yaw
+  -130: the ring planters, a pontoon and the bay face are in frame.
+
+## v5 fix round 2 (2026-10-01): roofline, street face and plaza against Google Earth (imagery 2026-03-11)
+
+- **Three roof blocks along the bar** (Earth top, o0, o90, o270; `raw/ref/earth/review2-8851/pier7`). The street-side
+  upper storey (`PIER7_SPLIT.upper`) is cut across its long axis at −2.5 m and 40.6 m along E→N (the seams measured on
+  the Earth top): a **lower NW block** of ~14 m with only the 2F under a white roof at ~9 m, the **main 3F block** of
+  ~43 m (meeting rooms and studios, glazed, ~13 m), and the **SE end block** of ~22 m at ~11 m (the tall 2F light-sports
+  hall: white panels with a clerestory). `PIER7_SPLIT.blocks` in `harbor/minami.js`. The bay-side stepped terrace starts
+  at the NW seam; beside the NW block the 2F roof stays flat.
+- **Street face**: continuous white panels with narrow vertical timber louvers at a 1.1 m pitch (#cdbfa8, a muted pale
+  timber) in front of the 2F and 3F. The v5:fix1 face (white panel / louver block / bare glass every 3.6 m) read as an
+  apartment block with punched blue windows and orange panels.
+- **Ring planters**: a white kerb ring (#e9e7e1) 0.5 m high and 4.6 m across, dark soil and a low dark planting mat; no
+  shrub spheres.
+- **Landing over the wall**: #b5ab9f (was #c7b7a6, which read salmon at noon).
+
+## v5 photos (2026-10-01): rebuilt against the author's own photos (IMG_0799-0823, 17:18-17:20 JST)
+
+The client's photos outrank Google Earth (docs/anime/OVERRIDES.md). Code: `harbor/minami5.js` (`buildPier7Photos`,
+`buildPlazaPhotos`), called from `harbor/minami.js`; pairs: `docs/shots/v5_photos/`.
+
+- **Bay side:** the T.P. 6.2 m seawall is the bay-side ground storey (board-formed concrete). The 2F terrace sits on its
+  crest, with a 3.6 m deck on slim white stilts and tie rods (the GSI deck footprints `pier7Deck` / `pier7Deck2`), a
+  stainless wire rail hung with string lights, and A-frame stands stored underneath. The fix1 pale cantilever is gone.
+- **Massing along the bar:** the NW end is a glazed room on the 2F deck under its own big gable roof. The middle has 2F
+  glazing with a dark-brown board band, and the 3F is glazed under a low gable with deep eaves and white rafters. The SE end
+  is a white vertical-board block carrying 「PIER7」 and a painting of the bay on its NW face. The 15 m 「PIER7」 on the
+  bay face is removed.
+- **Street NW corner:** a glass 1F box, a composite deck with steps, and the rust NAIWAN 創 PIER7 totem. A timber stair
+  runs up the street face, and the eave is carried on clusters of slender white columns.
+- **The plaza is flat at quay level, not stepped.** It has grey-beige pavers with granite-sett bands. The three ring
+  benches are 4.6 m white rings with an inner step, a sunken lawn and a young tree. The rest of the plaza holds the 陸閘
+  winch, the composite bleachers up to the lawn, the elevated walkway that bridges the gate (迎's deck to PIER7's NW
+  face), the white mesh stair cage, the composite stair, and the gate post with its 注意 board.
