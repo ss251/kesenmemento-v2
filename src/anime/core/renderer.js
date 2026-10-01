@@ -92,7 +92,7 @@ export function createRenderPipeline(renderer, quality) {
       tColor: { value: rtColor.texture }, tND: { value: rtND.texture }, tBloom: { value: rtB2.texture }, tBloom2: { value: rtB4.texture },
       uRes: { value: new THREE.Vector2(1, 1) }, uFar: { value: 2000 }, uPx: { value: 1.0 },
       uOutline: { value: 1.0 }, uLine: { value: new THREE.Color('#2e2740') },
-      uBloom: { value: 0.32 }, uGlow: { value: 0.14 }, uExposure: { value: 1.0 },
+      uBloom: { value: 0.32 }, uGlow: { value: 0.14 }, uExposure: { value: 1.0 }, uNeutral: { value: 0 },
       uSunScreen: { value: new THREE.Vector3(0.2, 0.9, 0) }, uLeak: { value: 1.0 }, uTime: { value: 0 },
       uVignette: { value: 0.22 },
       uLineRange: { value: new THREE.Vector2(35, 190) }, uLeakK: { value: 1.0 }, uNight: { value: 0.0 },
@@ -106,7 +106,7 @@ export function createRenderPipeline(renderer, quality) {
     },
     vertexShader: FS_VERT,
     fragmentShader: /* glsl */`
-      uniform sampler2D tColor, tND, tBloom, tBloom2; uniform vec2 uRes; uniform float uFar, uPx, uOutline, uBloom, uGlow, uExposure, uLeak, uTime, uVignette, uLeakK, uNight; uniform vec2 uLineRange;
+      uniform sampler2D tColor, tND, tBloom, tBloom2; uniform vec2 uRes; uniform float uFar, uPx, uOutline, uBloom, uGlow, uExposure, uLeak, uTime, uVignette, uLeakK, uNight, uNeutral; uniform vec2 uLineRange;
       uniform vec3 uLine; uniform vec3 uSunScreen; varying vec2 vUv;
       uniform float uMist, uMistH, uCamY; uniform vec3 uMistCol; uniform mat4 uInvProj; uniform mat3 uCamRot; uniform float uStreet;
       vec4 nd(vec2 uv){ return texture2D(tND, uv); }
@@ -163,7 +163,7 @@ export function createRenderPipeline(renderer, quality) {
         // cool the shadows (blue-violet), warm the highlights
         // [v4:polish2] drone value 0.55 -> 0.40: from the air the cooled shadows turned the hill roofs grey-lavender
         // (roof dE2000 bias da +5 / db -6 against the aerial photo)
-        col = mix(col, col * vec3(0.9, 0.92, 1.1), (1.0 - smoothstep(0.08, 0.55, L)) * mix(0.40, 0.35, uStreet));
+        col = mix(col, col * vec3(0.9, 0.92, 1.1), (1.0 - smoothstep(0.08, 0.55, L)) * mix(0.40, 0.35, uStreet) * (1.0 - 0.75 * uNeutral));   // [v5:detail] uNeutral: the photo look
         col += vec3(0.022, 0.012, -0.012) * smoothstep(0.55, 1.0, L);
         // [v4:polish2] drone white balance: from the air the violet sky fill tinted every roof lavender (roof dE2000 bias
         // da +4.8 / db -5.7 against the GSI aerial photo); a camera-style white balance on the town (not the sky, faded
@@ -173,7 +173,7 @@ export function createRenderPipeline(renderer, quality) {
         // gentle saturation lift (stronger at street level), plus [v4:polish1] a street-level vibrance: the near-grey
         // surfaces (asphalt, pastel render) gain colour, the already saturated ones barely move
         float mxc = max(col.r, max(col.g, col.b)), satp = mxc > 1e-4 ? (mxc - min(col.r, min(col.g, col.b))) / mxc : 0.0;
-        col = mix(vec3(lum(col)), col, mix(1.07, 1.15, uStreet) + uStreet * 0.5 * (1.0 - satp) * (1.0 - satp));
+        col = mix(vec3(lum(col)), col, mix(mix(1.07, 1.15, uStreet) + uStreet * 0.5 * (1.0 - satp) * (1.0 - satp), 1.0, uNeutral));
         // ---------- light leak from the sun side
         vec2 asp = vec2(uRes.x/uRes.y, 1.0);
         vec2 sp = uSunScreen.xy;

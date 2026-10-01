@@ -32,7 +32,9 @@ export async function build(ctx) {
   const t0 = performance.now();
   const stats = {};
   // ---- time & lights
-  const T = createTime(ctx, { preset: params.get('preset') || undefined, hours: params.has('hours') ? Number(params.get('hours')) : undefined, date: params.get('date') || undefined });
+  // [v5:detail] ?look=photo (or ?preset=photo): the photo-match lighting (life/time.js LOOKS)
+  const look = params.get('look') || (params.get('preset') === 'photo' ? 'photo' : undefined);
+  const T = createTime(ctx, { preset: (params.get('preset') !== 'photo' && params.get('preset')) || undefined, look, hours: params.has('hours') ? Number(params.get('hours')) : undefined, date: params.get('date') || undefined });
   ctx.services.time = T;
   const wq = params.get('weather');
   if (WEATHER[wq]) T.setWeather(WEATHER[wq]);

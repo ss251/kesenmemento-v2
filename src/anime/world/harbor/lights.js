@@ -54,14 +54,14 @@ export function nightMat(ctx, day, night, intensity = 1.4, opts = {}) {
     fragmentShader: /* glsl */`
       #include <common>
       #include <fog_pars_fragment>
-      uniform vec3 uDay; uniform vec3 uNightC; uniform float uNight; uniform float uAlways; uniform float uFlicker; uniform float uTime;
+      uniform vec3 uDay; uniform vec3 uNightC; uniform float uNight; uniform float uAlways; uniform float uFlicker; uniform float uTime; uniform float uLit;
       varying vec3 vN; varying vec3 vW;
       void main(){
         // daylight look: flat colour with a soft two-band shade so lamps read as objects, not holes
         float sh = 0.82 + 0.18 * step(0.0, vN.y + 0.3);
         vec3 dayc = uDay * sh;
         float f = 1.0 - uFlicker * (0.5 + 0.5 * sin(uTime * 7.0 + vW.x * 3.1 + vW.z * 1.7)) * 0.35;
-        float k = clamp(max(uNight, uAlways), 0.0, 1.0);
+        float k = clamp(max(max(uNight, uAlways), uLit), 0.0, 1.0);   // [v5:detail] uLit: interiors on at dusk (the photo look)
         vec3 col = mix(dayc, uNightC * f, k);
         gl_FragColor = vec4(col, 1.0);
         #include <fog_fragment>
@@ -71,6 +71,7 @@ export function nightMat(ctx, day, night, intensity = 1.4, opts = {}) {
   });
   m.uniforms.uNight = nightUniform(ctx);
   m.uniforms.uTime = ctx.shared.uTime;
+  m.uniforms.uLit = ctx.shared.uLit ??= { value: 0 };
   m.name = 'harborNight';
   cache.set(key, m);
   return m;

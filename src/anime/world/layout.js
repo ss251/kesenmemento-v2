@@ -50,8 +50,31 @@ export function zoneOf(x, z) {
 
 // ------------------------------------------------------------------ terrain & sea
 export const SEA = { level: 0.0 };
+/** [v5:detail] Ground pads: places where the 4 m DEM still carries building bulk or the old seawall that the author's
+ *  photos show as a flat pavement. Inside `ring` the ground is clamped to at most `max` (T.P. m), blended back to the DEM
+ *  over `feather` metres outside the ring. */
+export const GROUND_PADS = [
+  // 迎's SE end: the ANCHOR shopfront, its deck and the plaza corner stand on a flat pavement at T.P. ~2.3 (IMG_0824-0827,
+  // 0820); the DEM rises to 5 m there (the pre-2018 wall and 迎's own bulk), which buried the shopfront in a mound
+  { ring: [[-17.4, 43.4], [-9.5, 50.1], [-3.9, 47.4], [2, 44], [6, 52], [6, 62], [-6, 64], [-20, 62], [-24, 50], [-20, 44]], max: 2.3, feather: 2.5, src: 'sailesh IMG_0824-0827, 0820' },
+].map((p) => { const xs = p.ring.map((q) => q[0]), zs = p.ring.map((q) => q[1]); return { ...p, x0: Math.min(...xs) - p.feather, x1: Math.max(...xs) + p.feather, z0: Math.min(...zs) - p.feather, z1: Math.max(...zs) + p.feather }; });
+function padded(x, z, h) {
+  for (const p of GROUND_PADS) {
+    if (h <= p.max || x < p.x0 || x > p.x1 || z < p.z0 || z > p.z1) continue;
+    const R = p.ring; let inside = false, d = Infinity;
+    for (let i = 0, j = R.length - 1; i < R.length; j = i++) {
+      const [xi, zi] = R[i], [xj, zj] = R[j];
+      if ((zi > z) !== (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) inside = !inside;
+      const ex = xj - xi, ez = zj - zi, t = Math.max(0, Math.min(1, ((x - xi) * ex + (z - zi) * ez) / (ex * ex + ez * ez || 1)));
+      d = Math.min(d, Math.hypot(x - xi - ex * t, z - zi - ez * t));
+    }
+    const k = inside ? 1 : Math.max(0, 1 - d / p.feather);
+    if (k > 0) h = h + (p.max - h) * (k * k * (3 - 2 * k));
+  }
+  return h;
+}
 /** Terrain y (T.P. m) anywhere in the city bbox: ground on land, a smooth seabed under the sea. Bilinear, C0-smooth. */
-export function heightAt(x, z) { return S.heightAt(x, z); }
+export function heightAt(x, z) { return padded(x, z, S.heightAt(x, z)); }
 /** Signed distance to the sea shoreline (m): + in the sea, - on land (clamped to +-300). */
 export function shoreDist(x, z) { return S.shoreDist(x, z); }
 /** Sea test (the bay and open sea; rivers and ponds are not sea — see waterClass). */
@@ -59,7 +82,7 @@ export function isWater(x, z) { return S.shoreDist(x, z) > 0; }
 /** 0 land, 1 sea, 2 inland water (rivers, ponds) — nearest cell. */
 export function waterClass(x, z) { return S.waterClass(x, z); }
 /** Ground a thing can stand on: terrain on land, the sea surface over water. */
-export function groundAt(x, z) { const h = S.heightAt(x, z); return isWater(x, z) ? Math.max(h, SEA.level) : h; }
+export function groundAt(x, z) { const h = heightAt(x, z); return isWater(x, z) ? Math.max(h, SEA.level) : h; }
 
 /** Sea polygons: { zone: 'mid'|'far', ring: [[x,z],...], holes: [...] } (GSI WA 5100, clipped at z16 tile borders). */
 export const WATER = D.water;

@@ -71,6 +71,7 @@ export function createSky(scene, sunDir, quality) {
     uCloudShade: { value: new THREE.Color('#bdbfe0') },
     uCloud: { value: 0.55 },          // coverage 0..1 (weather)
     uSummerK: { value: 0 },           // [v3:polish] summer weight: taller low cumulus towers (入道雲)
+    uOvercast: { value: 0 },          // [v5:detail] a grey altocumulus deck over the whole sky (the photo look)
     uMorning: { value: 0 },
     // [v3:polish3] the frame's top edge (update() from the camera): x = camera azimuth, y/z = the A/B terms of the top
     // edge elevation atan(A cos(phi) / B) at relative azimuth phi, w = the horizontal half-FOV at the top edge (0 = off)
@@ -88,7 +89,7 @@ export function createSky(scene, sunDir, quality) {
       varying vec3 vDir;
       void main(){ vDir = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position = p.xyww; }`,
     fragmentShader: /* glsl */`
-      uniform vec3 uSun, uZenith, uMid, uHorizon, uWarm, uFog, uCloudLit, uCloudShade, uMoon; uniform float uTime, uCloud, uNight, uDusk, uSummerK; uniform vec2 uWind; uniform vec4 uFrame;
+      uniform vec3 uSun, uZenith, uMid, uHorizon, uWarm, uFog, uCloudLit, uCloudShade, uMoon; uniform float uTime, uCloud, uNight, uDusk, uSummerK, uOvercast; uniform vec2 uWind; uniform vec4 uFrame;
       varying vec3 vDir;
       float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
       float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
@@ -302,6 +303,24 @@ export function createSky(scene, sunDir, quality) {
             col = mix(col, mix(uCloudLit, uWarm, 0.35 * uDusk), streak * 0.15 * smoothstep(0.08, 0.4, h) * (1.0 - a));
           }
         }
+        // [v5:detail] overcast deck (the photo look): a low grey sheet of mottled altocumulus in two painted tones, darker
+        // overhead, paler and thinner toward the horizon, warm-lit cell edges toward the set sun (IMG_0806 / 0807 skies)
+        if (uOvercast > 0.001 && h > -0.03) {
+          float hh = max(h, 0.0);
+          vec2 uv2 = d.xz / (hh + 0.1) * 0.9;
+          vec2 q2 = vec2(dot(uv2, wind), dot(uv2, vec2(-wind.y, wind.x))) + vec2(-uTime * 0.006, 0.0);
+          float big = fbm(vec2(q2.x * 0.12, q2.y * 0.45) + 3.1);
+          float c1 = billow(vec2(q2.x * 5.0, q2.y * 8.0) + 1.7), c2 = billow(q2 * 14.0 + 4.2);
+          float mott = big * 0.7 + c1 * 0.22 + c2 * 0.12;
+          float lit = smoothstep(0.42, 0.86, mott);
+          float gap = smoothstep(0.4, 0.33, mott) * smoothstep(0.05, 0.4, h);
+          vec3 deck = mix(uCloudShade, uCloudLit, 0.15 + lit * 0.7);
+          deck = mix(deck, uMid, gap * 0.5);
+          deck += uWarm * pow(sd, 3.0) * smoothstep(0.55, 0.8, mott) * 0.5;
+          deck = mix(deck, uHorizon, (1.0 - smoothstep(0.0, 0.14, h)) * 0.55);
+          deck *= mix(0.88, 1.0, smoothstep(0.85, 0.2, h));
+          col = mix(col, deck, uOvercast * smoothstep(-0.03, 0.015, h));
+        }
         // below the horizon fades into the fog colour (matches distant terrain)
         col = mix(col, uFog, 1.0 - smoothstep(-0.1, 0.01, h));
         gl_FragColor = vec4(col, 1.0);
@@ -346,6 +365,7 @@ export function createSky(scene, sunDir, quality) {
     const cm = state.ctx?.pipeline?.compMat?.uniforms;
     if (!cm) return;
     cm.uExposure.value = p.exposure; cm.uBloom.value = p.bloom; cm.uGlow.value = p.glow;
+    if (cm.uNeutral) cm.uNeutral.value = p.neutral || 0;   // [v5:detail] the photo look's neutral grade
     if (cm.uLeakK) cm.uLeakK.value = p.leak;
     if (cm.uNight) cm.uNight.value = p.night ?? 0;
   }
@@ -412,6 +432,7 @@ export function createSky(scene, sunDir, quality) {
     uniforms.uSun.value.copy(T.sunDir);
     applyPalette(p, T.night ?? 0, T.dusk ?? 0);
     const wk = winterGrade(T.night ?? 0), sk = summerGrade(T.night ?? 0);
+    uniforms.uOvercast.value = T.overcast || 0;   // [v5:detail]
     if (T.weather) {
       uniforms.uCloud.value = 0.3 + 0.6 * Math.min(1, T.weather.cloud ?? 0.35); state.weatherFog = (T.weather.fog || 0) * 2.2 + (T.weather.rain || 0) * 0.8;
       if ((T.weather.rain || 0) > 0) uniforms.uCloud.value = Math.max(uniforms.uCloud.value, 0.6 + 0.35 * Math.min(1, T.weather.rain));   // [v3:polish3] rain = overcast: no stars, no moon

@@ -143,13 +143,19 @@ function parkCars(poly, y, r, fill = 0.6, avoid = () => false) {
 }
 function carMesh(ctx, list, name) {
   if (!list.length) return null;
-  const body = new THREE.BoxGeometry(1.72, 0.72, 4.2).translate(0, 0.62, 0);
-  const cab = new THREE.BoxGeometry(1.5, 0.58, 2.1).translate(0, 1.27, -0.25);
-  const geo = ctx.geo.mergeGeometries([body.toNonIndexed(), cab.toNonIndexed()]);
+  // [v5:detail] body + roof in the instance colour, a dark glass cabin band and four wheels (a second instanced mesh):
+  // the two plain boxes read as crates in the roof-deck photos (IMG_0792-0798)
+  const body = new THREE.BoxGeometry(1.72, 0.66, 4.2).translate(0, 0.6, 0);
+  const roof = new THREE.BoxGeometry(1.5, 0.08, 2.0).translate(0, 1.5, -0.25);
+  const geo = ctx.geo.mergeGeometries([body.toNonIndexed(), roof.toNonIndexed()]);
+  const cabG = new THREE.BoxGeometry(1.52, 0.56, 2.15).translate(0, 1.2, -0.25), wheel = new THREE.CylinderGeometry(0.31, 0.31, 0.22, 10).rotateZ(Math.PI / 2);
+  const darkG = ctx.geo.mergeGeometries([cabG.toNonIndexed(), ...[[-0.78, 1.35], [0.78, 1.35], [-0.78, -1.35], [0.78, -1.35]].map(([x, z]) => wheel.clone().translate(x, 0.31, z).toNonIndexed())]);
+  const dm = new THREE.InstancedMesh(darkG, ctx.mat.toon('#2f3946', { paint: 0 }), list.length);
   const im = new THREE.InstancedMesh(geo, ctx.mat.toon('#ffffff', { paint: 0.02 }), list.length);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), col = new THREE.Color();
   const r = ctx.rng(name);
-  list.forEach((c, i) => { q.setFromEuler(e.set(0, c.rot, 0)); m4.compose(new THREE.Vector3(c.x, c.y, c.z), q, new THREE.Vector3(1, 1, 1)); im.setMatrixAt(i, m4); im.setColorAt(i, col.set(carColor(r()))); });
+  list.forEach((c, i) => { q.setFromEuler(e.set(0, c.rot, 0)); m4.compose(new THREE.Vector3(c.x, c.y, c.z), q, new THREE.Vector3(1, 1, 1)); im.setMatrixAt(i, m4); dm.setMatrixAt(i, m4); im.setColorAt(i, col.set(carColor(r()))); });
+  dm.name = name + '-glass'; dm.castShadow = true; dm.instanceMatrix.needsUpdate = true; dm.computeBoundingSphere(); ctx.add(dm);
   im.name = name; im.castShadow = true; im.receiveShadow = true;
   im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true;
   im.computeBoundingSphere();

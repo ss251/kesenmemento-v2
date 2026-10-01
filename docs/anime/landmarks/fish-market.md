@@ -109,3 +109,9 @@ bay. `harbor/market5.js` (`buildCRoofPhotos`) replaces the v4 equipment boxes th
 - the COOKING STUDIO cross block at the south end;
 - five glazed observation pavilions with wave-shaped roofs and the white rocket-like stacks with stays;
 - the orange enclosed lifeboat on its trailer, and cars parked nose-in.
+
+## v5:detail (2026-10-02): C棟 roof deck (IMG_0792-0798)
+
+- The visitors' entrance and the pavilions have lit glazing with frames, and the small penthouse windows stay dark as
+  photographed.
+- Parked cars have a dark glass cabin and wheels (they read as crates before).

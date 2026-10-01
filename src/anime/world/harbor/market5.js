@@ -16,6 +16,7 @@ import * as THREE from 'three';
 import { capGeo, prismWalls, offsetRing, obbOf, seg, barAlong, paint } from './lmkit.js';
 import { mapMat, textTex, FONT } from './util.js';
 import { nightMat } from './lights.js';
+import { detailKit, shopGlass } from './detail5.js';   // [v5:detail]
 
 export const CROOF = { o: [704.6, 1043.8], d: [0.423, 0.906], n: [0.906, -0.423], s0: -50, s1: 50, depth: 16, h: 6.4, pav: [-65, -38.5, -12, 14.5, 41], pavOff: 20, lifeboat: [-4, 15.5] };
 const P = (s, t) => [CROOF.o[0] + CROOF.d[0] * s + CROOF.n[0] * t, CROOF.o[1] + CROOF.d[1] * s + CROOF.n[1] * t];
@@ -41,7 +42,8 @@ export function buildCRoofPhotos(ctx, k, { poly, roofY, cars, r }) {
     frame: t('#7e868d', { paint: 0 }), rail: t('#b7bec4', { paint: 0 }), yellow: t('#e2b23c', { paint: 0.02, polygonOffset: -2 }), cone: t('#e0442e', { paint: 0.02 }),
     coneW: t('#f2f0ea', { paint: 0.02 }), black: t('#2a2b2e', { paint: 0 }), orange: t('#ef5a2a', { paint: 0.03 }), orangeD: t('#c4441f', { paint: 0.03 }),
     navy: t('#2c3a5c', { paint: 0.02 }), steel: t('#a9b0b6', { paint: 0 }),
-    win: nightMat(ctx, '#4d5a66', '#ffe2b8', 1.2), glass: nightMat(ctx, '#8ea6b6', '#ffe8c8', 1.25), door: nightMat(ctx, '#a9b8b8', '#fff0d6', 1.5),
+    // [v5:detail] the small windows stay dark at 17:07 (IMG_0792); the pavilions and the entrance show lit interiors
+    win: t('#4a5662', { paint: 0 }), glass: shopGlass(ctx, 'office', 0.75), door: shopGlass(ctx, 'office', 1.0),
   };
   const y = roofY + 0.03;
   // ---- the deck surface (over the white roof cap) and a walk surface for the visitors
@@ -66,7 +68,7 @@ export function buildCRoofPhotos(ctx, k, { poly, roofY, cars, r }) {
     k.plane(2.7, 2.7, mapMat(ctx, 'decal', '#ffffff', sh, { transparent: true, alphaTest: 0.3 }), [xs, y + 4.62, zs], [0, ryE, 0]);
     k.plane(2.7, 2.7, mapMat(ctx, 'decal', '#ffffff', tex, { transparent: true, alphaTest: 0.3 }), [x, y + 4.7, z], [0, ryE, 0]);
   }
-  { const [x, z] = P(-3, 0.08); k.box(3.4, 2.6, 0.1, m.door, [x, y + 1.3, z], [0, ryE, 0]); const [cx, cz] = P(-3, 1.1); k.box(4.6, 0.14, 2.2, m.white, [cx, y + 3.0, cz], [0, ryE, 0]); for (const sd of [-1, 1]) { const a = P(-3 + sd * 2.6, 1.6), b = P(-3 + sd * 9, 1.6); barAlong(k, a, b, y + 0.95, 0.06, 0.06, m.rail); for (let f = 0; f <= 1; f += 0.25) { const p = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]; k.box(0.05, 0.95, 0.05, m.rail, [p[0], y + 0.48, p[1]]); } } }
+  { const D = detailKit(ctx, k), a0 = P(-3 - 1.8, 0); D.glazing({ a: a0, u: CROOF.d, n: nE, s0: 0, s1: 3.6, y0: y + 0.02, y1: y + 2.65, cols: 4, transoms: [y + 2.2], kind: 'office', out: 0.03, frame: m.frame }); const [x, z] = P(-3, 0.08); const [cx, cz] = P(-3, 1.1); k.box(4.6, 0.14, 2.2, m.white, [cx, y + 3.0, cz], [0, ryE, 0]); for (const sd of [-1, 1]) { const a = P(-3 + sd * 2.6, 1.6), b = P(-3 + sd * 9, 1.6); barAlong(k, a, b, y + 0.95, 0.06, 0.06, m.rail); for (let f = 0; f <= 1; f += 0.25) { const p = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]; k.box(0.05, 0.95, 0.05, m.rail, [p[0], y + 0.48, p[1]]); } } }
   // ---- the cooking-studio cross block at the south end
   { const cb = [P(CROOF.s1 - 7, 0), P(CROOF.s1, 0), P(CROOF.s1, 14), P(CROOF.s1 - 7, 14)];
     k.mesh(prismWalls(cb, y, top, { tile: 8 }), m.blue); k.mesh(capGeo(cb, top + 0.02, { tile: 4 }), m.white); k.mesh(prismWalls(offsetRing(cb, 0.05), top - 0.2, top + 0.4, { tile: 4 }), m.white);
@@ -82,7 +84,7 @@ export function buildCRoofPhotos(ctx, k, { poly, roofY, cars, r }) {
   const stack = (s, t2) => { const [x, z] = P(s, t2); k.cyl(0.32, 0.36, 7.6, m.white, [x, y + 3.8, z], null, 14); k.mesh(new THREE.ConeGeometry(0.33, 1.1, 14), m.white, [x, y + 8.15, z]); k.cyl(0.4, 0.4, 0.3, m.white, [x, y + 5.6, z], null, 14); for (const a of [0.5, 2.6, 4.7]) { const ex = x + Math.cos(a) * 3.2, ez = z + Math.sin(a) * 3.2, ss = seg([x, z], [ex, ez]), L = Math.hypot(ss.len, 5.2), b = k.box(0.04, 0.04, L, m.steel, [(x + ex) / 2, y + 2.6, (z + ez) / 2]); b.rotation.order = 'YXZ'; b.rotation.set(Math.atan2(5.2, ss.len), ss.rotY, 0); } phys?.addBox?.(x, z, 0.8, 0.8, 0, y, y + 8); };
   for (const s of CROOF.pav) {
     const g = k.group([...[P(s, CROOF.pavOff)[0]], y, P(s, CROOF.pavOff)[1]], ROT), kk = ctx.kit(g), L = 11, W = 6.4;
-    kk.box(W, 1.0, L, m.blueBase, [0, 0.5, 0]); kk.box(W - 0.3, 2.3, L - 0.3, m.glass, [0, 2.15, 0]);
+    kk.box(W, 1.0, L, m.blueBase, [0, 0.5, 0]); { const gm = m.glass; for (const xs of [-1, 1]) kk.plane(L - 0.3, 2.3, gm, [xs * (W / 2 - 0.15), 2.15, 0], [0, xs * Math.PI / 2, 0]); for (const zs of [-1, 1]) kk.plane(W - 0.3, 2.3, gm, [0, 2.15, zs * (L / 2 - 0.15)], [0, zs > 0 ? 0 : Math.PI, 0]); kk.box(W - 0.4, 0.1, L - 0.4, m.grey, [0, 3.28, 0]); }
     for (let z = -L / 2; z <= L / 2 + 0.01; z += L / 6) for (const xs of [-W / 2, W / 2]) kk.box(0.1, 2.3, 0.1, m.frame, [xs, 2.15, z]);
     for (let x = -W / 2; x <= W / 2 + 0.01; x += W / 3) for (const zs of [-L / 2, L / 2]) kk.box(0.1, 2.3, 0.1, m.frame, [x, 2.15, zs]);
     kk.box(W + 0.1, 0.5, L + 0.1, m.grey, [0, 3.55, 0]);

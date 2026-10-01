@@ -52,7 +52,7 @@ describe("photo-matched geometry", () => {
   });
   test("real names on the buildings; the store's pole sign is a generic 7, no trademark", () => {
     const src = read("src/anime/world/harbor/minami5.js") + read("src/anime/world/harbor/market5.js");
-    for (const s of ["A N C H O R", "'café'", "'RST'", "'BLACK TIDE'", "'KNEWS'", "Kesennuma slow street 結", "Kesennuma Amway House Hirakeru", "'nine one'"]) expect(src).toContain(s);
+    for (const s of ["'ANCHOR'.split('')", "'café'", "'RST'", "'BLACK TIDE'", "'KNEWS'", "Kesennuma slow street 結", "Kesennuma Amway House Hirakeru", "'nine one'"]) expect(src).toContain(s);
     for (const ch of ["気", "仙", "沼", "市", "魚", "場"]) expect(src).toContain(`['${ch}',`);
     expect(src).not.toMatch(/7-?ELEVEN|セブン-?イレブン/i);
   });
@@ -61,7 +61,30 @@ describe("photo-matched geometry", () => {
 describe("photo-pairs.mjs", () => {
   test("ENU, focal length and the corrected fixes", () => {
     const [x, z] = enu(38.9055, 141.5752); expect(x).toBeCloseTo(17.35, 1); expect(z).toBeCloseTo(55.5, 1);
-    expect(vfov(24)).toBeCloseTo(73.7, 0);
+    expect(vfov(24)).toBeCloseTo(71.6, 0);   // [v5:detail] diagonal-matched 35 mm equivalent (was 73.7)
     for (const [id, f] of Object.entries(FIX)) { expect(id).toMatch(/^IMG_08\d\d|IMG_079\d$/); expect(f.why.length).toBeGreaterThan(10); expect(L.isWater(f.x, f.z)).toBe(false); }
+  });
+});
+
+// [v5:detail] the detail pass: the photo-match look, the ground pad under the ANCHOR shopfront, the face frame
+import { LOOKS, createTime } from "../src/anime/world/life/time.js";
+import { ANCHOR } from "../src/anime/world/harbor/minami5.js";
+describe("v5 detail pass", () => {
+  test("the photo look: overcast dusk at 17:20 JST on 2026-10-01, interiors lit, no light leak", () => {
+    const P = LOOKS.photo;
+    expect(P.hours).toBeCloseTo(17.333, 2); expect(P.date).toBe("2026-10-01"); expect(P.cover).toBe(1); expect(P.lit).toBeGreaterThan(0.5);
+    const shared = {}; const T = createTime({ shared, sunDir: null, sky: null, scene: { add() {} } }, { look: "photo" });
+    expect(T.look).toBe("photo"); expect(T.overcast).toBe(1); expect(T.lamps).toBe(1); expect(shared.uLit.value).toBeCloseTo(P.lit, 5);
+    expect(T.palette.leak).toBe(0); expect(T.sun.elevation).toBeLessThan(4); expect(T.sun.elevation).toBeGreaterThan(-3);
+  });
+  test("the ground pad flattens the DEM mound in front of the ANCHOR face, nothing beyond its feather", () => {
+    expect(L.heightAt(-12, 52)).toBeLessThanOrEqual(2.31); expect(L.heightAt(-6, 54)).toBeLessThanOrEqual(2.31);
+    expect(L.heightAt(-16.5, 57.4)).toBeCloseTo(2.12, 1);
+    expect(L.GROUND_PADS.length).toBeGreaterThan(0); for (const p of L.GROUND_PADS) expect(p.src.startsWith("sailesh")).toBe(true);
+  });
+  test("the ANCHOR face is the 10.4 m street segment of 迎's footprint; the eave rises from the box to the glazed corner", () => {
+    const P = SITES.mukaeru.poly; expect(P.some((p) => p[0] === ANCHOR.P1[0] && p[1] === ANCHOR.P1[1])).toBe(true); expect(P.some((p) => p[0] === ANCHOR.P2[0] && p[1] === ANCHOR.P2[1])).toBe(true);
+    expect(Math.hypot(ANCHOR.P2[0] - ANCHOR.P1[0], ANCHOR.P2[1] - ANCHOR.P1[1])).toBeCloseTo(10.36, 1);
+    const E = ANCHOR.eave; for (let i = 1; i < E.length; i++) expect(E[i][1]).toBeGreaterThan(E[i - 1][1]);
   });
 });

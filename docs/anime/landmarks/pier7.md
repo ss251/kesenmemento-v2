@@ -130,3 +130,12 @@ The client's photos outrank Google Earth (docs/anime/OVERRIDES.md). Code: `harbo
   benches are 4.6 m white rings with an inner step, a sunken lawn and a young tree. The rest of the plaza holds the 陸閘
   winch, the composite bleachers up to the lawn, the elevated walkway that bridges the gate (迎's deck to PIER7's NW
   face), the white mesh stair cage, the composite stair, and the gate post with its 注意 board.
+
+## v5:detail (2026-10-02): the bay face at dusk (IMG_0802, 0814-0817)
+
+- The 1F, 2F and 3F bands are lit painted interiors (`detail5.js` `shopGlass`) behind light frames at 1.25 m with a transom.
+- The 2F glazing stands 3.5 m back behind a terrace. This bares the SE block's NW face with the bay painting and the
+  backlit 「PIER7」.
+- Festoons swag between the deck stilts, with a low lamp in every bay at the wall foot.
+- New elements: the composite SE stair from the quay, 「ラヂオ気仙沼 77.5MHz」 on the studio glass, and the 3F balcony
+  over the terrace at the IMG_0802 bearing.

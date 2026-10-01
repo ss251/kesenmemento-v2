@@ -45,7 +45,7 @@ renderer.info.autoReset = false;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(Number(params.get('fov') || 55), innerWidth / innerHeight, 0.1, 30000);
-const START_HOURS = params.has('hours') ? Number(params.get('hours')) : ({ asa: 6.5, hiru: 12, yugata: 16.5, yuyake: 17 + 20 / 60, yoru: 19.5 }[params.get('preset')] ?? 16.5);
+const START_HOURS = params.has('hours') ? Number(params.get('hours')) : ({ asa: 6.5, hiru: 12, yugata: 16.5, yuyake: 17 + 20 / 60, yoru: 19.5, photo: 17 + 20 / 60 }[params.get('look') === 'photo' ? 'photo' : params.get('preset')] ?? 16.5);
 const sunDir = new THREE.Vector3(...L.sunDirAt(START_HOURS)).normalize();
 const sky = createSky(scene, sunDir, quality);
 const pipeline = createRenderPipeline(renderer, quality);

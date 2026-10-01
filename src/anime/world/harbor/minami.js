@@ -17,6 +17,7 @@ import { SITES, PONTOONS, MINAMI } from './real.js';
 import { prismWalls, capGeo, offsetRing, obbOf, seg, barAlong, openRing, signedArea, worldKit, paint, quadsGeo } from './lmkit.js';
 import { nightMat, addGlint, registry } from './lights.js';
 import { mapMat, textTex, FONT } from './util.js';
+import { shopGlass } from './detail5.js';   // [v5:detail]
 import { buildPier7Photos, buildMukaeruPhotos, buildPlazaPhotos, buildSlowStreetPhotos, buildKonbiniPhotos, buildMarkingsPhotos, clipAxis } from './minami5.js';   // [v5:photos]
 
 const C = { white: '#f1f1ee', roof: '#eceeed', timber: '#d6b88e', timberDark: '#a9825a', render: '#f0efe9', deck: '#b08a62', steel: '#5d6470', concrete: '#c9c6bc', stepTop: '#d7d3c8', lawn: '#8a9566', paveA: '#c6c3b8', paveB: '#b9b6ac', tanStep: '#b5ab9f', ringWhite: '#e9e7e1', soil: '#4f4a3e', lowPlant: '#4d5e3c', louver: '#cdbfa8', pontoon: '#b9bcb6', membrane: '#f4f5f2', glassPale: '#a9bccb', terraceA: '#6d6664', terraceB: '#57545b', p7deck: '#a7a39c', mukGrey: '#cfcfca', mukDark: '#8f8d8b', tanDeck: '#ae9a90',
@@ -129,7 +130,8 @@ export function buildMinami(ctx) {
     for (let x = 0; x < w; x += 8) { g.fillStyle = '#9da09b'; g.fillRect(x, 0, 2, h); g.fillStyle = '#b4b7b2'; g.fillRect(x + 3, 0, 2, h); }   // ribs run down the slope
   }, [1, 1]);
   const m = {
-    white: t(C.white, { paint: 0.03 }), roof: t(C.roof, { paint: 0.03 }), timber: mapMat(ctx, 'toon', '#ffffff', timberTex, { paint: 0.05 }), mullion: t(C.timber, { paint: 0.03 }),
+    white: t(C.white, { paint: 0.03 }), roof: t(C.roof, { paint: 0.03 }), timber: mapMat(ctx, 'toon', '#ffffff', timberTex, { paint: 0.05 }), mullion: t('#e4e3de', { paint: 0.02 }),   // [v5:detail] light frames (IMG_0802, 0817)
+   
     render: t(C.render, { paint: 0.04 }), deck: t(C.deck, { paint: 0.06 }), steel: t(C.steel, { paint: 0 }), concrete: t(C.concrete, { paint: 0.07 }), step: t(C.stepTop, { paint: 0.06 }), paveA: t(C.paveA, { paint: 0.05 }), paveB: t(C.paveB, { paint: 0.05 }), tanStep: t(C.tanStep, { paint: 0.06 }), ringWhite: t(C.ringWhite, { paint: 0.02 }), paveBand: t('#8f8d88', { paint: 0.05 }), soil: t(C.soil, { paint: 0.08 }), lowPlant: t(C.lowPlant, { paint: 0.08 }), louver: t(C.louver, { paint: 0.03 }),
     lawn: t(C.lawn, { paint: 0.08 }), pontoon: t(C.pontoon, { paint: 0.06 }), membrane: t(C.membrane, { paint: 0.02, side: 'double' }), trunk: t('#76604e', { paint: 0 }), leaf: t('#6f9a52', { paint: 0.06 }), leafLit: t('#8fb566', { paint: 0.06 }),
     glass: nightMat(ctx, '#8aa4b8', '#ffdcaa', 1.25), glassDark: nightMat(ctx, '#5f7486', '#ffdcaa', 1.3), glassWarm: nightMat(ctx, '#95a9b6', '#ffe0b0', 1.35), lamp: nightMat(ctx, '#e8e6dc', '#fff0d0', 2.2),
@@ -142,9 +144,10 @@ export function buildMinami(ctx) {
   const hall = (poly, h) => { const o = obbOf(poly); out.halls.push({ x: o.cx, z: o.cz, rotY: o.rotY, depth: o.w, len: o.d, h }); if (ctx.physics?.addBox) edgesOf(poly, (a, b, len, n, u) => { const p = Math.max(1, Math.ceil(len / 16)); for (let i = 0; i < p; i++) { const s = (i + 0.5) * len / p; ctx.physics.addBox(a[0] + u[0] * s - n[0] * 0.25, a[1] + u[1] * s - n[1] * 0.25, 0.5, len / p, Math.atan2(u[0], u[1]), -5, 40); } }); return o; };
   const base = (poly) => Math.max(1.9, Math.min(...openRing(poly).map(([x, z]) => L.heightAt(x, z))));
   /** Glazed floor band with timber mullions every `sp` m and a white slab edge on top. */
-  const glazedBand = (poly, y0, y1, sp = 1.8, mat = m.glass) => {
-    k.mesh(prismWalls(offsetRing(poly, -0.25), y0, y1, { tile: 3 }), mat);
-    edgesOf(poly, (a, b, len, n, u) => { for (let s = 0.2; s <= len - 0.1; s += len / Math.max(1, Math.round(len / sp))) k.box(0.12, y1 - y0, 0.2, m.mullion, [a[0] + u[0] * s - n[0] * 0.12, (y0 + y1) / 2, a[1] + u[1] * s - n[1] * 0.12], [0, Math.atan2(u[0], u[1]), 0]); });
+  // [v5:detail] glass with a painted lit interior (detail5 shopGlass, one texture repeat per band height) and a transom
+  const glazedBand = (poly, y0, y1, sp = 1.8, mat = m.glass, transom = 0) => {
+    k.mesh(prismWalls(offsetRing(poly, -0.25), y0, y1, { tile: mat.name === 'shopGlass' ? y1 - y0 : 3 }), mat);
+    edgesOf(poly, (a, b, len, n, u) => { for (let s = 0.2; s <= len - 0.1; s += len / Math.max(1, Math.round(len / sp))) k.box(0.1, y1 - y0, 0.16, m.mullion, [a[0] + u[0] * s - n[0] * 0.12, (y0 + y1) / 2, a[1] + u[1] * s - n[1] * 0.12], [0, Math.atan2(u[0], u[1]), 0]); if (transom) k.box(0.1, 0.1, len, m.mullion, [(a[0] + b[0]) / 2 - n[0] * 0.12, transom, (a[1] + b[1]) / 2 - n[1] * 0.12], [0, Math.atan2(u[0], u[1]), 0]); });
     k.mesh(prismWalls(poly, y1, y1 + 0.55, { tile: 3 }), m.white);
     k.mesh(capGeo(poly, y1 + 0.02, { down: true }), m.white);
   };
@@ -163,12 +166,18 @@ export function buildMinami(ctx) {
     const poly = SITES.pier7.poly, g0 = base(poly), f2 = MINAMI.wallCrest, f3 = f2 + 5.2, roofY = f3 + 4.0;
     const T = PIER7_SPLIT;
     k.mesh(prismWalls(poly, g0 - 1, g0 + 0.3), m.concrete);
-    glazedBand(poly, g0 + 0.3, f2 - 0.55, 1.8, m.glassWarm);
+    glazedBand(poly, g0 + 0.3, f2 - 0.55, 1.8, shopGlass(ctx, 'shop', 0.95), g0 + 2.6);
     // [v5:photos] the NW pavilion and the SE white block are full-depth volumes of their own (minami5.js), so the 2F glazing,
     // its roof and the stepped terrace cover only the middle of the bar (IMG_0800-0806)
     const MID = clipAxis(poly, T.axis.o, T.axis.u, -2.5, 40.6);
-    glazedBand(MID, f2, f3 - 0.55, 2.4, m.glassPale);
-    k.mesh(capGeo(MID, f3 + 0.03), m.terraceA);                                   // the 2F roof (bay side shows)
+    // [v5:detail] the 2F glazing stands 3.5 m back from the bay edge behind a terrace with tables (IMG_0802, 0815); that
+    // also bares the SE block's NW face with 「PIER7」 and the bay painting above the deck (IMG_0816)
+    const dBay = Math.max(...MID.map((p) => (p[0] - T.axis.o[0]) * T.bayN[0] + (p[1] - T.axis.o[1]) * T.bayN[1]));
+    const MIDb = clipAxis(MID, T.axis.o, T.bayN, -1e3, dBay - 3.5), MIDt = clipAxis(MID, T.axis.o, T.bayN, dBay - 3.5, 1e3);
+    glazedBand(MIDb, f2, f3 - 0.55, 1.25, shopGlass(ctx, 'cafe', 1.0), f2 + 2.6);
+    k.mesh(capGeo(MIDt, f2 + 0.03, { tile: 2 }), m.p7deck);
+    if (ctx.physics?.addWalkBox) { const o = obbOf(MIDt); ctx.physics.addWalkBox(o.cx, o.cz, o.w, o.d, o.rotY, f2 + 0.03, f2 - 1); }
+    k.mesh(capGeo(MIDb, f3 + 0.03), m.terraceA);                                   // the 2F roof (bay side shows)
     // the stepped terrace on the bay-side 2F roof: nested strips from the 3F wall toward the bay, each one step lower
     const steps5 = T.steps.map((st) => clipAxis(st, T.axis.o, T.axis.u, -2.5, 40.6));   // [v5:photos]
     steps5.forEach((st, i) => { k.mesh(prismWalls(st, f3, f3 + 0.5 * (i + 1)), i % 2 ? m.terraceA : m.terraceB); k.mesh(capGeo(st, f3 + 0.5 * (i + 1) + 0.01), i % 2 ? m.terraceA : m.terraceB); });
@@ -182,11 +191,11 @@ export function buildMinami(ctx) {
     // and the SE white-board block are minami5's full-depth volumes
     for (const bl of T.blocks) {
       const top = tops[bl.id], P = bl.poly;
-      if (bl.id === 'main') glazedBand(P, f3, top - 0.55, 1.8, m.glassPale);
+      if (bl.id === 'main') glazedBand(P, f3, top - 0.55, 1.25, shopGlass(ctx, 'glow', 0.9), f3 + 2.5);
       if (bl.id === 'main') k.mesh(capGeo(offsetRing(P, -0.4), top - 0.6, { down: true, tile: 2 }), m.timber);
     }
     // interior warmth: timber-lined ceilings read through the glass
-    k.mesh(capGeo(offsetRing(poly, -0.4), f2 - 0.6, { down: true, tile: 2 }), m.timber); k.mesh(capGeo(offsetRing(MID, -0.4), f3 - 0.6, { down: true, tile: 2 }), m.timber);   // [v5:photos] MID
+    k.mesh(capGeo(offsetRing(poly, -0.4), f2 - 0.6, { down: true, tile: 2 }), m.timber); k.mesh(capGeo(offsetRing(MIDb, -0.4), f3 - 0.6, { down: true, tile: 2 }), m.timber);   // [v5:photos] MID
     // [v5:fix2] the street face: continuous white panels with narrow vertical timber louvers at a 1.1 m pitch in front of
     // the 2F and 3F (Earth o0 / l225: a white face, no punched windows; it read as an apartment block with blue windows
     // and orange panels). The louvers are a muted pale timber so they read as a texture, not as coloured rectangles.
@@ -203,7 +212,7 @@ export function buildMinami(ctx) {
     // the terrace on its crest, the deck on white stilts with the lit wire rail; the NW pavilion, the SE white block with
     // 「PIER7」 and the bay painting, the main gable roof, the 3F balcony box; the NW street corner (IMG_0799, 0823). It replaces
     // the v5:fix cantilevered pale deck and the 15 m 「PIER7」 on the 3F bay face, which the photos do not show.
-    out.pier7photos = buildPier7Photos(ctx, k, { L, P: poly, g0, f2, f3, T, tops });
+    out.pier7photos = buildPier7Photos(ctx, k, { L, P: poly, g0, f2, f3, T, tops, mid: MIDb });
     edgesOf(poly, (a, b, len, n, u) => {
       if (len < 30 || seaward(L, a, b, n, 40)) return;
       const p = [a[0] + u[0] * len * 0.5 + n[0] * 0.55, a[1] + u[1] * len * 0.5 + n[1] * 0.55];

@@ -86,3 +86,20 @@ v5:fix3 迎 and garden, which are kept intact.
 - **Across 魚町港町線:** the convenience store (the c6 solar shed) is drawn as a generic striped storefront with a
   brick end wall and a "7"-style pole sign (no trademark logo). The junction has zebras, a hatched median, ◇ marks and
   banded bollards.
+
+## v5:detail (2026-10-02): the ANCHOR shopfront in full (IMG_0824-0828)
+
+`harbor/minami5.js` `ANCHOR`, `buildMukaeruPhotos`, `buildStreetFront`; kit in `harbor/detail5.js`.
+
+- The ANCHOR face is the 10.4 m street segment P1 (-17.4, 43.4) to P2 (-9.5, 50.1). It has six white-framed clerestory
+  panes with the letters behind lit glass, the glazed 2F corner (f 0.72 onward, round onto the SE face), the café RST fascia
+  with six gooseneck lamps, the HAVE A NICE COFFEE oval, the Lander Blue and SHARKS boards, two nobori, five bikes, A-boards
+  and the soft-cream stand.
+- The eave is a folded plate (6.0 m at the box, a crease at f 0.36, 7.95 m at the corner) clipped to A's own outline. The
+  old full-width sine strip hung 5 m past the face, which made the wall look curved.
+- The 3F grey box stands 2.5 m back from the street, behind a 6.4 m ribbed strip that carries the two-flight steel stair.
+- `layout.js` `GROUND_PADS` clamps the DEM to T.P. 2.3 at the SE end. The DEM rose to 5 m there and buried the shopfront in
+  a mound.
+- The broad composite stair runs along the SE face from the deck to the bay terrace. The totem moved 2 m west (IMG_0824
+  bearing).
+- The pavement of 魚町港町線 has pavers, a sett line, kerbs, four young street trees and four parked cars.

@@ -25,6 +25,17 @@ export const PRESETS = [
 ];
 export const PRESET_BY_ID = Object.fromEntries(PRESETS.map((p) => [p.id, p]));
 export const DEMO_DATE = '2026-10-10';
+/** [v5:detail] Lighting looks layered over the clock (?look=photo, T.setLook('photo')). photo = the author's photos
+ *  (raw/photos-sailesh, 2026-10-01 17:07-17:22 JST): an overcast dusk at 17:20 in early October under a grey altocumulus
+ *  deck; soft, nearly shadowless light; shop interiors, deck lights and lamps already on. Used by tools/anime/photo-pairs.mjs
+ *  so the lighting never hides the comparison. */
+export const LOOKS = {
+  photo: {
+    hours: 17 + 20 / 60, date: '2026-10-01', cover: 1, lit: 0.8, dusk: 0.3,
+    pal: { zenith: '#5f7290', mid: '#8a99b0', horizon: '#c9c6c2', warm: '#e9a073', fog: '#a9afb7', sun: '#efe2d0', hemiSky: '#cfd2d6', hemiGround: '#9a968f', cloudLit: '#b7bfcb', cloudShade: '#6e7a90' },
+    sunI: 0.62, hemiI: 2.05, exposure: 1.0, bloom: 0.3, glow: 0.16, mix: 1.0,
+  },
+};
 
 const wrap24 = (h) => ((h % 24) + 24) % 24;
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -43,21 +54,23 @@ export function dayOfYearOf(ymd) { const d = new Date(ymd + 'T00:00:00Z'); retur
 export function createTime(ctx, opts = {}) {
   const S = ctx.shared;
   S.uNight ??= { value: 0 }; S.uLamps ??= { value: 0 }; S.uDusk ??= { value: 0 }; S.uWet ??= { value: 0 }; S.uRain ??= { value: 0 };
+  S.uLit ??= { value: 0 };   // [v5:detail] interiors lit regardless of the night factor (harbor nightMat reads it)
   const sunDir = ctx.sunDir || new THREE.Vector3(0, 1, 0);
-  const doy = opts.date ? dayOfYearOf(opts.date) : DEMO_DOY;
+  const LK = LOOKS[opts.look] || null;
+  let doy = opts.date ? dayOfYearOf(opts.date) : LK?.date ? dayOfYearOf(LK.date) : DEMO_DOY;
   const listeners = new Set();
   const pal = skyPaletteAt(16.5);
   const state = {
-    presets: PRESETS, date: opts.date || DEMO_DATE, dayOfYear: doy,
+    presets: PRESETS, date: opts.date || LK?.date || DEMO_DATE, dayOfYear: doy, look: LK ? opts.look : null, overcast: 0,
     hours: 16.5, preset: 'yugata', target: null, night: 0, lamps: 0, dusk: 0, sunDir, palette: pal,
     sun: { azimuth: 0, elevation: 0 }, lightDir: new THREE.Vector3(0, 1, 0),
-    weather: { cloud: 0.35, rain: 0, wind: 3, windDirDeg: 270, fog: 0 },   // live.js fills this; the sky core reads it
+    weather: { cloud: LK?.cover ?? 0.35, rain: 0, wind: 3, windDirDeg: 270, fog: 0 },   // live.js fills this; the sky core reads it
     // life's grade on top of foundation's palette (T.palette is life's copy; the sky core reads it): the night drops the
     // ambient so thousands of warm windows, lamp pools and boat lights carry the frame (promo.town's night), and the
     // bloom/glow rise with it. Tunable at runtime (window.__life.time.grade) for the look pass.
     grade: { ...GRADE },
     transitioning: false,
-    set, setHours, setWeather,
+    set, setHours, setWeather, setLook,
     onChange: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
     get presetInfo() { return PRESET_BY_ID[state.preset] || null; },
     clock() { const h = wrap24(state.hours); const hh = Math.floor(h), mm = Math.floor((h - hh) * 60 + 1e-6); return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`; },
@@ -91,6 +104,15 @@ export function createTime(ctx, opts = {}) {
     apply(state.hours); emit('weather');
   }
 
+  /** [v5:detail] Switch a look on (LOOKS id) or off (null): the photo look also moves the clock and the date. */
+  function setLook(id) {
+    const L2 = LOOKS[id] || null;
+    state.look = L2 ? id : null;
+    if (L2) { doy = dayOfYearOf(L2.date); state.date = L2.date; state.dayOfYear = doy; state.weather.cloud = L2.cover; tr = null; apply(L2.hours); }
+    else { S.uLit.value = 0; state.overcast = 0; apply(state.hours); }
+    emit('look'); return state;
+  }
+
   // ---------------------------------------------------------------- lights (life owns them; the sky core made them)
   let sunL = ctx.sky?.sun || null, hemi = ctx.sky?.hemi || null;
   if (!sunL) { sunL = new THREE.DirectionalLight('#fff0dc', 2.75); sunL.castShadow = true; ctx.scene.add(sunL); ctx.scene.add(sunL.target); }
@@ -107,6 +129,14 @@ export function createTime(ctx, opts = {}) {
     sunDir.set(s.dir[0], s.dir[1], s.dir[2]).normalize();
     keyLight(sunDir, state.lightDir).normalize();
     skyPaletteAt(h, pal);
+    // [v5:detail] a look repaints the hour's palette (keeping a little of its tint) before the weather and night grades
+    const LKa = LOOKS[state.look];
+    if (LKa) {
+      for (const [c, hex] of Object.entries(LKa.pal)) pal[c].lerp(_gs.set(hex), LKa.mix);
+      pal.sunI = LKa.sunI; pal.hemiI = LKa.hemiI; pal.exposure = LKa.exposure; pal.bloom = LKa.bloom; pal.glow = LKa.glow; pal.leak = 0; pal.neutral = 1;
+      state.dusk = Math.min(state.dusk, LKa.dusk); state.lamps = 1;
+    }
+    S.uLit.value = LKa ? LKa.lit : 0; state.overcast = LKa ? 1 : 0; if (!LKa) pal.neutral = 0;
     // weather: overcast dims and greys the key light a little (never murky: the ambient rises to compensate)
     const W = state.weather, over = Math.min(1, smooth(0.55, 1.0, W.cloud) * 0.8 + 0.3 * W.rain);
     const wet = Math.min(1, Math.max(W.wet || 0, W.rain * 1.6));
@@ -118,7 +148,7 @@ export function createTime(ctx, opts = {}) {
     sunL.color.copy(pal.sun).lerp(_grey, over * 0.45); sunL.intensity = pal.sunI * (1 - 0.42 * over);
     hemi.color.copy(pal.hemiSky); hemi.groundColor.copy(pal.hemiGround); hemi.intensity = pal.hemiI * (1 + 0.16 * over);
     // overcast / rain: the painted sky, fog and clouds go soft grey-blue (keeping their brightness), no light leak
-    if (over > 0.01) {
+    if (over > 0.01 && !LKa) {   // [v5:detail] a look brings its own overcast palette
       const k = over * 0.75;
       for (const c of ['zenith', 'mid', 'horizon', 'warm', 'fog', 'cloudLit', 'cloudShade']) {
         const col = pal[c]; if (!col?.isColor) continue;
@@ -146,7 +176,7 @@ export function createTime(ctx, opts = {}) {
     }
   }
   state.update = update;
-  apply(opts.hours ?? resolveHours(opts.preset || 'yugata'));
+  apply(opts.hours ?? LK?.hours ?? resolveHours(opts.preset || 'yugata'));
   state.preset = opts.preset || nearestPreset(state.hours, 0.02);
   return state;
 }
