@@ -29,6 +29,11 @@ const SHOTS = [
   ['a1_tapes_snap', `(__voyageShot('SENDOFF'), window.__c = __voyage.camRig('berth'), __voyage.send('HORN'), __voyage.send('CAST_OFF'), 'ok')`, 26, `__lookAt(__c.pos.toArray(), __c.look.toArray())`],
   ['a1_kanae', `__voyageKanae(100)`, 33, `(() => { const s = __sail.state, px = Math.cos(s.yaw), pz = -Math.sin(s.yaw); __lookAt([s.x + px * 170 - Math.sin(s.yaw) * 60, 26, s.z + pz * 170 - Math.cos(s.yaw) * 60], [s.x, 16, s.z]); })()`],
   ['a1_kanae_chase', `__voyageKanae(100)`, 26],
+  // [ship] fix round 2: the market rows on the way out, 商港 passed to starboard, and the lettered transom (photo 04)
+  ['a1_market', `__voyageAt(400)`, 10],
+  ['a1_shoko', `__voyageAt(__shipRoute.SHOKO.s - 130)`, 34],
+  ['a1_transom', `(__voyageShot('DOCKED'), document.getElementById('klc-ship').hidden = true, 'ok')`, 0.5, `__shipLook([21, 8.5, -60], [0, 3.0, -28.6])`],
+  ['a2_transom', `(__voyageShot('WAIT'), document.getElementById('klc-ship').hidden = true, 'ok')`, 0.5, `__shipLook([-19, 7.5, -58], [0, 3.0, -28.6])`],
   ['a1_baymouth', `__voyageShot('BAY_MOUTH')`, 2],
   ['a2_set', `__voyageShot('OCEAN_SET')`, 14],
   ['a2_wait', `__voyageShot('WAIT')`, 3],

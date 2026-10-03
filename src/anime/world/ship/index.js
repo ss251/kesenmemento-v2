@@ -143,14 +143,18 @@ export async function build(ctx) {
         return { state: got, data: { kept: d.kept.length, tags: d.kept.filter((f) => f.tag).map((f) => f.tag), landed: d.landedKg } };
       },
       __voyageCam: (name) => { if (!voyage.active) voyage.jump(voyage.state); voyage.setCam(name, true); return name; },
-      /** Sail mode from `back` m before the かなえ大橋 crossing, autopilot on (the bridge shot). */
-      __voyageKanae: (back = 160) => {
+      /** Sail mode from arclength `s` of the outbound line, under way, autopilot on (the market and 商港 shots). */
+      __voyageAt: (sAt) => {
         if (voyage.state !== 'DEPART' || !voyage.active) voyage.jump('DEPART');
-        const P = ROUTE.OUTBOUND_PATH, k = ROUTE.KANAE_CROSSING.s - back;
-        const [x, z] = P.at(k), [dx, dz] = P.dirAt(k);
+        const P = ROUTE.OUTBOUND_PATH, [x, z] = P.at(sAt), [dx, dz] = P.dirAt(sAt);
         sail.enter({ x, z, yaw: Math.atan2(dx, dz), u: 3.0, autopilot: true });
-        return { x: Math.round(x), z: Math.round(z) };
+        return { x: Math.round(x), z: Math.round(z), s: Math.round(sAt) };
       },
+      /** Sail mode from `back` m before the かなえ大橋 crossing, autopilot on (the bridge shot). */
+      __voyageKanae: (back = 160) => window.__voyageAt(ROUTE.KANAE_CROSSING.s - back),
+      __shipRoute: ROUTE,
+      /** Point the camera from ship-local [x, y, z] at ship-local [x, y, z] (the transom shots). */
+      __shipLook: (from, to) => { const a = ship.localToWorld(from), b = ship.localToWorld(to); window.__lookAt?.([a.x, a.y, a.z], [b.x, b.y, b.z]); return 'ok'; },
     });
   }
 
