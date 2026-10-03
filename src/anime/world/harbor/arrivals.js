@@ -141,18 +141,59 @@ export function planArrivals(list, slots = arrivalSlots()) {
   return out;
 }
 
-// [ship] Yield to 第一昭福丸 under way (explore/sail.js publishes ctx.services.sail): an arriving boat within YIELD_R
-// of her holds its position. Its schedule slips by the time it waited (`delay`, seconds on the arrival clock), so it
-// resumes from where it stopped once she has passed. Pure: returns the number of boats holding.
+// [ship] Yield to 第一昭福丸 under way (explore/sail.js publishes ctx.services.sail). Pure; returns the number of boats
+// holding. An arriving boat holds its position (its schedule slips by the time it waited, `delay` seconds on the
+// arrival clock, so it resumes from where it stopped once she has passed) when it is
+//   - within YIELD_R of her, or
+//   - in her swept lane ahead or abeam (|lateral| < her half-beam + its half-beam + YIELD_LANE.extra, up to
+//     YIELD_LANE.ahead metres ahead), measured on her route (`path`, sail's OUTBOUND) while she is on it, else on her
+//     heading.
+// A boat in her lane also eases aside (`offT`, metres to its own starboard, COLREG rule 14: both keep to starboard and
+// pass port to port) by up to YIELD_LANE.shift m, far enough to clear the lane, onto water at least YIELD_LANE.shore m
+// from the shore at its bow, midship and stern; if its starboard side has no room, it tries its port side. The offset
+// is chosen once per encounter (latched) from the boat's un-offset route position (bx, bz), and released (eased back
+// to 0 by update()) once she is past. Boats keep the pure stop when they are clear of her lane.
 export const YIELD_R = 120;   // [ship]
-export function yieldHold(boats, ship, dt, { radius = YIELD_R, rate = RATE } = {}) {   // [ship]
+export const YIELD_LANE = { ahead: 400, extra: 10, shift: 25, minShift: 6, shore: 10, ease: 4 };   // [ship] ease: m/s
+const SHIP_HALF = { L: 58.6 / 2, B: 9.2 / 2 };   // [ship] 第一昭福丸 (ship/route.js SHIP_DIMS)
+export function yieldHold(boats, ship, dt, { radius = YIELD_R, rate = RATE, path = null, shoreDist = null, lane = YIELD_LANE, half = SHIP_HALF } = {}) {   // [ship]
   let n = 0;
+  const onRoute = !!(ship && path && Number.isFinite(ship.s) && !(ship.xte > 30));
+  // her frame for a point: { along (m ahead of her midship), lat (m to her port) }
+  const frame = (x, z) => {
+    if (onRoute) { const q = path.project(x, z, Math.max(0, ship.s - 200), ship.s + lane.ahead + 100); return { along: q.s - ship.s, lat: q.d * (q.side || 1) }; }
+    const sy = Math.sin(ship.yaw || 0), cy = Math.cos(ship.yaw || 0), dx = x - ship.x, dz = z - ship.z;
+    return { along: dx * sy + dz * cy, lat: dx * cy - dz * sy };
+  };
   for (const b of boats) {
-    const hold = !!ship && b.phase === 'approach' && Math.hypot(b.x - ship.x, b.z - ship.z) < radius;
-    b.yielding = hold;
+    if (!ship || b.phase !== 'approach') { b.yielding = false; b.inLane = false; b.offT = 0; b.shift = null; continue; }
+    const bx = b.bx ?? b.x, bz = b.bz ?? b.z, hb = (b.S?.B ?? 9) / 2, hl = (b.S?.L ?? 50) / 2;
+    const f = frame(bx, bz), laneHalf = half.B + hb + lane.extra;
+    const inLane = Math.abs(f.lat) < laneHalf && f.along > -(half.L + hl + 5) && f.along < lane.ahead;
+    const hold = inLane || Math.hypot(b.x - ship.x, b.z - ship.z) < radius;
+    b.yielding = hold; b.inLane = inLane;
     if (hold) { b.delay = (b.delay || 0) + dt * rate; n++; }
+    if (!inLane) { b.offT = 0; b.shift = null; continue; }
+    if (b.shift == null) b.shift = chooseShift(b, bx, bz, frame, laneHalf, lane, shoreDist);
+    b.offT = b.shift;
   }
   return n;
+}
+/** The smallest-sufficient sidestep (m, + = the boat's starboard) that leaves her lane on water; 0 if none fits. */
+function chooseShift(b, bx, bz, frame, laneHalf, lane, shoreDist) {   // [ship]
+  const yaw = b.yaw ?? 0, sx = -Math.cos(yaw), sz = Math.sin(yaw);   // starboard of a heading (sin yaw, cos yaw)
+  const fx = Math.sin(yaw), fz = Math.cos(yaw), hl = (b.S?.L ?? 50) / 2;
+  const wet = (x, z) => !shoreDist || [-hl, 0, hl].every((k) => shoreDist(x + fx * k, z + fz * k) >= lane.shore);
+  let fallback = 0;
+  for (const side of [1, -1]) {
+    for (let o = lane.minShift; o <= lane.shift + 1e-9; o += 1) {
+      const x = bx + sx * side * o, z = bz + sz * side * o;
+      if (!wet(x, z)) break;   // further out on this side is the shore
+      if (side === 1) fallback = o;
+      if (Math.abs(frame(x, z).lat) >= laneHalf + 2) return side * Math.min(lane.shift, o + 4);   // a few metres spare
+    }
+  }
+  return fallback;   // no room to clear the lane: as far to starboard as the water allows (and it holds)
 }
 
 // [v3:fix] stills hide the floating name labels (a UI element, and the fixture's サンプル tag floated over the market
@@ -247,21 +288,27 @@ export function createArrivals(ctx, opts = {}) {
       b.phase = phase;
       const vis = phase === 'approach' || phase === 'berthed';
       b.carrier.visible = vis; b.handle?.setOn?.(vis ? 1 : 0);
-      if (!vis) { b.label.visible = false; continue; }
+      if (!vis) { b.label.visible = false; b.off = b.offT = 0; continue; }   // [ship] b.off: never aside off screen
       const s = R.len - dist;
       const [x, z] = R.at(s);
       const [xa, za] = R.at(s + 14), [xb, zb] = R.at(s - 14);
       let yaw = Math.atan2(xa - xb, za - zb);
       if (dist < 40) { const k = 1 - dist / 40; let d = R.heading - yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); yaw += d * k * k * (3 - 2 * k); }
       const speed = phase === 'approach' ? Math.min(1, dist / (SPEED * EASE)) : 0;
-      b.carrier.position.set(x, L?.SEA?.level ?? 0, z); b.carrier.rotation.set(0, yaw, 0);
+      // [ship] the sidestep for 第一昭福丸 (yieldHold sets offT): eased, along the boat's own starboard
+      b.bx = x; b.bz = z; b.yaw = yaw;
+      if (phase !== 'approach') b.offT = 0;
+      const E = YIELD_LANE.ease * Math.max(0, Math.min(dt || 0, 0.25)) * RATE;   // [ship]
+      b.off = (b.off || 0) + Math.max(-E, Math.min(E, (b.offT || 0) - (b.off || 0)));   // [ship]
+      const xo = x - Math.cos(yaw) * b.off, zo = z + Math.sin(yaw) * b.off;   // [ship]
+      b.carrier.position.set(xo, L?.SEA?.level ?? 0, zo); b.carrier.rotation.set(0, yaw, 0);
       b.group.rotation.set(Math.sin(t * 0.7 + b.si) * 0.006, 0, Math.sin(t * 0.9 + b.si * 2) * 0.02 * (0.4 + speed));
       b.group.position.y = Math.sin(t * 1.1 + b.si) * 0.06;
       b.wake.material.opacity = 0.85 * speed;
       b.wake.visible = speed > 0.02;
-      b.x = x; b.z = z;
+      b.x = xo; b.z = zo;   // [ship]
       // label: above the mast, hidden when very far or right on top of the camera
-      _q.set(x, b.air, z);
+      _q.set(xo, b.air, zo);   // [ship]
       const d = cam ? cam.distanceTo(_q) : 100;
       const near = d < 420;
       if (near !== b.lod) { b.lod = near; for (const o2 of b.detail) o2.visible = near; }
@@ -275,7 +322,7 @@ export function createArrivals(ctx, opts = {}) {
     }
     // [ship] boats near the sailing ship hold position next frame (their own clock stops)
     const sail = ctx.services?.sail;
-    yieldHold(boats, sail?.active ? sail.state : null, Math.max(0, Math.min(dt || 0, 0.25)));   // [ship]
+    yieldHold(boats, sail?.active ? sail.state : null, Math.max(0, Math.min(dt || 0, 0.25)), { path: sail?.path || null, shoreDist: L?.shoreDist || null });   // [ship]
     declutter();
   }
 
@@ -288,7 +335,7 @@ export function createArrivals(ctx, opts = {}) {
     for (const s of shown) { if (kept.some((k) => Math.abs(k.x - s.x) < 0.32 && Math.abs(k.y - s.y) < 0.2)) s.b.label.visible = false; else kept.push(s); }
   }
 
-  function state() { return boats.map((b) => ({ vessel: b.a.vessel, type: b.type, phase: b.phase, eta: b.a.time, slot: b.si, x: Math.round(b.x), z: Math.round(b.z), dry: b.route.dry, yielding: !!b.yielding, delay: Math.round(b.delay || 0) })); }   // [ship] yielding, delay
+  function state() { return boats.map((b) => ({ vessel: b.a.vessel, type: b.type, phase: b.phase, eta: b.a.time, slot: b.si, x: Math.round(b.x), z: Math.round(b.z), dry: b.route.dry, yielding: !!b.yielding, delay: Math.round(b.delay || 0), yaw: b.yaw ?? 0, px: b.x, pz: b.z, L: b.S.L, B: b.S.B, off: b.off || 0 })); }   // [ship] yielding, delay, the pose and the sidestep
 
   // follow life's live list (life builds after harbor: subscribe on the first frame it exists)
   let subscribed = false;

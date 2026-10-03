@@ -363,7 +363,7 @@ describe("AI boats yield to her; her berth stays free", () => {
       { phase: "berthed", x: 10, z: 0 }, { phase: "sea", x: 0, z: 0 },
     ];
     expect(YIELD_R).toBe(120);
-    expect(yieldHold(boats, { x: 0, z: 0 }, 0.5, { rate: 4 })).toBe(2);
+    expect(yieldHold(boats, { x: 0, z: 0, yaw: Math.PI / 2 }, 0.5, { rate: 4 })).toBe(2);   // heading east: (100, 0) dead ahead
     expect(boats.map((b) => b.delay || 0)).toEqual([2, 2, 0, 0, 0]);
     expect(boats.map((b) => b.yielding)).toEqual([true, true, false, false, false]);
     expect(yieldHold(boats, null, 0.5)).toBe(0);   // sail not active: nobody holds
@@ -393,6 +393,42 @@ describe("AI boats yield to her; her berth stays free", () => {
     expect(g1.delay).toBeGreaterThan(15);
     A.clear();
   });
+  test("a departure through 12 arrivals (ETAs 11:03-11:47): every arrival hull keeps an OBB gap >= 3 m, then they all go on", () => {
+    // oriented boxes [corners] for a hull of length l and beam w at (x, z) heading yaw; gap = 0-or-less when they overlap
+    const rect = (x, z, yaw, l, w) => { const sy = Math.sin(yaw), cy = Math.cos(yaw); return [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([a, b]) => [x + sy * a * l / 2 + cy * b * w / 2, z + cy * a * l / 2 - sy * b * w / 2]); };
+    const segD = (p, a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / (dx * dx + dz * dz))); return Math.hypot(p[0] - a[0] - dx * t, p[1] - a[1] - dz * t); };
+    const overlap = (A, B) => { for (const P of [A, B]) for (let i = 0; i < 4; i++) { const a = P[i], b = P[(i + 1) % 4], n = [b[1] - a[1], a[0] - b[0]]; const pa = A.map((q) => q[0] * n[0] + q[1] * n[1]), pb = B.map((q) => q[0] * n[0] + q[1] * n[1]); if (Math.max(...pa) < Math.min(...pb) || Math.max(...pb) < Math.min(...pa)) return false; } return true; };
+    const gap = (A, B) => { if (overlap(A, B)) return 0; let d = Infinity; for (const [P, Q] of [[A, B], [B, A]]) for (const p of P) for (let i = 0; i < 4; i++) d = Math.min(d, segD(p, Q[i], Q[(i + 1) % 4])); return d; };
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 30000);
+    const ctx = createContext({ scene, camera, renderer: null, audio: null, quality: { name: "low", phone: true }, sunDir: new THREE.Vector3(...L.SUN_DIR).normalize() });
+    ctx.sky = { hours: 11.0 };
+    const A = createArrivals(ctx, { follow: false });
+    const kinds = ["saury", "longline", "pole", "longline", "saury", "coastal"];
+    A.setArrivals(Array.from({ length: 12 }, (_, i) => ({ vessel: `QA試験丸${i + 1}`, time: `11:${String(3 + i * 4).padStart(2, "0")}`, kind: kinds[i % kinds.length] })));
+    const sail = createSail(ctx, {});
+    sail.enter();
+    let t = 0, worst = Infinity, held = 0, aside = 0;
+    for (let i = 0; i < 40000 && !sail.state.events.some((e) => e.type === "arrived"); i++) {
+      t += 0.05; sail.update(0.05); A.update(0.05, t);
+      const S = rect(sail.state.x, sail.state.z, sail.state.yaw, SHIP_DIMS.loa, SHIP_DIMS.beam);
+      for (const b of A.state()) {
+        if (b.phase !== "approach" && b.phase !== "berthed") continue;
+        if (b.yielding) held++;
+        aside = Math.max(aside, Math.abs(b.off));
+        worst = Math.min(worst, gap(S, rect(b.px, b.pz, b.yaw, b.L, b.B)));
+      }
+    }
+    expect(sail.state.events.map((e) => e.type)).toContain("arrived");
+    expect(held).toBeGreaterThan(0);                     // the encounter really happened
+    expect(aside).toBeGreaterThan(5);                    // and a boat stepped out of her lane
+    expect(aside).toBeLessThanOrEqual(25 + 1e-9);
+    expect(worst).toBeGreaterThanOrEqual(3);
+    // she is gone: everyone resumes and steps back onto the route
+    sail.exit();
+    for (let i = 0; i < 600; i++) { t += 0.05; A.update(0.05, t); }
+    for (const b of A.state()) { expect(b.yielding).toBe(false); expect(Math.abs(b.off)).toBeLessThan(0.01); }
+    A.clear();
+  }, 60000);
   test("the コの字岸壁 berth is reserved: no moored row boat in it, moorRun avoids it, a safety net removes any", () => {
     expect(inBerthReserve(BERTH.x, BERTH.z)).toBe(true);
     expect(inBerthReserve(BERTH.x + 200, BERTH.z)).toBe(false);
