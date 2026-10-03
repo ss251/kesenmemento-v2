@@ -16,7 +16,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { nightMat } from '../harbor/lights.js';
-import { ATLAS, sideUV, cellUV, fallbackPlan, cleanNendo, loadNendo, paintAtlas, makeCanvas } from './livery.js';
+import { ATLAS, NAME, sideUV, cellUV, fallbackPlan, cleanNendo, loadNendo, paintAtlas, makeCanvas } from './livery.js';
 import { resolveFlags } from './flags.js';
 
 // ------------------------------------------------------------------------------------------------- particulars
@@ -103,6 +103,18 @@ export function halfBreadth(s, h) {
   return b;
 }
 
+/**
+ * The quarter knuckle: the s at height h where the rounded stern's half-breadth falls to w (2.6 m, about where the
+ * shell turns from the side to face aft). Aft of it is the transom: white, with the name (shofukumaru04).
+ */
+export function knuckleS(h, w = 2.6) {
+  const hh = clamp(h, -0.6, SHIP.aftShelter.roof);
+  let a = 44, b = sternS(hh);
+  if (halfBreadth(b, hh) >= w) return b;
+  for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (halfBreadth(m, hh) >= w) a = m; else b = m; }
+  return (a + b) / 2;
+}
+
 // ------------------------------------------------------------------------------------------------- tiers
 export const TIERS = {
   high: { ds: [0.4, 0.8, 0.4], under: [0, 0.015, 0.05, 0.12, 0.22, 0.36, 0.52, 0.7, 0.85], above: [0, 0.3, 0.62, 0.75, 1.4, 2.2, 3.0, 3.6, 4.2, 4.7, 5.0, 5.4, 5.8, 6.2, 6.6, 7.0, 7.2, 7.3], seg: 10, railStep: 1.4, midRail: true, floats: 14, flags: 22, rbox: true, whips: 7 },
@@ -164,6 +176,44 @@ export function hullGeometry(tier = 'high') {
   const ng = g.toNonIndexed();
   ng.userData.stations = NI; ng.userData.rows = NJ;
   return ng;
+}
+
+/**
+ * The transom lettering decal: a grid laid on the hull shell of this tier (each row's station polyline, blended between
+ * the loft rows the way the hull's triangles are), 4 cm proud of it, facing aft, mapped to the atlas 'stern' cell.
+ * Seen from aft, port (+x) is on the left: u runs from +x to -x.
+ */
+export function transomDecalGeometry(tier = 'high', T = NAME.transom) {
+  const S = stations(tier).filter((s) => s >= 50), rowsH = TIERS[tier].above;
+  const rowS = (h, x) => {   // the shell's s at half-breadth |x| along the station polyline at height h
+    const pts = S.map((s) => { const a = sternS(h); return s > a ? [a, 0] : [s, halfBreadth(s, h)]; });
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [s0, b0] = pts[i], [s1, b1] = pts[i + 1];
+      if (b0 >= x && b1 <= x) return b0 === b1 ? s0 : s0 + ((s1 - s0) * (b0 - x)) / (b0 - b1);
+    }
+    return pts[pts.length - 1][0];
+  };
+  const shellS = (h, x) => {
+    let j = 0; while (j < rowsH.length - 2 && rowsH[j + 1] < h) j++;
+    const h0 = rowsH[j], h1 = rowsH[j + 1], t = clamp((h - h0) / (h1 - h0 || 1));
+    return rowS(h0, x) * (1 - t) + rowS(h1, x) * t;
+  };
+  const NU = tier === 'phone' ? 8 : 14, NV = tier === 'phone' ? 3 : 5;
+  const pos = [], uv = [], idx = [];
+  for (let j = 0; j <= NV; j++) for (let i = 0; i <= NU; i++) {
+    const u = i / NU, v = j / NV, x = T.w / 2 - u * T.w, h = T.h0 + v * (T.h1 - T.h0);
+    pos.push(x, h, zOf(shellS(h, Math.abs(x))) - 0.04);
+    uv.push(...cellUV('stern', u, v));
+  }
+  for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
+    const a = j * (NU + 1) + i, b = a + 1, c = a + NU + 1, d = c + 1;
+    idx.push(a, b, c, b, d, c);   // counter-clockwise seen from aft (-z)
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
 }
 
 // ------------------------------------------------------------------------------------------------- small kit
@@ -410,7 +460,7 @@ export function buildShofukumaru(ctx, opts = {}) {
   const g2 = canvas.getContext('2d');
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = tier === 'phone' ? 2 : 8;
-  const profile = { sheerAt };
+  const profile = { sheerAt, knuckleAt: knuckleS };
   let plan = fallbackPlan();
   paintAtlas(g2, plan, { profile }); tex.needsUpdate = true;
 
@@ -522,6 +572,8 @@ export function buildShofukumaru(ctx, opts = {}) {
   }
   // forecastle 7KFY lettering (aerial 07): across the beam, tops toward the bow
   { const d = k.mesh(atlasPlane('deck7kfy', 5.2, 1.75, 'up'), M.decal, [0, sheerAt(12.0) + 0.03, zOf(12.0)], [0, Math.PI, 0]); d.name = '7KFY-deck'; }
+  // the transom: 第一昭福丸 / KESENNUMA / SHOFUKU MARU No.1 (shofukumaru04), both liveries
+  { const d = k.mesh(transomDecalGeometry(tier), M.decal); d.name = 'transom-name'; d.castShadow = false; }
 
   // ---- the well: line hauler at the starboard 舷門, slow conveyor, branch-line reel, fish boxes, tubs
   { const yd = SHIP.wellDeck, xs = -(halfBreadth(25.0, 3.5) - 0.9);
@@ -721,7 +773,9 @@ export function buildShofukumaru(ctx, opts = {}) {
   const api = {
     group, anchors, ship: SHIP, tier,
     get livery() { return state.mode; }, get plan() { return plan; }, ready,
-    atlas: { canvas, texture: tex },
+    atlas: { canvas, texture: tex }, profile,
+    /** repaint the atlas with the current plan (after the web fonts arrive) */
+    repaint() { if (!disposed) { paintAtlas(g2, plan, { profile }); tex.needsUpdate = true; } },
     get triangles() { return countTriangles(group); },
     setFlags(on) { flags.visible = !!on; },
     setNight(f) { manualNight = true; uNight.value = clamp(+f || 0); },

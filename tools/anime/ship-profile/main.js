@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { createMaterials } from '../../../src/anime/core/materials.js';
 import { createRenderPipeline } from '../../../src/anime/core/renderer.js';
-import { buildShofukumaru, sheerAt, MID_S } from '../../../src/anime/world/ship/shofukumaru1.js';
+import { buildShofukumaru, MID_S } from '../../../src/anime/world/ship/shofukumaru1.js';
 import { ATLAS, paintAtlas, makeCanvas } from '../../../src/anime/world/ship/livery.js';
 
 const q = new URLSearchParams(location.search);
@@ -53,7 +53,7 @@ window.__render = async ({ side = 'port', mpp = 0.1226, bowX = 158, wlY = 291, w
 window.__atlas = (layers = '') => {
   if (!layers) return ship.atlas.canvas.toDataURL('image/png');
   const c = makeCanvas(ATLAS.W, ATLAS.H); const g = c.getContext('2d');
-  paintAtlas(g, ship.plan, { profile: { sheerAt }, layers: new Set(layers.split(',')) });
+  paintAtlas(g, ship.plan, { profile: ship.profile, layers: new Set(layers.split(',')) });
   return c.toDataURL('image/png');
 };
 
@@ -61,7 +61,7 @@ window.__atlas = (layers = '') => {
   await document.fonts?.ready;
   const st = await ship.ready;
   // repaint once the web fonts are in (the fallback was painted before they loaded)
-  if (st.mode === 'fallback') { paintAtlas(ship.atlas.canvas.getContext('2d'), ship.plan, { profile: { sheerAt } }); ship.atlas.texture.needsUpdate = true; }
+  if (st.mode === 'fallback') ship.repaint();
   window.__info = { livery: ship.livery, error: st.error, tier: ship.tier, triangles: ship.triangles, anchors: { mastTop: ship.anchors.mastTop, gangwayStbd: ship.anchors.gangwayStbd } };
   window.__ready = true;
 })();

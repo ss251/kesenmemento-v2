@@ -4,7 +4,7 @@
 //   rows    0-447   port hull side, drawn as seen from port (bow on the LEFT, like the nendo photo shofukumaru02)
 //   rows  448-895   starboard hull side, drawn as seen from starboard (bow on the RIGHT, like shofukumaru03)
 //   rows  896-1023  a strip of cells: 7KFY rail board, MG1-2112 board, the funnel crest (nendo only), 7KFY deck
-//                   lettering (transparent background) and four 大漁旗 designs
+//                   lettering and the transom lettering (both on a transparent background), four 大漁旗 designs
 //
 // Hull sides are addressed in (s, h): s = metres aft of the stem head, h = metres above the waterline (the top of
 // the red antifouling). Both sides are painted, never mirrored: the two sides of the real ship differ.
@@ -20,7 +20,9 @@
 // The clean-up (cleanNendo) turns the noisy traces into crisp anime shapes: same-colour fragments that touch are
 // merged (only while their union stays compact, so the two triangles of an X never fuse), each shape becomes its convex hull simplified to the fewest corners that keep 92 % of its area, corners
 // at the waterline drop just under it (the antifouling is painted last) and corners at the stem or stern run off
-// the hull end. Everything else stays where it was measured.
+// the bow. Nothing is snapped to the stern: aft of the quarter knuckle (where the rounded stern turns to face aft,
+// profile.knuckleAt) the transom is painted white over every livery shape, as on the model (shofukumaru04: the stern
+// triangles stop at the quarter and the white transom carries the name). Everything else stays where it was measured.
 
 export const ATLAS = {
   W: 2048, H: 1024,
@@ -29,10 +31,11 @@ export const ATLAS = {
   side: { port: 0, starboard: 448 }, sideH: 448,
   strip: 896, stripH: 128,
   cells: {
-    board7kfy: [0, 896, 384, 128],
-    boardMG: [384, 896, 384, 128],
-    crest: [768, 896, 128, 128],
-    deck7kfy: [896, 896, 384, 128],
+    board7kfy: [0, 896, 320, 128],
+    boardMG: [320, 896, 320, 128],
+    crest: [640, 896, 128, 128],
+    deck7kfy: [768, 896, 256, 128],
+    stern: [1024, 896, 256, 128],
     flag0: [1280, 896, 192, 128], flag1: [1472, 896, 192, 128], flag2: [1664, 896, 192, 128], flag3: [1856, 896, 192, 128],
   },
 };
@@ -45,10 +48,18 @@ export const COLORS = {
 
 /** Painted text placements (not livery: the real ship carries the name and call sign whatever the paint). */
 export const NAME = {
-  ja: '第一昭福丸', en: 'SHOFUKU MARU No.1', call: '7KFY', reg: 'MG1-2112', port: '気仙沼',
+  ja: '第一昭福丸', en: 'SHOFUKU MARU No.1', call: '7KFY', reg: 'MG1-2112', port: '気仙沼', portEn: 'KESENNUMA',
   // measured: port on shofukumaru02 (s 7.0-10.7); starboard on the WCPFC photo of the real ship (x 2086-1955, s 5.5-8.8),
   // between the bow line and the X1 red triangle, which starts at s 9.2
   place: { port: { s: [7.0, 10.7], h: [4.1, 4.65], sub: [3.62, 3.92] }, starboard: { s: [5.4, 8.9], h: [4.15, 4.72], sub: [3.66, 3.98] } },
+  // the transom (shofukumaru04, starboard quarter from aft, about 7.9 px/m there): three lines centred on the
+  // centreline below the stern bay. The hull name, a romanised line read as the port of registry (KESENNUMA: seven to
+  // nine bold capitals, too small in the photo to read letter by letter) and the romanised name. The decal box is
+  // w metres wide, h0-h1 high; each line is [text, h0, h1, width] in metres, painted into the 'stern' cell.
+  transom: {
+    w: 3.2, h0: 1.25, h1: 3.55,
+    lines: [['ja', 2.85, 3.45, 3.0], ['portEn', 2.05, 2.4, 2.3], ['en', 1.35, 1.63, 2.4]],
+  },
 };
 
 /** Generic hull portholes (structure, both liveries): read off shofukumaru02/05. */
@@ -161,10 +172,11 @@ export function cleanNendo(data, { mergeGap = 0.45, maxGrow = 1.45, keep = 0.92,
     }
     const shapes = frags.map((f) => {
       let p = simplify(convexHull(f.pts), keep);
-      p = p.map(([s, h]) => [s > 57.0 ? ATLAS.S1 : s < 0.8 ? ATLAS.S0 : s, h <= wl ? -0.2 : h]);
+      // corners at the stem run off the hull end; aft corners stay where they were traced (the transom paint clips them)
+      p = p.map(([s, h]) => [s < 0.8 ? ATLAS.S0 : s, h <= wl ? -0.2 : h]);
       return { colour: f.colour, pts: p, tag: 'traced', src: 'nendo' };
     });
-    for (const sh of marks.shapes || []) shapes.push({ colour: sh.colour, pts: sh.pts.map((p) => [p[0], p[1]]), tag: sh.tag || 'mark', src: 'nendo' });
+    for (const sh of marks.shapes || []) shapes.push({ colour: sh.colour, pts: sh.pts.map((p) => [p[0], p[1]]), tag: sh.tag || 'mark', src: 'nendo', ...(sh.over ? { over: true } : {}) });
     // traced lines: re-mapped, then dropped when their midpoint is in an ignore zone that says lines: true (a traced
     // X replaced by a measured one); the marks' own lines are kept as they are
     const traced = (data.lines?.[side] || []).map((l) => [...fitPoint(fit, l[0], l[1]), ...fitPoint(fit, l[2], l[3])])
@@ -190,9 +202,12 @@ const FONT_SERIF = '"Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif'
 const FONT_SANS = '"Noto Sans JP", "Hiragino Sans", "Yu Gothic", Arial, sans-serif';
 
 /**
- * Paint a plan into a 2D context of ATLAS.W x ATLAS.H. profile: { sheerAt(s) } (the deck-edge line).
- * layers: optional Set of 'base' | 'shapes' | 'circles' | 'lines' | 'text' | 'edge' | 'antifoul' | 'strip'
- * (the metrics pass paints 'shapes' alone).
+ * Paint a plan into a 2D context of ATLAS.W x ATLAS.H. profile: { sheerAt(s) (the deck-edge line), knuckleAt(h) (the
+ * s of the quarter knuckle at height h: aft of it the hull faces aft, the transom) }.
+ * layers: optional Set of 'base' | 'shapes' | 'circles' | 'lines' | 'transom' | 'text' | 'edge' | 'antifoul' | 'strip'
+ * (the metrics pass paints 'shapes' alone; the transom clip goes with the shapes).
+ * Order: shapes, circles, shapes marked over (painted across a circle's white disc, as on the real ship), lines, the
+ * white transom, text, the gunwale edge, the antifouling.
  */
 export function paintAtlas(g, plan, { profile = null, layers = null } = {}) {
   const on = (k) => !layers || layers.has(k);
@@ -206,7 +221,8 @@ export function paintAtlas(g, plan, { profile = null, layers = null } = {}) {
     if (on('base')) { g.fillStyle = COLORS.white; g.fillRect(0, y0, W, ATLAS.sideH); }
     const sp = plan[side] || { shapes: [], lines: [], circles: [] };
     const poly = (pts) => { g.beginPath(); pts.forEach(([s, h], i) => { const [x, y] = P(s, h); if (i) g.lineTo(x, y); else g.moveTo(x, y); }); g.closePath(); };
-    if (on('shapes')) for (const sh of sp.shapes) { g.fillStyle = sh.colour === 'red' ? COLORS.red : COLORS.black; poly(sh.pts); g.fill(); }
+    const fillShapes = (over) => { for (const sh of sp.shapes) if (!!sh.over === over) { g.fillStyle = sh.colour === 'red' ? COLORS.red : COLORS.black; poly(sh.pts); g.fill(); } };
+    if (on('shapes')) fillShapes(false);
     if (on('circles')) for (const c of sp.circles) {
       const [cx, cy] = P(c.c[0], c.c[1]);
       const disc = () => { g.beginPath(); g.ellipse(cx, cy, c.r * KX, c.r * KY, 0, 0, Math.PI * 2); };
@@ -219,10 +235,20 @@ export function paintAtlas(g, plan, { profile = null, layers = null } = {}) {
       g.restore();
       g.strokeStyle = COLORS.black; g.lineWidth = 0.13 * KX; disc(); g.stroke();
     }
+    if (on('shapes')) fillShapes(true);
     if (on('lines')) {
       g.strokeStyle = COLORS.black; g.lineWidth = 0.17 * KX; g.lineCap = 'butt';
       for (const { l } of sp.lines) { const [x0, y0b] = P(l[0], l[1]), [x1, y1] = P(l[2], l[3]); g.beginPath(); g.moveTo(x0, y0b); g.lineTo(x1, y1); g.stroke(); }
       for (const c of sp.circles) { const [a, b, e, d] = c.cut; const [x0, y0b] = P(a, b), [x1, y1] = P(e, d); g.beginPath(); g.moveTo(x0, y0b); g.lineTo(x1, y1); g.stroke(); }
+    }
+    if (profile?.knuckleAt && (on('transom') || on('shapes'))) {
+      // the transom: white aft of the quarter knuckle, from below the waterline to the top of the band
+      g.fillStyle = COLORS.white; g.beginPath();
+      const N = 24, hs = [];
+      for (let i = 0; i <= N; i++) hs.push(-0.6 + ((ATLAS.HT + 0.6) * i) / N);
+      hs.forEach((h, i) => { const [x, y] = P(profile.knuckleAt(h), h); if (i) g.lineTo(x, y); else g.moveTo(x, y); });
+      for (const [s, h] of [[ATLAS.S1 + 1, ATLAS.HT], [ATLAS.S1 + 1, -0.6]]) { const [x, y] = P(s, h); g.lineTo(x, y); }
+      g.closePath(); g.fill();
     }
     if (on('text')) {
       const pl = NAME.place[side];
@@ -286,6 +312,16 @@ function paintStrip(g, plan) {
   board('board7kfy', NAME.call, false);
   board('boardMG', NAME.reg, true);
   { const [x, y, w, h] = C.deck7kfy; g.clearRect(x, y, w, h); boxText(g, NAME.call, [x + 8, y + 10], [x + w - 8, y + h - 10], FONT_SANS, 900, '#2a2c34', 0.18); }
+  { // the transom lettering (both liveries: the name and port of registry are not livery): transparent background,
+    // laid out in metres inside the decal box NAME.transom, read from aft (port on the left)
+    const [x, y, w, h] = C.stern, T = NAME.transom; g.clearRect(x, y, w, h);
+    const kx = w / T.w, ky = h / (T.h1 - T.h0);
+    for (const [key, h0, h1, lw] of T.lines) {
+      const a = [x + (T.w - lw) / 2 * kx, y + (T.h1 - h1) * ky], b = [x + (T.w + lw) / 2 * kx, y + (T.h1 - h0) * ky];
+      const ja = key === 'ja';
+      boxText(g, NAME[key], a, b, ja ? FONT_SERIF : FONT_SANS, ja ? 900 : 700, COLORS.text, ja ? 0.3 : 0.12);
+    }
+  }
   // the crest cell: white, plus the crest strokes only in the nendo plan
   { const [x, y, w, h] = C.crest; g.fillStyle = COLORS.white; g.fillRect(x, y, w, h);
     if (plan.crest && plan.crest.length) {

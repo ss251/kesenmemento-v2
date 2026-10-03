@@ -1,0 +1,150 @@
+// [ship] What the livery atlas really paints, read back texel by texel: a probe 2D context replays paintAtlas() (paths,
+// fills, strokes, clips, text boxes) and reports the colour at chosen canvas pixels. Fix round 2: the transom is white
+// with the name in both liveries, the stern triangles stop at the quarter knuckle, and the starboard aft sheer triangle
+// is the real ship's (WCPFC photo), not the half-height 03 trace.
+import { describe, test, expect } from 'bun:test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { ATLAS, COLORS, NAME, sidePx, fallbackPlan, cleanNendo, paintAtlas, stubCanvas } from '../src/anime/world/ship/livery.js';
+import { SHIP, sheerAt, sternS, halfBreadth, knuckleS, zOf, transomDecalGeometry, buildShofukumaru } from '../src/anime/world/ship/shofukumaru1.js';
+
+const ROOT = resolve(import.meta.dir, '..');
+const read = (p) => JSON.parse(readFileSync(resolve(ROOT, p), 'utf8'));
+const NENDO = { traced: read('data/ship/shofukumaru1/livery-nendo.json'), lines: read('data/ship/shofukumaru1/lines-nendo.json'), marks: read('data/ship/shofukumaru1/livery-nendo-marks.json') };
+const PROFILE = { sheerAt, knuckleAt: knuckleS };
+
+/**
+ * A 2D context that tracks the colour of a few canvas pixels only. Paths are flattened (arcs, ellipses and curves to
+ * segments) in canvas space through the current transform; fill uses the non-zero rule, stroke the distance to the
+ * segments, clip intersects. Text is its glyph box (measureText width x the font size): conservative, a box is never
+ * thinner than the glyphs it stands for.
+ */
+function probeContext(points) {
+  const col = points.map(() => 'transparent');
+  let T = [1, 0, 0, 1, 0, 0], clips = [], st = { fillStyle: '#000', strokeStyle: '#000', lineWidth: 1, font: '10px sans-serif' };
+  const stack = [];
+  let subs = [], cur = null;
+  const tp = (x, y) => [T[0] * x + T[2] * y + T[4], T[1] * x + T[3] * y + T[5]];
+  const inside = (polys, [px, py]) => {
+    let w = 0;
+    for (const p of polys) for (let i = 0, j = p.length - 1; i < p.length; j = i++) {
+      const [xi, yi] = p[i], [xj, yj] = p[j];
+      if (yj <= py) { if (yi > py && (xi - xj) * (py - yj) - (px - xj) * (yi - yj) > 0) w++; }
+      else if (yi <= py && (xi - xj) * (py - yj) - (px - xj) * (yi - yj) < 0) w--;
+    }
+    return w !== 0;
+  };
+  const segDist = ([px, py], [ax, ay], [bx, by]) => { const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy; const t = L ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L)) : 0; return Math.hypot(px - ax - t * dx, py - ay - t * dy); };
+  const clipped = (p) => clips.every((c) => inside(c, p));
+  const paint = (hit, colour) => points.forEach((p, i) => { if (clipped(p) && hit(p)) col[i] = colour; });
+  const fontPx = () => +(/(\d+(?:\.\d+)?)px/.exec(st.font)?.[1] || 10);
+  const arcPts = (cx, cy, rx, ry, a0 = 0, a1 = Math.PI * 2) => { const n = 48, out = []; for (let i = 0; i <= n; i++) { const a = a0 + ((a1 - a0) * i) / n; out.push(tp(cx + rx * Math.cos(a), cy + ry * Math.sin(a))); } return out; };
+  const g = {
+    get fillStyle() { return st.fillStyle; }, set fillStyle(v) { st.fillStyle = v; },
+    get strokeStyle() { return st.strokeStyle; }, set strokeStyle(v) { st.strokeStyle = v; },
+    get lineWidth() { return st.lineWidth; }, set lineWidth(v) { st.lineWidth = v; },
+    get font() { return st.font; }, set font(v) { st.font = v; },
+    lineCap: 'butt', lineJoin: 'miter', textBaseline: 'alphabetic', textAlign: 'start',
+    save() { stack.push({ T: T.slice(), clips: clips.slice(), st: { ...st } }); },
+    restore() { const s = stack.pop(); if (s) { T = s.T; clips = s.clips; st = s.st; } },
+    translate(x, y) { T = [T[0], T[1], T[2], T[3], T[0] * x + T[2] * y + T[4], T[1] * x + T[3] * y + T[5]]; },
+    scale(a, b) { T = [T[0] * a, T[1] * a, T[2] * b, T[3] * b, T[4], T[5]]; },
+    beginPath() { subs = []; cur = null; },
+    moveTo(x, y) { cur = [tp(x, y)]; subs.push(cur); },
+    lineTo(x, y) { if (!cur) return g.moveTo(x, y); cur.push(tp(x, y)); },
+    quadraticCurveTo(cx, cy, x, y) { g.lineTo(cx, cy); g.lineTo(x, y); },
+    closePath() { if (cur && cur.length) cur.push(cur[0]); },
+    rect(x, y, w, h) { g.moveTo(x, y); g.lineTo(x + w, y); g.lineTo(x + w, y + h); g.lineTo(x, y + h); g.closePath(); },
+    arc(cx, cy, r, a0, a1) { cur = arcPts(cx, cy, r, r, a0, Math.min(a1, a0 + Math.PI * 2)); subs.push(cur); },
+    ellipse(cx, cy, rx, ry, rot, a0, a1) { cur = arcPts(cx, cy, rx, ry, a0, a1); subs.push(cur); },
+    clip() { clips.push(subs.map((s) => s.slice())); },
+    fill() { const polys = subs.map((s) => s.slice()); paint((p) => inside(polys, p), st.fillStyle); },
+    stroke() { const polys = subs.map((s) => s.slice()), r = st.lineWidth / 2; paint((p) => polys.some((q) => q.some((a, i) => i && segDist(p, q[i - 1], a) <= r)), st.strokeStyle); },
+    fillRect(x, y, w, h) { const q = [tp(x, y), tp(x + w, y), tp(x + w, y + h), tp(x, y + h)]; paint((p) => inside([q], p), st.fillStyle); },
+    strokeRect() {},
+    clearRect(x, y, w, h) { const q = [tp(x, y), tp(x + w, y), tp(x + w, y + h), tp(x, y + h)]; points.forEach((p, i) => { if (inside([q], p)) col[i] = 'transparent'; }); },
+    measureText(s) { return { width: [...String(s)].length * fontPx() * 0.9 }; },
+    fillText(s, x, y) { const w = g.measureText(s).width, h = fontPx(); const q = [tp(x - w / 2, y - h / 2), tp(x + w / 2, y - h / 2), tp(x + w / 2, y + h / 2), tp(x - w / 2, y + h / 2)]; paint((p) => inside([q], p), st.fillStyle); },
+  };
+  return { g, col };
+}
+function sample(plan, pts) {
+  const { g, col } = probeContext(pts);
+  paintAtlas(g, plan, { profile: PROFILE });
+  return col;
+}
+const PLANS = { fallback: fallbackPlan(), nendo: cleanNendo(NENDO) };
+const WHITE = COLORS.white.toLowerCase();
+
+describe('the transom (shofukumaru04): white, lettered, in both liveries', () => {
+  test('the quarter knuckle: where the rounded stern half-breadth falls to 2.6 m, forward of the stern line', () => {
+    for (const h of [0.5, 1, 2, 3, 4, 5, 6, 7]) {
+      const k = knuckleS(h);
+      expect(halfBreadth(k, h)).toBeCloseTo(2.6, 2);
+      expect(k).toBeLessThan(sternS(h)); expect(sternS(h) - k).toBeLessThan(1.2);
+    }
+    expect(knuckleS(4)).toBeGreaterThan(57.3); expect(knuckleS(4)).toBeLessThan(58.0);
+  });
+  for (const mode of ['fallback', 'nendo']) {
+    test(`${mode}: the atlas texel at the transom centreline (s 58.4, h 2-4) is white on both side bands`, () => {
+      const pts = [], where = [];
+      for (const side of ['port', 'starboard']) for (const h of [2, 2.5, 3, 3.5, 4]) { pts.push(sidePx(side, 58.4, h)); where.push(`${side} h ${h}`); }
+      const col = sample(PLANS[mode], pts);
+      col.forEach((c, i) => expect(`${where[i]}: ${String(c).toLowerCase()}`).toBe(`${where[i]}: ${WHITE}`));
+    });
+  }
+  test('nendo: the stern triangles still reach the quarter (black just forward of the knuckle on both sides)', () => {
+    // port: the big stern triangle (05); starboard: the stern quarter triangle (03, WCPFC)
+    const pts = [sidePx('port', knuckleS(0.5) - 0.3, 0.5), sidePx('starboard', knuckleS(2.5) - 0.3, 2.5)];
+    const col = sample(PLANS.nendo, pts);
+    expect(col).toEqual([COLORS.black, COLORS.black]);
+  });
+  test('nendo: nothing is snapped to the stern any more (no shape corner at s 59)', () => {
+    for (const side of ['port', 'starboard']) for (const sh of PLANS.nendo[side].shapes) for (const [s] of sh.pts) expect(s).toBeLessThan(ATLAS.S1);
+  });
+  test('the stern cell holds 第一昭福丸, KESENNUMA and SHOFUKU MARU No.1, centred, on a transparent background', () => {
+    const c = stubCanvas(ATLAS.W, ATLAS.H); paintAtlas(c.getContext('2d'), PLANS.fallback, { profile: PROFILE });
+    const [x, y, w, h] = ATLAS.cells.stern;
+    const texts = c.ops.filter((o) => o[0] === 'fillText');
+    const inCell = texts.filter((o) => { const i = c.ops.indexOf(o); const tr = c.ops.slice(0, i).reverse().find((q) => q[0] === 'translate'); return tr && tr[1] >= x && tr[1] <= x + w && tr[2] >= y && tr[2] <= y + h; });
+    expect(inCell.map((o) => o[1]).join('')).toBe(NAME.ja + NAME.portEn + NAME.en);
+    expect(c.ops.some((o) => o[0] === 'clearRect' && o[1] === x && o[2] === y && o[3] === w && o[4] === h)).toBe(true);
+    expect(NAME.portEn).toBe('KESENNUMA');
+  });
+  test('the stern cell lettering really paints (probe): ink inside each line box, clear between the lines', () => {
+    const [x, y, w, h] = ATLAS.cells.stern, T = NAME.transom, ky = h / (T.h1 - T.h0);
+    const mid = (h0, h1) => y + (T.h1 - (h0 + h1) / 2) * ky;
+    const pts = T.lines.map(([, h0, h1]) => [x + w / 2, mid(h0, h1)]).concat([[x + 3, y + 3]]);
+    const col = sample(PLANS.fallback, pts);
+    expect(col.slice(0, 3)).toEqual([COLORS.text, COLORS.text, COLORS.text]);
+    expect(col[3]).toBe('transparent');
+  });
+  for (const tier of ['high', 'phone']) test(`${tier}: the transom decal lies on the shell, faces aft and maps into the stern cell`, () => {
+    const g = transomDecalGeometry(tier), P = g.attributes.position, N = g.attributes.normal, U = g.attributes.uv;
+    const [cx, cy, cw, ch] = ATLAS.cells.stern;
+    const u0 = cx / ATLAS.W, u1 = (cx + cw) / ATLAS.W, v1 = 1 - cy / ATLAS.H, v0 = 1 - (cy + ch) / ATLAS.H;
+    for (let i = 0; i < P.count; i++) {
+      const x = P.getX(i), y = P.getY(i), z = P.getZ(i), s = zOf(z);
+      expect(Math.abs(x)).toBeLessThanOrEqual(NAME.transom.w / 2 + 1e-6);
+      expect(halfBreadth(knuckleS(y), y)).toBeGreaterThan(Math.abs(x));      // inside the knuckle: on the transom
+      expect(s).toBeGreaterThan(knuckleS(y) - 0.05); expect(s).toBeLessThan(sternS(y) + 0.1);
+      expect(N.getZ(i)).toBeLessThan(-0.5);                                  // faces aft (-z)
+      expect(U.getX(i)).toBeGreaterThanOrEqual(u0 - 1e-6); expect(U.getX(i)).toBeLessThanOrEqual(u1 + 1e-6);
+      expect(U.getY(i)).toBeGreaterThanOrEqual(v0 - 1e-6); expect(U.getY(i)).toBeLessThanOrEqual(v1 + 1e-6);
+    }
+    // read from aft (port on the left): the u = 0 edge is on the port side (+x)
+    let iMin = 0; for (let i = 0; i < U.count; i++) if (U.getX(i) < U.getX(iMin)) iMin = i;
+    expect(P.getX(iMin)).toBeGreaterThan(0);
+    g.dispose();
+  });
+  test('both liveries build the transom decal with the decal material', async () => {
+    for (const livery of ['fallback', 'nendo']) {
+      const S = buildShofukumaru({ shared: { uTime: { value: 0 }, uNight: { value: 0 } } }, { tier: 'phone', livery, liveryData: NENDO });
+      await S.ready;
+      let found = false;
+      S.group.traverse((o) => { if (!o.isMesh || !o.material?.alphaTest) return; const p = o.geometry.attributes.position; for (let i = 0; i < p.count; i++) if (p.getZ(i) < zOf(57.5) && p.getY(i) > 1 && p.getY(i) < 4) { found = true; break; } });
+      expect(found).toBe(true);
+      S.dispose();
+    }
+  });
+});
