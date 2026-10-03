@@ -43,6 +43,12 @@ const SHOTS = [
   ['a3_home', `__voyageShot('HOMECOMING')`, 27],
   ['a3_card', `__voyageShot('CARD')`, 0.5],
 ];
+// [ship:integrate] --ui 1: the town UI is mounted (?ui=1) and these shots replace the act list: the boarding chip at
+// the quay, and the places list with 「第一昭福丸に乗る」 at its head
+const UI_SHOTS = [
+  ['ui_chip', `(__voyage.exit(), __lookAt([548, 24, -18], [575, 6, -99]), 'ok')`, 1],
+  ['ui_places', `(__voyage.exit(), __lookAt([548, 24, -18], [575, 6, -99]), __explore.ui.openSearch(true), 'ok')`, 1],
+];
 const want = args.list ? new Set(args.list.split(',')) : null;
 
 const t0 = Date.now();
@@ -52,15 +58,16 @@ if (!args.nobuild) {
   if (r.reused) process.exitCode = 1;
 }
 const srv = serve({ port, dist });
-let browser;
+let browser, page;
 try {
   browser = await launch({ quiet: !args.verbose });
-  const page = await browser.page({ width: W, height: H });
+  page = await browser.page({ width: W, height: H });
   const q = new URLSearchParams({ shot: '1', w: String(W), h: String(H), t: '0', q: args.q || 'high', only: only.join(','), hours: '11' });
   if (args.q === 'phone') q.set('unsafe', '1');
-  if (args.livery) q.set('livery', args.livery);   // nendo | fallback (ship/flags.js: the URL wins); commit only fallback renders
+  if (args.livery) q.set('livery', args.livery);
+  if (args.ui) q.set('ui', '1');   // nendo | fallback (ship/flags.js: the URL wins); commit only fallback renders
   await page.goto(`${srv.url}index.html?${q}`);
-  await page.waitFor('window.__ready === true', { timeout: 280000 });
+  await page.waitFor('window.__ready === true', { timeout: Number(args.timeout || 280) * 1000 });
   console.log(`ready in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
   if (args.auto) {
     // [ship:acts] the hands-free voyage end to end (auto mode): every state in order, a shot at each, no errors
@@ -81,7 +88,7 @@ try {
     console.log('AUTO SEQUENCE', seen.join(' > '));
     if (seen.at(-1) !== 'CARD') { console.log('AUTO FAILED: did not reach CARD'); process.exitCode = 1; }
   } else await page.eval('__voyageInit()');
-  for (const [id, js, secs, cam] of args.auto ? [] : SHOTS) {
+  for (const [id, js, secs, cam] of args.auto ? [] : args.ui ? UI_SHOTS : SHOTS) {
     if (want && !want.has(id)) continue;
     const sum = await page.eval(`(() => { const r = ${js}; return r; })()`);
     const tNow = await page.eval('window.__ctx.time');
@@ -99,6 +106,7 @@ try {
   if (errs.length) { console.log('PAGE ERRORS:'); for (const l of errs.slice(0, 30)) console.log('  ', l.type, l.text.slice(0, 600)); process.exitCode = 1; }
 } catch (e) {
   console.log('SHOTS FAILED:', e.message);
+  try { for (const l of (page?.errors() || []).slice(0, 20)) console.log('  ', l.type, String(l.text).slice(0, 600)); console.log('  progress:', await page?.eval(`(document.getElementById('loadlabel') || {}).textContent + ' ' + JSON.stringify(window.__errors || [])`)); } catch (e2) { /* page gone */ }
   process.exitCode = 1;
 } finally {
   await browser?.close();
