@@ -149,10 +149,10 @@ leave the intro card (`body.playing`), and without it phonemem measures the city
 
 ## Results (2026-10-03, this branch)
 
-**Tests.** `bun test`: 709 pass, 24 skip, 1 fail (fix round 3, 734 tests in 43 files). The one failure is the known
+**Tests.** `bun test`: 710 pass, 24 skip, 1 fail (fix round 3, 735 tests in 43 files). The one failure is the known
 `test/v4-explore.test.js` "matches the committed file" (`data/buildings/city.json` exists only in the main repo; it
 predates this branch). The seven ship suites (`ship-model`, `ship-sail`, `ship-acts`, `ship-integrate`,
-`ship-livery-paint`, `ship-story`, and `v3-fix` for the public mirror) are 189 pass, 0 fail.
+`ship-livery-paint`, `ship-story`, and `v3-fix` for the public mirror) are 190 pass, 0 fail.
 `env -u NODE_OPTIONS bun run scripts/build-web.js` builds clean.
 
 **Phone tier** (`phonemem.mjs`, 390×844 at DPR 3, iPhone UA, forced phone tier, nendo livery on the local host):
