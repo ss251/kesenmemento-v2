@@ -298,6 +298,64 @@ describe("autopilot (pure pursuit on OUTBOUND)", () => {
   });
 });
 
+describe("autopilot recovery: left bow-on to a bank, she backs off and carries on", () => {
+  const P = OUTBOUND_PATH;
+  const runAP = (s, secs, dt = 0.05) => {
+    let prog = P.project(s.x, s.z).s, rec = null, backed = false;
+    const p0 = prog;
+    for (let i = 0; i < secs / dt; i++) {
+      const ap = pursue(P, s, prog, BOAT, AUTO, rec, dt);
+      rec = ap.rec; backed ||= rec.backing;
+      s = sailStep(s, ap, dt);
+      prog = P.project(s.x, s.z, Math.max(0, prog - 60), prog + 400).s;
+    }
+    const q = P.project(s.x, s.z, Math.max(0, prog - 60), prog + 400);
+    return { s, gain: prog - p0, xte: q.d, clear: hullClearance(s).d, backed };
+  };
+  test("the QA pose 150 m past かなえ大橋 (x 1615.4, z 1768.7): 180 s ends clear, on the line and 200 m on", () => {
+    const r = runAP({ ...boatState(1615.4, 1768.7, 0.0044), u: 0 }, 180);
+    expect(r.clear).toBeGreaterThan(10);
+    expect(r.xte).toBeLessThan(30);
+    expect(r.gain).toBeGreaterThan(200);
+  });
+  test("pinned by the helm (W + D into the bank, then let go), with or without a touch astern first", () => {
+    for (const k of [150, 400]) {
+      const s0 = KANAE_CROSSING.s + k, [x, z] = P.at(s0), [dx, dz] = P.dirAt(s0);
+      let s = { ...boatState(x, z, Math.atan2(dx, dz)), u: 3 }, order = 0.6;
+      for (let t = 0; t < 120; t += 0.05) { order = Math.min(1, order + 0.025); s = sailStep(s, { throttle: order, rudder: 1 }, 0.05); if (s.contact > 0 && Math.abs(s.u) < 0.3 && t > 10) break; }
+      expect(hullClearance(s).d).toBeLessThan(BOAT.margin + 1);   // she is on the bank
+      let a = s; for (let i = 0; i < 120; i++) a = sailStep(a, { throttle: -1, rudder: 0 }, 0.05);
+      for (const start of [s, a]) {
+        const r = runAP(start, 180);
+        expect(r.backed).toBe(true);
+        expect(r.clear).toBeGreaterThan(10);
+        expect(r.xte).toBeLessThan(30);
+        expect(r.gain).toBeGreaterThan(200);
+      }
+    }
+  });
+  test("recovery never fires on the clean run off the quay (straight, slow start)", () => {
+    let s = boatState(), prog = 0, rec = null, backed = false;
+    for (let i = 0; i < 3000; i++) { const ap = pursue(P, s, prog, BOAT, AUTO, rec, 0.1); rec = ap.rec; backed ||= rec.backing; s = sailStep(s, ap, 0.1); prog = P.project(s.x, s.z, Math.max(0, prog - 60), prog + 400).s; }
+    expect(backed).toBe(false);
+  });
+  test("runtime: left on the bank with the engine stopped, the autopilot re-engages after 8 s idle and gets her off", () => {
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 30000);
+    const ctx = createContext({ scene, camera, renderer: null, audio: null, quality: { name: "low", phone: true }, sunDir: new THREE.Vector3(...L.SUN_DIR).normalize() });
+    const sail = createSail(ctx, {});
+    sail.enter({ x: 1615.4, z: 1768.7, yaw: 0.0044, autopilot: false });
+    for (let i = 0; i < 20 * 7; i++) sail.update(0.05);
+    expect(sail.state.autopilot).toBe(false);
+    for (let i = 0; i < 20 * 2; i++) sail.update(0.05);
+    expect(sail.state.autopilot).toBe(true);
+    const s0 = sail.state.s;
+    for (let i = 0; i < 20 * 180; i++) sail.update(0.05);
+    expect(sail.state.s - s0).toBeGreaterThan(200);
+    expect(hullClearance(sail.boat).d).toBeGreaterThan(10);
+    sail.dispose();
+  });
+});
+
 describe("AI boats yield to her; her berth stays free", () => {
   test("yieldHold: approaching boats within 120 m hold (their clock slips), others carry on", () => {
     const boats = [
@@ -380,6 +438,24 @@ describe("createSail (runtime, true-size stub)", () => {
     expect(sail.state.autopilot).toBe(false);
     sail.exit();
     expect(sail.active).toBe(false);
+    sail.dispose();
+  });
+  test("touch look-around: a right-half drag (playerObj.look) swings the chase camera, then eases back behind her", () => {
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 30000);
+    const ctx = createContext({ scene, camera, renderer: null, audio: null, quality: { name: "low", phone: true }, sunDir: new THREE.Vector3(...L.SUN_DIR).normalize() });
+    ctx.playerObj = { look: { dx: 0, dy: 0 }, touchMove: { x: 0, y: 0 }, pos: new THREE.Vector3(), vel: new THREE.Vector3() };
+    const sail = createSail(ctx, {});
+    sail.enter({ autopilot: false });
+    const bearing = () => Math.atan2(camera.position.x - sail.state.x, camera.position.z - sail.state.z);
+    for (let i = 0; i < 40; i++) sail.update(0.05);
+    const b0 = bearing();
+    ctx.playerObj.look.dx = 150 * 2.2;   // player.js: a 150 px drag on the right half
+    for (let i = 0; i < 40; i++) sail.update(0.05);
+    expect(ctx.playerObj.look.dx).toBe(0);
+    const swung = Math.abs(Math.atan2(Math.sin(bearing() - b0), Math.cos(bearing() - b0)));
+    expect(swung).toBeGreaterThan(0.3);
+    for (let i = 0; i < 20 * 12; i++) sail.update(0.05);
+    expect(Math.abs(Math.atan2(Math.sin(bearing() - b0), Math.cos(bearing() - b0)))).toBeLessThan(0.05);
     sail.dispose();
   });
   test("phone tier: the wake ribbon is small (24 segments)", () => {

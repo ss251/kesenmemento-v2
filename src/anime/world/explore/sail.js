@@ -10,7 +10,8 @@
 //   - the shore: L.shoreDist (signed distance to the coastline, + at sea) sampled at the bow, the stern and the beam
 //     corners; she slides along a quay, never through it, and loses speed on contact.
 // Chase camera and the touch stick are copied from explore/drive.js. Autopilot (pure pursuit on OUTBOUND) takes over
-// when you let go and hands back the moment you touch the controls.
+// when you let go (8 s idle: underway, against a bank or stalled by one) and hands back the moment you touch the
+// controls; left on a bank, it backs her off astern before going ahead again (pursue's recovery).
 //
 // Keys (while sailing): W / S or the arrows up / down move the engine order (it stays where you leave it: a ship's
 // telegraph), X stops the engine, A / D or left / right put the rudder over (it returns to midships when released),
@@ -155,12 +156,23 @@ export const AUTO = {
   boostFrom: 260,       // m: the x4 time compression from here (clear of the send-off) ...
   boostEndBefore: 450,  // ... until this far before the end of the route
   window: [-60, 400],   // projection window around the last progress (no jumping between legs)
+  stuckFor: 2,          // s stuck on a bank before backing off it
+  clearBy: 12,          // m beyond the fender margin before going ahead again
+  roomToTurn: 30,       // m beyond the fender margin: room to turn ahead even while still pointing away
+  backMax: 45,          // s: the longest a backing run lasts
 };
 /**
  * Pure pursuit on a path: steer toward the point `Ld` ahead of the ship's projection. Returns { throttle, rudder,
- * boost, s (progress), xte (cross-track m) }. `progress` = the last returned s (keeps the projection local).
+ * boost, s (progress), xte (cross-track m), rec }. `progress` = the last returned s (keeps the projection local).
+ *
+ * Recovery (pure: the memory goes in as `rec` and comes back as the result's `rec`; pass `dt` for its timers). Pure
+ * pursuit only goes ahead and its yaw rate scales with speed, so with her bow on a bank it would hold her there. When
+ * she has been stuck for more than `A.stuckFor` s (in contact, or the engine ahead at under 0.3 m/s), near the shore
+ * and pointing more than 0.6 rad off the look-ahead point, she goes full astern with the rudder at +sign(alpha) (going
+ * astern that swings the bow toward the line) until she is `A.clearBy` m off the shore and within 0.5 rad of the
+ * point (or `A.roomToTurn` m off it, room to turn ahead: a back-and-fill), then resumes ahead. A backing run is capped at `A.backMax` s (the stern may find a bank too).
  */
-export function pursue(path, s, progress = 0, P = BOAT, A = AUTO) {
+export function pursue(path, s, progress = 0, P = BOAT, A = AUTO, rec = null, dt = 0, shoreDist = L.shoreDist) {
   const q = path.project(s.x, s.z, Math.max(0, progress + A.window[0]), progress + A.window[1]);
   const vWorld = Math.abs(s.u) * s.tc;
   const Ld = clamp(70 + vWorld * 7, 70, 200);
@@ -173,7 +185,25 @@ export function pursue(path, s, progress = 0, P = BOAT, A = AUTO) {
   let throttle = q.s < A.slowUntil ? 0.45 : 1;
   if (left < 160) throttle = left < 30 ? 0 : 0.35;
   const boost = q.s > A.boostFrom && left > A.boostEndBefore;
-  return { throttle, rudder, boost, s: q.s, xte: q.d * (q.side || 1) };
+  const xte = q.d * (q.side || 1);
+  // ---- recovery off a bank
+  const r0 = rec || { stuck: 0, backing: false, backT: 0 };
+  const off = q.s >= A.straightUntil && left > 30;   // never off the quay (she starts slow there) or at the end
+  if (!off) return { throttle, rudder, boost, s: q.s, xte, rec: { stuck: 0, backing: false, backT: 0 } };
+  const clear = r0.backing || r0.stuck > 0 || s.contact > 0 ? hullClearance(s, shoreDist).d : Infinity;
+  if (r0.backing) {
+    const backT = r0.backT + dt;
+    // off once clear and pointing at the line; or, still pointing away, once there is room to turn ahead (back and fill)
+    const done = (clear > P.margin + A.clearBy && Math.abs(alpha) < 0.5) || clear > P.margin + A.roomToTurn || backT > A.backMax;
+    if (!done) return { throttle: -1, rudder: Math.sign(alpha) || 1, boost: false, s: q.s, xte, rec: { stuck: 0, backing: true, backT } };
+    return { throttle, rudder, boost, s: q.s, xte, rec: { stuck: 0, backing: false, backT: 0 } };
+  }
+  const stuckNow = s.contact > 0 || (throttle > 0 && Math.abs(s.u) < 0.3);
+  const stuck = stuckNow ? r0.stuck + dt : 0;
+  if (stuck > A.stuckFor && Math.abs(alpha) > 0.6 && clear < P.margin + A.clearBy) {
+    return { throttle: -1, rudder: Math.sign(alpha) || 1, boost: false, s: q.s, xte, rec: { stuck: 0, backing: true, backT: 0 } };
+  }
+  return { throttle, rudder, boost, s: q.s, xte, rec: { stuck, backing: false, backT: 0 } };
 }
 
 // ------------------------------------------------------------------------------------------------ events (pure)
@@ -218,7 +248,7 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   let boat = boatState();
   const state = {
     active: false, autopilot: true, x: boat.x, z: boat.z, yaw: boat.yaw, u: 0, kn: 0, vWorld: 0, tc: 1, rudder: 0, eng: 0,
-    s: 0, xte: 0, contact: 0, events: [], idle: 0,
+    s: 0, xte: 0, contact: 0, events: [], idle: 0, recovering: false,
   };
   const orbit = { yaw: 0, pitch: -0.12, back: 0 };
   const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
@@ -256,6 +286,8 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
       if (locked || e.buttons) { orbit.yaw -= e.movementX * 0.004; orbit.pitch = clamp(orbit.pitch - e.movementY * 0.003, -0.8, 0.3); orbit.back = 3; }
     });
   }
+  /** Stopped in the water with an engine order ahead and next to the shore: the player left her on a bank. */
+  function stalled() { return Math.abs(boat.u) < 0.3 && hullClearance(boat, sd).d < BOAT.margin + AUTO.clearBy; }
   function takeOver() { if (state.autopilot) { state.autopilot = false; order = boat.eng; } state.idle = 0; }
   function readInput(dt) {
     const k = keys, tm = ctx.playerObj?.touchMove || { x: 0, y: 0 };
@@ -268,7 +300,8 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     const boost = k.has('ShiftLeft') || k.has('ShiftRight');
     const touched = Math.abs(dO) > 0.05 || Math.abs(rd) > 0.05 || boost;
     if (touched) takeOver(); else state.idle += dt;
-    if (!state.autopilot && state.idle > 8 && Math.abs(boat.u) > 0.5) setAutopilot(true);   // re-engage on idle (underway)
+    // re-engage on idle: underway, or against a bank, or stalled (the autopilot backs her off: pursue's recovery)
+    if (!state.autopilot && state.idle > 8 && (Math.abs(boat.u) > 0.5 || boat.contact > 0 || stalled())) setAutopilot(true);
     order = clamp(order + dO * 0.5 * dt, -1, 1);
     return { throttle: order, rudder: clamp(rd, -1, 1), boost };
   }
@@ -288,15 +321,17 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   }
 
   let progress = { s: 0, d: 0 };
+  let rec = null;   // the autopilot's recovery memory (pursue)
   function update(dt) {
     if (!state.active || dt <= 0) return;
     dt = Math.min(dt, 0.05); t += dt;
     const man = readInput(dt);
     let inp = man;
     if (state.autopilot) {
-      const ap = pursue(path, boat, progress.s);
+      const ap = pursue(path, boat, progress.s, BOAT, AUTO, rec, dt, sd);
+      rec = ap.rec; state.recovering = rec.backing;
       inp = { throttle: ap.throttle, rudder: ap.rudder, boost: ap.boost };
-    }
+    } else { rec = null; state.recovering = false; }
     const prev = boat;
     boat = sailStep(boat, inp, dt, sd);
     const q = path.project(boat.x, boat.z, Math.max(0, progress.s + AUTO.window[0]), progress.s + AUTO.window[1]);
@@ -317,6 +352,13 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     hullG.position.y = Math.sin(t * 0.9) * 0.08;
     wake.update(boat, dt);
     if (!state.active) return;
+    // touch look-around: player.js accumulates a right-half drag in playerObj.look (it is disabled while sailing, so
+    // nothing else reads it; its mouse look is gated off too, so a mouse drag is not counted twice)
+    const plk = ctx.playerObj?.look;
+    if (plk && (plk.dx || plk.dy)) {
+      orbit.yaw -= plk.dx * 0.0018; orbit.pitch = clamp(orbit.pitch - plk.dy * 0.0014, -0.8, 0.3); orbit.back = 3;
+      plk.dx = plk.dy = 0;
+    }
     // chase camera: behind and above the ship; the mouse orbit eases back behind her
     if (dt > 0 && orbit.back > 0) orbit.back -= dt; else if (dt > 0) orbit.yaw *= 1 - Math.min(1, dt * 1.2);
     const cy = boat.yaw + Math.PI + orbit.yaw, dist = 92 + Math.abs(boat.u * boat.tc) * 1.6, hgt = 26 - orbit.pitch * 60;
@@ -333,11 +375,11 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     const p = at || BERTH;
     boat = boatState(p.x, p.z, p.yaw ?? BERTH.yaw);
     if (at?.u) boat.u = at.u;
-    order = 0; fired.clear(); state.events = [];
+    order = 0; rec = null; fired.clear(); state.events = [];
     progress = { s: path.project(boat.x, boat.z).s, d: 0 };
     state.active = true; state.autopilot = at?.autopilot ?? true; state.idle = 0;
     orbit.yaw = 0; orbit.pitch = -0.12; camInit = false;
-    const pl = ctx.playerObj; if (pl) { pl.enabled = false; pl.fly = true; }
+    const pl = ctx.playerObj; if (pl) { pl.enabled = false; pl.fly = true; if (pl.look) pl.look.dx = pl.look.dy = 0; }
     ctx.services.life?.tour?.stop?.();
     sync(); place(0);
     return true;
@@ -354,7 +396,7 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     }
     wake.update(boat, 0);
   }
-  function setAutopilot(on) { state.autopilot = !!on; state.idle = 0; if (!on) order = boat.eng; }
+  function setAutopilot(on) { state.autopilot = !!on; state.idle = 0; rec = null; if (!on) order = boat.eng; }
   /** Streaming focus: ahead of the bow, further at speed (the world moves x tc). */
   function focus() { const k = 40 + Math.abs(boat.u * boat.tc) * 12; return { x: boat.x + Math.sin(boat.yaw) * k, z: boat.z + Math.cos(boat.yaw) * k }; }
   /** Put the ship at a pose without sailing (acts: back at the berth for the homecoming). */
