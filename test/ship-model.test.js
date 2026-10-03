@@ -10,6 +10,7 @@ import {
 } from '../src/anime/world/ship/shofukumaru1.js';
 import { ATLAS, sideUV, sidePx, fallbackPlan, cleanNendo, convexHull, simplify, polyArea, paintAtlas, stubCanvas, NENDO_FILES } from '../src/anime/world/ship/livery.js';
 import { resolveFlags, isDevHost } from '../src/anime/world/ship/flags.js';
+import { allowed } from '../scripts/public-mirror.js';
 
 const ROOT = resolve(import.meta.dir, '..');
 const read = (p) => readFileSync(resolve(ROOT, p), 'utf8');
@@ -125,9 +126,23 @@ describe('flags.js', () => {
     expect(resolveFlags({ search: '?livery=nendo', hostname: 'example.com', define: false })).toEqual({ nendoLivery: true, source: 'url' });
     expect(resolveFlags({ search: '?livery=fallback', hostname: 'localhost', define: true })).toEqual({ nendoLivery: false, source: 'url' });
   });
-  test('ON for local and Tailscale hosts', () => {
-    for (const h of ['localhost', '127.0.0.1', 'example.tail1234.ts.net', 'app.localhost']) expect(resolveFlags({ search: '', hostname: h, define: false }).nendoLivery).toBe(true);
-    expect(isDevHost('EXAMPLE.TAIL1.TS.NET')).toBe(true);
+  test('ON for local hosts only', () => {
+    for (const h of ['localhost', '127.0.0.1', 'app.localhost', 'LOCALHOST']) expect(resolveFlags({ search: '', hostname: h, define: false }).nendoLivery).toBe(true);
+  });
+  test('OFF on Tailscale hosts: the public Funnel link is a ts.net host', () => {
+    for (const h of ['example.tail1234.ts.net', 'EXAMPLE.TAIL1.TS.NET']) {
+      expect(isDevHost(h)).toBe(false);
+      expect(resolveFlags({ search: '', hostname: h, define: false })).toEqual({ nendoLivery: false, source: 'default' });
+    }
+    expect(resolveFlags({ search: '?livery=nendo', hostname: 'example.tail1234.ts.net', define: false }).nendoLivery).toBe(true);
+  });
+  test('the public mirror never serves the nendo trace', () => {
+    for (const f of ['livery-nendo.json', 'lines-nendo.json', 'livery-nendo-marks.json']) {
+      expect(allowed('/data/ship/shofukumaru1/' + f)).toBe(false);
+      expect(allowed('/data/ship/shofukumaru1/' + f.toUpperCase())).toBe(false);
+      expect(allowed('/data/ship/shofukumaru1/' + encodeURIComponent(f).replace('n', '%6E'))).toBe(false);
+    }
+    expect(allowed('/data/ship/i18n.json')).toBe(true);
   });
   test('ON when the build defines KLC_NENDO=1', () => {
     expect(resolveFlags({ search: '', hostname: 'kesennuma.example.jp', define: true })).toEqual({ nendoLivery: true, source: 'define' });

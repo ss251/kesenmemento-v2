@@ -3,12 +3,14 @@
 // nendoLivery: the full nendo livery (2020, nendo for 臼福本店) is the designer's work. The captain met Usufuku on
 // 2026-10-03; until he decides on a public deploy it is ON only for local / dev builds:
 //   1. the URL parameter ?livery=nendo|fallback wins;
-//   2. otherwise ON for localhost, 127.0.0.1, ::1, *.localhost and *.ts.net (the Tailscale demo funnel) hosts,
-//      or when the build defines KLC_NENDO=1 (Bun.build({ define: { KLC_NENDO: '"1"' } }) or the env at bundle time);
-//   3. OFF everywhere else (public).
+//   2. otherwise ON for localhost, 127.0.0.1, ::1 and *.localhost hosts, or when the build defines KLC_NENDO=1
+//      (Bun.build({ define: { KLC_NENDO: '"1"' } }) or the env at bundle time);
+//   3. OFF everywhere else (public). That includes *.ts.net: the captain's public Funnel link is a ts.net host, so
+//      tailnet dev turns the livery on with ?livery=nendo or KLC_NENDO=1, never by host name.
+// scripts/public-mirror.js also DENYs data/ship/shofukumaru1/*nendo* so the public mirror never serves the trace.
 // When OFF, ./livery.js paints the fallback livery and never fetches data/ship/shofukumaru1/*-nendo*.json.
 
-export const DEV_HOST_RE = /^(localhost|127\.0\.0\.1|\[?::1\]?)$|\.localhost$|\.ts\.net$/i;
+export const DEV_HOST_RE = /^(localhost|127\.0\.0\.1|\[?::1\]?)$|\.localhost$/i;
 export const isDevHost = (h) => DEV_HOST_RE.test(String(h || '').trim());
 
 /** The build-time define: a bare KLC_NENDO identifier replaced by the bundler, or process.env.KLC_NENDO. */

@@ -69,10 +69,10 @@ The sides are painted separately, never mirrored. On starboard the hull name rea
 
 **Flag** (`flags.js`):
 - `?livery=nendo|fallback` wins.
-- Otherwise the nendo livery is ON for localhost, 127.0.0.1, `*.localhost`, `*.ts.net`, or a build that defines `KLC_NENDO=1`.
-- It is OFF everywhere else.
+- Otherwise the nendo livery is ON for localhost, 127.0.0.1, ::1, `*.localhost`, or a build that defines `KLC_NENDO=1`.
+- It is OFF everywhere else, `*.ts.net` included (the captain's public Funnel link is a ts.net host; tailnet dev uses `?livery=nendo`).
 
-When it is OFF, the nendo files are never fetched. They are never imported either, so they are never bundled. A public deploy is the captain's call. That deploy should also leave `data/ship/shofukumaru1/*nendo*.json` out of the published data.
+When it is OFF, the nendo files are never fetched. They are never imported either, so they are never bundled. A public deploy is the captain's call. `scripts/public-mirror.js` DENYs `data/ship/shofukumaru1/*nendo*`, so the public mirror never serves those files.
 
 ## Budgets
 

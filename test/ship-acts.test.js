@@ -118,7 +118,7 @@ describe("ship: act state machine", () => {
     S.send("FREEZE_PROGRESS", { h: 20 });
     expect(S.send("STOW_DONE").reason).toBe("not_frozen");
   });
-  test("the North Atlantic ground is closed outside Aug-Jan (spawning season)", () => {
+  test("large longliners may fish west of 10°W / north of 42°N only 1 Aug-31 Jan (ICCAT Rec 22-08)", () => {
     expect(seasonOpen("2026-10-10")).toBe(true);
     expect(seasonOpen("2026-08-01")).toBe(true);
     expect(seasonOpen("2027-01-31")).toBe(true);
@@ -329,7 +329,8 @@ describe("ship: sendoff and ocean (pure parts)", () => {
   test("the captain's local music file is looked for only on local hosts, never in public, shots or automation", () => {
     expect(musicProbeAllowed({ host: "localhost" })).toBe(true);
     expect(musicProbeAllowed({ host: "127.0.0.1" })).toBe(true);
-    expect(musicProbeAllowed({ host: "example.tail1234.ts.net" })).toBe(true);
+    expect(musicProbeAllowed({ host: "example.tail1234.ts.net" })).toBe(false);   // the public Funnel link is a ts.net host
+    expect(musicProbeAllowed({ host: "example.tail1234.ts.net", search: "?music=local" })).toBe(true);
     expect(musicProbeAllowed({ host: "kesennuma.example.org" })).toBe(false);
     expect(musicProbeAllowed({ host: "localhost", search: "?shot=1" })).toBe(false);
     expect(musicProbeAllowed({ host: "localhost", webdriver: true })).toBe(false);

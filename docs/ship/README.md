@@ -70,17 +70,17 @@ Everything is added with `ctx.add` (the dynamic root), so it is never merged int
 ## Flags
 
 `ship/flags.js` `resolveFlags()`: `?livery=nendo|fallback` wins. Otherwise the nendo livery is on for localhost,
-127.0.0.1, ::1, `*.localhost` and `*.ts.net` (the Tailscale demo funnel), or when the build defines `KLC_NENDO=1`, and
-off everywhere else. With the flag off, the plain fallback livery is painted and nothing under
+127.0.0.1, ::1 and `*.localhost`, or when the build defines `KLC_NENDO=1`, and off everywhere else. That includes
+`*.ts.net`: the captain's public Funnel link is a ts.net host, so tailnet dev uses `?livery=nendo` or `KLC_NENDO=1`.
+`scripts/public-mirror.js` DENYs `data/ship/shofukumaru1/*nendo*`, so the public mirror never serves the trace and a
+public `?livery=nendo` falls back to the plain livery. With the flag off, the plain fallback livery is painted and nothing under
 `data/ship/shofukumaru1/*nendo*` is fetched. The bundle never contains the nendo data, only the file names; it is
 fetched at run time from `data/ship/shofukumaru1/` when the flag is on.
 
-**Open decision for the captain.** The brief for this build keeps the nendo livery behind this flag and leaves the
-public deploy to the captain. The worktree copy of the dossier and `next-pass-usui.md` carry a header saying 臼福本店
-granted the livery permission on 2026-10-03 and that nendo should be the default everywhere. This build follows the
-brief. To make nendo the default everywhere, `resolveFlags` returns `{ nendoLivery: true, source: 'default' }` as its
-last line (keeping `?livery=fallback` and `KLC_NENDO=0` as the opt-outs), the flag tests in
-`test/ship-model.test.js` flip, and the deploy must then publish `data/ship/shofukumaru1/*nendo*.json`.
+**Open decision for the captain.** The nendo livery stays behind this flag; a public deploy is the captain's call.
+To make nendo the default everywhere, `resolveFlags` returns `{ nendoLivery: true, source: 'default' }` as its last
+line (keeping `?livery=fallback` and `KLC_NENDO=0` as the opt-outs), the flag tests in `test/ship-model.test.js` flip,
+the nendo DENY line in `scripts/public-mirror.js` goes, and the deploy publishes `data/ship/shofukumaru1/*nendo*.json`.
 
 ## Phone tier
 
@@ -152,12 +152,13 @@ stay local because the photos are copyrighted.
 
 Real: her particulars (58.60 m LOA, 9.2 m beam, 486 t, air draft about 21 m), the measured profile, the 舷門 on the
 starboard side only, MG1-2112 and 7KFY, the berth on the コの字岸壁 east face, the route under かなえ大橋 with 11.7 m to
-spare, 6 kn in the harbour, the 11:00 send-off with five-colour tapes, 福来旗, music and the horn, the 150 km line with
+spare, the 11:00 send-off with five-colour tapes, 福来旗, music and the horn, the 150 km line with
 about 3,000 hooks, the ICCAT 30 kg / 115 cm minimum and the Aug–Jan season, Japan's 3,779 t of 43,296 t, −60 °C and about
 36 h to the core, the chain Las Palmas → reefer container → Shimizu bonded weigh-in, the homecoming under 大漁旗,
 北かつまぐろ屋 海の市店, and IUCN EN → LC in September 2021.
 
-Stylised: time compression (4x in the bay, the set in 40 s), the handling constants, the hull lines between the measured
+Stylised: 6 kn in the harbour (a harbour pace chosen for the game; no harbour limit for 気仙沼 is sourced, and her
+service speed is 12.3 kn), time compression (4x in the bay, the set in 40 s), the handling constants, the hull lines between the measured
 profile and the beam, the crowd size and tape lengths, the order and weights of the fish, the 900 kg allowance bar (a game
 setting, never the ship's real quota), the ocean palette and the hours, the floodlight pools of the night haul, and the
 chain cards as flat illustrations. Details: [MODEL.md](MODEL.md) and [acts.md](acts.md).
