@@ -1,7 +1,8 @@
 // [ship:acts] Headless shots of the three acts of 第一昭福丸 (and the side-on views compared with the model photos
 // 02 port / 03 starboard). Run ONLY through the machine gate (one headless Chrome machine-wide):
 //   tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port 8963 --out shots/ship-acts/a
-// --only   world modules (default environment,water,town,harbor,life)   --w/--h size (1280x720)   --q high|low|phone
+// [ship:integrate] It shoots the real app (src/anime/index.html): the 'ship' world module exposes the hooks below.
+// --only   world modules (default: the whole app)                         --w/--h size (1280x720, max 1920x1080)   --q high|low|phone
 // --list   comma list of shot ids to take (default: all)                 --nobuild reuse the last build
 // --livery nendo|fallback (default: the flag; a local host shows nendo)   --auto 1 the hands-free voyage end to end
 // Prints a JSON line per shot (state, tags, frame stats) and the page errors; exits non-zero on a page error.
@@ -15,11 +16,13 @@ if ([8787, 8790, 8791].includes(port)) throw new Error('port reserved');
 const W = Math.min(1920, Number(args.w || 1280)), H = Math.min(1080, Number(args.h || 720));
 const out = args.out || 'shots/ship-acts/a';
 const dist = join(ROOT, `dist/anime-${port}-voyage`);
-const only = (args.only || 'environment,water,town,harbor,life').split(',').map((s) => s.trim());
+const only = (args.only || 'environment,water,town,harbor,landmarks,life,ship,explore').split(',').map((s) => s.trim());
+if (!only.includes('ship')) only.push('ship');
 
 // id -> page JS (returns a summary) and the sim seconds to run after it
 const SHOTS = [
   ['a1_docked', `__voyageShot('DOCKED')`, 1.5],
+  ['a1_docked_night', `(__voyageShot('DOCKED'), __setHours(20.2), 'ok')`, 1.5],
   ['a1_side_port', `(__voyageShot('DOCKED'), __voyageCam('sidePort'), document.getElementById('klc-ship').hidden = true)`, 0.5],
   ['a1_sendoff', `__voyageShot('SENDOFF')`, 6.5],
   ['a1_sendoff_close', `(__voyageShot('SENDOFF'), __voyage.setCam('crowd', true), 'ok')`, 5],
@@ -30,11 +33,13 @@ const SHOTS = [
   ['a2_set', `__voyageShot('OCEAN_SET')`, 14],
   ['a2_wait', `__voyageShot('WAIT')`, 3],
   ['a2_haul', `__voyageShot('HAUL', { keep: 2, fishOnScale: true })`, 0.6],
+  ['a2_haul_night', `(__voyageShot('HAUL', { keep: 3, fishOnScale: true }), __setHours(22.5), 'ok')`, 0.6],
   ['a2_side_stbd', `(__voyageShot('HAUL', { keep: 1 }), __voyageCam('side'), document.getElementById('klc-ship').hidden = true)`, 0.4],
   ['a2_stow', `__voyageShot('STOW')`, 1.5],
   ['a3_laspalmas', `__voyageShot('TRANSSHIP_LAS_PALMAS')`, 0.5],
   ['a3_reefer', `__voyageShot('REEFER')`, 0.5],
   ['a3_shimizu', `__voyageShot('SHIMIZU_WEIGH')`, 0.5],
+  ['a3_home_approach', `__voyageShot('HOMECOMING')`, 12],
   ['a3_home', `__voyageShot('HOMECOMING')`, 27],
   ['a3_card', `__voyageShot('CARD')`, 0.5],
 ];
@@ -42,7 +47,7 @@ const want = args.list ? new Set(args.list.split(',')) : null;
 
 const t0 = Date.now();
 if (!args.nobuild) {
-  const r = await build({ entry: resolve(ROOT, 'tools/anime/debug/voyage/index.html'), outdir: dist, only });
+  const r = await build({ entry: resolve(ROOT, 'src/anime/index.html'), outdir: dist, only });
   console.log(`build ${r.reused ? 'FAILED (reused last good build)' : 'ok'} ${r.ms ?? ''} ms`);
   if (r.reused) process.exitCode = 1;
 }

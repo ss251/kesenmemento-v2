@@ -8,7 +8,7 @@ import { OUTBOUND_PATH, KANAE_CROSSING, BERTH } from '../../../../src/anime/worl
 let sail = null;
 window.__sailShot = (kind = 'berth') => {
   const ctx = window.__ctx;
-  if (!sail) sail = createSail(ctx, {});
+  if (!sail) sail = ctx.services.sail || createSail(ctx, {});   // [ship:integrate] the ship module's sail when it is built
   window.__sail = sail;
   const at = (s) => { const [x, z] = OUTBOUND_PATH.at(s), [dx, dz] = OUTBOUND_PATH.dirAt(s); return { x, z, yaw: Math.atan2(dx, dz) }; };
   if (kind === 'berth') { sail.enter({ ...BERTH, autopilot: true }); for (let i = 0; i < 40; i++) sail.update(0.05); }
