@@ -103,3 +103,18 @@ v5:fix3 迎 and garden, which are kept intact.
 - The broad composite stair runs along the SE face from the deck to the bay terrace. The totem moved 2 m west (IMG_0824
   bearing).
 - The pavement of 魚町港町線 has pavers, a sett line, kerbs, four young street trees and four parked cars.
+
+## v6 survey (2026-10-03)
+
+Measured from the author's photos with solved cameras (53 of 57 photos, 0.72 px): `docs/anime/survey/minami.md`,
+`data/survey/minami/features.json`. The plaza's stair cage, bleachers, winch and ring benches, 迎's 3F box and ANCHOR face,
+and the NAIWAN totems have surveyed positions; the app's BEFORE errors are in `data/survey/minami/diff-before.json`.
+
+## v6 rebuild (2026-10-03)
+
+Rebuilt to the survey (`harbor/minami5.js` `ANCHOR`, `MUK6`, `ANCHOR_OVAL`, `TOTEM6`, `CAGE6`): the ANCHOR face on its SfM plane
+(P1 / P2 moved 0.6-2 m from GSI's), floor T.P. 2.62, the fascia 6.2 / 6.8 / 6.25 m over it, the clerestory T.P. 7.30-8.45, the
+glazed corner from T.P. 5.62, café RST, the oval, Lander Blue / SHARKS at their cut heights; the grey 3F box from its two
+surveyed coping corners (8.67 m SE face, coping T.P. 14.83, 6.2 m deep); the SE deck at the floor level with four steps and
+the 迎 totem at its triangulated glyph (1.6 m); the 20-riser composite stair; the bay terrace now 3 m deep, meeting the white
+mesh cage, which carries the terrace on along its 21.3 m (see the plaza in `docs/anime/survey/minami.md`).

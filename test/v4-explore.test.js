@@ -149,6 +149,13 @@ describe("places (tour + places list)", () => {
   });
   test("every place is a real named feature of the data within 60 m of its position", () => {
     for (const p of EXTRA_PLACES) {
+      // [v6:c6] a place that only the newest imagery names (src 'earth': a Google Earth 2026-03-11 label, cited in
+      // places.js) has no OSM / GSI feature; it must not duplicate one of the same name either
+      if (p.src === 'earth') {
+        const dup = L.PLACES.find((q) => q.name === (p.ref || p.ja) && Math.hypot(q.x - p.at[0], q.z - p.at[1]) < 500);
+        expect([p.id, !!dup]).toEqual([p.id, false]);
+        continue;
+      }
       const hit = L.PLACES.find((q) => q.name === (p.ref || p.ja) && Math.hypot(q.x - p.at[0], q.z - p.at[1]) < 60);
       expect([p.id, !!hit]).toEqual([p.id, true]);
     }

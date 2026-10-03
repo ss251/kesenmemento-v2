@@ -20,3 +20,6 @@ tools/.cargo-home/
 tools/render-test/out/
 tools/**/target/
 tools/*.tar.xz
+# [v6:survey] photo/app overlays embed the author photos: never commit them
+docs/shots/v6_survey/
+tools/survey/__pycache__/

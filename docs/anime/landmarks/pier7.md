@@ -139,3 +139,19 @@ The client's photos outrank Google Earth (docs/anime/OVERRIDES.md). Code: `harbo
 - Festoons swag between the deck stilts, with a low lamp in every bay at the wall foot.
 - New elements: the composite SE stair from the quay, 「ラヂオ気仙沼 77.5MHz」 on the studio glass, and the 3F balcony
   over the terrace at the IMG_0802 bearing.
+
+## v6 survey (2026-10-03)
+
+Measured from the author's photos with solved cameras (53 of 57 photos, 0.72 px): `docs/anime/survey/minami.md`,
+`data/survey/minami/features.json`. The plaza's stair cage, bleachers, winch and ring benches, 迎's 3F box and ANCHOR face,
+and the NAIWAN totems have surveyed positions; the app's BEFORE errors are in `data/survey/minami/diff-before.json`.
+
+## v6 rebuild (2026-10-03)
+
+Rebuilt to the survey (`harbor/minami5.js` `PIER7_6`, `BAYFACE6`, `P7POLY6`, `PIER7_NW6`; `docs/anime/survey/minami.md` "AFTER"):
+the levels from the SfM points along the bay face (bay deck on the seawall T.P. 4.2, stilts 4.1 m out, 2F floor 4.95, 3F
+floor 8.6, main eave 11.9, NW pavilion eave 8.05, SE block 12.6), the 2F / 3F bay face 1.5 m inside the seawall line (GSI's
+outline stood 3.7 m further in; no stepped terrace), the roof ridges along the building axis, the cantilevered 3F balcony box;
+the NW street corner from IMG_0799 / 0823 / 0907 (the 1F glass box 3.8 m inside the GSI street edge, the T.P. 2.45 corner
+deck with two steps, the stair up the street side between two column clusters, the studio set back 2.2 m behind a railed
+terrace, the 創 totem at its triangulated logo centre, 1.8 m tall). The 気仙沼ベイクルーズ banner (not in any photo) is gone.

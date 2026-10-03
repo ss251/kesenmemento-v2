@@ -1,0 +1,254 @@
+{
+ "note": "window.__features(area) / __featureDims(area) from the built app (tools/anime/survey-diff.mjs)",
+ "area": "minami",
+ "generated": "2026-10-03T13:21:31.136Z",
+ "features": {
+  "totem.pier7": [
+   -6.04,
+   3.08,
+   72.08
+  ],
+  "totem.mukaeru": [
+   -11.71,
+   3.61,
+   60.19
+  ],
+  "anchor.oval": [
+   -11.878,
+   5.32,
+   47.812
+  ],
+  "anchor.P2.foot": [
+   -10.8,
+   2.62,
+   48.949
+  ],
+  "anchor.P2.eave": [
+   -10.8,
+   9.173,
+   48.949
+  ],
+  "anchor.P1.eave": [
+   -15.34,
+   8.82,
+   44.16
+  ],
+  "mukaeru.box.top#1": [
+   -16.36,
+   14.825,
+   40.63
+  ],
+  "mukaeru.box.top#2": [
+   -8.76,
+   14.825,
+   36.47
+  ],
+  "cage.top#1": [
+   0.83,
+   7.24,
+   49.5
+  ],
+  "cage.top#2": [
+   3.73,
+   7.24,
+   47.34
+  ],
+  "cage.top#3": [
+   -6.95,
+   7.24,
+   28.94
+  ],
+  "cage.foot#1": [
+   0.83,
+   1.82,
+   49.5
+  ],
+  "cage.foot#2": [
+   3.73,
+   1.82,
+   47.34
+  ],
+  "cage.foot#3": [
+   -6.95,
+   1.82,
+   28.94
+  ],
+  "cage.box_bottom": [
+   0.83,
+   5.7,
+   49.5
+  ],
+  "bleach.t1.top#1": [
+   2.4,
+   2.475,
+   45.05
+  ],
+  "bleach.t1.top#2": [
+   7.749,
+   2.475,
+   36.654
+  ],
+  "bleach.t1.bot#1": [
+   2.4,
+   1.83,
+   45.05
+  ],
+  "bleach.t1.bot#2": [
+   7.749,
+   1.83,
+   36.654
+  ],
+  "bleach.t2.top#1": [
+   1.745,
+   3.093,
+   43.922
+  ],
+  "bleach.t2.top#2": [
+   6.771,
+   3.093,
+   36.031
+  ],
+  "bleach.t2.bot#1": [
+   1.745,
+   2.475,
+   43.922
+  ],
+  "bleach.t2.bot#2": [
+   6.771,
+   2.475,
+   36.031
+  ],
+  "bleach.t3.top#1": [
+   1.095,
+   3.898,
+   42.805
+  ],
+  "bleach.t3.top#2": [
+   5.803,
+   3.898,
+   35.414
+  ],
+  "bleach.t3.bot#1": [
+   1.095,
+   3.093,
+   42.805
+  ],
+  "bleach.t3.bot#2": [
+   5.803,
+   3.093,
+   35.414
+  ],
+  "bleach.t4.top#1": [
+   -0.257,
+   4.605,
+   40.478
+  ],
+  "bleach.t4.top#2": [
+   3.786,
+   4.605,
+   34.13
+  ],
+  "bleach.t4.bot#1": [
+   -0.257,
+   3.898,
+   40.478
+  ],
+  "bleach.t4.bot#2": [
+   3.786,
+   3.898,
+   34.13
+  ],
+  "bleach.t5.top#1": [
+   -1.528,
+   5.27,
+   38.292
+  ],
+  "bleach.t5.top#2": [
+   1.892,
+   5.27,
+   32.923
+  ],
+  "bleach.t5.bot#1": [
+   -1.528,
+   4.605,
+   38.292
+  ],
+  "bleach.t5.bot#2": [
+   1.892,
+   4.605,
+   32.923
+  ],
+  "bleach.stair.bot#1": [
+   7.749,
+   2.045,
+   36.654
+  ],
+  "bleach.stair.bot#2": [
+   8.876,
+   2.045,
+   34.883
+  ],
+  "winch.foot#1": [
+   22.6,
+   1.83,
+   49.86
+  ],
+  "winch.foot#2": [
+   21.22,
+   1.83,
+   47.89
+  ],
+  "winch.tip#1": [
+   22.6,
+   4.5,
+   49.86
+  ],
+  "winch.tip#2": [
+   21.22,
+   4.5,
+   47.89
+  ],
+  "ring#1": [
+   33.63,
+   1.83,
+   60.44
+  ],
+  "ring#2": [
+   28.01,
+   1.83,
+   62.67
+  ],
+  "ring#3": [
+   21.53,
+   1.83,
+   54.58
+  ],
+  "ring.tree#1": [
+   28.05,
+   1.83,
+   63.02
+  ]
+ },
+ "dims": {
+  "mukaeru.box_se_w": 8.664,
+  "mukaeru.box_top_y": 14.825,
+  "anchor.floor": 2.62,
+  "plaza.y": 1.83,
+  "cage.h": 5.42,
+  "cage.front_w": 3.616,
+  "cage.side_len": 21.275,
+  "cage.front_azimuth_deg": 53.32,
+  "cage.side_azimuth_deg": 149.868,
+  "bleach.tiers": 5,
+  "bleach.rise": 0.688,
+  "bleach.top_y": 5.27,
+  "bleach.tread": 1.737,
+  "bleach.front_azimuth_deg": 32.498,
+  "bleach.stair.rise": 0.215,
+  "bleach.stair.risers": 16,
+  "winch.post_h": 2.67,
+  "winch.span": 2.405,
+  "ring.d_out": 4.665,
+  "ring.h": 0.27
+ }
+}

@@ -11,6 +11,7 @@ import { mkdirSync } from "node:fs";
 import { ROOT } from "../terrain/tiles.js";
 import { Grid, fillRings, edt, bilinear, inGrid } from "./raster.js";
 import { CACHE } from "./vt.js";
+import { LAND_FILL, inRing } from "./landfill.js";   // [v6:c8] reclaimed land GSI still draws as water
 
 export const OUT = join(ROOT, "data/anime");
 
@@ -45,6 +46,10 @@ export async function buildGrids(vt) {
     const n = g.w * g.h;
     const wat = new Uint8Array(n);
     for (const f of vt.WA) fillRings(g, wat, [f.outer, ...f.holes], f.code === 5100 ? 1 : 2);
+    // [v6:c8] reclaimed since the GSI photo: land, before the shore distance is derived (so sdf follows)
+    const fill = new Uint8Array(n);
+    for (const f of LAND_FILL) { fillRings(g, wat, [f.ring], 0); fillRings(g, fill, [f.ring], 1); }
+    const fillMin = (x, z) => { let m = -Infinity; for (const f of LAND_FILL) if (inRing(x, z, f.ring)) m = Math.max(m, f.minH ?? 0); return m; };
     // ground from the DEMs (core preferred, city elsewhere); DEM sea / no-data = 0
     const dem = new Float32Array(n);
     for (let j = 0; j < g.h; j++) for (let i = 0; i < g.w; i++) {
@@ -66,7 +71,7 @@ export async function buildGrids(vt) {
       let y = dem[k];
       if (wat[k] === 1) y = Math.min(y, -(0.8 + Math.min(13, Math.max(0, s) * 0.09)));   // seabed shelves down from the shore
       else if (wat[k] === 2) y = Math.min(y, Math.max(dem[k] - 0.8, -0.8), Number.isFinite(bank[k]) ? Math.max(-1.5, bank[k] - 2.0) : Infinity);
-      else y = Math.max(y, 0.45);   // land never dips under the sea surface (DEM no-data = 0 along the shore)
+      else y = Math.max(y, 0.45, fill[k] ? fillMin(g.cx(k % g.w), g.cz((k / g.w) | 0)) : -Infinity);   // land never dips under the sea surface (DEM no-data = 0 along the shore); [v6:c8] a fill yard sits at least at its minH
       h[k] = Math.max(-32000, Math.min(32000, Math.round(y * 10)));
     }
     res[name] = { g, h, sdf, wat };

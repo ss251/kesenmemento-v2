@@ -23,7 +23,7 @@ import { mapMat, textTex, FONT } from './util.js';
 import { apronLife } from './market.js';
 import { fitFontSize } from '../../core/textures.js';   // [v4:polish1]
 import { carColor } from '../town/carcolors.js';
-import { buildCRoofPhotos } from './market5.js';   // [v5:photos]   // [v5:fix2] the Japanese car-colour mix
+import { buildCRoofPhotos, DECK } from './market5.js';   // [v5:photos] [v6:rebuild]   // [v5:fix2] the Japanese car-colour mix
 
 const C = {
   wall: '#e9ebe8', wallShade: '#d9dcd9', concrete: '#c3c6c2', slab: '#b9bcb8', dark: '#4d5462', interior: '#5b6170',
@@ -154,7 +154,7 @@ function carMesh(ctx, list, name) {
   const im = new THREE.InstancedMesh(geo, ctx.mat.toon('#ffffff', { paint: 0.02 }), list.length);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), col = new THREE.Color();
   const r = ctx.rng(name);
-  list.forEach((c, i) => { q.setFromEuler(e.set(0, c.rot, 0)); m4.compose(new THREE.Vector3(c.x, c.y, c.z), q, new THREE.Vector3(1, 1, 1)); im.setMatrixAt(i, m4); dm.setMatrixAt(i, m4); im.setColorAt(i, col.set(carColor(r()))); });
+  list.forEach((c, i) => { q.setFromEuler(e.set(0, c.rot, 0)); m4.compose(new THREE.Vector3(c.x, c.y, c.z), q, new THREE.Vector3(1, 1, 1)); im.setMatrixAt(i, m4); dm.setMatrixAt(i, m4); const rc = carColor(r()); im.setColorAt(i, col.set(c.color || rc)); });   // [v6:rebuild] photographed cars keep their colour
   dm.name = name + '-glass'; dm.castShadow = true; dm.instanceMatrix.needsUpdate = true; dm.computeBoundingSphere(); ctx.add(dm);
   im.name = name; im.castShadow = true; im.receiveShadow = true;
   im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true;
@@ -194,11 +194,13 @@ export function buildMarket4(ctx, opts = {}) {
   // ============================================================== north facility: the long quay shed
   {
     const poly = SITES.marketShed.poly, g0 = baseY(L, poly), sea = seaEdges(L, poly);
-    const y1F = g0 + 7.0, roofY = g0 + 10.6;   // 1F unloading hall 7 m clear, 2F band, parking deck on top
-    // ground slab (the hall floor, raised 0.25 m) and the land-side / end walls of the 1F (the quay side is open)
-    k.mesh(capGeo(poly, g0 + 0.25), m.concrete);
-    k.mesh(prismWalls(poly, g0 - 1.5, g0 + 0.25), m.concrete);
-    k.mesh(prismWalls(poly, g0 + 0.25, y1F, { skip: (i) => sea.has(i) }), m.wall);
+    // [v6:rebuild] the 1F hall to the dawn photos (DECK.hall, data/survey/market/model.json): floor T.P. 2.19, soffit 6.9,
+    // the quay-face edge beam's underside 5.82, open from the quay face right through to the land-side wall
+    const HL = DECK.hall, fl = HL.floor, y1F = HL.soffit, roofY = g0 + 10.6;   // 2F band above, parking deck on top
+    // ground slab (the hall floor) and the land-side / end walls of the 1F (the quay side is open)
+    k.mesh(capGeo(poly, fl), ctx.mat.toon(C.concrete, { paint: 0.08, polygonOffset: -1 }));
+    k.mesh(prismWalls(poly, g0 - 1.5, fl), m.concrete);
+    k.mesh(prismWalls(poly, fl, y1F, { skip: (i) => sea.has(i) }), m.wall);
     // 2F band all round (windows on every side), the 1F ceiling (soffit) and the roof slab
     k.mesh(prismWalls(poly, y1F, roofY), m.wall);
     k.mesh(capGeo(poly, y1F, { down: true }), m.interior);
@@ -253,22 +255,34 @@ export function buildMarket4(ctx, opts = {}) {
         for (let s = len * 0.22; s < len - 20; s += 110) { const [x, z] = at(s, 0.16); k.plane(26, 4.06, wlabM, [x, y1F + 1.8, z], [0, rn, 0]); }
       }
     }
-    // the open quay side: columns every 7.5 m, the dark hall behind, hanging lamps, a fascia sign
+    // the open quay side: columns on the face line (spaced so the one marked 「7」 stands where IMG_0860 sees it), transverse
+    // beams over them right through the hall, lit strip lamps under the soffit; no back wall: the hall is open to the land side
     const sign = textTex(ctx, '気仙沼市魚市場', { w: 1024, h: 160, color: C.blue, font: FONT.sans, weight: 900, size: 0.78 });
     const signM = mapMat(ctx, 'decal', '#ffffff', sign, { transparent: true, alphaTest: 0.3 });
+    const colM = ctx.mat.toon('#8f918c', { paint: 0.05 }), beamM = ctx.mat.toon('#4a4f57', { paint: 0.02 }), plateM = ctx.mat.toon('#25272a', { paint: 0 });
+    const depthIn = (a, n) => { for (let d = 1; d < 80; d += 0.25) if (!inside(a[0] - n[0] * d, a[1] - n[1] * d, poly)) return d - 0.25; return 80; };
     edges(poly, (a, b, len, n, i, u) => {
       if (!sea.has(i)) return;
-      for (let s = 0; s <= len + 0.01; s += len / Math.max(1, Math.round(len / 7.5))) {
-        const x = a[0] + u[0] * s - n[0] * 0.5, z = a[1] + u[1] * s - n[1] * 0.5;
-        k.box(0.8, y1F - g0 - 0.25, 0.8, m.wallPlain, [x, (g0 + 0.25 + y1F) / 2, z], [0, Math.atan2(u[0], u[1]), 0]);
-        if (phys?.addCylinder) phys.addCylinder(x, z, 0.5, g0, y1F);
+      const n7 = Math.max(1, Math.round(len / HL.spacing)), sp = len / n7, P7 = HL.col.at, a7 = i === seaFace(poly, sea) ? (P7[0] - a[0]) * u[0] + (P7[1] - a[1]) * u[1] : null, off = a7 !== null ? ((a7 % sp) + sp) % sp : 0;
+      for (let s = off; s <= len + 0.01; s += sp) {
+        const x = a[0] + u[0] * s + n[0] * HL.col.d, z = a[1] + u[1] * s + n[1] * HL.col.d, rot = Math.atan2(u[0], u[1]);
+        k.box(HL.col.w, y1F - fl, HL.col.w, colM, [x, (fl + y1F) / 2, z], [0, rot, 0]);
+        if (phys?.addCylinder) phys.addCylinder(x, z, 0.5, fl, y1F);
+        if (a7 !== null) {   // the column numbers: a black band with the number in yellow, facing the quay (IMG_0860)
+          const no = HL.col.label + Math.round((s - a7) / sp) * HL.col.dir;
+          if (no >= 1) { const tx = textTex(ctx, String(no), { w: 128, h: 256, color: '#e2b04a', bg: '#25272a', font: FONT.sans, weight: 900, size: 0.7 });
+            k.plane(HL.col.w * 0.98, 1.2, mapMat(ctx, 'toon', '#ffffff', tx, { paint: 0 }), [x + n[0] * (HL.col.w / 2 + 0.01), fl + 3.3, z + n[1] * (HL.col.w / 2 + 0.01)], [0, Math.atan2(n[0], n[1]), 0]);
+            k.box(HL.col.w + 0.02, 0.5, HL.col.w + 0.02, plateM, [x, fl + 2.45, z], [0, rot, 0]); }
+        }
+        const fx = a[0] + u[0] * s, fz = a[1] + u[1] * s, din = depthIn([fx, fz], n);
+        barAlong(k, [fx, fz], [fx - n[0] * din, fz - n[1] * din], (HL.beam + y1F) / 2, 0.6, y1F - HL.beam, beamM);
       }
-      // back of the open hall: a dark wall 18 m in, lit strip lamps under the soffit
-      const ia = [a[0] - n[0] * 18, a[1] - n[1] * 18], ib = [b[0] - n[0] * 18, b[1] - n[1] * 18];
-      barAlong(k, ia, ib, (g0 + y1F) / 2, 0.2, y1F - g0, m.interior);
-      for (let s = 6; s < len - 3; s += 9) for (const d of [4, 10, 15]) k.box(0.25, 0.1, 2.2, m.lamp, [a[0] + u[0] * s - n[0] * d, y1F - 0.3, a[1] + u[1] * s - n[1] * d], [0, Math.atan2(u[0], u[1]), 0]);
+      // the girder over the column line and the lighter beam band between it and the face (IMG_0853-0861 ceiling bands)
+      const along = (d, y0, w) => barAlong(k, [a[0] + n[0] * d, a[1] + n[1] * d], [b[0] + n[0] * d, b[1] + n[1] * d], (y0 + y1F) / 2, w, y1F - y0, beamM);
+      along(HL.col.d, HL.beam, 0.8); along(HL.midBeam.d, HL.midBeam.bottom, 0.5);
+      for (let s = 6; s < len - 3; s += 9) for (const d of [4, 10, 16, 22, 28]) { const px = a[0] + u[0] * s - n[0] * d, pz = a[1] + u[1] * s - n[1] * d; if (inside(px, pz, poly)) k.box(0.25, 0.1, 2.2, m.lamp, [px, HL.beam - 0.15, pz], [0, Math.atan2(u[0], u[1]), 0]); }
       // 1F edge beam, signs every ~90 m on the 2F band
-      barAlong(k, [a[0] + n[0] * 0.05, a[1] + n[1] * 0.05], [b[0] + n[0] * 0.05, b[1] + n[1] * 0.05], y1F - 0.35, 0.3, 0.7, m.shade);
+      barAlong(k, [a[0] + n[0] * 0.05, a[1] + n[1] * 0.05], [b[0] + n[0] * 0.05, b[1] + n[1] * 0.05], (HL.edgeBeam + y1F) / 2, 0.5, y1F - HL.edgeBeam, beamM);
       for (let s = 45; s < len - 20; s += 95) {
         const x = a[0] + u[0] * s + n[0] * 0.08, z = a[1] + u[1] * s + n[1] * 0.08;
         k.plane(24, 3.8, signM, [x, y1F + 1.95, z], [0, Math.atan2(n[0], n[1]), 0]);
@@ -277,7 +291,8 @@ export function buildMarket4(ctx, opts = {}) {
       const kr = ctx.rng('shed-inner');
       for (let s = 8; s < len - 6; s += kr.range(10, 16)) {
         const x = a[0] + u[0] * s - n[0] * kr.range(6, 13), z = a[1] + u[1] * s - n[1] * kr.range(6, 13);
-        const sub = k.group([x, g0 + 0.25, z], Math.atan2(u[0], u[1])); const kk = ctx.kit(sub);
+        if (i === seaFace(poly, sea)) { const ah = hallA(x, z); if (ah > HL.clutterFree[0] && ah < HL.clutterFree[1]) continue; }   // [v6:rebuild] the photographed bays (DECK.hall.scaleWarning)
+        const sub = k.group([x, fl, z], Math.atan2(u[0], u[1])); const kk = ctx.kit(sub);
         if (kr() < 0.5) boxYard(kk, M, 0, 0, 0, { cols: 3, rows: 2, rng: kr, colors: ['blue', 'blue', 'white', 'orange'] });
         else for (let q = 0; q < 4; q++) tub(kk, M, (q % 2) * 1.5, 0, Math.floor(q / 2) * 1.4, kr.range(-0.2, 0.2));
       }
@@ -295,6 +310,16 @@ export function buildMarket4(ctx, opts = {}) {
     roofWalk(poly, roofY, roofY - 0.8);
     out.stats.shed = { g0, roofY, len: Math.round(o.d) };
     out.shed = { poly, g0, roofY, y1F, sea };
+    // [v6:survey] the open quay hall as built, for tools/anime/survey-diff.mjs (docs/anime/survey/market.md): the hall floor,
+    // the underside of the 1F ceiling at the quay face, and how far in the dark back wall stands (the photos see through)
+    ctx.features?.dim('market', 'canopy.floor_y', fl);
+    ctx.features?.dim('market', 'canopy.soffit_y', HL.edgeBeam);
+    { const fi = seaFace(poly, sea), P0 = openRing(poly)[fi], P1 = openRing(poly)[(fi + 1) % openRing(poly).length], len = Math.hypot(P1[0] - P0[0], P1[1] - P0[1]), u = [(P1[0] - P0[0]) / len, (P1[1] - P0[1]) / len], n0 = [u[1], -u[0]], mid = [(P0[0] + P1[0]) / 2, (P0[1] + P1[1]) / 2], n = inside(mid[0] + n0[0], mid[1] + n0[1], poly) ? [-n0[0], -n0[1]] : n0;
+      // the open depth the dawn cameras saw: from the quay face through the hall to the land-side wall, at the camera's line
+      const foot = (q) => { const a = (q[0] - P0[0]) * u[0] + (q[1] - P0[1]) * u[1]; return [P0[0] + u[0] * a, P0[1] + u[1] * a]; };
+      // quay edge 5.8 m out from the face (IMG_0855 quay-edge samples), the land-side wall behind the cameras
+      ctx.features?.dim('market', 'canopy.open_depth', depthIn(foot([531.6, 657.5]), n) + 5.8);
+      const fb = foot([563.77, 663.95]); ctx.features?.add('market', 'canopy.beam_bottom', [fb[0], HL.edgeBeam, fb[1]]); }
   }
 
   // ============================================================== north block (roof car park, vault, ramp)
@@ -344,7 +369,9 @@ export function buildMarket4(ctx, opts = {}) {
 
   // ============================================================== C棟
   {
-    const poly = SITES.marketC.poly, g0 = baseY(L, poly), sea = seaEdges(L, poly), roofY = g0 + 13.0, y2F = g0 + 7.5;
+    // [v6:rebuild] the roof deck is at the surveyed T.P. 15.585 (market5.js builds it and C棟's body above the strip); the
+    // quay-side strip east of the deck's parapet rail is a lower roof, DECK.deck.lowerDrop below it
+    const poly = SITES.marketC.poly, g0 = baseY(L, poly), sea = seaEdges(L, poly), roofY = DECK.deck.y - DECK.deck.lowerDrop, y2F = g0 + 7.5;
     k.mesh(prismWalls(poly, g0 - 1.5, roofY), m.wall);
     k.mesh(capGeo(poly, roofY), m.roofWhite);
     parapet(k, poly, roofY, 1.1, m.wall, m.wallPlain, 0.25);
@@ -372,10 +399,10 @@ export function buildMarket4(ctx, opts = {}) {
     ctx.noOutline(k.mesh(prismWalls(offsetRing(poly, 0.12), g0 + 0.5, roofY - 0.5), lightupMat(ctx, '#8fb6ff', 0.32, g0, 18)));
     // [v5:photos] the roof deck as the author's photos show it (IMG_0792-0798: a visitors' car park with the pale-blue lettered
     // penthouse, the wave-roofed observation pavilions, the lifeboat; harbor/market5.js), replacing the v4 equipment boxes
-    out.stats.Croof = buildCRoofPhotos(ctx, k, { poly, roofY, cars, r: ctx.rng('marketC-roof5') });
-    hallOf(poly, roofY - g0);
+    out.stats.Croof = buildCRoofPhotos(ctx, k, { cars });
+    hallOf(poly, DECK.deck.y - g0);
     solid(poly, g0, roofY + 1);
-    out.stats.C = { g0, roofY };
+    out.stats.C = { g0, roofY, deckY: DECK.deck.y };
   }
 
   // ============================================================== D棟 (PV roof)
@@ -436,6 +463,14 @@ const NORTH_MAIN = [[538.2, 607.5], [535.5, 602.8], [395.4, 568.2], [394, 575.2]
 /** The curved ramp from the street (474, 707) up onto the north block's roof deck. */
 const RAMP_PATH = [[474, 707], [492, 711], [512, 714], [528, 714], [538, 709], [543, 701], [541, 690], [531, 670], [521, 648], [514, 632]];
 function nearRamp(x, z, r = 10) { for (let i = 1; i < RAMP_PATH.length; i++) { const [ax, az] = RAMP_PATH[i - 1], [bx, bz] = RAMP_PATH[i], dx = bx - ax, dz = bz - az, t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz))); if (Math.hypot(ax + dx * t - x, az + dz * t - z) < r) return true; } return false; }
+/** [v6:rebuild] The sea edge of the north facility the dawn quay photos look out through (nearest to their cameras). */
+function seaFace(poly, sea) {
+  const P = openRing(poly), c = [531.6, 657.5]; let best = -1, bd = 1e9;
+  for (const i of sea) { const a = P[i], b = P[(i + 1) % P.length], dx = b[0] - a[0], dz = b[1] - a[1], L2 = dx * dx + dz * dz, t = Math.max(0, Math.min(1, ((c[0] - a[0]) * dx + (c[1] - a[1]) * dz) / L2)), d = Math.hypot(a[0] + dx * t - c[0], a[1] + dz * t - c[1]); if (d < bd) { bd = d; best = i; } }
+  return best;
+}
+/** [v6:rebuild] Metres along the north facility's quay face (from its south corner) of an ENU point. */
+function hallA(x, z) { const F = DECK.hall.frame, ux = F.to[0] - F.o[0], uz = F.to[1] - F.o[1], l = Math.hypot(ux, uz); return ((x - F.o[0]) * ux + (z - F.o[1]) * uz) / l; }
 function inside(x, z, poly) { let c = false; for (let i = 0, k = poly.length - 1; i < poly.length; k = i++) { const [xi, zi] = poly[i], [xk, zk] = poly[k]; if ((zi > z) !== (zk > z) && x < (xk - xi) * (z - zi) / (zk - zi) + xi) c = !c; } return c; }
 
 // ------------------------------------------------------------------------------------------------ 海の市

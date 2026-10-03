@@ -8,6 +8,7 @@ import { PHONE } from './tier.js';   // [v4:phone]
 import * as geo from './geo.js';
 import { Physics } from './physics.js';
 import { sharedHardShores } from '../world/layout/hardshore.js';   // [v3:fix]
+import { createFeatures } from './features.js';   // [v6:survey]
 
 export function mulberry32(seed) {
   let a = (typeof seed === 'string' ? [...seed].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619)) >>> 0, 2166136261) : seed) >>> 0;
@@ -44,6 +45,7 @@ export function createContext({ scene, camera, renderer = null, audio, quality, 
     mat, tex, geo, wires, physics, palette: PALETTE,
     shared, sunDir,
     services: {},
+    features: createFeatures(),   // [v6:survey] named feature positions (window.__features), core/features.js
     staticRoot, dynamicRoot,
     LAYER_NO_OUTLINE,
     time: 0,

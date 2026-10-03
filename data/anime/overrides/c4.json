@@ -77,6 +77,8 @@
     { "use": "parking", "ring": [[1031, -352], [1053, -352], [1053, -326], [1031, -326]], "src": "earth: small paved parking area in the gravel yard (sub-c4c top ez_c2)" },
     { "use": "vacant", "ring": [[871, -650], [924, -650], [924, -565], [913, -552], [871, -552]], "src": "earth: 本浜町二丁目 is still an empty gravel lot in 2026 (sub-c4a top ez_a2, o180, l225)" },
     { "use": "vacant", "surface": "weeds", "ring": [[932, -630], [962, -630], [955, -590], [945, -578], [932, -578]], "src": "earth: weedy strip between the lane and the levee road (sub-c4a top ez_a2)" },
-    { "use": "parking", "replace": true, "ring": [[1122, -724], [1150, -724], [1152, -745], [1172, -748], [1166, -720], [1155, -690], [1128, -686], [1122, -700]], "src": "earth: the 7-Eleven car park wraps the store on the south and east (sub-c4b top ez_b1); the store footprint is kept clear" }
+    { "use": "parking", "replace": true, "ring": [[1122, -724], [1150, -724], [1152, -745], [1172, -748], [1166, -720], [1155, -690], [1128, -686], [1122, -700]], "src": "earth: the 7-Eleven car park wraps the store on the south and east (sub-c4b top ez_b1); the store footprint is kept clear" },
+    { "use": "felled", "ring": [[1206, -262], [1220, -266], [1242, -270], [1253, -284], [1281, -306], [1325, -300], [1325, -222], [1265, -220], [1235, -205], [1212, -205], [1203, -228]], "src": "earth 2026-03-11 c4/r1003 top + c4_fukko: 復興の丘 park is treeless terraced grass; clears the forest land cover and trees" },
+    { "use": "park", "name": "復興の丘", "ring": [[1206, -262], [1220, -266], [1242, -270], [1253, -284], [1281, -306], [1325, -300], [1325, -222], [1265, -220], [1235, -205], [1212, -205], [1203, -228]], "src": "earth 2026-03-11 c4/r1003 top (labelled 復興の丘 Park): terraced grass with contour paths; gsi ~2020-22 the same terraces" }
   ]
 }

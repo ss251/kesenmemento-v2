@@ -20,6 +20,7 @@ import { lotTable, roofWhiteBalance, fitRoofTransform, enrichLot, nameRoads, riv
 // [v4:overrides] per-cell reference overrides (data/anime/overrides/*.json, docs/anime/OVERRIDES.md), folded in last
 import { OVERRIDES_DIR, loadOverrides, compileOverrides, overrideFeatures, patchLot, unusedLotPatches, applyRoadOverrides, applyLanduseOverrides, propPlacements } from "./enrich/fold.js";
 import { tileToLl, llToEnu } from "../../src/core/geo.js";
+import { LAND_FILL, inFill } from "./landfill.js";   // [v6:c8] reclaimed land GSI still draws as water
 
 export const ZONES = {
   hero: { cx: 180, cz: -20, r: 380 },
@@ -102,6 +103,26 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
 
   // ---------------------------------------------------------------- quays (coastline pieces <= 24 m, classified)
   const QUAYS = [];
+  // [v6:c8] the new edge of a land fill (scripts/anime/landfill.js): seawall pieces of 24 m or less, top from the land
+  // height like the pieces below. Chained right after the kept piece that ends where the wall starts (so harbor/world.js
+  // quayChains joins them), or appended when no piece ends there.
+  const fillWalls = new Map(LAND_FILL.filter((f) => f.wall?.length >= 2).map((f) => [f.id, f]));
+  log.landFill = { skipped: 0, walls: 0 };
+  const pushWall = (f) => {
+    fillWalls.delete(f.id);
+    for (let i = 1; i < f.wall.length; i++) {
+      const a = f.wall[i - 1], b = f.wall[i], n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 24));
+      for (let k = 0; k < n; k++) {
+        const pa = [a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n], pb = [a[0] + (b[0] - a[0]) * (k + 1) / n, a[1] + (b[1] - a[1]) * (k + 1) / n];
+        const mx = (pa[0] + pb[0]) / 2, mz = (pa[1] + pb[1]) / 2, zone = zoneOf(mx, mz);
+        const dx = pb[0] - pa[0], dz = pb[1] - pa[1], l = Math.hypot(dx, dz) || 1, nx = -dz / l, nz = dx / l;
+        const inl = S.shoreDist(mx + nx * 6, mz + nz * 6) < S.shoreDist(mx - nx * 6, mz - nz * 6) ? 1 : -1;
+        const land = S.heightAt(mx + nx * inl * 8, mz + nz * inl * 8);
+        QUAYS.push({ a: P1(pa), b: P1(pb), top: r2(Math.max(1.2, Math.min(4.2, land))), kind: "seawall", zone, fill: f.id });
+        log.landFill.walls++;
+      }
+    }
+  };
   for (const c of vt.Cstline) {
     const pts = c.pts;
     for (let i = 1; i < pts.length; i++) {
@@ -115,6 +136,7 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
         if (!inFar(mx, mz)) continue;
         const zone = zoneOf(mx, mz);
         if (zone === "far") continue;
+        if (LAND_FILL.some((f) => inFill(mx, mz, f, f.pad ?? 2))) { log.landFill.skipped++; continue; }   // [v6:c8] filled in since
         // inland normal: the side where the shore distance is negative
         const dx = pb[0] - pa[0], dz = pb[1] - pa[1], l = Math.hypot(dx, dz) || 1, nx = -dz / l, nz = dx / l;
         const s1 = S.shoreDist(mx + nx * 6, mz + nz * 6), s2 = S.shoreDist(mx - nx * 6, mz - nz * 6);
@@ -123,9 +145,11 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
         const land = S.heightAt(lx, lz), far = S.heightAt(mx + nx * inl * 30, mz + nz * inl * 30);
         const kind = quayKind({ x: mx, z: mz, zone, land, slope: (far - land) / 22, roadNear: roadHash.near(lx, lz, 14).some((s) => segDist(lx, lz, s.a, s.b).d < 10) });
         QUAYS.push({ a: P1(pa), b: P1(pb), top: r2(Math.max(1.2, Math.min(kind === "rocks" || kind === "beach" ? 2.2 : 4.2, land))), kind, zone });
+        for (const f of [...fillWalls.values()]) if (Math.hypot(pb[0] - f.wall[0][0], pb[1] - f.wall[0][1]) < 0.6) pushWall(f);
       }
     }
   }
+  for (const f of [...fillWalls.values()]) pushWall(f);
   log.quays = QUAYS.length; console.error("quays", Math.round(performance.now() - t0));
 
   // ---------------------------------------------------------------- lots
@@ -285,7 +309,8 @@ function extras(E, vt, ROADS, LOTS) {
   const lotAt = new Map(LOTS.map((l) => [l.id, l]));
   const places = [];
   const seen = new Set();
-  const add = (o) => { if (!showable(o.name)) return; if (o.nameEn && !showable(o.nameEn)) o.nameEn = null; const k = o.name + "|" + Math.round(o.x / 30) + "," + Math.round(o.z / 30); if (seen.has(k)) return; seen.add(k); places.push({ id: placeId(o.name, [o.x, o.z]), ...o }); };
+  // [v6:c11] a name that starts with （旧） is a former use (src/anime/world/layout.js PLACES drops them at load too)
+  const add = (o) => { if (!showable(o.name) || /^[（(]旧[）)]/.test(o.name)) return; if (o.nameEn && !showable(o.nameEn)) o.nameEn = null; const k = o.name + "|" + Math.round(o.x / 30) + "," + Math.round(o.z / 30); if (seen.has(k)) return; seen.add(k); places.push({ id: placeId(o.name, [o.x, o.z]), ...o }); };
   // named buildings (lots) first: their position is the building
   for (const l of LOTS) if (l.name) add({ name: l.name, nameEn: l.nameEn ?? null, cat: l.facility || (l.use ? l.use.split(":")[1] : l.kind), x: r1(l.obb.cx), z: r1(l.obb.cz), lot: l.id, src: l.src.name });
   for (const p of E.pois) if (p.name) add({ name: p.name, nameEn: p.nameEn ?? null, cat: p.type, group: p.cat, x: p.p[0], z: p.p[1], lot: p.lot && lotAt.has(p.lot) ? p.lot : null, src: "osm", osm: p.osm });

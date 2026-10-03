@@ -11,7 +11,13 @@ Code: `scripts/anime/enrich/overrides.js` (re-exported by `enrich/fold.js`). Tes
 ## Ground truth, in priority order
 
 1. **The client's own photos** (`raw/photos-sailesh/` when it exists; `raw/photos/` holds his photos of the inner-bay
-   scale model).
+   scale model). [v6:survey] Where an area has a photo survey (`data/survey/<area>/features.json`: solved cameras,
+   features measured in metres with a 1-sigma; `docs/anime/survey/<area>.md`), its numbers replace anything placed by
+   eye against the photos (phone GPS is 3–10 m off); check a rebuild with `tools/anime/survey-diff.mjs` and
+   `tools/anime/photo-align.mjs`. [v6:rebuild] The south shore (PIER7, the plaza, 迎 / ANCHOR, 結, the east promenade) is rebuilt to
+   `data/survey/minami/features.json`: every named feature within its 1-sigma (`test/v6-rebuild-minami.test.js`); the survey
+   constants live in `harbor/minami5.js` (`CAGE6`, `BLEACH6`, `WINCH6`, `RINGS6`, `WALK6`, `ANCHOR`, `MUK6`, `PIER7_6`) and the
+   plaza's paving level in `world/layout.js` `GROUND_PADS`.
 2. **Google Earth** (photoreal 3D, imagery dated 2026-03-11), captured for reference only with
    `tools/anime/earth-ref.mjs` (below). **Never ship, commit or paste these captures into the app.** They stay in
    `raw/ref/earth/<cell>/` (gitignored).
@@ -163,6 +169,15 @@ a tunnel road to clear a strip over a hill.
 - **Patch** an existing road by id (`r123`; `top_annot.jpg` labels them) with any of `pts`, `width` (the whole road
   reserve, 1 to 60 m), `carriage` (the carriageway, not more than `width`), `kind` (`national` `prefectural` `city`
   `alley` `bridge`), `name` and `nameEn`.
+- [v6:c7] `markings` (a patch or a new road) replaces the centre-line rule of `town/streets.js` (`markCentre`: a yellow
+  solid line on hero carriageways of 8.5 m or more, else white dashes) with what the imagery shows:
+  `{ "centre": "white-solid" | "white-dashed" | "yellow" | "hatched-median", "medianWidth": 0.5..10, "lanes": [a, b] }`.
+  `hatched-median` is a painted median (導流帯): two 0.15 m white solid lines `medianWidth` apart (default 3 m) with
+  0.45 m white chevrons at a 5 m pitch between them, and dashed white lane lines. `lanes` (1 to 4 each, default
+  `[1, 1]`) counts the lanes on each side: `a` on the right of the median and `b` on its left, looking along the road
+  from its first point to its last; the median sits where lanes of equal width put it. Example (c7.json, r14150 runs
+  north to south): `{ "centre": "hatched-median", "medianWidth": 3, "lanes": [1, 2] }` is one lane on the west side
+  and two on the east.
 - **Remove** a road with `remove: true`.
 - **Add** a road with a new id `ovr:<cell>:<name>`. It needs `pts`, `width` and `kind`.
 

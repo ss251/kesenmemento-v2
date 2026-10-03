@@ -21,6 +21,11 @@
   {
    "id": "osm",
    "what": "OpenStreetMap (c) OpenStreetMap contributors, ODbL: tunnel=yes on the 大船渡線BRT ways"
+  },
+  {
+   "id": "commons",
+   "what": "Wikimedia Commons BRT 内湾入口（八日町） station photos: \"JR East Naiwan-Iriguchi (Yōkamachi) Station Overall\" (2024-02-11) and \"Naiwan-Iriguchi Station.jpg\" (2022-03-12), CC BY-SA 4.0 (raw/ref/commons/untagged, reference only)",
+   "date": "2024-02-11"
   }
  ],
  "lots": [
@@ -386,6 +391,25 @@
    ],
    "replace": true,
    "src": "earth 2026-03-11 (raw/ref/earth/review2-8851/c1-d pair_o0): the OSM park ring of 赤土山自然公園 (© OpenStreetMap contributors) is dark 杉 wood with only a small clearing round the hut, not the mown lawn strip the app drew"
+  }
+ ],
+ "roads": [
+  {
+   "id": "r11073",
+   "width": 11,
+   "carriage": 6.5,
+   "src": "commons (post-2022 station photo) + earth 2026-03-11: two-lane BRT busway at 内湾入口 with kerbed platforms both sides"
+  }
+ ],
+ "props": [
+  {
+   "type": "bench",
+   "at": [
+    -424,
+    -311
+   ],
+   "face": 155,
+   "src": "commons station photo: bench on the north platform against the retaining wall"
   }
  ]
 }

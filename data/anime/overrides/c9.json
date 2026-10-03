@@ -22,6 +22,11 @@
    "id": "osm",
    "what": "OpenStreetMap, raw/osm/overpass.json (© OpenStreetMap contributors, ODbL)",
    "date": "2026-05-06"
+  },
+  {
+   "id": "toshoken",
+   "what": "東北の小売・流通ニュース (toshoken.com/news/32145, 2026-04-18): ビッグハウス本郷店 reopened as スーパーアークス本郷店, 気仙沼市本郷15-2, 1,395 m² sales floor, 9:00-22:00, operated by ベルジョイス (アークスグループ)",
+   "date": "2026-04-18"
   }
  ],
  "lots": [
@@ -1808,7 +1813,9 @@
    "roof": {
     "color": "#9fa0a4"
    },
-   "src": "gsi: roof colour #90a4a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6)"
+   "src": "gsi: roof colour #90a4a0 from the GSI photo with the photo's cyan-green cast removed (Lab a/b shift calibrated on the cell's asphalt, #9aada5 on the photo, neutral on Earth 2026-03-11; over the cell this halves the hue error against Earth, median Δab 10.4 -> 5.6); toshoken 2026: ビッグハウス本郷店 reopened as スーパーアークス本郷店 on 2026-04-18 (本郷15-2)",
+   "name": "スーパーアークス 本郷店",
+   "nameEn": "Super Arcs Hongo"
   },
   {
    "id": "16/58539/25070/366",
@@ -2107,16 +2114,26 @@
     "shape": "flat",
     "color": "#5d6470"
    },
-   "src": "earth: E top + o0, Big House is a single-storey supermarket hall whose roof is covered in dark solar panels, not a 3-storey white block"
+   "src": "earth: E top + o0, Big House is a single-storey supermarket hall whose roof is covered in dark solar panels, not a 3-storey white block; toshoken 2026: ビッグハウス本郷店 reopened as スーパーアークス本郷店 on 2026-04-18 (本郷15-2)",
+   "name": "スーパーアークス 本郷店",
+   "nameEn": "Super Arcs Hongo"
   },
   {
    "id": "16/58539/25070/348",
    "storeys": 1,
    "height": 4,
-   "src": "earth: E top, a small roof structure of Big House, not 3 storeys; roof colour: the GSI photo colour with its cast removed",
+   "src": "earth: E top, a small roof structure of Big House, not 3 storeys; roof colour: the GSI photo colour with its cast removed; toshoken 2026: ビッグハウス本郷店 reopened as スーパーアークス本郷店 on 2026-04-18 (本郷15-2)",
    "roof": {
     "color": "#cbbfd0"
-   }
+   },
+   "name": "スーパーアークス 本郷店",
+   "nameEn": "Super Arcs Hongo"
+  },
+  {
+   "id": "16/58539/25070/352",
+   "name": "スーパーアークス 本郷店",
+   "nameEn": "Super Arcs Hongo",
+   "src": "toshoken 2026: ビッグハウス本郷店 reopened as スーパーアークス本郷店 on 2026-04-18 (本郷15-2)"
   }
  ],
  "newLots": [
@@ -2868,6 +2885,119 @@
     ]
    ],
    "src": "earth: E top (raw/ref/earth/c10/E/top_annot.jpg) + c9 C top: the 幸町 区画整理 zone is finished, new houses on bare soil and gravel plots along new streets; OSM still maps it as a brownfield building site (drawn with hoardings)"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "replace": true,
+   "name": "大川河川敷",
+   "ring": [
+    [
+     -726,
+     668
+    ],
+    [
+     -672,
+     650
+    ],
+    [
+     -636,
+     667
+    ],
+    [
+     -616,
+     681
+    ],
+    [
+     -600,
+     762
+    ],
+    [
+     -608,
+     797
+    ],
+    [
+     -614,
+     850
+    ],
+    [
+     -622,
+     858
+    ],
+    [
+     -631,
+     858
+    ],
+    [
+     -636,
+     850
+    ],
+    [
+     -637,
+     832
+    ],
+    [
+     -637,
+     822
+    ],
+    [
+     -639,
+     806
+    ],
+    [
+     -642,
+     796
+    ],
+    [
+     -646,
+     788
+    ],
+    [
+     -652,
+     781
+    ],
+    [
+     -660,
+     772
+    ],
+    [
+     -665,
+     762
+    ],
+    [
+     -670,
+     747
+    ],
+    [
+     -678,
+     733
+    ],
+    [
+     -685,
+     723
+    ],
+    [
+     -694,
+     712
+    ],
+    [
+     -703,
+     703
+    ],
+    [
+     -710,
+     695
+    ],
+    [
+     -718,
+     686
+    ],
+    [
+     -724,
+     680
+    ]
+   ],
+   "src": "earth 2026-03-11 c9/r1003 top: open reed and grass floodplain with paths, no woodland, between the levee road (r13884/r15270/r15322) and the 大川 bank; GSI photo: grass with tracks and a few shrubs. West edge kept about 6 m off the levee road and clear of lots 277/280/281/282/296; east edge 3 m inside the OSM riverArea bank"
   }
  ],
  "roads": [],

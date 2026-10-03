@@ -222,24 +222,18 @@
   },
   {
    "id": "16/58540/25067/125",
-   "roof": {
-    "color": "#828c84"
-   },
-   "src": "earth: roof #828c84 on the top view (sub/mw, lot 287); app #b6c3bc"
+   "remove": true,
+   "src": "earth: sub/mw top + o0/o180, bare soil, the GSI-era row is demolished"
   },
   {
    "id": "16/58540/25067/126",
-   "roof": {
-    "color": "#8b948c"
-   },
-   "src": "earth: roof #8b948c on the top view (sub/mw, lot 288); app #adc3c9"
+   "remove": true,
+   "src": "earth: sub/mw top + o0/o180, bare soil, the GSI-era row is demolished"
   },
   {
    "id": "16/58540/25067/131",
-   "roof": {
-    "color": "#848981"
-   },
-   "src": "earth: roof #848981 on the top view (sub/mw, lot 291); app #aab3b0"
+   "remove": true,
+   "src": "earth: sub/mw top + o0/o180, bare soil, the GSI-era row is demolished"
   },
   {
    "id": "16/58540/25067/132",
@@ -257,10 +251,8 @@
   },
   {
    "id": "16/58540/25067/139",
-   "roof": {
-    "color": "#9da397"
-   },
-   "src": "earth: roof #9da397 on the top view (sub/mw, lot 295); app #a4c7d1"
+   "remove": true,
+   "src": "earth: sub/mw top + o0/o180, bare soil, the GSI-era row is demolished"
   },
   {
    "id": "16/58540/25067/143",
@@ -915,10 +907,8 @@
   },
   {
    "id": "16/58540/25067/328",
-   "roof": {
-    "color": "#777f7f"
-   },
-   "src": "earth: roof #777f7f on the top view (sub/sw, lot 8); app #4a6359"
+   "remove": true,
+   "src": "earth: sub/sw top + o0, dry grass, no roof; demolished since the GSI photo"
   },
   {
    "id": "16/58540/25067/333",
@@ -1472,17 +1462,13 @@
   },
   {
    "id": "16/58541/25067/144",
-   "roof": {
-    "color": "#617076"
-   },
-   "src": "earth: roof #617076 on the top view (sub/me, lot 616); app #3e544e"
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
   },
   {
    "id": "16/58541/25067/145",
-   "roof": {
-    "color": "#586573"
-   },
-   "src": "earth: roof #586573 on the top view (sub/se, lot 62); app #455c54"
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
   },
   {
    "id": "16/58541/25067/152",
@@ -1493,17 +1479,13 @@
   },
   {
    "id": "16/58541/25067/157",
-   "roof": {
-    "color": "#667a7d"
-   },
-   "src": "earth: roof #667a7d on the top view (sub/se, lot 66); app #496158"
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
   },
   {
    "id": "16/58541/25067/159",
-   "roof": {
-    "color": "#4f5f6a"
-   },
-   "src": "earth: roof #4f5f6a on the top view (sub/se, lot 68); app #465d54"
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
   },
   {
    "id": "16/58541/25067/160",
@@ -1514,10 +1496,8 @@
   },
   {
    "id": "16/58541/25067/162",
-   "roof": {
-    "color": "#516775"
-   },
-   "src": "earth: roof #516775 on the top view (sub/se, lot 70); app #455c54"
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
   },
   {
    "id": "16/58541/25067/165",
@@ -2365,6 +2345,31 @@
     "color": "#626e75"
    },
    "src": "earth: roof #626e75 on the top view (sub/se, lot null); app #a1bc7b"
+  },
+  {
+   "id": "16/58540/25068/297",
+   "remove": true,
+   "src": "earth: sub/sw top + o0, a pale slab with no roof or walls; demolished"
+  },
+  {
+   "id": "16/58540/25067/368",
+   "remove": true,
+   "src": "earth: sub/sw top, bare ground (the 11 m2 lot between 328 and 297)"
+  },
+  {
+   "id": "16/58541/25067/155",
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
+  },
+  {
+   "id": "16/58541/25067/156",
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
+  },
+  {
+   "id": "16/58541/25067/158",
+   "remove": true,
+   "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
   }
  ],
  "newLots": [
@@ -2399,6 +2404,105 @@
   }
  ],
  "landuse": [
+  {
+   "use": "park",
+   "replace": true,
+   "ring": [
+    [
+     152,
+     -458
+    ],
+    [
+     168,
+     -392
+    ],
+    [
+     177,
+     -385
+    ],
+    [
+     204,
+     -369
+    ],
+    [
+     242,
+     -369
+    ],
+    [
+     250,
+     -360
+    ],
+    [
+     287,
+     -353
+    ],
+    [
+     330,
+     -335
+    ],
+    [
+     330,
+     -448
+    ],
+    [
+     308,
+     -455
+    ],
+    [
+     283,
+     -450
+    ],
+    [
+     268,
+     -437
+    ],
+    [
+     256,
+     -410
+    ],
+    [
+     249,
+     -404
+    ],
+    [
+     240,
+     -377
+    ],
+    [
+     209,
+     -377
+    ],
+    [
+     199,
+     -382
+    ],
+    [
+     206,
+     -412
+    ],
+    [
+     188,
+     -432
+    ],
+    [
+     172,
+     -473
+    ],
+    [
+     190,
+     -505
+    ],
+    [
+     177,
+     -533
+    ],
+    [
+     129,
+     -518
+    ]
+   ],
+   "src": "earth 2026-03-11 c2/r1003 top: the OSM 復興祈念公園 ring, cut at x=330 (the cell edge) and notched round OSM car park 駐車場 (centroid 224.5,-390.6) so that it stays; replaces the whole-hill OSM park lawn"
+  },
   {
    "use": "parking",
    "ring": [
@@ -2593,6 +2697,117 @@
    ],
    "name": "駐車場",
    "src": "earth: the 復興祈念公園 car park, two rows of marked stalls (sub/se zoom_parkwc.jpg)"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -74,
+     -590
+    ],
+    [
+     -54,
+     -590
+    ],
+    [
+     -54,
+     -545
+    ],
+    [
+     -74,
+     -545
+    ]
+   ],
+   "src": "earth: sub/mw top + o0/o180, bare soil, the GSI-era row is demolished"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     -88,
+     -244
+    ],
+    [
+     -82.5,
+     -248
+    ],
+    [
+     -74,
+     -240.5
+    ],
+    [
+     -62,
+     -233.5
+    ],
+    [
+     -60.5,
+     -230.5
+    ],
+    [
+     -63.5,
+     -227.5
+    ],
+    [
+     -69.5,
+     -225
+    ],
+    [
+     -78.5,
+     -233
+    ],
+    [
+     -81,
+     -236
+    ]
+   ],
+   "src": "earth: sub/sw top, dry grass and an old slab where 328/297/368 stood"
+  },
+  {
+   "use": "cedar",
+   "ring": [
+    [
+     62,
+     -410
+    ],
+    [
+     96,
+     -410
+    ],
+    [
+     99,
+     -386
+    ],
+    [
+     120,
+     -381
+    ],
+    [
+     130,
+     -376
+    ],
+    [
+     130,
+     -346
+    ],
+    [
+     92,
+     -346
+    ],
+    [
+     68,
+     -350
+    ],
+    [
+     64,
+     -368
+    ],
+    [
+     62,
+     -380
+    ]
+   ],
+   "src": "earth: sub/se top + r1003 obliques, closed 杉 stand"
   }
  ],
  "roads": [],

@@ -35,15 +35,53 @@ export const LOT_FIX = {
   // [v5:fix3] 五十鈴神社: the GSI footprint at the porch's door (17 m², OSM relation r10841412, the shrine's own) is the
   // 向拝 in front of the hall, built by harbor/shinmei.js; town drew it as a house with windows across the entrance
   '16/58541/25068/119': { kind: 'shrine', landmark: 'isuzuShrine', src: 'GSI footprint at the hall door, inside the shrine relation (OSM r10841412); isuzu-jinja.md' },
+  // [v6:c5] the red-roofed building at (-311, 261) carries OSM's 気仙沼図書館 (w761699215, n5162609831) and 放送大学
+  // (n8660784318) tags from the temporary-library years; the library was rebuilt on its original site at 笹が陣3-30
+  // (OSM w768699248, lot 16/58540/25069/191) and the OUJ study room is inside it. Its current use is not established.
+  '16/58540/25069/81': { clearName: true, src: 'OUJ facilities list 2026: 視聴学習室 at 笹が陣3-30 (気仙沼図書館); NDL: library rebuilt on its original site 2018; the OSM library/放送大学 tags here date from the temporary-library years' },
+  // [v6:c11] 魚市場前5-4: OSM w768698009 '（旧）気仙沼魚市場前郵便局' (amenity=post_office). The office moved to 仲町2-1-30-4 and
+  // became 気仙沼仲町郵便局 on 2021-05-19 (lot 16/58541/25070/90); the building still stands, its 2026 use is unverified,
+  // so the kind stays and only the name and the post-office use go (no red 郵便局 board, no post_office search hit).
+  '16/58542/25070/15': { clearName: true, clearUse: true, src: 'Japan Post storeinformation id=4928: 気仙沼魚市場前郵便局 moved to 仲町2-1-30-4 as 気仙沼仲町郵便局 on 2021-05-19; the building still stands (Earth 2026-03-11, c11/C #64), current use unknown' },
 };
 
 /** [v4:polish3] Place corrections by place id (the GSI annotation that sat on the wrong building). */
 export const PLACE_FIX = {
   p1lgul48: { x: -190.0, z: 574.0, lot: '16/58540/25069/263', src: 'osm', fix: 'OSM relation 12442922' },
   pj04sfn: { x: -190.0, z: 574.0, lot: '16/58540/25069/263', src: 'osm', fix: 'OSM relation 12442922' },
+  // [v6:c6] OSM n7653079722 '角星園茶舗' (shop=tea) sits inside 角星店舗 (魚町2-1-17, the 角星 sake brewery's shop,
+  // kesennuma-kanko.jp/kazamachi_kakuboshi): no tea shop of that name exists, and the lot itself carries 角星店舗 (c6.json)
+  // p1i6dceq is the place the lot carried under the OSM name (older layout.json); once the lot is renamed, the OSM node
+  // itself is no longer folded into it by name and comes back as pg5mbvm
+  p1i6dceq: { drop: true, fix: 'kesennuma-kanko: 魚町2-1-17 is 角星店舗; no 角星園茶舗 exists' },
+  pg5mbvm: { drop: true, fix: 'OSM n7653079722 角星園茶舗: kesennuma-kanko: 魚町2-1-17 is 角星店舗; no 角星園茶舗 exists' },
+  // [v6:c6] OSM n8660809118 carries the school's old name 晃陽学園 気仙沼リアス調理専門学校; the lot now has the name on its
+  // sign and on koyo-gakuen.ac.jp/rias (気仙沼リアス調理製菓専門学校, c6.json), so the node would list the school twice
+  pg4c6vy: { drop: true, fix: 'OSM n8660809118 (old name): koyo-gakuen.ac.jp/rias + IMG_0822 sign 気仙沼リアス調理製菓専門学校' },
+  // [v6:c11] 気仙沼中央公民館 (329-seat hall, community centre, gym) opened 2021-12 at 内の脇一丁目16番6号 by the 大川 (OSM way
+  // 1056818841, no GSI footprint yet). The old site, 魚市場前1-1 (lot 16/58541/25070/106, 旧河北ビル), is now 気仙沼市魚市場前庁舎
+  // (overrides/c11.json): city page sec/s234/010/020/20210812202208.html (2026-05-20) puts the 教育サポートセンター on its 3rd floor.
+  // p1lj9pmj is the lot's place under the old OSM name (older layout.json); once c11.json renames the lot it is pqzjlyl.
+  // the node's own name (気仙沼市中央公民館) and its 魚町 address tags are from the old hall; the city page's title and h1 and
+  // OSM way 1056818841 both name the new hall 気仙沼中央公民館
+  p1ny88at: { name: '気仙沼中央公民館', x: 55.4, z: 1388.1, lot: null, src: 'osm', fix: 'OSM way 1056818841 centroid and name; city page edu/s175/1329378202067.html (h1 気仙沼中央公民館): 内の脇一丁目16番6号 (opened 2021-12)' },
+  p1lj9pmj: { name: '気仙沼市魚市場前庁舎', nameEn: 'Kesennuma City Uoichibamae Office', cat: 'government', fix: 'former 中央公民館 temporary site (旧河北ビル); city 2026-05-20 page' },
+  pqzjlyl: { nameEn: 'Kesennuma City Uoichibamae Office', cat: 'government', fix: 'former 中央公民館 temporary site (旧河北ビル); city 2026-05-20 page' },
+  // [v6:c5] the 放送大学 study room and the stale library node sat on lot 16/58540/25069/81 (see LOT_FIX)
+  pxclbh2: { x: -200.9, z: 440.6, lot: '16/58540/25069/191', src: 'osm', fix: 'OUJ: 放送大学 気仙沼視聴学習室 is inside 気仙沼図書館, 笹が陣3-30 (OSM way 768699248)' },
+  pq0eloj: { drop: true, fix: 'stale OSM node n5162609831 from the temporary library; the library is pa2yyyv on lot 191' },
 };
-/** Apply PLACE_FIX to the layout places in place (idempotent). */
-export function applyPlaceFix(places) { let n = 0; for (const p of places || []) { const f = PLACE_FIX[p.id]; if (f) { Object.assign(p, f); n++; } } return n; }
+/** Apply PLACE_FIX to the layout places in place (idempotent); a fix with `drop: true` removes the place. */
+export function applyPlaceFix(places) {
+  if (!places) return 0;
+  let n = 0;
+  for (let i = places.length - 1; i >= 0; i--) {
+    const f = PLACE_FIX[places[i].id]; if (!f) continue;
+    if (f.drop) places.splice(i, 1); else Object.assign(places[i], f);
+    n++;
+  }
+  return n;
+}
 
 /** Apply LOT_FIX to a layout lot in place (idempotent). Returns true when the lot was changed. */
 export function applyLotFix(lot) {
@@ -55,6 +93,7 @@ export function applyLotFix(lot) {
   if (f.roofShape && lot.roof) lot.roof.shape = f.roofShape;
   if (f.name) lot.name = f.name;
   if (f.clearName) { delete lot.name; delete lot.nameEn; }
+  if (f.clearUse) delete lot.use;   // [v6:c11] a former use (e.g. a post office that moved away)
   if (f.nameEn) lot.nameEn = f.nameEn;
   if (f.landmark) lot.landmark = f.landmark;
   lot.src = { ...(lot.src || {}), fix: f.src };

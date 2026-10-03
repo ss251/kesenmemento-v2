@@ -58,6 +58,8 @@ sky.attach(ctx);
 sky.setHours(START_HOURS);
 if (params.has('cloud')) sky.uniforms.uCloud.value = Number(params.get('cloud'));   // cloud coverage 0..1 (life's weather overrides)
 window.__ctx = ctx; window.THREE = THREE; window.__L = L;
+window.__features = (area) => ctx.features.dump(area);   // [v6:survey] tools/anime/survey-diff.mjs
+window.__featureDims = (area) => ctx.features.dims(area);
 
 function resize() {
   const w = SHOT ? Number(params.get('w') || 1280) : innerWidth, h = SHOT ? Number(params.get('h') || 720) : innerHeight;

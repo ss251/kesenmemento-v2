@@ -24,6 +24,8 @@ export const LANDUSE_USES = { parking: "parking", vacant: "gravel", park: "park"
 export const COVER_USES = ["forest", "cedar", "felled"];
 export const VACANT_SURFACES = ["gravel", "weeds"];
 export const PROP_TYPES = ["vending", "bike", "tree", "bench", "bollard"];
+/** [v6:c7] road-patch `markings.centre` (town/streets.js markCentre): the centre marking drawn on a road */
+export const ROAD_CENTRES = ["white-solid", "white-dashed", "yellow", "hatched-median"];
 /** how far (m) a coordinate may lie outside its cell's bbox */
 export const BBOX_PAD = 30;
 
@@ -139,7 +141,7 @@ export function validateOverride(doc, file = "inline.json") {
   list("roads").forEach((o, i) => {
     const p = `.roads[${i}]`;
     if (!o || typeof o !== "object") { E(p, "must be an object"); return; }
-    allowed(o, p, ["id", "remove", "pts", "width", "carriage", "kind", "name", "nameEn", "src"]);
+    allowed(o, p, ["id", "remove", "pts", "width", "carriage", "kind", "name", "nameEn", "markings", "src"]);
     cite(o, p);
     const add = typeof o.id === "string" && o.id.startsWith("ovr:");
     if (typeof o.id !== "string" || !(add ? /^ovr:[a-z0-9-]+:[\w-]+$/.test(o.id) : /^r\d+$/.test(o.id))) E(p + ".id", 'must be a layout road id ("r123") or a new "ovr:<cell>:<name>"');
@@ -154,6 +156,16 @@ export function validateOverride(doc, file = "inline.json") {
     if (o.kind != null) oneOf(o.kind, p + ".kind", ROAD_KINDS);
     if (o.name != null) str(o.name, p + ".name");
     if (o.nameEn != null) str(o.nameEn, p + ".nameEn");
+    if (o.markings != null) {   // [v6:c7] { centre, medianWidth?, lanes?: [a, b] } (docs/anime/OVERRIDES.md)
+      const m = o.markings, q = p + ".markings";
+      if (typeof m !== "object" || Array.isArray(m)) E(q, "must be an object { centre, medianWidth, lanes }");
+      else {
+        allowed(m, q, ["centre", "medianWidth", "lanes"]);
+        oneOf(m.centre, q + ".centre", ROAD_CENTRES);
+        if (m.medianWidth != null) { num(m.medianWidth, q + ".medianWidth", 0.5, 10); if (m.centre !== "hatched-median") E(q + ".medianWidth", 'only with centre "hatched-median"'); }
+        if (m.lanes != null && !(Array.isArray(m.lanes) && m.lanes.length === 2 && m.lanes.every((n) => Number.isInteger(n) && n >= 1 && n <= 4))) E(q + ".lanes", "must be [a, b]: whole lane counts from 1 to 4");
+      }
+    }
     if (add && (o.pts == null || o.width == null || o.kind == null)) E(p, "a new road needs pts, width and kind");
     if (!o.remove && !Object.keys(o).some((k) => !["id", "src"].includes(k))) E(p, "changes nothing");
   });
@@ -285,6 +297,7 @@ function applyRoadFields(r, o) {
   if (o.kind != null) r.kind = o.kind;
   if (o.name != null) { r.name = o.name; if (o.nameEn == null) delete r.nameEn; }
   if (o.nameEn != null) r.nameEn = o.nameEn;
+  if (o.markings != null) r.markings = { centre: o.markings.centre, ...(o.markings.medianWidth != null ? { medianWidth: r1(o.markings.medianWidth) } : {}), ...(o.markings.lanes ? { lanes: o.markings.lanes.slice() } : {}) };   // [v6:c7]
   r.ovr = r.ovr ? r.ovr + " + " + o.ref : o.ref;
 }
 

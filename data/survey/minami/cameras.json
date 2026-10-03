@@ -1,0 +1,2066 @@
+{
+ "area": "minami",
+ "frame": "ENU: x = (lon - 141.5750) * 86744 east, y = T.P. metres up, z = -(lat - 38.9060) * 111014 south",
+ "note": "solved by tools/survey/sfm_enu.py (station-aware SfM + georegistration); intrinsics in full-resolution pixels of the JPEGs in raw/survey/<area>/images (pixel centres at +0.5, COLMAP convention); quaternion = three.js camera -> ENU",
+ "registered": 53,
+ "total": 57,
+ "reproj_mean_px": 0.716,
+ "cameras": [
+  {
+   "id": "IMG_0799",
+   "image": "raw/survey/minami/images/uw14/IMG_0799.jpg",
+   "lens": "uw14",
+   "camera_model": "OPENCV",
+   "width": 3024,
+   "height": 4032,
+   "fx": 1609.667,
+   "fy": 1609.667,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0045644,
+    0.0007033,
+    0.0015891,
+    -5.18e-05
+   ],
+   "position": [
+    -8.7084,
+    3.5764,
+    65.8666
+   ],
+   "quaternion": [
+    -0.04275453,
+    0.89614126,
+    -0.05754845,
+    -0.43793957
+   ],
+   "yaw": -128.0182,
+   "pitch": 8.082,
+   "roll": -1.5177,
+   "heading_deg": 128.018,
+   "reproj_px": 1.0,
+   "obs": 535,
+   "gps_offset_m": 3.26,
+   "eye_m": 1.58,
+   "registered": true
+  },
+  {
+   "id": "IMG_0800",
+   "image": "raw/survey/minami/images/w24/IMG_0800.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    18.3838,
+    3.6695,
+    51.8362
+   ],
+   "quaternion": [
+    -0.03544338,
+    0.98391602,
+    -0.07377202,
+    -0.15877886
+   ],
+   "yaw": -161.8775,
+   "pitch": 8.9995,
+   "roll": -2.688,
+   "heading_deg": 161.877,
+   "reproj_px": 0.99,
+   "obs": 1444,
+   "gps_offset_m": 7.69,
+   "eye_m": 1.53,
+   "registered": true
+  },
+  {
+   "id": "IMG_0801",
+   "image": "raw/survey/minami/images/uw14/IMG_0801.jpg",
+   "lens": "uw14",
+   "camera_model": "OPENCV",
+   "width": 3024,
+   "height": 4032,
+   "fx": 1609.667,
+   "fy": 1609.667,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0045644,
+    0.0007033,
+    0.0015891,
+    -5.18e-05
+   ],
+   "position": [
+    18.3403,
+    3.6853,
+    51.707
+   ],
+   "quaternion": [
+    -0.02511568,
+    0.98394601,
+    -0.10538656,
+    -0.14182072
+   ],
+   "yaw": -163.7207,
+   "pitch": 12.387,
+   "roll": -1.1459,
+   "heading_deg": 163.721,
+   "reproj_px": 1.2,
+   "obs": 816,
+   "gps_offset_m": 3.08,
+   "eye_m": 1.55,
+   "registered": true
+  },
+  {
+   "id": "IMG_0802",
+   "image": "raw/survey/minami/images/w48/IMG_0802.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    18.314,
+    3.6575,
+    51.6119
+   ],
+   "quaternion": [
+    -0.01813619,
+    0.98280651,
+    -0.07472467,
+    -0.16786505
+   ],
+   "yaw": -160.6617,
+   "pitch": 8.799,
+   "roll": -0.6123,
+   "heading_deg": 160.662,
+   "reproj_px": 1.17,
+   "obs": 1442,
+   "gps_offset_m": 1.27,
+   "eye_m": 1.52,
+   "registered": true
+  },
+  {
+   "id": "IMG_0803",
+   "image": "raw/survey/minami/images/uw14/IMG_0803.jpg",
+   "lens": "uw14",
+   "camera_model": "OPENCV",
+   "width": 3024,
+   "height": 4032,
+   "fx": 1609.667,
+   "fy": 1609.667,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0045644,
+    0.0007033,
+    0.0015891,
+    -5.18e-05
+   ],
+   "position": [
+    31.4182,
+    3.4525,
+    51.4881
+   ],
+   "quaternion": [
+    0.00434668,
+    0.99143712,
+    -0.11186232,
+    0.06723371
+   ],
+   "yaw": 172.1984,
+   "pitch": 12.8496,
+   "roll": -0.3775,
+   "heading_deg": 187.802,
+   "reproj_px": 1.28,
+   "obs": 2084,
+   "gps_offset_m": 1.73,
+   "eye_m": 1.4,
+   "registered": true
+  },
+  {
+   "id": "IMG_0805",
+   "image": "raw/survey/minami/images/w24/IMG_0805.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    31.4015,
+    3.4309,
+    51.4305
+   ],
+   "quaternion": [
+    0.03231653,
+    0.96271832,
+    -0.08123996,
+    0.25598662
+   ],
+   "yaw": 150.3238,
+   "pitch": 9.9604,
+   "roll": 1.2002,
+   "heading_deg": 209.676,
+   "reproj_px": 0.77,
+   "obs": 2207,
+   "gps_offset_m": 1.79,
+   "eye_m": 1.37,
+   "registered": true
+  },
+  {
+   "id": "IMG_0806",
+   "image": "raw/survey/minami/images/w24/IMG_0806.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    31.2274,
+    3.4078,
+    51.4372
+   ],
+   "quaternion": [
+    0.03571962,
+    0.91285983,
+    -0.05991579,
+    0.40226998
+   ],
+   "yaw": 132.505,
+   "pitch": 7.9395,
+   "roll": 0.984,
+   "heading_deg": 227.495,
+   "reproj_px": 0.88,
+   "obs": 2184,
+   "gps_offset_m": 1.8,
+   "eye_m": 1.35,
+   "registered": true
+  },
+  {
+   "id": "IMG_0807",
+   "image": "raw/survey/minami/images/w24/IMG_0807.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    31.2908,
+    3.4026,
+    51.6881
+   ],
+   "quaternion": [
+    0.05113059,
+    0.7555489,
+    -0.04944695,
+    0.65121926
+   ],
+   "yaw": 98.5357,
+   "pitch": 8.1239,
+   "roll": 0.7444,
+   "heading_deg": 261.464,
+   "reproj_px": 0.71,
+   "obs": 1514,
+   "gps_offset_m": 0.94,
+   "eye_m": 1.34,
+   "registered": true
+  },
+  {
+   "id": "IMG_0808",
+   "image": "raw/survey/minami/images/w24/IMG_0808.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    31.2278,
+    3.3997,
+    51.6181
+   ],
+   "quaternion": [
+    0.059927,
+    0.58406833,
+    -0.04023777,
+    0.80848863
+   ],
+   "yaw": 71.7109,
+   "pitch": 8.2738,
+   "roll": 0.286,
+   "heading_deg": 288.289,
+   "reproj_px": 0.7,
+   "obs": 1518,
+   "gps_offset_m": 1.62,
+   "eye_m": 1.34,
+   "registered": true
+  },
+  {
+   "id": "IMG_0809",
+   "image": "raw/survey/minami/images/w24/IMG_0809.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    31.3219,
+    3.3936,
+    51.8749
+   ],
+   "quaternion": [
+    0.05904754,
+    0.29302837,
+    -0.02660825,
+    0.95390763
+   ],
+   "yaw": 34.0925,
+   "pitch": 7.3682,
+   "roll": -0.9336,
+   "heading_deg": 325.908,
+   "reproj_px": 0.67,
+   "obs": 1092,
+   "gps_offset_m": 0.75,
+   "eye_m": 1.34,
+   "registered": true
+  },
+  {
+   "id": "IMG_0810",
+   "image": "raw/survey/minami/images/w24/IMG_0810.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    32.635,
+    3.3979,
+    51.1548
+   ],
+   "quaternion": [
+    0.05533683,
+    -0.03929656,
+    -0.00929445,
+    0.99765086
+   ],
+   "yaw": -4.5839,
+   "pitch": 6.2971,
+   "roll": -1.3198,
+   "heading_deg": 4.584,
+   "reproj_px": 0.51,
+   "obs": 913,
+   "gps_offset_m": 3.75,
+   "eye_m": 1.35,
+   "registered": true
+  },
+  {
+   "id": "IMG_0811",
+   "image": "raw/survey/minami/images/w24/IMG_0811.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    31.7827,
+    3.46,
+    51.069
+   ],
+   "quaternion": [
+    0.05255348,
+    -0.41294473,
+    0.01055282,
+    0.90917733
+   ],
+   "yaw": -48.9277,
+   "pitch": 5.9855,
+   "roll": -1.3951,
+   "heading_deg": 48.928,
+   "reproj_px": 0.71,
+   "obs": 1432,
+   "gps_offset_m": 2.77,
+   "eye_m": 1.41,
+   "registered": true
+  },
+  {
+   "id": "IMG_0812",
+   "image": "raw/survey/minami/images/w24/IMG_0812.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    31.408,
+    3.5094,
+    51.6211
+   ],
+   "quaternion": [
+    0.038939,
+    -0.60644228,
+    0.00869793,
+    0.79412584
+   ],
+   "yaw": -74.8047,
+   "pitch": 4.1515,
+   "roll": -1.9199,
+   "heading_deg": 74.805,
+   "reproj_px": 0.76,
+   "obs": 682,
+   "gps_offset_m": 1.48,
+   "eye_m": 1.45,
+   "registered": true
+  },
+  {
+   "id": "IMG_0813",
+   "image": "raw/survey/minami/images/w24/IMG_0813.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    30.7076,
+    3.3996,
+    52.4255
+   ],
+   "quaternion": [
+    -0.01158726,
+    0.96232518,
+    -0.03081248,
+    -0.26990105
+   ],
+   "yaw": -148.6765,
+   "pitch": 3.7589,
+   "roll": -0.3255,
+   "heading_deg": 148.677,
+   "reproj_px": 0.7,
+   "obs": 1043,
+   "gps_offset_m": 0.64,
+   "eye_m": 1.34,
+   "registered": true
+  },
+  {
+   "id": "IMG_0814",
+   "image": "raw/survey/minami/images/w48/IMG_0814.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    23.9921,
+    3.5978,
+    59.1497
+   ],
+   "quaternion": [
+    0.05395304,
+    0.94395824,
+    -0.12888443,
+    0.29903296
+   ],
+   "yaw": 145.0526,
+   "pitch": 15.9972,
+   "roll": 1.477,
+   "heading_deg": 214.947,
+   "reproj_px": 0.22,
+   "obs": 196,
+   "gps_offset_m": 7.31,
+   "eye_m": 1.46,
+   "registered": true
+  },
+  {
+   "id": "IMG_0815",
+   "image": "raw/survey/minami/images/w48/IMG_0815.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    23.5254,
+    3.4553,
+    59.4847
+   ],
+   "quaternion": [
+    0.02570225,
+    0.99411105,
+    -0.10377416,
+    0.01770716
+   ],
+   "yaw": 178.2502,
+   "pitch": 11.9604,
+   "roll": 2.7787,
+   "heading_deg": 181.75,
+   "reproj_px": 0.46,
+   "obs": 510,
+   "gps_offset_m": 0.91,
+   "eye_m": 1.32,
+   "registered": true
+  },
+  {
+   "id": "IMG_0816",
+   "image": "raw/survey/minami/images/t77/IMG_0816.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    22.9697,
+    3.523,
+    60.8604
+   ],
+   "quaternion": [
+    -0.00798436,
+    0.94878567,
+    -0.04144588,
+    -0.31308824
+   ],
+   "yaw": -143.4494,
+   "pitch": 4.7982,
+   "roll": 0.6211,
+   "heading_deg": 143.449,
+   "reproj_px": 0.31,
+   "obs": 639,
+   "gps_offset_m": 0.87,
+   "eye_m": 1.39,
+   "registered": true
+  },
+  {
+   "id": "IMG_0817",
+   "image": "raw/survey/minami/images/t77/IMG_0817.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    23.0156,
+    3.5076,
+    60.7927
+   ],
+   "quaternion": [
+    0.008578,
+    0.98120572,
+    -0.04889435,
+    -0.18647011
+   ],
+   "yaw": -158.3856,
+   "pitch": 5.3219,
+   "roll": 2.0184,
+   "heading_deg": 158.386,
+   "reproj_px": 0.27,
+   "obs": 674,
+   "gps_offset_m": 0.95,
+   "eye_m": 1.37,
+   "registered": true
+  },
+  {
+   "id": "IMG_0818",
+   "image": "raw/survey/minami/images/t77/IMG_0818.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    17.9279,
+    3.5118,
+    62.7526
+   ],
+   "quaternion": [
+    0.06517821,
+    0.48204382,
+    -0.01598229,
+    0.87357319
+   ],
+   "yaw": 57.9114,
+   "pitch": 7.4282,
+   "roll": 2.0178,
+   "heading_deg": 302.089,
+   "reproj_px": 0.15,
+   "obs": 78,
+   "gps_offset_m": 3.89,
+   "eye_m": 1.38,
+   "registered": true
+  },
+  {
+   "id": "IMG_0819",
+   "image": "raw/survey/minami/images/t77/IMG_0819.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    14.6368,
+    3.5003,
+    60.7515
+   ],
+   "quaternion": [
+    0.00640379,
+    0.84742036,
+    0.0021969,
+    0.53087936
+   ],
+   "yaw": 115.8697,
+   "pitch": 0.1762,
+   "roll": 0.7555,
+   "heading_deg": 244.13,
+   "reproj_px": 0.46,
+   "obs": 134,
+   "gps_offset_m": 3.69,
+   "eye_m": 1.38,
+   "registered": true
+  },
+  {
+   "id": "IMG_0820",
+   "image": "raw/survey/minami/images/t77/IMG_0820.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    14.5429,
+    3.8496,
+    60.6603
+   ],
+   "quaternion": [
+    0.02230052,
+    0.65497094,
+    0.0109541,
+    0.7552455
+   ],
+   "yaw": 81.8909,
+   "pitch": 1.1079,
+   "roll": 2.6232,
+   "heading_deg": 278.109,
+   "reproj_px": 0.85,
+   "obs": 215,
+   "gps_offset_m": 3.29,
+   "eye_m": 1.73,
+   "registered": true
+  },
+  {
+   "id": "IMG_0821",
+   "image": "raw/survey/minami/images/t77/IMG_0821.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    6.8589,
+    3.4734,
+    63.8555
+   ],
+   "quaternion": [
+    0.03208743,
+    0.79766297,
+    0.00357551,
+    0.60223865
+   ],
+   "yaw": 105.9466,
+   "pitch": 1.8879,
+   "roll": 3.1831,
+   "heading_deg": 254.053,
+   "reproj_px": 0.4,
+   "obs": 246,
+   "gps_offset_m": 3.21,
+   "eye_m": 1.3,
+   "registered": true
+  },
+  {
+   "id": "IMG_0822",
+   "image": "raw/survey/minami/images/t77/IMG_0822.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -2.7148,
+    3.6245,
+    65.6724
+   ],
+   "quaternion": [
+    0.05707785,
+    0.56770802,
+    -0.01795306,
+    0.82105262
+   ],
+   "yaw": 69.4397,
+   "pitch": 6.5524,
+   "roll": 2.0378,
+   "heading_deg": 290.56,
+   "reproj_px": 0.32,
+   "obs": 555,
+   "gps_offset_m": 2.84,
+   "eye_m": 1.54,
+   "registered": true
+  },
+  {
+   "id": "IMG_0823",
+   "image": "raw/survey/minami/images/uw14/IMG_0823.jpg",
+   "lens": "uw14",
+   "camera_model": "OPENCV",
+   "width": 3024,
+   "height": 4032,
+   "fx": 1609.667,
+   "fy": 1609.667,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0045644,
+    0.0007033,
+    0.0015891,
+    -5.18e-05
+   ],
+   "position": [
+    -9.531,
+    3.4478,
+    69.8835
+   ],
+   "quaternion": [
+    -0.01763378,
+    0.87434341,
+    -0.03995712,
+    -0.48333847
+   ],
+   "yaw": -122.1127,
+   "pitch": 4.9864,
+   "roll": 0.448,
+   "heading_deg": 122.113,
+   "reproj_px": 1.01,
+   "obs": 547,
+   "gps_offset_m": 1.79,
+   "eye_m": 1.52,
+   "registered": true
+  },
+  {
+   "id": "IMG_0824",
+   "image": "raw/survey/minami/images/w48/IMG_0824.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -10.3915,
+    3.4274,
+    69.0702
+   ],
+   "quaternion": [
+    0.08400307,
+    0.04082009,
+    0.00633154,
+    0.99560892
+   ],
+   "yaw": 4.7906,
+   "pitch": 9.599,
+   "roll": 1.1312,
+   "heading_deg": 355.209,
+   "reproj_px": 0.82,
+   "obs": 686,
+   "gps_offset_m": 0.95,
+   "eye_m": 1.52,
+   "registered": true
+  },
+  {
+   "id": "IMG_0825",
+   "image": "raw/survey/minami/images/w48/IMG_0825.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -17.1011,
+    3.672,
+    57.0962
+   ],
+   "quaternion": [
+    0.06561677,
+    -0.17215204,
+    0.01648291,
+    0.98274434
+   ],
+   "yaw": -19.8336,
+   "pitch": 7.738,
+   "roll": 0.5669,
+   "heading_deg": 19.834,
+   "reproj_px": 0.75,
+   "obs": 1763,
+   "gps_offset_m": 2.51,
+   "eye_m": 1.56,
+   "registered": true
+  },
+  {
+   "id": "IMG_0826",
+   "image": "raw/survey/minami/images/w24/IMG_0826.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -17.1023,
+    3.6764,
+    57.0442
+   ],
+   "quaternion": [
+    0.08033031,
+    -0.18087075,
+    0.01955872,
+    0.98002565
+   ],
+   "yaw": -20.8687,
+   "pitch": 9.4697,
+   "roll": 0.5389,
+   "heading_deg": 20.869,
+   "reproj_px": 0.8,
+   "obs": 3746,
+   "gps_offset_m": 2.17,
+   "eye_m": 1.57,
+   "registered": true
+  },
+  {
+   "id": "IMG_0827",
+   "image": "raw/survey/minami/images/w24/IMG_0827.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -17.0852,
+    3.6805,
+    57.0657
+   ],
+   "quaternion": [
+    0.09915734,
+    -0.21218679,
+    0.02377188,
+    0.97189479
+   ],
+   "yaw": -24.6067,
+   "pitch": 11.7025,
+   "roll": 0.2415,
+   "heading_deg": 24.607,
+   "reproj_px": 0.82,
+   "obs": 3414,
+   "gps_offset_m": 2.8,
+   "eye_m": 1.57,
+   "registered": true
+  },
+  {
+   "id": "IMG_0828",
+   "image": "raw/survey/minami/images/w24/IMG_0828.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -17.007,
+    3.6718,
+    56.7609
+   ],
+   "quaternion": [
+    0.03901678,
+    0.18656506,
+    0.00764124,
+    0.98163781
+   ],
+   "yaw": 21.5847,
+   "pitch": 4.2294,
+   "roll": 1.6985,
+   "heading_deg": 338.415,
+   "reproj_px": 0.7,
+   "obs": 844,
+   "gps_offset_m": 2.82,
+   "eye_m": 1.54,
+   "registered": true
+  },
+  {
+   "id": "IMG_0829",
+   "image": "raw/survey/minami/images/w24/IMG_0829.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -17.0034,
+    3.6712,
+    56.7854
+   ],
+   "quaternion": [
+    0.03822149,
+    0.58966305,
+    -0.00046191,
+    0.80674432
+   ],
+   "yaw": 72.4067,
+   "pitch": 3.5669,
+   "roll": 2.5457,
+   "heading_deg": 287.593,
+   "reproj_px": 0.92,
+   "obs": 732,
+   "gps_offset_m": 2.55,
+   "eye_m": 1.54,
+   "registered": true
+  },
+  {
+   "id": "IMG_0830",
+   "image": "raw/survey/minami/images/w24/IMG_0830.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -17.3009,
+    3.5307,
+    56.7053
+   ],
+   "quaternion": [
+    0.03027732,
+    0.86879956,
+    -0.03837733,
+    0.49274516
+   ],
+   "yaw": 120.9212,
+   "pitch": 5.539,
+   "roll": 0.8514,
+   "heading_deg": 239.079,
+   "reproj_px": 0.6,
+   "obs": 599,
+   "gps_offset_m": 1.5,
+   "eye_m": 1.43,
+   "registered": true
+  },
+  {
+   "id": "IMG_0831",
+   "image": "raw/survey/minami/images/w24/IMG_0831.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -16.7609,
+    3.5621,
+    57.3767
+   ],
+   "quaternion": [
+    -0.00394374,
+    0.98253861,
+    -0.04758423,
+    0.17982788
+   ],
+   "yaw": 159.1906,
+   "pitch": 5.2838,
+   "roll": -1.4308,
+   "heading_deg": 200.809,
+   "reproj_px": 0.56,
+   "obs": 809,
+   "gps_offset_m": 2.3,
+   "eye_m": 1.43,
+   "registered": true
+  },
+  {
+   "id": "IMG_0832",
+   "image": "raw/survey/minami/images/w24/IMG_0832.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -16.8523,
+    3.5669,
+    57.3989
+   ],
+   "quaternion": [
+    -0.014235,
+    0.99707103,
+    -0.04585514,
+    -0.05953176
+   ],
+   "yaw": -173.2278,
+   "pitch": 5.3441,
+   "roll": -1.3195,
+   "heading_deg": 173.228,
+   "reproj_px": 0.37,
+   "obs": 758,
+   "gps_offset_m": 1.44,
+   "eye_m": 1.44,
+   "registered": true
+  },
+  {
+   "id": "IMG_0833",
+   "registered": false,
+   "gps": [
+    -32.05,
+    84.8
+   ],
+   "heading_deg": 132.2512513,
+   "f35": 24
+  },
+  {
+   "id": "IMG_0834",
+   "image": "raw/survey/minami/images/w24/IMG_0834.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -26.2903,
+    3.2109,
+    85.6088
+   ],
+   "quaternion": [
+    0.05802479,
+    0.28192336,
+    -0.00854985,
+    0.95764255
+   ],
+   "yaw": 32.863,
+   "pitch": 6.6587,
+   "roll": 0.9427,
+   "heading_deg": 327.137,
+   "reproj_px": 0.81,
+   "obs": 2847,
+   "gps_offset_m": 2.59,
+   "eye_m": 1.37,
+   "registered": true
+  },
+  {
+   "id": "IMG_0835",
+   "image": "raw/survey/minami/images/w48/IMG_0835.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -26.2878,
+    3.2049,
+    85.679
+   ],
+   "quaternion": [
+    0.05417824,
+    0.27270731,
+    -0.01174782,
+    0.96049853
+   ],
+   "yaw": 31.7232,
+   "pitch": 6.3432,
+   "roll": 0.4025,
+   "heading_deg": 328.277,
+   "reproj_px": 0.44,
+   "obs": 1396,
+   "gps_offset_m": 2.61,
+   "eye_m": 1.36,
+   "registered": true
+  },
+  {
+   "id": "IMG_0836",
+   "image": "raw/survey/minami/images/w48/IMG_0836.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -26.3976,
+    3.1954,
+    85.8929
+   ],
+   "quaternion": [
+    0.03967999,
+    0.54239737,
+    -0.0217891,
+    0.83890156
+   ],
+   "yaw": 65.7868,
+   "pitch": 5.1758,
+   "roll": 0.3732,
+   "heading_deg": 294.213,
+   "reproj_px": 0.34,
+   "obs": 1727,
+   "gps_offset_m": 2.78,
+   "eye_m": 1.35,
+   "registered": true
+  },
+  {
+   "id": "IMG_0837",
+   "image": "raw/survey/minami/images/w24/IMG_0837.jpg",
+   "lens": "w24",
+   "camera_model": "OPENCV",
+   "width": 4284,
+   "height": 5712,
+   "fx": 3978.516,
+   "fy": 3978.516,
+   "cx": 2142.0,
+   "cy": 2856.0,
+   "dist": [
+    0.1211589,
+    -0.1925518,
+    0.0019912,
+    -0.0007763
+   ],
+   "position": [
+    -26.4239,
+    3.2034,
+    85.8424
+   ],
+   "quaternion": [
+    0.03804664,
+    0.50711491,
+    -0.023475,
+    0.86071821
+   ],
+   "yaw": 61.0065,
+   "pitch": 5.1236,
+   "roll": -0.1049,
+   "heading_deg": 298.994,
+   "reproj_px": 0.67,
+   "obs": 3595,
+   "gps_offset_m": 1.7,
+   "eye_m": 1.36,
+   "registered": true
+  },
+  {
+   "id": "IMG_0838",
+   "image": "raw/survey/minami/images/uw14/IMG_0838.jpg",
+   "lens": "uw14",
+   "camera_model": "OPENCV",
+   "width": 3024,
+   "height": 4032,
+   "fx": 1609.667,
+   "fy": 1609.667,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0045644,
+    0.0007033,
+    0.0015891,
+    -5.18e-05
+   ],
+   "position": [
+    -26.4003,
+    3.2326,
+    85.836
+   ],
+   "quaternion": [
+    0.05169141,
+    0.46275076,
+    -0.02451354,
+    0.8846405
+   ],
+   "yaw": 55.2424,
+   "pitch": 6.5543,
+   "roll": 0.2577,
+   "heading_deg": 304.758,
+   "reproj_px": 0.91,
+   "obs": 3221,
+   "gps_offset_m": 2.76,
+   "eye_m": 1.39,
+   "registered": true
+  },
+  {
+   "id": "IMG_0839",
+   "image": "raw/survey/minami/images/uw14/IMG_0839.jpg",
+   "lens": "uw14",
+   "camera_model": "OPENCV",
+   "width": 3024,
+   "height": 4032,
+   "fx": 1609.667,
+   "fy": 1609.667,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0045644,
+    0.0007033,
+    0.0015891,
+    -5.18e-05
+   ],
+   "position": [
+    -26.4898,
+    3.2255,
+    85.9399
+   ],
+   "quaternion": [
+    0.03248613,
+    0.64558565,
+    -0.03341909,
+    0.76226438
+   ],
+   "yaw": 80.5006,
+   "pitch": 5.3176,
+   "roll": -0.5181,
+   "heading_deg": 279.499,
+   "reproj_px": 0.8,
+   "obs": 2691,
+   "gps_offset_m": 2.73,
+   "eye_m": 1.38,
+   "registered": true
+  },
+  {
+   "id": "IMG_0840",
+   "image": "raw/survey/minami/images/w48/IMG_0840.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -26.7305,
+    3.3495,
+    88.9711
+   ],
+   "quaternion": [
+    -0.024877767219442744,
+    0.9592373689808859,
+    0.06513244578591067,
+    0.2738658999487678
+   ],
+   "yaw": -211.8199,
+   "pitch": -7.9658,
+   "roll": -0.6973,
+   "heading_deg": 211.82,
+   "reproj_px": 0.32,
+   "obs": 1541,
+   "gps_offset_m": 1.31,
+   "eye_m": 1.49,
+   "registered": true,
+   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns \u62d3's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
+  },
+  {
+   "id": "IMG_0841",
+   "image": "raw/survey/minami/images/w48/IMG_0841.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -26.6161,
+    3.3393,
+    89.0231
+   ],
+   "quaternion": [
+    -0.03224161993418805,
+    0.9818264548777191,
+    0.06310226642396417,
+    0.17605508915799264
+   ],
+   "yaw": -200.1703,
+   "pitch": -7.7739,
+   "roll": -2.3769,
+   "heading_deg": 200.17,
+   "reproj_px": 0.35,
+   "obs": 1541,
+   "gps_offset_m": 1.95,
+   "eye_m": 1.47,
+   "registered": true,
+   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns \u62d3's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
+  },
+  {
+   "id": "IMG_0842",
+   "registered": false,
+   "gps": [
+    -42.65,
+    84.19
+   ],
+   "heading_deg": 319.5969238,
+   "f35": 24
+  },
+  {
+   "id": "IMG_0888",
+   "image": "raw/survey/minami/images/w48/IMG_0888.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    126.861,
+    2.6477,
+    67.3821
+   ],
+   "quaternion": [
+    0.05642689,
+    0.59650155,
+    0.00675713,
+    0.80059743
+   ],
+   "yaw": 73.5628,
+   "pitch": 4.7202,
+   "roll": 4.4968,
+   "heading_deg": 286.437,
+   "reproj_px": 0.0,
+   "obs": 1,
+   "gps_offset_m": 0.0,
+   "eye_m": 1.45,
+   "registered": true
+  },
+  {
+   "id": "IMG_0890",
+   "image": "raw/survey/minami/images/w48/IMG_0890.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    128.0388,
+    3.6258,
+    64.4722
+   ],
+   "quaternion": [
+    0.03566541,
+    0.13457109,
+    -0.00052292,
+    0.99026175
+   ],
+   "yaw": 15.495,
+   "pitch": 4.0586,
+   "roll": 0.4919,
+   "heading_deg": 344.505,
+   "reproj_px": 0.36,
+   "obs": 79,
+   "gps_offset_m": 2.9,
+   "eye_m": 2.25,
+   "registered": true
+  },
+  {
+   "id": "IMG_0891",
+   "image": "raw/survey/minami/images/uw14/IMG_0891.jpg",
+   "lens": "uw14",
+   "camera_model": "OPENCV",
+   "width": 3024,
+   "height": 4032,
+   "fx": 1609.667,
+   "fy": 1609.667,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0045644,
+    0.0007033,
+    0.0015891,
+    -5.18e-05
+   ],
+   "position": [
+    128.1313,
+    3.2975,
+    64.6038
+   ],
+   "quaternion": [
+    -0.02936034,
+    -0.45545707,
+    -0.01278075,
+    0.88968167
+   ],
+   "yaw": -54.2261,
+   "pitch": -3.6628,
+   "roll": 0.2298,
+   "heading_deg": 54.226,
+   "reproj_px": 0.9,
+   "obs": 790,
+   "gps_offset_m": 4.01,
+   "eye_m": 1.89,
+   "registered": true
+  },
+  {
+   "id": "IMG_0893",
+   "image": "raw/survey/minami/images/w48/IMG_0893.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    130.2543,
+    3.3376,
+    68.6163
+   ],
+   "quaternion": [
+    -0.02075513,
+    -0.23567721,
+    -0.00148651,
+    0.9716086
+   ],
+   "yaw": -27.2772,
+   "pitch": -2.3516,
+   "roll": 0.3954,
+   "heading_deg": 27.277,
+   "reproj_px": 0.18,
+   "obs": 528,
+   "gps_offset_m": 3.72,
+   "eye_m": 1.43,
+   "registered": true
+  },
+  {
+   "id": "IMG_0894",
+   "image": "raw/survey/minami/images/w48/IMG_0894.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    129.9523,
+    3.3962,
+    68.8981
+   ],
+   "quaternion": [
+    0.01766052,
+    -0.68782057,
+    0.01242912,
+    0.72555943
+   ],
+   "yaw": -86.9487,
+   "pitch": 2.4487,
+   "roll": -0.3589,
+   "heading_deg": 86.949,
+   "reproj_px": 0.18,
+   "obs": 658,
+   "gps_offset_m": 3.98,
+   "eye_m": 1.5,
+   "registered": true
+  },
+  {
+   "id": "IMG_0895",
+   "image": "raw/survey/minami/images/w48/IMG_0895.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    129.9816,
+    3.3937,
+    68.7721
+   ],
+   "quaternion": [
+    -0.01204994,
+    0.81002074,
+    -0.01012347,
+    -0.58618999
+   ],
+   "yaw": -108.2222,
+   "pitch": 1.7494,
+   "roll": -0.4387,
+   "heading_deg": 108.222,
+   "reproj_px": 0.41,
+   "obs": 1107,
+   "gps_offset_m": 3.91,
+   "eye_m": 1.5,
+   "registered": true
+  },
+  {
+   "id": "IMG_0896",
+   "image": "raw/survey/minami/images/w48/IMG_0896.jpg",
+   "lens": "w48",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 5622.622,
+   "fy": 5622.622,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    0.1476872,
+    -0.0646653,
+    0.0,
+    0.0
+   ],
+   "position": [
+    130.076,
+    3.3251,
+    68.6642
+   ],
+   "quaternion": [
+    -0.01080909,
+    0.90271492,
+    -0.01853332,
+    -0.4297039
+   ],
+   "yaw": -129.0943,
+   "pitch": 2.4501,
+   "roll": -0.2057,
+   "heading_deg": 129.094,
+   "reproj_px": 0.7,
+   "obs": 734,
+   "gps_offset_m": 3.78,
+   "eye_m": 1.42,
+   "registered": true
+  },
+  {
+   "id": "IMG_0906",
+   "registered": false,
+   "gps": [
+    -33.25,
+    79.87
+   ],
+   "heading_deg": 60.66402439,
+   "f35": 77
+  },
+  {
+   "id": "IMG_0907",
+   "image": "raw/survey/minami/images/t77/IMG_0907.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -25.7409,
+    3.25,
+    74.5645
+   ],
+   "quaternion": [
+    0.03237643,
+    -0.67907987,
+    0.00669697,
+    0.73331947
+   ],
+   "yaw": -85.6571,
+   "pitch": 3.2435,
+   "roll": -1.9602,
+   "heading_deg": 85.657,
+   "reproj_px": 0.3,
+   "obs": 491,
+   "gps_offset_m": 0.82,
+   "eye_m": 1.36,
+   "registered": true
+  },
+  {
+   "id": "IMG_0908",
+   "image": "raw/survey/minami/images/t77/IMG_0908.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -25.7518,
+    3.2466,
+    74.3836
+   ],
+   "quaternion": [
+    -0.02927661,
+    0.7732954,
+    -0.01448269,
+    -0.63320404
+   ],
+   "yaw": -101.4222,
+   "pitch": 3.4097,
+   "roll": -1.5464,
+   "heading_deg": 101.422,
+   "reproj_px": 0.37,
+   "obs": 304,
+   "gps_offset_m": 0.84,
+   "eye_m": 1.36,
+   "registered": true
+  },
+  {
+   "id": "IMG_0910",
+   "registered": false,
+   "gps": [
+    -26.75,
+    74.32
+   ],
+   "heading_deg": 48.77447127,
+   "f35": 77
+  },
+  {
+   "id": "IMG_0911",
+   "image": "raw/survey/minami/images/t77/IMG_0911.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -25.8131,
+    3.0016,
+    74.4397
+   ],
+   "quaternion": [
+    0.03613253,
+    -0.28257278,
+    -0.00634518,
+    0.95854411
+   ],
+   "yaw": -32.9119,
+   "pitch": 3.7661,
+   "roll": -1.8713,
+   "heading_deg": 32.912,
+   "reproj_px": 0.68,
+   "obs": 1437,
+   "gps_offset_m": 0.74,
+   "eye_m": 1.11,
+   "registered": true
+  },
+  {
+   "id": "IMG_0912",
+   "image": "raw/survey/minami/images/t77/IMG_0912.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -25.8666,
+    3.0047,
+    74.3966
+   ],
+   "quaternion": [
+    0.03969102,
+    -0.20409317,
+    -0.00661804,
+    0.97812412
+   ],
+   "yaw": -23.6351,
+   "pitch": 4.298,
+   "roll": -1.675,
+   "heading_deg": 23.635,
+   "reproj_px": 0.72,
+   "obs": 1555,
+   "gps_offset_m": 0.69,
+   "eye_m": 1.12,
+   "registered": true
+  },
+  {
+   "id": "IMG_0913",
+   "image": "raw/survey/minami/images/t77/IMG_0913.jpg",
+   "lens": "t77",
+   "camera_model": "RADIAL",
+   "width": 3024,
+   "height": 4032,
+   "fx": 9013.945,
+   "fy": 9013.945,
+   "cx": 1512.0,
+   "cy": 2016.0,
+   "dist": [
+    -0.0413225,
+    3.6887471,
+    0.0,
+    0.0
+   ],
+   "position": [
+    -25.2704,
+    3.0124,
+    74.6871
+   ],
+   "quaternion": [
+    0.06337875,
+    -0.00941067,
+    0.00557727,
+    0.99792959
+   ],
+   "yaw": -1.0441,
+   "pitch": 7.2732,
+   "roll": 0.5741,
+   "heading_deg": 1.044,
+   "reproj_px": 0.24,
+   "obs": 64,
+   "gps_offset_m": 1.19,
+   "eye_m": 1.13,
+   "registered": true
+  }
+ ]
+}

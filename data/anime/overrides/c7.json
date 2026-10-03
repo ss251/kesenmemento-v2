@@ -22,6 +22,16 @@
    "id": "osm",
    "what": "OpenStreetMap, raw/osm/overpass.json (© OpenStreetMap contributors, ODbL)",
    "date": "2026-05-06"
+  },
+  {
+   "id": "sailesh",
+   "what": "author photos raw/photos-sailesh/drive-1003/IMG_0895.HEIC (heading 111) and IMG_0896.HEIC (heading 125), 2026-10-02, taken from (133, 69) on the 港町 quay road (reference only)",
+   "date": "2026-10-02"
+  },
+  {
+   "id": "earth-streets",
+   "what": "Google Earth web 3D top view, imagery dated 2026-03-11, raw/ref/streets8924/cap/c7_19 (z1.jpg, pair_top.jpg): the 港町 quay road markings",
+   "date": "2026-03-11"
   }
  ],
  "lots": [
@@ -31,7 +41,9 @@
     "shape": "flat",
     "color": "#bec2c9"
    },
-   "src": "earth: sub-s top + o0 + o180, お魚いちば is a fan-shaped two-storey hall with a flat mid-grey roof (Earth #9da4ab), not a pale-blue hipped roof"
+   "wall": "#cfd8c8",
+   "facade": "shop",
+   "src": "earth: sub-s top + o0 + o180, お魚いちば is a fan-shaped two-storey hall with a flat mid-grey roof (Earth #9da4ab), not a pale-blue hipped roof; sailesh: IMG_0895 2026-10-02, sage-green siding"
   },
   {
    "id": "16/58541/25068/139",
@@ -39,7 +51,9 @@
     "shape": "flat",
     "color": "#bec2c9"
    },
-   "src": "earth: sub-s top, the west wing of お魚いちば under the same flat grey roof"
+   "wall": "#cfd8c8",
+   "facade": "shop",
+   "src": "earth: sub-s top, the west wing of お魚いちば under the same flat grey roof; sailesh: IMG_0895 2026-10-02, sage-green siding"
   },
   {
    "id": "16/58541/25068/145",
@@ -49,7 +63,9 @@
     "shape": "flat",
     "color": "#bfc0c5"
    },
-   "src": "earth: sub-s top + o0, the east end of お魚いちば: the same two-storey hall (the app drew a 3-storey block with a dark roof)"
+   "wall": "#cfd8c8",
+   "facade": "shop",
+   "src": "earth: sub-s top + o0, the east end of お魚いちば: the same two-storey hall (the app drew a 3-storey block with a dark roof); sailesh: IMG_0895 2026-10-02, sage-green siding"
   },
   {
    "id": "16/58541/25068/144",
@@ -713,6 +729,18 @@
    "id": "r12719",
    "width": 6.4,
    "src": "earth: sub-n top (o_e_road.jpg), the 魚町 service road runs on the same asphalt as the 県道, about 6 m, not 4.4 m"
+  },
+  {
+   "id": "r14150",
+   "markings": {
+    "centre": "hatched-median",
+    "medianWidth": 3,
+    "lanes": [
+     1,
+     2
+    ]
+   },
+   "src": "earth-streets: c7_19 z1 + pair_top, no yellow centre line: a ~3 m white chevron-hatched median (導流帯) between two solid white lines; 1 northbound lane on the west side, 2 lanes with a dashed white divider on the east side (lanes = [right, left] looking from the road's first point, north, to its last)"
   }
  ]
 }

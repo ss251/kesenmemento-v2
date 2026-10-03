@@ -39,7 +39,7 @@ describe("S1 PIER7 massing", () => {
     const src = read("src/anime/world/harbor/minami.js");
     expect(src).toContain("glassPale: '#a9bccb'"); expect(src).toContain("terraceA: '#6d6664'");
     // [v5:fix2] the 3F is now the main of three blocks along the street-side split (test/v5-fix2.test.js)
-    expect(src).toContain("if (bl.id === 'main') glazedBand(P, f3, top - 0.55");
+    expect(src).toContain("glazedBand(P, f3, top - 0.55");   // [v6:rebuild] the main block's 3F over its surveyed depth
     expect(src).not.toContain("glazedBand(poly, f3,");
   });
   test("迎 has three roof sections and a tan stepped deck at its NW end", () => {

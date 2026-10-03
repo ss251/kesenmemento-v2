@@ -35,6 +35,20 @@ export const LOOKS = {
     pal: { zenith: '#5f7290', mid: '#8a99b0', horizon: '#c9c6c2', warm: '#e9a073', fog: '#a9afb7', sun: '#efe2d0', hemiSky: '#cfd2d6', hemiGround: '#9a968f', cloudLit: '#b7bfcb', cloudShade: '#6e7a90' },
     sunI: 0.62, hemiI: 2.05, exposure: 1.0, bloom: 0.3, glow: 0.16, mix: 1.0,
   },
+  // [v5:photos3] the author's second batch (raw/photos-sailesh/drive-1003, 2026-10-02): sunny = the 14:59 promenade and the
+  // 16:29 PIER7 street shots (deep blue sky with scattered fair-weather cumulus, a hard low sun, shops unlit); dawn = the
+  // 06:48-06:54 fish-market shots (a clear, slightly hazy morning, the sun 15 deg up in the ESE glaring on the water, the
+  // hall lamps still on). photo-pairs.mjs sets the photo's own clock on top, so the sun stands where it stood.
+  sunny: {
+    hours: 16.5, date: '2026-10-02', cover: 0.42, lit: 0, dusk: 0.15, overcast: 0, lamps: 0,
+    pal: { zenith: '#3a6fc4', mid: '#79a6dc', horizon: '#cfdde9', warm: '#f3dcbc', fog: '#bccbdb', sun: '#fff0da', hemiSky: '#c6d6ee', hemiGround: '#a69c8c', cloudLit: '#ffffff', cloudShade: '#aab8d0' },
+    sunI: 2.6, hemiI: 1.55, exposure: 1.0, bloom: 0.2, glow: 0.08, mix: 0.9,
+  },
+  dawn: {
+    hours: 6.88, date: '2026-10-02', cover: 0.15, lit: 0.55, dusk: 0.35, overcast: 0, lamps: 0.6,
+    pal: { zenith: '#6f93c4', mid: '#a9bfd8', horizon: '#ece6d8', warm: '#ffd9a8', fog: '#d6d6cf', sun: '#ffe6c2', hemiSky: '#c9d3df', hemiGround: '#8f8a80', cloudLit: '#fff6e8', cloudShade: '#b7bfcc' },
+    sunI: 2.4, hemiI: 1.35, exposure: 1.0, bloom: 0.32, glow: 0.14, mix: 0.9,
+  },
 };
 
 const wrap24 = (h) => ((h % 24) + 24) % 24;
@@ -134,9 +148,9 @@ export function createTime(ctx, opts = {}) {
     if (LKa) {
       for (const [c, hex] of Object.entries(LKa.pal)) pal[c].lerp(_gs.set(hex), LKa.mix);
       pal.sunI = LKa.sunI; pal.hemiI = LKa.hemiI; pal.exposure = LKa.exposure; pal.bloom = LKa.bloom; pal.glow = LKa.glow; pal.leak = 0; pal.neutral = 1;
-      state.dusk = Math.min(state.dusk, LKa.dusk); state.lamps = 1;
+      state.dusk = Math.min(state.dusk, LKa.dusk); state.lamps = LKa.lamps ?? 1;   // [v5:photos3] the sunny look keeps the lamps off
     }
-    S.uLit.value = LKa ? LKa.lit : 0; state.overcast = LKa ? 1 : 0; if (!LKa) pal.neutral = 0;
+    S.uLit.value = LKa ? LKa.lit : 0; state.overcast = LKa ? (LKa.overcast ?? 1) : 0; if (!LKa) pal.neutral = 0;
     // weather: overcast dims and greys the key light a little (never murky: the ambient rises to compensate)
     const W = state.weather, over = Math.min(1, smooth(0.55, 1.0, W.cloud) * 0.8 + 0.3 * W.rain);
     const wet = Math.min(1, Math.max(W.wet || 0, W.rain * 1.6));

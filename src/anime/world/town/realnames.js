@@ -25,10 +25,11 @@ function coloursOf(lot, k) {
   return P[k % P.length];
 }
 
-/** The text a sign would carry: OSM building names that are administrative (共同化建物, 旧..., a works JV) get none,
- *  and a bracketed English gloss is dropped. */
+/** The text a sign would carry: OSM building names that are administrative (共同化建物, 旧... or （旧）..., a works JV)
+ *  get none, and a bracketed English gloss is dropped. [v6:c11] '（旧）' marks a former use: OSM's
+ *  （旧）気仙沼魚市場前郵便局 moved to 仲町 as 気仙沼仲町郵便局 on 2021-05-19 (Japan Post storeinformation id=4928). */
 export function signName(name) {
-  if (!name || /共同化|^旧|JV$|工事|仮設/.test(name)) return null;
+  if (!name || /共同化|^[（(]?旧[）)]?|JV$|工事|仮設/.test(name)) return null;
   const t = name.replace(/\s*\([A-Za-z][^)]*\)\s*$/, '').trim();
   return t.length && t.length <= 24 ? t : null;
 }

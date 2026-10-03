@@ -115,3 +115,8 @@ bay. `harbor/market5.js` (`buildCRoofPhotos`) replaces the v4 equipment boxes th
 - The visitors' entrance and the pavilions have lit glazing with frames, and the small penthouse windows stay dark as
   photographed.
 - Parked cars have a dark glass cabin and wheels (they read as crates before).
+
+## v6:rebuild (2026-10-03): rebuilt to the photo survey
+
+The C棟 roof deck and the north facility's quay hall are rebuilt from the measured spec `data/survey/market/model.json`
+(method, numbers and remaining gaps: `docs/anime/survey/market.md`, section "Rebuild").

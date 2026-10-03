@@ -15,10 +15,17 @@ export const EXTRA_PLACES = [
   // [v4:integrate] walk: at the torii on the 東浜街道 bend, looking up the stair to the hall (the nearest street is under
   // the wooded slope, where the grove hides the hall)
   { id: 'isuzu', ja: '五十鈴神社', en: 'Isuzu Shrine', cat: 'shrine', at: [362.4, -125.0], src: 'osm', walk: { x: 340.5, z: -158, yaw: -135, pitch: 12, dist: 34.1 } },
+  // [v6:c6] 熊野神社 on the wooded 入沢 hill (the EVIDENCE.md #34 hill): Google Earth (imagery 2026-03-11) labels "Kumano
+  // Shrine 熊野神社", pin tip at about (-141, -163) (raw/ref/earth/kumano8935/top_annot.jpg; c6/sub-a, c5/sub-b tops),
+  // and weathernews spot 9000482 gives 宮城県気仙沼市入沢, 38.907498N 141.573539E = (-127, -166). Neither OSM nor GSI
+  // Anno names it (search found only the 熊野神社 3 to 6 km away). No lot is re-kinded: the 社殿 footprint (/275 under the
+  // pin, /262 or /256) is not identified yet; a re-kind also needs a builder (kind 'shrine' without a landmark is not drawn
+  // in the hero or mid zones).
+  { id: 'kumano', ja: '熊野神社', en: 'Kumano Shrine', cat: 'shrine', at: [-141, -164], src: 'earth' },
   { id: 'otokoyama', ja: '男山本店 魚町直営店', en: 'Otokoyama sake brewery shop (heritage, 1931)', cat: 'shop', at: [-36.6, -54.4], src: 'osm' },
-  // [v4:polish1] 角星店舗 (the sake brewery's 1929 shop, rebuilt 2016; harbor/kazemachi.js): the OSM node inside its
-  // footprint is named 角星園茶舗
-  { id: 'kakuboshi', ja: '角星店舗', en: 'Kakuboshi sake shop (heritage, 1929)', cat: 'shop', at: [-98.1, -39.4], src: 'osm', ref: '角星園茶舗' },
+  // [v4:polish1] 角星店舗 (the sake brewery's 1929 shop, rebuilt 2016; harbor/kazemachi.js). [v6:c6] the lot carries the
+  // name 角星店舗 (overrides/c6.json, kesennuma-kanko.jp); the OSM node 角星園茶舗 inside it is dropped (lotfix PLACE_FIX)
+  { id: 'kakuboshi', ja: '角星店舗', en: 'Kakuboshi sake shop (heritage, 1929)', cat: 'shop', at: [-98.1, -39.4], src: 'osm' },
   { id: 'takeyama', ja: '武山米店・炊飯博物館', en: 'Takeyama rice shop and Rice Cooking Museum', cat: 'shop', at: [-184.5, -103.6], src: 'osm', ref: '武山米店' },
   { id: 'mukaeru', ja: '迎（ムカエル）', en: 'Mukaeru (waterfront shops)', cat: 'shop', at: [-19.1, 28.2], src: 'osm', ref: '南町海岸商業施設「迎」' },
   { id: 'mambo', ja: '喫茶マンボ', en: 'Kissa Mambo café', cat: 'food', at: [-160.3, 142.4], src: 'osm' },

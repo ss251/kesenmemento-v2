@@ -22,6 +22,23 @@
    "id": "osm",
    "what": "OpenStreetMap, raw/osm/overpass.json (OSM base 2026-05-06), © OpenStreetMap contributors (ODbL)",
    "date": "2026-05-06"
+  },
+  {
+   "id": "sailesh",
+   "what": "author photo raw/photos-sailesh/drive-1003/IMG_0822.HEIC (2026-10-01 17:20, from (-5, 66), heading 295)",
+   "date": "2026-10-01"
+  },
+  {
+   "id": "kesennuma-kanko",
+   "what": "official Kesennuma tourism site kesennuma-kanko.jp (角星店舗 /kazamachi_kakuboshi/, 鼎・斉吉 /saikichi/), with saikichi-pro.jp/store/kanae/ and the Crewship directory (data/local/crew_shops.json)"
+  },
+  {
+   "id": "tripadvisor",
+   "what": "TripAdvisor Hotel_Review-g1023417-d5230955 (Kinkokan) and miyagi-kankou.or.jp theme/detail.php?id=14881 (旅館金港館, 入沢1-27)"
+  },
+  {
+   "id": "koyo",
+   "what": "koyo-gakuen.ac.jp/rias (school name 気仙沼リアス調理製菓専門学校, 南町2-2-12)"
   }
  ],
  "lots": [
@@ -327,6 +344,47 @@
     "color": "#8e8e92"
    },
    "src": "earth: mid grey roof, not dark slate (sub-f top, rs_af)"
+  },
+  {
+   "id": "16/58540/25068/350",
+   "roof": {
+    "shape": "saw",
+    "color": "#e8e8e6",
+    "ridge": "z"
+   },
+   "src": "earth: c6 sub-c top + l45, white folded-plate roof, folds front to back"
+  },
+  {
+   "id": "16/58541/25068/49",
+   "roof": {
+    "color": "#4a4e5c"
+   },
+   "src": "earth: c6 sub-b top, dark blue-grey roof over the whole outline (GSI photo #d4cccc is out of date)"
+  },
+  {
+   "id": "16/58540/25068/332",
+   "wall": "#efefea",
+   "facade": "public",
+   "storeys": 3,
+   "name": "晃陽学園 気仙沼リアス調理製菓専門学校",
+   "src": "sailesh: IMG_0822 2026-10-01, white block with punched windows + navy-clad set-back top with the school sign (name as on the sign and koyo-gakuen.ac.jp/rias)"
+  },
+  {
+   "id": "16/58540/25068/295",
+   "name": "角星店舗",
+   "nameEn": "Kakuboshi sake shop",
+   "src": "kesennuma-kanko 角星店舗 (魚町2-1-17); no 角星園茶舗 exists"
+  },
+  {
+   "id": "16/58540/25068/282",
+   "nameEn": "Ryokan Kinkokan",
+   "src": "tripadvisor / miyagi-kankou: Kinkokan (OSM name:en Kimkokan is a typo)"
+  },
+  {
+   "id": "16/58541/25068/89",
+   "name": "鼎・斉吉",
+   "nameEn": "Kanae Saikichi",
+   "src": "kesennuma-kanko + saikichi-pro: 柏崎1-13 (GSI geocode 232.6,240.8; crewship pin 239,230); earth sub-f top: blue-grey-roofed building with an 8-stall car park on the bluff"
   }
  ],
  "newLots": [
@@ -689,6 +747,65 @@
    },
    "facade": "plain",
    "src": "earth: its white flat-roofed single-storey wing (sub-f top t22)"
+  },
+  {
+   "id": "ovr:c6:shinmei-hall-w",
+   "poly": [
+    [
+     220,
+     -204
+    ],
+    [
+     233,
+     -204
+    ],
+    [
+     233,
+     -190
+    ],
+    [
+     220,
+     -190
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 1,
+   "height": 5,
+   "roof": {
+    "shape": "hip",
+    "color": "#8e9497"
+   },
+   "src": "earth: c6 sub-b top + o180, hipped west part of a new 1-storey hall, eaves at about 5 m (OSM w966913921; GSI photo predates it)"
+  },
+  {
+   "id": "ovr:c6:shinmei-hall-e",
+   "poly": [
+    [
+     233,
+     -205
+    ],
+    [
+     243,
+     -205
+    ],
+    [
+     243,
+     -191
+    ],
+    [
+     233,
+     -191
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 1,
+   "height": 5,
+   "roof": {
+    "shape": "gable",
+    "color": "#8e9497",
+    "ridge": "z"
+   },
+   "src": "earth: c6 sub-b top + o180, two parallel north-south gables on the east part"
   }
  ],
  "landuse": [
@@ -1150,6 +1267,53 @@
     ]
    ],
    "src": "earth: pier7 top + o180, the strip between the 迎 lawn and the quay edge, north of the stepped garden, is dark asphalt (Earth #817b82)"
+  }
+ ],
+ "roads": [
+  {
+   "id": "r13982",
+   "width": 22,
+   "carriage": 15,
+   "kind": "city",
+   "src": "earth 2026-03-11 top (streets8924/c6_minami): 4-lane road, about 15 m kerb to kerb + 2.5 m W / 4 m E sidewalks"
+  },
+  {
+   "id": "r13981",
+   "width": 22,
+   "carriage": 15,
+   "kind": "city",
+   "src": "earth 2026-03-11 top (streets8924/c6_minami): 4-lane road, about 15 m kerb to kerb + 2.5 m W / 4 m E sidewalks"
+  },
+  {
+   "id": "r14057",
+   "width": 22,
+   "carriage": 15,
+   "kind": "city",
+   "src": "earth 2026-03-11 top (streets8924/c6_minami): 4-lane road, about 15 m kerb to kerb + 2.5 m W / 4 m E sidewalks"
+  },
+  {
+   "id": "r14055",
+   "width": 22,
+   "carriage": 15,
+   "kind": "city",
+   "src": "earth 2026-03-11 top (streets8924/c6_minami): 4-lane road, about 15 m kerb to kerb + 2.5 m W / 4 m E sidewalks"
+  },
+  {
+   "id": "r13899",
+   "width": 20,
+   "carriage": 15,
+   "kind": "city",
+   "src": "earth 2026-03-11 top (streets8924/c6_minami): the same 4-lane road where it reaches the junction; GSI edges 16.1 m (rejected by the class clamp)"
+  },
+  {
+   "id": "r13972",
+   "remove": true,
+   "src": "earth: exact duplicate of r14057 (same GSI centreline stacked twice)"
+  },
+  {
+   "id": "r13970",
+   "remove": true,
+   "src": "earth: exact duplicate of r14055 (same GSI centreline stacked twice)"
   }
  ]
 }

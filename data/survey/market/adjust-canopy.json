@@ -1,0 +1,1165 @@
+{
+ "cluster": "canopy",
+ "photos": [
+  "IMG_0853",
+  "IMG_0854",
+  "IMG_0855",
+  "IMG_0860",
+  "IMG_0861"
+ ],
+ "n_points": 1350,
+ "cost": 1049.8698264870459,
+ "chi2_per_residual": 0.37038597610643514,
+ "reproj_px": {
+  "IMG_0855": {
+   "n": 526,
+   "rms": 0.79,
+   "mean": 0.87
+  },
+  "IMG_0853": {
+   "n": 618,
+   "rms": 0.69,
+   "mean": 0.78
+  },
+  "IMG_0854": {
+   "n": 536,
+   "rms": 0.74,
+   "mean": 0.84
+  },
+  "IMG_0860": {
+   "n": 538,
+   "rms": 0.75,
+   "mean": 0.86
+  },
+  "IMG_0861": {
+   "n": 577,
+   "rms": 0.73,
+   "mean": 0.83
+  }
+ },
+ "reproj_mean_px": 0.834,
+ "worst": [
+  {
+   "sigma_units": 4.04,
+   "what": [
+    "obs",
+    "tie:siftq:1011",
+    "IMG_0855",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.78,
+   "what": [
+    "obs",
+    "tie:siftq:329",
+    "IMG_0854",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.67,
+   "what": [
+    "obs",
+    "tie:siftq:329",
+    "IMG_0860",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.65,
+   "what": [
+    "obs",
+    "tie:siftq:587",
+    "IMG_0855",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.62,
+   "what": [
+    "obs",
+    "tie:siftq:153",
+    "IMG_0855",
+    "u"
+   ]
+  },
+  {
+   "sigma_units": 2.55,
+   "what": [
+    "obs",
+    "tie:siftq:256",
+    "IMG_0855",
+    "u"
+   ]
+  },
+  {
+   "sigma_units": 2.55,
+   "what": [
+    "obs",
+    "tie:siftq:31",
+    "IMG_0861",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.54,
+   "what": [
+    "obs",
+    "tie:siftq:153",
+    "IMG_0854",
+    "u"
+   ]
+  },
+  {
+   "sigma_units": 2.46,
+   "what": [
+    "obs",
+    "tie:siftq:476",
+    "IMG_0854",
+    "u"
+   ]
+  },
+  {
+   "sigma_units": 2.42,
+   "what": [
+    "obs",
+    "tie:siftq:288",
+    "IMG_0860",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.39,
+   "what": [
+    "obs",
+    "tie:siftq:1124",
+    "IMG_0855",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.34,
+   "what": [
+    "obs",
+    "tie:siftq:1",
+    "IMG_0854",
+    "u"
+   ]
+  },
+  {
+   "sigma_units": 2.33,
+   "what": [
+    "obs",
+    "tie:siftq:1",
+    "IMG_0853",
+    "u"
+   ]
+  },
+  {
+   "sigma_units": 2.29,
+   "what": [
+    "obs",
+    "tie:siftq:1124",
+    "IMG_0860",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.28,
+   "what": [
+    "obs",
+    "tie:siftq:524",
+    "IMG_0854",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.28,
+   "what": [
+    "obs",
+    "tie:siftq:524",
+    "IMG_0861",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.27,
+   "what": [
+    "obs",
+    "tie:siftq:476",
+    "IMG_0853",
+    "u"
+   ]
+  },
+  {
+   "sigma_units": 2.25,
+   "what": [
+    "obs",
+    "tie:siftq:503",
+    "IMG_0854",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.21,
+   "what": [
+    "obs",
+    "tie:siftq:772",
+    "IMG_0853",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.2,
+   "what": [
+    "obs",
+    "tie:siftq:240",
+    "IMG_0855",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.18,
+   "what": [
+    "obs",
+    "tie:siftq:772",
+    "IMG_0860",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.17,
+   "what": [
+    "obs",
+    "tie:siftq:240",
+    "IMG_0854",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.17,
+   "what": [
+    "obs",
+    "tie:siftq:503",
+    "IMG_0861",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.17,
+   "what": [
+    "obs",
+    "tie:siftq:1111",
+    "IMG_0855",
+    "v"
+   ]
+  },
+  {
+   "sigma_units": 2.16,
+   "what": [
+    "obs",
+    "tie:siftq:817",
+    "IMG_0853",
+    "v"
+   ]
+  }
+ ],
+ "constraints_sigma_units": {
+  "roll": [
+   0.069,
+   0.123,
+   -0.048,
+   0.105,
+   0.093
+  ],
+  "sun": [
+   -0.164
+  ],
+  "gps": [
+   1.719,
+   1.189,
+   1.411,
+   -0.167,
+   1.52,
+   -0.234,
+   0.476,
+   -0.011,
+   0.3,
+   0.096
+  ],
+  "vertical": [
+   0.103,
+   -0.026,
+   -0.158,
+   0.04,
+   0.019,
+   0.048
+  ],
+  "dist": [
+   0.467,
+   -0.048,
+   -0.881,
+   0.196,
+   -0.027
+  ],
+  "level": [
+   -0.542
+  ],
+  "on_y": [
+   0.017,
+   -0.074,
+   -0.183,
+   -0.156,
+   0.014,
+   -0.393,
+   -0.705,
+   -0.647,
+   0.068,
+   -0.058,
+   0.238,
+   0.226,
+   0.413,
+   0.371,
+   0.138,
+   0.211,
+   0.086,
+   0.45,
+   -0.022,
+   -0.188,
+   0.191
+  ],
+  "on_line": [
+   0.062,
+   0.053,
+   -0.005,
+   0.133,
+   0.239,
+   0.22,
+   -0.023,
+   0.02,
+   -0.08,
+   -0.076,
+   -0.139,
+   -0.125,
+   -0.046,
+   -0.071,
+   -0.029,
+   -0.151,
+   0.007,
+   0.064,
+   -0.054
+  ],
+  "far_water": [
+   0.168,
+   0.074,
+   0.06,
+   -0.288,
+   -0.06
+  ],
+  "scalar-prior": [
+   -0.082,
+   -0.007,
+   0.0
+  ]
+ },
+ "lenses": {
+  "t77": {
+   "f": 8969.0,
+   "k1": 0.0,
+   "k2": 0.0
+  },
+  "t78": {
+   "f": 9065.0,
+   "k1": 0.0,
+   "k2": 0.0
+  }
+ },
+ "scalars": {
+  "apron_y": {
+   "value": 1.8418,
+   "sigma": 0.0222
+  },
+  "curb_off": {
+   "value": 0.4893,
+   "sigma": 0.2528
+  },
+  "floor_y": {
+   "value": 2.0,
+   "sigma": 0.4
+  }
+ },
+ "points": {
+  "truck855.plate_t": {
+   "enu": [
+    572.99,
+    2.37,
+    664.391
+   ],
+   "sigma": [
+    0.03,
+    0.009,
+    0.02
+   ],
+   "res_px": {
+    "IMG_0855": 0.5
+   },
+   "feature": false,
+   "note": null
+  },
+  "truck855.plate_b": {
+   "enu": [
+    572.987,
+    2.2,
+    664.392
+   ],
+   "sigma": [
+    0.03,
+    0.009,
+    0.02
+   ],
+   "res_px": {
+    "IMG_0855": 0.5
+   },
+   "feature": false,
+   "note": null
+  },
+  "truck855.plate_l": {
+   "enu": [
+    573.251,
+    2.267,
+    664.323
+   ],
+   "sigma": [
+    0.023,
+    0.01,
+    0.026
+   ],
+   "res_px": {
+    "IMG_0855": 0.35
+   },
+   "feature": false,
+   "note": null
+  },
+  "truck855.plate_r": {
+   "enu": [
+    572.965,
+    2.277,
+    664.485
+   ],
+   "sigma": [
+    0.022,
+    0.01,
+    0.022
+   ],
+   "res_px": {
+    "IMG_0855": 0.35
+   },
+   "feature": false,
+   "note": null
+  },
+  "truck855.hub_f": {
+   "enu": [
+    572.363,
+    2.155,
+    665.771
+   ],
+   "sigma": [
+    0.029,
+    0.01,
+    0.017
+   ],
+   "res_px": {
+    "IMG_0855": 0.56
+   },
+   "feature": false,
+   "note": null
+  },
+  "truck855.hub_r": {
+   "enu": [
+    573.113,
+    2.174,
+    668.157
+   ],
+   "sigma": [
+    0.029,
+    0.011,
+    0.02
+   ],
+   "res_px": {
+    "IMG_0855": 0.13
+   },
+   "feature": false,
+   "note": null
+  },
+  "truck855.foot_f": {
+   "enu": [
+    572.368,
+    1.842,
+    665.77
+   ],
+   "sigma": [
+    0.028,
+    0.01,
+    0.016
+   ],
+   "res_px": {
+    "IMG_0855": 0.57
+   },
+   "feature": false,
+   "note": null
+  },
+  "truck855.foot_r": {
+   "enu": [
+    573.112,
+    1.84,
+    668.155
+   ],
+   "sigma": [
+    0.029,
+    0.011,
+    0.019
+   ],
+   "res_px": {
+    "IMG_0855": 0.16
+   },
+   "feature": false,
+   "note": null
+  },
+  "curb.0853.0": {
+   "enu": [
+    576.842,
+    1.833,
+    663.683
+   ],
+   "sigma": [
+    0.313,
+    0.036,
+    0.087
+   ],
+   "res_px": {
+    "IMG_0853": 0.35
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.1": {
+   "enu": [
+    577.42,
+    1.834,
+    664.944
+   ],
+   "sigma": [
+    0.316,
+    0.036,
+    0.093
+   ],
+   "res_px": {
+    "IMG_0853": 0.3
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.2": {
+   "enu": [
+    578.239,
+    1.843,
+    666.714
+   ],
+   "sigma": [
+    0.321,
+    0.036,
+    0.106
+   ],
+   "res_px": {
+    "IMG_0853": 0.03
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.3": {
+   "enu": [
+    578.773,
+    1.822,
+    667.933
+   ],
+   "sigma": [
+    0.324,
+    0.036,
+    0.117
+   ],
+   "res_px": {
+    "IMG_0853": 0.8
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.4": {
+   "enu": [
+    579.072,
+    1.807,
+    668.625
+   ],
+   "sigma": [
+    0.326,
+    0.036,
+    0.124
+   ],
+   "res_px": {
+    "IMG_0853": 1.44
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.5": {
+   "enu": [
+    579.398,
+    1.809,
+    669.332
+   ],
+   "sigma": [
+    0.328,
+    0.036,
+    0.132
+   ],
+   "res_px": {
+    "IMG_0853": 1.34
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.6": {
+   "enu": [
+    579.771,
+    1.845,
+    670.061
+   ],
+   "sigma": [
+    0.33,
+    0.036,
+    0.141
+   ],
+   "res_px": {
+    "IMG_0853": 0.14
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.7": {
+   "enu": [
+    580.098,
+    1.839,
+    670.792
+   ],
+   "sigma": [
+    0.332,
+    0.036,
+    0.15
+   ],
+   "res_px": {
+    "IMG_0853": 0.12
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.8": {
+   "enu": [
+    580.595,
+    1.854,
+    671.842
+   ],
+   "sigma": [
+    0.334,
+    0.036,
+    0.164
+   ],
+   "res_px": {
+    "IMG_0853": 0.51
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.9": {
+   "enu": [
+    581.155,
+    1.853,
+    673.07
+   ],
+   "sigma": [
+    0.338,
+    0.037,
+    0.182
+   ],
+   "res_px": {
+    "IMG_0853": 0.49
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0853.10": {
+   "enu": [
+    581.454,
+    1.862,
+    673.701
+   ],
+   "sigma": [
+    0.339,
+    0.037,
+    0.191
+   ],
+   "res_px": {
+    "IMG_0853": 0.9
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0855.0": {
+   "enu": [
+    580.064,
+    1.86,
+    670.665
+   ],
+   "sigma": [
+    0.331,
+    0.036,
+    0.149
+   ],
+   "res_px": {
+    "IMG_0855": 0.78
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0855.1": {
+   "enu": [
+    580.22,
+    1.849,
+    671.035
+   ],
+   "sigma": [
+    0.332,
+    0.036,
+    0.154
+   ],
+   "res_px": {
+    "IMG_0855": 0.29
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0855.2": {
+   "enu": [
+    580.535,
+    1.852,
+    671.716
+   ],
+   "sigma": [
+    0.334,
+    0.036,
+    0.163
+   ],
+   "res_px": {
+    "IMG_0855": 0.45
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "curb.0855.3": {
+   "enu": [
+    580.949,
+    1.846,
+    672.635
+   ],
+   "sigma": [
+    0.336,
+    0.036,
+    0.175
+   ],
+   "res_px": {
+    "IMG_0855": 0.19
+   },
+   "feature": false,
+   "note": "bottom edge of a striped wheel-stop block on the quay edge"
+  },
+  "bollard.0853.a": {
+   "enu": [
+    578.006,
+    1.864,
+    666.152
+   ],
+   "sigma": [
+    0.319,
+    0.034,
+    0.1
+   ],
+   "res_px": {
+    "IMG_0853": 0.5
+   },
+   "feature": true,
+   "note": "mooring bitt base"
+  },
+  "bollard.0855.a": {
+   "enu": [
+    581.994,
+    1.841,
+    674.936
+   ],
+   "sigma": [
+    0.342,
+    0.035,
+    0.209
+   ],
+   "res_px": {
+    "IMG_0855": 0.03
+   },
+   "feature": true,
+   "note": "mooring bitt base"
+  },
+  "hall.conv.end_top": {
+   "enu": [
+    564.822,
+    1.566,
+    672.419
+   ],
+   "sigma": [
+    21.476,
+    2.835,
+    7.049
+   ],
+   "res_px": {
+    "IMG_0855": 1.82,
+    "IMG_0854": 0.91,
+    "IMG_0853": 2.63
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "hall.conv.wheelA": {
+   "enu": [
+    556.692,
+    2.003,
+    668.182
+   ],
+   "sigma": [
+    0.561,
+    0.082,
+    0.327
+   ],
+   "res_px": {
+    "IMG_0855": 2.25,
+    "IMG_0854": 0.98,
+    "IMG_0860": 1.41,
+    "IMG_0861": 0.67,
+    "IMG_0853": 1.83
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "hall.conv.wheelB_foot": {
+   "enu": [
+    555.87,
+    1.948,
+    668.665
+   ],
+   "sigma": [
+    0.551,
+    0.083,
+    0.346
+   ],
+   "res_px": {
+    "IMG_0855": 1.66,
+    "IMG_0854": 1.06,
+    "IMG_0860": 1.38,
+    "IMG_0861": 0.47,
+    "IMG_0853": 2.07
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "hall.tub1.a": {
+   "enu": [
+    544.967,
+    2.841,
+    661.071
+   ],
+   "sigma": [
+    0.533,
+    0.082,
+    0.493
+   ],
+   "res_px": {
+    "IMG_0855": 2.29,
+    "IMG_0854": 1.81,
+    "IMG_0861": 0.67
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "hall.tub1.b": {
+   "enu": [
+    543.604,
+    2.938,
+    661.86
+   ],
+   "sigma": [
+    0.514,
+    0.08,
+    0.521
+   ],
+   "res_px": {
+    "IMG_0855": 2.86,
+    "IMG_0854": 1.01,
+    "IMG_0860": 2.62,
+    "IMG_0861": 1.78
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "hall.beam.c": {
+   "enu": [
+    525.787,
+    7.347,
+    659.234
+   ],
+   "sigma": [
+    0.563,
+    0.054,
+    0.845
+   ],
+   "res_px": {
+    "IMG_0855": 0.15,
+    "IMG_0854": 0.15
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "hall.beam.dot1": {
+   "enu": [
+    525.762,
+    7.349,
+    659.239
+   ],
+   "sigma": [
+    0.562,
+    0.054,
+    0.846
+   ],
+   "res_px": {
+    "IMG_0855": 0.92,
+    "IMG_0854": 0.91
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "farshore.far.a": {
+   "enu": [
+    996.53,
+    5.739,
+    773.392
+   ],
+   "sigma": [
+    81.631,
+    0.287,
+    21.145
+   ],
+   "res_px": {
+    "IMG_0855": 2.08,
+    "IMG_0854": 2.2,
+    "IMG_0853": 0.78,
+    "IMG_0860": 0.79
+   },
+   "feature": false,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "farshore.far.b": {
+   "enu": [
+    1017.888,
+    6.063,
+    806.904
+   ],
+   "sigma": [
+    96.385,
+    0.287,
+    29.884
+   ],
+   "res_px": {
+    "IMG_0855": 0.64,
+    "IMG_0854": 0.93,
+    "IMG_0853": 0.67,
+    "IMG_0860": 0.09
+   },
+   "feature": false,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "quay.bollard.a": {
+   "enu": [
+    581.988,
+    1.832,
+    674.942
+   ],
+   "sigma": [
+    0.341,
+    0.032,
+    0.207
+   ],
+   "res_px": {
+    "IMG_0855": 1.69,
+    "IMG_0854": 1.35,
+    "IMG_0853": 1.51
+   },
+   "feature": true,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  },
+  "quay.curb.b": {
+   "enu": [
+    580.951,
+    1.851,
+    672.631
+   ],
+   "sigma": [
+    0.334,
+    0.031,
+    0.173
+   ],
+   "res_px": {
+    "IMG_0855": 0.93,
+    "IMG_0854": 1.28,
+    "IMG_0861": 1.87
+   },
+   "feature": false,
+   "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+  }
+ },
+ "cameras": {
+  "IMG_0853": {
+   "position": [
+    522.394,
+    7.1637,
+    658.4973
+   ],
+   "heading": 104.633,
+   "tilt": -4.234,
+   "roll": 0.418,
+   "sigma": {
+    "rot_deg": [
+     1.2993,
+     0.1198,
+     0.9944
+    ],
+    "pos_m": [
+     0.532,
+     0.052,
+     0.904
+    ]
+   },
+   "gps": [
+    419.26,
+    587.14
+   ]
+  },
+  "IMG_0854": {
+   "position": [
+    522.4845,
+    7.153,
+    658.5176
+   ],
+   "heading": 104.272,
+   "tilt": -2.446,
+   "roll": 0.741,
+   "sigma": {
+    "rot_deg": [
+     1.3108,
+     0.1211,
+     0.991
+    ],
+    "pos_m": [
+     0.531,
+     0.051,
+     0.902
+    ]
+   },
+   "gps": [
+    437.82,
+    668.55
+   ]
+  },
+  "IMG_0855": {
+   "position": [
+    522.4945,
+    7.1608,
+    658.539
+   ],
+   "heading": 100.445,
+   "tilt": -2.807,
+   "roll": -0.286,
+   "sigma": {
+    "rot_deg": [
+     1.2765,
+     0.1191,
+     1.0422
+    ],
+    "pos_m": [
+     0.531,
+     0.051,
+     0.902
+    ]
+   },
+   "gps": [
+    431.31,
+    672.56
+   ]
+  },
+  "IMG_0860": {
+   "position": [
+    523.2614,
+    7.1812,
+    659.8799
+   ],
+   "heading": 104.178,
+   "tilt": -4.569,
+   "roll": 0.63,
+   "sigma": {
+    "rot_deg": [
+     1.2924,
+     0.1188,
+     0.9985
+    ],
+    "pos_m": [
+     0.509,
+     0.051,
+     0.891
+    ]
+   },
+   "gps": [
+    494.68,
+    660.53
+   ]
+  },
+  "IMG_0861": {
+   "position": [
+    523.2919,
+    7.1703,
+    659.8295
+   ],
+   "heading": 99.699,
+   "tilt": -5.2,
+   "roll": 0.558,
+   "sigma": {
+    "rot_deg": [
+     1.2483,
+     0.1134,
+     1.0469
+    ],
+    "pos_m": [
+     0.509,
+     0.051,
+     0.891
+    ]
+   },
+   "gps": [
+    505.28,
+    654.06
+   ]
+  }
+ }
+}

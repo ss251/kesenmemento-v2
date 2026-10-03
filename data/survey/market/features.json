@@ -1,0 +1,1200 @@
+{
+ "note": "Market survey features (tools/survey/market_features.py): ENU metres (x east, y T.P. up, z south), 1-sigma per axis. Names: docs/anime/survey/market.md. Groups name#k are matched without order by tools/anime/survey-diff.mjs.",
+ "area": "market",
+ "features": [
+  {
+   "name": "deck.wall.n_base",
+   "enu": [
+    666.704,
+    15.585,
+    963.027
+   ],
+   "sigma": [
+    0.019,
+    0.093,
+    0.02
+   ],
+   "method": "survey adjustment (deck:wall.ne_base)",
+   "views": [
+    "IMG_0792"
+   ],
+   "res_px": {
+    "IMG_0792": 0.64
+   },
+   "note": "penthouse east wall, north end, at the deck (single view IMG_0792 on the wall plane, GSI corner prior)"
+  },
+  {
+   "name": "deck.wall.n_top",
+   "enu": [
+    666.706,
+    22.313,
+    963.027
+   ],
+   "sigma": [
+    0.019,
+    0.095,
+    0.02
+   ],
+   "method": "survey adjustment (deck:wall.ne_top)",
+   "views": [
+    "IMG_0792"
+   ],
+   "res_px": {
+    "IMG_0792": 0.33
+   },
+   "note": "penthouse wall top at the north end"
+  },
+  {
+   "name": "deck.wall.s_base",
+   "enu": [
+    733.052,
+    15.585,
+    1108.439
+   ],
+   "sigma": [
+    0.019,
+    0.051,
+    0.019
+   ],
+   "method": "survey adjustment (deck:wall.se_base)",
+   "views": [
+    "IMG_0796",
+    "IMG_0798"
+   ],
+   "res_px": {
+    "IMG_0798": 9.54,
+    "IMG_0796": 16.13
+   },
+   "note": "inside corner penthouse wall / cooking-studio north face, at the deck"
+  },
+  {
+   "name": "deck.wall.s_top",
+   "enu": [
+    733.049,
+    22.154,
+    1108.44
+   ],
+   "sigma": [
+    0.018,
+    0.041,
+    0.019
+   ],
+   "method": "survey adjustment (deck:wall.se_top)",
+   "views": [
+    "IMG_0794",
+    "IMG_0796",
+    "IMG_0798"
+   ],
+   "res_px": {
+    "IMG_0794": 4.83,
+    "IMG_0796": 1.75,
+    "IMG_0798": 6.4
+   }
+  },
+  {
+   "name": "deck.entrance.canopy_nn",
+   "enu": [
+    701.282,
+    18.758,
+    1035.047
+   ],
+   "sigma": [
+    0.284,
+    0.03,
+    0.211
+   ],
+   "method": "survey adjustment (deck:entrance.canopy_n)",
+   "views": [
+    "IMG_0792",
+    "IMG_0795"
+   ],
+   "res_px": {
+    "IMG_0792": 0.0,
+    "IMG_0795": 0.01
+   },
+   "note": "visitors entrance canopy, north front corner"
+  },
+  {
+   "name": "deck.entrance.canopy_ss",
+   "enu": [
+    701.82,
+    18.758,
+    1040.532
+   ],
+   "sigma": [
+    0.392,
+    0.03,
+    0.22
+   ],
+   "method": "survey adjustment (deck:entrance.canopy_s)",
+   "views": [
+    "IMG_0795"
+   ],
+   "res_px": {
+    "IMG_0795": 0.0
+   },
+   "note": "visitors entrance canopy, south front corner"
+  },
+  {
+   "name": "deck.entrance.jamb_n",
+   "enu": [
+    700.2,
+    15.585,
+    1036.447
+   ],
+   "sigma": [
+    0.862,
+    0.862,
+    0.862
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 15.4,
+   "note": "entrance glazing, north jamb at the floor",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.entrance.jamb_s",
+   "enu": [
+    701.828,
+    15.585,
+    1040.017
+   ],
+   "sigma": [
+    0.822,
+    0.822,
+    0.822
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 13.9,
+   "note": "entrance glazing, south jamb at the floor",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.letter.1",
+   "enu": [
+    707.354,
+    20.878,
+    1052.13
+   ],
+   "sigma": [
+    0.909,
+    0.909,
+    0.909
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 17.0,
+   "note": "raised letter centre",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.letter.2",
+   "enu": [
+    705.188,
+    20.789,
+    1047.382
+   ],
+   "sigma": [
+    0.845,
+    0.845,
+    0.845
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 14.6,
+   "note": "raised letter centre",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.letter.3",
+   "enu": [
+    703.108,
+    20.715,
+    1042.823
+   ],
+   "sigma": [
+    0.825,
+    0.825,
+    0.825
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 13.9,
+   "note": "raised letter centre",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.letter.4",
+   "enu": [
+    701.009,
+    20.845,
+    1038.22
+   ],
+   "sigma": [
+    0.854,
+    0.854,
+    0.854
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 14.9,
+   "note": "raised letter centre",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.letter.5",
+   "enu": [
+    699.071,
+    20.453,
+    1033.972
+   ],
+   "sigma": [
+    0.491,
+    0.491,
+    0.491
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 16.2,
+   "note": "raised letter centre",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.letter.6",
+   "enu": [
+    696.998,
+    20.798,
+    1029.427
+   ],
+   "sigma": [
+    0.558,
+    0.558,
+    0.558
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 20.6,
+   "note": "raised letter centre",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.letter.7",
+   "enu": [
+    694.83,
+    20.812,
+    1024.674
+   ],
+   "sigma": [
+    0.632,
+    0.632,
+    0.632
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 25.3,
+   "note": "raised letter centre",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#1",
+   "enu": [
+    708.997,
+    17.406,
+    1055.733
+   ],
+   "sigma": [
+    0.97,
+    0.97,
+    0.97
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 19.1,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#2",
+   "enu": [
+    707.3,
+    17.416,
+    1052.012
+   ],
+   "sigma": [
+    0.897,
+    0.897,
+    0.897
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 16.5,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#3",
+   "enu": [
+    705.604,
+    17.33,
+    1048.293
+   ],
+   "sigma": [
+    0.843,
+    0.843,
+    0.843
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0795"
+   ],
+   "range_m": 14.5,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#4",
+   "enu": [
+    696.579,
+    17.394,
+    1028.507
+   ],
+   "sigma": [
+    0.57,
+    0.57,
+    0.57
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 21.1,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#5",
+   "enu": [
+    694.936,
+    17.416,
+    1024.906
+   ],
+   "sigma": [
+    0.627,
+    0.627,
+    0.627
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 24.8,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#6",
+   "enu": [
+    693.272,
+    17.425,
+    1021.258
+   ],
+   "sigma": [
+    0.686,
+    0.686,
+    0.686
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 28.6,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#7",
+   "enu": [
+    690.471,
+    17.51,
+    1015.117
+   ],
+   "sigma": [
+    0.79,
+    0.79,
+    0.79
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 35.1,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#8",
+   "enu": [
+    688.851,
+    17.493,
+    1011.566
+   ],
+   "sigma": [
+    0.85,
+    0.85,
+    0.85
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 38.9,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#9",
+   "enu": [
+    687.147,
+    17.538,
+    1007.83
+   ],
+   "sigma": [
+    0.915,
+    0.915,
+    0.915
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 42.9,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#10",
+   "enu": [
+    684.261,
+    17.492,
+    1001.503
+   ],
+   "sigma": [
+    1.025,
+    1.025,
+    1.025
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 49.8,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#11",
+   "enu": [
+    682.685,
+    17.524,
+    998.047
+   ],
+   "sigma": [
+    1.086,
+    1.086,
+    1.086
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 53.5,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#12",
+   "enu": [
+    681.127,
+    17.556,
+    994.632
+   ],
+   "sigma": [
+    1.146,
+    1.146,
+    1.146
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 57.2,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#13",
+   "enu": [
+    678.368,
+    17.534,
+    988.584
+   ],
+   "sigma": [
+    1.254,
+    1.254,
+    1.254
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 63.8,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#14",
+   "enu": [
+    676.52,
+    17.567,
+    984.532
+   ],
+   "sigma": [
+    1.326,
+    1.326,
+    1.326
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 68.2,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#15",
+   "enu": [
+    674.898,
+    17.595,
+    980.975
+   ],
+   "sigma": [
+    1.389,
+    1.389,
+    1.389
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0792"
+   ],
+   "range_m": 72.1,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#16",
+   "enu": [
+    731.777,
+    17.585,
+    1105.675
+   ],
+   "sigma": [
+    1.003,
+    1.003,
+    1.003
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 49.4,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#17",
+   "enu": [
+    730.234,
+    17.532,
+    1102.292
+   ],
+   "sigma": [
+    0.948,
+    0.948,
+    0.948
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 45.7,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#18",
+   "enu": [
+    728.735,
+    17.481,
+    1099.006
+   ],
+   "sigma": [
+    0.896,
+    0.896,
+    0.896
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 42.1,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#19",
+   "enu": [
+    726.056,
+    17.511,
+    1093.132
+   ],
+   "sigma": [
+    0.805,
+    0.805,
+    0.805
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 35.7,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#20",
+   "enu": [
+    724.558,
+    17.446,
+    1089.848
+   ],
+   "sigma": [
+    0.756,
+    0.756,
+    0.756
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 32.2,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#21",
+   "enu": [
+    722.984,
+    17.379,
+    1086.398
+   ],
+   "sigma": [
+    0.706,
+    0.706,
+    0.706
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 28.5,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#22",
+   "enu": [
+    720.318,
+    17.194,
+    1080.553
+   ],
+   "sigma": [
+    0.626,
+    0.626,
+    0.626
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 22.3,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#23",
+   "enu": [
+    718.742,
+    17.199,
+    1077.097
+   ],
+   "sigma": [
+    0.582,
+    0.582,
+    0.582
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 18.7,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.window#24",
+   "enu": [
+    717.15,
+    17.277,
+    1073.606
+   ],
+   "sigma": [
+    0.542,
+    0.542,
+    0.542
+   ],
+   "method": "ray x plane wall",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 15.1,
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.pavilion#1",
+   "enu": [
+    685.6,
+    15.585,
+    963.3
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#2",
+   "enu": [
+    691.8,
+    15.585,
+    977.2
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#3",
+   "enu": [
+    704.2,
+    15.585,
+    1004.7
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#4",
+   "enu": [
+    710.5,
+    15.585,
+    1018.064
+   ],
+   "sigma": [
+    0.6,
+    0.05,
+    0.6
+   ],
+   "method": "photo measurement (v6:rebuild)",
+   "note": "[v6:rebuild] IMG_0793: SW corner (s 73.56, off 13.7) and SE glazing edge (off 20.33) cut on the measured south-face plane; north end by the 8.3 m length of #5 (GSI ortho centre 0.3 m away)"
+  },
+  {
+   "name": "deck.pavilion#5",
+   "enu": [
+    724.884,
+    15.585,
+    1044.059
+   ],
+   "sigma": [
+    0.8,
+    0.05,
+    0.8
+   ],
+   "method": "photo measurement (v6:rebuild)",
+   "note": "[v6:rebuild] edge fit of IMG_0794 / 0796 (well registered): west face off 16, north end s 94.9; 8.3 m long, 6.6 m wide as #4. IMG_0797's pose is not used (held only by its GPS fix)"
+  },
+  {
+   "name": "deck.pavilion#6",
+   "enu": [
+    729.864,
+    15.585,
+    1054.977
+   ],
+   "sigma": [
+    0.8,
+    0.05,
+    0.8
+   ],
+   "method": "photo measurement (v6:rebuild)",
+   "note": "[v6:rebuild] south end s 114.5 (corner in IMG_0794 / 0796 / 0798), west face off 16 (edge fit), north end bounded by the stack S56 in the gap: 6.9 m long. The GSI ortho centre (s 114.7) is 3.7 m south of this"
+  },
+  {
+   "name": "deck.pavilion#7",
+   "enu": [
+    741.9,
+    15.585,
+    1086.1
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#8",
+   "enu": [
+    748.2,
+    15.585,
+    1100.1
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.cone#1",
+   "enu": [
+    709.498,
+    15.585,
+    1030.581
+   ],
+   "sigma": [
+    0.258,
+    0.258,
+    0.258
+   ],
+   "method": "ray x plane deck",
+   "views": [
+    "IMG_0793"
+   ],
+   "range_m": 12.2,
+   "cluster": "deck0793"
+  },
+  {
+   "name": "deck.cone#2",
+   "enu": [
+    710.647,
+    15.585,
+    1033.402
+   ],
+   "sigma": [
+    0.198,
+    0.198,
+    0.198
+   ],
+   "method": "ray x plane deck",
+   "views": [
+    "IMG_0793"
+   ],
+   "range_m": 9.2,
+   "cluster": "deck0793"
+  },
+  {
+   "name": "deck.cone#3",
+   "enu": [
+    711.866,
+    15.585,
+    1036.356
+   ],
+   "sigma": [
+    0.137,
+    0.137,
+    0.137
+   ],
+   "method": "ray x plane deck",
+   "views": [
+    "IMG_0793"
+   ],
+   "range_m": 6.1,
+   "cluster": "deck0793"
+  },
+  {
+   "name": "deck.cone#4",
+   "enu": [
+    713.056,
+    15.585,
+    1039.146
+   ],
+   "sigma": [
+    0.088,
+    0.088,
+    0.088
+   ],
+   "method": "ray x plane deck",
+   "views": [
+    "IMG_0793"
+   ],
+   "range_m": 3.5,
+   "note": "[v6:rebuild] the cone's footprint centre on the deck (the first pick, v 4255, was half way up the cone: it put the cone 0.6 m too far)",
+   "cluster": "deck0793"
+  },
+  {
+   "name": "deck.lifeboat.end_n",
+   "enu": [
+    714.163,
+    15.585,
+    1031.295
+   ],
+   "sigma": [
+    0.233,
+    0.233,
+    0.233
+   ],
+   "method": "ray x plane deck",
+   "views": [
+    "IMG_0793"
+   ],
+   "range_m": 11.2,
+   "note": "lifeboat trailer, north (left) end at the deck",
+   "cluster": "deck0793"
+  },
+  {
+   "name": "deck.lifeboat.end_s",
+   "enu": [
+    716.329,
+    15.585,
+    1034.117
+   ],
+   "sigma": [
+    0.189,
+    0.189,
+    0.189
+   ],
+   "method": "ray x plane deck",
+   "views": [
+    "IMG_0793"
+   ],
+   "range_m": 9.1,
+   "note": "lifeboat trailer, south (right) end at the deck",
+   "cluster": "deck0793"
+  },
+  {
+   "name": "deck.studio.door",
+   "enu": [
+    735.977,
+    15.585,
+    1107.226
+   ],
+   "sigma": [
+    0.669,
+    0.669,
+    0.669
+   ],
+   "method": "ray x plane studio",
+   "views": [
+    "IMG_0798"
+   ],
+   "range_m": 52.2,
+   "note": "[v6:rebuild] cooking-studio door, centre at the deck, cut on the studio face plane (IMG_0798; IMG_0794 (2026, 2848) and IMG_0796 (2743, 2237) cut to within 0.27 m). The earlier value (the mean of the canopy corners) sat 7 m north of the face: the three views look along the canopy's depth (5-10 deg apart), so its corners' depth was unconstrained",
+   "cluster": "deck"
+  },
+  {
+   "name": "deck.studio.window",
+   "enu": [
+    739.866,
+    17.453,
+    1105.606
+   ],
+   "sigma": [
+    0.018,
+    0.017,
+    0.019
+   ],
+   "method": "survey adjustment (deck:studio.winB_tl+studio.winB_tr+studio.winB_bl+studio.winB_br)",
+   "views": [
+    "IMG_0794",
+    "IMG_0796",
+    "IMG_0798"
+   ],
+   "res_px": {
+    "IMG_0794": 3.25,
+    "IMG_0796": 2.36,
+    "IMG_0798": 3.83
+   },
+   "note": "studio window left of the door, centre"
+  },
+  {
+   "name": "deck.studio.mascot",
+   "enu": [
+    738.691,
+    19.936,
+    1106.098
+   ],
+   "sigma": [
+    0.053,
+    0.047,
+    0.081
+   ],
+   "method": "survey adjustment (deck:studio.mascot)",
+   "views": [
+    "IMG_0794",
+    "IMG_0796",
+    "IMG_0798"
+   ],
+   "res_px": {
+    "IMG_0794": 0.61,
+    "IMG_0796": 1.49,
+    "IMG_0798": 1.8
+   }
+  },
+  {
+   "name": "deck.studio.louvre_ne",
+   "enu": [
+    753.804,
+    24.96,
+    1105.251
+   ],
+   "sigma": [
+    0.28,
+    0.03,
+    0.412
+   ],
+   "method": "survey adjustment (deck:studio.louvre_tl)",
+   "views": [
+    "IMG_0794",
+    "IMG_0796",
+    "IMG_0798"
+   ],
+   "res_px": {
+    "IMG_0794": 1.55,
+    "IMG_0796": 2.72,
+    "IMG_0798": 5.35
+   },
+   "note": "louvred plant box on the studio roof, NE top corner"
+  },
+  {
+   "name": "deck.studio.louvre_nw",
+   "enu": [
+    744.362,
+    24.973,
+    1109.74
+   ],
+   "sigma": [
+    0.026,
+    0.025,
+    0.029
+   ],
+   "method": "survey adjustment (deck:studio.louvre_tr)",
+   "views": [
+    "IMG_0794",
+    "IMG_0796",
+    "IMG_0798"
+   ],
+   "res_px": {
+    "IMG_0794": 4.48,
+    "IMG_0796": 2.57,
+    "IMG_0798": 4.97
+   }
+  },
+  {
+   "name": "canopy.beam_bottom",
+   "enu": [
+    563.772,
+    5.818,
+    663.951
+   ],
+   "sigma": [
+    0.609,
+    0.609,
+    0.609
+   ],
+   "method": "ray x plane shedface",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 33.1,
+   "note": "underside of the outermost ceiling beam at the open quay face, seen from inside the hall (IMG_0855)",
+   "cluster": "canopy"
+  }
+ ],
+ "dims": [
+  {
+   "name": "deck.y",
+   "value": 15.585,
+   "sigma": 0.15,
+   "note": "T.P. of the deck: survey adjustment (eye heights 1.45 m, pylon top 115 m); formal 0.02"
+  },
+  {
+   "name": "deck.wall_h",
+   "value": 6.603,
+   "sigma": 0.1,
+   "note": "penthouse wall top above the deck"
+  },
+  {
+   "name": "deck.studio_h",
+   "value": 6.534,
+   "sigma": 0.1,
+   "note": "studio parapet top above the deck"
+  },
+  {
+   "name": "deck.pavilions",
+   "value": 8,
+   "sigma": 0,
+   "note": "GSI ortho: 8 pavilions in 4 pairs"
+  },
+  {
+   "name": "deck.wall_len",
+   "value": 159.83,
+   "sigma": 1.5,
+   "note": "penthouse east wall, NE corner to the studio corner"
+  },
+  {
+   "name": "canopy.floor_y",
+   "value": 2.19,
+   "sigma": 0.15,
+   "note": "hall floor T.P. from the canopy adjustment (eye 1.45 m, apron 1.85, quay top 1.8)"
+  },
+  {
+   "name": "canopy.open_depth",
+   "value": 39.0,
+   "sigma": 1.5,
+   "note": "the camera stood 39 m in from the quay edge (27 m inside the hall) and saw straight out: no back wall within that depth"
+  },
+  {
+   "name": "canopy.soffit_y",
+   "value": 5.82,
+   "sigma": 0.6,
+   "note": "underside of the outermost ceiling beam at the quay face (feature canopy.beam_bottom): 3.6 m above the hall floor"
+  }
+ ]
+}

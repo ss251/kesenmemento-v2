@@ -22,6 +22,21 @@
   {
    "id": "osm",
    "what": "OpenStreetMap names and tags (© OpenStreetMap contributors, ODbL), as already in the layout"
+  },
+  {
+   "id": "web",
+   "what": "burankoutyu.com/?p=450: ホテル望洋, 白い外壁の5階建て (closed after the 2017 bankruptcy, not demolished); read 2026-10-03",
+   "date": "2026-10-03"
+  },
+  {
+   "id": "idemitsu",
+   "what": "Idemitsu SS list for 気仙沼市 (map.idemitsu.com, citycode 04205) and gogo.gs/shop/0407000052: apollostation カーランド鹿折SS, (株)気仙沼商会, 新浜町2-2-10",
+   "date": "2026-10-03"
+  },
+  {
+   "id": "fukuju",
+   "what": "fukujusuisan.co.jp/about: 本浜工場 気仙沼市本浜町1-62-1 (OSM n7298264279 蝠寿水産 is a typo)",
+   "date": "2026-10-03"
   }
  ],
  "lots": [
@@ -53,7 +68,9 @@
     "shape": "flat",
     "color": "#dedfe2"
    },
-   "src": "earth: n1 top + o0, the station's single-storey sales building (昭和シェル), light grey roof"
+   "src": "earth: n1 top + o0, the station's single-storey sales building, light grey roof; idemitsu: apollostation カーランド鹿折SS (株)気仙沼商会, 新浜町2-2-10",
+   "name": "apollostation カーランド鹿折SS",
+   "nameEn": "apollostation Carland Shishiori"
   },
   {
    "id": "16/58541/25067/287",
@@ -338,7 +355,7 @@
   {
    "id": "16/58542/25067/45",
    "height": 9.0,
-   "src": "earth: m2 o0, part of 蝠寿水産 (was 11.1 m)"
+   "src": "earth: m2 o0, part of 福寿水産 (was 11.1 m)"
   },
   {
    "id": "16/58542/25067/46",
@@ -349,7 +366,9 @@
     "shape": "flat",
     "color": "#d6d6d8"
    },
-   "src": "earth: m2 top + o0, 蝠寿水産's plant, about 9 m (was a 5-storey office)"
+   "src": "fukuju: 福寿水産 本浜工場, 本浜町1-62-1; earth: m2 top + o0, 福寿水産's plant, about 9 m (was a 5-storey office)",
+   "name": "福寿水産 本浜工場",
+   "nameEn": "Fukuju Suisan Honhama plant"
   },
   {
    "id": "16/58542/25067/47",
@@ -408,14 +427,8 @@
   },
   {
    "id": "16/58541/25067/332",
-   "kind": "hotel",
-   "storeys": 3,
-   "height": 10.0,
-   "roof": {
-    "shape": "flat",
-    "color": "#b0aeb2"
-   },
-   "src": "earth: s1 top + o0 / o180, the former hotel steps down the slope in terraces under grey roofs, about three storeys above each step (was a 6-storey block, 21 m, with a saw roof)"
+   "remove": true,
+   "src": "earth: t-boyo top + o0/o90, split into the hip-roofed hall and the flat terraces (ovr:c3:boyo-hall, ovr:c3:boyo-terraces)"
   },
   {
    "id": "16/58541/25068/16",
@@ -695,6 +708,383 @@
     "color": "#c9c6bc"
    },
    "src": "earth: m2 top + o0, a new low plant by the quay road (a tan and a grey roof bay), on what GSI shows as open paving"
+  },
+  {
+   "id": "ovr:c3:hamacho-n-new",
+   "poly": [
+    [
+     659,
+     -783
+    ],
+    [
+     674,
+     -783
+    ],
+    [
+     674,
+     -773
+    ],
+    [
+     659,
+     -772
+    ]
+   ],
+   "kind": "office",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#4f5459"
+   },
+   "src": "osm: w1286457742 + earth: n2 top, a two-storey building with a dark grey roof on what GSI shows as a vacant gravel lot"
+  },
+  {
+   "id": "ovr:c3:corner-prefab-1",
+   "poly": [
+    [
+     441,
+     -783
+    ],
+    [
+     445.5,
+     -783
+    ],
+    [
+     445.5,
+     -774
+    ],
+    [
+     441,
+     -774
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 2.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#e4e6e4"
+   },
+   "wall": "#2f6a6a",
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one)"
+  },
+  {
+   "id": "ovr:c3:corner-prefab-2",
+   "poly": [
+    [
+     447,
+     -787.9
+    ],
+    [
+     454,
+     -784.05
+    ],
+    [
+     454,
+     -780
+    ],
+    [
+     447,
+     -780
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 2.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#e4e6e4"
+   },
+   "wall": "#2f6a6a",
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one); the north-east corner clipped at road r9781's south kerb (the unit sits along the road)"
+  },
+  {
+   "id": "ovr:c3:corner-prefab-3",
+   "poly": [
+    [
+     451.5,
+     -780
+    ],
+    [
+     455,
+     -780
+    ],
+    [
+     455,
+     -774
+    ],
+    [
+     451.5,
+     -774
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 2.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#e4e6e4"
+   },
+   "wall": "#2f6a6a",
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one)"
+  },
+  {
+   "id": "ovr:c3:corner-prefab-4",
+   "poly": [
+    [
+     439.5,
+     -773.5
+    ],
+    [
+     452.5,
+     -773.5
+    ],
+    [
+     452.5,
+     -768
+    ],
+    [
+     439.5,
+     -768
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 2.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#e4e6e4"
+   },
+   "wall": "#2f6a6a",
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one)"
+  },
+  {
+   "id": "ovr:c3:yard-shed-s",
+   "poly": [
+    [
+     562,
+     -595
+    ],
+    [
+     582,
+     -595
+    ],
+    [
+     582,
+     -588
+    ],
+    [
+     562,
+     -588
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 5.5,
+   "roof": {
+    "shape": "gable",
+    "color": "#9a7f78",
+    "ridge": "x"
+   },
+   "src": "earth: m2 top + o0/o90/o180, a shed on the yard's south edge along the road, two-tone mauve/tan roof (GSI: vacant)"
+  },
+  {
+   "id": "ovr:c3:marutoyo-annex-w",
+   "poly": [
+    [
+     659,
+     -466
+    ],
+    [
+     668,
+     -466
+    ],
+    [
+     675,
+     -463
+    ],
+    [
+     675,
+     -453
+    ],
+    [
+     659,
+     -453
+    ]
+   ],
+   "kind": "factory",
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#d6d7d4"
+   },
+   "src": "earth: m2 top + o0/o90/o180/o270, low white plant blocks south-west of マルトヨ食品 (GSI shows them; no GSI footprint)"
+  },
+  {
+   "id": "ovr:c3:marutoyo-annex-e",
+   "poly": [
+    [
+     677,
+     -463
+    ],
+    [
+     689,
+     -463
+    ],
+    [
+     689,
+     -448
+    ],
+    [
+     677,
+     -448
+    ]
+   ],
+   "kind": "factory",
+   "height": 4.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#d6d7d4"
+   },
+   "src": "earth: m2 top + o0/o90/o180/o270, low white plant blocks south-west of マルトヨ食品 (GSI shows them; no GSI footprint)"
+  },
+  {
+   "id": "ovr:c3:boyo-hall",
+   "poly": [
+    [
+     362.5,
+     -294.9
+    ],
+    [
+     379,
+     -308.6
+    ],
+    [
+     385.6,
+     -306.8
+    ],
+    [
+     384.6,
+     -302.8
+    ],
+    [
+     387.4,
+     -293.7
+    ],
+    [
+     384.9,
+     -284.1
+    ],
+    [
+     385.6,
+     -283.1
+    ],
+    [
+     387.2,
+     -282.8
+    ],
+    [
+     386.3,
+     -279.1
+    ],
+    [
+     382.8,
+     -279.8
+    ],
+    [
+     372,
+     -276
+    ],
+    [
+     356.6,
+     -288.3
+    ],
+    [
+     361.9,
+     -292.9
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 2,
+   "height": 9,
+   "roof": {
+    "shape": "hip",
+    "color": "#8a8a8c"
+   },
+   "src": "earth: t-boyo top + o0/o90, the former hotel's north-east end is a large multi-facet hipped grey roof hall (part of OSM way 781684041); storeys 2 so the town builder draws the hip roof (with 3+ storeys a hotel is drawn as a flat-roofed office block)"
+  },
+  {
+   "id": "ovr:c3:boyo-terraces",
+   "poly": [
+    [
+     356.6,
+     -288.3
+    ],
+    [
+     372,
+     -276
+    ],
+    [
+     382.8,
+     -279.8
+    ],
+    [
+     375.6,
+     -253
+    ],
+    [
+     379.7,
+     -252
+    ],
+    [
+     376.1,
+     -237.5
+    ],
+    [
+     371.4,
+     -238.5
+    ],
+    [
+     371,
+     -236.8
+    ],
+    [
+     354.7,
+     -236.8
+    ],
+    [
+     355.6,
+     -240
+    ],
+    [
+     349.9,
+     -241.7
+    ],
+    [
+     357.7,
+     -275.1
+    ],
+    [
+     353.5,
+     -275.9
+    ],
+    [
+     355,
+     -282.2
+    ],
+    [
+     354,
+     -282.4
+    ],
+    [
+     355.4,
+     -288.6
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 5,
+   "height": 17,
+   "roof": {
+    "shape": "flat",
+    "color": "#b0aeb2"
+   },
+   "name": "旧ホテル望洋館",
+   "nameEn": "former Hotel Boyo",
+   "src": "osm: way 781684041 building:levels 6; web: 5階建て per burankoutyu.com/?p=450; earth: t-boyo top + o0/o90, terraced flat roofs (2D drape, no height)"
   }
  ],
  "landuse": [
@@ -757,8 +1147,16 @@
      -783
     ],
     [
-     452,
+     439,
      -783
+    ],
+    [
+     439,
+     -766
+    ],
+    [
+     452,
+     -766
     ],
     [
      452,
@@ -769,7 +1167,7 @@
      -664
     ]
    ],
-   "src": "earth: n1 top, an empty block of dry weeds between the two streets"
+   "src": "earth: n1 top, an empty block of dry weeds between the two streets (the corner yard at x 439-452, z -783..-766 is gravel, landuse ovr below)"
   },
   {
    "use": "vacant",
@@ -1162,6 +1560,121 @@
     ]
    ],
    "src": "earth: s1 top, a contractor's gravel yard with stacked materials"
+  },
+  {
+   "use": "vacant",
+   "surface": "gravel",
+   "ring": [
+    [
+     437,
+     -792.5
+    ],
+    [
+     447,
+     -787.6
+    ],
+    [
+     457,
+     -782
+    ],
+    [
+     459.2,
+     -781.5
+    ],
+    [
+     458.6,
+     -766
+    ],
+    [
+     439,
+     -766
+    ],
+    [
+     439,
+     -780
+    ],
+    [
+     437,
+     -780
+    ]
+   ],
+   "src": "earth: n1 top + o0/o180, the pale gravel yard at the road corner under the four prefab units (GSI: one dark roof)"
+  },
+  {
+   "use": "park",
+   "ring": [
+    [
+     330,
+     -448
+    ],
+    [
+     349,
+     -440
+    ],
+    [
+     370,
+     -435
+    ],
+    [
+     372,
+     -402
+    ],
+    [
+     372,
+     -380
+    ],
+    [
+     362,
+     -352
+    ],
+    [
+     330,
+     -336
+    ]
+   ],
+   "src": "earth 2026-03-11 c3/r1003 + c2/r1003 top: the mown terraces end at x≈370 and z≈-350"
+  },
+  {
+   "use": "forest",
+   "ring": [
+    [
+     372,
+     -455
+    ],
+    [
+     411,
+     -455
+    ],
+    [
+     413,
+     -428
+    ],
+    [
+     407,
+     -380
+    ],
+    [
+     397,
+     -357
+    ],
+    [
+     390,
+     -340
+    ],
+    [
+     330,
+     -336
+    ],
+    [
+     362,
+     -352
+    ],
+    [
+     372,
+     -380
+    ]
+   ],
+   "src": "earth 2026-03-11 c3/r1003 top + pair_o0: closed broadleaf woods on the east and south-east slopes of 陣山 between the terraces and the 3丁目 back lots; GSI photo agrees"
   }
  ]
 }

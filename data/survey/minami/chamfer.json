@@ -1,0 +1,3248 @@
+{
+ "note": "Edge chamfer app -> photo (tools/anime/photo-align.mjs): px in the --h frame and at full resolution, per tag (before / after a rebuild).",
+ "tags": {
+  "before": {
+   "IMG_0799": {
+    "id": "IMG_0799",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 43395,
+    "chamfer": {
+     "mean": 63.66,
+     "median": 25,
+     "p90": 205.35
+    },
+    "chamferFullRes": {
+     "mean": 178.2,
+     "median": 70,
+     "p90": 575
+    }
+   },
+   "IMG_0800": {
+    "id": "IMG_0800",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 67406,
+    "chamfer": {
+     "mean": 37.85,
+     "median": 8,
+     "p90": 158.8
+    },
+    "chamferFullRes": {
+     "mean": 150.1,
+     "median": 31.7,
+     "p90": 629.9
+    }
+   },
+   "IMG_0801": {
+    "id": "IMG_0801",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 66077,
+    "chamfer": {
+     "mean": 23.11,
+     "median": 5.39,
+     "p90": 57.58
+    },
+    "chamferFullRes": {
+     "mean": 64.7,
+     "median": 15.1,
+     "p90": 161.2
+    }
+   },
+   "IMG_0802": {
+    "id": "IMG_0802",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 64362,
+    "chamfer": {
+     "mean": 17.01,
+     "median": 7,
+     "p90": 38
+    },
+    "chamferFullRes": {
+     "mean": 47.6,
+     "median": 19.6,
+     "p90": 106.4
+    }
+   },
+   "IMG_0803": {
+    "id": "IMG_0803",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 45568,
+    "chamfer": {
+     "mean": 8.41,
+     "median": 5,
+     "p90": 20.22
+    },
+    "chamferFullRes": {
+     "mean": 23.5,
+     "median": 14,
+     "p90": 56.6
+    }
+   },
+   "IMG_0805": {
+    "id": "IMG_0805",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 46691,
+    "chamfer": {
+     "mean": 11.81,
+     "median": 7,
+     "p90": 28.86
+    },
+    "chamferFullRes": {
+     "mean": 46.8,
+     "median": 27.8,
+     "p90": 114.5
+    }
+   },
+   "IMG_0806": {
+    "id": "IMG_0806",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 45197,
+    "chamfer": {
+     "mean": 12.74,
+     "median": 7,
+     "p90": 32.98
+    },
+    "chamferFullRes": {
+     "mean": 50.5,
+     "median": 27.8,
+     "p90": 130.8
+    }
+   },
+   "IMG_0807": {
+    "id": "IMG_0807",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 34561,
+    "chamfer": {
+     "mean": 9.61,
+     "median": 5.66,
+     "p90": 26.02
+    },
+    "chamferFullRes": {
+     "mean": 38.1,
+     "median": 22.4,
+     "p90": 103.2
+    }
+   },
+   "IMG_0808": {
+    "id": "IMG_0808",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 27915,
+    "chamfer": {
+     "mean": 6.74,
+     "median": 4,
+     "p90": 17
+    },
+    "chamferFullRes": {
+     "mean": 26.8,
+     "median": 15.9,
+     "p90": 67.4
+    }
+   },
+   "IMG_0809": {
+    "id": "IMG_0809",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 25465,
+    "chamfer": {
+     "mean": 8.38,
+     "median": 3.16,
+     "p90": 18.25
+    },
+    "chamferFullRes": {
+     "mean": 33.2,
+     "median": 12.5,
+     "p90": 72.4
+    }
+   },
+   "IMG_0810": {
+    "id": "IMG_0810",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 34096,
+    "chamfer": {
+     "mean": 10.32,
+     "median": 2.83,
+     "p90": 34.46
+    },
+    "chamferFullRes": {
+     "mean": 40.9,
+     "median": 11.2,
+     "p90": 136.7
+    }
+   },
+   "IMG_0811": {
+    "id": "IMG_0811",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 30089,
+    "chamfer": {
+     "mean": 8.34,
+     "median": 3,
+     "p90": 18.03
+    },
+    "chamferFullRes": {
+     "mean": 33.1,
+     "median": 11.9,
+     "p90": 71.5
+    }
+   },
+   "IMG_0812": {
+    "id": "IMG_0812",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 28573,
+    "chamfer": {
+     "mean": 6.72,
+     "median": 3,
+     "p90": 12.53
+    },
+    "chamferFullRes": {
+     "mean": 26.7,
+     "median": 11.9,
+     "p90": 49.7
+    }
+   },
+   "IMG_0813": {
+    "id": "IMG_0813",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 45505,
+    "chamfer": {
+     "mean": 15.29,
+     "median": 8,
+     "p90": 35.17
+    },
+    "chamferFullRes": {
+     "mean": 60.7,
+     "median": 31.7,
+     "p90": 139.5
+    }
+   },
+   "IMG_0814": {
+    "id": "IMG_0814",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 44260,
+    "chamfer": {
+     "mean": 26.08,
+     "median": 14,
+     "p90": 65.19
+    },
+    "chamferFullRes": {
+     "mean": 73,
+     "median": 39.2,
+     "p90": 182.5
+    }
+   },
+   "IMG_0815": {
+    "id": "IMG_0815",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 59369,
+    "chamfer": {
+     "mean": 17.01,
+     "median": 11,
+     "p90": 41.01
+    },
+    "chamferFullRes": {
+     "mean": 47.6,
+     "median": 30.8,
+     "p90": 114.8
+    }
+   },
+   "IMG_0816": {
+    "id": "IMG_0816",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 39407,
+    "chamfer": {
+     "mean": 14.34,
+     "median": 6,
+     "p90": 37.64
+    },
+    "chamferFullRes": {
+     "mean": 40.1,
+     "median": 16.8,
+     "p90": 105.4
+    }
+   },
+   "IMG_0817": {
+    "id": "IMG_0817",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 59813,
+    "chamfer": {
+     "mean": 16.3,
+     "median": 8.06,
+     "p90": 43.46
+    },
+    "chamferFullRes": {
+     "mean": 45.6,
+     "median": 22.6,
+     "p90": 121.7
+    }
+   },
+   "IMG_0818": {
+    "id": "IMG_0818",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 44778,
+    "chamfer": {
+     "mean": 24.93,
+     "median": 13.34,
+     "p90": 66.19
+    },
+    "chamferFullRes": {
+     "mean": 69.8,
+     "median": 37.4,
+     "p90": 185.3
+    }
+   },
+   "IMG_0819": {
+    "id": "IMG_0819",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 2329,
+    "chamfer": {
+     "mean": 36.45,
+     "median": 19,
+     "p90": 111.84
+    },
+    "chamferFullRes": {
+     "mean": 102.1,
+     "median": 53.2,
+     "p90": 313.2
+    }
+   },
+   "IMG_0820": {
+    "id": "IMG_0820",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 43193,
+    "chamfer": {
+     "mean": 17.95,
+     "median": 8.25,
+     "p90": 42.57
+    },
+    "chamferFullRes": {
+     "mean": 50.3,
+     "median": 23.1,
+     "p90": 119.2
+    }
+   },
+   "IMG_0821": {
+    "id": "IMG_0821",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 46369,
+    "chamfer": {
+     "mean": 15.93,
+     "median": 12,
+     "p90": 38
+    },
+    "chamferFullRes": {
+     "mean": 44.6,
+     "median": 33.6,
+     "p90": 106.4
+    }
+   },
+   "IMG_0822": {
+    "id": "IMG_0822",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 40500,
+    "chamfer": {
+     "mean": 19.13,
+     "median": 9.85,
+     "p90": 53.01
+    },
+    "chamferFullRes": {
+     "mean": 53.6,
+     "median": 27.6,
+     "p90": 148.4
+    }
+   },
+   "IMG_0823": {
+    "id": "IMG_0823",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 53678,
+    "chamfer": {
+     "mean": 76.3,
+     "median": 21.19,
+     "p90": 258.99
+    },
+    "chamferFullRes": {
+     "mean": 213.7,
+     "median": 59.3,
+     "p90": 725.2
+    }
+   },
+   "IMG_0824": {
+    "id": "IMG_0824",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 40249,
+    "chamfer": {
+     "mean": 12.42,
+     "median": 7.07,
+     "p90": 31.33
+    },
+    "chamferFullRes": {
+     "mean": 34.8,
+     "median": 19.8,
+     "p90": 87.7
+    }
+   },
+   "IMG_0825": {
+    "id": "IMG_0825",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 37883,
+    "chamfer": {
+     "mean": 13.91,
+     "median": 8.94,
+     "p90": 32
+    },
+    "chamferFullRes": {
+     "mean": 39,
+     "median": 25,
+     "p90": 89.6
+    }
+   },
+   "IMG_0826": {
+    "id": "IMG_0826",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 36568,
+    "chamfer": {
+     "mean": 15.56,
+     "median": 7.81,
+     "p90": 41.18
+    },
+    "chamferFullRes": {
+     "mean": 61.7,
+     "median": 31,
+     "p90": 163.4
+    }
+   },
+   "IMG_0827": {
+    "id": "IMG_0827",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 42096,
+    "chamfer": {
+     "mean": 15.92,
+     "median": 8.06,
+     "p90": 41.62
+    },
+    "chamferFullRes": {
+     "mean": 63.1,
+     "median": 32,
+     "p90": 165.1
+    }
+   },
+   "IMG_0828": {
+    "id": "IMG_0828",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 55241,
+    "chamfer": {
+     "mean": 15.01,
+     "median": 6.08,
+     "p90": 40.31
+    },
+    "chamferFullRes": {
+     "mean": 59.5,
+     "median": 24.1,
+     "p90": 159.9
+    }
+   },
+   "IMG_0829": {
+    "id": "IMG_0829",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 47310,
+    "chamfer": {
+     "mean": 22.35,
+     "median": 7.07,
+     "p90": 71.59
+    },
+    "chamferFullRes": {
+     "mean": 88.6,
+     "median": 28,
+     "p90": 284
+    }
+   },
+   "IMG_0830": {
+    "id": "IMG_0830",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 28319,
+    "chamfer": {
+     "mean": 18.32,
+     "median": 10.2,
+     "p90": 49.02
+    },
+    "chamferFullRes": {
+     "mean": 72.7,
+     "median": 40.5,
+     "p90": 194.4
+    }
+   },
+   "IMG_0831": {
+    "id": "IMG_0831",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 37806,
+    "chamfer": {
+     "mean": 13.67,
+     "median": 6.32,
+     "p90": 31.4
+    },
+    "chamferFullRes": {
+     "mean": 54.2,
+     "median": 25.1,
+     "p90": 124.6
+    }
+   },
+   "IMG_0832": {
+    "id": "IMG_0832",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 45619,
+    "chamfer": {
+     "mean": 13.65,
+     "median": 7,
+     "p90": 37.22
+    },
+    "chamferFullRes": {
+     "mean": 54.1,
+     "median": 27.8,
+     "p90": 147.6
+    }
+   },
+   "IMG_0834": {
+    "id": "IMG_0834",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 28982,
+    "chamfer": {
+     "mean": 20.42,
+     "median": 6,
+     "p90": 42
+    },
+    "chamferFullRes": {
+     "mean": 81,
+     "median": 23.8,
+     "p90": 166.6
+    }
+   },
+   "IMG_0835": {
+    "id": "IMG_0835",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 24467,
+    "chamfer": {
+     "mean": 23.76,
+     "median": 11.4,
+     "p90": 65.37
+    },
+    "chamferFullRes": {
+     "mean": 66.5,
+     "median": 31.9,
+     "p90": 183
+    }
+   },
+   "IMG_0836": {
+    "id": "IMG_0836",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 25062,
+    "chamfer": {
+     "mean": 20.89,
+     "median": 9,
+     "p90": 63.95
+    },
+    "chamferFullRes": {
+     "mean": 58.5,
+     "median": 25.2,
+     "p90": 179.1
+    }
+   },
+   "IMG_0837": {
+    "id": "IMG_0837",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 23912,
+    "chamfer": {
+     "mean": 23,
+     "median": 6,
+     "p90": 41.19
+    },
+    "chamferFullRes": {
+     "mean": 91.2,
+     "median": 23.8,
+     "p90": 163.4
+    }
+   },
+   "IMG_0838": {
+    "id": "IMG_0838",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 28189,
+    "chamfer": {
+     "mean": 41.74,
+     "median": 4.47,
+     "p90": 137.58
+    },
+    "chamferFullRes": {
+     "mean": 116.9,
+     "median": 12.5,
+     "p90": 385.2
+    }
+   },
+   "IMG_0839": {
+    "id": "IMG_0839",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 33695,
+    "chamfer": {
+     "mean": 15.67,
+     "median": 3,
+     "p90": 23.02
+    },
+    "chamferFullRes": {
+     "mean": 43.9,
+     "median": 8.4,
+     "p90": 64.5
+    }
+   },
+   "IMG_0840": {
+    "id": "IMG_0840",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 10519,
+    "chamfer": {
+     "mean": 24.81,
+     "median": 17,
+     "p90": 60.03
+    },
+    "chamferFullRes": {
+     "mean": 69.5,
+     "median": 47.6,
+     "p90": 168.1
+    }
+   },
+   "IMG_0841": {
+    "id": "IMG_0841",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 12064,
+    "chamfer": {
+     "mean": 36.55,
+     "median": 26.08,
+     "p90": 91.38
+    },
+    "chamferFullRes": {
+     "mean": 102.4,
+     "median": 73,
+     "p90": 255.9
+    }
+   },
+   "IMG_0888": {
+    "id": "IMG_0888",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 28531,
+    "chamfer": {
+     "mean": 39.66,
+     "median": 25.71,
+     "p90": 94.05
+    },
+    "chamferFullRes": {
+     "mean": 111.1,
+     "median": 72,
+     "p90": 263.3
+    }
+   },
+   "IMG_0890": {
+    "id": "IMG_0890",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 22653,
+    "chamfer": {
+     "mean": 8.8,
+     "median": 3,
+     "p90": 32
+    },
+    "chamferFullRes": {
+     "mean": 24.6,
+     "median": 8.4,
+     "p90": 89.6
+    }
+   },
+   "IMG_0891": {
+    "id": "IMG_0891",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 40689,
+    "chamfer": {
+     "mean": 11.41,
+     "median": 7,
+     "p90": 27
+    },
+    "chamferFullRes": {
+     "mean": 31.9,
+     "median": 19.6,
+     "p90": 75.6
+    }
+   },
+   "IMG_0893": {
+    "id": "IMG_0893",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 15686,
+    "chamfer": {
+     "mean": 15.01,
+     "median": 14,
+     "p90": 26.93
+    },
+    "chamferFullRes": {
+     "mean": 42,
+     "median": 39.2,
+     "p90": 75.4
+    }
+   },
+   "IMG_0894": {
+    "id": "IMG_0894",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 58502,
+    "chamfer": {
+     "mean": 24.05,
+     "median": 11,
+     "p90": 65
+    },
+    "chamferFullRes": {
+     "mean": 67.3,
+     "median": 30.8,
+     "p90": 182
+    }
+   },
+   "IMG_0895": {
+    "id": "IMG_0895",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 52777,
+    "chamfer": {
+     "mean": 22.92,
+     "median": 5,
+     "p90": 60
+    },
+    "chamferFullRes": {
+     "mean": 64.2,
+     "median": 14,
+     "p90": 168
+    }
+   },
+   "IMG_0896": {
+    "id": "IMG_0896",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 47963,
+    "chamfer": {
+     "mean": 16.18,
+     "median": 8,
+     "p90": 39
+    },
+    "chamferFullRes": {
+     "mean": 45.3,
+     "median": 22.4,
+     "p90": 109.2
+    }
+   },
+   "IMG_0907": {
+    "id": "IMG_0907",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 37647,
+    "chamfer": {
+     "mean": 29.31,
+     "median": 13.93,
+     "p90": 84.76
+    },
+    "chamferFullRes": {
+     "mean": 82.1,
+     "median": 39,
+     "p90": 237.3
+    }
+   },
+   "IMG_0908": {
+    "id": "IMG_0908",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 39848,
+    "chamfer": {
+     "mean": 21.5,
+     "median": 14.27,
+     "p90": 54.01
+    },
+    "chamferFullRes": {
+     "mean": 60.2,
+     "median": 39.9,
+     "p90": 151.2
+    }
+   },
+   "IMG_0911": {
+    "id": "IMG_0911",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 41597,
+    "chamfer": {
+     "mean": 23.1,
+     "median": 13,
+     "p90": 71.06
+    },
+    "chamferFullRes": {
+     "mean": 64.7,
+     "median": 36.4,
+     "p90": 199
+    }
+   },
+   "IMG_0912": {
+    "id": "IMG_0912",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 44026,
+    "chamfer": {
+     "mean": 23.76,
+     "median": 15,
+     "p90": 68.03
+    },
+    "chamferFullRes": {
+     "mean": 66.5,
+     "median": 42,
+     "p90": 190.5
+    }
+   },
+   "IMG_0913": {
+    "id": "IMG_0913",
+    "tag": "before",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 50409,
+    "chamfer": {
+     "mean": 19.11,
+     "median": 9,
+     "p90": 52.61
+    },
+    "chamferFullRes": {
+     "mean": 53.5,
+     "median": 25.2,
+     "p90": 147.3
+    }
+   },
+   "_summary": {
+    "photos": 53,
+    "mean": 20.88,
+    "p90": 57.28,
+    "at": "2026-10-03T10:07:28.990Z"
+   }
+  },
+  "after": {
+   "IMG_0799": {
+    "id": "IMG_0799",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 44905,
+    "chamfer": {
+     "mean": 22.03,
+     "median": 5.66,
+     "p90": 78.85
+    },
+    "chamferFullRes": {
+     "mean": 61.7,
+     "median": 15.8,
+     "p90": 220.8
+    }
+   },
+   "IMG_0800": {
+    "id": "IMG_0800",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 60311,
+    "chamfer": {
+     "mean": 11.97,
+     "median": 4.12,
+     "p90": 25.02
+    },
+    "chamferFullRes": {
+     "mean": 47.5,
+     "median": 16.4,
+     "p90": 99.2
+    }
+   },
+   "IMG_0801": {
+    "id": "IMG_0801",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 61014,
+    "chamfer": {
+     "mean": 12.38,
+     "median": 4.12,
+     "p90": 29.15
+    },
+    "chamferFullRes": {
+     "mean": 34.7,
+     "median": 11.5,
+     "p90": 81.6
+    }
+   },
+   "IMG_0802": {
+    "id": "IMG_0802",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 58247,
+    "chamfer": {
+     "mean": 7.49,
+     "median": 4.47,
+     "p90": 18.44
+    },
+    "chamferFullRes": {
+     "mean": 21,
+     "median": 12.5,
+     "p90": 51.6
+    }
+   },
+   "IMG_0803": {
+    "id": "IMG_0803",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 46080,
+    "chamfer": {
+     "mean": 7.52,
+     "median": 4.47,
+     "p90": 18
+    },
+    "chamferFullRes": {
+     "mean": 21.1,
+     "median": 12.5,
+     "p90": 50.4
+    }
+   },
+   "IMG_0805": {
+    "id": "IMG_0805",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 46977,
+    "chamfer": {
+     "mean": 9.42,
+     "median": 5,
+     "p90": 24.02
+    },
+    "chamferFullRes": {
+     "mean": 37.4,
+     "median": 19.8,
+     "p90": 95.3
+    }
+   },
+   "IMG_0806": {
+    "id": "IMG_0806",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 49166,
+    "chamfer": {
+     "mean": 13.15,
+     "median": 7.07,
+     "p90": 35.51
+    },
+    "chamferFullRes": {
+     "mean": 52.2,
+     "median": 28,
+     "p90": 140.9
+    }
+   },
+   "IMG_0807": {
+    "id": "IMG_0807",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 48634,
+    "chamfer": {
+     "mean": 11.07,
+     "median": 6,
+     "p90": 30.81
+    },
+    "chamferFullRes": {
+     "mean": 43.9,
+     "median": 23.8,
+     "p90": 122.2
+    }
+   },
+   "IMG_0808": {
+    "id": "IMG_0808",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 35069,
+    "chamfer": {
+     "mean": 5.66,
+     "median": 3,
+     "p90": 13.34
+    },
+    "chamferFullRes": {
+     "mean": 22.5,
+     "median": 11.9,
+     "p90": 52.9
+    }
+   },
+   "IMG_0809": {
+    "id": "IMG_0809",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 27904,
+    "chamfer": {
+     "mean": 9.27,
+     "median": 4,
+     "p90": 20.02
+    },
+    "chamferFullRes": {
+     "mean": 36.8,
+     "median": 15.9,
+     "p90": 79.4
+    }
+   },
+   "IMG_0810": {
+    "id": "IMG_0810",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 33739,
+    "chamfer": {
+     "mean": 9.71,
+     "median": 2.24,
+     "p90": 30
+    },
+    "chamferFullRes": {
+     "mean": 38.5,
+     "median": 8.9,
+     "p90": 119
+    }
+   },
+   "IMG_0811": {
+    "id": "IMG_0811",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 29600,
+    "chamfer": {
+     "mean": 8.21,
+     "median": 3,
+     "p90": 15.81
+    },
+    "chamferFullRes": {
+     "mean": 32.6,
+     "median": 11.9,
+     "p90": 62.7
+    }
+   },
+   "IMG_0812": {
+    "id": "IMG_0812",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 28126,
+    "chamfer": {
+     "mean": 6.63,
+     "median": 3,
+     "p90": 12.08
+    },
+    "chamferFullRes": {
+     "mean": 26.3,
+     "median": 11.9,
+     "p90": 47.9
+    }
+   },
+   "IMG_0813": {
+    "id": "IMG_0813",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 47838,
+    "chamfer": {
+     "mean": 14.24,
+     "median": 7,
+     "p90": 32.57
+    },
+    "chamferFullRes": {
+     "mean": 56.5,
+     "median": 27.8,
+     "p90": 129.2
+    }
+   },
+   "IMG_0814": {
+    "id": "IMG_0814",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 40369,
+    "chamfer": {
+     "mean": 29.04,
+     "median": 8.25,
+     "p90": 98.62
+    },
+    "chamferFullRes": {
+     "mean": 81.3,
+     "median": 23.1,
+     "p90": 276.1
+    }
+   },
+   "IMG_0815": {
+    "id": "IMG_0815",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 59825,
+    "chamfer": {
+     "mean": 13.88,
+     "median": 8.25,
+     "p90": 34.23
+    },
+    "chamferFullRes": {
+     "mean": 38.9,
+     "median": 23.1,
+     "p90": 95.9
+    }
+   },
+   "IMG_0816": {
+    "id": "IMG_0816",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 36480,
+    "chamfer": {
+     "mean": 12.65,
+     "median": 5,
+     "p90": 35.36
+    },
+    "chamferFullRes": {
+     "mean": 35.4,
+     "median": 14,
+     "p90": 99
+    }
+   },
+   "IMG_0817": {
+    "id": "IMG_0817",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 64092,
+    "chamfer": {
+     "mean": 14.08,
+     "median": 7,
+     "p90": 38.91
+    },
+    "chamferFullRes": {
+     "mean": 39.4,
+     "median": 19.6,
+     "p90": 108.9
+    }
+   },
+   "IMG_0818": {
+    "id": "IMG_0818",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 46462,
+    "chamfer": {
+     "mean": 14.13,
+     "median": 7,
+     "p90": 38.99
+    },
+    "chamferFullRes": {
+     "mean": 39.6,
+     "median": 19.6,
+     "p90": 109.2
+    }
+   },
+   "IMG_0819": {
+    "id": "IMG_0819",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 41319,
+    "chamfer": {
+     "mean": 23.07,
+     "median": 9,
+     "p90": 80.05
+    },
+    "chamferFullRes": {
+     "mean": 64.6,
+     "median": 25.2,
+     "p90": 224.1
+    }
+   },
+   "IMG_0820": {
+    "id": "IMG_0820",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 54508,
+    "chamfer": {
+     "mean": 13.5,
+     "median": 7,
+     "p90": 39.46
+    },
+    "chamferFullRes": {
+     "mean": 37.8,
+     "median": 19.6,
+     "p90": 110.5
+    }
+   },
+   "IMG_0821": {
+    "id": "IMG_0821",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 27682,
+    "chamfer": {
+     "mean": 16.01,
+     "median": 12,
+     "p90": 35.23
+    },
+    "chamferFullRes": {
+     "mean": 44.8,
+     "median": 33.6,
+     "p90": 98.6
+    }
+   },
+   "IMG_0822": {
+    "id": "IMG_0822",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 39309,
+    "chamfer": {
+     "mean": 19.1,
+     "median": 10,
+     "p90": 51.89
+    },
+    "chamferFullRes": {
+     "mean": 53.5,
+     "median": 28,
+     "p90": 145.3
+    }
+   },
+   "IMG_0823": {
+    "id": "IMG_0823",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 55043,
+    "chamfer": {
+     "mean": 28.4,
+     "median": 6,
+     "p90": 98.4
+    },
+    "chamferFullRes": {
+     "mean": 79.5,
+     "median": 16.8,
+     "p90": 275.5
+    }
+   },
+   "IMG_0824": {
+    "id": "IMG_0824",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 43727,
+    "chamfer": {
+     "mean": 10.97,
+     "median": 7,
+     "p90": 27.89
+    },
+    "chamferFullRes": {
+     "mean": 30.7,
+     "median": 19.6,
+     "p90": 78.1
+    }
+   },
+   "IMG_0825": {
+    "id": "IMG_0825",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 35401,
+    "chamfer": {
+     "mean": 14.09,
+     "median": 8,
+     "p90": 32.28
+    },
+    "chamferFullRes": {
+     "mean": 39.4,
+     "median": 22.4,
+     "p90": 90.4
+    }
+   },
+   "IMG_0826": {
+    "id": "IMG_0826",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 35938,
+    "chamfer": {
+     "mean": 9.12,
+     "median": 5,
+     "p90": 22.09
+    },
+    "chamferFullRes": {
+     "mean": 36.2,
+     "median": 19.8,
+     "p90": 87.6
+    }
+   },
+   "IMG_0827": {
+    "id": "IMG_0827",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 33672,
+    "chamfer": {
+     "mean": 8.66,
+     "median": 5,
+     "p90": 21.84
+    },
+    "chamferFullRes": {
+     "mean": 34.4,
+     "median": 19.8,
+     "p90": 86.6
+    }
+   },
+   "IMG_0828": {
+    "id": "IMG_0828",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 52764,
+    "chamfer": {
+     "mean": 13.74,
+     "median": 5.1,
+     "p90": 35.69
+    },
+    "chamferFullRes": {
+     "mean": 54.5,
+     "median": 20.2,
+     "p90": 141.6
+    }
+   },
+   "IMG_0829": {
+    "id": "IMG_0829",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 47524,
+    "chamfer": {
+     "mean": 22.26,
+     "median": 7,
+     "p90": 71.39
+    },
+    "chamferFullRes": {
+     "mean": 88.3,
+     "median": 27.8,
+     "p90": 283.2
+    }
+   },
+   "IMG_0830": {
+    "id": "IMG_0830",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 28827,
+    "chamfer": {
+     "mean": 18.21,
+     "median": 11,
+     "p90": 47.21
+    },
+    "chamferFullRes": {
+     "mean": 72.2,
+     "median": 43.6,
+     "p90": 187.3
+    }
+   },
+   "IMG_0831": {
+    "id": "IMG_0831",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 35043,
+    "chamfer": {
+     "mean": 13.55,
+     "median": 6,
+     "p90": 30.27
+    },
+    "chamferFullRes": {
+     "mean": 53.8,
+     "median": 23.8,
+     "p90": 120.1
+    }
+   },
+   "IMG_0832": {
+    "id": "IMG_0832",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 40495,
+    "chamfer": {
+     "mean": 11.03,
+     "median": 5,
+     "p90": 26.17
+    },
+    "chamferFullRes": {
+     "mean": 43.7,
+     "median": 19.8,
+     "p90": 103.8
+    }
+   },
+   "IMG_0834": {
+    "id": "IMG_0834",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 27210,
+    "chamfer": {
+     "mean": 15.44,
+     "median": 5,
+     "p90": 34
+    },
+    "chamferFullRes": {
+     "mean": 61.2,
+     "median": 19.8,
+     "p90": 134.9
+    }
+   },
+   "IMG_0835": {
+    "id": "IMG_0835",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 22304,
+    "chamfer": {
+     "mean": 21.47,
+     "median": 13,
+     "p90": 55
+    },
+    "chamferFullRes": {
+     "mean": 60.1,
+     "median": 36.4,
+     "p90": 154
+    }
+   },
+   "IMG_0836": {
+    "id": "IMG_0836",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 23867,
+    "chamfer": {
+     "mean": 15.66,
+     "median": 7,
+     "p90": 47.01
+    },
+    "chamferFullRes": {
+     "mean": 43.8,
+     "median": 19.6,
+     "p90": 131.6
+    }
+   },
+   "IMG_0837": {
+    "id": "IMG_0837",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 22902,
+    "chamfer": {
+     "mean": 24.94,
+     "median": 5,
+     "p90": 77.89
+    },
+    "chamferFullRes": {
+     "mean": 98.9,
+     "median": 19.8,
+     "p90": 309
+    }
+   },
+   "IMG_0838": {
+    "id": "IMG_0838",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 26393,
+    "chamfer": {
+     "mean": 26.76,
+     "median": 4,
+     "p90": 80.15
+    },
+    "chamferFullRes": {
+     "mean": 74.9,
+     "median": 11.2,
+     "p90": 224.4
+    }
+   },
+   "IMG_0839": {
+    "id": "IMG_0839",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 32895,
+    "chamfer": {
+     "mean": 26.72,
+     "median": 3,
+     "p90": 43.83
+    },
+    "chamferFullRes": {
+     "mean": 74.8,
+     "median": 8.4,
+     "p90": 122.7
+    }
+   },
+   "IMG_0840": {
+    "id": "IMG_0840",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 54679,
+    "chamfer": {
+     "mean": 20.32,
+     "median": 14,
+     "p90": 48.26
+    },
+    "chamferFullRes": {
+     "mean": 56.9,
+     "median": 39.2,
+     "p90": 135.1
+    }
+   },
+   "IMG_0841": {
+    "id": "IMG_0841",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 25237,
+    "chamfer": {
+     "mean": 16.68,
+     "median": 11.66,
+     "p90": 39.85
+    },
+    "chamferFullRes": {
+     "mean": 46.7,
+     "median": 32.7,
+     "p90": 111.6
+    }
+   },
+   "IMG_0888": {
+    "id": "IMG_0888",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 29510,
+    "chamfer": {
+     "mean": 37.79,
+     "median": 24.02,
+     "p90": 93.41
+    },
+    "chamferFullRes": {
+     "mean": 105.8,
+     "median": 67.3,
+     "p90": 261.5
+    }
+   },
+   "IMG_0890": {
+    "id": "IMG_0890",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 22647,
+    "chamfer": {
+     "mean": 8.81,
+     "median": 3,
+     "p90": 32
+    },
+    "chamferFullRes": {
+     "mean": 24.7,
+     "median": 8.4,
+     "p90": 89.6
+    }
+   },
+   "IMG_0891": {
+    "id": "IMG_0891",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 42942,
+    "chamfer": {
+     "mean": 11.45,
+     "median": 7.07,
+     "p90": 27.46
+    },
+    "chamferFullRes": {
+     "mean": 32,
+     "median": 19.8,
+     "p90": 76.9
+    }
+   },
+   "IMG_0893": {
+    "id": "IMG_0893",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 25705,
+    "chamfer": {
+     "mean": 14.36,
+     "median": 12,
+     "p90": 29.07
+    },
+    "chamferFullRes": {
+     "mean": 40.2,
+     "median": 33.6,
+     "p90": 81.4
+    }
+   },
+   "IMG_0894": {
+    "id": "IMG_0894",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 67594,
+    "chamfer": {
+     "mean": 21.86,
+     "median": 9,
+     "p90": 60.02
+    },
+    "chamferFullRes": {
+     "mean": 61.2,
+     "median": 25.2,
+     "p90": 168
+    }
+   },
+   "IMG_0895": {
+    "id": "IMG_0895",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 55228,
+    "chamfer": {
+     "mean": 23.26,
+     "median": 4.12,
+     "p90": 60.64
+    },
+    "chamferFullRes": {
+     "mean": 65.1,
+     "median": 11.5,
+     "p90": 169.8
+    }
+   },
+   "IMG_0896": {
+    "id": "IMG_0896",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 48028,
+    "chamfer": {
+     "mean": 16.09,
+     "median": 8,
+     "p90": 38.9
+    },
+    "chamferFullRes": {
+     "mean": 45.1,
+     "median": 22.4,
+     "p90": 108.9
+    }
+   },
+   "IMG_0907": {
+    "id": "IMG_0907",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 56831,
+    "chamfer": {
+     "mean": 25.16,
+     "median": 13,
+     "p90": 68.18
+    },
+    "chamferFullRes": {
+     "mean": 70.4,
+     "median": 36.4,
+     "p90": 190.9
+    }
+   },
+   "IMG_0908": {
+    "id": "IMG_0908",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 49774,
+    "chamfer": {
+     "mean": 20.68,
+     "median": 12.04,
+     "p90": 56
+    },
+    "chamferFullRes": {
+     "mean": 57.9,
+     "median": 33.7,
+     "p90": 156.8
+    }
+   },
+   "IMG_0911": {
+    "id": "IMG_0911",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 45500,
+    "chamfer": {
+     "mean": 16.31,
+     "median": 9,
+     "p90": 42.38
+    },
+    "chamferFullRes": {
+     "mean": 45.7,
+     "median": 25.2,
+     "p90": 118.7
+    }
+   },
+   "IMG_0912": {
+    "id": "IMG_0912",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 43403,
+    "chamfer": {
+     "mean": 20.31,
+     "median": 12,
+     "p90": 57.43
+    },
+    "chamferFullRes": {
+     "mean": 56.9,
+     "median": 33.6,
+     "p90": 160.8
+    }
+   },
+   "IMG_0913": {
+    "id": "IMG_0913",
+    "tag": "after",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 48078,
+    "chamfer": {
+     "mean": 18.46,
+     "median": 10,
+     "p90": 49.82
+    },
+    "chamferFullRes": {
+     "mean": 51.7,
+     "median": 28,
+     "p90": 139.5
+    }
+   },
+   "_summary": {
+    "photos": 53,
+    "mean": 16.17,
+    "p90": 43.22,
+    "at": "2026-10-03T12:52:50.315Z"
+   }
+  },
+  "wip": {
+   "IMG_0799": {
+    "id": "IMG_0799",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 44905,
+    "chamfer": {
+     "mean": 22.03,
+     "median": 5.66,
+     "p90": 78.85
+    },
+    "chamferFullRes": {
+     "mean": 61.7,
+     "median": 15.8,
+     "p90": 220.8
+    }
+   },
+   "IMG_0819": {
+    "id": "IMG_0819",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 40411,
+    "chamfer": {
+     "mean": 22.88,
+     "median": 9,
+     "p90": 79.76
+    },
+    "chamferFullRes": {
+     "mean": 64.1,
+     "median": 25.2,
+     "p90": 223.3
+    }
+   },
+   "IMG_0823": {
+    "id": "IMG_0823",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 55043,
+    "chamfer": {
+     "mean": 28.4,
+     "median": 6,
+     "p90": 98.4
+    },
+    "chamferFullRes": {
+     "mean": 79.5,
+     "median": 16.8,
+     "p90": 275.5
+    }
+   },
+   "IMG_0834": {
+    "id": "IMG_0834",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 27607,
+    "chamfer": {
+     "mean": 19.99,
+     "median": 5.39,
+     "p90": 37
+    },
+    "chamferFullRes": {
+     "mean": 79.3,
+     "median": 21.4,
+     "p90": 146.8
+    }
+   },
+   "IMG_0835": {
+    "id": "IMG_0835",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 21999,
+    "chamfer": {
+     "mean": 19.85,
+     "median": 12.04,
+     "p90": 49.94
+    },
+    "chamferFullRes": {
+     "mean": 55.6,
+     "median": 33.7,
+     "p90": 139.8
+    }
+   },
+   "IMG_0838": {
+    "id": "IMG_0838",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 27080,
+    "chamfer": {
+     "mean": 44.79,
+     "median": 4,
+     "p90": 184.77
+    },
+    "chamferFullRes": {
+     "mean": 125.4,
+     "median": 11.2,
+     "p90": 517.4
+    }
+   },
+   "IMG_0893": {
+    "id": "IMG_0893",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 25704,
+    "chamfer": {
+     "mean": 14.36,
+     "median": 12,
+     "p90": 29.07
+    },
+    "chamferFullRes": {
+     "mean": 40.2,
+     "median": 33.6,
+     "p90": 81.4
+    }
+   },
+   "IMG_0894": {
+    "id": "IMG_0894",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 67594,
+    "chamfer": {
+     "mean": 21.86,
+     "median": 9,
+     "p90": 60.02
+    },
+    "chamferFullRes": {
+     "mean": 61.2,
+     "median": 25.2,
+     "p90": 168
+    }
+   },
+   "IMG_0895": {
+    "id": "IMG_0895",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 55228,
+    "chamfer": {
+     "mean": 23.26,
+     "median": 4.12,
+     "p90": 60.64
+    },
+    "chamferFullRes": {
+     "mean": 65.1,
+     "median": 11.5,
+     "p90": 169.8
+    }
+   },
+   "IMG_0907": {
+    "id": "IMG_0907",
+    "tag": "wip",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 56831,
+    "chamfer": {
+     "mean": 25.16,
+     "median": 13,
+     "p90": 68.18
+    },
+    "chamferFullRes": {
+     "mean": 70.4,
+     "median": 36.4,
+     "p90": 190.9
+    }
+   },
+   "_summary": {
+    "photos": 10,
+    "mean": 24.26,
+    "p90": 74.66,
+    "at": "2026-10-03T12:47:08.418Z"
+   }
+  },
+  "verify1": {
+   "IMG_0799": {
+    "id": "IMG_0799",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 44904,
+    "chamfer": {
+     "mean": 22.04,
+     "median": 5.66,
+     "p90": 78.85
+    },
+    "chamferFullRes": {
+     "mean": 61.7,
+     "median": 15.8,
+     "p90": 220.8
+    }
+   },
+   "IMG_0800": {
+    "id": "IMG_0800",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 60585,
+    "chamfer": {
+     "mean": 11.94,
+     "median": 4.12,
+     "p90": 25.01
+    },
+    "chamferFullRes": {
+     "mean": 47.4,
+     "median": 16.4,
+     "p90": 99.2
+    }
+   },
+   "IMG_0801": {
+    "id": "IMG_0801",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 60996,
+    "chamfer": {
+     "mean": 12.65,
+     "median": 4.12,
+     "p90": 30.08
+    },
+    "chamferFullRes": {
+     "mean": 35.4,
+     "median": 11.5,
+     "p90": 84.2
+    }
+   },
+   "IMG_0802": {
+    "id": "IMG_0802",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 58246,
+    "chamfer": {
+     "mean": 7.49,
+     "median": 4.47,
+     "p90": 18.38
+    },
+    "chamferFullRes": {
+     "mean": 21,
+     "median": 12.5,
+     "p90": 51.5
+    }
+   },
+   "IMG_0803": {
+    "id": "IMG_0803",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 46081,
+    "chamfer": {
+     "mean": 7.52,
+     "median": 4.47,
+     "p90": 18
+    },
+    "chamferFullRes": {
+     "mean": 21.1,
+     "median": 12.5,
+     "p90": 50.4
+    }
+   },
+   "IMG_0805": {
+    "id": "IMG_0805",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 46977,
+    "chamfer": {
+     "mean": 9.42,
+     "median": 5,
+     "p90": 24.02
+    },
+    "chamferFullRes": {
+     "mean": 37.4,
+     "median": 19.8,
+     "p90": 95.3
+    }
+   },
+   "IMG_0806": {
+    "id": "IMG_0806",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 49167,
+    "chamfer": {
+     "mean": 13.15,
+     "median": 7.07,
+     "p90": 35.51
+    },
+    "chamferFullRes": {
+     "mean": 52.2,
+     "median": 28,
+     "p90": 140.9
+    }
+   },
+   "IMG_0807": {
+    "id": "IMG_0807",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 48634,
+    "chamfer": {
+     "mean": 11.07,
+     "median": 6,
+     "p90": 30.81
+    },
+    "chamferFullRes": {
+     "mean": 43.9,
+     "median": 23.8,
+     "p90": 122.2
+    }
+   },
+   "IMG_0808": {
+    "id": "IMG_0808",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 35053,
+    "chamfer": {
+     "mean": 5.65,
+     "median": 3,
+     "p90": 13.34
+    },
+    "chamferFullRes": {
+     "mean": 22.4,
+     "median": 11.9,
+     "p90": 52.9
+    }
+   },
+   "IMG_0809": {
+    "id": "IMG_0809",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 27879,
+    "chamfer": {
+     "mean": 9.26,
+     "median": 4,
+     "p90": 20.02
+    },
+    "chamferFullRes": {
+     "mean": 36.7,
+     "median": 15.9,
+     "p90": 79.4
+    }
+   },
+   "IMG_0810": {
+    "id": "IMG_0810",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 33739,
+    "chamfer": {
+     "mean": 9.71,
+     "median": 2.24,
+     "p90": 30
+    },
+    "chamferFullRes": {
+     "mean": 38.5,
+     "median": 8.9,
+     "p90": 119
+    }
+   },
+   "IMG_0811": {
+    "id": "IMG_0811",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 29600,
+    "chamfer": {
+     "mean": 8.21,
+     "median": 3,
+     "p90": 15.81
+    },
+    "chamferFullRes": {
+     "mean": 32.6,
+     "median": 11.9,
+     "p90": 62.7
+    }
+   },
+   "IMG_0812": {
+    "id": "IMG_0812",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 28126,
+    "chamfer": {
+     "mean": 6.63,
+     "median": 3,
+     "p90": 12.08
+    },
+    "chamferFullRes": {
+     "mean": 26.3,
+     "median": 11.9,
+     "p90": 47.9
+    }
+   },
+   "IMG_0813": {
+    "id": "IMG_0813",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 47822,
+    "chamfer": {
+     "mean": 14.25,
+     "median": 7,
+     "p90": 32.64
+    },
+    "chamferFullRes": {
+     "mean": 56.5,
+     "median": 27.8,
+     "p90": 129.5
+    }
+   },
+   "IMG_0814": {
+    "id": "IMG_0814",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 40369,
+    "chamfer": {
+     "mean": 29.04,
+     "median": 8.25,
+     "p90": 98.62
+    },
+    "chamferFullRes": {
+     "mean": 81.3,
+     "median": 23.1,
+     "p90": 276.1
+    }
+   },
+   "IMG_0815": {
+    "id": "IMG_0815",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 59819,
+    "chamfer": {
+     "mean": 13.88,
+     "median": 8.25,
+     "p90": 34.23
+    },
+    "chamferFullRes": {
+     "mean": 38.9,
+     "median": 23.1,
+     "p90": 95.9
+    }
+   },
+   "IMG_0816": {
+    "id": "IMG_0816",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 36478,
+    "chamfer": {
+     "mean": 12.66,
+     "median": 5,
+     "p90": 35.36
+    },
+    "chamferFullRes": {
+     "mean": 35.4,
+     "median": 14,
+     "p90": 99
+    }
+   },
+   "IMG_0817": {
+    "id": "IMG_0817",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 64090,
+    "chamfer": {
+     "mean": 14.08,
+     "median": 7,
+     "p90": 38.91
+    },
+    "chamferFullRes": {
+     "mean": 39.4,
+     "median": 19.6,
+     "p90": 108.9
+    }
+   },
+   "IMG_0818": {
+    "id": "IMG_0818",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 46462,
+    "chamfer": {
+     "mean": 14.13,
+     "median": 7,
+     "p90": 38.99
+    },
+    "chamferFullRes": {
+     "mean": 39.6,
+     "median": 19.6,
+     "p90": 109.2
+    }
+   },
+   "IMG_0819": {
+    "id": "IMG_0819",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 41319,
+    "chamfer": {
+     "mean": 23.07,
+     "median": 9,
+     "p90": 80.05
+    },
+    "chamferFullRes": {
+     "mean": 64.6,
+     "median": 25.2,
+     "p90": 224.1
+    }
+   },
+   "IMG_0820": {
+    "id": "IMG_0820",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 54510,
+    "chamfer": {
+     "mean": 13.5,
+     "median": 7,
+     "p90": 39.46
+    },
+    "chamferFullRes": {
+     "mean": 37.8,
+     "median": 19.6,
+     "p90": 110.5
+    }
+   },
+   "IMG_0821": {
+    "id": "IMG_0821",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 27682,
+    "chamfer": {
+     "mean": 16.01,
+     "median": 12,
+     "p90": 35.23
+    },
+    "chamferFullRes": {
+     "mean": 44.8,
+     "median": 33.6,
+     "p90": 98.6
+    }
+   },
+   "IMG_0822": {
+    "id": "IMG_0822",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 39307,
+    "chamfer": {
+     "mean": 19.1,
+     "median": 10,
+     "p90": 51.89
+    },
+    "chamferFullRes": {
+     "mean": 53.5,
+     "median": 28,
+     "p90": 145.3
+    }
+   },
+   "IMG_0823": {
+    "id": "IMG_0823",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 55042,
+    "chamfer": {
+     "mean": 28.4,
+     "median": 6,
+     "p90": 98.41
+    },
+    "chamferFullRes": {
+     "mean": 79.5,
+     "median": 16.8,
+     "p90": 275.5
+    }
+   },
+   "IMG_0824": {
+    "id": "IMG_0824",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 43727,
+    "chamfer": {
+     "mean": 10.97,
+     "median": 7,
+     "p90": 27.89
+    },
+    "chamferFullRes": {
+     "mean": 30.7,
+     "median": 19.6,
+     "p90": 78.1
+    }
+   },
+   "IMG_0825": {
+    "id": "IMG_0825",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 35401,
+    "chamfer": {
+     "mean": 14.09,
+     "median": 8,
+     "p90": 32.28
+    },
+    "chamferFullRes": {
+     "mean": 39.4,
+     "median": 22.4,
+     "p90": 90.4
+    }
+   },
+   "IMG_0826": {
+    "id": "IMG_0826",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 35938,
+    "chamfer": {
+     "mean": 9.12,
+     "median": 5,
+     "p90": 22.09
+    },
+    "chamferFullRes": {
+     "mean": 36.2,
+     "median": 19.8,
+     "p90": 87.6
+    }
+   },
+   "IMG_0827": {
+    "id": "IMG_0827",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 33672,
+    "chamfer": {
+     "mean": 8.66,
+     "median": 5,
+     "p90": 21.84
+    },
+    "chamferFullRes": {
+     "mean": 34.4,
+     "median": 19.8,
+     "p90": 86.6
+    }
+   },
+   "IMG_0828": {
+    "id": "IMG_0828",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 52767,
+    "chamfer": {
+     "mean": 13.73,
+     "median": 5.1,
+     "p90": 35.69
+    },
+    "chamferFullRes": {
+     "mean": 54.5,
+     "median": 20.2,
+     "p90": 141.6
+    }
+   },
+   "IMG_0829": {
+    "id": "IMG_0829",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 47521,
+    "chamfer": {
+     "mean": 22.26,
+     "median": 7,
+     "p90": 71.39
+    },
+    "chamferFullRes": {
+     "mean": 88.3,
+     "median": 27.8,
+     "p90": 283.2
+    }
+   },
+   "IMG_0830": {
+    "id": "IMG_0830",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 28821,
+    "chamfer": {
+     "mean": 18.21,
+     "median": 11,
+     "p90": 47.27
+    },
+    "chamferFullRes": {
+     "mean": 72.2,
+     "median": 43.6,
+     "p90": 187.5
+    }
+   },
+   "IMG_0831": {
+    "id": "IMG_0831",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 35043,
+    "chamfer": {
+     "mean": 13.55,
+     "median": 6,
+     "p90": 30.27
+    },
+    "chamferFullRes": {
+     "mean": 53.8,
+     "median": 23.8,
+     "p90": 120.1
+    }
+   },
+   "IMG_0832": {
+    "id": "IMG_0832",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 40505,
+    "chamfer": {
+     "mean": 11.02,
+     "median": 5,
+     "p90": 26.17
+    },
+    "chamferFullRes": {
+     "mean": 43.7,
+     "median": 19.8,
+     "p90": 103.8
+    }
+   },
+   "IMG_0834": {
+    "id": "IMG_0834",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 27210,
+    "chamfer": {
+     "mean": 15.44,
+     "median": 5,
+     "p90": 34
+    },
+    "chamferFullRes": {
+     "mean": 61.2,
+     "median": 19.8,
+     "p90": 134.9
+    }
+   },
+   "IMG_0835": {
+    "id": "IMG_0835",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 22304,
+    "chamfer": {
+     "mean": 21.47,
+     "median": 13,
+     "p90": 55
+    },
+    "chamferFullRes": {
+     "mean": 60.1,
+     "median": 36.4,
+     "p90": 154
+    }
+   },
+   "IMG_0836": {
+    "id": "IMG_0836",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 23867,
+    "chamfer": {
+     "mean": 15.66,
+     "median": 7,
+     "p90": 47.01
+    },
+    "chamferFullRes": {
+     "mean": 43.8,
+     "median": 19.6,
+     "p90": 131.6
+    }
+   },
+   "IMG_0837": {
+    "id": "IMG_0837",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.2521,
+    "look": "photo",
+    "appEdgePx": 22902,
+    "chamfer": {
+     "mean": 24.94,
+     "median": 5,
+     "p90": 77.89
+    },
+    "chamferFullRes": {
+     "mean": 98.9,
+     "median": 19.8,
+     "p90": 309
+    }
+   },
+   "IMG_0838": {
+    "id": "IMG_0838",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 26393,
+    "chamfer": {
+     "mean": 26.76,
+     "median": 4,
+     "p90": 80.15
+    },
+    "chamferFullRes": {
+     "mean": 74.9,
+     "median": 11.2,
+     "p90": 224.4
+    }
+   },
+   "IMG_0839": {
+    "id": "IMG_0839",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 32895,
+    "chamfer": {
+     "mean": 26.72,
+     "median": 3,
+     "p90": 43.83
+    },
+    "chamferFullRes": {
+     "mean": 74.8,
+     "median": 8.4,
+     "p90": 122.7
+    }
+   },
+   "IMG_0840": {
+    "id": "IMG_0840",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 54679,
+    "chamfer": {
+     "mean": 20.32,
+     "median": 14,
+     "p90": 48.26
+    },
+    "chamferFullRes": {
+     "mean": 56.9,
+     "median": 39.2,
+     "p90": 135.1
+    }
+   },
+   "IMG_0841": {
+    "id": "IMG_0841",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "photo",
+    "appEdgePx": 25237,
+    "chamfer": {
+     "mean": 16.68,
+     "median": 11.66,
+     "p90": 39.85
+    },
+    "chamferFullRes": {
+     "mean": 46.7,
+     "median": 32.7,
+     "p90": 111.6
+    }
+   },
+   "IMG_0888": {
+    "id": "IMG_0888",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 29533,
+    "chamfer": {
+     "mean": 37.8,
+     "median": 24.02,
+     "p90": 93.39
+    },
+    "chamferFullRes": {
+     "mean": 105.8,
+     "median": 67.3,
+     "p90": 261.5
+    }
+   },
+   "IMG_0890": {
+    "id": "IMG_0890",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 22647,
+    "chamfer": {
+     "mean": 8.81,
+     "median": 3,
+     "p90": 32
+    },
+    "chamferFullRes": {
+     "mean": 24.7,
+     "median": 8.4,
+     "p90": 89.6
+    }
+   },
+   "IMG_0891": {
+    "id": "IMG_0891",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 42942,
+    "chamfer": {
+     "mean": 11.45,
+     "median": 7.07,
+     "p90": 27.46
+    },
+    "chamferFullRes": {
+     "mean": 32,
+     "median": 19.8,
+     "p90": 76.9
+    }
+   },
+   "IMG_0893": {
+    "id": "IMG_0893",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 25704,
+    "chamfer": {
+     "mean": 14.36,
+     "median": 12,
+     "p90": 29.07
+    },
+    "chamferFullRes": {
+     "mean": 40.2,
+     "median": 33.6,
+     "p90": 81.4
+    }
+   },
+   "IMG_0894": {
+    "id": "IMG_0894",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 67594,
+    "chamfer": {
+     "mean": 21.86,
+     "median": 9,
+     "p90": 60.02
+    },
+    "chamferFullRes": {
+     "mean": 61.2,
+     "median": 25.2,
+     "p90": 168
+    }
+   },
+   "IMG_0895": {
+    "id": "IMG_0895",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 55591,
+    "chamfer": {
+     "mean": 23.15,
+     "median": 4.12,
+     "p90": 60.01
+    },
+    "chamferFullRes": {
+     "mean": 64.8,
+     "median": 11.5,
+     "p90": 168
+    }
+   },
+   "IMG_0896": {
+    "id": "IMG_0896",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 50715,
+    "chamfer": {
+     "mean": 15.66,
+     "median": 7.62,
+     "p90": 37
+    },
+    "chamferFullRes": {
+     "mean": 43.9,
+     "median": 21.3,
+     "p90": 103.6
+    }
+   },
+   "IMG_0907": {
+    "id": "IMG_0907",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 56831,
+    "chamfer": {
+     "mean": 25.16,
+     "median": 13,
+     "p90": 68.18
+    },
+    "chamferFullRes": {
+     "mean": 70.4,
+     "median": 36.4,
+     "p90": 190.9
+    }
+   },
+   "IMG_0908": {
+    "id": "IMG_0908",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 49774,
+    "chamfer": {
+     "mean": 20.68,
+     "median": 12.04,
+     "p90": 56
+    },
+    "chamferFullRes": {
+     "mean": 57.9,
+     "median": 33.7,
+     "p90": 156.8
+    }
+   },
+   "IMG_0911": {
+    "id": "IMG_0911",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 45500,
+    "chamfer": {
+     "mean": 16.31,
+     "median": 9,
+     "p90": 42.38
+    },
+    "chamferFullRes": {
+     "mean": 45.7,
+     "median": 25.2,
+     "p90": 118.7
+    }
+   },
+   "IMG_0912": {
+    "id": "IMG_0912",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 43403,
+    "chamfer": {
+     "mean": 20.31,
+     "median": 12,
+     "p90": 57.43
+    },
+    "chamferFullRes": {
+     "mean": 56.9,
+     "median": 33.6,
+     "p90": 160.8
+    }
+   },
+   "IMG_0913": {
+    "id": "IMG_0913",
+    "tag": "verify1",
+    "W": 1080,
+    "H": 1440,
+    "scale": 0.35714,
+    "look": "sunny",
+    "appEdgePx": 48078,
+    "chamfer": {
+     "mean": 18.46,
+     "median": 10,
+     "p90": 49.82
+    },
+    "chamferFullRes": {
+     "mean": 51.7,
+     "median": 28,
+     "p90": 139.5
+    }
+   },
+   "_summary": {
+    "photos": 53,
+    "mean": 16.16,
+    "p90": 43.2,
+    "at": "2026-10-03T13:29:28.954Z"
+   }
+  }
+ }
+}

@@ -1,0 +1,734 @@
+{
+ "planes": {
+  "wall": {
+   "vertical_line": [
+    [
+     666.22,
+     961.95
+    ],
+    [
+     734.32,
+     1111.25
+    ]
+   ],
+   "sigma": 0.1,
+   "note": "GSI line A shifted 1.56 m east by the survey adjustment (wallA_off)"
+  },
+  "deck": {
+   "y": 15.585,
+   "sigma": 0.03
+  },
+  "studio": {
+   "vertical_line": [
+    [
+     731.7,
+     1109.0
+    ],
+    [
+     757.5,
+     1098.3
+    ]
+   ],
+   "sigma": 0.1
+  },
+  "shedface": {
+   "vertical_line": [
+    [
+     538.2,
+     607.5
+    ],
+    [
+     612.4,
+     771.3
+    ]
+   ],
+   "sigma": 0.5,
+   "note": "OSM / app quay face of the north facility (marketShed)"
+  }
+ },
+ "features": [
+  {
+   "name": "deck.wall.n_base",
+   "from_adjust": "deck:wall.ne_base",
+   "y": 15.585,
+   "note": "penthouse east wall, north end, at the deck (single view IMG_0792 on the wall plane, GSI corner prior)"
+  },
+  {
+   "name": "deck.wall.n_top",
+   "from_adjust": "deck:wall.ne_top",
+   "note": "penthouse wall top at the north end"
+  },
+  {
+   "name": "deck.wall.s_base",
+   "from_adjust": "deck:wall.se_base",
+   "y": 15.585,
+   "note": "inside corner penthouse wall / cooking-studio north face, at the deck"
+  },
+  {
+   "name": "deck.wall.s_top",
+   "from_adjust": "deck:wall.se_top"
+  },
+  {
+   "name": "deck.entrance.canopy_nn",
+   "from_adjust": "deck:entrance.canopy_n",
+   "note": "visitors entrance canopy, north front corner"
+  },
+  {
+   "name": "deck.entrance.canopy_ss",
+   "from_adjust": "deck:entrance.canopy_s",
+   "note": "visitors entrance canopy, south front corner"
+  },
+  {
+   "name": "deck.entrance.jamb_n",
+   "obs": {
+    "0795": [
+     2542,
+     2240
+    ]
+   },
+   "plane": "wall",
+   "y": 15.585,
+   "note": "entrance glazing, north jamb at the floor"
+  },
+  {
+   "name": "deck.entrance.jamb_s",
+   "obs": {
+    "0795": [
+     2050,
+     2240
+    ]
+   },
+   "plane": "wall",
+   "y": 15.585,
+   "note": "entrance glazing, south jamb at the floor"
+  },
+  {
+   "name": "deck.letter.1",
+   "obs": {
+    "0795": [
+     518,
+     1624
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.08,
+   "note": "raised letter centre"
+  },
+  {
+   "name": "deck.letter.2",
+   "obs": {
+    "0795": [
+     1091,
+     1624
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.08,
+   "note": "raised letter centre"
+  },
+  {
+   "name": "deck.letter.3",
+   "obs": {
+    "0795": [
+     1674,
+     1624
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.08,
+   "note": "raised letter centre"
+  },
+  {
+   "name": "deck.letter.4",
+   "obs": {
+    "0795": [
+     2289,
+     1602
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.08,
+   "note": "raised letter centre"
+  },
+  {
+   "name": "deck.letter.5",
+   "obs": {
+    "0792": [
+     627,
+     2149
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.08,
+   "note": "raised letter centre"
+  },
+  {
+   "name": "deck.letter.6",
+   "obs": {
+    "0792": [
+     1208,
+     2302
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.08,
+   "note": "raised letter centre"
+  },
+  {
+   "name": "deck.letter.7",
+   "obs": {
+    "0792": [
+     1575,
+     2455
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.08,
+   "note": "raised letter centre"
+  },
+  {
+   "name": "deck.window#1",
+   "obs": {
+    "0795": [
+     86,
+     2013
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#2",
+   "obs": {
+    "0795": [
+     523,
+     2013
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#3",
+   "obs": {
+    "0795": [
+     972,
+     2024
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#4",
+   "obs": {
+    "0792": [
+     1286,
+     3000
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#5",
+   "obs": {
+    "0792": [
+     1557,
+     3007
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#6",
+   "obs": {
+    "0792": [
+     1757,
+     3014
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#7",
+   "obs": {
+    "0792": [
+     1993,
+     3014
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#8",
+   "obs": {
+    "0792": [
+     2093,
+     3021
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#9",
+   "obs": {
+    "0792": [
+     2179,
+     3021
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#10",
+   "obs": {
+    "0792": [
+     2293,
+     3031
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#11",
+   "obs": {
+    "0792": [
+     2343,
+     3031
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#12",
+   "obs": {
+    "0792": [
+     2386,
+     3031
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#13",
+   "obs": {
+    "0792": [
+     2450,
+     3036
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#14",
+   "obs": {
+    "0792": [
+     2486,
+     3036
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#15",
+   "obs": {
+    "0792": [
+     2514,
+     3036
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#16",
+   "obs": {
+    "0798": [
+     2197,
+     2133
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#17",
+   "obs": {
+    "0798": [
+     2217,
+     2133
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#18",
+   "obs": {
+    "0798": [
+     2240,
+     2133
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#19",
+   "obs": {
+    "0798": [
+     2293,
+     2127
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#20",
+   "obs": {
+    "0798": [
+     2333,
+     2127
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#21",
+   "obs": {
+    "0798": [
+     2387,
+     2127
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#22",
+   "obs": {
+    "0798": [
+     2527,
+     2133
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#23",
+   "obs": {
+    "0798": [
+     2663,
+     2127
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.window#24",
+   "obs": {
+    "0798": [
+     2890,
+     2107
+    ]
+   },
+   "plane": "wall",
+   "pick_m": 0.1
+  },
+  {
+   "name": "deck.pavilion#1",
+   "enu": [
+    685.6,
+    15.585,
+    963.3
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#2",
+   "enu": [
+    691.8,
+    15.585,
+    977.2
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#3",
+   "enu": [
+    704.2,
+    15.585,
+    1004.7
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#4",
+   "enu": [
+    710.5,
+    15.585,
+    1018.064
+   ],
+   "sigma": [
+    0.6,
+    0.05,
+    0.6
+   ],
+   "method": "photo measurement (v6:rebuild)",
+   "note": "[v6:rebuild] IMG_0793: SW corner (s 73.56, off 13.7) and SE glazing edge (off 20.33) cut on the measured south-face plane; north end by the 8.3 m length of #5 (GSI ortho centre 0.3 m away)"
+  },
+  {
+   "name": "deck.pavilion#5",
+   "enu": [
+    724.884,
+    15.585,
+    1044.059
+   ],
+   "sigma": [
+    0.8,
+    0.05,
+    0.8
+   ],
+   "method": "photo measurement (v6:rebuild)",
+   "note": "[v6:rebuild] edge fit of IMG_0794 / 0796 (well registered): west face off 16, north end s 94.9; 8.3 m long, 6.6 m wide as #4. IMG_0797's pose is not used (held only by its GPS fix)"
+  },
+  {
+   "name": "deck.pavilion#6",
+   "enu": [
+    729.864,
+    15.585,
+    1054.977
+   ],
+   "sigma": [
+    0.8,
+    0.05,
+    0.8
+   ],
+   "method": "photo measurement (v6:rebuild)",
+   "note": "[v6:rebuild] south end s 114.5 (corner in IMG_0794 / 0796 / 0798), west face off 16 (edge fit), north end bounded by the stack S56 in the gap: 6.9 m long. The GSI ortho centre (s 114.7) is 3.7 m south of this"
+  },
+  {
+   "name": "deck.pavilion#7",
+   "enu": [
+    741.9,
+    15.585,
+    1086.1
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.pavilion#8",
+   "enu": [
+    748.2,
+    15.585,
+    1100.1
+   ],
+   "sigma": [
+    1.5,
+    0.05,
+    1.5
+   ],
+   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
+   "note": "pavilions stand in 4 pairs"
+  },
+  {
+   "name": "deck.cone#1",
+   "obs": {
+    "0793": [
+     1193,
+     3331
+    ]
+   },
+   "plane": "deck",
+   "pick_m": 0.05
+  },
+  {
+   "name": "deck.cone#2",
+   "obs": {
+    "0793": [
+     1376,
+     3490
+    ]
+   },
+   "plane": "deck",
+   "pick_m": 0.05
+  },
+  {
+   "name": "deck.cone#3",
+   "obs": {
+    "0793": [
+     1768,
+     3820
+    ]
+   },
+   "plane": "deck",
+   "pick_m": 0.05
+  },
+  {
+   "name": "deck.cone#4",
+   "obs": {
+    "0793": [
+     2875,
+     4700
+    ]
+   },
+   "plane": "deck",
+   "pick_m": 0.05,
+   "note": "[v6:rebuild] the cone's footprint centre on the deck (the first pick, v 4255, was half way up the cone: it put the cone 0.6 m too far)"
+  },
+  {
+   "name": "deck.lifeboat.end_n",
+   "obs": {
+    "0793": [
+     2844,
+     3368
+    ]
+   },
+   "plane": "deck",
+   "note": "lifeboat trailer, north (left) end at the deck"
+  },
+  {
+   "name": "deck.lifeboat.end_s",
+   "obs": {
+    "0793": [
+     4128,
+     3551
+    ]
+   },
+   "plane": "deck",
+   "note": "lifeboat trailer, south (right) end at the deck"
+  },
+  {
+   "name": "deck.studio.door",
+   "obs": {
+    "0798": [
+     2077,
+     2200
+    ]
+   },
+   "plane": "studio",
+   "y": 15.585,
+   "pick_m": 0.1,
+   "note": "[v6:rebuild] cooking-studio door, centre at the deck, cut on the studio face plane (IMG_0798; IMG_0794 (2026, 2848) and IMG_0796 (2743, 2237) cut to within 0.27 m). The earlier value (the mean of the canopy corners) sat 7 m north of the face: the three views look along the canopy's depth (5-10 deg apart), so its corners' depth was unconstrained"
+  },
+  {
+   "name": "deck.studio.window",
+   "from_adjust": "deck:studio.winB_tl+studio.winB_tr+studio.winB_bl+studio.winB_br",
+   "note": "studio window left of the door, centre"
+  },
+  {
+   "name": "deck.studio.mascot",
+   "from_adjust": "deck:studio.mascot"
+  },
+  {
+   "name": "deck.studio.louvre_ne",
+   "from_adjust": "deck:studio.louvre_tl",
+   "note": "louvred plant box on the studio roof, NE top corner"
+  },
+  {
+   "name": "deck.studio.louvre_nw",
+   "from_adjust": "deck:studio.louvre_tr"
+  },
+  {
+   "name": "canopy.beam_bottom",
+   "obs": {
+    "0855": [
+     1512,
+     1482
+    ]
+   },
+   "plane": "shedface",
+   "pick_m": 0.05,
+   "note": "underside of the outermost ceiling beam at the open quay face, seen from inside the hall (IMG_0855)"
+  }
+ ],
+ "dims": [
+  {
+   "name": "deck.y",
+   "value": 15.585,
+   "sigma": 0.15,
+   "note": "T.P. of the deck: survey adjustment (eye heights 1.45 m, pylon top 115 m); formal 0.02"
+  },
+  {
+   "name": "deck.wall_h",
+   "value": 6.603,
+   "sigma": 0.1,
+   "note": "penthouse wall top above the deck"
+  },
+  {
+   "name": "deck.studio_h",
+   "value": 6.534,
+   "sigma": 0.1,
+   "note": "studio parapet top above the deck"
+  },
+  {
+   "name": "deck.pavilions",
+   "value": 8,
+   "sigma": 0,
+   "note": "GSI ortho: 8 pavilions in 4 pairs"
+  },
+  {
+   "name": "deck.wall_len",
+   "value": 159.83,
+   "sigma": 1.5,
+   "note": "penthouse east wall, NE corner to the studio corner"
+  },
+  {
+   "name": "canopy.floor_y",
+   "value": 2.19,
+   "sigma": 0.15,
+   "note": "hall floor T.P. from the canopy adjustment (eye 1.45 m, apron 1.85, quay top 1.8)"
+  },
+  {
+   "name": "canopy.open_depth",
+   "value": 39.0,
+   "sigma": 1.5,
+   "note": "the camera stood 39 m in from the quay edge (27 m inside the hall) and saw straight out: no back wall within that depth"
+  },
+  {
+   "name": "canopy.soffit_y",
+   "value": 5.82,
+   "sigma": 0.6,
+   "note": "underside of the outermost ceiling beam at the quay face (feature canopy.beam_bottom): 3.6 m above the hall floor"
+  }
+ ]
+}

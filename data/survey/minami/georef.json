@@ -1,0 +1,136 @@
+{
+ "pivot": [
+  0.0,
+  0.0,
+  60.0
+ ],
+ "scale": 0.9999266868257384,
+ "scale_sigma": 0.009556404425849733,
+ "yaw_deg": 0.5636019519065946,
+ "yaw_sigma_deg": 0.4261846562730139,
+ "t": [
+  0.04752836645442688,
+  0.017670211855863687,
+  -0.13719399974439161
+ ],
+ "t_sigma": [
+  0.16187243870093723,
+  0.046033167022830175,
+  0.17266292741001305
+ ],
+ "before": {
+  "mukaeru.SE": {
+   "n": 19,
+   "median_m": -0.746,
+   "mad_m": 0.066
+  },
+  "mukaeru.SW_anchor": {
+   "n": 938,
+   "median_m": 0.051,
+   "mad_m": 0.19
+  },
+  "mukaeru.SW_nw": {
+   "n": 4,
+   "median_m": -1.99,
+   "mad_m": 0.006
+  },
+  "mukaeru.NE": {
+   "n": 13,
+   "median_m": -1.606,
+   "mad_m": 0.201
+  },
+  "pier7.NW_box": {
+   "n": 153,
+   "median_m": -0.521,
+   "mad_m": 0.099
+  },
+  "pier7.street1": {
+   "n": 36,
+   "median_m": 0.516,
+   "mad_m": 0.211
+  },
+  "yuwaeru.S": {
+   "n": 6,
+   "median_m": -0.304,
+   "mad_m": 0.927
+  },
+  "yuwaeru.road": {
+   "n": 69,
+   "median_m": 0.582,
+   "mad_m": 0.167
+  },
+  "ground.plaza": {
+   "n": 65,
+   "median_m": -0.003,
+   "mad_m": 0.239
+  },
+  "ground.street": {
+   "n": 40,
+   "median_m": -0.234,
+   "mad_m": 0.054
+  },
+  "gps": {
+   "n": 53,
+   "median_m": 2.3,
+   "mean_m": 2.36
+  }
+ },
+ "after": {
+  "mukaeru.SE": {
+   "n": 19,
+   "median_m": -0.909,
+   "mad_m": 0.078
+  },
+  "mukaeru.SW_anchor": {
+   "n": 938,
+   "median_m": 0.103,
+   "mad_m": 0.16
+  },
+  "mukaeru.SW_nw": {
+   "n": 4,
+   "median_m": -1.754,
+   "mad_m": 0.003
+  },
+  "mukaeru.NE": {
+   "n": 13,
+   "median_m": -1.582,
+   "mad_m": 0.2
+  },
+  "pier7.NW_box": {
+   "n": 153,
+   "median_m": -0.445,
+   "mad_m": 0.1
+  },
+  "pier7.street1": {
+   "n": 36,
+   "median_m": 0.151,
+   "mad_m": 0.203
+  },
+  "yuwaeru.S": {
+   "n": 6,
+   "median_m": 0.02,
+   "mad_m": 1.005
+  },
+  "yuwaeru.road": {
+   "n": 69,
+   "median_m": 0.622,
+   "mad_m": 0.142
+  },
+  "ground.plaza": {
+   "n": 65,
+   "median_m": 0.015,
+   "mad_m": 0.239
+  },
+  "ground.street": {
+   "n": 40,
+   "median_m": -0.216,
+   "mad_m": 0.054
+  },
+  "gps": {
+   "n": 53,
+   "median_m": 2.33,
+   "mean_m": 2.45
+  }
+ },
+ "note": "P_enu = pivot + scale * Ry(yaw) (P_model - pivot) + t (tools/survey/georef_refine.py)"
+}

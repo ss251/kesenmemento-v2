@@ -12,6 +12,12 @@
 // Writes <out>/pair_IMG_xxxx.jpg (photo left, render right, same height) and <out>/index.json (the cameras used).
 // The photos stay in raw/ (gitignored). FIX below corrects a GPS fix that is clearly off (a reason is given for each):
 // the photo then names the corrected position in index.json.
+//
+// [v5:photos3] Two batches: raw/photos-sailesh/index.json (2026-10-01, IMG_0792-0842) and the author's second drive
+// raw/photos-sailesh/drive-1003/index.json (2026-10-02; 24 of its 48 repeat the first batch, the first batch's entry wins).
+// `--new 1` renders only the second batch's new photos. The look is chosen per photo (`--look auto`, the default): the
+// first batch's overcast dusk keeps `photo` (17:20), the 10-02 daytime shots get `sunny` and the dawn market shots `dawn`
+// at the photo's own clock, and a night shot gets no look at its own clock. `--look photo` forces one look for all.
 import { join, resolve } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import sharp from 'sharp';
@@ -23,7 +29,6 @@ const port = Number(args.port || 8870);
 if ([8787, 8790, 8791].includes(port)) throw new Error('port reserved');
 const H = Math.min(1080, Number(args.h || 1080)), W = Math.round(H * 3 / 4);
 const OUT = resolve(ROOT, args.out || 'docs/shots/v5_photos');
-const PHOTOS = join(ROOT, 'raw/photos-sailesh');
 
 /** GPS fixes that disagree with what the photo shows. [x, z] replaces the fix; y = a deck height (T.P.) to stand on;
  *  dh = a heading correction in degrees; pitch = the camera tilt read off the horizon (degrees, + up). */
@@ -61,21 +66,50 @@ export const FIX = {
 /** Per-photo camera tilt (degrees, + up), read off the horizon / verticals of each photo. */
 const PITCH = { IMG_0803: 8, IMG_0801: 6, IMG_0799: 6, IMG_0823: 6, IMG_0795: 4, IMG_0820: 8, IMG_0825: 6, IMG_0826: 6, IMG_0833: 2 };
 
+/** [v5:photos3] The photo batches, oldest first (a photo in both keeps the first batch's entry). */
+export const BATCHES = [
+  { id: 1, dir: 'raw/photos-sailesh', note: '2026-10-01 17:07-17:22 JST, IMG_0792-0842' },
+  { id: 2, dir: 'raw/photos-sailesh/drive-1003', note: 'drive 2026-10-03: 2026-10-01 13:30 (IMG_0774) and 2026-10-02 06:48-21:11 JST; 24 new' },
+];
+/** [v5:photos3] The look for a photo's date and clock (`--look auto`): the first batch's overcast dusk -> photo; 10-02 dawn
+ *  -> dawn; daytime -> sunny; night -> none (the clock alone). */
+export function lookFor(date, hours) {
+  if (date === '2026:10:01' && hours >= 16.9) return 'photo';
+  if (hours >= 5 && hours < 9) return 'dawn';
+  if (hours >= 9 && hours < 17.6) return 'sunny';
+  return 'none';
+}
+
 export function enu(lat, lon) { return [(lon - 141.575) * 86744, -(lat - 38.906) * 111014]; }
 export const vfov = (f35) => 2 * Math.atan(17.31 / f35) * 180 / Math.PI;   // [v5:detail] diagonal-matched 35 mm equivalent
 
 if (import.meta.main) await main();   // importable (tests use enu / vfov / FIX) without running the tool
 
 async function main() {
-  const index = JSON.parse(await Bun.file(join(PHOTOS, 'index.json')).text());
-  let list = index.map((p) => {
-    const id = p.SourceFile.split('/').pop().replace(/\.\w+$/, '');
-    const [x, z] = enu(p.GPSLatitude, p.GPSLongitude);
-    const fx = FIX[id] || {};
-    const hhmm = p.DateTimeOriginal.split(' ')[1].split(':').map(Number);
-    return { id, gps: [+x.toFixed(1), +z.toFixed(1)], x: fx.x ?? x, z: fx.z ?? z, y: fx.y ?? null, heading: p.GPSImgDirection + (fx.dh || 0), f35: p.FocalLengthIn35mmFormat, fov: +vfov(p.FocalLengthIn35mmFormat).toFixed(2), pitch: fx.pitch ?? PITCH[id] ?? 3, hours: hhmm[0] + hhmm[1] / 60, fix: fx.why || null };
-  });
+  // [v5:photos3] both batches; the first batch's entry wins for a photo in both
+  const seen = new Set();
+  let list = [];
+  for (const B of BATCHES) {
+    const ip0 = join(ROOT, B.dir, 'index.json'); if (!existsSync(ip0)) continue;
+    for (const p of JSON.parse(await Bun.file(ip0).text())) {
+      const id = p.SourceFile.split('/').pop().replace(/\.\w+$/, '');
+      if (seen.has(id)) continue; seen.add(id);
+      const [x, z] = enu(p.GPSLatitude, p.GPSLongitude);
+      const fx = FIX[id] || {};
+      const [date, clock] = p.DateTimeOriginal.split(' '), hhmm = clock.split(':').map(Number), hours = hhmm[0] + hhmm[1] / 60 + hhmm[2] / 3600;
+      list.push({ id, batch: B.id, src: join(ROOT, B.dir, 'jpg', `${id}.jpg`), date, gps: [+x.toFixed(1), +z.toFixed(1)], alt: p.GPSAltitude != null ? +p.GPSAltitude.toFixed(1) : null, x: fx.x ?? x, z: fx.z ?? z, y: fx.y ?? null, heading: p.GPSImgDirection + (fx.dh || 0), f35: p.FocalLengthIn35mmFormat, fov: +vfov(p.FocalLengthIn35mmFormat).toFixed(2), pitch: fx.pitch ?? PITCH[id] ?? 3, hours: +hours.toFixed(4), fix: fx.why || null, skip: fx.skip || null });
+    }
+  }
+  if (args.new) list = list.filter((p) => p.batch === 2);
   if (args.only) { const want = new Set(String(args.only).split(',').map((s) => 'IMG_' + s.replace(/^IMG_/, ''))); list = list.filter((p) => want.has(p.id)); }
+  // the look per photo: --hours / --weather -> the old clock-and-weather lighting for all; --look <id> -> that look for all
+  const legacy = !!(args.hours || args.weather);
+  const lookArg = args.look ?? (legacy ? 'none' : 'auto');
+  for (const p of list) {
+    p.look = lookArg === 'auto' ? lookFor(p.date, p.hours) : lookArg;
+    // the photo look keeps its 17:20 unless --photo-time; the new looks and night shots run at the photo's own clock
+    p.renderHours = legacy ? Number(args.hours || 16.5) : p.look === 'photo' && !args['photo-time'] ? 17 + 20 / 60 : p.hours;
+  }
   mkdirSync(OUT, { recursive: true });
 
   const dist = join(ROOT, `dist/anime-${port}`);
@@ -86,16 +120,18 @@ async function main() {
     browser = await launch({ quiet: !args.verbose });
     const page = await browser.page({ width: W, height: H });
     // [v5:detail] the photo look by default (overcast dusk 17:20 JST, 2026-10-01, interiors lit); --hours / --weather go back
-    // to the clock-and-weather lighting (the v5 pairs used 16:30 cloudy)
-    const look = args.look ?? (args.hours || args.weather ? 'none' : 'photo');
-    const hours0 = args.hours ? Number(args.hours) : look === 'photo' ? 17 + 20 / 60 : 16.5;
+    // to the clock-and-weather lighting (the v5 pairs used 16:30 cloudy). [v5:photos3] the page loads with the first photo's
+    // look; the look and the clock then switch per photo (life/time.js setLook, __setHours)
+    const look0 = list[0]?.look ?? 'photo', hours0 = list[0]?.renderHours ?? 17 + 20 / 60;
     const q = new URLSearchParams({ shot: '1', w: String(W), h: String(H), t: '0', q: args.q || 'high', fov: '60', hours: String(hours0) });
-    if (look !== 'none') q.set('look', look); else q.set('weather', args.weather || 'cloudy');
+    if (look0 !== 'none') q.set('look', look0); else q.set('weather', args.weather || (legacy ? 'cloudy' : 'clear'));
     if (args.query) for (const [k, v] of new URLSearchParams(args.query)) q.set(k, v);
     await page.goto(`${srv.url}index.html?${q}`);
     await page.waitFor('window.__ready === true', { timeout: 280000 });
+    let curLook = look0;
     for (const p of list) {
-      if (args['photo-time']) await page.eval(`window.__setHours(${p.hours})`);
+      if (p.look !== curLook) { await page.eval(`void window.__life.time.setLook(${p.look === 'none' ? 'null' : JSON.stringify(p.look)})`); curLook = p.look; }
+      await page.eval(`void window.__setHours(${p.renderHours})`);
       const cam = await page.eval(`(() => {
         const c = window.__ctx, ph = c.physics, x = ${p.x}, z = ${p.z};
         const g = ${p.y === null ? 'ph.groundHeight(x, z, 1e9)' : p.y};
@@ -109,21 +145,22 @@ async function main() {
       await page.frames(4);
       const app = join(OUT, `app_${p.id}.png`);
       await page.shot(app);
-      const src = join(PHOTOS, 'jpg', `${p.id}.jpg`);
-      if (existsSync(src)) {
-        const a = await sharp(src).rotate().resize({ height: H, width: W, fit: 'cover' }).toBuffer();
+      if (existsSync(p.src)) {
+        const a = await sharp(p.src).rotate().resize({ height: H, width: W, fit: 'cover' }).toBuffer();
         const b = await sharp(app).resize(W, H).toBuffer();
-        const label = Buffer.from(`<svg width="${W * 2}" height="40"><rect width="100%" height="40" fill="rgba(0,0,0,0.55)"/><text x="12" y="27" font-size="20" font-family="Helvetica" fill="#fff">${p.id}  ENU (${p.x.toFixed(1)}, ${p.z.toFixed(1)})  heading ${p.heading.toFixed(0)}°  ${p.f35} mm  eye ${(cam.ground + 1.5).toFixed(1)} m${p.fix ? '  [GPS corrected]' : ''}</text><text x="${W + 12}" y="27" font-size="20" font-family="Helvetica" fill="#fff">app (photo left)${look !== 'none' ? '  look: ' + look : ''}</text></svg>`);
+        const hh = (h) => `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.floor((h % 1) * 60)).padStart(2, '0')}`;
+        const label = Buffer.from(`<svg width="${W * 2}" height="40"><rect width="100%" height="40" fill="rgba(0,0,0,0.55)"/><text x="12" y="27" font-size="18" font-family="Helvetica" fill="#fff">${p.id}  ${p.date.slice(5).replace(':', '-')} ${hh(p.hours)}  ENU (${p.x.toFixed(1)}, ${p.z.toFixed(1)})  h ${p.heading.toFixed(0)}°  ${p.f35} mm  eye ${(cam.ground + 1.5).toFixed(1)} m${p.fix ? '  [corrected]' : ''}</text><text x="${W + 12}" y="27" font-size="18" font-family="Helvetica" fill="#fff">app (photo left)  ${p.look !== 'none' ? 'look: ' + p.look + ' ' : ''}${hh(p.renderHours)}</text></svg>`);
         await sharp({ create: { width: W * 2, height: H, channels: 3, background: '#000' } }).composite([{ input: a, left: 0, top: 0 }, { input: b, left: W, top: 0 }, { input: label, left: 0, top: H - 40 }]).jpeg({ quality: 84 }).toFile(join(OUT, `pair_${p.id}.jpg`));
       }
-      used.push({ ...p, ground: cam.ground, l0: cam.l0 });
-      console.log(`${p.id}: (${p.x.toFixed(1)}, ${p.z.toFixed(1)}) h${p.heading.toFixed(0)} f${p.f35} ground ${cam.ground} L0 ${cam.l0}`);
+      const { src: _src, ...keep } = p; void _src;
+      used.push({ ...keep, ground: cam.ground, l0: cam.l0 });
+      console.log(`${p.id}: (${p.x.toFixed(1)}, ${p.z.toFixed(1)}) h${p.heading.toFixed(0)} f${p.f35} ${p.look} ${p.renderHours.toFixed(2)} ground ${cam.ground} L0 ${cam.l0}`);
     }
     const errs = page.errors(); if (errs.length) console.log('PAGE ERRORS:', errs.length, errs.slice(0, 5).map((e) => e.text.slice(0, 300)));
-    // --only merges into the existing index
+    // --only / --new merge into the existing index
     let all = used; const ip = join(OUT, 'index.json');
-    if (args.only && existsSync(ip)) { const old = JSON.parse(await Bun.file(ip).text()).photos || []; const ids = new Set(used.map((p) => p.id)); all = [...old.filter((p) => !ids.has(p.id)), ...used].sort((a, b) => a.id.localeCompare(b.id)); }
-    writeFileSync(ip, JSON.stringify({ note: 'Cameras of the photo / app pairs (tools/anime/photo-pairs.mjs). The photos are raw/photos-sailesh (gitignored); pair_*.jpg embed them and are gitignored here.', hours: args['photo-time'] ? 'photo time' : hours0, look: look === 'none' ? null : look, weather: look === 'none' ? args.weather || 'cloudy' : null, photos: all }, null, 1));
+    if ((args.only || args.new) && existsSync(ip)) { const old = JSON.parse(await Bun.file(ip).text()).photos || []; const ids = new Set(used.map((p) => p.id)); all = [...old.filter((p) => !ids.has(p.id)), ...used].sort((a, b) => a.id.localeCompare(b.id)); }
+    writeFileSync(ip, JSON.stringify({ note: 'Cameras of the photo / app pairs (tools/anime/photo-pairs.mjs). The photos are raw/photos-sailesh and raw/photos-sailesh/drive-1003 (gitignored); pair_*.jpg embed them and are gitignored here. Each camera names its look and clock (look, renderHours).', looks: legacy ? null : { photo: '17:20 overcast dusk (2026-10-01)', sunny: 'the photo clock, sunny (2026-10-02)', dawn: 'the photo clock, dawn (2026-10-02)', none: 'the photo clock, no look' }, weather: legacy ? args.weather || 'cloudy' : null, photos: all }, null, 1));
   } catch (e) {
     console.log('PAIRS FAILED:', e.message); process.exitCode = 1;
   } finally {

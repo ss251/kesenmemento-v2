@@ -8,6 +8,7 @@ import { join } from "node:path";
 import sharp from "sharp";
 import * as L from "../src/anime/world/layout.js";
 import { PIER7_SPLIT } from "../src/anime/world/harbor/minami.js";
+import { PIER7_6 } from "../src/anime/world/harbor/minami5.js";
 import { SITES, MINAMI } from "../src/anime/world/harbor/real.js";
 import { WALK_SET } from "../src/anime/world/explore/places.js";
 import { fitRoofTransform, gradeRoof } from "../scripts/anime/enrich/fold.js";
@@ -36,7 +37,10 @@ describe("B1 PIER7 roofline and street face", () => {
     const h = Object.fromEntries(T.blocks.map((b) => [b.id, b.h]));
     expect(h.main).toBeGreaterThan(h.se); expect(h.se).toBeGreaterThan(h.nw);
     const src = read("src/anime/world/harbor/minami.js");
-    expect(src).toContain("nw: Math.max(f3 + 0.05, g0 + 9), main: Math.max(f3 + 3.4, g0 + 13), se: Math.max(f3 + 1.6, g0 + 11)");
+    // [v6:rebuild] the built eaves come from the photo survey's SfM points (PIER7_6): the NW pavilion lowest, the SE block's
+    // eave over the main block's (its top band reaches T.P. 13.6 in the points)
+    expect(src).toContain("const tops = { ...PIER7_6.tops };");
+    expect(PIER7_6.tops.nw).toBeLessThan(PIER7_6.tops.main); expect(PIER7_6.tops.main).toBeCloseTo(11.9, 1);
   });
   test("the street face is white panels with narrow timber louvers (pitch <= 1.2 m), no punched glass slots", () => {
     const src = read("src/anime/world/harbor/minami.js");

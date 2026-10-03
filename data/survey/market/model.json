@@ -1,0 +1,566 @@
+{
+ "note": "[v6:rebuild] The fish-market rebuild spec: every dimension the app builds for the C棟 roof deck (harbor/market5.js) and the north-facility quay hall (harbor/market4.js), from the photo survey (data/survey/market/features.json, docs/anime/survey/market.md). Deck positions are in the penthouse-wall frame: s = metres along the east wall from the frame origin (south-south-east, +), off = metres out from the wall face (east, +); ENU = o + s*u + off*n. Heights are T.P. metres unless named h (above the deck). Sources per block in `src`.",
+ "frame": {
+  "o": [
+   666.22,
+   961.95
+  ],
+  "u": [
+   0.414987,
+   0.909823
+  ],
+  "n": [
+   0.909823,
+   -0.414987
+  ]
+ },
+ "deck": {
+  "y": 15.585,
+  "edge": 23.2,
+  "north": -13.5,
+  "lowerDrop": 3.4,
+  "src": "deck.y (survey adjustment, eye heights + bridge pylon); the east parapet rail runs right behind the pavilions (seen through their glazing in IMG_0793 / 0798; the GSI / Earth top view's bright parapet line at off 21.3): off 23.2, 0.6 m clear of pair 3; the strip east of it is a lower roof the photos never see (they look over the rail at the bay)"
+ },
+ "rail": {
+  "h": 1.1,
+  "parapet": 0.45,
+  "post": 1.5,
+  "src": "IMG_0797 / 0798 / 0793: a 0.45 m concrete upstand with a 1.1 m galvanised rail"
+ },
+ "wall": {
+  "s": [
+   1.18,
+   161.0
+  ],
+  "top": [
+   22.31,
+   22.15
+  ],
+  "plinth": {
+   "h": 0.4,
+   "out": 0.28
+  },
+  "windows": {
+   "w": 1.95,
+   "h0": 1.0,
+   "h1": 2.64,
+   "list": [
+    6.15,
+    10.1,
+    14.05,
+    20.91,
+    24.82,
+    29.27,
+    35.92,
+    39.67,
+    43.47,
+    50.43,
+    54.53,
+    58.44,
+    65.19,
+    69.2,
+    73.15,
+    94.9,
+    98.99,
+    103.08,
+    108.9,
+    112.85,
+    116.8,
+    122.72,
+    126.56,
+    130.36,
+    136.78,
+    140.57,
+    144.18,
+    150.64,
+    154.25,
+    157.97
+   ],
+   "vents": [
+    10.1,
+    24.82,
+    39.67,
+    54.53,
+    69.19,
+    98.99,
+    112.85,
+    126.56,
+    140.57,
+    154.25
+   ],
+   "src": "24 centres measured on the wall plane (deck.window#1-24, IMG_0792 / 0795 / 0798); the triplets at s 6-14 and 109-117 by the 14.4 m triplet period (no photo sees them square-on)"
+  },
+  "vents": {
+   "w": 1.6,
+   "h0": 2.98,
+   "h1": 3.42
+  },
+  "letters": {
+   "chars": "気仙沼市魚市場",
+   "s": [
+    99.12,
+    93.9,
+    88.89,
+    83.83,
+    79.16,
+    74.16,
+    68.94
+   ],
+   "h": [
+    5.29,
+    5.2,
+    5.13,
+    5.26,
+    4.87,
+    5.21,
+    5.23
+   ],
+   "size": 2.4,
+   "out": 0.12
+  },
+  "entrance": {
+   "door": [
+    81.88,
+    85.8
+   ],
+   "doorH": 2.93,
+   "canopy": [
+    81.05,
+    86.27
+   ],
+   "canopyH": [
+    3.07,
+    3.4
+   ],
+   "canopyOut": 1.56
+  },
+  "ramps": [
+   {
+    "s": [
+     86.2,
+     89.1
+    ],
+    "out": 1.5,
+    "h": 0.9
+   },
+   {
+    "s": [
+     77.5,
+     82.6
+    ],
+    "out": 1.5,
+    "h": 0.9
+   }
+  ],
+  "eaves": [
+   {
+    "s": [
+     50.8,
+     71.0
+    ],
+    "h": 7.3,
+    "set": 1.0,
+    "depth": 6.0
+   },
+   {
+    "s": [
+     99.5,
+     117.4
+    ],
+    "h": 7.1,
+    "set": 1.0,
+    "depth": 6.0
+   }
+  ],
+  "src": "wall line, base and top: deck.wall.* (survey adjustment, GSI lot corners); windows: 1.95 x 1.64 m measured on the wall plane in IMG_0792 (six windows) and IMG_0795 (two), centres in triplets every ~14.5 m (deck.window#1-24); vents: IMG_0792 / 0795 above each triplet's middle window; letters: deck.letter.1-7 (2.4 m glyphs, IMG_0795); entrance: deck.entrance.* and IMG_0795 cuts; raised roof sections behind the parapet with rounded white end caps: IMG_0792 (s 50.8-71.0, front edge T.P. 22.9 = h 7.3), IMG_0794 / 0795 (s 99.5-117.4, h 7.1-7.6), each cut 1 m behind the wall face; the entrance landing (0.3 m step) and its two handrails cut on the deck / the rail line in IMG_0795",
+  "landing": {
+   "s": [
+    76.5,
+    91.0
+   ],
+   "out": 1.6,
+   "h": 0.3
+  }
+ },
+ "penthouse": {
+  "west": -32.0,
+  "src": "GSI / Earth top: the upper floor fills C棟 from its west edge (off -32) to the east wall"
+ },
+ "studio": {
+  "face": [
+   [
+    731.7,
+    1109.0
+   ],
+   [
+    757.5,
+    1098.3
+   ]
+  ],
+  "top": 22.12,
+  "south": 182.0,
+  "windows": [
+   {
+    "c": [
+     739.87,
+     1105.61
+    ],
+    "w": 1.68,
+    "h": [
+     16.72,
+     18.18
+    ]
+   },
+   {
+    "c": [
+     742.78,
+     1104.27
+    ],
+    "w": 1.68,
+    "h": [
+     16.72,
+     18.18
+    ]
+   }
+  ],
+  "mascot": [
+   738.69,
+   19.94,
+   1106.1
+  ],
+  "louvre": {
+   "a": [
+    744.36,
+    1109.74
+   ],
+   "b": [
+    753.8,
+    1105.25
+   ],
+   "y": [
+    22.66,
+    24.96
+   ],
+   "depth": 4.0
+  },
+  "lamps": [
+   [
+    754.36,
+    26.53,
+    1113.72
+   ],
+   [
+    745.76,
+    26.33,
+    1116.11
+   ]
+  ],
+  "src": "deck.studio.* (survey adjustment; studio face = GSI line shifted by studio_off), louvre box corners, lamp panels (IMG_0794 / 0796 / 0798); door from deck.studio.door (cut on the face plane in IMG_0794 / 0796 / 0798), its canopy flush with the face (canopy corners off 1.43 / 5.31, T.P. 18.68-19.15)",
+  "door": {
+   "off": 3.05,
+   "w": 3.0,
+   "h": 2.75,
+   "canopy": [
+    1.4,
+    5.3
+   ],
+   "canopyH": [
+    3.1,
+    3.55
+   ],
+   "canopyOut": 1.1
+  },
+  "sign": {
+   "off": 3.3,
+   "h": [
+    4.35,
+    3.85
+   ]
+  }
+ },
+ "pavilions": {
+  "h": {
+   "curb": 0.3,
+   "plinth": 0.79,
+   "glass": 2.1,
+   "fascia": 2.5
+  },
+  "roof": {
+   "low": 2.7,
+   "tip": 3.75,
+   "curl": 2.0,
+   "over": 0.6,
+   "outer": 2.0,
+   "inner": 0.7,
+   "th": 0.32
+  },
+  "list": [
+   {
+    "s": [
+     5.15,
+     13.45
+    ],
+    "o": [
+     13.7,
+     20.3
+    ],
+    "outer": "N"
+   },
+   {
+    "s": [
+     20.35,
+     28.65
+    ],
+    "o": [
+     13.7,
+     20.3
+    ],
+    "outer": "S"
+   },
+   {
+    "s": [
+     50.55,
+     58.85
+    ],
+    "o": [
+     13.7,
+     20.3
+    ],
+    "outer": "N"
+   },
+   {
+    "s": [
+     65.28,
+     73.58
+    ],
+    "o": [
+     13.7,
+     20.3
+    ],
+    "outer": "S"
+   },
+   {
+    "s": [
+     94.9,
+     103.2
+    ],
+    "o": [
+     16.0,
+     22.6
+    ],
+    "outer": "N"
+   },
+   {
+    "s": [
+     107.6,
+     114.5
+    ],
+    "o": [
+     16.0,
+     22.6
+    ],
+    "outer": "S"
+   },
+   {
+    "s": [
+     140.25,
+     148.55
+    ],
+    "o": [
+     13.7,
+     20.3
+    ],
+    "outer": "N"
+   },
+   {
+    "s": [
+     151.7,
+     160.0
+    ],
+    "o": [
+     13.7,
+     20.3
+    ],
+    "outer": "S"
+   }
+  ],
+  "src": "6.6 m wide, 8.3 m long (#6 6.9 m): #4 from IMG_0793 (SW corner s 73.56 / off 13.7, south face 6.6 m wide, plinth 0.79 / glass 2.1 / fascia 2.5 / raised roof end 3.6-3.8 m, cut on the measured face plane); pair 3 (#5, #6) from an edge fit of the well-registered IMG_0794 / 0796 / 0798 (best west face off 16, #5 north end s 94-95; #6 south end s 114.5 from its corner seen in all three, north end bounded by the stack S56 in the gap); IMG_0797 is not used (its pose is held only by its GPS fix: the cactus's plate cuts 7 m apart in IMG_0796 and IMG_0797, and the two photos' distances to it break the triangle inequality); pairs 1, 2, 4 centred on the GSI ortho (deck.pavilion#1-3, #7, #8, sigma 1.5 m), #8 clamped 1 m short of the studio face; outer (swept-up) ends alternate N / S within each pair (IMG_0793, 0797)"
+ },
+ "stacks": {
+  "r": 0.38,
+  "cone": 0.7,
+  "collarH": 1.0,
+  "list": [
+   [
+    16.9,
+    15.5,
+    20.6
+   ],
+   [
+    31.2,
+    15.6,
+    20.6
+   ],
+   [
+    62.07,
+    15.5,
+    20.6
+   ],
+   [
+    75.09,
+    17.61,
+    20.6
+   ],
+   [
+    82.4,
+    18.6,
+    21.2
+   ],
+   [
+    106.6,
+    15.5,
+    20.55
+   ],
+   [
+    122.37,
+    15.86,
+    20.71
+   ],
+   [
+    150.1,
+    15.5,
+    20.6
+   ]
+  ],
+  "src": "S67 (IMG_0796 x 0798, 3.0 / 1.6 px); S56 cut at the measured tip height on its IMG_0796 bearing (in the gap between #5 and #6, as IMG_0797 shows it); the two stacks south of #4 cut at that height on their IMG_0793 bearings (the one behind the lifeboat stands beyond it, tip T.P. 21.2); the mid-pair stacks of pairs 1, 2, 4 and the one after pair 1 by the pattern"
+ },
+ "lifeboat": {
+  "n": [
+   714.16,
+   1031.3
+  ],
+  "s": [
+   716.33,
+   1034.12
+  ],
+  "src": "deck.lifeboat.end_n / end_s (trailer ends on the deck, IMG_0793); the hull's stencil reads 5.30 x 2.30 x 1.00 (L x B x D); the stern faces IMG_0793 6.4 m away (its keel, sheer, canopy and hatch-box tops 0.45 / 1.07 / 1.92 / 2.23 m above the deck at that range)",
+  "stern": 86.6,
+  "L": 5.3,
+  "B": 2.3,
+  "off": 16.0,
+  "keel": 0.45,
+  "sheer": 1.07,
+  "canopy": 1.92,
+  "top": 2.23
+ },
+ "cones": [
+  [
+   709.498,
+   1030.581
+  ],
+  [
+   710.647,
+   1033.402
+  ],
+  [
+   711.866,
+   1036.356
+  ],
+  [
+   713.056,
+   1039.146
+  ]
+ ],
+ "hall": {
+  "floor": 2.19,
+  "soffit": 7.0,
+  "edgeBeam": 5.82,
+  "beam": 6.4,
+  "col": {
+   "at": [
+    556.49,
+    667.5
+   ],
+   "w": 0.7,
+   "d": -8.1,
+   "label": 7,
+   "dir": -1,
+   "note": "column 「7」: its foot cut on the hall floor in IMG_0853 (d -7.5) and IMG_0860 (d -8.7), 8.1 m inside the face line (the roof overhangs the column line by 8 m; the outer beam band at the face is the T.P. 5.82 edge beam); a 62.2 m from the shed's south quay corner. No other column is in view over a 51.9-62.2, so the spacing is > 10.3 m: 15 m (12 bays) is assumed. The other numbers are taken to rise toward the north end (the photos show only 「7」)"
+  },
+  "src": "the north facility's quay hall (IMG_0853-0861, 06:53 dawn): floor T.P. 2.19 (canopy.floor_y), open from the quay face to the land-side wall (canopy.open_depth), the face edge beam's underside T.P. 5.82 (canopy.beam_bottom), a longitudinal girder over the column line (underside 6.4 where IMG_0855's dark band ends), a lighter beam band at d -4 (6.1), transverse beams over the columns",
+  "midBeam": {
+   "d": -4.0,
+   "bottom": 6.1
+  },
+  "spacing": 14.98,
+  "frame": {
+   "o": [
+    538.2,
+    607.5
+   ],
+   "to": [
+    612.4,
+    771.3
+   ],
+   "note": "a = metres along the quay face from its south corner, d = metres out from the face (east, + to the sea)"
+  },
+  "clutterFree": [
+   35,
+   75
+  ],
+  "scaleWarning": "The dawn cluster's depth scale looks 2-3x short: at the solved ranges the 2 t truck's cab front (1.7 m) measures 0.8 m and the 1 t fish tubs 0.46 m wide (IMG_0855). Hall items closer than the quay face are therefore not placed from these photos (the tub rows, the conveyor); the bays they stand in are left free of the generic clutter."
+ },
+ "cars": [
+  {
+   "name": "silver kei (IMG_0794)",
+   "s": 92.6,
+   "o": 10.2,
+   "face": "W",
+   "color": "#b9bcbf"
+  },
+  {
+   "name": "cactus",
+   "s": 94.96,
+   "o": 10.14,
+   "face": "W",
+   "color": "#2f7f8f"
+  },
+  {
+   "name": "crown",
+   "s": 96.74,
+   "o": 10.27,
+   "face": "W",
+   "color": "#e9eae6"
+  },
+  {
+   "name": "mazda",
+   "s": 98.82,
+   "o": 10.2,
+   "face": "W",
+   "color": "#f2f2ee"
+  },
+  {
+   "name": "swift",
+   "s": 100.51,
+   "o": 10.5,
+   "face": "W",
+   "color": "#f0f0ec"
+  },
+  {
+   "name": "spacia",
+   "s": 102.18,
+   "o": 10.5,
+   "face": "W",
+   "color": "#ecebe5"
+  },
+  {
+   "name": "dark SUV (IMG_0794 / 0797)",
+   "s": 104.6,
+   "o": 10.4,
+   "face": "W",
+   "color": "#3b3e42"
+  }
+ ],
+ "carsSrc": "cactus and crown: their plates cut at the plate height (0.45 m) in IMG_0796; mazda, swift and spacia at the plate spacing IMG_0797 shows (its absolute position is not trusted); centres 2.1 m behind the plate, facing west; the silver kei and the dark SUV at the row's ends (IMG_0794). Not built: the parked cars are transient (and box cars add edges that cannot match the photos); the measured positions stay here for reference",
+ "carsBuilt": false
+}

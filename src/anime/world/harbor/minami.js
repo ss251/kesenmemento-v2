@@ -18,7 +18,7 @@ import { prismWalls, capGeo, offsetRing, obbOf, seg, barAlong, openRing, signedA
 import { nightMat, addGlint, registry } from './lights.js';
 import { mapMat, textTex, FONT } from './util.js';
 import { shopGlass } from './detail5.js';   // [v5:detail]
-import { buildPier7Photos, buildMukaeruPhotos, buildPlazaPhotos, buildSlowStreetPhotos, buildKonbiniPhotos, buildMarkingsPhotos, clipAxis } from './minami5.js';   // [v5:photos]
+import { buildPier7Photos, buildMukaeruPhotos, buildPlazaPhotos, buildSlowStreetPhotos, buildKonbiniPhotos, buildMarkingsPhotos, buildEastPromenade, clipAxis, LAWN6, PIER7_6, P7POLY6, P7_1F6 } from './minami5.js';   // [v5:photos]
 
 const C = { white: '#f1f1ee', roof: '#eceeed', timber: '#d6b88e', timberDark: '#a9825a', render: '#f0efe9', deck: '#b08a62', steel: '#5d6470', concrete: '#c9c6bc', stepTop: '#d7d3c8', lawn: '#8a9566', paveA: '#c6c3b8', paveB: '#b9b6ac', tanStep: '#b5ab9f', ringWhite: '#e9e7e1', soil: '#4f4a3e', lowPlant: '#4d5e3c', louver: '#cdbfa8', pontoon: '#b9bcb6', membrane: '#f4f5f2', glassPale: '#a9bccb', terraceA: '#6d6664', terraceB: '#57545b', p7deck: '#a7a39c', mukGrey: '#cfcfca', mukDark: '#8f8d8b', tanDeck: '#ae9a90',
   // [v5:fix3] 迎 from Sailesh's photos (IMG_0818 / IMG_0824) + Earth 2026-03-11: silver rib siding, khaki render, grey metal roofs
@@ -163,37 +163,40 @@ export function buildMinami(ctx) {
   // #6d6664 / #504e57) that falls toward the bay. Pale glass (#a9bccb) with white solid panels and timber louvers on
   // the street face (it was a 3-storey, 13 m all-blue-glass box over the whole bar).
   {
-    const poly = SITES.pier7.poly, g0 = base(poly), f2 = MINAMI.wallCrest, f3 = f2 + 5.2, roofY = f3 + 4.0;
+    // [v6:rebuild] PIER7's levels from the photo survey's SfM points along the bay face (raw/survey/minami/points.ply; the
+    // deck edge and its lights at T.P. 4.4-4.5, the stilts 4.1 m out, the 3F floor band at 8.6, the main roof's eave at
+    // 11.9, the SE block's top at 13.6, the NW pavilion's roof edge at 8.8; IMG_0799, 0802, 0806, 0817): the bay-side
+    // seawall is the T.P. ~4.1 m wall with the deck on it, not 6.2 m (the plaza's T.P. 1.83 + 4.4 m)
+    const poly = SITES.pier7.poly, g0 = base(poly), f2 = PIER7_6.f2, f3 = PIER7_6.f3, roofY = PIER7_6.tops.main;
     const T = PIER7_SPLIT;
-    k.mesh(prismWalls(poly, g0 - 1, g0 + 0.3), m.concrete);
-    glazedBand(poly, g0 + 0.3, f2 - 0.55, 1.8, shopGlass(ctx, 'shop', 0.95), g0 + 2.6);
+    k.mesh(prismWalls(P7_1F6, g0 - 1, g0 + 0.3), m.concrete);
+    glazedBand(P7_1F6, g0 + 0.3, f2 - 0.55, 1.8, shopGlass(ctx, 'shop', 0.95), g0 + 2.6);   // [v6:rebuild] the 1F behind the corner deck
     // [v5:photos] the NW pavilion and the SE white block are full-depth volumes of their own (minami5.js), so the 2F glazing,
     // its roof and the stepped terrace cover only the middle of the bar (IMG_0800-0806)
-    const MID = clipAxis(poly, T.axis.o, T.axis.u, -2.5, 40.6);
+    // [v6:rebuild] the bay face stands 1.5 m inside the seawall line (P7WALL), not on GSI's outline 3.7 m further in (SfM points
+    // of the 2F / 3F glass; IMG_0802, 0814-0817): P7POLY6 carries it; the block seams at -0.5 and 39.0 along the axis
+    const P6 = P7POLY6, [c0, c1] = PIER7_6.cuts;
+    const MID = clipAxis(P6, T.axis.o, T.axis.u, c0, c1);
     // [v5:detail] the 2F glazing stands 3.5 m back from the bay edge behind a terrace with tables (IMG_0802, 0815); that
     // also bares the SE block's NW face with 「PIER7」 and the bay painting above the deck (IMG_0816)
     const dBay = Math.max(...MID.map((p) => (p[0] - T.axis.o[0]) * T.bayN[0] + (p[1] - T.axis.o[1]) * T.bayN[1]));
-    const MIDb = clipAxis(MID, T.axis.o, T.bayN, -1e3, dBay - 3.5), MIDt = clipAxis(MID, T.axis.o, T.bayN, dBay - 3.5, 1e3);
+    void dBay; const MIDb = MID;   // [v6:rebuild] the 2F glass stands at the bay face; the terrace in front is the deck on the wall (minami5)
     glazedBand(MIDb, f2, f3 - 0.55, 1.25, shopGlass(ctx, 'cafe', 1.0), f2 + 2.6);
-    k.mesh(capGeo(MIDt, f2 + 0.03, { tile: 2 }), m.p7deck);
-    if (ctx.physics?.addWalkBox) { const o = obbOf(MIDt); ctx.physics.addWalkBox(o.cx, o.cz, o.w, o.d, o.rotY, f2 + 0.03, f2 - 1); }
     k.mesh(capGeo(MIDb, f3 + 0.03), m.terraceA);                                   // the 2F roof (bay side shows)
     // the stepped terrace on the bay-side 2F roof: nested strips from the 3F wall toward the bay, each one step lower
-    const steps5 = T.steps.map((st) => clipAxis(st, T.axis.o, T.axis.u, -2.5, 40.6));   // [v5:photos]
+    const steps5 = [];   // [v6:rebuild] no stepped terrace: the 3F glass rises straight above the 2F's head band (IMG_0802, 0817)
     steps5.forEach((st, i) => { k.mesh(prismWalls(st, f3, f3 + 0.5 * (i + 1)), i % 2 ? m.terraceA : m.terraceB); k.mesh(capGeo(st, f3 + 0.5 * (i + 1) + 0.01), i % 2 ? m.terraceA : m.terraceB); });
     if (ctx.physics?.addWalkBox) for (const [i, st] of steps5.entries()) { const o = obbOf(st); ctx.physics.addWalkBox(o.cx, o.cz, o.w, o.d, o.rotY, f3 + 0.5 * (i + 1), f3 - 1); }
     // [v5:fix2] the 3F in three blocks with a broken roofline (Earth 2026-03-11): the NW block keeps only the 2F (a white
     // roof at ~9 m), the main block is the glazed 3F (meeting rooms and studios, ~13 m), the SE block is the tall 2F
     // light-sports hall (~11 m; white panels with a clerestory). Heights are above the street (g0), never below a floor.
-    const tops = { nw: Math.max(f3 + 0.05, g0 + 9), main: Math.max(f3 + 3.4, g0 + 13), se: Math.max(f3 + 1.6, g0 + 11) };
+    const tops = { ...PIER7_6.tops };   // [v6:rebuild] eaves as the SfM points put them (was g0 + 9 / 13 / 11)
     const along = (a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], l = Math.hypot(dx, dz) || 1; return Math.abs((dx * T.axis.u[0] + dz * T.axis.u[1]) / l); };
     // [v5:photos] only the main block is built here (glazed 3F; its gable roof with deep eaves is minami5's); the NW pavilion
     // and the SE white-board block are minami5's full-depth volumes
-    for (const bl of T.blocks) {
-      const top = tops[bl.id], P = bl.poly;
-      if (bl.id === 'main') glazedBand(P, f3, top - 0.55, 1.25, shopGlass(ctx, 'glow', 0.9), f3 + 2.5);
-      if (bl.id === 'main') k.mesh(capGeo(offsetRing(P, -0.4), top - 0.6, { down: true, tile: 2 }), m.timber);
-    }
+    { const top = tops.main, P = MID;   // [v6:rebuild] the glazed 3F over the main block's full depth
+      glazedBand(P, f3, top - 0.55, 1.25, shopGlass(ctx, 'glow', 0.9), f3 + 2.5);
+      k.mesh(capGeo(offsetRing(P, -0.4), top - 0.6, { down: true, tile: 2 }), m.timber); }
     // interior warmth: timber-lined ceilings read through the glass
     k.mesh(capGeo(offsetRing(poly, -0.4), f2 - 0.6, { down: true, tile: 2 }), m.timber); k.mesh(capGeo(offsetRing(MIDb, -0.4), f3 - 0.6, { down: true, tile: 2 }), m.timber);   // [v5:photos] MID
     // [v5:fix2] the street face: continuous white panels with narrow vertical timber louvers at a 1.1 m pitch in front of
@@ -212,7 +215,7 @@ export function buildMinami(ctx) {
     // the terrace on its crest, the deck on white stilts with the lit wire rail; the NW pavilion, the SE white block with
     // 「PIER7」 and the bay painting, the main gable roof, the 3F balcony box; the NW street corner (IMG_0799, 0823). It replaces
     // the v5:fix cantilevered pale deck and the 15 m 「PIER7」 on the 3F bay face, which the photos do not show.
-    out.pier7photos = buildPier7Photos(ctx, k, { L, P: poly, g0, f2, f3, T, tops, mid: MIDb });
+    out.pier7photos = buildPier7Photos(ctx, k, { L, P: P6, g0, f2, f3, T, tops, mid: MIDb });
     edgesOf(poly, (a, b, len, n, u) => {
       if (len < 30 || seaward(L, a, b, n, 40)) return;
       const p = [a[0] + u[0] * len * 0.5 + n[0] * 0.55, a[1] + u[1] * len * 0.5 + n[1] * 0.55];
@@ -221,7 +224,7 @@ export function buildMinami(ctx) {
       sign('気仙沼市まち・ひと・しごと交流プラザ', 12, 0.8, q[0], f3 - 0.25, q[1], Math.atan2(n[0], n[1]), { color: '#3a4a5c' });
     });
     // the bay-cruise ticket office sign at the NW end (気仙沼ベイクルーズ)
-    sign('気仙沼ベイクルーズ 乗船券売場', 6.5, 0.9, 1.6, g0 + 3.0, 70.2, Math.atan2(-0.5, -0.87), { color: '#f4f2ea', bg: '#1f4fa8', font: FONT.round });
+    // [v6:rebuild] (the 気仙沼ベイクルーズ banner on the NW face is not in IMG_0799 / 0823 / 0907: removed)
     hall(poly, f3 - g0);
     for (const bl of T.blocks) if (bl.id !== 'nw') hall(bl.poly, tops[bl.id] - g0);
     out.pier7 = { g0, f2, f3, roofY, tops };
@@ -489,11 +492,12 @@ export function buildMinami(ctx) {
     out.garden = pz;
     out.konbini = buildKonbiniPhotos(ctx, k, { L, base });
     out.markings = buildMarkingsPhotos(ctx, k, { L });
+    out.eastPromenade = buildEastPromenade(ctx, k, { L });   // [v6:rebuild]
   }
 
   // ============================================================== the sloped lawn north of 迎
   {
-    const P = MINAMI.lawn, pos = [], idx = [];
+    const P = PHOTOS5 ? LAWN6 : MINAMI.lawn, pos = [], idx = [];   // [v6:rebuild] the lawn bank as the photos place it
     const c = P.reduce((s, p) => [s[0] + p[0] / P.length, s[1] + p[1] / P.length], [0, 0]);
     const yOf = (x, z) => Math.max(L.heightAt(x, z) + 0.08, 2.2 + Math.max(0, Math.min(1, (x - 14) / -40)) * 3.2);
     const rings = 4;

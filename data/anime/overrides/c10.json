@@ -22,6 +22,14 @@
    "id": "osm",
    "what": "OpenStreetMap, raw/osm/overpass.json (© OpenStreetMap contributors, ODbL)",
    "date": "2026-05-06"
+  },
+  {
+   "id": "web",
+   "what": "kkanyo.jp/room (guest rooms 4F-10F), jalan.net yad310253"
+  },
+  {
+   "id": "commons",
+   "what": "Wikimedia Commons, reference only: 'Cityscape of Kessennuma City, 2026' (2026-03-29, from 安波山; raw/ref/heights8921) and 'Kesennuma civic hall' (March 2025, CC BY-SA 4.0; raw/ref/commons/untagged/169266032_Kesennuma_civic_hall.jpg)"
   }
  ],
  "lots": [
@@ -34,8 +42,9 @@
     "shape": "flat",
     "color": "#a8a7a4"
    },
-   "facade": "public",
-   "src": "earth: A o90 + o180 + full o90, 気仙沼市民会館 is a 3-level hall with a fly tower (~16 m); its roof sits well below the 26 m box"
+   "facade": "plain",
+   "src": "earth: A o90 + o180 + full o90, 気仙沼市民会館 is a 3-level hall with a fly tower (~16 m); its roof sits well below the 26 m box; commons Kesennuma civic hall 2025: grey panel patchwork (#c8cbcc / #9ea3a8), no punched windows",
+   "wall": "#b4b9bd"
   },
   {
    "id": "16/58540/25069/320",
@@ -85,13 +94,8 @@
   },
   {
    "id": "16/58540/25069/317",
-   "storeys": 2,
-   "height": 6.5,
-   "roof": {
-    "shape": "gable",
-    "color": "#908c8a"
-   },
-   "src": "earth: A o0 + o180, a two-storey building with a dark pitched roof at the 河原田 junction, not a 3-storey flat block"
+   "remove": true,
+   "src": "earth: A top + o0/o180, the footprint is the new 河原田 junction carriageway and island (presence/v_c10j2, obl_c10j)"
   },
   {
    "id": "16/58540/25069/319",
@@ -771,10 +775,8 @@
   },
   {
    "id": "16/58540/25069/318",
-   "roof": {
-    "color": "#9a9790"
-   },
-   "src": "earth: sub-cell top view, roof Earth #928b8c (was #e8e8f0, ΔE 30.7)"
+   "remove": true,
+   "src": "earth: A top, crossing and junction apron, no building"
   },
   {
    "id": "16/58540/25069/322",
@@ -1646,10 +1648,13 @@
   },
   {
    "id": "16/58541/25069/187",
+   "height": 12.5,
    "roof": {
-    "color": "#858786"
+    "shape": "flat",
+    "color": "#6f7276"
    },
-   "src": "earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #94a8a8, ΔE 13.1)"
+   "facade": "plain",
+   "src": "earth: t-kanyo o180/o270, a curved multi-level structure with a parking deck at the curved-road level (about T.P. 19-20); DEM T.P. 7-18 under the outline (kind kept 'warehouse': with 'hotel' the street-level kit stands a 4-storey office block on its main wing, top T.P. 31.6)"
   },
   {
    "id": "16/58541/25069/188",
@@ -1975,10 +1980,8 @@
   },
   {
    "id": "16/58541/25069/307",
-   "roof": {
-    "color": "#5f6a70"
-   },
-   "src": "earth: sub-cell top view, roof Earth #5b616e (was #90b0ac, ΔE 27.3)"
+   "remove": true,
+   "src": "earth: t-kanyo top/o0/o180/o270, the complex is several roofed wings; rebuilt as newLots"
   },
   {
    "id": "16/58541/25069/308",
@@ -2631,6 +2634,582 @@
    },
    "facade": "shop",
    "src": "earth: D top (zgD1.jpg; its shadow is ~7 m), a new two-storey building with a pale flat roof"
+  },
+  {
+   "id": "ovr:c10:kawarada-row-a",
+   "poly": [
+    [
+     85.7,
+     602.6
+    ],
+    [
+     93,
+     590.9
+    ],
+    [
+     94.2,
+     588.9
+    ],
+    [
+     98.9,
+     595.2
+    ],
+    [
+     92.1,
+     606.8
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#6e6268"
+   },
+   "src": "osm: w792747205 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
+  },
+  {
+   "id": "ovr:c10:kawarada-row-b",
+   "poly": [
+    [
+     92.7,
+     590
+    ],
+    [
+     86.1,
+     586
+    ],
+    [
+     80.8,
+     582.8
+    ],
+    [
+     83.9,
+     575.6
+    ],
+    [
+     91.7,
+     579.4
+    ],
+    [
+     89.9,
+     583.3
+    ],
+    [
+     93.9,
+     588
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#6e6268"
+   },
+   "src": "osm: w792747206 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
+  },
+  {
+   "id": "ovr:c10:kawarada-row-c",
+   "poly": [
+    [
+     86.1,
+     586.5
+    ],
+    [
+     78.9,
+     598.2
+    ],
+    [
+     85.4,
+     602.2
+    ],
+    [
+     92.6,
+     590.4
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#6e6268"
+   },
+   "src": "osm: w792747207 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
+  },
+  {
+   "id": "ovr:c10:kawarada-row-d",
+   "poly": [
+    [
+     78.6,
+     597.8
+    ],
+    [
+     73.3,
+     594.6
+    ],
+    [
+     80.5,
+     582.9
+    ],
+    [
+     85.8,
+     586.1
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#6e6268"
+   },
+   "src": "osm: w792747208 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
+  },
+  {
+   "id": "ovr:c10:saiwai-h-a",
+   "poly": [
+    [
+     -159.2,
+     963.4
+    ],
+    [
+     -163.3,
+     979.2
+    ],
+    [
+     -169.2,
+     977.6
+    ],
+    [
+     -165.1,
+     961.9
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#827d88"
+   },
+   "src": "osm: w1284225987 + earth: E top, o0/o180, a new 2-storey house (the GSI photo shows a graded vacant lot)"
+  },
+  {
+   "id": "ovr:c10:saiwai-h-b",
+   "poly": [
+    [
+     -166.5,
+     961.1
+    ],
+    [
+     -169.3,
+     972.8
+    ],
+    [
+     -176.8,
+     971
+    ],
+    [
+     -173.9,
+     959.3
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#86757f"
+   },
+   "src": "osm: w1284225988 + earth: E top, o0/o180, a new 2-storey house (the GSI photo shows a graded vacant lot)"
+  },
+  {
+   "id": "ovr:c10:saiwai-h-c",
+   "poly": [
+    [
+     -121.1,
+     969.7
+    ],
+    [
+     -124.4,
+     977.8
+    ],
+    [
+     -132,
+     974.8
+    ],
+    [
+     -128.7,
+     966.7
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#464c60"
+   },
+   "src": "osm: w1284225986 + earth: E top, o0/o180, a new 2-storey house (the GSI photo shows a graded vacant lot)"
+  },
+  {
+   "id": "ovr:c10:saiwai-warehouse",
+   "poly": [
+    [
+     -176.6,
+     991.6
+    ],
+    [
+     -155.6,
+     1000.8
+    ],
+    [
+     -159.8,
+     1010.3
+    ],
+    [
+     -180.7,
+     1001.1
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 6,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8d9d6"
+   },
+   "src": "osm: w1284225990 (237 m2) + earth: E top, a large white flat-roofed warehouse with trucks in its yard (the GSI photo shows a graded vacant lot)"
+  },
+  {
+   "id": "ovr:c10:kanyo-north",
+   "poly": [
+    [
+     195.1,
+     446.0
+    ],
+    [
+     212.3,
+     462.0
+    ],
+    [
+     199.7,
+     475.6
+    ],
+    [
+     182.5,
+     459.5
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 3,
+   "height": 10.8,
+   "roof": {
+    "shape": "hip",
+    "color": "#76787f"
+   },
+   "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the north wing on the T.P. 17.7 terrace, grey hip roof, eaves at about T.P. 28.5"
+  },
+  {
+   "id": "ovr:c10:kanyo-main",
+   "poly": [
+    [
+     177.7,
+     455.1
+    ],
+    [
+     199.7,
+     475.6
+    ],
+    [
+     187.6,
+     488.6
+    ],
+    [
+     165.6,
+     468.2
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 2,
+   "height": 10.7,
+   "roof": {
+    "shape": "hip",
+    "color": "#76787f"
+   },
+   "name": "サンマリン気仙沼ホテル観洋",
+   "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the main (west) wing on the T.P. 17.7 terrace, grey hip roof, eaves at about T.P. 28.5"
+  },
+  {
+   "id": "ovr:c10:kanyo-east",
+   "poly": [
+    [
+     210.9,
+     463.5
+    ],
+    [
+     225.4,
+     476.9
+    ],
+    [
+     209.6,
+     493.8
+    ],
+    [
+     190.8,
+     490.7
+    ],
+    [
+     187.7,
+     488.4
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 3,
+   "height": 19.7,
+   "roof": {
+    "shape": "flat",
+    "color": "#9a9a9a"
+   },
+   "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the flat middle section between the wings and the tower, roof about T.P. 28.5; it steps down to the harbour side (DEM T.P. 9-22)"
+  },
+  {
+   "id": "ovr:c10:kanyo-annex",
+   "poly": [
+    [
+     203.9,
+     465.1
+    ],
+    [
+     208.0,
+     468.9
+    ],
+    [
+     201.1,
+     476.2
+    ],
+    [
+     197.0,
+     472.4
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 5,
+   "height": 15.7,
+   "roof": {
+    "shape": "flat",
+    "color": "#cfc8b0"
+   },
+   "facade": "plain",
+   "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the cream rooftop block on the wings (gsi: its shadow), top about T.P. 33.5"
+  },
+  {
+   "id": "ovr:c10:kanyo-d",
+   "poly": [
+    [
+     215.4,
+     478.5
+    ],
+    [
+     219.9,
+     482.7
+    ],
+    [
+     212.4,
+     490.8
+    ],
+    [
+     207.9,
+     486.6
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 7,
+   "height": 31.6,
+   "roof": {
+    "shape": "flat",
+    "color": "#8d9196"
+   },
+   "src": "commons Cityscape 2026: the lower block in front of the tower's NW face, top about T.P. 41; earth: t-kanyo top, white rooftop railings"
+  },
+  {
+   "id": "ovr:c10:kanyo-tower",
+   "poly": [
+    [
+     223.5,
+     479.2
+    ],
+    [
+     235.0,
+     489.9
+    ],
+    [
+     223.4,
+     502.4
+    ],
+    [
+     211.9,
+     491.7
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 11,
+   "height": 46.4,
+   "roof": {
+    "shape": "flat",
+    "color": "#646f7b"
+   },
+   "wall": "#9aa8a6",
+   "src": "web: kkanyo.jp rooms 4F-10F; commons Cityscape 2026; earth: t-kanyo o270 tower on the east side; roof T.P. 52 over the GSI notch of lot 307"
+  },
+  {
+   "id": "ovr:c10:kanyo-tower-ne",
+   "poly": [
+    [
+     232.5,
+     469.5
+    ],
+    [
+     243.3,
+     481.0
+    ],
+    [
+     235.0,
+     489.9
+    ],
+    [
+     223.5,
+     479.2
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 12,
+   "height": 43.9,
+   "roof": {
+    "shape": "flat",
+    "color": "#646f7b"
+   },
+   "wall": "#9aa8a6",
+   "src": "commons Cityscape 2026: the slender NE slab of the tower with the open stair flights, roof about T.P. 49.5; gsi: the NE notch of lot 307"
+  },
+  {
+   "id": "ovr:c10:kanyo-crown",
+   "poly": [
+    [
+     223.7,
+     482.8
+    ],
+    [
+     231.4,
+     490.0
+    ],
+    [
+     223.9,
+     498.0
+    ],
+    [
+     216.2,
+     490.9
+    ]
+   ],
+   "kind": "hotel",
+   "height": 51.4,
+   "roof": {
+    "shape": "flat",
+    "color": "#4f5a62"
+   },
+   "facade": "plain",
+   "wall": "#9aa8a6",
+   "src": "commons Cityscape 2026: the stepped dark-capped crown on the tower, 5 m over its roof (top about T.P. 57)"
+  },
+  {
+   "id": "ovr:c10:kanyo-se-n",
+   "poly": [
+    [
+     237.8,
+     487.1
+    ],
+    [
+     244.9,
+     493.7
+    ],
+    [
+     241.5,
+     497.3
+    ],
+    [
+     245.9,
+     501.4
+    ],
+    [
+     241.8,
+     505.8
+    ],
+    [
+     230.3,
+     495.2
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 3,
+   "height": 12.4,
+   "roof": {
+    "shape": "gable",
+    "color": "#d3cab6"
+   },
+   "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the stepped SE low wing, north band, cream pitched roof"
+  },
+  {
+   "id": "ovr:c10:kanyo-se-m",
+   "poly": [
+    [
+     230.3,
+     495.2
+    ],
+    [
+     241.8,
+     505.8
+    ],
+    [
+     234.3,
+     513.9
+    ],
+    [
+     222.9,
+     503.2
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 3,
+   "height": 12.4,
+   "roof": {
+    "shape": "hip",
+    "color": "#747b84"
+   },
+   "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the stepped SE low wing, middle band, grey roof"
+  },
+  {
+   "id": "ovr:c10:kanyo-se-s",
+   "poly": [
+    [
+     222.9,
+     503.2
+    ],
+    [
+     234.3,
+     513.9
+    ],
+    [
+     227.2,
+     521.5
+    ],
+    [
+     215.8,
+     510.8
+    ]
+   ],
+   "kind": "hotel",
+   "storeys": 2,
+   "height": 12.3,
+   "roof": {
+    "shape": "gable",
+    "color": "#d3cab6"
+   },
+   "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the stepped SE low wing, south band, cream pitched roof"
   }
  ],
  "landuse": [

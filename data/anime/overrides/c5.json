@@ -7,7 +7,7 @@
   -200,
   400
  ],
- "note": "八日町・三日町・南町一丁目 and the 沢田 hills down to 気仙沼小学校 and 気仙沼図書館 (ENU x -700..-200, z -200..400). Read block by block from Google Earth 2026-03-11 (raw/ref/earth/c5: full-cell views plus sub-cells sub-a..sub-f, review sheets in sheets/), checked against the GSI photo and OSM.",
+ "note": "八日町・三日町・南町一丁目 and the 沢田 hills down to 気仙沼小学校 (気仙沼図書館, 笹が陣3-30, lies just south of the cell, in c9) (ENU x -700..-200, z -200..400). Read block by block from Google Earth 2026-03-11 (raw/ref/earth/c5: full-cell views plus sub-cells sub-a..sub-f, review sheets in sheets/), checked against the GSI photo and OSM.",
  "sources": [
   {
    "id": "earth",
@@ -22,6 +22,16 @@
    "id": "osm",
    "what": "OpenStreetMap, raw/osm/overpass.json (OSM base 2026-05-06), © OpenStreetMap contributors (ODbL)",
    "date": "2026-05-06"
+  },
+  {
+   "id": "commons",
+   "what": "Wikimedia Commons ground photos, raw/ref/commons (窓あかりー気仙沼1, File:窓あかりー気仙沼1.jpg)",
+   "date": "2026-09-24"
+  },
+  {
+   "id": "zengin",
+   "what": "zengin.ajtw.net branch list of 七十七銀行 (0125): 501 気仙沼支店 at 南町3-1-1, 502 内脇支店 at 田中前",
+   "ref": "https://zengin.ajtw.net/linkmeisai.php?abg=0125"
   }
  ],
  "lots": [
@@ -48,7 +58,9 @@
     "shape": "flat",
     "color": "#b8bab8"
    },
-   "src": "earth: 七十七銀行 気仙沼支店 is a flat-roofed pale 2-storey bank block, not a gabled shop (sub-a top, sheets/a1; GSI flat light roof)"
+   "src": "earth: a flat-roofed pale 2-storey block about 7 m high, not a gabled shop (sub-a top, sheets/a1 #33; GSI flat light roof). zengin: no bank branch here; the OSM bank tag is stale",
+   "storeys": 2,
+   "height": 7
   },
   {
    "id": "16/58539/25068/444",
@@ -451,14 +463,12 @@
   },
   {
    "id": "16/58540/25069/81",
-   "name": "放送大学 気仙沼視聴学習室",
-   "nameEn": "Open University of Japan, Kesennuma study room",
    "storeys": 2,
    "roof": {
     "shape": "gable",
     "color": "#8a4e44"
    },
-   "src": "earth: the long red-brown pitched roof carries the 放送大学 気仙沼視聴学習室 label (sub-f top, sheets/f2); OSM node n8660784318 is in it. The 気仙沼図書館 name is out of date: Earth labels the library at about (-311, 413), outside this lot"
+   "src": "earth: red-brown gable; the 放送大学 label is stale (OUJ: the study room is in 気仙沼図書館, 笹が陣3-30)"
   },
   {
    "id": "16/58540/25069/82",
@@ -485,7 +495,7 @@
   {
    "id": "16/58540/25068/183",
    "remove": true,
-   "src": "earth: bare ground beside the road, the house on the GSI photo is gone (sub-f top, sheets/f1)"
+   "src": "earth: the GSI footprint /183 (a derived 2-storey 12 x 10 m house) is not there; only a single-storey white-roofed shed stands on its west part, drawn as ovr:c5:sawada-shed (sub-f top, presence zoom v_c5_183k and obl_c5_183; Earth is offset ~5 m east here). The lane r12571 was not widened; the rest of the footprint is bare ground"
   },
   {
    "id": "16/58540/25068/240",
@@ -719,9 +729,59 @@
    "id": "16/58540/25068/182",
    "remove": true,
    "src": "earth: forest canopy on the slope, no roof visible; the GSI photo shows trees too (sub-d top, sheets/d2, d3)"
+  },
+  {
+   "id": "16/58539/25068/442",
+   "roof": {
+    "color": "#8a878a"
+   },
+   "src": "earth: t-post top, mid-grey deck the same tone as the adjacent asphalt (GSI value is cyan-cast)"
+  },
+  {
+   "id": "16/58540/25068/58",
+   "kind": "shop",
+   "storeys": 3,
+   "height": 10.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#b9bbb9"
+   },
+   "wall": "#eeeeea",
+   "facade": "shop",
+   "name": "島田呉服店",
+   "src": "commons 窓あかりー気仙沼1 2026-09-24: white RC block ≥3 levels, charcoal fascia with the name, vertical しまだ sign; the shop storey reads ~4.4 m to the fascia top (scaled on the parked car), so 3 levels ≈ 10.5 m"
   }
  ],
- "newLots": [],
+ "newLots": [
+  {
+   "id": "ovr:c5:sawada-shed",
+   "poly": [
+    [
+     -427,
+     200
+    ],
+    [
+     -420,
+     200
+    ],
+    [
+     -420,
+     208.5
+    ],
+    [
+     -427,
+     208.5
+    ]
+   ],
+   "kind": "warehouse",
+   "height": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#e2e2df"
+   },
+   "src": "earth 2026 sub-f/presence zoom 183: single-storey white-roofed shed on the east edge of the lane, on the GSI footprint /183 (Earth is offset ~5 m east here)"
+  }
+ ],
  "landuse": [
   {
    "use": "vacant",
@@ -767,6 +827,32 @@
     ]
    ],
    "src": "earth: a paved square with a bean-shaped dark feature, lined with lamps, between the vacant lot and the 南町 back row (sub-d top, z_plaza_top.jpg)"
+  },
+  {
+   "use": "felled",
+   "ring": [
+    [
+     -730,
+     -157
+    ],
+    [
+     -650,
+     -152
+    ],
+    [
+     -635,
+     -130
+    ],
+    [
+     -650,
+     -113
+    ],
+    [
+     -730,
+     -118
+    ]
+   ],
+   "src": "earth 2026-03-11 c5/r1003 top: cleared bare slope with a track; GSI photo shows woods"
   }
  ],
  "roads": [],

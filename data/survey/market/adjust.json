@@ -1,0 +1,3737 @@
+{
+ "note": "Survey adjustment input (tools/survey/market_adjust.py). Picks: full-resolution upright JPEG pixels (raw/survey/market/images/<lens>/IMG_xxxx.jpg), read off pixel-gridded crops. ENU: x east, y T.P. up, z south.",
+ "clusters": {
+  "deck": {
+   "lenses": {
+    "uw14": {
+     "w": 3024,
+     "h": 4032,
+     "f": 1631,
+     "k1": 0,
+     "k2": 0,
+     "dir": "uw14",
+     "refine": [
+      "f",
+      "k1",
+      "k2"
+     ],
+     "f_sigma": 80,
+     "note": "iPhone 15 Pro ultra-wide 2.22 mm, EXIF 14 mm equivalent (13-14.5 mm)"
+    },
+    "w24": {
+     "w": 4284,
+     "h": 5712,
+     "f": 3960,
+     "k1": 0,
+     "k2": 0,
+     "dir": "w24",
+     "refine": [
+      "f",
+      "k1"
+     ],
+     "f_sigma": 60,
+     "note": "main 6.765 mm, EXIF 24 mm equivalent"
+    }
+   },
+   "cams": {
+    "IMG_0792": {
+     "lens": "w24",
+     "init": {
+      "x": 711.5,
+      "z": 1033.9,
+      "heading": 316,
+      "pitch": 3,
+      "y": 16.65
+     },
+     "pnp": false
+    },
+    "IMG_0794": {
+     "lens": "w24",
+     "init": {
+      "heading": 148,
+      "pitch": 0,
+      "y": 16.65
+     },
+     "pnp": false
+    },
+    "IMG_0795": {
+     "lens": "uw14",
+     "init": {
+      "heading": 233,
+      "pitch": 3,
+      "y": 16.65
+     },
+     "pnp": false
+    },
+    "IMG_0796": {
+     "lens": "uw14",
+     "init": {
+      "heading": 112,
+      "pitch": 3,
+      "y": 16.65
+     },
+     "pnp": false
+    },
+    "IMG_0797": {
+     "lens": "uw14",
+     "init": {
+      "heading": 62,
+      "pitch": 2,
+      "y": 16.65
+     },
+     "pnp": false
+    },
+    "IMG_0798": {
+     "lens": "uw14",
+     "init": {
+      "heading": 134,
+      "pitch": 4,
+      "y": 16.65
+     },
+     "pnp": false
+    }
+   },
+   "scalars": {
+    "deck_y": {
+     "init": 15.2
+    },
+    "wallA_off": {
+     "init": 0.0,
+     "sigma": 1.5
+    },
+    "studio_off": {
+     "init": 0.0,
+     "sigma": 1.5
+    },
+    "wallA_top": {
+     "init": 21.6
+    },
+    "studio_top": {
+     "init": 20.0
+    }
+   },
+   "points": {
+    "wall.se_top": {
+     "obs": {
+      "IMG_0794": [
+       2200,
+       2490
+      ],
+      "IMG_0796": [
+       2850,
+       2040
+      ],
+      "IMG_0798": [
+       2177.5,
+       1986
+      ]
+     },
+     "px": 2.0,
+     "note": "inside corner penthouse east wall / studio north face, parapet top",
+     "range": 55.0
+    },
+    "wall.se_base": {
+     "obs": {
+      "IMG_0798": [
+       2180,
+       2193
+      ],
+      "IMG_0796": [
+       2850,
+       2222
+      ]
+     },
+     "px": 6.0,
+     "note": "the same corner at the deck",
+     "range": 55.0
+    },
+    "studio.louvre_tl": {
+     "obs": {
+      "IMG_0794": [
+       1147,
+       2310
+      ],
+      "IMG_0796": [
+       2228.5,
+       1991
+      ],
+      "IMG_0798": [
+       1566.5,
+       1965
+      ]
+     },
+     "px": 2.0,
+     "note": "louvred plant box on the studio roof: NE top corner (left as seen from the deck)",
+     "range": 55.0
+    },
+    "studio.louvre_tr": {
+     "obs": {
+      "IMG_0794": [
+       1685,
+       2337
+      ],
+      "IMG_0796": [
+       2506.5,
+       1985
+      ],
+      "IMG_0798": [
+       1859,
+       1945
+      ]
+     },
+     "px": 2.0,
+     "range": 55.0,
+     "note": "louvred plant box: NW top corner"
+    },
+    "studio.louvre_br": {
+     "obs": {
+      "IMG_0794": [
+       1685,
+       2458
+      ],
+      "IMG_0796": [
+       2506.5,
+       2041
+      ],
+      "IMG_0798": [
+       1859,
+       2007.5
+      ]
+     },
+     "px": 2.5,
+     "range": 55.0,
+     "note": "louvred plant box: NW corner at the studio parapet"
+    },
+    "studio.lampL_panel": {
+     "obs": {
+      "IMG_0794": [
+       1352,
+       2286
+      ],
+      "IMG_0796": [
+       2327.5,
+       1971.5
+      ],
+      "IMG_0798": [
+       1683.5,
+       1944
+      ]
+     },
+     "px": 2.0,
+     "note": "left lamp pole (wind vane) panel top-left corner",
+     "range": 55.0
+    },
+    "studio.lampR_panel": {
+     "obs": {
+      "IMG_0794": [
+       1762,
+       2313
+      ],
+      "IMG_0796": [
+       2551.5,
+       1965
+      ],
+      "IMG_0798": [
+       1901.5,
+       1925
+      ]
+     },
+     "px": 2.0,
+     "range": 55.0
+    },
+    "studio.lampR_base": {
+     "obs": {
+      "IMG_0794": [
+       1785,
+       2435
+      ],
+      "IMG_0796": [
+       2567.5,
+       2040
+      ],
+      "IMG_0798": [
+       1920,
+       2004
+      ]
+     },
+     "px": 2.5,
+     "range": 55.0
+    },
+    "studio.canopy_lt": {
+     "obs": {
+      "IMG_0794": [
+       1918,
+       2630
+      ],
+      "IMG_0796": [
+       2662.5,
+       2120
+      ],
+      "IMG_0798": [
+       2006,
+       2074
+      ]
+     },
+     "px": 2.0,
+     "note": "entrance canopy fascia, top left (north) end",
+     "range": 55.0
+    },
+    "studio.canopy_rt": {
+     "obs": {
+      "IMG_0794": [
+       2152,
+       2640
+      ],
+      "IMG_0796": [
+       2820,
+       2120
+      ],
+      "IMG_0798": [
+       2152.5,
+       2074
+      ]
+     },
+     "px": 2.0,
+     "range": 55.0
+    },
+    "studio.canopy_rb": {
+     "obs": {
+      "IMG_0794": [
+       2152,
+       2680
+      ],
+      "IMG_0796": [
+       2820,
+       2140
+      ],
+      "IMG_0798": [
+       2152.5,
+       2090
+      ]
+     },
+     "px": 2.5,
+     "range": 55.0
+    },
+    "studio.winB_tl": {
+     "obs": {
+      "IMG_0794": [
+       1740,
+       2685
+      ],
+      "IMG_0796": [
+       2552.5,
+       2152.5
+      ],
+      "IMG_0798": [
+       1902.5,
+       2128.5
+      ]
+     },
+     "px": 2.0,
+     "note": "window left of the studio door, frame corners",
+     "range": 55.0
+    },
+    "studio.winB_tr": {
+     "obs": {
+      "IMG_0794": [
+       1840,
+       2688
+      ],
+      "IMG_0796": [
+       2612.5,
+       2152.5
+      ],
+      "IMG_0798": [
+       1962.5,
+       2127.5
+      ]
+     },
+     "px": 2.0,
+     "range": 55.0
+    },
+    "studio.winB_bl": {
+     "obs": {
+      "IMG_0794": [
+       1740,
+       2765
+      ],
+      "IMG_0796": [
+       2552.5,
+       2192.5
+      ],
+      "IMG_0798": [
+       1902.5,
+       2175
+      ]
+     },
+     "px": 2.0,
+     "range": 55.0
+    },
+    "studio.winB_br": {
+     "obs": {
+      "IMG_0794": [
+       1840,
+       2768
+      ],
+      "IMG_0796": [
+       2612.5,
+       2192.5
+      ],
+      "IMG_0798": [
+       1962.5,
+       2174
+      ]
+     },
+     "px": 2.0,
+     "range": 55.0
+    },
+    "studio.mascot": {
+     "obs": {
+      "IMG_0794": [
+       1865,
+       2595
+      ],
+      "IMG_0796": [
+       2625,
+       2102.5
+      ],
+      "IMG_0798": [
+       1970,
+       2070
+      ]
+     },
+     "px": 3.0,
+     "note": "the chef mascot sign",
+     "range": 55.0
+    },
+    "pylon.n_top": {
+     "obs": {
+      "IMG_0798": [
+       640,
+       2002
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "note": "気仙沼湾横断橋 north pylon top",
+     "range": 900.0
+    },
+    "wall.ne_top": {
+     "obs": {
+      "IMG_0792": [
+       2618,
+       2832
+      ]
+     },
+     "px": 2.0,
+     "note": "penthouse east wall, north end, top of the wall",
+     "range": 80.0
+    },
+    "wall.ne_base": {
+     "obs": {
+      "IMG_0792": [
+       2619,
+       3112
+      ]
+     },
+     "px": 2.0,
+     "note": "penthouse east wall, north end, top of the 0.25 m plinth",
+     "range": 80.0
+    },
+    "entrance.canopy_n": {
+     "obs": {
+      "IMG_0792": [
+       715,
+       2523
+      ],
+      "IMG_0795": [
+       2785,
+       1824
+      ]
+     },
+     "px": 3.0,
+     "note": "visitors entrance canopy, north front corner",
+     "range": 14.0
+    },
+    "entrance.canopy_s": {
+     "obs": {
+      "IMG_0795": [
+       1985,
+       1858
+      ]
+     },
+     "px": 3.0,
+     "note": "visitors entrance canopy, south front corner",
+     "range": 14.0
+    },
+    "wall.win1_tl": {
+     "obs": {
+      "IMG_0792": [
+       1207,
+       2835
+      ]
+     },
+     "px": 2.0,
+     "note": "first window north of the entrance (under 市)",
+     "range": 12.0
+    },
+    "wall.win1_bl": {
+     "obs": {
+      "IMG_0792": [
+       1207,
+       3158
+      ]
+     },
+     "px": 2.0,
+     "range": 12.0
+    },
+    "wall.win1_tr": {
+     "obs": {
+      "IMG_0792": [
+       1365,
+       2848
+      ]
+     },
+     "px": 2.0,
+     "range": 12.0
+    },
+    "wall.win1_br": {
+     "obs": {
+      "IMG_0792": [
+       1362,
+       3150
+      ]
+     },
+     "px": 2.0,
+     "range": 12.0
+    },
+    "car.cactus.plate_tl": {
+     "obs": {
+      "IMG_0797": [
+       223.6,
+       2302
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.cactus.plate_tr": {
+     "obs": {
+      "IMG_0797": [
+       286.6,
+       2302
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.cactus.plate_bl": {
+     "obs": {
+      "IMG_0797": [
+       223.6,
+       2331.4
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.cactus.plate_br": {
+     "obs": {
+      "IMG_0797": [
+       286.6,
+       2331.4
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.crown.plate_tl": {
+     "obs": {
+      "IMG_0797": [
+       753.6,
+       2307.6
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.crown.plate_tr": {
+     "obs": {
+      "IMG_0797": [
+       814.4,
+       2307.6
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.crown.plate_bl": {
+     "obs": {
+      "IMG_0797": [
+       753.6,
+       2337.6
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.crown.plate_br": {
+     "obs": {
+      "IMG_0797": [
+       814.4,
+       2337.6
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.mazda.plate_tl": {
+     "obs": {
+      "IMG_0797": [
+       1239.6,
+       2335
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.mazda.plate_tr": {
+     "obs": {
+      "IMG_0797": [
+       1300,
+       2335
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.mazda.plate_bl": {
+     "obs": {
+      "IMG_0797": [
+       1239.6,
+       2368
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.mazda.plate_br": {
+     "obs": {
+      "IMG_0797": [
+       1300,
+       2368
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.swift.plate_tl": {
+     "obs": {
+      "IMG_0797": [
+       1758.4,
+       2328.6
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.swift.plate_tr": {
+     "obs": {
+      "IMG_0797": [
+       1816.4,
+       2328.6
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.swift.plate_bl": {
+     "obs": {
+      "IMG_0797": [
+       1758.4,
+       2359
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.swift.plate_br": {
+     "obs": {
+      "IMG_0797": [
+       1816.4,
+       2359
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.spacia.plate_tl": {
+     "obs": {
+      "IMG_0797": [
+       2278.4,
+       2344
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.spacia.plate_tr": {
+     "obs": {
+      "IMG_0797": [
+       2338,
+       2344
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.spacia.plate_bl": {
+     "obs": {
+      "IMG_0797": [
+       2278.4,
+       2375
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "car.spacia.plate_br": {
+     "obs": {
+      "IMG_0797": [
+       2338,
+       2375
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 8.0
+    },
+    "edge.wallbase.0798.0": {
+     "obs": {
+      "IMG_0798": [
+       2281.2,
+       2217.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0798.1": {
+     "obs": {
+      "IMG_0798": [
+       2377.3,
+       2236.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0798.2": {
+     "obs": {
+      "IMG_0798": [
+       2472.1,
+       2262.4
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0798.3": {
+     "obs": {
+      "IMG_0798": [
+       2569.1,
+       2276.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0798.4": {
+     "obs": {
+      "IMG_0798": [
+       2664.8,
+       2297.8
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0798.5": {
+     "obs": {
+      "IMG_0798": [
+       2760.9,
+       2316.4
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0798.6": {
+     "obs": {
+      "IMG_0798": [
+       2856.8,
+       2336.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0798.7": {
+     "obs": {
+      "IMG_0798": [
+       2952.8,
+       2355.8
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0794.0": {
+     "obs": {
+      "IMG_0794": [
+       2347.7,
+       2864.3
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0794.1": {
+     "obs": {
+      "IMG_0794": [
+       2435.3,
+       2903.5
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0794.2": {
+     "obs": {
+      "IMG_0794": [
+       2533.5,
+       2901.4
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0794.3": {
+     "obs": {
+      "IMG_0794": [
+       2626.5,
+       2919.5
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0794.4": {
+     "obs": {
+      "IMG_0794": [
+       2712.9,
+       2963.6
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0794.5": {
+     "obs": {
+      "IMG_0794": [
+       2804.1,
+       2988.5
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.wallbase.0792.0": {
+     "obs": {
+      "IMG_0792": [
+       1500.0,
+       3318.0
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 40.0
+    },
+    "edge.wallbase.0792.1": {
+     "obs": {
+      "IMG_0792": [
+       2000.0,
+       3236.0
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 40.0
+    },
+    "edge.wallbase.0792.2": {
+     "obs": {
+      "IMG_0792": [
+       2400.0,
+       3172.0
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 40.0
+    },
+    "edge.wallbase.0795.0": {
+     "obs": {
+      "IMG_0795": [
+       600.0,
+       2222.0
+      ]
+     },
+     "px": 3.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.wallbase.0795.1": {
+     "obs": {
+      "IMG_0795": [
+       1500.0,
+       2234.0
+      ]
+     },
+     "px": 3.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0798.0": {
+     "obs": {
+      "IMG_0798": [
+       2220.3,
+       1946.8
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.walltop.0798.1": {
+     "obs": {
+      "IMG_0798": [
+       2266.6,
+       1906.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.walltop.0798.2": {
+     "obs": {
+      "IMG_0798": [
+       2313.0,
+       1866.4
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.walltop.0798.3": {
+     "obs": {
+      "IMG_0798": [
+       2359.4,
+       1826.2
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.walltop.0798.4": {
+     "obs": {
+      "IMG_0798": [
+       2405.9,
+       1786.2
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.walltop.0798.5": {
+     "obs": {
+      "IMG_0798": [
+       2451.9,
+       1745.6
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.walltop.0795.0": {
+     "obs": {
+      "IMG_0795": [
+       221.0,
+       1482.2
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.1": {
+     "obs": {
+      "IMG_0795": [
+       462.6,
+       1479.3
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.2": {
+     "obs": {
+      "IMG_0795": [
+       704.3,
+       1473.8
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.3": {
+     "obs": {
+      "IMG_0795": [
+       945.9,
+       1468.8
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.4": {
+     "obs": {
+      "IMG_0795": [
+       1187.6,
+       1463.6
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.5": {
+     "obs": {
+      "IMG_0795": [
+       1429.2,
+       1458.7
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.6": {
+     "obs": {
+      "IMG_0795": [
+       1670.9,
+       1452.9
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.7": {
+     "obs": {
+      "IMG_0795": [
+       1912.5,
+       1447.2
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.8": {
+     "obs": {
+      "IMG_0795": [
+       2154.1,
+       1442.1
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.9": {
+     "obs": {
+      "IMG_0795": [
+       2395.8,
+       1437.7
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.10": {
+     "obs": {
+      "IMG_0795": [
+       2637.4,
+       1433.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0795.11": {
+     "obs": {
+      "IMG_0795": [
+       2879.1,
+       1429.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 14.0
+    },
+    "edge.walltop.0792.0": {
+     "obs": {
+      "IMG_0792": [
+       2470.0,
+       2755.0
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 40.0
+    },
+    "edge.walltop.0792.1": {
+     "obs": {
+      "IMG_0792": [
+       2540.0,
+       2788.0
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 40.0
+    },
+    "edge.stbase.0798.0": {
+     "obs": {
+      "IMG_0798": [
+       1848.8,
+       2204.3
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0798.1": {
+     "obs": {
+      "IMG_0798": [
+       1906.3,
+       2202.3
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0798.2": {
+     "obs": {
+      "IMG_0798": [
+       1963.8,
+       2199.7
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0798.3": {
+     "obs": {
+      "IMG_0798": [
+       2021.3,
+       2208.8
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0798.4": {
+     "obs": {
+      "IMG_0798": [
+       2078.8,
+       2199.7
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0798.5": {
+     "obs": {
+      "IMG_0798": [
+       2136.2,
+       2196.5
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0794.0": {
+     "obs": {
+      "IMG_0794": [
+       1793.4,
+       2833.7
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0794.1": {
+     "obs": {
+      "IMG_0794": [
+       1860.0,
+       2838.0
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0794.2": {
+     "obs": {
+      "IMG_0794": [
+       1926.6,
+       2842.4
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0794.3": {
+     "obs": {
+      "IMG_0794": [
+       1993.3,
+       2845.5
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0794.4": {
+     "obs": {
+      "IMG_0794": [
+       2059.9,
+       2848.0
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0794.5": {
+     "obs": {
+      "IMG_0794": [
+       2126.5,
+       2851.9
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0796.0": {
+     "obs": {
+      "IMG_0796": [
+       2681.2,
+       2234.4
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0796.1": {
+     "obs": {
+      "IMG_0796": [
+       2723.8,
+       2236.5
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0796.2": {
+     "obs": {
+      "IMG_0796": [
+       2766.2,
+       2237.7
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.stbase.0796.3": {
+     "obs": {
+      "IMG_0796": [
+       2808.8,
+       2233.3
+      ]
+     },
+     "px": 2.5,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0798.0": {
+     "obs": {
+      "IMG_0798": [
+       1894.5,
+       2005.7
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0798.1": {
+     "obs": {
+      "IMG_0798": [
+       1943.7,
+       2002.4
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0798.2": {
+     "obs": {
+      "IMG_0798": [
+       1992.8,
+       1998.7
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0798.3": {
+     "obs": {
+      "IMG_0798": [
+       2042.0,
+       1995.4
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0798.4": {
+     "obs": {
+      "IMG_0798": [
+       2091.1,
+       1991.7
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0798.5": {
+     "obs": {
+      "IMG_0798": [
+       2140.2,
+       1988.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.0": {
+     "obs": {
+      "IMG_0794": [
+       1730.9,
+       2467.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.1": {
+     "obs": {
+      "IMG_0794": [
+       1792.1,
+       2471.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.2": {
+     "obs": {
+      "IMG_0794": [
+       1853.3,
+       2474.7
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.3": {
+     "obs": {
+      "IMG_0794": [
+       1914.5,
+       2478.6
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.4": {
+     "obs": {
+      "IMG_0794": [
+       1975.7,
+       2482.1
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.5": {
+     "obs": {
+      "IMG_0794": [
+       2036.9,
+       2485.5
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.6": {
+     "obs": {
+      "IMG_0794": [
+       2098.1,
+       2489.3
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0794.7": {
+     "obs": {
+      "IMG_0794": [
+       2159.3,
+       2492.6
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0796.0": {
+     "obs": {
+      "IMG_0796": [
+       2456.0,
+       2038.3
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0796.1": {
+     "obs": {
+      "IMG_0796": [
+       2524.0,
+       2042.2
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0796.2": {
+     "obs": {
+      "IMG_0796": [
+       2592.0,
+       2041.8
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0796.3": {
+     "obs": {
+      "IMG_0796": [
+       2660.0,
+       2041.4
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0796.4": {
+     "obs": {
+      "IMG_0796": [
+       2728.0,
+       2040.9
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    },
+    "edge.sttop.0796.5": {
+     "obs": {
+      "IMG_0796": [
+       2796.0,
+       2040.7
+      ]
+     },
+     "px": 2.0,
+     "feature": false,
+     "range": 55.0
+    }
+   },
+   "constraints": [
+    {
+     "kind": "eye",
+     "photos": [
+      "IMG_0792",
+      "IMG_0794",
+      "IMG_0795",
+      "IMG_0796",
+      "IMG_0797",
+      "IMG_0798"
+     ],
+     "y": "deck_y",
+     "h": 1.45,
+     "sigma": 0.12
+    },
+    {
+     "kind": "gps",
+     "photos": [
+      "IMG_0794",
+      "IMG_0795",
+      "IMG_0796",
+      "IMG_0797",
+      "IMG_0798"
+     ],
+     "sigma": 8.0
+    },
+    {
+     "kind": "roll",
+     "photos": [
+      "IMG_0792",
+      "IMG_0794",
+      "IMG_0795",
+      "IMG_0796",
+      "IMG_0797",
+      "IMG_0798"
+     ],
+     "sigma_deg": 6.0
+    },
+    {
+     "kind": "known",
+     "p": "wall.ne_base",
+     "enu": [
+      664.8,
+      null,
+      962.6
+     ],
+     "sigma": [
+      1.5,
+      1.0,
+      1.5
+     ],
+     "note": "GSI lot corner"
+    },
+    {
+     "kind": "known",
+     "p": "wall.se_base",
+     "enu": [
+      732.9,
+      null,
+      1111.9
+     ],
+     "sigma": [
+      1.5,
+      1.0,
+      1.5
+     ],
+     "note": "GSI lot corner"
+    },
+    {
+     "kind": "known",
+     "p": "pylon.n_top",
+     "enu": [
+      1543.8,
+      115.0,
+      1373.8
+     ],
+     "sigma": [
+      3.0,
+      1.5,
+      3.0
+     ]
+    },
+    {
+     "kind": "vertical",
+     "a": "wall.ne_top",
+     "b": "wall.ne_base",
+     "sigma": 0.02
+    },
+    {
+     "kind": "vertical",
+     "a": "wall.se_top",
+     "b": "wall.se_base",
+     "sigma": 0.02
+    },
+    {
+     "kind": "on_y",
+     "points": [
+      "wall.se_base"
+     ],
+     "y": "deck_y",
+     "sigma": 0.05
+    },
+    {
+     "kind": "on_line",
+     "name": "wall A",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.05,
+     "points": [
+      "wall.ne_top",
+      "wall.ne_base",
+      "wall.se_top",
+      "wall.se_base",
+      "wall.win1_tl",
+      "wall.win1_bl",
+      "wall.win1_tr",
+      "wall.win1_br"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "name": "studio face",
+     "line": [
+      [
+       732.9,
+       1111.9
+      ],
+      [
+       758.7,
+       1101.2
+      ]
+     ],
+     "offset": "studio_off",
+     "sigma": 0.08,
+     "points": [
+      "wall.se_top",
+      "wall.se_base",
+      "studio.winB_tl",
+      "studio.winB_tr",
+      "studio.winB_bl",
+      "studio.winB_br",
+      "studio.mascot"
+     ]
+    },
+    {
+     "kind": "vertical",
+     "a": "studio.winB_tl",
+     "b": "studio.winB_bl",
+     "sigma": 0.02
+    },
+    {
+     "kind": "vertical",
+     "a": "studio.winB_tr",
+     "b": "studio.winB_br",
+     "sigma": 0.02
+    },
+    {
+     "kind": "level",
+     "a": "studio.winB_tl",
+     "b": "studio.winB_tr",
+     "sigma": 0.02
+    },
+    {
+     "kind": "level",
+     "a": "studio.winB_bl",
+     "b": "studio.winB_br",
+     "sigma": 0.02
+    },
+    {
+     "kind": "level",
+     "a": "studio.canopy_lt",
+     "b": "studio.canopy_rt",
+     "sigma": 0.03
+    },
+    {
+     "kind": "vertical",
+     "a": "wall.win1_tl",
+     "b": "wall.win1_bl",
+     "sigma": 0.02
+    },
+    {
+     "kind": "vertical",
+     "a": "wall.win1_tr",
+     "b": "wall.win1_br",
+     "sigma": 0.02
+    },
+    {
+     "kind": "level",
+     "a": "wall.win1_tl",
+     "b": "wall.win1_tr",
+     "sigma": 0.02
+    },
+    {
+     "kind": "level",
+     "a": "wall.win1_bl",
+     "b": "wall.win1_br",
+     "sigma": 0.02
+    },
+    {
+     "kind": "level",
+     "a": "entrance.canopy_n",
+     "b": "entrance.canopy_s",
+     "sigma": 0.03
+    },
+    {
+     "kind": "level",
+     "a": "studio.louvre_tl",
+     "b": "studio.louvre_tr",
+     "sigma": 0.03
+    },
+    {
+     "kind": "vertical",
+     "a": "studio.louvre_tr",
+     "b": "studio.louvre_br",
+     "sigma": 0.03
+    },
+    {
+     "kind": "dist",
+     "a": "car.cactus.plate_tl",
+     "b": "car.cactus.plate_tr",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.cactus.plate_bl",
+     "b": "car.cactus.plate_br",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.cactus.plate_tl",
+     "b": "car.cactus.plate_bl",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.cactus.plate_tr",
+     "b": "car.cactus.plate_br",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "vertical",
+     "a": "car.cactus.plate_tl",
+     "b": "car.cactus.plate_bl",
+     "sigma": 0.01
+    },
+    {
+     "kind": "vertical",
+     "a": "car.cactus.plate_tr",
+     "b": "car.cactus.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.cactus.plate_tl",
+     "b": "car.cactus.plate_tr",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.cactus.plate_bl",
+     "b": "car.cactus.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "dist",
+     "a": "car.crown.plate_tl",
+     "b": "car.crown.plate_tr",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.crown.plate_bl",
+     "b": "car.crown.plate_br",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.crown.plate_tl",
+     "b": "car.crown.plate_bl",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.crown.plate_tr",
+     "b": "car.crown.plate_br",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "vertical",
+     "a": "car.crown.plate_tl",
+     "b": "car.crown.plate_bl",
+     "sigma": 0.01
+    },
+    {
+     "kind": "vertical",
+     "a": "car.crown.plate_tr",
+     "b": "car.crown.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.crown.plate_tl",
+     "b": "car.crown.plate_tr",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.crown.plate_bl",
+     "b": "car.crown.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "dist",
+     "a": "car.mazda.plate_tl",
+     "b": "car.mazda.plate_tr",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.mazda.plate_bl",
+     "b": "car.mazda.plate_br",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.mazda.plate_tl",
+     "b": "car.mazda.plate_bl",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.mazda.plate_tr",
+     "b": "car.mazda.plate_br",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "vertical",
+     "a": "car.mazda.plate_tl",
+     "b": "car.mazda.plate_bl",
+     "sigma": 0.01
+    },
+    {
+     "kind": "vertical",
+     "a": "car.mazda.plate_tr",
+     "b": "car.mazda.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.mazda.plate_tl",
+     "b": "car.mazda.plate_tr",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.mazda.plate_bl",
+     "b": "car.mazda.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "dist",
+     "a": "car.swift.plate_tl",
+     "b": "car.swift.plate_tr",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.swift.plate_bl",
+     "b": "car.swift.plate_br",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.swift.plate_tl",
+     "b": "car.swift.plate_bl",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.swift.plate_tr",
+     "b": "car.swift.plate_br",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "vertical",
+     "a": "car.swift.plate_tl",
+     "b": "car.swift.plate_bl",
+     "sigma": 0.01
+    },
+    {
+     "kind": "vertical",
+     "a": "car.swift.plate_tr",
+     "b": "car.swift.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.swift.plate_tl",
+     "b": "car.swift.plate_tr",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.swift.plate_bl",
+     "b": "car.swift.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "dist",
+     "a": "car.spacia.plate_tl",
+     "b": "car.spacia.plate_tr",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.spacia.plate_bl",
+     "b": "car.spacia.plate_br",
+     "L": 0.33,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.spacia.plate_tl",
+     "b": "car.spacia.plate_bl",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "dist",
+     "a": "car.spacia.plate_tr",
+     "b": "car.spacia.plate_br",
+     "L": 0.165,
+     "sigma": 0.004
+    },
+    {
+     "kind": "vertical",
+     "a": "car.spacia.plate_tl",
+     "b": "car.spacia.plate_bl",
+     "sigma": 0.01
+    },
+    {
+     "kind": "vertical",
+     "a": "car.spacia.plate_tr",
+     "b": "car.spacia.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.spacia.plate_tl",
+     "b": "car.spacia.plate_tr",
+     "sigma": 0.01
+    },
+    {
+     "kind": "level",
+     "a": "car.spacia.plate_bl",
+     "b": "car.spacia.plate_br",
+     "sigma": 0.01
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.15,
+     "edge": true,
+     "name": "wall A base",
+     "points": [
+      "edge.wallbase.0798.0",
+      "edge.wallbase.0798.1",
+      "edge.wallbase.0798.2",
+      "edge.wallbase.0798.3",
+      "edge.wallbase.0798.4",
+      "edge.wallbase.0798.5",
+      "edge.wallbase.0798.6",
+      "edge.wallbase.0798.7"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "deck_y",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.wallbase.0798.0",
+      "edge.wallbase.0798.1",
+      "edge.wallbase.0798.2",
+      "edge.wallbase.0798.3",
+      "edge.wallbase.0798.4",
+      "edge.wallbase.0798.5",
+      "edge.wallbase.0798.6",
+      "edge.wallbase.0798.7"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.15,
+     "edge": true,
+     "name": "wall A base",
+     "points": [
+      "edge.wallbase.0794.0",
+      "edge.wallbase.0794.1",
+      "edge.wallbase.0794.2",
+      "edge.wallbase.0794.3",
+      "edge.wallbase.0794.4",
+      "edge.wallbase.0794.5"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "deck_y",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.wallbase.0794.0",
+      "edge.wallbase.0794.1",
+      "edge.wallbase.0794.2",
+      "edge.wallbase.0794.3",
+      "edge.wallbase.0794.4",
+      "edge.wallbase.0794.5"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.15,
+     "edge": true,
+     "name": "wall A base",
+     "points": [
+      "edge.wallbase.0792.0",
+      "edge.wallbase.0792.1",
+      "edge.wallbase.0792.2"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "deck_y",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.wallbase.0792.0",
+      "edge.wallbase.0792.1",
+      "edge.wallbase.0792.2"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.15,
+     "edge": true,
+     "name": "wall A base",
+     "points": [
+      "edge.wallbase.0795.0",
+      "edge.wallbase.0795.1"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "deck_y",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.wallbase.0795.0",
+      "edge.wallbase.0795.1"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.06,
+     "edge": true,
+     "name": "wall A top",
+     "points": [
+      "edge.walltop.0798.0",
+      "edge.walltop.0798.1",
+      "edge.walltop.0798.2",
+      "edge.walltop.0798.3",
+      "edge.walltop.0798.4",
+      "edge.walltop.0798.5"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "wallA_top",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.walltop.0798.0",
+      "edge.walltop.0798.1",
+      "edge.walltop.0798.2",
+      "edge.walltop.0798.3",
+      "edge.walltop.0798.4",
+      "edge.walltop.0798.5"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.06,
+     "edge": true,
+     "name": "wall A top",
+     "points": [
+      "edge.walltop.0795.0",
+      "edge.walltop.0795.1",
+      "edge.walltop.0795.2",
+      "edge.walltop.0795.3",
+      "edge.walltop.0795.4",
+      "edge.walltop.0795.5",
+      "edge.walltop.0795.6",
+      "edge.walltop.0795.7",
+      "edge.walltop.0795.8",
+      "edge.walltop.0795.9",
+      "edge.walltop.0795.10",
+      "edge.walltop.0795.11"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "wallA_top",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.walltop.0795.0",
+      "edge.walltop.0795.1",
+      "edge.walltop.0795.2",
+      "edge.walltop.0795.3",
+      "edge.walltop.0795.4",
+      "edge.walltop.0795.5",
+      "edge.walltop.0795.6",
+      "edge.walltop.0795.7",
+      "edge.walltop.0795.8",
+      "edge.walltop.0795.9",
+      "edge.walltop.0795.10",
+      "edge.walltop.0795.11"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       664.8,
+       962.6
+      ],
+      [
+       732.9,
+       1111.9
+      ]
+     ],
+     "offset": "wallA_off",
+     "sigma": 0.06,
+     "edge": true,
+     "name": "wall A top",
+     "points": [
+      "edge.walltop.0792.0",
+      "edge.walltop.0792.1"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "wallA_top",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.walltop.0792.0",
+      "edge.walltop.0792.1"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       732.9,
+       1111.9
+      ],
+      [
+       758.7,
+       1101.2
+      ]
+     ],
+     "offset": "studio_off",
+     "sigma": 0.15,
+     "edge": true,
+     "name": "studio base",
+     "points": [
+      "edge.stbase.0798.0",
+      "edge.stbase.0798.1",
+      "edge.stbase.0798.2",
+      "edge.stbase.0798.3",
+      "edge.stbase.0798.4",
+      "edge.stbase.0798.5"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "deck_y",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.stbase.0798.0",
+      "edge.stbase.0798.1",
+      "edge.stbase.0798.2",
+      "edge.stbase.0798.3",
+      "edge.stbase.0798.4",
+      "edge.stbase.0798.5"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       732.9,
+       1111.9
+      ],
+      [
+       758.7,
+       1101.2
+      ]
+     ],
+     "offset": "studio_off",
+     "sigma": 0.15,
+     "edge": true,
+     "name": "studio base",
+     "points": [
+      "edge.stbase.0794.0",
+      "edge.stbase.0794.1",
+      "edge.stbase.0794.2",
+      "edge.stbase.0794.3",
+      "edge.stbase.0794.4",
+      "edge.stbase.0794.5"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "deck_y",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.stbase.0794.0",
+      "edge.stbase.0794.1",
+      "edge.stbase.0794.2",
+      "edge.stbase.0794.3",
+      "edge.stbase.0794.4",
+      "edge.stbase.0794.5"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       732.9,
+       1111.9
+      ],
+      [
+       758.7,
+       1101.2
+      ]
+     ],
+     "offset": "studio_off",
+     "sigma": 0.15,
+     "edge": true,
+     "name": "studio base",
+     "points": [
+      "edge.stbase.0796.0",
+      "edge.stbase.0796.1",
+      "edge.stbase.0796.2",
+      "edge.stbase.0796.3"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "deck_y",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.stbase.0796.0",
+      "edge.stbase.0796.1",
+      "edge.stbase.0796.2",
+      "edge.stbase.0796.3"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       732.9,
+       1111.9
+      ],
+      [
+       758.7,
+       1101.2
+      ]
+     ],
+     "offset": "studio_off",
+     "sigma": 0.08,
+     "edge": true,
+     "name": "studio top",
+     "points": [
+      "edge.sttop.0798.0",
+      "edge.sttop.0798.1",
+      "edge.sttop.0798.2",
+      "edge.sttop.0798.3",
+      "edge.sttop.0798.4",
+      "edge.sttop.0798.5"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "studio_top",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.sttop.0798.0",
+      "edge.sttop.0798.1",
+      "edge.sttop.0798.2",
+      "edge.sttop.0798.3",
+      "edge.sttop.0798.4",
+      "edge.sttop.0798.5"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       732.9,
+       1111.9
+      ],
+      [
+       758.7,
+       1101.2
+      ]
+     ],
+     "offset": "studio_off",
+     "sigma": 0.08,
+     "edge": true,
+     "name": "studio top",
+     "points": [
+      "edge.sttop.0794.0",
+      "edge.sttop.0794.1",
+      "edge.sttop.0794.2",
+      "edge.sttop.0794.3",
+      "edge.sttop.0794.4",
+      "edge.sttop.0794.5",
+      "edge.sttop.0794.6",
+      "edge.sttop.0794.7"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "studio_top",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.sttop.0794.0",
+      "edge.sttop.0794.1",
+      "edge.sttop.0794.2",
+      "edge.sttop.0794.3",
+      "edge.sttop.0794.4",
+      "edge.sttop.0794.5",
+      "edge.sttop.0794.6",
+      "edge.sttop.0794.7"
+     ]
+    },
+    {
+     "kind": "on_line",
+     "line": [
+      [
+       732.9,
+       1111.9
+      ],
+      [
+       758.7,
+       1101.2
+      ]
+     ],
+     "offset": "studio_off",
+     "sigma": 0.08,
+     "edge": true,
+     "name": "studio top",
+     "points": [
+      "edge.sttop.0796.0",
+      "edge.sttop.0796.1",
+      "edge.sttop.0796.2",
+      "edge.sttop.0796.3",
+      "edge.sttop.0796.4",
+      "edge.sttop.0796.5"
+     ]
+    },
+    {
+     "kind": "on_y",
+     "y": "studio_top",
+     "sigma": 0.04,
+     "edge": true,
+     "points": [
+      "edge.sttop.0796.0",
+      "edge.sttop.0796.1",
+      "edge.sttop.0796.2",
+      "edge.sttop.0796.3",
+      "edge.sttop.0796.4",
+      "edge.sttop.0796.5"
+     ]
+    },
+    {
+     "kind": "known",
+     "p": "studio.louvre_tl",
+     "enu": [
+      753.2,
+      null,
+      1106.2
+     ],
+     "sigma": [
+      2.0,
+      1.0,
+      2.0
+     ],
+     "note": "GSI ortho z18: louvre box, NE top corner (the left end of its north face seen from the deck)"
+    },
+    {
+     "kind": "known",
+     "p": "studio.louvre_tr",
+     "enu": [
+      744.2,
+      null,
+      1110.0
+     ],
+     "sigma": [
+      2.0,
+      1.0,
+      2.0
+     ],
+     "note": "GSI ortho z18: louvre box, NW top corner"
+    }
+   ],
+   "default_range": 30.0
+  },
+  "deck0793": {
+   "note": "IMG_0793 alone: the other deck photos fixed at the deck solution, SIFT ties with IMG_0792, the deck floor and the eye height",
+   "lenses": {
+    "uw14": {
+     "w": 3024,
+     "h": 4032,
+     "f": 1631,
+     "k1": 0,
+     "k2": 0,
+     "dir": "uw14",
+     "refine": [
+      "f",
+      "k1",
+      "k2"
+     ],
+     "f_sigma": 80,
+     "note": "iPhone 15 Pro ultra-wide 2.22 mm, EXIF 14 mm equivalent (13-14.5 mm)"
+    },
+    "w24": {
+     "w": 4284,
+     "h": 5712,
+     "f": 3960,
+     "k1": 0,
+     "k2": 0,
+     "dir": "w24",
+     "refine": [
+      "f",
+      "k1"
+     ],
+     "f_sigma": 60,
+     "note": "main 6.765 mm, EXIF 24 mm equivalent"
+    }
+   },
+   "cams": {
+    "IMG_0793": {
+     "lens": "w24",
+     "init": {
+      "heading": 358.6,
+      "pitch": 0.1,
+      "roll": 0.9,
+      "y": 17.05
+     },
+     "pnp": false,
+     "rel_init": {
+      "ref": "IMG_0792",
+      "dist": 1.5,
+      "bearing": 30
+     }
+    },
+    "IMG_0792": {
+     "lens": "w24",
+     "fixed": true
+    }
+   },
+   "ties": [
+    {
+     "db": "raw/survey/market/database.db",
+     "tag": "sift0793",
+     "photos": [
+      "IMG_0792",
+      "IMG_0793"
+     ],
+     "min_inliers": 15,
+     "max_per_pair": 600,
+     "px": 1.2
+    }
+   ],
+   "scalars": {
+    "deck_y": {
+     "init": 15.6,
+     "fixed": true
+    }
+   },
+   "points": {},
+   "default_range": 12.0,
+   "constraints": [
+    {
+     "kind": "eye",
+     "photos": [
+      "IMG_0793"
+     ],
+     "y": "deck_y",
+     "h": 1.45,
+     "sigma": 0.12
+    },
+    {
+     "kind": "roll",
+     "photos": [
+      "IMG_0793"
+     ],
+     "sigma_deg": 6.0
+    },
+    {
+     "kind": "on_y_sel",
+     "name": "deck floor",
+     "y": "deck_y",
+     "sigma": 0.06,
+     "min_angle": 1.0,
+     "select": [
+      {
+       "img": "IMG_0793",
+       "poly": [
+        [
+         0,
+         3500
+        ],
+        [
+         2700,
+         3500
+        ],
+        [
+         2700,
+         3800
+        ],
+        [
+         4284,
+         3900
+        ],
+        [
+         4284,
+         5712
+        ],
+        [
+         0,
+         5712
+        ]
+       ]
+      },
+      {
+       "img": "IMG_0792",
+       "poly": [
+        [
+         1200,
+         3650
+        ],
+        [
+         4284,
+         3600
+        ],
+        [
+         4284,
+         5712
+        ],
+        [
+         0,
+         5712
+        ],
+        [
+         0,
+         4300
+        ]
+       ]
+      }
+     ]
+    }
+   ],
+   "lens_first_fixed": true,
+   "from_cluster": "deck"
+  },
+  "canopy": {
+   "note": "North-facility canopy quay (IMG_0853-0861, 06:53 JST, 77 mm): SIFT ties among the five frames, the quay edge (GSI / layout quay line, top T.P. 1.8), the apron floor, eye heights, the sun-glitter azimuth.",
+   "lenses": {
+    "t77": {
+     "w": 3024,
+     "h": 4032,
+     "f": 8969,
+     "dir": "t77",
+     "refine": [],
+     "note": "9 mm tele at digital zoom 1.002 (EXIF 77 mm equivalent)"
+    },
+    "t78": {
+     "w": 3024,
+     "h": 4032,
+     "f": 9065,
+     "dir": "t77",
+     "refine": [],
+     "note": "the same lens at digital zoom 1.0127 (EXIF 78 mm)"
+    }
+   },
+   "cams": {
+    "IMG_0853": {
+     "lens": "t78",
+     "pnp": false,
+     "init": {
+      "x": 525.4,
+      "y": 6.8,
+      "z": 660.5,
+      "heading": 104.88399999999999,
+      "pitch": -4.402,
+      "roll": -0.09660138347457004
+     },
+     "reinit": true
+    },
+    "IMG_0854": {
+     "lens": "t78",
+     "pnp": false,
+     "init": {
+      "x": 525.4,
+      "y": 6.8,
+      "z": 660.5,
+      "heading": 102.44299999999998,
+      "pitch": -2.581,
+      "roll": 0.24838374635686344
+     },
+     "reinit": true
+    },
+    "IMG_0855": {
+     "lens": "t77",
+     "pnp": false,
+     "init": {
+      "x": 525.4,
+      "y": 6.8,
+      "z": 660.5,
+      "heading": 98.6,
+      "pitch": -2.77,
+      "roll": -0.6400000000000001
+     },
+     "reinit": true
+    },
+    "IMG_0860": {
+     "lens": "t77",
+     "pnp": false,
+     "init": {
+      "x": 525.4,
+      "y": 6.8,
+      "z": 660.5,
+      "heading": 104.314,
+      "pitch": -4.757,
+      "roll": 0.1851572091839464
+     },
+     "reinit": true
+    },
+    "IMG_0861": {
+     "lens": "t77",
+     "pnp": false,
+     "init": {
+      "x": 525.4,
+      "y": 6.8,
+      "z": 660.5,
+      "heading": 99.82499999999999,
+      "pitch": -5.177,
+      "roll": 0.27833632633435457
+     },
+     "reinit": true
+    }
+   },
+   "ties": [
+    {
+     "db": "raw/survey/market/database.db",
+     "tag": "siftq",
+     "photos": [
+      "IMG_0853",
+      "IMG_0854",
+      "IMG_0855",
+      "IMG_0860",
+      "IMG_0861"
+     ],
+     "min_inliers": 30,
+     "max_per_pair": 300,
+     "px": 1.2,
+     "exclude": {
+      "IMG_0853": [
+       [
+        0,
+        1200,
+        2700,
+        2250
+       ]
+      ],
+      "IMG_0854": [
+       [
+        0,
+        1440,
+        2780,
+        2560
+       ]
+      ],
+      "IMG_0855": [
+       [
+        0,
+        1480,
+        3024,
+        2570
+       ]
+      ],
+      "IMG_0860": [
+       [
+        0,
+        1120,
+        2560,
+        2290
+       ]
+      ],
+      "IMG_0861": [
+       [
+        0,
+        1060,
+        3024,
+        2200
+       ]
+      ]
+     },
+     "note": "only the static hall (ceiling, column 7, tubs, conveyor, floor): the boats, the water glitter, the truck and the people in the bright opening move between frames"
+    }
+   ],
+   "scalars": {
+    "floor_y": {
+     "init": 2.0,
+     "sigma": 0.4,
+     "note": "hall floor T.P. (apron 1.8-1.9)"
+    },
+    "apron_y": {
+     "init": 1.85,
+     "sigma": 0.1,
+     "note": "apron T.P. under the truck"
+    },
+    "curb_off": {
+     "init": 0.5,
+     "sigma": 1.5,
+     "note": "wheel-stop line offset from the layout quay line (m, + = landward, west)"
+    }
+   },
+   "points": {
+    "truck855.plate_t": {
+     "obs": {
+      "IMG_0855": [
+       915.0,
+       2424.0
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "truck855.plate_b": {
+     "obs": {
+      "IMG_0855": [
+       915.5,
+       2455.0
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "truck855.plate_l": {
+     "obs": {
+      "IMG_0855": [
+       898.0,
+       2439.0
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "truck855.plate_r": {
+     "obs": {
+      "IMG_0855": [
+       932.0,
+       2440.5
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "truck855.hub_f": {
+     "obs": {
+      "IMG_0855": [
+       1172.0,
+       2468.0
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "truck855.hub_r": {
+     "obs": {
+      "IMG_0855": [
+       1563.0,
+       2442.0
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "truck855.foot_f": {
+     "obs": {
+      "IMG_0855": [
+       1172.0,
+       2522.0
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "truck855.foot_r": {
+     "obs": {
+      "IMG_0855": [
+       1563.0,
+       2500.0
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 48.0
+    },
+    "curb.0853.0": {
+     "obs": {
+      "IMG_0853": [
+       50.0,
+       2228.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.1": {
+     "obs": {
+      "IMG_0853": [
+       250.0,
+       2215.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.2": {
+     "obs": {
+      "IMG_0853": [
+       520.0,
+       2196.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.3": {
+     "obs": {
+      "IMG_0853": [
+       700.0,
+       2189.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.4": {
+     "obs": {
+      "IMG_0853": [
+       800.0,
+       2186.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.5": {
+     "obs": {
+      "IMG_0853": [
+       900.0,
+       2179.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.6": {
+     "obs": {
+      "IMG_0853": [
+       1000.0,
+       2165.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.7": {
+     "obs": {
+      "IMG_0853": [
+       1100.0,
+       2160.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.8": {
+     "obs": {
+      "IMG_0853": [
+       1240.0,
+       2148.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.9": {
+     "obs": {
+      "IMG_0853": [
+       1400.0,
+       2138.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0853.10": {
+     "obs": {
+      "IMG_0853": [
+       1480.0,
+       2131.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0855.0": {
+     "obs": {
+      "IMG_0855": [
+       1740.0,
+       2381.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0855.1": {
+     "obs": {
+      "IMG_0855": [
+       1790.0,
+       2380.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0855.2": {
+     "obs": {
+      "IMG_0855": [
+       1880.0,
+       2373.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "curb.0855.3": {
+     "obs": {
+      "IMG_0855": [
+       2000.0,
+       2366.0
+      ]
+     },
+     "px": 4.0,
+     "feature": false,
+     "range": 55.0,
+     "note": "bottom edge of a striped wheel-stop block on the quay edge"
+    },
+    "bollard.0853.a": {
+     "obs": {
+      "IMG_0853": [
+       435.0,
+       2197.0
+      ]
+     },
+     "px": 3.0,
+     "feature": true,
+     "range": 55.0,
+     "note": "mooring bitt base"
+    },
+    "bollard.0855.a": {
+     "obs": {
+      "IMG_0855": [
+       2290.0,
+       2347.0
+      ]
+     },
+     "px": 3.0,
+     "feature": true,
+     "range": 55.0,
+     "note": "mooring bitt base"
+    },
+    "hall.conv.end_top": {
+     "obs": {
+      "IMG_0855": [
+       2722.0,
+       2702.0
+      ],
+      "IMG_0854": [
+       2117.6,
+       2772.0
+      ],
+      "IMG_0853": [
+       2067.2,
+       2483.5
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "hall.conv.wheelA": {
+     "obs": {
+      "IMG_0855": [
+       2342.0,
+       2872.0
+      ],
+      "IMG_0854": [
+       1736.8,
+       2938.7
+      ],
+      "IMG_0860": [
+       1468.8,
+       2640.9
+      ],
+      "IMG_0861": [
+       2182.0,
+       2549.1
+      ],
+      "IMG_0853": [
+       1687.1,
+       2653.0
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "hall.conv.wheelB_foot": {
+     "obs": {
+      "IMG_0855": [
+       2520.0,
+       2913.0
+      ],
+      "IMG_0854": [
+       1913.9,
+       2980.7
+      ],
+      "IMG_0860": [
+       1644.4,
+       2684.0
+      ],
+      "IMG_0861": [
+       2357.8,
+       2593.5
+      ],
+      "IMG_0853": [
+       1864.2,
+       2693.1
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "hall.tub1.a": {
+     "obs": {
+      "IMG_0855": [
+       895.0,
+       3283.0
+      ],
+      "IMG_0854": [
+       261.7,
+       3346.2
+      ],
+      "IMG_0861": [
+       507.4,
+       2972.7
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "hall.tub1.b": {
+     "obs": {
+      "IMG_0855": [
+       1284.0,
+       3335.0
+      ],
+      "IMG_0854": [
+       663.0,
+       3399.7
+      ],
+      "IMG_0860": [
+       157.4,
+       3151.1
+      ],
+      "IMG_0861": [
+       886.9,
+       3039.4
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "hall.beam.c": {
+     "obs": {
+      "IMG_0855": [
+       1738.0,
+       1075.0
+      ],
+      "IMG_0854": [
+       1200.0,
+       1100.7
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "hall.beam.dot1": {
+     "obs": {
+      "IMG_0855": [
+       1767.0,
+       1066.0
+      ],
+      "IMG_0854": [
+       1230.2,
+       1093.6
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "farshore.far.a": {
+     "obs": {
+      "IMG_0855": [
+       2010.0,
+       1600.0
+      ],
+      "IMG_0854": [
+       1411.6,
+       1653.7
+      ],
+      "IMG_0853": [
+       1356.4,
+       1371.1
+      ],
+      "IMG_0860": [
+       1411.1,
+       1324.1
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 600.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "farshore.far.b": {
+     "obs": {
+      "IMG_0855": [
+       2490.0,
+       1590.0
+      ],
+      "IMG_0854": [
+       1896.5,
+       1652.9
+      ],
+      "IMG_0853": [
+       1841.1,
+       1367.0
+      ],
+      "IMG_0860": [
+       1892.9,
+       1323.1
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 600.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "quay.bollard.a": {
+     "obs": {
+      "IMG_0855": [
+       2290.0,
+       2347.0
+      ],
+      "IMG_0854": [
+       1689.5,
+       2412.4
+      ],
+      "IMG_0853": [
+       1637.8,
+       2126.9
+      ]
+     },
+     "px": 1.5,
+     "feature": true,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    },
+    "quay.curb.b": {
+     "obs": {
+      "IMG_0855": [
+       2000.0,
+       2366.0
+      ],
+      "IMG_0854": [
+       1395.7,
+       2426.0
+      ],
+      "IMG_0861": [
+       1951.7,
+       2010.9
+      ]
+     },
+     "px": 1.5,
+     "feature": false,
+     "range": 30.0,
+     "note": "picked in IMG_0855, carried to the other frames by NCC (tools/survey/quay_match.py)"
+    }
+   },
+   "default_range": 55.0,
+   "constraints": [
+    {
+     "kind": "roll",
+     "photos": [
+      "IMG_0853",
+      "IMG_0854",
+      "IMG_0855",
+      "IMG_0860",
+      "IMG_0861"
+     ],
+     "sigma_deg": 6.0
+    },
+    {
+     "kind": "sun",
+     "img": "IMG_0855",
+     "uv": [
+      2550,
+      1760
+     ],
+     "az": 107.3,
+     "sigma_deg": 1.5,
+     "note": "sun glitter on the water: astronomy-engine sun azimuth at 06:53:17 JST"
+    },
+    {
+     "kind": "gps",
+     "photos": [
+      "IMG_0853",
+      "IMG_0854",
+      "IMG_0855",
+      "IMG_0860",
+      "IMG_0861"
+     ],
+     "sigma": 60.0,
+     "note": "indoor fixes 28-132 m off: a weak prior only"
+    },
+    {
+     "kind": "vertical",
+     "a": "truck855.plate_t",
+     "b": "truck855.plate_b",
+     "sigma": 0.03
+    },
+    {
+     "kind": "dist",
+     "a": "truck855.plate_t",
+     "b": "truck855.plate_b",
+     "L": 0.165,
+     "sigma": 0.012,
+     "note": "medium plate height"
+    },
+    {
+     "kind": "level",
+     "a": "truck855.plate_l",
+     "b": "truck855.plate_r",
+     "sigma": 0.02
+    },
+    {
+     "kind": "dist",
+     "a": "truck855.plate_l",
+     "b": "truck855.plate_r",
+     "L": 0.33,
+     "sigma": 0.015,
+     "note": "medium plate width"
+    },
+    {
+     "kind": "on_y",
+     "y": "apron_y",
+     "sigma": 0.03,
+     "points": [
+      "truck855.foot_f",
+      "truck855.foot_r"
+     ]
+    },
+    {
+     "kind": "vertical",
+     "a": "truck855.hub_f",
+     "b": "truck855.foot_f",
+     "sigma": 0.03
+    },
+    {
+     "kind": "vertical",
+     "a": "truck855.hub_r",
+     "b": "truck855.foot_r",
+     "sigma": 0.03
+    },
+    {
+     "kind": "dist",
+     "a": "truck855.hub_f",
+     "b": "truck855.foot_f",
+     "L": 0.33,
+     "sigma": 0.02,
+     "note": "static tyre radius (~0.66 m tyres)"
+    },
+    {
+     "kind": "dist",
+     "a": "truck855.hub_r",
+     "b": "truck855.foot_r",
+     "L": 0.33,
+     "sigma": 0.02
+    },
+    {
+     "kind": "dist",
+     "a": "truck855.foot_f",
+     "b": "truck855.foot_r",
+     "L": 2.5,
+     "sigma": 0.04,
+     "note": "Dyna 2 t standard wheelbase 2500 mm"
+    },
+    {
+     "kind": "on_line",
+     "name": "quay edge (layout)",
+     "line": [
+      [
+       543.9,
+       590.4
+      ],
+      [
+       647.0,
+       816.0
+      ]
+     ],
+     "offset": "curb_off",
+     "sigma": 0.15,
+     "points": [
+      "curb.0853.0",
+      "curb.0853.1",
+      "curb.0853.2",
+      "curb.0853.3",
+      "curb.0853.4",
+      "curb.0853.5",
+      "curb.0853.6",
+      "curb.0853.7",
+      "curb.0853.8",
+      "curb.0853.9",
+      "curb.0853.10",
+      "curb.0855.0",
+      "curb.0855.1",
+      "curb.0855.2",
+      "curb.0855.3",
+      "bollard.0853.a",
+      "bollard.0855.a",
+      "quay.bollard.a",
+      "quay.curb.b"
+     ],
+     "note": "the wheel stops and bitts stand on one line parallel to the quay face"
+    },
+    {
+     "kind": "on_y",
+     "y": "apron_y",
+     "sigma": 0.05,
+     "points": [
+      "curb.0853.0",
+      "curb.0853.1",
+      "curb.0853.2",
+      "curb.0853.3",
+      "curb.0853.4",
+      "curb.0853.5",
+      "curb.0853.6",
+      "curb.0853.7",
+      "curb.0853.8",
+      "curb.0853.9",
+      "curb.0853.10",
+      "curb.0855.0",
+      "curb.0855.1",
+      "curb.0855.2",
+      "curb.0855.3",
+      "bollard.0853.a",
+      "bollard.0855.a",
+      "quay.bollard.a",
+      "quay.curb.b"
+     ]
+    },
+    {
+     "kind": "far_water",
+     "img": "IMG_0855",
+     "uv": [
+      [
+       100,
+       1689
+      ],
+      [
+       250,
+       1689
+      ],
+      [
+       2100,
+       1680
+      ],
+      [
+       2400,
+       1680
+      ],
+      [
+       2650,
+       1679
+      ]
+     ],
+     "y": 0.0,
+     "sigma": 0.4,
+     "coast": [
+      [
+       1103.6,
+       608.7
+      ],
+      [
+       1117.7,
+       633.9
+      ],
+      [
+       1126.1,
+       641.3
+      ],
+      [
+       1133.5,
+       647.3
+      ],
+      [
+       1138.5,
+       656.7
+      ],
+      [
+       1133.0,
+       662.6
+      ],
+      [
+       1133.7,
+       671.8
+      ],
+      [
+       1129.8,
+       681.4
+      ],
+      [
+       1129.1,
+       695.1
+      ],
+      [
+       1118.0,
+       719.5
+      ],
+      [
+       1119.4,
+       723.6
+      ],
+      [
+       1116.8,
+       729.6
+      ],
+      [
+       1114.0,
+       737.1
+      ],
+      [
+       1110.7,
+       751.8
+      ],
+      [
+       1111.3,
+       759.0
+      ],
+      [
+       1105.6,
+       757.7
+      ],
+      [
+       1100.6,
+       766.6
+      ],
+      [
+       1103.7,
+       774.3
+      ],
+      [
+       1106.9,
+       778.0
+      ],
+      [
+       1106.1,
+       817.1
+      ],
+      [
+       1105.4,
+       840.6
+      ]
+     ],
+     "note": "the far shore of the bay (layout coast, GSI); water level T.P. 0 +- 0.4 (tide unknown)"
+    }
+   ],
+   "lens_first_fixed": false,
+   "init_model": {
+    "path": "raw/survey/market/models/canopy",
+    "up": [
+     0.009827701359097387,
+     -0.9961130156815766,
+     0.08753442908793964
+    ],
+    "yaw": -118.83237914917375,
+    "scale": 0.3,
+    "t": [
+     525.0,
+     6.8,
+     660.0
+    ],
+    "note": "rotations of the (depth-collapsed) SfM model; yaw so that IMG_0855 looks at 100.7 deg (sun glitter); positions squeezed (scale 0.3) around a guess"
+   },
+   "ties_late": true
+  }
+ }
+}

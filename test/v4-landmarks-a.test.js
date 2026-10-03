@@ -137,7 +137,7 @@ test('魚町 wall: T.P. 4.1 m crest, 1.3 m over the pavement, 21 flap gates, ~31
 
 test('南町: PIER7 and 迎 at 3 storeys with white roofs, the garden, two pontoons and ファンタジー (no ferry)', () => {
   const M = H.minami;
-  expect(M.pier7.roofY - M.pier7.g0).toBeGreaterThan(11);
+  expect(M.pier7.roofY).toBeCloseTo(11.9, 1);   // [v6:rebuild] the main eave at T.P. 11.9 (photo survey SfM points)
   expect(M.mukaeru.roofY - M.mukaeru.g0).toBeGreaterThan(9);
   expect(M.garden.top).toBe(6.2);
   expect(M.pontoons.length).toBe(2);

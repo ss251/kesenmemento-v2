@@ -1,0 +1,995 @@
+{
+ "area": "minami",
+ "note": "South-shore survey features (tools/survey/minami_features.py): ENU metres (x east, y T.P. up, z south), 1-sigma per axis. Names: docs/anime/survey/minami.md. Groups name#k are matched without order by tools/anime/survey-diff.mjs.",
+ "sigma_px": 2.5,
+ "georef": {
+  "t_sigma_m": 0.23667524778223875,
+  "yaw_sigma_deg": 0.4261846562730139
+ },
+ "features": [
+  {
+   "name": "cage.top#1",
+   "enu": [
+    0.831,
+    7.221,
+    49.502
+   ],
+   "sigma": [
+    0.253,
+    0.052,
+    0.251
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0807",
+    "IMG_0808",
+    "IMG_0818"
+   ],
+   "res_px": {
+    "0808": 5.6,
+    "0807": 6.8,
+    "0818": 1.4
+   },
+   "note": "top-left corner of the cage (the box over the gate post, under the red beacon) [cage.box.tl]"
+  },
+  {
+   "name": "cage.box_bottom",
+   "enu": [
+    0.814,
+    5.704,
+    49.489
+   ],
+   "sigma": [
+    0.25,
+    0.05,
+    0.25
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0807",
+    "IMG_0808",
+    "IMG_0818"
+   ],
+   "res_px": {
+    "0808": 2.4,
+    "0807": 0.9,
+    "0818": 0.9
+   },
+   "note": "bottom-left corner of that box (it sits on the concrete gate post) [cage.box.bl]"
+  },
+  {
+   "name": "cage.top#2",
+   "enu": [
+    3.728,
+    7.251,
+    47.34
+   ],
+   "sigma": [
+    0.266,
+    0.053,
+    0.266
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "top of the corner column (front face / long side face), on the front-face plane through the box corner [cage.corner.top]"
+  },
+  {
+   "name": "cage.top#3",
+   "enu": [
+    -6.945,
+    7.233,
+    28.942
+   ],
+   "sigma": [
+    0.374,
+    0.057,
+    0.374
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "top of the last post of the long side face (beyond the bleachers) [cage.side.end_top]"
+  },
+  {
+   "name": "cage.foot#2",
+   "enu": [
+    3.728,
+    1.822,
+    47.34
+   ],
+   "sigma": [
+    0.369,
+    0.073,
+    0.369
+   ],
+   "method": "drop",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "foot of the corner column on the paving [cage.corner.foot]"
+  },
+  {
+   "name": "cage.foot#3",
+   "enu": [
+    -6.945,
+    1.822,
+    28.942
+   ],
+   "sigma": [
+    0.502,
+    0.076,
+    0.502
+   ],
+   "method": "drop",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "foot of the last post (hidden by the bleachers): the end top at the corner foot's ground level [cage.side.end_foot]"
+  },
+  {
+   "name": "cage.foot#1",
+   "enu": [
+    0.831,
+    1.822,
+    49.502
+   ],
+   "sigma": [
+    0.355,
+    0.072,
+    0.354
+   ],
+   "method": "drop",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "the ground under the top-left box (the gate post's foot), at the corner foot's level [cage.box.foot]"
+  },
+  {
+   "name": "bleach.t1.top#1",
+   "enu": [
+    2.402,
+    2.475,
+    45.055
+   ],
+   "sigma": [
+    0.296,
+    0.053,
+    0.296
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 1: the front-top corner at its left end, against the cage face [bleach.t1.left_top]"
+  },
+  {
+   "name": "bleach.t1.bot#1",
+   "enu": [
+    2.393,
+    1.889,
+    45.039
+   ],
+   "sigma": [
+    0.296,
+    0.053,
+    0.296
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 1: the front-bottom corner at its left end, against the cage face [bleach.t1.left_bot]"
+  },
+  {
+   "name": "bleach.t2.top#1",
+   "enu": [
+    1.747,
+    3.093,
+    43.925
+   ],
+   "sigma": [
+    0.301,
+    0.054,
+    0.301
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 2: the front-top corner at its left end, against the cage face [bleach.t2.left_top]"
+  },
+  {
+   "name": "bleach.t2.bot#1",
+   "enu": [
+    1.738,
+    2.409,
+    43.91
+   ],
+   "sigma": [
+    0.301,
+    0.054,
+    0.301
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 2: the front-bottom corner at its left end, against the cage face [bleach.t2.left_bot]"
+  },
+  {
+   "name": "bleach.t3.top#1",
+   "enu": [
+    1.097,
+    3.898,
+    42.805
+   ],
+   "sigma": [
+    0.306,
+    0.054,
+    0.306
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 3: the front-top corner at its left end, against the cage face [bleach.t3.left_top]"
+  },
+  {
+   "name": "bleach.t3.bot#1",
+   "enu": [
+    1.091,
+    3.139,
+    42.794
+   ],
+   "sigma": [
+    0.306,
+    0.054,
+    0.306
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 3: the front-bottom corner at its left end, against the cage face [bleach.t3.left_bot]"
+  },
+  {
+   "name": "bleach.t4.top#1",
+   "enu": [
+    -0.255,
+    4.605,
+    40.474
+   ],
+   "sigma": [
+    0.318,
+    0.054,
+    0.318
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 4: the front-top corner at its left end, against the cage face [bleach.t4.left_top]"
+  },
+  {
+   "name": "bleach.t4.bot#1",
+   "enu": [
+    -0.256,
+    3.922,
+    40.472
+   ],
+   "sigma": [
+    0.318,
+    0.054,
+    0.318
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 4: the front-bottom corner at its left end, against the cage face [bleach.t4.left_bot]"
+  },
+  {
+   "name": "bleach.t5.top#1",
+   "enu": [
+    -1.526,
+    5.27,
+    38.284
+   ],
+   "sigma": [
+    0.331,
+    0.055,
+    0.331
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 5: the front-top corner at its left end, against the cage face [bleach.t5.left_top]"
+  },
+  {
+   "name": "bleach.t5.bot#1",
+   "enu": [
+    -1.523,
+    4.674,
+    38.289
+   ],
+   "sigma": [
+    0.331,
+    0.055,
+    0.331
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 5: the front-bottom corner at its left end, against the cage face [bleach.t5.left_bot]"
+  },
+  {
+   "name": "bleach.t1.top#2",
+   "enu": [
+    7.705,
+    2.475,
+    36.696
+   ],
+   "sigma": [
+    0.46,
+    0.071,
+    0.46
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 1: the front-top corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t1.right_top]"
+  },
+  {
+   "name": "bleach.t1.bot#2",
+   "enu": [
+    7.691,
+    1.889,
+    36.687
+   ],
+   "sigma": [
+    0.46,
+    0.071,
+    0.46
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 1: the front-bottom corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t1.right_bot]"
+  },
+  {
+   "name": "bleach.t2.top#2",
+   "enu": [
+    6.727,
+    3.093,
+    36.075
+   ],
+   "sigma": [
+    0.461,
+    0.071,
+    0.461
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 2: the front-top corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t2.right_top]"
+  },
+  {
+   "name": "bleach.t2.bot#2",
+   "enu": [
+    6.714,
+    2.409,
+    36.067
+   ],
+   "sigma": [
+    0.461,
+    0.071,
+    0.461
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 2: the front-bottom corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t2.right_bot]"
+  },
+  {
+   "name": "bleach.t3.top#2",
+   "enu": [
+    5.757,
+    3.898,
+    35.46
+   ],
+   "sigma": [
+    0.462,
+    0.071,
+    0.462
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 3: the front-top corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t3.right_top]"
+  },
+  {
+   "name": "bleach.t3.bot#2",
+   "enu": [
+    5.747,
+    3.139,
+    35.454
+   ],
+   "sigma": [
+    0.462,
+    0.071,
+    0.462
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 3: the front-bottom corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t3.right_bot]"
+  },
+  {
+   "name": "bleach.t4.top#2",
+   "enu": [
+    3.738,
+    4.605,
+    34.179
+   ],
+   "sigma": [
+    0.465,
+    0.071,
+    0.465
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 4: the front-top corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t4.right_top]"
+  },
+  {
+   "name": "bleach.t4.bot#2",
+   "enu": [
+    3.737,
+    3.922,
+    34.178
+   ],
+   "sigma": [
+    0.465,
+    0.071,
+    0.465
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 4: the front-bottom corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t4.right_bot]"
+  },
+  {
+   "name": "bleach.t5.top#2",
+   "enu": [
+    1.841,
+    5.27,
+    32.976
+   ],
+   "sigma": [
+    0.468,
+    0.071,
+    0.468
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 5: the front-top corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t5.right_top]"
+  },
+  {
+   "name": "bleach.t5.bot#2",
+   "enu": [
+    1.846,
+    4.674,
+    32.979
+   ],
+   "sigma": [
+    0.468,
+    0.071,
+    0.468
+   ],
+   "method": "radial",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tier 5: the front-bottom corner at its right end (the stair edge: its front line meets the radial plane of IMG_0808 x 3164) [bleach.t5.right_bot]"
+  },
+  {
+   "name": "bleach.stair.bot#1",
+   "enu": [
+    7.691,
+    2.038,
+    36.687
+   ],
+   "sigma": [
+    0.46,
+    0.071,
+    0.46
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "central stair: left end of the first step nosing, on tier 1's front plane (one riser over the paving) [bleach.stair.bot_l]"
+  },
+  {
+   "name": "bleach.stair.bot#2",
+   "enu": [
+    8.81,
+    2.038,
+    34.923
+   ],
+   "sigma": [
+    0.466,
+    0.071,
+    0.466
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "central stair: right end of the first step nosing, on tier 1's front plane (one riser over the paving) [bleach.stair.bot_r]"
+  },
+  {
+   "name": "ring#1",
+   "enu": [
+    33.633,
+    1.84,
+    60.441
+   ],
+   "sigma": [
+    0.441,
+    0.071,
+    0.441
+   ],
+   "method": "ringfit",
+   "views": [
+    "IMG_0813"
+   ],
+   "res_px": {},
+   "note": "ring bench centre at the paving (circle fit of 4 outer-top-edge picks, rms 0.21 m) [ringA]"
+  },
+  {
+   "name": "ring#2",
+   "enu": [
+    28.006,
+    1.84,
+    62.669
+   ],
+   "sigma": [
+    0.433,
+    0.071,
+    0.433
+   ],
+   "method": "ringfit",
+   "views": [
+    "IMG_0805"
+   ],
+   "res_px": {},
+   "note": "ring bench centre at the paving (circle fit of 4 outer-top-edge picks, rms 0.12 m) [ringB]"
+  },
+  {
+   "name": "ring#3",
+   "enu": [
+    21.532,
+    1.84,
+    54.581
+   ],
+   "sigma": [
+    0.406,
+    0.071,
+    0.406
+   ],
+   "method": "ringfit",
+   "views": [
+    "IMG_0807"
+   ],
+   "res_px": {},
+   "note": "ring bench centre at the paving (circle fit of 3 outer-top-edge picks, rms 0.00 m) [ringC]"
+  },
+  {
+   "name": "ring.tree#1",
+   "enu": [
+    28.051,
+    1.84,
+    63.024
+   ],
+   "sigma": [
+    0.374,
+    0.071,
+    0.374
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0800",
+    "IMG_0801",
+    "IMG_0803"
+   ],
+   "res_px": {},
+   "note": "ring B's tree trunk from both plaza stations (check of the ring fit) [ringB.tree]"
+  },
+  {
+   "name": "winch.foot#1",
+   "enu": [
+    22.6,
+    1.84,
+    49.856
+   ],
+   "sigma": [
+    0.415,
+    0.071,
+    0.415
+   ],
+   "method": "ground",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "foot of the left post (seen from the plaza) [winch.foot_l]"
+  },
+  {
+   "name": "winch.tip#1",
+   "enu": [
+    22.6,
+    4.463,
+    49.856
+   ],
+   "sigma": [
+    0.512,
+    0.087,
+    0.512
+   ],
+   "method": "drop",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tip of the pointed post [winch.tip_l]"
+  },
+  {
+   "name": "winch.foot#2",
+   "enu": [
+    21.218,
+    1.84,
+    47.892
+   ],
+   "sigma": [
+    0.457,
+    0.071,
+    0.457
+   ],
+   "method": "ground",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "foot of the right post (seen from the plaza) [winch.foot_r]"
+  },
+  {
+   "name": "winch.tip#2",
+   "enu": [
+    21.218,
+    4.551,
+    47.892
+   ],
+   "sigma": [
+    0.546,
+    0.087,
+    0.546
+   ],
+   "method": "drop",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "tip of the pointed post [winch.tip_r]"
+  },
+  {
+   "name": "mukaeru.box.top#1",
+   "enu": [
+    -16.36,
+    14.666,
+    40.635
+   ],
+   "sigma": [
+    0.325,
+    0.139,
+    0.39
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0808",
+    "IMG_0824"
+   ],
+   "res_px": {
+    "0808": 17.5,
+    "0824": 7.3
+   },
+   "note": "top (coping) of the 3F box's south corner (SE / street faces) [mukaeru.box.S_top]"
+  },
+  {
+   "name": "mukaeru.box.top#2",
+   "enu": [
+    -8.757,
+    14.983,
+    36.472
+   ],
+   "sigma": [
+    0.35,
+    0.203,
+    0.463
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0808",
+    "IMG_0824"
+   ],
+   "res_px": {
+    "0808": 27.0,
+    "0824": 14.3
+   },
+   "note": "top (coping) of the 3F box's east corner (SE / bay faces) [mukaeru.box.E_top]"
+  },
+  {
+   "name": "anchor.oval",
+   "enu": [
+    -11.873,
+    5.309,
+    47.813
+   ],
+   "sigma": [
+    0.27,
+    0.05,
+    0.27
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0826"
+   ],
+   "res_px": {},
+   "note": "the HAVE A NICE COFFEE oval sign (its centre), on the ANCHOR face plane"
+  },
+  {
+   "name": "anchor.P2.foot",
+   "enu": [
+    -10.797,
+    2.623,
+    48.948
+   ],
+   "sigma": [
+    0.265,
+    0.05,
+    0.265
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0826"
+   ],
+   "res_px": {},
+   "note": "SE end of the khaki face (where the glazed corner starts), at the sidewalk"
+  },
+  {
+   "name": "anchor.P2.eave",
+   "enu": [
+    -10.613,
+    9.124,
+    49.142
+   ],
+   "sigma": [
+    0.265,
+    0.051,
+    0.265
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0826"
+   ],
+   "res_px": {},
+   "note": "eave (fascia underside) at the SE end of the face"
+  },
+  {
+   "name": "totem.pier7",
+   "enu": [
+    -6.045,
+    3.08,
+    72.08
+   ],
+   "sigma": [
+    0.267,
+    0.061,
+    0.261
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0799",
+    "IMG_0823",
+    "IMG_0907"
+   ],
+   "res_px": {
+    "0799": 30.4,
+    "0823": 8.7,
+    "0907": 25.9
+   },
+   "note": "PIER7 \u5275 totem: centre of the oval logo"
+  },
+  {
+   "name": "totem.mukaeru",
+   "enu": [
+    -11.713,
+    3.614,
+    60.187
+   ],
+   "sigma": [
+    0.293,
+    0.133,
+    0.362
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0820",
+    "IMG_0824"
+   ],
+   "res_px": {
+    "0824": 42.6,
+    "0820": 79.6
+   },
+   "note": "\u8fce totem: centre of the \u8fce glyph"
+  }
+ ],
+ "dims": [
+  {
+   "name": "cage.h",
+   "value": 5.429,
+   "sigma": 0.08,
+   "how": "corner column top - foot"
+  },
+  {
+   "name": "cage.front_w",
+   "value": 3.615,
+   "sigma": 0.15,
+   "how": "box corner -> corner column, horizontal"
+  },
+  {
+   "name": "cage.side_len",
+   "value": 21.27,
+   "sigma": 0.3,
+   "how": "corner column -> last post, horizontal"
+  },
+  {
+   "name": "cage.front_azimuth_deg",
+   "value": 53.27,
+   "sigma": 0.5,
+   "how": "compass bearing of the front face (mod 180)"
+  },
+  {
+   "name": "cage.side_azimuth_deg",
+   "value": 149.882,
+   "sigma": 0.5,
+   "how": "compass bearing of the side face (mod 180)"
+  },
+  {
+   "name": "bleach.stair.rise",
+   "value": 0.215,
+   "sigma": 0.03,
+   "how": "stair riser: (tier-5 top - paving) / 16"
+  },
+  {
+   "name": "bleach.tiers",
+   "value": 5.0,
+   "sigma": 0.0,
+   "how": "counted in IMG_0808 (left block; tier 1 at the paving to tier 5)"
+  },
+  {
+   "name": "bleach.rise",
+   "value": 0.69,
+   "sigma": 0.03,
+   "how": "mean riser: (tier-5 top - paving) / 5"
+  },
+  {
+   "name": "bleach.top_y",
+   "value": 5.27,
+   "sigma": 0.06,
+   "how": "T.P. of the tier-5 seat"
+  },
+  {
+   "name": "bleach.tread",
+   "value": 1.736,
+   "sigma": 0.15,
+   "how": "mean tread perpendicular to the tier fronts (1.16, 1.15, 2.39, 2.25 m)"
+  },
+  {
+   "name": "bleach.front_azimuth_deg",
+   "value": 32.39,
+   "sigma": 2.0,
+   "how": "compass bearing of the tier fronts (mod 180): perpendicular to the radial stair edge"
+  },
+  {
+   "name": "bleach.stair.risers",
+   "value": 16.0,
+   "sigma": 2.0,
+   "how": "IMG_0808: the stair from the paving to the top deck (estimate)"
+  },
+  {
+   "name": "ring.d_out",
+   "value": 4.666,
+   "sigma": 0.4,
+   "how": "outer diameter, mean of rings A and B (A 4.31, B 5.02; C 6.54 m from 3 picks, its left side out of frame)"
+  },
+  {
+   "name": "ring.h",
+   "value": 0.267,
+   "sigma": 0.04,
+   "how": "rim height over the paving at the front (0.33, 0.24, 0.23 m)"
+  },
+  {
+   "name": "winch.post_h",
+   "value": 2.667,
+   "sigma": 0.05,
+   "how": "post tips over the paving"
+  },
+  {
+   "name": "winch.span",
+   "value": 2.402,
+   "sigma": 0.15,
+   "how": "between the two posts"
+  },
+  {
+   "name": "mukaeru.box_top_y",
+   "value": 14.825,
+   "sigma": 0.06,
+   "how": "T.P. of the box's coping"
+  },
+  {
+   "name": "mukaeru.box_se_w",
+   "value": 8.668,
+   "sigma": 0.2,
+   "how": "width of the SE face"
+  },
+  {
+   "name": "anchor.floor",
+   "value": 2.623,
+   "sigma": 0.05,
+   "how": "sidewalk T.P. at the face's SE end"
+  }
+ ]
+}

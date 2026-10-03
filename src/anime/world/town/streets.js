@@ -278,11 +278,45 @@ export function buildStreets(ctx, { lotIdx, roadIdx, roads, heroZone, rivers = n
   function markCentre(r, S, cw, hw, hero) {
     const startN = nodeAt(r, 0), endN = nodeAt(r, 1), len = S[S.length - 1].s;
     const solid = hero && cw * 2 >= 8.5;
-    const K = runs(S, (s) => !((startN && startN.deg >= 3 && s.s < startN.R + 3) || (endN && endN.deg >= 3 && len - s.s < endN.R + 3)) && !water(s.x, s.z) && !roadIdx.covering(s.x, s.z, -0.5, r).length);
-    if (solid) { strip(lineB, K, -0.08, 0.08, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [s.s / 0.8, o / 0.8], () => YEL); return; }
+    const keepS = (s) => !((startN && startN.deg >= 3 && s.s < startN.R + 3) || (endN && endN.deg >= 3 && len - s.s < endN.R + 3)) && !water(s.x, s.z) && !roadIdx.covering(s.x, s.z, -0.5, r).length;
+    const K = runs(S, keepS);
+    // [v6:c7] an override's measured centre marking (road patch `markings`, docs/anime/OVERRIDES.md) replaces the rule
+    const mk = r.markings;
+    if (mk?.centre === 'hatched-median') { hatchedMedian(r, S, K, keepS, cw, mk); return; }
+    if (mk?.centre === 'white-solid' || mk?.centre === 'yellow') { strip(lineB, K, -0.08, 0.08, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [s.s / 0.8, o / 0.8], () => (mk.centre === 'yellow' ? YEL : WHITE)); return; }
+    if (solid && !mk) { strip(lineB, K, -0.08, 0.08, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [s.s / 0.8, o / 0.8], () => YEL); return; }
     // dashed: 5 m on, 5 m off
     const D = K.map((s) => (s && (Math.floor(s.s / 5) % 2 === 0) ? s : null));
     strip(lineB, D, -0.075, 0.075, (x, z) => roadY(x, z) + 0.02, (p, o, s) => [s.s / 0.8, o / 0.8], () => WHITE);
+  }
+  /** [v6:c7] a painted median (導流帯): two 0.15 m white solid lines `medianWidth` apart with 0.45 m white chevrons at a
+   *  5 m pitch between them, and dashed white lane lines. lanes = [a, b]: a lanes on the right of the median looking
+   *  from the road's first point to its last (the +o side of the samples' frame), b on its left; the median sits where
+   *  lanes of equal width put it. */
+  function hatchedMedian(r, S, K, keepS, cw, mk) {
+    const mw = mk.medianWidth ?? 3, [a, b] = mk.lanes ?? [1, 1], len = S[S.length - 1].s;
+    const laneW = (2 * cw - mw) / (a + b);
+    const hi = laneW >= 2.5 ? cw - a * laneW : mw / 2, lo = hi - mw, oc = (hi + lo) / 2;
+    const Y = (x, z) => roadY(x, z) + 0.02;
+    for (const e of [lo, hi]) strip(lineB, K, e - 0.075, e + 0.075, Y, (p, o, s) => [s.s / 0.8, (o - e) / 0.8], () => WHITE);
+    // lane lines: 5 m on, 5 m off
+    const D = K.map((s) => (s && (Math.floor(s.s / 5) % 2 === 0) ? s : null));
+    const lanes = [];
+    for (let k = 1; k < a; k++) lanes.push(hi + k * (cw - hi) / a);
+    for (let k = 1; k < b; k++) lanes.push(lo - k * (lo + cw) / b);
+    for (const e of lanes) strip(lineB, D, e - 0.075, e + 0.075, Y, (p, o, s) => [s.s / 0.8, (o - e) / 0.8], () => WHITE);
+    // chevrons: a V of two 0.45 m strokes from the median's edges to its middle, the point toward the road's first point
+    const armL = Math.max(1.2, mw * 0.7), half = 0.225, ins = 0.12;
+    for (let s = 2.5; s < len - armL; s += 5) {
+      const p = pointAtS(S, s), q = pointAtS(S, s + armL); if (!p || !q) continue;
+      if (!keepS({ s, x: p.x, z: p.z }) || !keepS({ s: s + armL, x: q.x, z: q.z })) continue;
+      const tx = p.tx, tz = p.tz, nx = -tz, nz = tx;
+      const W = (o, d) => { const x = p.x + nx * o + tx * d, z = p.z + nz * o + tz * d; return lineB.vert(x, Y(x, z) + 0.001, z, o / 0.8, d / 0.8, UP, WHITE); };
+      for (const e of [lo + ins, hi - ins]) {
+        const o1 = e, d1 = armL, o2 = oc, d2 = 0, l = Math.hypot(o2 - o1, d2 - d1), uo = (o2 - o1) / l, ud = (d2 - d1) / l, po = -ud * half, pd = uo * half;
+        lineB.quad(W(o1 + po, d1 + pd), W(o2 + po, d2 + pd), W(o2 - po, d2 - pd), W(o1 - po, d1 - pd));
+      }
+    }
   }
 
   function pointAtS(S, s) { for (let i = 1; i < S.length; i++) if (S[i].s >= s) { const a = S[i - 1], b = S[i], t = (s - a.s) / Math.max(1e-6, b.s - a.s); return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t, tx: a.tx, tz: a.tz }; } return null; }

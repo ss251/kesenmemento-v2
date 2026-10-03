@@ -1,0 +1,402 @@
+{
+ "method": "tools/survey/adjust.py (station-aware BA on COLMAP SIFT matches)",
+ "images_total": 57,
+ "registered": [
+  "IMG_0799",
+  "IMG_0801",
+  "IMG_0803",
+  "IMG_0823",
+  "IMG_0838",
+  "IMG_0839",
+  "IMG_0800",
+  "IMG_0805",
+  "IMG_0806",
+  "IMG_0813",
+  "IMG_0826",
+  "IMG_0827",
+  "IMG_0828",
+  "IMG_0834",
+  "IMG_0837",
+  "IMG_0802",
+  "IMG_0815",
+  "IMG_0824",
+  "IMG_0825",
+  "IMG_0836",
+  "IMG_0835",
+  "IMG_0816",
+  "IMG_0911",
+  "IMG_0912"
+ ],
+ "not_registered": [
+  "IMG_0807",
+  "IMG_0808",
+  "IMG_0809",
+  "IMG_0810",
+  "IMG_0811",
+  "IMG_0812",
+  "IMG_0814",
+  "IMG_0817",
+  "IMG_0818",
+  "IMG_0819",
+  "IMG_0820",
+  "IMG_0821",
+  "IMG_0822",
+  "IMG_0829",
+  "IMG_0830",
+  "IMG_0831",
+  "IMG_0832",
+  "IMG_0833",
+  "IMG_0840",
+  "IMG_0841",
+  "IMG_0842",
+  "IMG_0888",
+  "IMG_0890",
+  "IMG_0891",
+  "IMG_0893",
+  "IMG_0894",
+  "IMG_0895",
+  "IMG_0896",
+  "IMG_0906",
+  "IMG_0907",
+  "IMG_0908",
+  "IMG_0910",
+  "IMG_0913"
+ ],
+ "registered_pct": 42.1,
+ "points": 5337,
+ "observations": 11752,
+ "reprojection_px": {
+  "mean": 0.913,
+  "median": 0.802,
+  "p90": 1.675,
+  "all_mean": 0.931
+ },
+ "intrinsics": {
+  "OPENCV#1": [
+   1635.447339,
+   -6.9e-05,
+   -0.005414,
+   0.000771,
+   0.000646
+  ],
+  "OPENCV#2": [
+   3959.20708,
+   0.007855,
+   -0.038061,
+   0.001881,
+   0.000106
+  ],
+  "RADIAL#3": [
+   5585.799554,
+   0.00736,
+   0.126333
+  ],
+  "RADIAL#4": [
+   8981.190019,
+   -0.17065,
+   1.642095
+  ]
+ },
+ "per_image": {
+  "IMG_0799": {
+   "points": 62,
+   "reproj_mean_px": 0.385
+  },
+  "IMG_0801": {
+   "points": 521,
+   "reproj_mean_px": 0.879
+  },
+  "IMG_0803": {
+   "points": 333,
+   "reproj_mean_px": 0.921
+  },
+  "IMG_0823": {
+   "points": 62,
+   "reproj_mean_px": 0.284
+  },
+  "IMG_0838": {
+   "points": 1517,
+   "reproj_mean_px": 0.77
+  },
+  "IMG_0839": {
+   "points": 885,
+   "reproj_mean_px": 0.87
+  },
+  "IMG_0891": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0800": {
+   "points": 685,
+   "reproj_mean_px": 0.475
+  },
+  "IMG_0805": {
+   "points": 520,
+   "reproj_mean_px": 0.625
+  },
+  "IMG_0806": {
+   "points": 244,
+   "reproj_mean_px": 0.855
+  },
+  "IMG_0807": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0808": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0809": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0810": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0811": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0812": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0813": {
+   "points": 26,
+   "reproj_mean_px": 0.477
+  },
+  "IMG_0826": {
+   "points": 1951,
+   "reproj_mean_px": 1.293
+  },
+  "IMG_0827": {
+   "points": 1956,
+   "reproj_mean_px": 1.239
+  },
+  "IMG_0828": {
+   "points": 38,
+   "reproj_mean_px": 1.533
+  },
+  "IMG_0829": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0830": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0831": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0832": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0834": {
+   "points": 829,
+   "reproj_mean_px": 0.898
+  },
+  "IMG_0837": {
+   "points": 590,
+   "reproj_mean_px": 0.928
+  },
+  "IMG_0802": {
+   "points": 195,
+   "reproj_mean_px": 0.552
+  },
+  "IMG_0814": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0815": {
+   "points": 18,
+   "reproj_mean_px": 0.249
+  },
+  "IMG_0824": {
+   "points": 58,
+   "reproj_mean_px": 0.942
+  },
+  "IMG_0825": {
+   "points": 176,
+   "reproj_mean_px": 0.757
+  },
+  "IMG_0836": {
+   "points": 398,
+   "reproj_mean_px": 0.428
+  },
+  "IMG_0835": {
+   "points": 383,
+   "reproj_mean_px": 0.345
+  },
+  "IMG_0840": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0841": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0893": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0894": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0895": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0816": {
+   "points": 12,
+   "reproj_mean_px": 0.413
+  },
+  "IMG_0817": {
+   "points": 1,
+   "reproj_mean_px": 0.01
+  },
+  "IMG_0819": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0821": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0822": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0910": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0907": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0908": {
+   "points": 0,
+   "reproj_mean_px": null
+  },
+  "IMG_0911": {
+   "points": 276,
+   "reproj_mean_px": 0.71
+  },
+  "IMG_0912": {
+   "points": 16,
+   "reproj_mean_px": 0.549
+  }
+ },
+ "gps_residual_m": {
+  "IMG_0799": 9.29,
+  "IMG_0801": 2.65,
+  "IMG_0803": 1.1,
+  "IMG_0823": 10.24,
+  "IMG_0838": 0.31,
+  "IMG_0839": 0.6,
+  "IMG_0891": 0.0,
+  "IMG_0800": 6.68,
+  "IMG_0805": 0.81,
+  "IMG_0806": 1.34,
+  "IMG_0807": 0.79,
+  "IMG_0808": 0.88,
+  "IMG_0809": 0.78,
+  "IMG_0810": 1.64,
+  "IMG_0811": 0.71,
+  "IMG_0812": 1.69,
+  "IMG_0813": 1.67,
+  "IMG_0826": 15.57,
+  "IMG_0827": 16.16,
+  "IMG_0828": 16.9,
+  "IMG_0829": 16.21,
+  "IMG_0830": 15.02,
+  "IMG_0831": 14.83,
+  "IMG_0832": 13.84,
+  "IMG_0834": 0.58,
+  "IMG_0837": 1.01,
+  "IMG_0802": 1.79,
+  "IMG_0814": 4.94,
+  "IMG_0815": 1.25,
+  "IMG_0824": 4.72,
+  "IMG_0825": 14.98,
+  "IMG_0836": 0.19,
+  "IMG_0835": 0.57,
+  "IMG_0840": 2.6,
+  "IMG_0841": 2.04,
+  "IMG_0893": 0.22,
+  "IMG_0894": 0.08,
+  "IMG_0895": 0.08,
+  "IMG_0816": 1.65,
+  "IMG_0817": 1.44,
+  "IMG_0819": 0.0,
+  "IMG_0821": 0.0,
+  "IMG_0822": 0.0,
+  "IMG_0910": 28.51,
+  "IMG_0907": 28.15,
+  "IMG_0908": 27.99,
+  "IMG_0911": 28.88,
+  "IMG_0912": 28.89
+ },
+ "eye_height_m": {
+  "IMG_0799": -0.76,
+  "IMG_0801": 1.45,
+  "IMG_0803": 1.59,
+  "IMG_0823": 0.77,
+  "IMG_0838": 1.39,
+  "IMG_0839": 1.42,
+  "IMG_0891": 1.45,
+  "IMG_0800": 1.41,
+  "IMG_0805": 1.52,
+  "IMG_0806": 1.77,
+  "IMG_0807": 1.52,
+  "IMG_0808": 1.46,
+  "IMG_0809": 1.45,
+  "IMG_0810": 1.45,
+  "IMG_0811": 1.45,
+  "IMG_0812": 1.45,
+  "IMG_0813": 1.47,
+  "IMG_0826": 4.56,
+  "IMG_0827": 4.56,
+  "IMG_0828": 4.66,
+  "IMG_0829": 1.69,
+  "IMG_0830": 1.5,
+  "IMG_0831": 1.46,
+  "IMG_0832": 1.45,
+  "IMG_0834": 1.45,
+  "IMG_0837": 1.46,
+  "IMG_0802": 1.41,
+  "IMG_0814": 1.14,
+  "IMG_0815": 0.24,
+  "IMG_0824": 1.48,
+  "IMG_0825": 4.5,
+  "IMG_0836": 1.46,
+  "IMG_0835": 1.45,
+  "IMG_0840": 1.45,
+  "IMG_0841": 1.45,
+  "IMG_0893": 1.45,
+  "IMG_0894": 1.45,
+  "IMG_0895": 1.45,
+  "IMG_0816": 0.11,
+  "IMG_0817": 0.02,
+  "IMG_0819": 1.45,
+  "IMG_0821": 1.45,
+  "IMG_0822": 1.45,
+  "IMG_0910": 1.2,
+  "IMG_0907": 1.44,
+  "IMG_0908": 1.4,
+  "IMG_0911": -2.0,
+  "IMG_0912": -1.99
+ },
+ "refs": [],
+ "priors": {
+  "gps_sigma_m": 6.0,
+  "eye_m": 1.45,
+  "eye_sigma_m": 0.35,
+  "station_gap_s": 4.0,
+  "station_sigma_m": 0.6
+ }
+}
