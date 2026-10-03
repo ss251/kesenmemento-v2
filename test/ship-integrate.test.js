@@ -121,12 +121,12 @@ describe("ship: the module at runtime (headless, phone tier)", () => {
   const H = headlessCtx();
   const { ctx } = H;
   let built;
-  test("build(): she lies at the コの字岸壁, the livery follows the flag, nothing nendo is fetched off a dev host", async () => {
+  test("build(): she lies at the コの字岸壁, the nendo livery by default, nothing nendo is fetched with the KLC_NENDO=0 fallback", async () => {
     built = await build(ctx);
     const S = ctx.services.ship;
     expect(S && S.ship && S.sail && S.voyage).toBeTruthy();
     expect(built.tier).toBe("phone");
-    expect(built.livery).toBe(process.env.KLC_NENDO === "1" ? "nendo" : "fallback");
+    expect(built.livery).toBe(process.env.KLC_NENDO === "0" ? "fallback" : "nendo");
     if (built.livery === "fallback") expect(fetches).toBe(0);
     expect(built.triangles).toBeLessThan(BUDGET.phone);
     const g = S.ship.group; g.updateWorldMatrix(true, true);

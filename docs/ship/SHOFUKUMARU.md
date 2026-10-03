@@ -74,33 +74,26 @@ reason and leaves the state as it was.
 | `&beat=STATE` | Starts at any state; the machine is fast-forwarded through legal events. Wins over `act`. |
 | `&keep=N`, `&fish=1` | With `beat=HAUL`: N fish already kept, and a fish on the scale. |
 | `&auto=1` | The hands-free demo, about 5 to 6 minutes from the quay to the card (for the mayor demo). |
-| `&livery=nendo` / `fallback` | Forces the livery (section 6). |
+| `&livery=fallback` / `nendo` | The plain fallback livery is opt-in; nendo is the default (section 6). |
 | `&shot=1&t=S` | For deterministic screenshots: enters the beat at once and runs S seconds. |
 | `&lang=ja` / `en` | The app's language switch; every ship string is in `data/ship/i18n.json`. |
 
 ## 6. The livery flag
 
-The full livery (nendo for 臼福本店, 2020) is the designer's work, so it sits behind a flag.
-`src/anime/world/ship/flags.js` `resolveFlags()` decides:
+**Livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.**
 
-1. `?livery=nendo|fallback` wins.
-2. Otherwise the livery is **on** for `localhost`, `127.0.0.1`, `::1` and `*.localhost`, or when the bundle defines
-   `KLC_NENDO=1`.
-3. Otherwise it is **off**. That includes the public Funnel link (`*.ts.net`) and every public host.
+The full livery is nendo's design for 臼福本店 (2020). `src/anime/world/ship/flags.js` `resolveFlags()` decides:
 
-When the flag is off, `livery.js` paints the plain fallback livery and never fetches `data/ship/shofukumaru1/*nendo*`.
-The bundle carries only the file names, never the data. `scripts/public-mirror.js` also refuses those files.
+1. `?livery=fallback|nendo` wins.
+2. Otherwise a bundle built with `KLC_NENDO=0` shows the plain fallback (`KLC_NENDO=1`, or no define, keeps nendo).
+3. Otherwise the nendo livery, on every host: `localhost`, the tailnet, the public Funnel link (`*.ts.net`) and any
+   public deploy.
 
-**Turning it on publicly (once the captain approves):**
-
-1. In `resolveFlags`, make the last line `return { nendoLivery: true, source: 'default' };`. `?livery=fallback` stays
-   as the opt-out.
-2. Flip the host-default expectations in `test/ship-model.test.js` (the `flags.js` tests).
-3. Remove the `DENY.push(/^\/data\/ship\/shofukumaru1\/[^/]*nendo/i)` line from `scripts/public-mirror.js`, and
-   flip its test, "the public mirror never serves the nendo trace", in `test/ship-model.test.js`.
-4. Deploy with `data/ship/shofukumaru1/livery-nendo.json`, `lines-nendo.json` and `livery-nendo-marks.json`.
-
-For a one-off tailnet demo without changing code, add `?livery=nendo` to the URL, or build with `KLC_NENDO=1`.
+The plain fallback stays in the code as an opt-in only. With it, `livery.js` paints the plain livery and never
+fetches `data/ship/shofukumaru1/*nendo*`. The bundle never carries the nendo data, only the file names: it is fetched
+at runtime, so every deploy must serve `data/ship/shofukumaru1/livery-nendo.json`, `lines-nendo.json` and
+`livery-nendo-marks.json` under `/data/` (`scripts/serve.js` and `scripts/public-mirror.js` do; see the static-server
+note in `docs/ARCHITECTURE.md`). If they fail to load, she keeps the plain livery.
 
 ## 7. Architecture and APIs
 
@@ -117,7 +110,7 @@ stem and h is metres above the waterline.
 |---|---|
 | `ship/shofukumaru1.js` | `SHIP` (the particulars, each with its source); `buildShofukumaru(ctx, { livery, tier })` → `{ group, anchors: { gangwayStbd, sternSetting, bridge, mastTop, hornPos, railPoints[], flagPoints[] }, setFlags(on), setNight(f), update(dt, t), dispose() }`; `BUDGET` = 150 k triangles (high) and 60 k (phone). |
 | `ship/flags.js` | `resolveFlags({ search?, hostname?, define? })` → `{ nendoLivery, source }`. |
-| `ship/livery.js` | `paintAtlas`, `fallbackPlan`, `loadNendo` (only when the flag is on), `cleanNendo`. |
+| `ship/livery.js` | `paintAtlas`, `fallbackPlan`, `loadNendo` (with the default nendo livery; never with the fallback), `cleanNendo`. |
 | `ship/route.js` | `BERTH {x, z, yaw}`, `SHOKO`, `BAY_MOUTH`, `OUTBOUND` (polyline), `OUTBOUND_PATH`, `KANAE_CROSSING {s, x, z, clearance, margin}`, `routeClearance(path)`. |
 | `explore/sail.js` | `BOAT` (handling constants); `boatStep(s, input, dt, P)` (pure); `sailStep` (with shore); `pursue` (autopilot); `createSail(ctx, { ship, route })` → `{ enter(at), exit(), active, state, setAutopilot(on), focus(), onEvent(cb) }`. Events: `passKanae`, `passShoko`, `bayMouth`, `arrived`. |
 | `ship/acts.js` | `createActs(snapshot?)` (pure, serialisable with `snapshot()`); `STATES`, `EVENTS` (guards), `RULES`, `makeCatch`, `seasonOpen`, `weighIn`. |
@@ -140,10 +133,10 @@ env -u NODE_OPTIONS bun test test/ship-model.test.js test/ship-sail.test.js test
 |---|---|
 | `ship-sail` | `boatStep` (inertia, astern, a tactical diameter of 3 to 4 LOA, rudder and yaw lag, purity and determinism); shore collision (500 random runs never bring a hull sample within 1 m of the shore, and she slides along a quay); OUTBOUND is water every 5 m and at least 40 m from the shore beyond the berth approach; かなえ大橋 is crossed between the pylons with at least 10 m above her 21 m air draft; the autopilot and its recovery; AI boats giving way. |
 | `ship-acts` | The tag format, and that a demo tag never matches the real format; the act state machine (order, guards, refused events, serialise and restore, the ICCAT season); the release rule and the quota; the Act 3 order (the fish leave her at Las Palmas, and Shimizu refuses 1 kg over); i18n parity; the phone budget of the scenes. |
-| `ship-model` | Dimensions against `SHIP`; the 舷門 on the starboard side only; the triangle budgets per tier; the flags (URL, hosts, `*.ts.net` off, define) and the public mirror refusing the nendo files; the fallback livery fetches nothing and no module bundles the nendo data; lettering reads right from both sides. |
+| `ship-model` | Dimensions against `SHIP`; the 舷門 on the starboard side only; the triangle budgets per tier; the flags (nendo by default on every host, `?livery=fallback` and `KLC_NENDO=0` give the fallback), and the local server and the public mirror serving the nendo files; the fallback livery fetches nothing and no module bundles the nendo data; lettering reads right from both sides. |
 | `ship-livery-paint` | Replays `paintAtlas` on a probe canvas and reads back texels: the transom, the stern triangles, the aft sheer triangle. |
 | `ship-integrate` | The URL parameters, the boarding entry, the module order, and the whole voyage headless through the real module, from the quay to the card. |
-| `v3-fix` | The public mirror's other rules (run with the ship files because the mirror gained the nendo DENY). |
+| `v3-fix` | The public mirror's other rules (run with the ship files: the mirror serves the ship's data). |
 
 Headless shots go through the one-browser gate:
 

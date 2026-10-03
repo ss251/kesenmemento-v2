@@ -200,7 +200,7 @@ export function cleanNendo(data, { mergeGap = 0.45, maxGrow = 1.45, keep = 0.92,
   return plan;
 }
 
-/** Fetch the three nendo files (page-relative data/ship/shofukumaru1/). Only ever called when the flag is on. */
+/** Fetch the three nendo files (page-relative data/ship/shofukumaru1/). Never called with the opt-in fallback. */
 export const NENDO_FILES = { traced: 'livery-nendo.json', lines: 'lines-nendo.json', marks: 'livery-nendo-marks.json' };
 export async function loadNendo(fetchJson = defaultFetchJson, base = null) {
   const root = base ?? (typeof location !== 'undefined' ? new URL('data/ship/shofukumaru1/', location.href).href : 'data/ship/shofukumaru1/');

@@ -73,18 +73,15 @@ Everything is added with `ctx.add` (the dynamic root), so it is never merged int
 
 ## Flags
 
-`ship/flags.js` `resolveFlags()`: `?livery=nendo|fallback` wins. Otherwise the nendo livery is on for localhost,
-127.0.0.1, ::1 and `*.localhost`, or when the build defines `KLC_NENDO=1`, and off everywhere else. That includes
-`*.ts.net`: the captain's public Funnel link is a ts.net host, so tailnet dev uses `?livery=nendo` or `KLC_NENDO=1`.
-`scripts/public-mirror.js` DENYs `data/ship/shofukumaru1/*nendo*`, so the public mirror never serves the trace and a
-public `?livery=nendo` falls back to the plain livery. With the flag off, the plain fallback livery is painted and nothing under
-`data/ship/shofukumaru1/*nendo*` is fetched. The bundle never contains the nendo data, only the file names; it is
-fetched at run time from `data/ship/shofukumaru1/` when the flag is on.
+**Livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.**
 
-**Open decision for the captain.** The nendo livery stays behind this flag; a public deploy is the captain's call.
-To make nendo the default everywhere, `resolveFlags` returns `{ nendoLivery: true, source: 'default' }` as its last
-line (keeping `?livery=fallback` and `KLC_NENDO=0` as the opt-outs), the flag tests in `test/ship-model.test.js` flip,
-the nendo DENY line in `scripts/public-mirror.js` goes, and the deploy publishes `data/ship/shofukumaru1/*nendo*.json`.
+`ship/flags.js` `resolveFlags()`: `?livery=fallback|nendo` wins. Otherwise a build that defines `KLC_NENDO=0` shows the
+plain fallback. Otherwise the nendo livery is on, on every host: localhost, the tailnet, the captain's public Funnel
+link (`*.ts.net`) and any public deploy. The fallback stays in the code as an opt-in only; with it, nothing under
+`data/ship/shofukumaru1/*nendo*` is fetched. The bundle never contains the nendo data, only the file names; it is
+fetched at run time from `data/ship/shofukumaru1/`, so every deploy serves those three files under `/data/`:
+`scripts/serve.js` does, `scripts/public-mirror.js` passes them (its nendo DENY is gone), and a static host follows the
+pattern in `docs/ARCHITECTURE.md` (Static deploy). `test/ship-model.test.js` checks all of this.
 
 ## Phone tier
 

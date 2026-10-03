@@ -17,9 +17,8 @@ export const ALLOW = [
   /^\/api\/live(\/[\w./-]*)?$/,                                  // live data is read-only JSON
 ];
 export const DENY = [/\.\./, /\/\./, /^\/api\/splat-transform/, /^\/api\/config/, /\.map$/];   // [v3:fix] never the token route
-// [ship] The nendo livery trace of 第一昭福丸 is the designer's work: never served publicly until the captain decides on a
-// public deploy (he met 臼福本店 on 2026-10-03). A public ?livery=nendo then fails to load and the ship keeps the fallback.
-DENY.push(/^\/data\/ship\/shofukumaru1\/[^/]*nendo/i);
+// [ship] The nendo livery trace of 第一昭福丸 (data/ship/shofukumaru1/*nendo*.json) is served like any other app data:
+// livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.
 
 export function allowed(pathname) {
   let p;

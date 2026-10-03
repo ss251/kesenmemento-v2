@@ -99,8 +99,8 @@ tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.m
 The first command shoots every act from a jump: the machine is fast-forwarded legally, then that scene is entered.
 `--auto 1` sails the whole hands-free voyage and shoots each state as it is reached; it fails unless the voyage
 reaches CARD with no page error. The tool shoots the real app (`src/anime/index.html`) with every world module;
-the `ship` module puts the real `ship/shofukumaru1.js` model in the sail mode (the nendo livery on a local host;
-`--livery fallback` for shots that are committed).
+the `ship` module puts the real `ship/shofukumaru1.js` model in the sail mode (the nendo livery by default on every
+host; `--livery fallback` for the opt-in plain livery).
 
 The shots go to `shots/ship-acts/` (gitignored): every act, plus side-on views to compare with the model photos
 (`a1_side_port` with photo 02, port; `a2_side_stbd` with photo 03, starboard).

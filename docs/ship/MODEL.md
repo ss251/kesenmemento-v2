@@ -62,13 +62,13 @@ there over every livery shape, so the stern triangles stop at the quarter as on 
 (`transomDecalGeometry`, 4 cm proud, facing aft, the atlas `stern` cell, alpha-tested) carries three lines centred on
 the centreline, as on photo 04: 第一昭福丸 (h 2.85–3.45, 3.0 m wide), KESENNUMA (h 2.05–2.4; the photo shows a
 romanised line of seven to nine bold capitals, too small to read letter by letter, taken as the port of registry) and
-SHOFUKU MARU No.1 (h 1.35–1.63). It is structure, not livery: the public build has it too.
+SHOFUKU MARU No.1 (h 1.35–1.63). It is structure, not livery: the plain fallback has it too.
 
 The sides are painted separately, never mirrored. On starboard the hull name reads 丸福昭一第 from left to right, because Japanese hull names read from the bow aft.
 
-**Fallback** (public): white hull, red antifouling over the bulb, a black bow wedge, 第一昭福丸 / SHOFUKU MARU No.1, 7KFY and MG1-2112. `livery.js` holds no nendo coordinates. There are no lines, triangles, circle or crest, and no crest mesh.
+**Fallback** (opt-in: `?livery=fallback` or `KLC_NENDO=0`): white hull, red antifouling over the bulb, a black bow wedge, 第一昭福丸 / SHOFUKU MARU No.1, 7KFY and MG1-2112. `livery.js` holds no nendo coordinates. There are no lines, triangles, circle or crest, and no crest mesh.
 
-**Nendo** (dev flag): drawn at runtime from three files:
+**Nendo** (the default in all builds): drawn at runtime from three files:
 - `data/ship/shofukumaru1/livery-nendo.json` (traced shapes);
 - `lines-nendo.json` (traced diagonals);
 - `livery-nendo-marks.json` (this builder's measured supplements: the star circles fitted to the red segment boundary, the triangles the tracer missed because they were lit grey, the bow lines, the starboard ignore zones for the 舷門 and the hawse, and the crest strokes).
@@ -87,12 +87,12 @@ counterpart is 4.2 m wide); the position along the hull is the fit's.
 
 `cleanNendo()` turns each traced fragment into its convex hull. It merges a fragment with a touching fragment of the same colour only while the union stays compact. It then simplifies the shape to the fewest corners that keep 92 % of its area, and snaps corners at the waterline and at the stem. Nothing is snapped to the stern (fix round 2: snapping corners past s 57 to the atlas edge made the stern triangles meet across the transom); the white transom clips them at the quarter knuckle instead. `paintAtlas` order: shapes, circles, `over` shapes, lines, the white transom, text, the gunwale edge, the antifouling.
 
-**Flag** (`flags.js`):
-- `?livery=nendo|fallback` wins.
-- Otherwise the nendo livery is ON for localhost, 127.0.0.1, ::1, `*.localhost`, or a build that defines `KLC_NENDO=1`.
-- It is OFF everywhere else, `*.ts.net` included (the captain's public Funnel link is a ts.net host; tailnet dev uses `?livery=nendo`).
+**Flag** (`flags.js`). Livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.
+- `?livery=fallback|nendo` wins.
+- Otherwise a build that defines `KLC_NENDO=0` shows the fallback.
+- Otherwise nendo, on every host, the public Funnel link (`*.ts.net`) and any public deploy included.
 
-When it is OFF, the nendo files are never fetched. They are never imported either, so they are never bundled. A public deploy is the captain's call. `scripts/public-mirror.js` DENYs `data/ship/shofukumaru1/*nendo*`, so the public mirror never serves those files.
+With the fallback, the nendo files are never fetched. They are never imported either, so they are never bundled: every deploy serves them under `/data/ship/shofukumaru1/` (`scripts/serve.js`, `scripts/public-mirror.js` and the static-deploy pattern in `docs/ARCHITECTURE.md`).
 
 ## Budgets
 
@@ -118,4 +118,4 @@ Reading the scores:
 - The livery IoU is computed against the traced shapes (starboard in the fitted frame) and against the photo's own pixels.
 - Starboard only: `wcpfcIoU` scores the livery against the WCPFC photo of the real ship (x → s by a projective fit through six anchors, h by a vertical scale measured from the waterline to the sheer), forward of s 44, aft of s 44 (the weaker check: see the caveat above) and over the whole side, and writes `profile-starboard-<livery>-<tier>-wcpfc-ref-overlay.png` (local only).
 
-Composites that contain the reference photos (`*-ref-*.png`) and renders of the nendo livery stay local, through a `.gitignore` in that folder.
+Composites that contain the reference photos (`*-ref-*.png`) stay local, through a `.gitignore` in that folder. Renders of the nendo livery may be committed since the permission of 2026-10-03.

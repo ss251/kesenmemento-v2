@@ -9,7 +9,7 @@ import {
   SHIP, BUDGET, TIERS, MID_S, zOf, sheerAt, fwdS, sternS, keelAt, halfBreadth, stations, hullGeometry, buildShofukumaru, countTriangles,
 } from '../src/anime/world/ship/shofukumaru1.js';
 import { ATLAS, sideUV, sidePx, fallbackPlan, cleanNendo, convexHull, simplify, polyArea, paintAtlas, stubCanvas, NENDO_FILES, fitPoint, pwl, NAME } from '../src/anime/world/ship/livery.js';
-import { resolveFlags, isDevHost } from '../src/anime/world/ship/flags.js';
+import { resolveFlags, isDevHost, buildDefine } from '../src/anime/world/ship/flags.js';
 import { allowed } from '../scripts/public-mirror.js';
 
 const ROOT = resolve(import.meta.dir, '..');
@@ -121,35 +121,59 @@ describe('budgets', () => {
   });
 });
 
-describe('flags.js', () => {
-  test('the URL parameter wins', () => {
-    expect(resolveFlags({ search: '?livery=nendo', hostname: 'example.com', define: false })).toEqual({ nendoLivery: true, source: 'url' });
-    expect(resolveFlags({ search: '?livery=fallback', hostname: 'localhost', define: true })).toEqual({ nendoLivery: false, source: 'url' });
+describe('flags.js: nendo by default on every host (臼福本店 permission, 2026-10-03)', () => {
+  const PUBLIC = ['example.tail1234.ts.net', 'EXAMPLE.TAIL1.TS.NET', 'kesennuma.example.jp', 'example.github.io', 'klc.up.railway.app', ''];
+  test('a public host (the Funnel link, any deploy) means nendo', () => {
+    for (const h of PUBLIC) expect(resolveFlags({ search: '', hostname: h, define: null })).toEqual({ nendoLivery: true, source: 'default' });
   });
-  test('ON for local hosts only', () => {
-    for (const h of ['localhost', '127.0.0.1', 'app.localhost', 'LOCALHOST']) expect(resolveFlags({ search: '', hostname: h, define: false }).nendoLivery).toBe(true);
+  test('local hosts mean nendo too', () => {
+    for (const h of ['localhost', '127.0.0.1', 'app.localhost']) expect(resolveFlags({ search: '', hostname: h, define: null }).nendoLivery).toBe(true);
   });
-  test('OFF on Tailscale hosts: the public Funnel link is a ts.net host', () => {
-    for (const h of ['example.tail1234.ts.net', 'EXAMPLE.TAIL1.TS.NET']) {
-      expect(isDevHost(h)).toBe(false);
-      expect(resolveFlags({ search: '', hostname: h, define: false })).toEqual({ nendoLivery: false, source: 'default' });
+  test('?livery=fallback means the fallback, on any host and against any define', () => {
+    for (const h of [...PUBLIC, 'localhost']) for (const define of [null, true, false]) {
+      expect(resolveFlags({ search: '?livery=fallback', hostname: h, define })).toEqual({ nendoLivery: false, source: 'url' });
     }
-    expect(resolveFlags({ search: '?livery=nendo', hostname: 'example.tail1234.ts.net', define: false }).nendoLivery).toBe(true);
   });
-  test('the public mirror never serves the nendo trace', () => {
-    for (const f of ['livery-nendo.json', 'lines-nendo.json', 'livery-nendo-marks.json']) {
-      expect(allowed('/data/ship/shofukumaru1/' + f)).toBe(false);
-      expect(allowed('/data/ship/shofukumaru1/' + f.toUpperCase())).toBe(false);
-      expect(allowed('/data/ship/shofukumaru1/' + encodeURIComponent(f).replace('n', '%6E'))).toBe(false);
-    }
-    expect(allowed('/data/ship/i18n.json')).toBe(true);
-  });
-  test('ON when the build defines KLC_NENDO=1', () => {
+  test('KLC_NENDO=0 gives the fallback; KLC_NENDO=1 keeps nendo; ?livery=nendo wins over KLC_NENDO=0', () => {
+    expect(resolveFlags({ search: '', hostname: 'kesennuma.example.jp', define: false })).toEqual({ nendoLivery: false, source: 'define' });
     expect(resolveFlags({ search: '', hostname: 'kesennuma.example.jp', define: true })).toEqual({ nendoLivery: true, source: 'define' });
+    expect(resolveFlags({ search: '?livery=nendo', hostname: 'example.com', define: false })).toEqual({ nendoLivery: true, source: 'url' });
   });
-  test('OFF everywhere else (public)', () => {
-    for (const h of ['kesennuma.example.jp', 'example.github.io', 'ts.net.evil.com', 'localhost.evil.com', '']) expect(resolveFlags({ search: '', hostname: h, define: false })).toEqual({ nendoLivery: false, source: 'default' });
-    expect(resolveFlags({ search: '?livery=bogus', hostname: 'example.com', define: false }).nendoLivery).toBe(false);
+  test('an unknown ?livery value keeps the default (nendo)', () => {
+    expect(resolveFlags({ search: '?livery=bogus', hostname: 'example.com', define: null }).nendoLivery).toBe(true);
+  });
+  test('the build define reads KLC_NENDO tri-state from the env', () => {
+    const prev = process.env.KLC_NENDO;
+    try {
+      process.env.KLC_NENDO = '0'; expect(buildDefine()).toBe(false); expect(resolveFlags({ search: '' }).nendoLivery).toBe(false);
+      process.env.KLC_NENDO = '1'; expect(buildDefine()).toBe(true); expect(resolveFlags({ search: '' }).nendoLivery).toBe(true);
+      delete process.env.KLC_NENDO; expect(buildDefine()).toBeNull(); expect(resolveFlags({ search: '' })).toEqual({ nendoLivery: true, source: 'default' });
+    } finally { if (prev === undefined) delete process.env.KLC_NENDO; else process.env.KLC_NENDO = prev; }
+  });
+  test('isDevHost (the local music probe only) still knows local from public', () => {
+    for (const h of ['localhost', '127.0.0.1', 'app.localhost']) expect(isDevHost(h)).toBe(true);
+    for (const h of ['example.tail1234.ts.net', 'localhost.evil.com', '']) expect(isDevHost(h)).toBe(false);
+  });
+  test('the public mirror serves the nendo trace (the default livery must load on the public link)', () => {
+    for (const f of ['livery-nendo.json', 'lines-nendo.json', 'livery-nendo-marks.json']) expect(allowed('/data/ship/shofukumaru1/' + f)).toBe(true);
+    expect(allowed('/data/ship/i18n.json')).toBe(true);
+    expect(allowed('/data/ship/shofukumaru1/../../../.env')).toBe(false);
+  });
+  test('the local server and the static-server pattern serve the nendo trace from data/ship/shofukumaru1/', async () => {
+    const { start } = await import('../scripts/serve.js');
+    const { server, url } = await start({ port: 8971, build: false, quiet: true });
+    try {
+      for (const f of ['livery-nendo.json', 'lines-nendo.json', 'livery-nendo-marks.json']) {
+        const r = await fetch(url + 'data/ship/shofukumaru1/' + f);
+        expect(r.status).toBe(200);
+        expect(await r.json()).toEqual(JSON.parse(read('data/ship/shofukumaru1/' + f)));
+      }
+    } finally { server.stop(true); }
+  });
+  test('the nendo files are tracked data, not ignored', () => {
+    const ignore = read('.gitignore');
+    expect(ignore).not.toMatch(/nendo/);
+    expect(ignore).not.toMatch(/^\/?data\/ship\/?$/m);
   });
 });
 
@@ -175,7 +199,7 @@ describe('fallback livery holds nothing of the nendo design', () => {
     expect(ops.some((o) => o[0] === 'ellipse')).toBe(false);
     S.dispose();
   });
-  test('no module bundles the nendo data (it is fetched at runtime, behind the flag)', () => {
+  test('no module bundles the nendo data (it is fetched at runtime; the fallback never fetches it)', () => {
     for (const f of ['src/anime/world/ship/livery.js', 'src/anime/world/ship/shofukumaru1.js', 'src/anime/world/ship/flags.js']) {
       const src = read(f);
       expect(src).not.toMatch(/import[^;]*\.json/);
@@ -187,7 +211,7 @@ describe('fallback livery holds nothing of the nendo design', () => {
   });
 });
 
-describe('nendo livery (flag on)', () => {
+describe('nendo livery (the default)', () => {
   const plan = cleanNendo(NENDO);
   test('traced shapes are cleaned into crisp polygons, both sides, not mirrored', () => {
     for (const side of ['port', 'starboard']) {

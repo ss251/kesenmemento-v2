@@ -254,6 +254,7 @@ The numbers below were measured on an M2 Max. The machine was shared, so the bro
   [docs/anime/landmarks/](docs/anime/landmarks/): the engineering contract and the landmark reference sheets.
 - [docs/ship/SHOFUKUMARU.md](docs/ship/SHOFUKUMARU.md): 第一昭福丸 (7KFY). How to board and sail her, the three acts,
   the URL parameters, the livery flag, the APIs, the tests and the phone budget. Open `?ship=1` to board her.
+  Livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.
 
 ## Credits
 
