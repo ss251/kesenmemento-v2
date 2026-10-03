@@ -16,6 +16,7 @@ import { createLabels, LABEL_KINDS } from './labels.js';
 import { mountExploreUI } from './ui.js';
 import { EXTRA_PLACES, placeStops, droneFraming, walkFraming, topAt, makeTreeAt } from './places.js';
 import { buildInteriors } from './interiors.js';
+import { createStoryPins } from './storypins.js';
 import { makeLotIndex, makeRoadIndex } from '../town/common.js';
 import { makeRealNames } from '../town/realnames.js';
 
@@ -120,7 +121,23 @@ export async function build(ctx) {
   });
   // [ship:integrate] 「第一昭福丸に乗る」 heads the places list (selecting it boards her; world/ship/index.js PLACE)
   const shipPlace = ctx.services.ship?.place ? [ctx.services.ship.place] : [];
+  // [ship:story] the story pins (storypins.js, data/ship/story-pins.json): their own group after the boarding entry;
+  // selecting one flies the drone there, pins its label and opens its card
+  let storyFeat = [];
+  try {
+    const story = createStoryPins(ctx, {
+      L,
+      lang: () => api.ui?.i18n?.lang || life?.hud?.i18n?.lang || 'ja',
+      fly: (p) => {
+        drive?.active && drive.exit(); ctx.planet?.active && ctx.planet.exit();
+        tour?.stop?.(); tour?.flyTo?.(p.view ? { pos: p.view.pos, look: p.view.look } : places.frame(p).drone);
+        api.labels?.pin(api.labels.items?.find((it) => it.id === p.id) || places.labelItem(p));
+      },
+    });
+    api.story = story; storyFeat = story.places;
+  } catch (e) { fail('story', e); }
   const featured = shipPlace.concat(tourFeat).concat(lmStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'landmarks' })), exStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'places' })));
+  featured.splice(shipPlace.length, 0, ...storyFeat);   // [ship:story] the story group right after the boarding entry
   const search = createSearch(L, { featured, near: () => { const p = drive?.active ? drive.state : cam.position; return [p.x, p.z]; } });
   api.search = search;
   const places = {
@@ -143,7 +160,7 @@ export async function build(ctx) {
     bm?.step(1e9);
     t = lap('basemap', t);
     // label items: the featured places, then every named OSM / GSI place of a kind a visitor looks for
-    const items = featured.map((p) => ({ id: p.id, ja: p.ja, en: p.en, cat: p.cat, x: p.at[0], z: p.at[1], y: topAt(L, p.at[0], p.at[1], 10), prio: p.group === 'places' ? 2 : 3 }));
+    const items = featured.map((p) => ({ id: p.id, ja: p.ja, en: p.en, cat: p.cat, x: p.at[0], z: p.at[1], y: p.labelY ?? topAt(L, p.at[0], p.at[1], 10), prio: p.group === 'places' ? 2 : 3 }));
     const lotTop = (p) => { const l = p.lot ? L.lotById(p.lot) : null; return l ? (l.groundY || 0) + (l.height || 6) : L.heightAt(p.at[0], p.at[1]) + 5; };
     for (const p of search.all) if (LABEL_KINDS.test(p.cat) && !featured.some((f) => f.ja === p.ja && Math.hypot(f.at[0] - p.at[0], f.at[1] - p.at[1]) < 150)) items.push({ id: p.id, ja: p.ja, en: p.en, cat: p.cat, x: p.at[0], z: p.at[1], y: lotTop(p), prio: 1 });
     // [v4:integrate] buildings occlude; [v4:polish1] at most 10 on the low tier and on a portrait screen (the phone's
