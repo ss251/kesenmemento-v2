@@ -44,7 +44,7 @@ const HAIR_F = [
 ];
 
 // Archetypes -> Human spec. r = seeded rng.
-const LOOKS = {
+export const LOOKS = {   // [ship:acts] exported: the send-off crowd (ship/sendoff.js)
   fisherman(r, i) {
     const apron = r.pick(['#d9733c', '#e0823f', '#3f6f5c', '#34546e']);
     return {

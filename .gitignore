@@ -20,3 +20,6 @@ tools/.cargo-home/
 tools/render-test/out/
 tools/**/target/
 tools/*.tar.xz
+
+# [ship:acts] the captain's own send-off music (optional, local only; ship/sendoff.js plays it when present)
+data/ship/sendoff-music.mp3
