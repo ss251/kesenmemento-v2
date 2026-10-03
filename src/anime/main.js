@@ -378,7 +378,7 @@ async function main() {
   }
   document.body.classList.add('loaded');
   const go = $('go'); if (go) { go.disabled = false; go.focus(); go.addEventListener('click', start); }
-  canvas.addEventListener('click', () => { if (started) player.requestLock(); });
+  canvas.addEventListener('click', () => { if (started && !ctx.services.ship?.voyage?.active) player.requestLock(); });   // [ship:integrate] the voyage UI needs the cursor
   document.addEventListener('pointerlockchange', () => { document.body.classList.toggle('locked', document.pointerLockElement === canvas); });
   addEventListener('keydown', (e) => {
     if (e.code === 'Enter' && !started) start();

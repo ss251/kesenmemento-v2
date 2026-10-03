@@ -87,6 +87,7 @@ export async function build(ctx) {
     ctx.services.explore?.drive?.active && ctx.services.explore.drive.exit();
     ctx.planet?.active && ctx.planet.exit();
     ctx.services.life?.tour?.stop?.();
+    try { if (typeof document !== 'undefined' && document.pointerLockElement) document.exitPointerLock?.(); } catch (e) { /* no lock */ }   // the voyage UI needs the cursor
     if (state && state !== 'DOCKED') voyage.jump(state, opts);   // jump() enters the scene and shows its UI
     else if (!voyage.active) voyage.start();
     return voyage.state;
