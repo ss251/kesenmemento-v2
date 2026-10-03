@@ -8,8 +8,9 @@
 //   ACT 3 帰港 TRANSSHIP_LAS_PALMAS -> REEFER -> SHIMIZU_WEIGH -> HOMECOMING -> CARD
 //
 // The catch does NOT sail home: it is transshipped at Las Palmas into reefer containers, landed at the bonded port of
-// Shimizu where every fish is weighed (1 kg over the declared catch costs the licence), while the ship and crew come
-// home to Kesennuma under 大漁旗.
+// Shimizu for the landing inspection (about 3 Fisheries Agency inspectors, a reader gun on each fish's chip, a
+// same-number sticker on its cheek, the trucks on truck scales; 1 kg over the quota costs the licences of all 6 ships:
+// docs/ship/next-pass-usui.md item 3), while the ship and crew come home to Kesennuma under 大漁旗.
 //
 //   const acts = createActs({ seed, date })     acts.state / acts.data / acts.act
 //   acts.can(ev, payload) -> { ok, reason? }    acts.send(ev, payload) -> { ok, state, reason?, auto? }
@@ -28,6 +29,12 @@ export const ACT_OF = {
 };
 /** Act 3 runs in exactly this order (the true chain). */
 export const CHAIN_ORDER = ['TRANSSHIP_LAS_PALMAS', 'REEFER', 'SHIMIZU_WEIGH', 'HOMECOMING', 'CARD'];
+/**
+ * The Shimizu landing inspection, in order (Usui's talk, 2026-10-03; docs/ship/next-pass-usui.md item 3): about 3
+ * Fisheries Agency inspectors check by eye, scan each fish's chip with a reader gun, put a sticker with the same number
+ * on its cheek, and the trucks are weighed on truck scales; the last caption is the rule.
+ */
+export const SHIMIZU_STEPS = ['inspectors', 'chip', 'sticker', 'truck', 'rule'];
 
 /** Sourced rules and numbers (dossier section 5). */
 export const RULES = {
@@ -45,8 +52,12 @@ export const RULES = {
   coreH: 36,              // about 36 h to freeze the core
   japanT: 3779,           // Japan's 2025/26 E. Atlantic bluefin quota (Usui's slide)
   tacT: 43296,            // the E. Atlantic + Mediterranean TAC (slide)
+  japanBoats: 100,        // about 100 registered boats share Japan's quota, 48 of them fish Atlantic bluefin
+  japanBluefinBoats: 48,  // (Usui's talk, 2026-10-03; next-pass-usui.md item 2)
+  inspectors: 3,          // about 3 Fisheries Agency inspectors at the Shimizu landing (next-pass-usui.md item 3)
+  fleetShips: 6,          // 1 kg over the quota costs the licences of all 6 of the company's ships (item 3)
   // The quota bar is the ship's share (dossier §5): the minister's allocation to this one ship is about 80 t, as Usui
-  // said in his public talk on 2026-10-03 (the captain's usui-talk-notes.md, marked ⚠: not yet confirmed in writing;
+  // said in his public talk on 2026-10-03 (docs/ship/next-pass-usui.md item 2, marked ⚠, so it is shown as 'about';
   // it fits the 76.3 t MSC catch of 2024). This set's catch is a slice of it.
   shipShareKg: 80000,
   allowanceKg: 80000,
@@ -199,9 +210,10 @@ function endOfHaul(d) {
   return null;
 }
 
-/** Shimizu: every tagged fish is weighed again on leaving the bonded port; the total may not pass the declared catch. */
+/** Shimizu: every tagged fish is checked again at the landing (its chip scanned, the same-number sticker on its cheek,
+ *  the trucks weighed); the weighed total may not pass the declared catch. Each row carries its sticker number. */
 export function weighIn(d) {
-  const rows = d.kept.filter((f) => f.tag).map((f) => ({ tag: f.tag, species: f.species, declared: f.kg, weighed: f.weighed ?? f.kg }));
+  const rows = d.kept.filter((f) => f.tag).map((f) => ({ tag: f.tag, sticker: f.tag, scanned: true, species: f.species, declared: f.kg, weighed: f.weighed ?? f.kg }));
   const declared = r1(rows.reduce((s, x) => s + x.declared, 0)), weighed = r1(rows.reduce((s, x) => s + x.weighed, 0));
   return { rows, declared, weighed, overKg: r1(Math.max(0, weighed - declared)) };
 }

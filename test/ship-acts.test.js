@@ -4,8 +4,8 @@
 import { test, expect, describe } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { formatTag, isDemoTag, REAL_TAG_RE, DEMO_TAG_RE, tagSerial } from "../src/anime/world/ship/tags.js";
-import { createActs, STATES, ACT_OF, CHAIN_ORDER, EVENTS, RULES, makeCatch, seasonOpen, forkLengthCm, japanSharePct, weighIn } from "../src/anime/world/ship/acts.js";
-import { CHAIN, chainCards } from "../src/anime/world/ship/chain.js";
+import { createActs, STATES, ACT_OF, CHAIN_ORDER, EVENTS, RULES, makeCatch, seasonOpen, forkLengthCm, japanSharePct, weighIn, SHIMIZU_STEPS } from "../src/anime/world/ship/acts.js";
+import { CHAIN, chainCards, CLOSING } from "../src/anime/world/ship/chain.js";
 import { BUDGET as SENDOFF_BUDGET, tapeState, TAPE_COLOURS, hornSpec, MELODY, musicProbeAllowed } from "../src/anime/world/ship/sendoff.js";
 import { BUDGET as OCEAN_BUDGET, swellAt, OCEAN_LABEL_KEYS } from "../src/anime/world/ship/ocean.js";
 import { PHONE } from "../src/anime/core/tier.js";
@@ -300,7 +300,7 @@ describe("ship: i18n", () => {
     expect(ja).not.toMatch(/2022年.*(LC|低懸念)/); expect(en).not.toMatch(/2022.*Least Concern/);
     expect(ja).not.toContain("724");
     expect(D.ja["ship.ocean.where"]).toBe("北大西洋 西経10度以西・北緯42度以北 / 8月〜1月の漁期");
-    expect(D.ja["ship.haul.japan"]).toBe("日本の枠 3,779t / 43,296t (8.7%)");
+    expect(D.ja["ship.haul.japan"]).toContain("3,779t"); expect(D.ja["ship.haul.japan"]).toContain("43,296t"); expect(D.ja["ship.haul.japan"]).toContain("8.7%");
   });
   test("no coordinates or map position in the ocean act", () => {
     for (const l of ["ja", "en"]) for (const [k, v] of Object.entries(D[l])) if (k.startsWith("ship.ocean")) expect(/\d+\s*°\s*\d+|\d+\.\d+\s*[NSEW]\b|\d+°\d+'/.test(v)).toBe(false);
@@ -393,5 +393,126 @@ describe("ship: fix round 2 (the dossier's processing, clock and quota bar)", ()
     expect(M.data.haulEnd).toBe("line_in");                                            // one set never fills the ship's share
     // the old claim is gone from the code and the docs
     for (const f of ["src/anime/world/ship/acts.js", "docs/ship/acts.md", "docs/ship/README.md"]) expect(readFileSync(ROOT + f, "utf8")).not.toMatch(/not public|never shown|ゲームの設定）　\{kg\}/);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------- Usui's talk
+// docs/ship/next-pass-usui.md (the captain's product-safe notes of 臼井壯太朗's talk at Hackatsuon, 2026-10-03):
+// items 1, 2, 3, 4, 6 and 7. The UI is rendered for real through mountShipUI on a minimal DOM stub.
+function withStubDOM(fn) {
+  const mk = () => ({ id: "", hidden: false, innerHTML: "", textContent: "", style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(type, fn) { this.on = fn; }, querySelectorAll() { return []; }, querySelector() { return null; }, appendChild() {}, classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } } });
+  const prev = globalThis.document;
+  globalThis.document = { getElementById: () => null, createElement: () => mk(), head: mk(), body: mk() };
+  try { return fn(); } finally { if (prev === undefined) delete globalThis.document; else globalThis.document = prev; }
+}
+async function renderView(view, data, lang, { facts = false } = {}) {
+  const { mountShipUI } = await import("../src/anime/ui/ship.js");
+  return withStubDOM(() => {
+    const ui = mountShipUI({}, { lang });
+    ui.show(view, data);
+    // the 船のデータ button: a click through the UI's own handler opens the facts panel
+    if (facts) ui.el.on({ target: { closest: () => ({ disabled: false, dataset: { a: "facts" } }) } });
+    return ui;
+  });
+}
+const textOf = (html) => html.replace(/<[^>]+>/g, "\n").replace(/&quot;/g, '"').replace(/&amp;/g, "&").split("\n").map((x) => x.trim()).filter(Boolean);
+
+describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", () => {
+  const D = JSON.parse(readFileSync(ROOT + "data/ship/i18n.json", "utf8"));
+  const NEW_KEYS = [
+    "ship.facts.fleet", "ship.facts.voyage", "ship.facts.aroma", "ship.facts.trivia",
+    ...SHIMIZU_STEPS.map((id) => "ship.chain.shimizu.step." + id), "ship.tag.real",
+    "ship.card.closing", "ship.card.closingBy",
+  ];
+  test("i18n: every new key is in JA and EN, filled, and actually translated", () => {
+    for (const k of NEW_KEYS) for (const l of ["ja", "en"]) { expect(typeof D[l][k]).toBe("string"); expect(D[l][k].trim().length).toBeGreaterThan(0); }
+    for (const k of NEW_KEYS) expect(D.en[k]).not.toBe(D.ja[k]);
+    expect(Object.keys(D.en)).toEqual(Object.keys(D.ja));
+  });
+  test("item 1: 6 ships now, one retired in 2026 (SHIP, the facts panel, the Las Palmas card); no 7-ship count left", async () => {
+    const { SHIP } = await import("../src/anime/world/ship/shofukumaru1.js");
+    expect(SHIP.fleet).toEqual({ ships: 6, retired: { n: 1, year: 2026 } });
+    for (const k of ["ship.facts.fleet", "ship.chain.lp.fact"]) { expect(D.ja[k]).toContain("現在6隻（2026年に1隻退役）"); expect(D.en[k]).toContain("6 tuna vessels (one retired in 2026)"); }
+    const all = JSON.stringify(D);
+    expect(all).not.toMatch(/気仙沼に3隻|3 ships at Kesennuma|7隻|7 ships/);
+  });
+  test("item 2: the quota bar is the minister's allocation to this one ship, about 80 t, with the 3,700 t / ~100 boats / 48 context", () => {
+    expect(RULES.allowanceKg).toBe(80000);
+    expect(D.ja["ship.haul.quotaBar"]).toContain("大臣からこの船1隻への配分 約80t");
+    expect(D.en["ship.haul.quotaBar"]).toContain("The minister's allocation to this one ship: about 80 t");
+    for (const s of ["約3,700t", "3,779t", "43,296t", "8.7%", "約100隻", "48隻", "大西洋クロマグロ"]) expect(D.ja["ship.haul.japan"]).toContain(s);
+    for (const s of ["about 3,700 t", "3,779 t of 43,296 t", "8.7%", "about 100 registered boats", "48 of which fish Atlantic bluefin"]) expect(D.en["ship.haul.japan"]).toContain(s);
+    expect([RULES.japanBoats, RULES.japanBluefinBoats]).toEqual([100, 48]);
+    expect(japanSharePct()).toBe("8.7");
+  });
+  test("item 3: Act 3 runs Las Palmas, reefer, the Shimizu inspection steps in order, home, card", () => {
+    expect(SHIMIZU_STEPS).toEqual(["inspectors", "chip", "sticker", "truck", "rule"]);
+    const M = driveTo("SHIMIZU_WEIGH");
+    const beats = [];
+    for (const c of chainCards(M.data)) { beats.push(c.state); if (c.steps) for (const st of c.steps) beats.push(c.state + ":" + st.id); }
+    expect(beats).toEqual(["TRANSSHIP_LAS_PALMAS", "REEFER", "SHIMIZU_WEIGH", "SHIMIZU_WEIGH:inspectors", "SHIMIZU_WEIGH:chip", "SHIMIZU_WEIGH:sticker", "SHIMIZU_WEIGH:truck", "SHIMIZU_WEIGH:rule", "HOMECOMING", "CARD"]);
+    const shimizu = chainCards(M.data).find((c) => c.state === "SHIMIZU_WEIGH");
+    expect(shimizu.steps.map((x) => x.n)).toEqual([1, 2, 3, 4, 5]);
+    expect(shimizu.steps.filter((x) => x.rule).map((x) => x.id)).toEqual(["rule"]);
+    // each fish's chip is scanned and its cheek sticker carries the same number as its tag; the tags stay DEMO
+    for (const r of M.data.weighIn.rows) { expect(r.scanned).toBe(true); expect(r.sticker).toBe(r.tag); expect(isDemoTag(r.tag)).toBe(true); }
+  });
+  test("item 3: the Shimizu captions (3 inspectors, reader guns, the cheek sticker, truck scales, all 6 licences) and the real tag copy", async () => {
+    expect(RULES.inspectors).toBe(3); expect(RULES.fleetShips).toBe(6);
+    const M = driveTo("SHIMIZU_WEIGH");
+    for (const [lang, want] of [
+      ["ja", ["水産庁の検査官 約3人", "リーダーガンで、1本ずつICチップを読み取る", "同じ番号のシールを、魚のほほに貼る", "トラックスケール", "1kgでも超えれば、臼福の6隻すべてが漁業許可を失い、罰金や懲役", "ICチップ＋QRコードで、1番からの通し番号"]],
+      ["en", ["About 3 Fisheries Agency inspectors", "scan each fish's chip with a reader gun", "same number goes on the fish's cheek", "weighed on truck scales", "1 kg over the quota means losing the licences of all 6 ships, plus fines or prison", "IC chip plus QR code, numbered from 1"]],
+    ]) {
+      const ui = await renderView("SHIMIZU_WEIGH", M.data, lang);
+      const html = ui.el.innerHTML;
+      const order = [...html.matchAll(/data-step="(\w+)"/g)].map((m) => m[1]);
+      expect(order).toEqual(SHIMIZU_STEPS);
+      const text = textOf(html).join("\n");
+      for (const s of want) expect(text).toContain(s);
+      for (const r of M.data.weighIn.rows) expect(html).toContain(r.tag);
+    }
+  });
+  test("item 4: the crew life copy in the facts panel and the crew card, JA and EN", () => {
+    expect(D.ja["ship.facts.voyage"]).toContain("9〜15か月"); expect(D.en["ship.facts.voyage"]).toContain("9 to 15 months");
+    expect(D.ja["ship.facts.crew"]).toContain("日本人6〜7人、インドネシア人約18人"); expect(D.en["ship.facts.crew"]).toContain("6–7 Japanese, about 18 Indonesian");
+    expect(D.ja["ship.facts.aroma"]).toContain("「気仙沼を思い出しながら眠れるように」"); expect(D.en["ship.facts.aroma"]).toContain("sleep remembering home, Kesennuma, Japan");
+    expect(D.ja["ship.facts.aroma"]).toContain("森の香り"); expect(D.en["ship.facts.aroma"]).toContain("forest-scent aroma");
+    for (const s of ["9〜15か月", "日本人6〜7人", "インドネシア人約18人", "気仙沼を思い出しながら眠れるように"]) expect(D.ja["ship.chain.home.fact"]).toContain(s);
+    for (const s of ["9 to 15 months", "6–7 Japanese", "about 18 Indonesian", "sleep remembering home, Kesennuma, Japan"]) expect(D.en["ship.chain.home.fact"]).toContain(s);
+  });
+  test("items 1, 4, 6: the facts panel lists the fleet, the voyage, the aroma and the Precure trivia as text only", async () => {
+    const ui = readFileSync(ROOT + "src/anime/ui/ship.js", "utf8");
+    const keys = ui.match(/const keys = \[([^\]]+)\]/)[1].match(/'(\w+)'/g).map((q) => q.slice(1, -1));
+    for (const k of ["crew", "voyage", "aroma", "fleet", "trivia"]) expect(keys).toContain(k);
+    for (const lang of ["ja", "en"]) {
+      const text = textOf((await renderView("HAUL", driveTo("HAUL").data, lang, { facts: true })).el.innerHTML);
+      for (const k of ["crew", "voyage", "aroma", "fleet", "trivia"]) expect(text).toContain(D[lang]["ship.facts." + k]);
+      expect(text).toContain(D[lang]["ship.facts.title"]);
+    }
+    expect(D.ja["ship.facts.trivia"]).toContain("デリシャスパーティ♡プリキュア"); expect(D.ja["ship.facts.trivia"]).toContain("主人公の父がまぐろ船の船長");
+    expect(D.en["ship.facts.trivia"]).toContain("the heroine's father is the captain of their tuna boat");
+    // text only: no Precure image, file or URL anywhere in the app
+    const files = [];
+    const walk = (d) => { for (const e of readdirSync(ROOT + d, { withFileTypes: true })) { const p = d + "/" + e.name; if (e.isDirectory()) walk(p); else files.push(p); } };
+    walk("src"); walk("data/ship");
+    expect(files.filter((f) => /precure|cure|プリキュア/i.test(f))).toEqual([]);
+    for (const f of files.filter((x) => /\.(js|html|css)$/.test(x))) expect(readFileSync(ROOT + f, "utf8")).not.toMatch(/precure|プリキュア/i);
+  });
+  test("item 7: the final card ends on Usui's line, attributed to 臼井壯太朗 (臼福本店) at Hackatsuon on 2026-10-03", async () => {
+    expect(CLOSING).toEqual({ line: "ship.card.closing", by: "ship.card.closingBy" });
+    expect(D.ja["ship.card.closing"]).toBe("「気仙沼の食を、世界中で楽しんでもらい、輸出していこう。」");
+    expect(D.en["ship.card.closing"]).toBe("\"Help Kesennuma's food be enjoyed, and exported, all over the world.\"");
+    for (const l of ["ja", "en"]) for (const s of ["臼井壯太朗", "臼福本店", "Hackatsuon"]) expect(D[l]["ship.card.closingBy"]).toContain(s);
+    expect(D.ja["ship.card.closingBy"]).toContain("2026年10月3日"); expect(D.en["ship.card.closingBy"]).toContain("2026-10-03");
+    const M = driveTo("CARD");
+    for (const lang of ["ja", "en"]) {
+      const ui = await renderView("CARD", M.data, lang);
+      const html = ui.el.innerHTML;
+      const beforeButtons = textOf(html.slice(0, html.indexOf('<div class="row"')));
+      expect(beforeButtons.at(-2)).toBe(D[lang]["ship.card.closing"]);
+      expect(beforeButtons.at(-1)).toBe("— " + D[lang]["ship.card.closingBy"]);
+      expect(textOf(html)).toContain(D[lang]["ship.card.line"]);
+    }
   });
 });

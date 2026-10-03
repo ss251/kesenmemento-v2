@@ -22,7 +22,7 @@ export const TIMING = {
   musicAt: 0.8, hornAt: 4.0, castOffAt: 13,          // auto mode casts off on its own; a player presses もやいを解く
   departAuto: 9,                                      // stand-in follower speed (m/s) when no sail mode is wired
   setSeconds: 40, waitSeconds: 9, freezeSeconds: 7,   // 150 km / 2.5 h / 36 h compressed
-  fishGap: 0.8, autoDecide: 1.6, cardSeconds: 7,
+  fishGap: 0.8, autoDecide: 1.6, cardSeconds: 7, shimizuSeconds: 12,   // the Shimizu inspection reads its 5 steps
   homeApproach: 24, homeHornAt: 20,
   ff: 5,                                              // the 早送り button
   // the hands-free demo (?auto=1) through Act 1, in OUTBOUND arclength (m) and sim seconds: past the 出漁準備岸壁 and
@@ -274,7 +274,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
         break;
       }
       case 'TRANSSHIP_LAS_PALMAS': case 'REEFER': case 'SHIMIZU_WEIGH':
-        if (auto && (V.cardT += fdt) > TIMING.cardSeconds) send('NEXT');
+        if (auto && (V.cardT += fdt) > (st === 'SHIMIZU_WEIGH' ? TIMING.shimizuSeconds : TIMING.cardSeconds)) send('NEXT');
         break;
       case 'HOMECOMING': {
         // she comes in along the last 420 m of the outbound line, reversed, and stops at the berth

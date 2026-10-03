@@ -75,6 +75,18 @@ const CSS = /* css */`
 #klc-ship .line{font-size:clamp(22px,4.4vw,34px);font-weight:900;color:var(--accent);margin:10px 0 4px;letter-spacing:.04em}
 #klc-ship .facts{position:absolute;right:16px;top:64px;width:min(360px,calc(100% - 32px));padding:14px 16px;pointer-events:auto}
 #klc-ship .facts ul{margin:6px 0;padding-left:18px;font-size:13px;line-height:1.6}
+#klc-ship .facts{max-height:calc(100% - 80px);overflow:auto}
+#klc-ship .steps{list-style:none;margin:8px 0;padding:0;display:grid;gap:4px;font-size:14px;line-height:1.5}
+#klc-ship .steps li{display:flex;gap:8px;align-items:flex-start;opacity:0;animation:klc-step .5s ease-out forwards}
+#klc-ship .steps li b{flex:none;width:22px;height:22px;margin-top:1px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center}
+#klc-ship .steps li.rule{font-weight:700;color:#a8322a}
+#klc-ship .steps li.rule b{background:var(--ink)}
+@keyframes klc-step{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+body.shot #klc-ship .steps li{animation:none;opacity:1}
+@media (prefers-reduced-motion:reduce){#klc-ship .steps li{animation:none;opacity:1}}
+#klc-ship .closing{margin:14px 0 10px;padding:10px 14px;border-left:4px solid var(--accent);background:rgba(210,74,60,.07);border-radius:0 10px 10px 0}
+#klc-ship .closing p{margin:0;font-size:16px;font-weight:700;line-height:1.6}
+#klc-ship .closing cite{display:block;margin-top:4px;font-style:normal;font-size:12px;opacity:.75}
 #klc-ship [hidden]{display:none!important}
 body.klc-ship #klc-ui,body.klc-ship #klc-x,body.klc-ship #klc-labels,body.klc-ship #klc-ui-restore{display:none!important}
 body.klc-ship #corner,body.klc-ship #help,body.klc-ship #cross,body.klc-ship #toast,body.klc-ship #klc-board{display:none!important}
@@ -167,6 +179,7 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
         <div class="line">${esc(t('ship.card.line'))}</div>
         <p>${esc(t('ship.card.date'))}<br>${esc(t('ship.card.shop'))}</p>
         <p class="note">${esc(t('ship.card.fact'))}</p>
+        <blockquote class="closing" data-f="closing"><p>${esc(t(c.closing.line))}</p><cite>— ${esc(t(c.closing.by))}</cite></blockquote>
         <div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><a href="${esc(c.link)}" data-a="shop" style="pointer-events:auto"><button class="primary" tabindex="-1">${esc(t('ship.card.go'))}</button></a><button data-a="RESTART">${esc(t('ship.btn.restart'))}</button><button data-a="exit">${esc(t('ship.btn.exit'))}</button></div>
       </div></div>`;
     }
@@ -174,12 +187,15 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
       return `<div class="panel glass"><h3>${esc(t(c.title))}</h3><p>${esc(t(c.body))}</p><p class="note">${esc(t(c.fact))}</p>
         <div class="row"><button data-a="HORN">${esc(t('ship.btn.horn'))}</button><button class="primary" data-a="NEXT">${esc(t('ship.btn.next'))}</button></div></div>`;
     }
+    // the Shimizu landing inspection: its substeps in order, numbered like the badges on the art, one after another
+    const steps = c.steps ? `<ol class="steps" data-f="steps">${c.steps.map((x, i) => `<li class="${x.rule ? 'rule' : ''}" data-step="${esc(x.id)}" style="animation-delay:${(0.4 + i * 1.1).toFixed(1)}s"><b>${x.rule ? '!' : x.n}</b><span>${esc(t(x.key))}</span></li>`).join('')}</ol>` : '';
+    const tagNote = c.tagNote ? `<p class="note">${esc(t(c.tagNote))}</p>` : '';
     return `<div class="card"><div class="inner glass"><canvas width="960" height="440" data-art="${esc(view)}"></canvas>
-      <h2>${esc(t(c.title))}</h2><p>${esc(t(c.body, c.vars))}</p>${rows}<p class="note">${esc(t(c.fact, c.vars))}</p>
+      <h2>${esc(t(c.title))}</h2><p>${esc(t(c.body, c.vars))}</p>${steps}${rows}<p class="note">${esc(t(c.fact, c.vars))}</p>${tagNote}
       <div class="row" style="display:flex;justify-content:flex-end"><button class="primary" data-a="NEXT">${esc(t('ship.btn.next'))}</button></div></div></div>`;
   }
   function factsPanel() {
-    const keys = ['gt', 'loa', 'built', 'call', 'speed', 'air', 'crew', 'starlink', 'msc', 'iucn', 'awards'];
+    const keys = ['gt', 'loa', 'built', 'call', 'speed', 'air', 'crew', 'voyage', 'aroma', 'starlink', 'msc', 'iucn', 'awards', 'fleet', 'trivia'];
     return `<div class="facts glass"><h3 style="margin:0">${esc(t('ship.facts.title'))}</h3><ul>${keys.map((k) => `<li>${esc(t('ship.facts.' + k))}</li>`).join('')}</ul><p class="note">${esc(t('ship.facts.src'))}</p><p class="note">${esc(t(ui.model.livery === 'nendo' ? 'ship.livery.nendo' : 'ship.livery.fallback'))}</p></div>`;
   }
   function render() {
@@ -196,7 +212,7 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
       <div class="toast glass" data-f="toast"></div>
       ${isCard || v === 'HOMECOMING' ? chainCard(v, d) : `<div class="panel glass">${panelFor(v, d)}</div>`}
       ${ui.facts ? factsPanel() : ''}`;
-    for (const cv of el.querySelectorAll('canvas[data-art]')) { try { drawChainArt(cv.dataset.art, cv.getContext('2d'), cv.width, cv.height, { weighed: d.weighIn?.weighed ?? 0 }); } catch (e) { console.warn(e); } }
+    for (const cv of el.querySelectorAll('canvas[data-art]')) { try { drawChainArt(cv.dataset.art, cv.getContext('2d'), cv.width, cv.height, { weighed: d.weighIn?.weighed ?? 0, tags: (d.weighIn?.rows || []).map((r) => r.tag) }); } catch (e) { console.warn(e); } }
     update(ui.model);
   }
   el.addEventListener('click', (e) => {
