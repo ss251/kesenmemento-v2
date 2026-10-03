@@ -1,6 +1,7 @@
 // [ship:story] Living City story pins: short sourced stories tied to a real place, listed in the places list (their own
 // group, 「まちの物語」) and found by search. Selecting one flies the drone there, pins its label and opens a story card.
-// A small wooden 説明板 (the kind that stands at a real site) marks the spot in the world.
+// A small wooden 説明板 marks the spot in the world. It is a stylised marker of the pin: no source shows a real signboard
+// at the site (a housing-relocation dig), and its roof and lettering are invented.
 //
 // The strings and the sources are in data/ship/story-pins.json (JA and EN, same keys). Each pin is a lat/lon, projected
 // with layout.js llToXZ. A pin outside the map (layout ZONES.far) is moved to the nearest map edge, 60 m in, and its
