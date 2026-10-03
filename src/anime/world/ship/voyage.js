@@ -69,7 +69,8 @@ export function fastForward(acts, target, { keep = Infinity } = {}) {
   return acts;
 }
 
-export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback', auto = false, withUI = true, seed, date } = {}) {
+export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback', auto: auto0 = false, withUI = true, seed, date } = {}) {
+  let auto = !!auto0;   // [ship:integrate] mutable: the hands-free demo can be switched on after the module is built
   const L = ctx.L;
   const BERTH = route.BERTH, BAY = route.BAY_MOUTH;
   const outbound = polyline(route.OUTBOUND);
@@ -97,8 +98,15 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
   // ------------------------------------------------------------------------------------------------ helpers
   const hours = (h) => { const T = ctx.services?.time; if (T?.setHours) T.setHours(h); else ctx.sky?.setHours?.(h); };
   const W = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(ship.group.matrixWorld);
-  function berth() { rig.set(BERTH.x, BERTH.z, BERTH.yaw); rig.bob(0, 0, 0); }
-  const quaySide = () => (BERTH.side === 'port' ? 1 : -1);
+  function berth() { V.home = false; rig.set(BERTH.x, BERTH.z, BERTH.yaw); rig.bob(0, 0, 0); }
+  // [ship:integrate] home from the sea she comes in bow first along the outbound line reversed, so she lies at the same
+  // berth turned end for end (port side to the quay). The approach ends exactly on this pose: no 180 deg snap.
+  const HOME_YAW = Math.atan2(Math.sin(BERTH.yaw + Math.PI), Math.cos(BERTH.yaw + Math.PI));
+  /** [ship:integrate] Her heading coming home at `s` along the outbound line: the chord over +-12 m (the polyline's
+   *  corners turn her smoothly instead of snapping). At s = 0 it is exactly HOME_YAW. */
+  function homeYaw(s) { const a = outbound.at(s + 12), b = outbound.at(Math.max(0, s - 12)); return Math.atan2(b.x - a.x, b.z - a.z); }
+  function berthHome() { V.home = true; rig.set(BERTH.x, BERTH.z, HOME_YAW); rig.bob(0, 0, 0); }
+  const quaySide = () => (BERTH.side === 'port' ? 1 : -1) * (V.home ? -1 : 1);
   function holdPlayer(x, z) {
     const pl = ctx.playerObj; if (!pl) return;
     pl.enabled = false; pl.fly = true;
@@ -165,10 +173,10 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
       case 'HOMECOMING': {
         if (ocean.active) ocean.exit();
         hours(14.5); ship.setFlags?.(true);
-        V.homeS = 0; const p = outbound.at(420); rig.set(p.x, p.z, p.yaw + Math.PI); rig.bob(0, 0, 0);
+        V.homeS = 0; const p = outbound.at(420); rig.set(p.x, p.z, homeYaw(420)); rig.bob(0, 0, 0);
         holdPlayer(BERTH.x, BERTH.z);
-        // the quay crowd waits with 福来旗 (built at the berth pose, then the ship is moved out to approach)
-        const keep = { x: rig.x, z: rig.z, yaw: rig.yaw }; berth(); sendoff.start({ mode: 'homecoming' }); rig.set(keep.x, keep.z, keep.yaw);
+        // the quay crowd waits with 福来旗 (built at the home pose, then the ship is moved out to approach)
+        const keep = { x: rig.x, z: rig.z, yaw: rig.yaw }; berthHome(); sendoff.start({ mode: 'homecoming' }); rig.set(keep.x, keep.z, keep.yaw);
         setCam('home', true); V.hornDone = false; break;
       }
       case 'CARD': break;
@@ -271,8 +279,8 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
       case 'HOMECOMING': {
         // she comes in along the last 420 m of the outbound line, reversed, and stops at the berth
         const k = Math.min(1, V.t / TIMING.homeApproach), e = 1 - (1 - k) * (1 - k);
-        if (k < 1) { const p = outbound.at(420 * (1 - e)); rig.set(p.x, p.z, p.yaw + Math.PI); }
-        else if (!V.berthed) { V.berthed = true; berth(); }
+        if (k < 1) { const sH = 420 * (1 - e), p = outbound.at(sH); rig.set(p.x, p.z, homeYaw(sH)); }
+        else if (!V.berthed) { V.berthed = true; berthHome(); }
         if (V.t >= TIMING.homeHornAt && !V.hornDone) { V.hornDone = true; horn(); }
         if (auto && V.t > TIMING.homeApproach + 8) send('NEXT');
         break;
@@ -319,7 +327,14 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
     if (a === 'KEEP') return keep();
     if (a === 'RELEASE') return release();
     if (a === 'RESTART') { const r = send('RESTART'); V.toasts.clear(); return r; }
-    if (a === 'shop') { const S = arguments[1]; api.exit(); const c = S.cam; try { window.__lookAt?.(c.pos, c.look); } catch (e) { /* */ } ctx.services?.explore?.ui?.goTo?.({ name: S.name, x: S.x, z: S.z }); return; }
+    if (a === 'shop') {
+      // [ship:integrate] explore's goTo takes a place ({ id, ja, en, cat, at }); without the explore UI, the card's camera
+      const S = arguments[1]; api.exit();
+      const go = ctx.services?.explore?.ui?.goTo;
+      if (go) go({ id: 'shop-' + S.id, ja: S.name, en: S.nameEn || S.name, cat: 'shop', at: [S.x, S.z] }, { how: 'fly' });
+      else { const c = S.cam; try { window.__lookAt?.(c.pos, c.look); } catch (e) { /* */ } }
+      return;
+    }
     if (a === 'CAST_OFF') { V.toasts.clear(); }
     return send(a);
   }
@@ -329,6 +344,8 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
     get acts() { return acts; },
     get active() { return V.active; },
     get state() { return acts.state; },
+    get auto() { return auto; },
+    setAuto(on) { auto = !!on; },
     sendoff, ocean, ui, rig, TIMING,
     start() {
       V.active = true; V.toasts.clear();
@@ -345,7 +362,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
       berth(); ship.setFlags?.(true);
       ui?.hide();
       const pl = ctx.playerObj;
-      if (pl) { pl.enabled = typeof document !== 'undefined' ? document.body.classList.contains('playing') : true; pl.fly = true; }
+      if (pl) { pl.enabled = typeof document !== 'undefined' ? (document.body?.classList?.contains('playing') ?? true) : true; pl.fly = true; }
       V.cam = null;
     },
     send, action, horn, keep, release,

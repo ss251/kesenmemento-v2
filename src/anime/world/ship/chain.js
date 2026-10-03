@@ -22,7 +22,7 @@ export const CHAIN = [
 
 /** 北かつまぐろ屋 海の市店 (OSM node n7181952808, layout place p1m5usud, inside the 海の市 lot 16/58541/25069/401). */
 export const SHOP = {
-  id: 'p1m5usud', name: '北かつまぐろ屋 海の市店', address: '気仙沼市 魚市場前7-13', x: 389.7, z: 675, lot: '16/58541/25069/401',
+  id: 'p1m5usud', name: '北かつまぐろ屋 海の市店', nameEn: 'Kitakatsu Maguroya (Umi-no-Ichi)', address: '気仙沼市 魚市場前7-13', x: 389.7, z: 675, lot: '16/58541/25069/401',
   // a drone view over the 海の市 roof toward the shop's side, for ?cam= (main.js camSpec 'x,y,z>lx,ly,lz')
   cam: { pos: [452, 38, 742], look: [389.7, 6, 675] },
 };

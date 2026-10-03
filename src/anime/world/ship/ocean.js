@@ -134,12 +134,12 @@ export function createOcean(ctx, { ship, rig = null }) {
     hide(ctx.staticRoot);
     for (const c of [...(ctx.dynamicRoot?.children || [])]) hide(c);
     for (const c of [...(ctx.scene?.children || [])]) if (c !== ctx.staticRoot && c !== ctx.dynamicRoot && !c.isLight && c.name !== 'sky' && c !== ctx.sky?.sun?.target && !keep.has(c)) hide(c);
-    if (typeof document !== 'undefined') document.body.classList.add('klc-ship-ocean');
+    if (typeof document !== 'undefined') document.body?.classList?.add('klc-ship-ocean');
   }
   function showWorld() {
     for (const o of S.hidden) o.visible = true;
     S.hidden = [];
-    if (typeof document !== 'undefined') document.body.classList.remove('klc-ship-ocean');
+    if (typeof document !== 'undefined') document.body?.classList?.remove('klc-ship-ocean');
   }
 
   function build() {
