@@ -47,6 +47,12 @@ const SHOTS = [
   ['a3_home_approach', `__voyageShot('HOMECOMING')`, 12],
   ['a3_home', `__voyageShot('HOMECOMING')`, 27],
   ['a3_card', `__voyageShot('CARD')`, 0.5],
+  // [ship] the Usui next pass (docs/ship/next-pass-usui.md): the Shimizu inspection, the closing line and the facts
+  // panel, in Japanese and in English (the 船のデータ / EN buttons of the voyage UI)
+  ['a1_facts', `(__voyageShot('DOCKED'), __shipFacts(true), 'ok')`, 1],
+  ['a3_shimizu_en', `(__voyageShot('SHIMIZU_WEIGH'), __shipFacts(false), __shipLang('en'), 'ok')`, 0.5],
+  ['a3_card_en', `(__voyageShot('CARD'), __shipFacts(false), __shipLang('en'), 'ok')`, 0.5],
+  ['a1_facts_en', `(__voyageShot('DOCKED'), __shipFacts(true), __shipLang('en'), 'ok')`, 1],
 ];
 // [ship:integrate] --ui 1: the town UI is mounted (?ui=1) and these shots replace the act list: the boarding chip at
 // the quay, and the places list with 「第一昭福丸に乗る」 at its head
@@ -103,6 +109,9 @@ try {
     console.log('AUTO SEQUENCE', seen.join(' > '));
     if (seen.at(-1) !== 'CARD') { console.log('AUTO FAILED: did not reach CARD'); process.exitCode = 1; }
   } else await page.eval('__voyageInit()');
+  // the voyage UI's own buttons: open or close the facts panel, switch the language (both re-render the UI)
+  await page.eval(`(window.__shipFacts = (on) => { const b = document.querySelector('#klc-ship [data-a="facts"]'); if (b && (b.getAttribute('aria-pressed') === 'true') !== on) b.click(); return on; },
+    window.__shipLang = (l) => { const ui = document.getElementById('klc-ship'); const b = ui && ui.querySelector('[data-a="lang"]'); if (b && ui.getAttribute('lang') !== l) b.click(); return l; }, true)`);
   for (const [id, js, secs, cam] of args.auto ? [] : args.ui ? UI_SHOTS : SHOTS) {
     if (want && !want.has(id)) continue;
     const sum = await page.eval(`(() => { const r = ${js}; return r; })()`);
