@@ -65,6 +65,7 @@ function probeContext(points) {
     clearRect(x, y, w, h) { const q = [tp(x, y), tp(x + w, y), tp(x + w, y + h), tp(x, y + h)]; points.forEach((p, i) => { if (inside([q], p)) col[i] = 'transparent'; }); },
     measureText(s) { return { width: [...String(s)].length * fontPx() * 0.9 }; },
     fillText(s, x, y) { const w = g.measureText(s).width, h = fontPx(); const q = [tp(x - w / 2, y - h / 2), tp(x + w / 2, y - h / 2), tp(x + w / 2, y + h / 2), tp(x - w / 2, y + h / 2)]; paint((p) => inside([q], p), st.fillStyle); },
+    strokeText(s, x, y) { const w = g.measureText(s).width, h = fontPx(); const q = [tp(x - w / 2, y - h / 2), tp(x + w / 2, y - h / 2), tp(x + w / 2, y + h / 2), tp(x - w / 2, y + h / 2)]; paint((p) => inside([q], p), st.strokeStyle); },
   };
   return { g, col };
 }

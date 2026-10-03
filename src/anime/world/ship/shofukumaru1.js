@@ -206,7 +206,9 @@ export function transomDecalGeometry(tier = 'high') {
     for (let j = 0; j <= NV; j++) for (let i = 0; i <= NU; i++) {
       const u = i / NU, v = j / NV, x = B.width / 2 - u * B.width, h = B.h0 + v * (B.h1 - B.h0);
       pos.push(x, h, zOf(shellS(h, Math.abs(x))) - 0.04);
-      uv.push(...cellUV('stern', u, B.v0 + v * (B.v1 - B.v0)));
+      // inset 3 texels from the cell and band edges: no bleed from the neighbouring cells (a red 大漁旗, the antifouling)
+      const [, , cw, ch] = ATLAS.cells.stern, iu = 3 / cw, iv = 3 / ch;
+      uv.push(...cellUV('stern', iu + u * (1 - 2 * iu), B.v0 + iv + v * (B.v1 - B.v0 - 2 * iv)));
     }
     for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
       const a = o + j * (NU + 1) + i, b = a + 1, c = a + NU + 1, d = c + 1;

@@ -290,7 +290,7 @@ export function paintAtlas(g, plan, { profile = null, layers = null } = {}) {
 }
 
 /** Fit text into the canvas box between corners a and b (any order), stretched to fill it like hull lettering. */
-function boxText(g, text, a, b, font, weight, color, spacing = 0) {
+function boxText(g, text, a, b, font, weight, color, spacing = 0, thick = 0) {
   const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]);
   const w = x1 - x0, h = y1 - y0; if (w <= 0 || h <= 0) return;
   g.save();
@@ -302,7 +302,10 @@ function boxText(g, text, a, b, font, weight, color, spacing = 0) {
   const k = w / total;
   let x = x0;
   for (let i = 0; i < chars.length; i++) {
-    g.save(); g.translate(x + (widths[i] * k) / 2, (y0 + y1) / 2); g.scale(k, 1); g.fillText(chars[i], 0, 0); g.restore();
+    g.save(); g.translate(x + (widths[i] * k) / 2, (y0 + y1) / 2); g.scale(k, 1); g.fillText(chars[i], 0, 0);
+    // thick: a stroke round each glyph, so thin strokes (一) survive the mipmaps and the decal's alpha test
+    if (thick > 0) { g.strokeStyle = color; g.lineWidth = thick; g.lineJoin = 'round'; g.strokeText(chars[i], 0, 0); }
+    g.restore();
     x += (widths[i] + gap) * k;
   }
   g.restore();
@@ -329,7 +332,7 @@ function paintStrip(g, plan) {
     const [x, y, w, h] = C.stern; g.clearRect(x, y, w, h);
     for (const { key, v0, v1 } of transomBands()) {
       const ja = key === 'ja', top = y + (1 - v1) * h, bot = y + (1 - v0) * h, pad = (bot - top) * 0.06;
-      boxText(g, NAME[key], [x + w * 0.02, top + pad], [x + w * 0.98, bot - pad], ja ? FONT_SERIF : FONT_SANS, ja ? 900 : 700, COLORS.text, ja ? 0.18 : 0.1);
+      boxText(g, NAME[key], [x + w * 0.03, top + pad], [x + w * 0.97, bot - pad], ja ? FONT_SERIF : FONT_SANS, ja ? 900 : 700, COLORS.text, ja ? 0.18 : 0.1, ja ? 3 : 1.5);
     }
   }
   // the crest cell: white, plus the crest strokes only in the nendo plan
