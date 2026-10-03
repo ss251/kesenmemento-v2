@@ -31,7 +31,7 @@ const SHOTS = [
   ['a1_kanae_chase', `__voyageKanae(100)`, 26],
   // [ship] fix round 2: the market rows on the way out, 商港 passed to starboard, and the lettered transom (photo 04)
   ['a1_market', `__voyageAt(400)`, 10],
-  ['a1_shoko', `__voyageAt(__shipRoute.SHOKO.s - 130)`, 34],
+  ['a1_shoko', `__voyageAt(__shipRoute.SHOKO.s - 40)`, 8],
   ['a1_transom', `(__voyageShot('DOCKED'), document.getElementById('klc-ship').hidden = true, 'ok')`, 0.5, `__shipLook([21, 8.5, -60], [0, 3.0, -28.6])`],
   ['a2_transom', `(__voyageShot('WAIT'), document.getElementById('klc-ship').hidden = true, 'ok')`, 0.5, `__shipLook([-19, 7.5, -58], [0, 3.0, -28.6])`],
   ['a1_baymouth', `__voyageShot('BAY_MOUTH')`, 2],
@@ -85,7 +85,7 @@ try {
         seen.push(st);
         await page.frames(3);
         await page.shot(resolve(ROOT, `${out}_auto_${String(seen.length).padStart(2, '0')}_${st}.png`));
-        console.log(JSON.stringify({ t: Math.round(t), state: st, data: await page.eval('({ km: __voyage.acts.data.setKm, kept: __voyage.acts.data.kept.length, released: __voyage.acts.data.released.length, landed: __voyage.acts.data.landedKg, haulEnd: __voyage.acts.data.haulEnd })') }));
+        console.log(JSON.stringify({ t: Math.round(t), state: st, data: await page.eval('({ km: __voyage.acts.data.setKm, kept: __voyage.acts.data.kept.length, released: __voyage.acts.data.released.length, landed: __voyage.acts.data.landedKg, haulEnd: __voyage.acts.data.haulEnd, passed: __voyage.acts.data.passed.slice() })') }));
       }
       if (st === 'CARD') break;
       t += 2; await page.eval(`__simTo(${t})`);
