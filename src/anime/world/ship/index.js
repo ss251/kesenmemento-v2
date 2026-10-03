@@ -52,6 +52,12 @@ export function parseShipParams(search = '') {
   return { board: true, state, auto: q.get('auto') === '1', keep, fish: q.get('fish') === '1' };
 }
 
+/** Has the viewer left the intro card? main.js start() adds body.playing; without a DOM class list (tests) it is true. */
+export function introDone(doc = typeof document !== 'undefined' ? document : null) {
+  const cl = doc?.body?.classList;
+  return !cl || typeof cl.contains !== 'function' ? true : cl.contains('playing');
+}
+
 /** True when (x, z) at height y is close enough to the berth to offer boarding (pure). */
 export function nearBerth(x, z, y = 0, B = BOARD, berth = ROUTE.BERTH) {
   return Math.hypot(x - berth.x, z - berth.z) <= B.radius && y <= B.maxAlt;
@@ -80,7 +86,13 @@ export async function build(ctx) {
   const ship = buildShofukumaru(ctx, { livery, tier });
   ctx.onUpdate((dt, t) => ship.update(dt, t));
   const sail = createSail(ctx, { ship });   // she lies at ROUTE.BERTH until a voyage moves her
-  voyage = createVoyage(ctx, { ship, sail, route: ROUTE, livery, auto: want.auto });
+  voyage = createVoyage(ctx, { ship, sail, route: ROUTE, livery, auto: want.auto, gate: () => SHOT || introDone() });
+
+  // the voyage UI needs the cursor: a pointer lock that lands while it runs (main.js start() asks for one as the intro
+  // closes, the same frame a URL voyage boards) is released at once
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') document.addEventListener('pointerlockchange', () => {
+    try { if (voyage?.active && document.pointerLockElement) document.exitPointerLock?.(); } catch (e) { /* no lock */ }
+  });
 
   /** Board: start the voyage at its current state, or jump (legally fast-forwarded) to `state`. */
   function board(state = null, opts = {}) {
@@ -106,11 +118,14 @@ export async function build(ctx) {
     chip.update({ visible: on, lang: ctx.services.life?.hud?.i18n?.lang });
   });
 
-  // ---- the URL: board on the first simulation step (after main.js has placed its own camera)
+  // ---- the URL: board on the first simulation step after the viewer has left the intro card (「まちへ出る」 adds
+  // body.playing), so the send-off, the tapes, the music and the horn are seen, not run behind the card. Shots (?shot)
+  // board on the very first step.
   if (want.board) {
     let pending = true;
     ctx.onUpdate(() => {
       if (!pending) return;
+      if (!SHOT && !introDone()) return;
       pending = false;
       try { board(want.state, { keep: want.keep ?? Infinity, fishOnScale: want.fish }); }
       catch (e) { console.error('[ship] board', e); (window.__errors ||= []).push({ module: 'ship:board', message: String((e && e.stack) || e) }); }

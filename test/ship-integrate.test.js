@@ -8,7 +8,7 @@ import * as THREE from "three";
 import * as L from "../src/anime/world/layout.js";
 import { createContext } from "../src/anime/core/ctx.js";
 import { listModules } from "../scripts/anime/registry.js";
-import { parseShipParams, nearBerth, ACT_START, PLACE, BOARD, BLOCKED_KEYS, build } from "../src/anime/world/ship/index.js";
+import { parseShipParams, nearBerth, introDone, ACT_START, PLACE, BOARD, BLOCKED_KEYS, build } from "../src/anime/world/ship/index.js";
 import { STATES, ACT_OF } from "../src/anime/world/ship/acts.js";
 import { BERTH } from "../src/anime/world/ship/route.js";
 import { isDemoTag } from "../src/anime/world/ship/tags.js";
@@ -220,4 +220,34 @@ describe("ship: the bundle still starts the app (Bun HTML entry guard)", () => {
     expect(out.main).toBe(true);   // main.js's module labels are in the page's script chunk
     rmSync(dir, { recursive: true, force: true });
   }, 60000);
+});
+
+describe("ship: a URL voyage waits for the intro card (?ship=1&auto=1 on a phone)", () => {
+  test("no board and no director step until body.playing is set; then the send-off starts from the quay", async () => {
+    const classes = new Set();
+    const body0 = document.body, loc0 = globalThis.location;
+    document.body = { ...body0, classList: { contains: (c) => classes.has(c), add: (c) => classes.add(c), remove: (c) => classes.delete(c), toggle() {} } };
+    globalThis.location = { search: "?ship=1&auto=1", hostname: "example.com" };
+    try {
+      expect(introDone()).toBe(false);
+      const { ctx } = headlessCtx();
+      await build(ctx);
+      const V = ctx.services.ship.voyage;
+      let t = 0; const dt = 1 / 15;
+      for (let i = 0; i < 15 * 60; i++) { t += dt; step(ctx, dt, t); }   // a minute on the intro card
+      expect(V.active).toBe(false);
+      expect(V.state).toBe("DOCKED");
+      classes.add("playing");                                            // 「まちへ出る」
+      expect(introDone()).toBe(true);
+      t += dt; step(ctx, dt, t);
+      expect(V.active).toBe(true);
+      expect(V.state).toBe("DOCKED");
+      for (let i = 0; i < 15 * 6 && V.state === "DOCKED"; i++) { t += dt; step(ctx, dt, t); }
+      expect(V.state).toBe("SENDOFF");
+      V.exit();
+    } finally {
+      document.body = body0;
+      if (loc0 === undefined) delete globalThis.location; else globalThis.location = loc0;
+    }
+  });
 });

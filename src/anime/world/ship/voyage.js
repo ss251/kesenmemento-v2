@@ -7,7 +7,7 @@
 //   ACT 3  TRANSSHIP_LAS_PALMAS -> REEFER -> SHIMIZU_WEIGH (cards) -> HOMECOMING (back at the コの字岸壁 under 大漁旗)
 //          -> CARD (your DEMO tags, 「まぐろの日は北かつまぐろ屋へ」)
 //
-//   const v = createVoyage(ctx, { ship, sail, route, livery, auto })
+//   const v = createVoyage(ctx, { ship, sail, route, livery, auto, gate })   gate(): false holds the director (the intro card)
 //   v.start() / v.exit() / v.send(ev) / v.jump(state, opts) (tests and shots) / v.acts / v.active
 // ship: buildShofukumaru(...) (or a stand-in with { group, anchors }); sail: createSail(...) (optional: without it the
 // director follows route.OUTBOUND itself); route: ship/route.js (BERTH, OUTBOUND, BAY_MOUTH, SHOKO, KANAE_CROSSING).
@@ -69,7 +69,7 @@ export function fastForward(acts, target, { keep = Infinity } = {}) {
   return acts;
 }
 
-export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback', auto: auto0 = false, withUI = true, seed, date } = {}) {
+export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback', auto: auto0 = false, withUI = true, seed, date, gate = null } = {}) {
   let auto = !!auto0;   // [ship:integrate] mutable: the hands-free demo can be switched on after the module is built
   const L = ctx.L;
   const BERTH = route.BERTH, BAY = route.BAY_MOUTH;
@@ -226,6 +226,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
   // ------------------------------------------------------------------------------------------------ per frame
   function update(dt, t) {
     if (!V.active) return;
+    if (gate && !gate()) return;   // [ship] nothing runs behind the intro card (index.js: body.playing)
     const st = acts.state, d = acts.data;
     const fdt = dt * V.ff;
     V.t += fdt;
