@@ -48,6 +48,7 @@ quay edge (`crowd`), the bay mouth (`bay`), the ocean stages (`set`, `wait`, `ha
 ACT 1  DOCKED -START-> SENDOFF -CAST_OFF[horn sounded]-> DEPART -REACH_BAY_MOUTH[passed under かなえ大橋]-> BAY_MOUTH
 ACT 2  -TO_OCEAN[season open]-> OCEAN_SET -SET_DONE[150 km set]-> WAIT -WAIT_DONE[>= 2 h]-> HAUL -> STOW -STOW_DONE[36 h]->
 ACT 3  TRANSSHIP_LAS_PALMAS -NEXT-> REEFER -NEXT-> SHIMIZU_WEIGH -NEXT[no kg over the declaration]-> HOMECOMING -NEXT-> CARD
+       SHIMIZU_WEIGH card steps (SHIMIZU_STEPS): inspectors -> chip -> sticker -> truck -> rule
 ```
 
 - **Data events** don't change the state: `HORN`, `TAPE_SNAP`, `PASS {what: kanae|shoko}`, `SET_PROGRESS {km}`,
@@ -72,8 +73,8 @@ ACT 3  TRANSSHIP_LAS_PALMAS -NEXT-> REEFER -NEXT-> SHIMIZU_WEIGH -NEXT[no kg ove
 | Each bluefin weighed and tagged; bled and spiked at once (神経締め), gills, guts and tail removed (`dressed: true`); −60 °C, about 36 h to the core | The tag text always carries `DEMO-` |
 | The catch: 150 kg-class bluefin | The fish come from a seeded queue: mostly bluefin, two undersize bluefin, one bigeye and one albacore. Weights to length use a bluefin relation (a = 3.5e-5, b = 2.878; 30 kg ↔ 115 cm). |
 | Bigeye and albacore are not covered by the bluefin tags or quota | — |
-| The chain: Las Palmas → reefer container → Shimizu bonded weigh-in (1 kg over loses the licence); the ship and crew come home under 大漁旗 | — |
-| The quota bar is the ship's share (dossier §5): about 80 t, the minister's allocation to this one ship as Usui said in his public talk on 2026-10-03 (the captain's notes mark it ⚠, not yet confirmed in writing; it fits the 76.3 t MSC catch of 2024). Labelled 「この船1隻への配分 約80t（臼井社長, 2026-10-03）」 | This set's catch shown as a slice of it |
+| The chain: Las Palmas → reefer container → the Shimizu landing inspection (`SHIMIZU_STEPS`: about 3 Fisheries Agency inspectors, a reader gun on each chip, the same-number cheek sticker, the trucks on truck scales; 1 kg over the quota costs the licences of all 6 ships, plus fines or prison: [next-pass-usui.md](next-pass-usui.md) item 3); the ship and crew come home under 大漁旗 | The inspection is a flat illustration with numbered badges; the in-game weigh-in still compares the weighed and declared kg (`weighInOk`) |
+| The quota bar is the ship's share (dossier §5): about 80 t, the minister's allocation to this one ship as Usui said in his public talk on 2026-10-03 ([next-pass-usui.md](next-pass-usui.md) item 2, marked ⚠, so shown as "about"; it fits the 76.3 t MSC catch of 2024). Labelled 「大臣からこの船1隻への配分 約80t（臼井社長, 2026-10-03）」, with Japan's about 3,700 t shared by about 100 boats, 48 on Atlantic bluefin | This set's catch shown as a slice of it |
 | Act 2's hours: the set 4–5 h from near dawn, the soak 2–3 h, a 10–12 h haul that often ends at midnight | The HUD clock runs 05:30 → 10:00 over the set and from 10:00 through the soak (the sky sits at 11:00); the haul is lit at 16:12, or at night in the night variant |
 | — | The chain cards are flat canvas illustrations (no photos, no logos); 富士山 behind Shimizu is scenery |
 | Facts panel: 486 t (Japanese GT), 58.60 m, completed 2020-02-05 by みらい造船, Starlink, first MSC Atlantic bluefin in 2020, IUCN EN → LC in **September 2021** (the slide's 2022 is wrong), mainly the eastern stock | — |
