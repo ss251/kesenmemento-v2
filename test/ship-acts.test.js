@@ -501,6 +501,10 @@ describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", ()
     expect(files.filter((f) => /precure|cure|プリキュア/i.test(f))).toEqual([]);
     for (const f of files.filter((x) => /\.(js|html|css)$/.test(x))) expect(readFileSync(ROOT + f, "utf8")).not.toMatch(/precure|プリキュア/i);
   }, 30000);   // reads every file under src/ and data/ship: it timed out at the 5 s default under machine load
+  test("the facts panel's source line names every body its numbers come from, including MSC (the 2020 certification) and IUCN (EN to LC)", () => {
+    for (const k of ["ICCAT", "IUCN", "MSC", "WCPFC", "JASNAOE"]) expect(D.en["ship.facts.src"]).toContain(k);
+    for (const k of ["ICCAT", "IUCN", "MSC", "WCPFC", "臼福本店", "臼井壯太朗"]) expect(D.ja["ship.facts.src"]).toContain(k);
+  });
   test("the Precure trivia says the same in JA and EN: a tuna-boat captain, no 'their' boat", () => {
     expect(D.ja["ship.facts.trivia"]).toContain("主人公の父がまぐろ船の船長");
     expect(D.en["ship.facts.trivia"]).toBe("Trivia: in the anime デリシャスパーティ♡プリキュア, the heroine's father is a tuna-boat captain");
