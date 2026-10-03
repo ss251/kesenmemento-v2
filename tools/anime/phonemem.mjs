@@ -3,8 +3,12 @@
 // optionally where the heap goes (sampling heap profile by allocating function, or a full heap snapshot).
 //
 //   tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/phonemem.mjs --port 8860 [--nobuild] [--desktop]
-//       [--q low] [--url https://.../] [--eval diag.js] [--sample out.json] [--snapshot out.heapsnapshot] [--settle 12] [--out report.json]
+//       [--q low] [--url https://.../] [--params "k=v&..."] [--start] [--eval diag.js] [--sample out.json]
+//       [--snapshot out.heapsnapshot] [--settle 12] [--out report.json]
 //
+// --start leaves the intro card the way a visitor does (clicks 「まちへ出る」, #go; else sets body.playing) right after
+// 'loaded', before the settle wait. Without it the page is measured on the intro card, and anything that waits for
+// body.playing (a URL voyage such as ?ship=1&act=2) has not started yet.
 // Phone = 390x844, DPR 3, mobile, touch (pointer: coarse), like qa3 --phone but at the real DPR.
 import { join } from 'node:path';
 import { writeFileSync, createWriteStream, mkdirSync } from 'node:fs';
@@ -56,7 +60,11 @@ await p.S('Inspector.enable').catch(() => {});
 try { await p.waitFor(`document.body.classList.contains('loaded') || document.body.classList.contains('shot')`, { timeout: cap ? 120000 : 240000 }); }
 catch (e) { if (!cap) throw e; console.log(JSON.stringify({ url, heapcap: cap, crashed: true, polledPeakMB: Math.round(peak / 1e6), error: String(e.message).slice(0, 200) })); polling = false; await b.close(); srv?.stop(); process.exit(0); }
 const firstFrameMs = Date.now() - t0;
-await Bun.sleep(settle * 1000);   // streaming settles, the drone hovers
+let started = null;
+if (arg('start') === '1') {
+  started = await p.eval(`(() => { const go = document.getElementById('go'); if (go && !go.disabled) go.click(); if (!document.body.classList.contains('playing')) document.body.classList.add('playing'); return { playing: document.body.classList.contains('playing'), clicked: !!go }; })()`);
+}
+await Bun.sleep(settle * 1000);   // streaming settles, the drone hovers (or, with --start, the visitor's first seconds)
 const loadPeak = peak;
 const settled = await heap();   // without a forced GC (what a visitor's tab holds)
 await p.S('HeapProfiler.collectGarbage');
@@ -85,7 +93,7 @@ const info = await p.eval(`(() => {
 })()`);
 if (arg('eval')) info.eval = await p.eval(await Bun.file(arg('eval')).text());   // extra page JS (diagnostics)
 const modPeak = Math.max(0, ...Object.values(info.modules || {}).map((m) => m.heapMB || 0));
-const report = { url, desktop, heapcap: cap, crashed, firstFrameMs, heapPeakMB: Math.max(Math.round(loadPeak / 1e6), modPeak), heapPolledPeakMB: Math.round(loadPeak / 1e6), heapModulePeakMB: modPeak, heapSettledMB: Math.round((settled.JSHeapUsedSize || 0) / 1e6), heapTotalPeakMB: Math.round(peakTotal / 1e6), heapAfterGcMB: Math.round((steady.JSHeapUsedSize || 0) / 1e6), ...info, pageErrors: p.errors().slice(0, 5) };
+const report = { url, desktop, heapcap: cap, crashed, firstFrameMs, started, heapPeakMB: Math.max(Math.round(loadPeak / 1e6), modPeak), heapPolledPeakMB: Math.round(loadPeak / 1e6), heapModulePeakMB: modPeak, heapSettledMB: Math.round((settled.JSHeapUsedSize || 0) / 1e6), heapTotalPeakMB: Math.round(peakTotal / 1e6), heapAfterGcMB: Math.round((steady.JSHeapUsedSize || 0) / 1e6), ...info, pageErrors: p.errors().slice(0, 5) };
 console.log(JSON.stringify(report, null, 1));
 if (arg('out')) writeFileSync(arg('out'), JSON.stringify(report, null, 1));
 
