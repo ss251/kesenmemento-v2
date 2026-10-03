@@ -115,7 +115,7 @@ body.shot #klc-story,body.shotui #klc-story{transition:none}
 
 /** The story card (DOM): open(pin, lang, edge), close(). Null without a document (tests). */
 export function mountStoryCard(doc = typeof document !== 'undefined' ? document : null) {
-  // a real DOM only (tests stub `document` with a canvas factory and nothing else)
+  // a real DOM only (some tests fake `document` with a canvas factory and nothing else)
   if (typeof doc?.createElement !== 'function' || typeof doc.getElementById !== 'function' || !doc.head?.appendChild || !doc.body?.appendChild) return null;
   if (!doc.getElementById('klc-story-css')) { const st = doc.createElement('style'); st.id = 'klc-story-css'; st.textContent = CSS; doc.head.appendChild(st); }
   const el = doc.createElement('aside');

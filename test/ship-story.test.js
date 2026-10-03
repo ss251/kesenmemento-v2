@@ -34,6 +34,9 @@ describe("story pins: data", () => {
     expect(en).toContain("5,500 years ago"); expect(en).toContain("early Jōmon"); expect(en).toContain("more than 140 kg");
     expect(en).toContain("over 2 m"); expect(en).toContain("stone blades"); expect(en).toContain("may have been a place where tuna were butchered");
   });
+  test("no disaster framing anywhere in the pins' strings or sources", () => {
+    expect(/震災|津波|防災|被災|東日本大震災|tsunami|disaster|遺構/i.test(JSON.stringify(STORY))).toBe(false);
+  });
   test("the location is sourced: the prefecture's dig list (唐桑町荒谷前), the 2013 reports and GSI", () => {
     const urls = pin.sources.map((s) => s.url || "").join(" ");
     expect(urls).toContain("pref.miyagi.jp");
