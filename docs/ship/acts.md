@@ -18,15 +18,15 @@ means for the three acts"). Marker in code: `[ship:acts]`.
 | `src/anime/ui/ship.js` | The UI: act titles, the HUDs, the haul controls, the chain cards, the final card and the facts panel. Japanese by default, English on the toggle. |
 | `data/ship/i18n.json` | Every ship string in JA and EN (`data/i18n.json` belongs to other packages). |
 | `test/ship-acts.test.js` | Tests for the tags, the machine, the release rule, the quota stop, the Act 3 order, i18n, the pure scene parts and the phone budget. |
-| `tools/anime/ship-acts-shots.mjs`, `tools/anime/debug/voyage/` | Headless shots of every act through the machine gate. |
+| `tools/anime/ship-acts-shots.mjs` | Headless shots of every act through the machine gate (the real app; the `ship` world module exposes the hooks). |
 
-Wiring (for the integrator):
+Wiring: the `ship` world module (`src/anime/world/ship/index.js`, see [README.md](README.md)) does this at load:
 
 ```js
 import { createVoyage } from './ship/voyage.js';
 import * as ROUTE from './ship/route.js';
 const voyage = createVoyage(ctx, { ship, sail, route: ROUTE, livery: flags.nendoLivery ? 'nendo' : 'fallback' });
-voyage.start();   // from a UI button; voyage.exit() returns to town
+voyage.start();   // from the boarding chip or the places list; voyage.exit() returns to town
 ```
 
 Pass `auto: true` for a hands-free demo. It begins the send-off, casts off after the horn, and cuts from the quay
@@ -91,8 +91,9 @@ tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.m
 
 The first command shoots every act from a jump: the machine is fast-forwarded legally, then that scene is entered.
 `--auto 1` sails the whole hands-free voyage and shoots each state as it is reached; it fails unless the voyage
-reaches CARD with no page error. The debug entry `tools/anime/debug/voyage/` loads the full app plus the real
-`ship/shofukumaru1.js` model in the sail mode (the nendo livery on a local host).
+reaches CARD with no page error. The tool shoots the real app (`src/anime/index.html`) with every world module;
+the `ship` module puts the real `ship/shofukumaru1.js` model in the sail mode (the nendo livery on a local host;
+`--livery fallback` for shots that are committed).
 
 The shots go to `shots/ship-acts/` (gitignored): every act, plus side-on views to compare with the model photos
 (`a1_side_port` with photo 02, port; `a2_side_stbd` with photo 03, starboard).
