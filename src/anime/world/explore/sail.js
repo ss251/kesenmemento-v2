@@ -11,7 +11,9 @@
 //     corners; she slides along a quay, never through it, and loses speed on contact.
 // Chase camera and the touch stick are copied from explore/drive.js. Autopilot (pure pursuit on OUTBOUND) takes over
 // when you let go (8 s idle: underway, against a bank or stalled by one) and hands back the moment you touch the
-// controls; left on a bank, it backs her off astern before going ahead again (pursue's recovery).
+// controls; left on a bank, it backs her off astern before going ahead again (pursue's recovery). If the back-and-fill
+// has not freed her after AUTO.towAfter (45) sim seconds more than 60 m off the line, the tow-assist puts her back on
+// it (state.towed counts them), so she can never be left stuck.
 //
 // Keys (while sailing): W / S or the arrows up / down move the engine order (it stays where you leave it: a ship's
 // telegraph), X stops the engine, A / D or left / right put the rudder over (it returns to midships when released),
@@ -160,6 +162,10 @@ export const AUTO = {
   clearBy: 12,          // m beyond the fender margin before going ahead again
   roomToTurn: 30,       // m beyond the fender margin: room to turn ahead even while still pointing away
   backMax: 45,          // s: the longest a backing run lasts
+  towAfter: 45,         // sim s of back-and-fill or repeated contact, more than towXte off the line, before the tow-assist
+  towXte: 60,           // m: the cross-track error the tow-assist needs
+  towGrace: 20,         // s: a gap in the trouble shorter than this does not reset the tow clock
+  towSpeed: 1.5,        // m/s: her way after the tow
 };
 /**
  * Pure pursuit on a path: steer toward the point `Ld` ahead of the ship's projection. Returns { throttle, rudder,
@@ -180,15 +186,18 @@ export function pursue(path, s, progress = 0, P = BOAT, A = AUTO, rec = null, dt
   const alpha = wrap(Math.atan2(tx - s.x, tz - s.z) - s.yaw);
   // curvature to reach the look-ahead point; yaw rises with a port turn (rudder < 0): rudder = -kappa * R0
   const kappa = (2 * Math.sin(alpha)) / Ld;
-  const rudder = q.s < A.straightUntil ? 0 : clamp(-kappa * P.R0 * 1.3, -1, 1);
+  // [B1] the straight, slow start applies only on the quay's own line: lost 100-300 m off it near the start (the
+  // projection window lets s fall back under straightUntil), she steers and recovers like anywhere else
+  const nearQuay = q.s < A.straightUntil && Math.abs(q.d) < 40;
+  const rudder = nearQuay ? 0 : clamp(-kappa * P.R0 * 1.3, -1, 1);
   const left = path.len - q.s;
-  let throttle = q.s < A.slowUntil ? 0.45 : 1;
+  let throttle = q.s < A.slowUntil && Math.abs(q.d) < 40 ? 0.45 : 1;
   if (left < 160) throttle = left < 30 ? 0 : 0.35;
   const boost = q.s > A.boostFrom && left > A.boostEndBefore;
   const xte = q.d * (q.side || 1);
   // ---- recovery off a bank
   const r0 = rec || { stuck: 0, backing: false, backT: 0 };
-  const off = q.s >= A.straightUntil && left > 30;   // never off the quay (she starts slow there) or at the end
+  const off = !nearQuay && left > 30;   // never off the quay (she starts slow there) or at the end
   if (!off) return { throttle, rudder, boost, s: q.s, xte, rec: { stuck: 0, backing: false, backT: 0 } };
   const clear = r0.backing || r0.stuck > 0 || s.contact > 0 ? hullClearance(s, shoreDist).d : Infinity;
   if (r0.backing) {
@@ -248,7 +257,7 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   let boat = boatState();
   const state = {
     active: false, autopilot: true, x: boat.x, z: boat.z, yaw: boat.yaw, u: 0, kn: 0, vWorld: 0, tc: 1, rudder: 0, eng: 0,
-    s: 0, xte: 0, contact: 0, events: [], idle: 0, recovering: false,
+    s: 0, xte: 0, contact: 0, events: [], idle: 0, recovering: false, towed: 0,
   };
   const orbit = { yaw: 0, pitch: -0.12, back: 0 };
   // the look drag handed over by player.js while she sails (see place())
@@ -325,9 +334,27 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
 
   let progress = { s: 0, d: 0 };
   let rec = null;   // the autopilot's recovery memory (pursue)
+  // [B2] tow-assist: she can never be left stuck. The autopilot's back-and-fill can fail in a pocket mid harbour; after
+  // AUTO.towAfter sim seconds of backing or repeated contact more than AUTO.towXte off the line, she is put back on it
+  const tow = { clock: 0, last: -1e9 };
+  let camEase = 0;
+  function towAssist(dt) {
+    const off = state.autopilot && Math.abs(progress.d) > AUTO.towXte;
+    const trouble = off && (!!rec?.backing || boat.contact > 0 || Math.abs(boat.u) < 0.3);
+    if (trouble) { tow.clock += dt; tow.last = t; }
+    else if (off && t - tow.last < AUTO.towGrace) tow.clock += dt;
+    else tow.clock = 0;
+    if (tow.clock <= AUTO.towAfter) return;
+    const [x, z] = path.at(progress.s), [dx, dz] = path.dirAt(progress.s);
+    boat = { ...boatState(x, z, Math.atan2(dx, dz)), u: AUTO.towSpeed, tc: boat.tc };
+    progress = { s: progress.s, d: 0 };
+    rec = null; state.recovering = false; state.towed = (state.towed || 0) + 1;
+    tow.clock = 0; tow.last = -1e9; camEase = 2.5;
+  }
   function update(dt) {
     if (!state.active || dt <= 0) return;
     dt = Math.min(dt, 0.05); t += dt;
+    towAssist(dt);
     const man = readInput(dt);
     let inp = man;
     if (state.autopilot) {
@@ -369,7 +396,8 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     const cy = boat.yaw + Math.PI + orbit.yaw, dist = 92 + Math.abs(boat.u * boat.tc) * 1.6, hgt = 26 - orbit.pitch * 60;
     const tx = boat.x + Math.sin(cy) * dist, tz = boat.z + Math.cos(cy) * dist;
     const ty = Math.max(hgt, (LL.heightAt ? LL.heightAt(tx, tz) : 0) + 6);
-    if (!camInit || dt <= 0) { camPos.set(tx, ty, tz); camInit = true; } else camPos.lerp(new THREE.Vector3(tx, ty, tz), Math.min(1, dt * 3));
+    if (!camInit || dt <= 0) { camPos.set(tx, ty, tz); camInit = true; } else camPos.lerp(new THREE.Vector3(tx, ty, tz), Math.min(1, dt * (camEase > 0 ? 1.0 : 3)));
+    if (camEase > 0) camEase -= dt;
     camLook.set(boat.x + Math.sin(boat.yaw) * 25, 9, boat.z + Math.cos(boat.yaw) * 25);
     if (cam) { cam.position.copy(camPos); cam.lookAt(camLook); }
     const pl = ctx.playerObj;
@@ -380,7 +408,7 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     const p = at || BERTH;
     boat = boatState(p.x, p.z, p.yaw ?? BERTH.yaw);
     if (at?.u) boat.u = at.u;
-    order = 0; rec = null; fired.clear(); state.events = [];
+    order = 0; rec = null; fired.clear(); state.events = []; tow.clock = 0; tow.last = -1e9; state.towed = 0;
     progress = { s: path.project(boat.x, boat.z).s, d: 0 };
     state.active = true; state.autopilot = at?.autopilot ?? true; state.idle = 0;
     orbit.yaw = 0; orbit.pitch = -0.12; camInit = false;

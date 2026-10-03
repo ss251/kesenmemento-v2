@@ -356,6 +356,95 @@ describe("autopilot recovery: left bow-on to a bank, she backs off and carries o
   });
 });
 
+describe("autopilot near the start: lost off the line (B1), and the tow-assist (B2)", () => {
+  const P = OUTBOUND_PATH;
+  const mkCtx = () => {
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 30000);
+    const ctx = createContext({ scene, camera, renderer: null, audio: null, quality: { name: "low", phone: true }, sunDir: new THREE.Vector3(...L.SUN_DIR).normalize() });
+    ctx.playerObj = { look: { dx: 0, dy: 0 }, touchMove: { x: 0, y: 0 }, pos: new THREE.Vector3(), vel: new THREE.Vector3() };
+    return ctx;
+  };
+  test("B1: pursue() at s 40..79 and 150 m off the line steers toward the line, on either side, and is not slowed for the quay", () => {
+    for (const s0 of [40, 55, 70, 79]) {
+      const [lx, lz] = P.at(s0), [dx, dz] = P.dirAt(s0), yaw = Math.atan2(dx, dz);
+      for (const side of [-1, 1]) {
+        const ox = side * 150 * dz, oz = -side * 150 * dx;   // 150 m abeam of the line
+        const s = { ...boatState(lx + ox, lz + oz, yaw), u: 2 };
+        const q = P.project(s.x, s.z, 0, 400);
+        expect(q.s).toBeLessThan(AUTO.straightUntil + 30);
+        expect(Math.abs(q.d)).toBeGreaterThan(100);
+        const ap = pursue(P, s, q.s);
+        expect(Math.abs(ap.rudder)).toBeGreaterThan(0.2);
+        // port = the (dz, -dx) side of her bow; the line lies toward -offset; a port turn is a negative rudder
+        const toLinePort = (-ox * dz + oz * dx) > 0;
+        expect(Math.sign(ap.rudder)).toBe(toLinePort ? -1 : 1);
+        expect(ap.throttle).toBe(1);
+      }
+    }
+    // on the quay's own line the start is still straight and slow
+    const s0 = 40, [lx, lz] = P.at(s0), [dx, dz] = P.dirAt(s0);
+    const on = pursue(P, { ...boatState(lx, lz, Math.atan2(dx, dz)), u: 1 }, s0);
+    expect(on.rudder).toBe(0);
+    expect(on.throttle).toBe(0.45);
+  });
+  test("B1: pinned on the west bank near the start (W + D from s 30), the autopilot ends up on the line, never stuck or sailing away", () => {
+    const ctx = mkCtx(), sail = createSail(ctx, {});
+    const [x, z] = P.at(30), [dx, dz] = P.dirAt(30);
+    sail.enter({ x, z, yaw: Math.atan2(dx, dz), u: 3, autopilot: false });
+    ctx.playerObj.touchMove = { x: 1, y: -1 };   // W + D
+    let t = 0;
+    for (; t < 200; t += 0.05) { sail.update(0.05); if (t > 5 && sail.state.contact > 0 && Math.abs(sail.state.u) < 0.5 && sail.state.xte > 90) break; }
+    expect(sail.state.xte).toBeGreaterThan(90);   // she is on the far bank (xte about 150 m)
+    ctx.playerObj.touchMove = { x: 0, y: 0 };
+    for (let i = 0; i < 20 * 150; i++) sail.update(0.05);
+    expect(sail.state.autopilot).toBe(true);
+    expect(sail.state.xte).toBeLessThan(40);
+    expect(sail.state.contact).toBe(0);
+    expect(sail.state.s).toBeGreaterThan(100);
+    for (let i = 0; i < 20 * 60; i++) sail.update(0.05);
+    expect(sail.state.xte).toBeLessThan(40);      // and she keeps going: it did not stay stuck
+    expect(hullClearance(sail.boat).d).toBeGreaterThan(5);
+    sail.dispose();
+  });
+  test("B2: in the mid-harbour pocket (x 459, z 155; s 215, xte 107) back-and-fill alone does not free her, the tow-assist does within 60 s", () => {
+    const old = AUTO.towAfter; AUTO.towAfter = 1e9;
+    try {
+      const ctx = mkCtx(), sail = createSail(ctx, {});
+      sail.enter({ x: 459, z: 155, yaw: -50 * Math.PI / 180, autopilot: true });
+      for (let i = 0; i < 20 * 120; i++) sail.update(0.05);
+      expect(sail.state.xte).toBeGreaterThan(60);   // the reported failure: still 100 m off the line
+      expect(sail.state.towed).toBe(0);
+      sail.dispose();
+    } finally { AUTO.towAfter = old; }
+    const ctx = mkCtx(), sail = createSail(ctx, {});
+    sail.enter({ x: 459, z: 155, yaw: -50 * Math.PI / 180, autopilot: true });
+    for (let i = 0; i < 20 * 60; i++) sail.update(0.05);
+    expect(sail.state.towed).toBe(1);
+    expect(Math.abs(sail.state.xte)).toBeLessThan(40);
+    expect(sail.state.contact).toBe(0);
+    expect(sail.state.u).toBeGreaterThan(1);
+    for (let i = 0; i < 20 * 120; i++) sail.update(0.05);
+    expect(sail.state.s).toBeGreaterThan(400);    // and she carries on down the route
+    expect(sail.state.towed).toBe(1);
+    sail.dispose();
+  });
+  test("B2: the tow-assist never fires on a clean run off the quay, or while the helm has her", () => {
+    const ctx = mkCtx(), sail = createSail(ctx, {});
+    sail.enter();
+    for (let i = 0; i < 20 * 240; i++) sail.update(0.05);
+    expect(sail.state.towed).toBe(0);
+    expect(sail.state.s).toBeGreaterThan(500);
+    // hand steering: pinned against the bank for 100 s, the helm keeps her (the tow only helps the autopilot)
+    const [x, z] = P.at(30), [dx, dz] = P.dirAt(30);
+    sail.enter({ x, z, yaw: Math.atan2(dx, dz), u: 3, autopilot: false });
+    ctx.playerObj.touchMove = { x: 1, y: -1 };
+    for (let i = 0; i < 20 * 100; i++) sail.update(0.05);
+    expect(sail.state.autopilot).toBe(false);
+    expect(sail.state.towed).toBe(0);
+    sail.dispose();
+  });
+});
+
 describe("AI boats yield to her; her berth stays free", () => {
   test("yieldHold: approaching boats within 120 m hold (their clock slips), others carry on", () => {
     const boats = [
