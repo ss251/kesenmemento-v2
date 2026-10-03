@@ -45,8 +45,11 @@ export const RULES = {
   coreH: 36,              // about 36 h to freeze the core
   japanT: 3779,           // Japan's 2025/26 E. Atlantic bluefin quota (Usui's slide)
   tacT: 43296,            // the E. Atlantic + Mediterranean TAC (slide)
-  // The bar in the game is THIS SET's allowance, a game setting: the ship's own quota is not public and is never shown.
-  allowanceKg: 900,
+  // The quota bar is the ship's share (dossier §5): the minister's allocation to this one ship is about 80 t, as Usui
+  // said in his public talk on 2026-10-03 (the captain's usui-talk-notes.md, marked ⚠: not yet confirmed in writing;
+  // it fits the 76.3 t MSC catch of 2024). This set's catch is a slice of it.
+  shipShareKg: 80000,
+  allowanceKg: 80000,
   season: { from: [8, 1], to: [1, 31] },   // west of 10°W and north of 42°N: 1 Aug - 31 Jan for large-scale longliners
 };
 export const SPECIES = {
@@ -159,7 +162,8 @@ export const EVENTS = {
     act(d) {
       const f = d.onScale;
       const tag = SPECIES[f.species]?.tagged ? formatTag(d.nextTag++, d.yy) : null;
-      d.kept.push({ ...f, tag, bled: true, spiked: true, frozenC: RULES.freezeC });
+      // dossier §5: bled and spiked at once (神経締め); gills, guts and tail removed; frozen at -60 °C
+      d.kept.push({ ...f, tag, bled: true, spiked: true, dressed: true, frozenC: RULES.freezeC });
       if (SPECIES[f.species]?.quota) d.landedKg = r1(d.landedKg + f.kg);
       d.onScale = null;
       return endOfHaul(d);

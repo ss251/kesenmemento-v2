@@ -10,7 +10,7 @@
 //     one visual float per few km, time-compressed), the main line paying out over the stern roller;
 //   - WAIT (縄待ち): the ship lies near the end buoy;
 //   - HAUL (揚縄) at the STARBOARD forward 舷門 with the line hauler: the fish come up one by one, are swung in through
-//     the opening, laid on the scale, then kept (tagged, bled and spiked, slid to the -60 °C freezer) or released;
+//     the opening, laid on the scale, then kept (tagged, bled and spiked, gills, guts and tail off, slid to the -60 °C freezer) or released;
 //   - STOW: the freezer hatch, -60 °C, about 36 h to the core.
 //
 //   const oc = createOcean(ctx, { ship })    oc.enter({ heading }) / oc.exit() / oc.update(dt, t)
@@ -26,8 +26,12 @@ export const BUDGET = {
 const budgetFor = (q) => (q?.phone || q?.name === 'low' ? BUDGET.phone : q?.name === 'medium' ? BUDGET.medium : BUDGET.high);
 /** The i18n keys the ocean scene shows (the UI renders them). */
 export const OCEAN_LABEL_KEYS = ['ship.ocean.where', 'ship.ocean.nopos', 'ship.ocean.seasonNote'];
-/** The sun in each stage (JST hour on the app's sun model; a stylised low sun: dawn set, afternoon haul). */
-export const STAGE_HOURS = { set: 5.9, wait: 8.2, haul: 16.2, stow: 16.6 };
+/**
+ * The sun in each stage (JST hour on the app's sun model). Dossier §5: the set runs 4-5 h from near dawn (the HUD clock
+ * 05:30 -> 10:00), the 縄待ち soak 2-3 h (about 10:00-12:30, so the sky sits at 11:00), then the 10-12 h haul that
+ * often ends at midnight (shown at 16:12 in the afternoon light; the night-haul variant lights it after dark).
+ */
+export const STAGE_HOURS = { set: 5.9, wait: 11.0, haul: 16.2, stow: 16.6 };
 /** One visual float per this many km of line (500 real floats over 150 km would be a wall of orange). */
 export const VISUAL_FLOAT_KM = 2.5;
 

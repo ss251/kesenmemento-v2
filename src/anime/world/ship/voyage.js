@@ -27,6 +27,8 @@ export const TIMING = {
   ff: 5,                                              // the 早送り button
 };
 const KN = 0.514444;
+/** The set on the HUD clock: from STAGE_HOURS.set - 0.4 (05:30) for 4.5 h (dossier §5: 4-5 h from near dawn). */
+export const SET_CLOCK = { start: STAGE_HOURS.set - 0.4, hours: 4.5 };
 
 function polyline(pts) {
   const acc = [0];
@@ -297,7 +299,10 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
     V.lastPos = p;
     const f = new THREE.Vector3(0, 0, 1).transformDirection(ship.group.matrixWorld);
     const model = { kn: sail?.active && sail.state?.kn !== undefined ? Math.abs(sail.state.kn) : V.kn, hdg: (Math.atan2(f.x, -f.z) * 180) / Math.PI, tapes: sendoff.active ? { n: sendoff.stats.tapes, snapped: sendoff.stats.snapped } : null, livery, autopilot: sail?.state?.autopilot };
-    if (st === 'OCEAN_SET') { const h = STAGE_HOURS.set - 0.4 + (d.setKm / RULES.lineKm) * 4.5; model.clock = `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.floor((h % 1) * 60)).padStart(2, '0')}`; }
+    // the HUD clock: the set 05:30 -> 10:00 (4.5 h), then the soak from 10:00 (縄待ち 2-3 h; the sky sits at STAGE_HOURS.wait)
+    const hhmm = (h) => `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.floor((h % 1) * 60)).padStart(2, '0')}`;
+    if (st === 'OCEAN_SET') model.clock = hhmm(SET_CLOCK.start + (d.setKm / RULES.lineKm) * SET_CLOCK.hours);
+    if (st === 'WAIT') model.clock = hhmm(SET_CLOCK.start + SET_CLOCK.hours + d.waitedH);
     ui?.update(model);
     applyCam(dt);
   }

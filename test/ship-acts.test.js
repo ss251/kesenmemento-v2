@@ -360,3 +360,38 @@ describe("ship: sendoff and ocean (pure parts)", () => {
     expect(src).toMatch(/hideWorld|showWorld/);
   });
 });
+
+// ---------------------------------------------------------------------------------------------------------- fix round 2
+describe("ship: fix round 2 (the dossier's processing, clock and quota bar)", () => {
+  const I18N = JSON.parse(readFileSync(ROOT + "data/ship/i18n.json", "utf8"));
+  test("every kept fish is bled, spiked and dressed (gills, guts and tail off), then frozen at -60 °C (dossier §5)", () => {
+    const M = driveTo("STOW");
+    expect(M.data.kept.length).toBeGreaterThan(0);
+    for (const f of M.data.kept) { expect(f.bled).toBe(true); expect(f.spiked).toBe(true); expect(f.dressed).toBe(true); expect(f.frozenC).toBe(-60); }
+    for (const k of ["ship.haul.kept", "ship.haul.keptOther"]) {
+      expect(I18N.ja[k]).toContain("すぐに血抜き・神経締め、エラ・内臓・尾を取って−60℃の冷凍庫へ");
+      expect(I18N.en[k]).toContain("bled and spiked at once, gills, guts and tail removed, then into the −60 °C freezer".replace(/^b/, I18N.en[k].includes("Bled") ? "B" : "b"));
+    }
+  });
+  test("Act 2's clock runs forward: set 05:30-10:00, the soak from 10:00 (sky 11:00), the haul from 12:30 on", async () => {
+    const { STAGE_HOURS } = await import("../src/anime/world/ship/ocean.js");
+    const { SET_CLOCK } = await import("../src/anime/world/ship/voyage.js");
+    const setEnd = SET_CLOCK.start + SET_CLOCK.hours;
+    expect(SET_CLOCK.start).toBeCloseTo(5.5, 6); expect(setEnd).toBeCloseTo(10.0, 6);
+    expect(STAGE_HOURS.wait).toBeGreaterThanOrEqual(setEnd);                         // never back before the set ended
+    expect(STAGE_HOURS.wait).toBeLessThanOrEqual(setEnd + RULES.waitMaxH);
+    expect(STAGE_HOURS.haul).toBeGreaterThanOrEqual(setEnd + RULES.waitH + 0.5);     // the haul starts about 12:30-13:00 or later
+    expect(STAGE_HOURS.set).toBeLessThan(STAGE_HOURS.wait); expect(STAGE_HOURS.wait).toBeLessThan(STAGE_HOURS.haul); expect(STAGE_HOURS.haul).toBeLessThan(STAGE_HOURS.stow);
+  });
+  test("the quota bar is the ship's share, about 80 t (Usui, 2026-10-03); this set's catch is a slice of it", () => {
+    expect(RULES.shipShareKg).toBe(80000);
+    expect(RULES.allowanceKg).toBe(RULES.shipShareKg);
+    expect(I18N.ja["ship.haul.quotaBar"]).toContain("この船1隻への配分 約80t（臼井社長, 2026-10-03）");
+    expect(I18N.en["ship.haul.quotaBar"]).toContain("about 80 t (Usui, 2026-10-03)");
+    const M = driveTo("STOW");
+    expect(M.data.landedKg).toBeGreaterThan(0); expect(M.data.landedKg / M.data.allowanceKg).toBeLessThan(0.1);
+    expect(M.data.haulEnd).toBe("line_in");                                            // one set never fills the ship's share
+    // the old claim is gone from the code and the docs
+    for (const f of ["src/anime/world/ship/acts.js", "docs/ship/acts.md", "docs/ship/README.md"]) expect(readFileSync(ROOT + f, "utf8")).not.toMatch(/not public|never shown|ゲームの設定）　\{kg\}/);
+  });
+});

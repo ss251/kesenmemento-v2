@@ -122,7 +122,8 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
         <p class="note">${esc(t('ship.set.note'))}</p><p class="note long">${esc(t('ship.set.buoy'))}</p>
         <div class="row"><button data-a="ff">${esc(t('ship.btn.ff'))}</button></div>`;
       case 'WAIT': return `<h3>${esc(t('ship.wait.title'))}</h3>
-        <div class="meters"><div class="meter"><b data-f="waitH">0.0</b><small>${esc(t('ship.wait.hLabel'))}</small></div></div>
+        <div class="meters"><div class="meter"><b data-f="waitH">0.0</b><small>${esc(t('ship.wait.hLabel'))}</small></div>
+        <div class="meter"><b data-f="clock">10:00</b><small>${esc(t('ship.wait.time'))}</small></div></div>
         <div class="bar"><i data-f="waitbar" style="width:0%"></i></div><p class="note">${esc(t('ship.wait.note'))}</p>
         <div class="row"><button data-a="ff">${esc(t('ship.btn.ff'))}</button></div>`;
       case 'HAUL': return haulPanel(d);
@@ -140,7 +141,8 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
     const tagged = d.kept.filter((x) => x.tag);
     const lastTag = tagged.at(-1)?.tag;
     const sp = f ? t('ship.species.' + f.species) : '';
-    const pct = Math.min(100, (d.landedKg / d.allowanceKg) * 100);
+    // the ship's share (about 80 t, Usui 2026-10-03) with this set's catch as a slice; a landed slice stays visible
+    const pct = d.landedKg > 0 ? Math.max(1.5, Math.min(100, (d.landedKg / d.allowanceKg) * 100)) : 0;
     return `<h3>${esc(t('ship.haul.title'))}</h3>
       <div class="scale"><div class="lcd" data-f="lcd">${f && ui.model.fishReady ? nf(f.kg, 1) + ' kg' : '—'}</div>
         <div><b>${f && ui.model.fishReady ? esc(sp) : esc(t('ship.haul.waiting'))}</b><br><small>${f && ui.model.fishReady ? esc(t('ship.haul.fl', { cm: f.fl })) : ''}</small></div></div>
@@ -149,7 +151,7 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
       <p class="note long">${esc(t('ship.haul.rule'))}</p>
       <div class="meters"><div class="meter"><b>${lastTag ? `<span class="tag">${esc(lastTag)}</span>` : '—'}</b><small>${esc(t('ship.haul.tag'))}</small></div>
         <div class="meter"><b>${esc(t('ship.haul.freezerN', { n: d.kept.length }))}</b><small>${esc(t('ship.haul.freezer'))}</small></div></div>
-      <small>${esc(t('ship.haul.quotaBar', { kg: nf(d.landedKg, 1), max: nf(d.allowanceKg) }))}</small>
+      <small>${esc(t('ship.haul.quotaBar', { kg: nf(d.landedKg, 1), max: nf(d.allowanceKg / 1000) }))}</small>
       <div class="bar quota"><i style="width:${pct.toFixed(1)}%"></i></div>
       <p class="note">${esc(t('ship.haul.japan'))}</p>`;
   }

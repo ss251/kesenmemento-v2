@@ -29,10 +29,13 @@ const voyage = createVoyage(ctx, { ship, sail, route: ROUTE, livery: flags.nendo
 voyage.start();   // from the boarding chip or the places list; voyage.exit() returns to town
 ```
 
-Pass `auto: true` for a hands-free demo. It begins the send-off, casts off after the horn, and cuts from the quay
-to the approach to かなえ大橋 once the tapes have snapped. After the bridge it skips to the bay mouth, decides each
-fish by the rules (an undersize fish or one over the quota is tried, refused and released) and turns the cards. The
-player can stop it at any point.
+Pass `auto: true` for a hands-free demo (the mayor demo, `?ship=1&auto=1`). It begins the send-off and casts off
+after the horn. Once the tapes have snapped it sails Act 1 as the dossier tells it, in cuts along the outbound line
+(`TIMING.auto*` in voyage.js): 12 s past the 出漁準備岸壁 and market rows (from s 330), then 220 m before かなえ大橋
+until she has passed under it, then 150 m before 商港 (just past みらい造船) until she has passed it, and only then on
+to the bay mouth. At BAY_MOUTH `acts.data.passed` is `['kanae', 'shoko']` (tested). The manual 湾口へ（早送り）button
+also sends the 商港 PASS, with its toast, before it jumps. In Act 2 the demo decides each fish by the rules (an
+undersize fish is tried, refused and released) and turns the cards. The player can stop it at any point.
 
 **Cameras.** While the sail mode is active, its chase camera is used. Otherwise the director places the camera from
 rigs in the ship's frame: the quay view from behind and above the stern (`berth`, `sendoff`, `home`), the crowd at the
@@ -50,9 +53,10 @@ ACT 3  TRANSSHIP_LAS_PALMAS -NEXT-> REEFER -NEXT-> SHIMIZU_WEIGH -NEXT[no kg ove
 - **Data events** don't change the state: `HORN`, `TAPE_SNAP`, `PASS {what: kanae|shoko}`, `SET_PROGRESS {km}`,
   `WAIT_PROGRESS {h}`, `FISH_UP`, `FREEZE_PROGRESS {h}`.
 - **Haul:** `KEEP` is refused with `undersize` for a bluefin under 30 kg (the fish stays on the scale and must be
-  released), and with `quota` when the fish would push the landed weight past this set's allowance.
-- **Haul ends** (an automatic move to STOW) when the allowance has no room for a legal bluefin, after a quota refusal,
-  or when the line is in.
+  released), and with `quota` when the fish would push the landed weight past the ship's share (`allowanceKg`).
+- **Haul ends** (an automatic move to STOW) when the share has no room for a legal bluefin, after a quota refusal,
+  or when the line is in. With the ship's share at 80 t a single set never fills it, so the line comes in; the quota
+  stop is kept as a rule (tested with a small `allowanceKg`).
 - **Illegal events** return `{ ok: false, reason: 'illegal' }` and change nothing.
 
 ## What is real and what is stylised
@@ -65,10 +69,12 @@ ACT 3  TRANSSHIP_LAS_PALMAS -NEXT-> REEFER -NEXT-> SHIMIZU_WEIGH -NEXT[no kg ove
 | Her service speed, 12.3 kn (JASNAOE SOY 2020) | 6 kn in the harbour: a harbour pace chosen for the game. Neither the dossier nor any cited source gives a 気仙沼 harbour limit (港則法 sets no fixed figure there). |
 | ICCAT: no fishing in spawning seasons and on spawning grounds (Usui's slide 81); large-scale longliners west of 10°W and north of 42°N only 1 Aug–31 Jan (Rec 22-08); minimum 30 kg / 115 cm; Japan 3,779 t of 43,296 t (8.7 %) | The ocean scene: no coordinates or position, a cold palette and long swells; the hours of the day |
 | Gear: a line of about 150 km with about 3,000 hooks, floats every 300 m, radio buoys with a red flag and lamp, orange 30 cm floats; set from the stern, haul through the starboard forward 舷門 | Time compression: the set takes 40 s, the soak 9 s, the freeze 7 s. One visual float is drawn per 2.5 km; the HUD counts the real ones. |
-| Each bluefin weighed and tagged; bled and spiked; −60 °C, about 36 h to the core | The tag text always carries `DEMO-` |
+| Each bluefin weighed and tagged; bled and spiked at once (神経締め), gills, guts and tail removed (`dressed: true`); −60 °C, about 36 h to the core | The tag text always carries `DEMO-` |
 | The catch: 150 kg-class bluefin | The fish come from a seeded queue: mostly bluefin, two undersize bluefin, one bigeye and one albacore. Weights to length use a bluefin relation (a = 3.5e-5, b = 2.878; 30 kg ↔ 115 cm). |
 | Bigeye and albacore are not covered by the bluefin tags or quota | — |
-| The chain: Las Palmas → reefer container → Shimizu bonded weigh-in (1 kg over loses the licence); the ship and crew come home under 大漁旗 | The allowance bar is this set's allowance, a game setting of 900 kg. The ship's real quota is never shown. |
+| The chain: Las Palmas → reefer container → Shimizu bonded weigh-in (1 kg over loses the licence); the ship and crew come home under 大漁旗 | — |
+| The quota bar is the ship's share (dossier §5): about 80 t, the minister's allocation to this one ship as Usui said in his public talk on 2026-10-03 (the captain's notes mark it ⚠, not yet confirmed in writing; it fits the 76.3 t MSC catch of 2024). Labelled 「この船1隻への配分 約80t（臼井社長, 2026-10-03）」 | This set's catch shown as a slice of it |
+| Act 2's hours: the set 4–5 h from near dawn, the soak 2–3 h, a 10–12 h haul that often ends at midnight | The HUD clock runs 05:30 → 10:00 over the set and from 10:00 through the soak (the sky sits at 11:00); the haul is lit at 16:12, or at night in the night variant |
 | — | The chain cards are flat canvas illustrations (no photos, no logos); 富士山 behind Shimizu is scenery |
 | Facts panel: 486 t (Japanese GT), 58.60 m, completed 2020-02-05 by みらい造船, Starlink, first MSC Atlantic bluefin in 2020, IUCN EN → LC in **September 2021** (the slide's 2022 is wrong), mainly the eastern stock | — |
 | 北かつまぐろ屋 海の市店, 魚市場前7-13 (OSM node 7181952808, layout place `p1m5usud`) | The card's camera link (`?cam=452,38,742>389.7,6,675`); no discount promise |
