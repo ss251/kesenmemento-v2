@@ -8,7 +8,7 @@ import { createMaterials } from '../src/anime/core/materials.js';
 import {
   SHIP, BUDGET, TIERS, MID_S, zOf, sheerAt, fwdS, sternS, keelAt, halfBreadth, stations, hullGeometry, buildShofukumaru, countTriangles,
 } from '../src/anime/world/ship/shofukumaru1.js';
-import { ATLAS, sideUV, sidePx, fallbackPlan, cleanNendo, convexHull, simplify, polyArea, paintAtlas, stubCanvas, NENDO_FILES } from '../src/anime/world/ship/livery.js';
+import { ATLAS, sideUV, sidePx, fallbackPlan, cleanNendo, convexHull, simplify, polyArea, paintAtlas, stubCanvas, NENDO_FILES, fitPoint, pwl, NAME } from '../src/anime/world/ship/livery.js';
 import { resolveFlags, isDevHost } from '../src/anime/world/ship/flags.js';
 import { allowed } from '../scripts/public-mirror.js';
 
@@ -194,15 +194,54 @@ describe('nendo livery (flag on)', () => {
       expect(plan[side].shapes.length).toBeGreaterThanOrEqual(6);
       for (const s of plan[side].shapes) { expect(s.pts.length).toBeLessThanOrEqual(8); expect(s.src).toBe('nendo'); }
       expect(plan[side].circles.length).toBe(1);
-      expect(plan[side].lines.length).toBeGreaterThanOrEqual(8);
+      expect(plan[side].lines.length).toBeGreaterThanOrEqual(side === 'port' ? 8 : 7);
     }
     const reds = (side) => plan[side].shapes.filter((s) => s.colour === 'red').map((s) => Math.min(...s.pts.map((p) => p[0])));
     expect(reds('port')).not.toEqual(reds('starboard'));
   });
+  test('starboard: the 03 trace is re-mapped through the measured anchors (stem, foremast, bridge, radar, aft mast, transom)', () => {
+    const fit = NENDO.marks.starboard.fit;
+    const want = [[0, 0], [16.58, 14.2], [28.1, 28.3], [44.12, 42.8], [53.11, 53.7], [58.62, 58.6]];
+    for (const [su, st] of want) expect(fitPoint(fit, su, 1)[0]).toBeCloseTo(st, 6);
+    expect(fitPoint(fit, 10, 5)[1]).toBeLessThan(4);                 // heights near the bow shrink (the camera looks down)
+    expect(fitPoint(fit, 50, 5)[1]).toBeCloseTo(5, 6);               // from the bridge aft they stand
+    expect(fitPoint(null, 3, 4)).toEqual([3, 4]);                     // port: no fit
+    expect(pwl([[0, 0], [10, 20]], 15)).toBeCloseTo(30, 6);          // extended past the end
+  });
+  test('starboard X1 (WCPFC): a red down-triangle on the sheer straddling the foremast, a black up-triangle under it', () => {
+    const sb = plan.starboard.shapes;
+    const red = sb.filter((q) => q.colour === 'red' && Math.max(...q.pts.map((p) => p[0])) < 25);
+    expect(red.length).toBe(1);
+    const xs = red[0].pts.map((p) => p[0]), top = red[0].pts.filter((p) => p[1] > 4), v = red[0].pts.reduce((a, p) => (p[1] < a[1] ? p : a));
+    expect(Math.min(...xs)).toBeLessThan(SHIP.foremast.s - 3);
+    expect(Math.max(...xs)).toBeGreaterThan(SHIP.foremast.s + 1);        // straddles the foremast (s 14.2)
+    expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(5.5);       // the real ship's, not the trace's 2.15 m
+    for (const [s0, h0] of top) { expect(h0).toBeGreaterThanOrEqual(sheerAt(s0)); expect(h0 - sheerAt(s0)).toBeLessThan(0.5); }   // on the sheer
+    expect(NAME.place.starboard.s[1]).toBeLessThanOrEqual(Math.min(...xs));   // the hull name sits forward of it (WCPFC)
+    expect(v[0]).toBeGreaterThan(12); expect(v[0]).toBeLessThan(14);
+    expect(v[1]).toBeGreaterThan(1.5); expect(v[1]).toBeLessThan(2.2);
+    const blk = sb.find((q) => q.tag === 'x1-black');
+    expect(Math.min(...blk.pts.map((p) => p[1]))).toBeLessThan(0);
+    expect(blk.pts.some((p) => p[0] === v[0] && p[1] === v[1])).toBe(true);   // the X meets at one vertex
+    // the X lines run through that vertex
+    const thru = plan.starboard.lines.filter(({ l: [a, b, c, d] }) => Math.abs((c - a) * (v[1] - b) - (d - b) * (v[0] - a)) / Math.hypot(c - a, d - b) < 0.05);
+    expect(thru.length).toBe(2);
+    // nothing traced is left of the old X1 (17-21 m in the trace), and nothing red sits above the sheer there
+    for (const q of sb.filter((x) => x.tag === 'traced')) { const c = q.pts.reduce((a, p) => a + p[0], 0) / q.pts.length; expect(c > 14.6 && c < 22.5).toBe(false); }
+  });
+  test('starboard X2 (WCPFC): the red band slants from s ~37.3 at the sheer to its black foot near s 41.5', () => {
+    const band = plan.starboard.shapes.find((q) => q.tag === 'x2-band');
+    const top = band.pts.filter((p) => p[1] > 4).map((p) => p[0]), foot = band.pts.filter((p) => p[1] < 0).map((p) => p[0]);
+    expect((top[0] + top[1]) / 2).toBeGreaterThan(37); expect((top[0] + top[1]) / 2).toBeLessThan(38.5);
+    expect((foot[0] + foot[1]) / 2).toBeGreaterThan(40.8); expect((foot[0] + foot[1]) / 2).toBeLessThan(42);
+    const ft = plan.starboard.shapes.find((q) => q.tag === 'x2-foot');
+    expect(Math.max(...ft.pts.map((p) => p[0]))).toBeCloseTo(Math.max(...foot), 2);
+    expect(plan.starboard.shapes.filter((q) => q.colour === 'red' && q.tag === 'traced' && q.pts.some((p) => p[0] > 36 && p[0] < 44)).length).toBe(0);
+  });
   test('starboard ignore zones drop the 舷門 and hawse hits', () => {
     for (const s of plan.starboard.shapes.filter((q) => q.tag === 'traced')) {
       const cs = s.pts.reduce((a, p) => a + p[0], 0) / s.pts.length, ch = s.pts.reduce((a, p) => a + p[1], 0) / s.pts.length;
-      expect(cs > 22.5 && cs < 31.5 && ch > 2.5 && ch < 5).toBe(false);
+      expect(cs > 21.4 && cs < 31.4 && ch > 2.2 && ch < 5).toBe(false);
     }
   });
   test('the funnel crest is added only with the nendo livery; the injected data is used without fetching', async () => {

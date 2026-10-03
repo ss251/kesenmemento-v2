@@ -13,7 +13,8 @@
 //   livery IoU       (a) per colour against the traced shapes (data/ship/shofukumaru1/livery-nendo.json), sampled
 //                    every 5 cm in (s, h) over the hull side above the waterline, starboard ignore zones excluded;
 //                    (b) per colour against the photo's own pixels in the hull band (h 0-9.2 m), classified exactly
-//                    like docs/ship/livery-trace.py (black: max < 85; red: R > 120, G < 60, B < 65, R - B > 80).
+//                    like docs/ship/livery-trace.py (black: max < 85; red: R > 120, G < 60, B < 65, R - B > 80);
+//                    (c) starboard only, against the WCPFC photo of the real ship (wcpfcIoU below).
 // The render goes through the app's own pipeline (ink outlines on; vignette, leak, bloom and grading neutral) at 2x and
 // is downsampled like a photo, then segmented exactly like the reference; the plain alpha-mask IoU is reported too.
 // Starboard (shofukumaru03) is a slight three-quarter view, so it is also scored at its own fitted scale
@@ -29,7 +30,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { build, serve, launch } from './cdp.mjs';
 import { sheerAt, fwdS, sternS } from '../../src/anime/world/ship/shofukumaru1.js';
-import { sidePx, ATLAS } from '../../src/anime/world/ship/livery.js';
+import { sidePx, ATLAS, fitPoint } from '../../src/anime/world/ship/livery.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export const REFS = {
@@ -82,7 +83,9 @@ export function tracedIoU(atlas, traced, marks, side, step = 0.05) {
   const res = {};
   const ignore = marks?.[side]?.ignore || [];
   for (const colour of ['black', 'red']) {
-    const polys = (traced[side]?.shapes || []).filter((s) => s.colour === colour).map((s) => s.pts);
+    // the traced shapes in the true frame (marks.fit: starboard's three-quarter view re-mapped), as cleanNendo uses them
+    const fit = marks?.[side]?.fit || null;
+    const polys = (traced[side]?.shapes || []).filter((s) => s.colour === colour).map((s) => s.pts.map(([a, b]) => fitPoint(fit, a, b)));
     let I = 0, U = 0;
     for (let s = 0; s <= 58.6; s += step) for (let h = 0.05; h <= 8.0; h += step) {
       if (h > sheerAt(s) || s < fwdS(h) || s > sternS(h)) continue;
@@ -94,6 +97,51 @@ export function tracedIoU(atlas, traced, marks, side, step = 0.05) {
       if (mine && ref) I++; if (mine || ref) U++;
     }
     res[colour] = U ? I / U : 1;
+  }
+  return res;
+}
+
+// --------------------------------------------------------------------------------------------- WCPFC photo IoU
+// The starboard livery against the real ship: the WCPFC registry photo (7KFY_..._29_January_2020.jpg, 2400 x 1800, a
+// starboard view from forward of the beam). Photo x -> s by a projective fit through the stem, foremast, bridge front,
+// radar mast, aft mast and transom (its residuals, within 0.7 m, removed piecewise); h from the waterline (y 879) by
+// a vertical m/px measured on the hull side (waterline to sheer). Scored forward of s 44 by default: aft of the radar
+// mast the anchors are centreline masts and the rounded stern, and the fit there disagrees with the vertical scale.
+export const WCPFC = {
+  file: '7KFY_SHOFUKU%20MARU%20NO_1_29_January_2020.jpg', wlY: 879,
+  anchors: [[22, 58.6], [228, 53.7], [595, 42.8], [1125, 28.3], [1745, 14.2], [2309, 0]],
+  vScale: [[22, 0.0390], [250, 0.0367], [775, 0.0289], [1125, 0.0262], [1659, 0.0226], [1941, 0.0223], [2309, 0.0249]],
+  ignore: [{ s: [21.4, 31.4], h: [2.2, 5.0] }, { s: [4.7, 9.0], h: [-0.4, 2.8] }],   // the 舷門 and the hawse: not livery
+};
+const lerpT = (t, x) => { let i = 1; while (i < t.length - 1 && x > t[i][0]) i++; const [x0, y0] = t[i - 1], [x1, y1] = t[i]; return y0 + ((x - x0) * (y1 - y0)) / (x1 - x0); };
+/** x (photo px) -> s: projective least squares s = (a x + b) / (c x + 1) on the anchors, residuals removed piecewise. */
+export function wcpfcS(anchors = WCPFC.anchors) {
+  // normal equations for [a, b, c] in a x + b - c x s = s
+  const M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], v = [0, 0, 0];
+  for (const [x, s] of anchors) { const r = [x, 1, -x * s]; for (let i = 0; i < 3; i++) { v[i] += r[i] * s; for (let j = 0; j < 3; j++) M[i][j] += r[i] * r[j]; } }
+  const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+  const D = det(M), p = [0, 1, 2].map((k) => det(M.map((row, i) => row.map((e, j) => (j === k ? v[i] : e)))) / D);
+  const f = (x) => (p[0] * x + p[1]) / (p[2] * x + 1);
+  const corr = anchors.map(([x, s]) => [x, s - f(x)]).sort((a, b) => a[0] - b[0]);
+  return (x) => f(x) + lerpT(corr, x);
+}
+export function wcpfcIoU(atlas, photo, { sMax = 44, outPx = null } = {}) {
+  const S = wcpfcS(), res = {}, { data, W } = photo;
+  const sOf = new Float32Array(W); for (let x = 0; x < W; x++) sOf[x] = S(x);
+  for (const colour of ['black', 'red']) {
+    let I = 0, U = 0;
+    for (let y = 450; y < 900; y++) for (let x = 0; x < W; x++) {
+      const s = sOf[x], h = (WCPFC.wlY - y) * lerpT(WCPFC.vScale, x);
+      if (s < 0.6 || s > Math.min(58.2, sMax) || h < 0.15 || h > sheerAt(s) - 0.25) continue;
+      if (WCPFC.ignore.some((z) => s >= z.s[0] && s <= z.s[1] && h >= z.h[0] && h <= z.h[1])) continue;
+      const k = (y * W + x) * 4, r = data[k], g = data[k + 1], b = data[k + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      const ref = colour === 'black' ? mx < 62 && mx - mn < 30 : r > g + 28 && r > b + 12 && r > 55;   // a scanned, darker photo
+      const [ax, ay] = sidePx('starboard', s, h), q = (Math.round(ay) * atlas.W + Math.round(ax)) * 4;
+      const mine = atlas.data[q + 3] > 128 && (colour === 'black' ? isBlack(atlas.data[q], atlas.data[q + 1], atlas.data[q + 2]) : isRed(atlas.data[q], atlas.data[q + 1], atlas.data[q + 2]));
+      if (mine && ref) I++; if (mine || ref) U++;
+      if (outPx) outPx(x, y, colour, mine, ref);
+    }
+    res[colour] = U ? +(I / U).toFixed(4) : 1;
   }
   return res;
 }
@@ -157,6 +205,20 @@ async function main() {
         const atl = await loadRGBA(Buffer.from((await page.eval(`window.__atlas('shapes')`)).split(',')[1], 'base64'));
         run.tracedIoU = { port: tracedIoU(atl, traced, marks, 'port'), starboard: tracedIoU(atl, traced, marks, 'starboard') };
         console.log('traced-shape IoU', JSON.stringify(run.tracedIoU));
+        if (existsSync(join(REF_DIR, WCPFC.file))) {
+          // the starboard livery on the real ship; overlay (local only: the photo): yellow photo-only red, cyan
+          // render-only red, red both; brown photo-only black, blue render-only black, black both
+          const photo = await loadRGBA(join(REF_DIR, WCPFC.file)), ov = Buffer.alloc(photo.W * photo.H * 3);
+          for (let i = 0; i < photo.W * photo.H; i++) for (let c = 0; c < 3; c++) ov[i * 3 + c] = Math.round(photo.data[i * 4 + c] * 0.45 + 140);
+          const paint = (x, y, colour, mine, ref) => {
+            if (!mine && !ref) return;
+            const col = colour === 'red' ? (mine && ref ? [220, 30, 40] : ref ? [255, 210, 0] : [0, 200, 230]) : (mine && ref ? [20, 20, 20] : ref ? [150, 90, 0] : [60, 60, 230]);
+            const i = (y * photo.W + x) * 3; ov[i] = col[0]; ov[i + 1] = col[1]; ov[i + 2] = col[2];
+          };
+          run.wcpfcIoU = { fwdOf44: wcpfcIoU(atl, photo, { outPx: paint }), all: wcpfcIoU(atl, photo, { sMax: 99 }) };
+          await sharp(ov, { raw: { width: photo.W, height: photo.H, channels: 3 } }).extract({ left: 0, top: 450, width: photo.W, height: 470 }).png().toFile(join(out, `profile-starboard-${livery}-${tier}-wcpfc-ref-overlay.png`));
+          console.log('WCPFC photo livery IoU (starboard)', JSON.stringify(run.wcpfcIoU));
+        }
       }
       if (tier === 'high') for (const [name, extra] of [['flags', 'flags: true'], ['night', 'night: 1']]) {
         // 大漁旗 dressed (setFlags) and lit (setNight) port views, rendered the same way (2x, downsampled)

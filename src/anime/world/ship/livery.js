@@ -46,8 +46,9 @@ export const COLORS = {
 /** Painted text placements (not livery: the real ship carries the name and call sign whatever the paint). */
 export const NAME = {
   ja: '第一昭福丸', en: 'SHOFUKU MARU No.1', call: '7KFY', reg: 'MG1-2112', port: '気仙沼',
-  // measured from shofukumaru02 (port, s 7.0-10.7) and placed clear of the X on starboard (three-quarter view)
-  place: { port: { s: [7.0, 10.7], h: [4.1, 4.65], sub: [3.62, 3.92] }, starboard: { s: [8.2, 12.4], h: [4.15, 4.72], sub: [3.66, 3.98] } },
+  // measured: port on shofukumaru02 (s 7.0-10.7); starboard on the WCPFC photo of the real ship (x 2086-1955, s 5.5-8.8),
+  // between the bow line and the X1 red triangle, which starts at s 9.2
+  place: { port: { s: [7.0, 10.7], h: [4.1, 4.65], sub: [3.62, 3.92] }, starboard: { s: [5.4, 8.9], h: [4.15, 4.72], sub: [3.66, 3.98] } },
 };
 
 /** Generic hull portholes (structure, both liveries): read off shofukumaru02/05. */
@@ -97,6 +98,26 @@ export function simplify(pts, keep = 0.92) {
 const bbox = (pts) => { let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity; for (const [s, h] of pts) { a = Math.min(a, s); b = Math.min(b, h); c = Math.max(c, s); d = Math.max(d, h); } return [a, b, c, d]; };
 const inBox = (p, z) => p[0] >= z.s[0] && p[0] <= z.s[1] && p[1] >= z.h[0] && p[1] <= z.h[1];
 
+/** Piecewise-linear interpolation through [[x, y], ...] (sorted by x), extended linearly past both ends. */
+export function pwl(table, x) {
+  const n = table.length;
+  if (n === 1) return table[0][1];
+  let i = 1; while (i < n - 1 && x > table[i][0]) i++;
+  const [x0, y0] = table[i - 1], [x1, y1] = table[i];
+  return y0 + ((x - x0) * (y1 - y0)) / (x1 - x0 || 1);
+}
+/**
+ * Map a traced point into the true (s, h) frame. A side photo that is not truly side-on (shofukumaru03 is a slight
+ * three-quarter view, traced at one uniform 0.1266 m/px) stretches s near the near bow and h where the camera looks
+ * down: fit.s maps the traced s to the true s through measured anchors (stem, foremast, bridge front, radar mast, aft
+ * mast, transom); fit.h scales h by a factor that depends on the TRUE s. No fit: the point is returned as it is.
+ */
+export function fitPoint(fit, s, h) {
+  if (!fit) return [s, h];
+  const st = fit.s ? pwl(fit.s, s) : s;
+  return [st, fit.h ? h * pwl(fit.h, st) : h];
+}
+
 // --------------------------------------------------------------------------------------------- plans
 /**
  * A plan is what gets painted: per side { shapes: [{colour, pts, tag}], lines: [[s0,h0,s1,h1]], circles: [...] },
@@ -117,8 +138,10 @@ export function cleanNendo(data, { mergeGap = 0.45, maxGrow = 1.45, keep = 0.92,
   for (const side of ['port', 'starboard']) {
     const marks = data.marks?.[side] || {};
     const ignore = marks.ignore || [];
+    // the traced data is re-mapped into the true frame first (marks.fit); ignore zones and marks are in the true frame
+    const fit = marks.fit || null;
     let frags = (data.traced?.[side]?.shapes || [])
-      .map((sh) => ({ colour: sh.colour, pts: sh.pts.map((p) => [p[0], p[1]]) }))
+      .map((sh) => ({ colour: sh.colour, pts: sh.pts.map((p) => fitPoint(fit, p[0], p[1])) }))
       .filter((sh) => { const [a, b, c, d] = bbox(sh.pts); const cen = [(a + c) / 2, (b + d) / 2]; return !ignore.some((z) => inBox(cen, z)); });
     // merge same-colour fragments whose boxes touch (a triangle split by the name or by portholes), but only when
     // the union stays compact: two separate triangles of an X never merge (their hull would be far bigger)
@@ -142,7 +165,11 @@ export function cleanNendo(data, { mergeGap = 0.45, maxGrow = 1.45, keep = 0.92,
       return { colour: f.colour, pts: p, tag: 'traced', src: 'nendo' };
     });
     for (const sh of marks.shapes || []) shapes.push({ colour: sh.colour, pts: sh.pts.map((p) => [p[0], p[1]]), tag: sh.tag || 'mark', src: 'nendo' });
-    const lines = (data.lines?.[side] || []).concat(marks.lines || []).map((l) => ({ l: l.slice(0, 4), src: 'nendo' }));
+    // traced lines: re-mapped, then dropped when their midpoint is in an ignore zone that says lines: true (a traced
+    // X replaced by a measured one); the marks' own lines are kept as they are
+    const traced = (data.lines?.[side] || []).map((l) => [...fitPoint(fit, l[0], l[1]), ...fitPoint(fit, l[2], l[3])])
+      .filter((l) => !ignore.some((z) => z.lines && inBox([(l[0] + l[2]) / 2, (l[1] + l[3]) / 2], z)));
+    const lines = traced.concat(marks.lines || []).map((l) => ({ l: l.slice(0, 4).map((v) => Math.round(v * 1000) / 1000), src: 'nendo' }));
     const circles = (marks.circles || []).map((c) => ({ ...c, src: 'nendo' }));
     plan[side] = { shapes, lines, circles };
   }
