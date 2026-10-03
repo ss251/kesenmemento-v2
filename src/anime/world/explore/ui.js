@@ -155,6 +155,7 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
   /** Go to a place: the stops fly or walk as the tour does; any other place gets a framing computed on the spot. */
   function goTo(p, { how = null } = {}) {
     if (!p) return;
+    if (typeof p.action === 'function') { p.action(); return; }   // [ship:integrate] e.g. 「第一昭福丸に乗る」 boards the ship
     if (drive?.active) drive.exit();
     ctx.planet?.active && ctx.planet.exit();
     const pl = ctx.playerObj, T = tour();
@@ -191,8 +192,9 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
       // the places list: the tour stops, the civic landmarks and explore's places, by kind
       ui.results = search.featured();
       const groups = new Map();
-      ui.results.forEach((p, i) => { const g = p.group || 'places'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(row(p, i)); });
-      list.innerHTML = [...groups].map(([g, rows]) => `<h4>${esc(I.t('v4.x.group.' + g))}</h4>${rows.join('')}`).join('');
+      const heads = new Map();   // [ship:integrate] a group may carry its own heading (groupLabel: { ja, en })
+      ui.results.forEach((p, i) => { const g = p.group || 'places'; if (!groups.has(g)) { groups.set(g, []); heads.set(g, p.groupLabel ? (p.groupLabel[I.lang] || p.groupLabel.ja) : I.t('v4.x.group.' + g)); } groups.get(g).push(row(p, i)); });
+      list.innerHTML = [...groups].map(([g, rows]) => `<h4>${esc(heads.get(g))}</h4>${rows.join('')}`).join('');
       return;
     }
     ui.results = search.find(q, 30);

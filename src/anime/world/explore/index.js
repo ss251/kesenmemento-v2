@@ -69,7 +69,8 @@ export async function build(ctx) {
     const lastCam = { p: new ctx.THREE.Vector3(), q: new ctx.THREE.Quaternion(), ok: false }; let still = 0;
     ctx.onUpdate((dt) => {
       if (ctx.planet?.active) { stream.sb.cull(null); return; }
-      const p = api.drive?.active ? api.drive.focus() : ctx.playerObj?.pos || cam.position;
+      const sail = ctx.services.sail;   // [ship:integrate] at the helm: stream ahead of her bow (sail.focus)
+      const p = api.drive?.active ? api.drive.focus() : sail?.active ? sail.focus() : ctx.playerObj?.pos || cam.position;
       const g = Math.max(L.heightAt(cam.position.x, cam.position.z), 0);
       const alt = cam.position.y - g;
       const mode = alt < 40 ? 'ground' : alt < 260 ? 'low' : 'high';
@@ -117,7 +118,9 @@ export async function build(ctx) {
     const nm = s.id === 'hero' ? { ja: '内湾', en: 'Inner bay' } : { ja: s.ja, en: s.en };
     return { id: s.id, ...nm, cat: 'landmark', at, group: 'tour' };
   });
-  const featured = tourFeat.concat(lmStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'landmarks' })), exStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'places' })));
+  // [ship:integrate] 「第一昭福丸に乗る」 heads the places list (selecting it boards her; world/ship/index.js PLACE)
+  const shipPlace = ctx.services.ship?.place ? [ctx.services.ship.place] : [];
+  const featured = shipPlace.concat(tourFeat).concat(lmStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'landmarks' })), exStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'places' })));
   const search = createSearch(L, { featured, near: () => { const p = drive?.active ? drive.state : cam.position; return [p.x, p.z]; } });
   api.search = search;
   const places = {

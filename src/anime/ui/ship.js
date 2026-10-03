@@ -77,11 +77,16 @@ const CSS = /* css */`
 #klc-ship .facts ul{margin:6px 0;padding-left:18px;font-size:13px;line-height:1.6}
 #klc-ship [hidden]{display:none!important}
 body.klc-ship #klc-ui,body.klc-ship #klc-x,body.klc-ship #klc-labels,body.klc-ship #klc-ui-restore{display:none!important}
+body.klc-ship #corner,body.klc-ship #help,body.klc-ship #cross,body.klc-ship #toast,body.klc-ship #klc-board{display:none!important}
+body:not(.playing):not(.shot) #klc-ship{display:none!important}
 @media (max-width:600px){#klc-ship .long{display:none}#klc-ship .where{top:60px;padding:6px 10px;font-size:12px}#klc-ship .where small{font-size:10.5px}#klc-ship .meters{gap:2px 10px;margin:4px 0}#klc-ship .meter b{font-size:18px}#klc-ship .panel{left:8px;right:8px;width:auto;bottom:8px;padding:12px}#klc-ship .top{left:8px;right:8px}#klc-ship .acts span{padding:6px 8px;font-size:12px}#klc-ship .toast{top:170px}#klc-ship .scale .lcd{font-size:22px;min-width:110px}}
 `;
 
+/** A real DOM (not a test stub): the UI mounts only there. */
+const hasDOM = () => typeof document !== 'undefined' && typeof document.getElementById === 'function' && !!document.body?.classList;
+
 export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
-  if (typeof document === 'undefined') return null;
+  if (!hasDOM()) return null;
   const I = createShipI18n(lang);
   const t = (k, v) => I.t(k, v);
   if (!document.getElementById('klc-ship-css')) { const st = document.createElement('style'); st.id = 'klc-ship-css'; st.textContent = CSS; document.head.appendChild(st); }
@@ -234,4 +239,46 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
   function message(key, vars, warn = false) { ui.msg = key ? (DATA.ja[key] !== undefined ? t(key, vars) : key) : ''; ui.msgWarn = warn; if (ui.view === 'HAUL') render(); }
   function hide() { el.hidden = true; document.body.classList.remove('klc-ship'); }
   return { el, show, update, toast, message, title, hide, render, i18n: I, t, get state() { return { ...ui }; }, STATES };
+}
+
+// ------------------------------------------------------------------------------------------------ boarding chip
+// [ship:integrate] 「第一昭福丸に乗る」: a chip that appears while you are near the コの字岸壁 (world/ship/index.js decides
+// when), in the explore UI's paper-glass style. Shown only once the visitor is in the town (body.playing) or in a UI shot.
+const BOARD_CSS = /* css */`
+#klc-board{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(8px);z-index:5;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;
+  display:flex;align-items:center;gap:12px;padding:8px 10px 8px 18px;border-radius:999px;background:rgba(250,247,241,.9);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);
+  box-shadow:0 8px 28px rgba(35,40,70,.18),0 0 0 1px rgba(255,255,255,.5) inset;font-family:"Zen Maru Gothic","Noto Sans JP",sans-serif;color:#1f3a68;white-space:nowrap;max-width:calc(100vw - 24px)}
+#klc-board.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+#klc-board .txt{display:grid;gap:2px;min-width:0}
+#klc-board b{font:900 15px/1.2 "Zen Maru Gothic","Noto Sans JP",sans-serif;overflow:hidden;text-overflow:ellipsis}
+#klc-board small{font:500 11px/1.2 "Noto Sans JP",sans-serif;color:#6b6f86;overflow:hidden;text-overflow:ellipsis}
+#klc-board button{font:700 14px/1 "Zen Maru Gothic","Noto Sans JP",sans-serif;color:#fff;background:#d24a3c;border:0;border-radius:999px;min-height:44px;padding:0 18px;cursor:pointer;box-shadow:0 4px 12px rgba(210,74,60,.35)}
+#klc-board button:focus-visible{outline:3px solid #2f7fae;outline-offset:2px}
+body:not(.playing):not(.shotui) #klc-board,body.noui #klc-board{display:none!important}
+@media (max-width:720px){#klc-board{bottom:calc(262px + env(safe-area-inset-bottom,0px));padding:6px 6px 6px 14px;gap:8px}#klc-board b{font-size:13px}#klc-board small{display:none}}
+@media (prefers-reduced-motion:reduce){#klc-board{transition:none}}
+`;
+
+/** The boarding chip. -> { el, update({ visible, lang }) } (null without a DOM). */
+export function mountBoardChip(ctx, { onBoard = () => {}, lang } = {}) {
+  if (!hasDOM()) return null;
+  const I = createShipI18n(lang);
+  if (!document.getElementById('klc-board-css')) { const st = document.createElement('style'); st.id = 'klc-board-css'; st.textContent = BOARD_CSS; document.head.appendChild(st); }
+  const el = document.createElement('div'); el.id = 'klc-board'; el.setAttribute('role', 'region');
+  document.body.appendChild(el);
+  let shown = false;
+  function render() {
+    el.setAttribute('lang', I.lang); el.setAttribute('aria-label', I.t('ship.board.title'));
+    el.innerHTML = `<div class="txt"><b>${esc(I.t('ship.board.title'))}</b><small>${esc(I.t('ship.board.sub'))}</small></div><button type="button" data-a="board">${esc(I.t('ship.board.go'))}</button>`;
+  }
+  el.addEventListener('click', (e) => { if (e.target.closest('[data-a="board"]')) { e.target.blur?.(); onBoard(); } });
+  render();
+  return {
+    el,
+    update({ visible = shown, lang: l } = {}) {
+      if (l && l !== I.lang) { I.set(l); render(); }
+      if (visible !== shown) { shown = visible; el.classList.toggle('show', shown); el.setAttribute('aria-hidden', String(!shown)); }
+    },
+    get visible() { return shown; },
+  };
 }

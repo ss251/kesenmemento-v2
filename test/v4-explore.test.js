@@ -323,7 +323,7 @@ describe("physics tags (streamed colliders)", () => {
 describe("wiring", () => {
   test("the explore module is registered after life and town leaves its lots to it", () => {
     const main = readFileSync(join(ROOT, "src/anime/main.js"), "utf8");
-    expect(main).toMatch(/'life', 'explore'\]/);
+    expect(main).toMatch(/'life', ('ship', )?'explore'\]/);   // [ship:integrate] the ship module sits between them
     const town = readFileSync(join(ROOT, "src/anime/world/town/index.js"), "utf8");
     expect(town).toMatch(/EXPLORE_LOTS\.has\(lot\.id\)/);
     expect(town).toMatch(/exploreOwnsMid/);
