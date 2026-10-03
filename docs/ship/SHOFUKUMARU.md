@@ -10,7 +10,8 @@ This page is the entry point. For more detail:
 - [MODEL.md](MODEL.md): the model, the livery and the profile check;
 - [acts.md](acts.md): the act machine and the scenes;
 - [shofukumaru-dossier.md](shofukumaru-dossier.md): the captain's sourced dossier, committed verbatim under the
-  captain's confirmed UPDATE header of 2026-10-03 (the livery permission). Every number in the build comes from it;
+  captain's confirmed UPDATE header of 2026-10-03 (the livery permission). The numbers in the build come from it,
+  from [next-pass-usui.md](next-pass-usui.md) and from the sources cited in [section 10](#10-sources);
 - [next-pass-usui.md](next-pass-usui.md): the facts from 臼井壯太朗's talk at Hackatsuon (2026-10-03) that the build
   uses, and only those.
 
@@ -50,7 +51,10 @@ The sail mode (`explore/sail.js`) takes her out on autopilot. Use the controls b
 
 After 8 s with no input, the autopilot takes over again. That happens when she is under way, when she is against a
 bank, or when a bank has stopped her. If she is left bow-on to a bank, the autopilot backs her off astern before it
-goes ahead. Shore collision checks sample points on the hull outline against the shoreline (a 2 m fender margin). Against a quay
+goes ahead. The straight, slow start is only for the quay's own line (within 40 m of it): lost 100 m or more off the
+line near the start, the autopilot steers and recovers like anywhere else. If back-and-fill has not freed her after 45
+simulated seconds more than 60 m off the line, the **tow-assist** puts her back on it at 1.5 m/s and eases the camera
+(`state.towed` counts them), so she is never left stuck. It only helps the autopilot, never the helm. Shore collision checks sample points on the hull outline against the shoreline (a 2 m fender margin). Against a quay
 she slides along it and loses speed. Harbour boats in her lane move aside to their own starboard. While the voyage runs, the town's keys
 (C, N, 1 to 9, R) are blocked.
 
@@ -114,8 +118,8 @@ stem and h is metres above the waterline.
 | `ship/flags.js` | `resolveFlags({ search?, hostname?, define? })` → `{ nendoLivery, source }`. |
 | `ship/livery.js` | `paintAtlas`, `fallbackPlan`, `loadNendo` (with the default nendo livery; never with the fallback), `cleanNendo`. |
 | `ship/route.js` | `BERTH {x, z, yaw}`, `SHOKO`, `BAY_MOUTH`, `OUTBOUND` (polyline), `OUTBOUND_PATH`, `KANAE_CROSSING {s, x, z, clearance, margin}`, `routeClearance(path)`. |
-| `explore/sail.js` | `BOAT` (handling constants); `boatStep(s, input, dt, P)` (pure); `sailStep` (with shore); `pursue` (autopilot); `createSail(ctx, { ship, route })` → `{ enter(at), exit(), active, state, setAutopilot(on), focus(), onEvent(cb) }`. Events: `passKanae`, `passShoko`, `bayMouth`, `arrived`. |
-| `ship/acts.js` | `createActs(snapshot?)` (pure, serialisable with `snapshot()`); `STATES`, `EVENTS` (guards), `RULES`, `makeCatch`, `seasonOpen`, `weighIn`. |
+| `explore/sail.js` | `BOAT` (handling constants); `AUTO` (autopilot constants, the tow-assist's among them); `boatStep(s, input, dt, P)` (pure); `sailStep` (with shore); `pursue` (autopilot); `createSail(ctx, { ship, route })` → `{ enter(at), exit(), active, state, setAutopilot(on), focus(), onEvent(cb) }`. Events: `passKanae`, `passShoko`, `bayMouth`, `arrived`. |
+| `ship/acts.js` | `createActs(snapshot?)` (pure, serialisable with `snapshot()`); `STATES`, `EVENTS` (guards), `RULES`, `makeCatch`, `seasonOpen`, `weighIn`; `oceanNoposKey(today)` (the Act 2 banner says the real ship is fishing "right now" only inside the Aug–Jan season; otherwise she "fishes these waters each Aug–Jan season"). |
 | `ship/tags.js` | `formatTag(n, yy = 26)` → `DEMO-7KFY-26-0001`; `isDemoTag(s)`; `REAL_TAG_RE` (`/^7KFY-\d{2}-\d{4}$/`), which a demo tag never matches. |
 | `ship/sendoff.js`, `ocean.js`, `chain.js` | The scenes for Acts 1, 2 and 3. |
 | `ship/voyage.js` | `createVoyage(ctx, { ship, sail, route, livery, auto })`: the director. It runs the machine, the scenes, the cameras and the UI. |
@@ -128,23 +132,25 @@ Shot hooks: `window.__ship`, `__voyage`, `__sail`, `__voyageShot(state, opts)`, 
 
 ```sh
 env -u NODE_OPTIONS bun test test/ship-model.test.js test/ship-sail.test.js test/ship-acts.test.js \
-  test/ship-integrate.test.js test/ship-livery-paint.test.js test/v3-fix.test.js
+  test/ship-integrate.test.js test/ship-livery-paint.test.js test/ship-story.test.js test/v3-fix.test.js
 ```
 
 | File | Covers |
 |---|---|
-| `ship-sail` | `boatStep` (inertia, astern, a tactical diameter of 3 to 4 LOA, rudder and yaw lag, purity and determinism); shore collision (500 random runs never bring a hull sample within 1 m of the shore, and she slides along a quay); OUTBOUND is water every 5 m and at least 40 m from the shore beyond the berth approach; かなえ大橋 is crossed between the pylons with at least 10 m above her 21 m air draft; the autopilot and its recovery; AI boats giving way. |
+| `ship-sail` | `boatStep` (inertia, astern, a tactical diameter of 3 to 4 LOA, rudder and yaw lag, purity and determinism); shore collision (500 random runs never bring a hull sample within 1 m of the shore, and she slides along a quay); OUTBOUND is water every 5 m and at least 40 m from the shore beyond the berth approach; かなえ大橋 is crossed between the pylons with at least 10 m above her 21 m air draft; the autopilot and its recovery, including lost off the line near the start (s 40–79, 150 m off: it steers toward the line) and the tow-assist (the mid-harbour pocket is cleared within 60 s; it never fires on a clean run or under the helm); AI boats giving way. |
 | `ship-acts` | The tag format, and that a demo tag never matches the real format; the act state machine (order, guards, refused events, serialise and restore, the ICCAT season); the release rule and the quota; the Act 3 order (the fish leave her at Las Palmas, and Shimizu refuses 1 kg over); i18n parity; the phone budget of the scenes.; and the Usui next pass (the new keys in JA and EN, the fleet of 6, the quota context, the Shimizu inspection steps in order, the crew copy, the text-only trivia, and the closing line as the final card's last line, rendered through `mountShipUI`). |
 | `ship-model` | Dimensions against `SHIP`; the 舷門 on the starboard side only; the triangle budgets per tier; the flags (nendo by default on every host, `?livery=fallback` and `KLC_NENDO=0` give the fallback), and the local server and the public mirror serving the nendo files; the fallback livery fetches nothing and no module bundles the nendo data; lettering reads right from both sides. |
-| `ship-livery-paint` | Replays `paintAtlas` on a probe canvas and reads back texels: the transom, the stern triangles, the aft sheer triangle. |
+| `ship-livery-paint` | Replays `paintAtlas` on a probe canvas and reads back texels: the transom, the aft sheer triangle, and the starboard stern hourglass X (the texel 1 m above its centre is black; the small triangle stands forward of the open stern bay; the large triangle's aft edge is one straight segment; nothing of it lies aft of the quarter knuckle). |
+| `ship-story` | The story pin: its data, sourced position, edge rule, drone view, places entry, card, board and explore wiring (section 9b). |
 | `ship-integrate` | The URL parameters, the boarding entry, the module order, and the whole voyage headless through the real module, from the quay to the card. |
 | `v3-fix` | The public mirror's other rules (run with the ship files: the mirror serves the ship's data). |
 
-Headless shots go through the one-browser gate:
+Headless shots go through the one-browser gate (nendo is the default, so no `--livery` is needed; add `--livery fallback`
+for the opt-in plain look):
 
 ```sh
-tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port <port> --w 1920 --h 1080 --livery fallback --out shots/ship-int/fb
-tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-profile.mjs --port <port> --livery fallback
+tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port <port> --w 1920 --h 1080 --out shots/ship-int/a
+tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-profile.mjs --port <port>
 ```
 
 `ship-profile.mjs` renders her side-on and compares the silhouette with model photo 02 (port, 0.1226 m/px) and photo
@@ -165,6 +171,42 @@ freed once she is 450 m out. The measured numbers (390 × 844 at DPR 3, iPhone U
 [README.md § Results](README.md#results-2026-10-03-this-branch). The ship adds about 11 MB of texture to the city. At
 sea the frame draws about 135 calls and 36 k triangles.
 
+## 9b. Story pin: 5,500 years of tuna in 唐桑
+
+The Living City's first **story pin** is the 波怒棄館遺跡 in 唐桑 (next-pass-usui.md item 5): an early Jōmon shell
+midden with more than 140 kg of tuna bones. A story pin is a short sourced story tied to a real place. It is listed in
+the places list under its own group, 「まちの物語」 / "Stories of the town" (after the boarding entry), and found by
+search. Selecting it flies the drone to the site, pins its label and opens a story card.
+
+| Part | Where |
+|---|---|
+| The module | `src/anime/world/explore/storypins.js` (marker `[ship:story]`), wired in `explore/index.js` |
+| The data: JA and EN strings, the lat/lon, the sources | `data/ship/story-pins.json` |
+| The tests | `test/ship-story.test.js` (13 tests) |
+| The shot | `docs/ship/shots/acts_ui_story.jpg` (`ship-acts-shots.mjs --ui 1 --list ui_story`) |
+
+**API.**
+
+| Call | Result |
+|---|---|
+| `storyPlaces(L)` | The places-list entries `{ id, ja, en, cat, at, group, groupLabel, story, edge, view }` |
+| `pinPosition(pin, L)` | `{ x, z, inMap, edge }` (pure): the projected lat/lon, or, outside the map (`layout` `ZONES.far`), the nearest point 60 m inside its edge, with the card saying so |
+| `storyFraming(L, x, z)` | The drone view (pure): the board in the lower third, the sea beyond it, the camera 46 m back and 24 m up |
+| `createStoryPins(ctx, { L, fly, lang })` | `{ places, card, markers, root, open(id) }`; the boards hang under one root so the ocean act hides them with the town |
+| `window.__story.open('story-hanukidate')` | Flies there and opens the card (the shot hook) |
+
+**Real and stylised.**
+
+| Real (sourced) | Stylised (the game's choice) |
+|---|---|
+| The site, 波怒棄館遺跡, a 貝塚 on a hilltop overlooking 広田湾 (Nikkei 2013-05-20) | The pin's position: it stands at lat 38.958, lon 141.627, near where 荒谷前 meets Route 45, to within about 300 m (the card says so): an estimate from the address, not a surveyed point |
+| Its age: early Jōmon, about 5,500 years ago | The wooden 説明板 model, its roof and its lettering: invented. No source shows a real signboard at the site, and the area was a housing-relocation dig |
+| The bones: more than 140 kg of tuna bones (press reports; Usui's talk); fish over 2 m; stone blades stuck in some bones | The drone framing (the sea on the far side of the board) |
+| A possible butchering site (the press, as a "may have been") | |
+| The address: 気仙沼市唐桑町荒谷前 (the prefecture's 2013 dig list; the GSI reverse geocode of 38.958, 141.627 returns 唐桑町荒谷前) | |
+
+The pin's strings carry no disaster framing, and `ship-story` tests that.
+
 ## 10. Sources
 
 - The captain's dossier, [shofukumaru-dossier.md](shofukumaru-dossier.md): the particulars, the profile measured
@@ -174,6 +216,24 @@ sea the frame draws about 135 calls and 36 k triangles.
   ship from starboard (29 January 2020). They are used for measurement only, live in the gitignored `raw/ref/`, and
   are never shipped.
 - 臼井社長's slides from Hackatsuon 2026 (the cutaway, the gear, the specs, the tag, the bonded weigh-in, ICCAT).
-- ICCAT Rec. 22-08 (the 30 kg / 115 cm minimum and the season); IUCN (Atlantic bluefin moved from EN to LC in
-  September 2021; the slide's 2022 is wrong).
+- 臼井壯太朗's talk at Hackatsuon on 2026-10-03, as the captain's product-safe notes, only the items in
+  [next-pass-usui.md](next-pass-usui.md): the fleet of 6 (one retired in 2026), the minister's allocation of about 80 t
+  to this one ship (marked ⚠, so shown as "about"), about 100 registered boats with 48 on Atlantic bluefin, the IC chip
+  plus QR code numbered from 1, the Shimizu inspection, 1 kg over the quota costing all 6 licences, voyages of 9–15
+  months, the crew of 6–7 Japanese and about 18 Indonesian, the Laudamiel aroma, the Precure trivia (text only) and the
+  closing line.
+- ICCAT Rec. 22-08 (the 30 kg / 115 cm minimum and the season); ICCAT 2025/26 (Japan 3,779 t of 43,296 t, 8.7 %).
+- IUCN (Atlantic bluefin moved from EN to LC in September 2021; the slide's 2022 is wrong), which sources the facts
+  panel's EN → LC line.
+- MSC (the facts panel's 「2020年、大西洋クロマグロで初めてMSC認証」): the MSC Japan press release of 2020-08-13,
+  <https://www.msc.org/jp/what-you-can-do/media-centre/press-releases/200813>, and
+  <https://www.usufuku.jp/msc_cert.html>. Neither the dossier nor `next-pass-usui.md` has this line.
+- The story pin (section 9b): 日本経済新聞 2013-05-20 「縄文期のマグロ解体場か」
+  (<https://www.nikkei.com/article/DGXNASDG17039_Q3A520C1CR0000/>: 広田湾を望む高台, about 5,500 years ago, fish over
+  2 m); 共同通信 2013-05-17 via 四国新聞 (<https://www.shikoku-np.co.jp/national/culture_entertainment/print.aspx?id=20130517000543>:
+  the stone blades); the prefecture's 2013 dig list (<https://www.pref.miyagi.jp/site/maizou/hakkutujyouhou.html>:
+  気仙沼市唐桑町荒谷前, by Route 45); the city's excavation report 『波怒棄館遺跡』 2022
+  (<https://ci.nii.ac.jp/ncid/BC13429351>); and the GSI reverse geocoder
+  (<https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress?lat=38.958&lon=141.627>: 唐桑町荒谷前). The
+  figure "more than 140 kg" is from the press reports and Usui's talk.
 - OSM, GSI and `harbor/kanae.js` for the berth, the route and かなえ大橋.

@@ -37,7 +37,10 @@ With `?shot=1&t=S` the beat is entered on the first simulation step and the scen
   the rudder over, X stops the engine, Shift holds the 4x time compression, P toggles the autopilot. On a phone, the
   left half of the screen is the stick and a drag on the right half looks around. Touching the controls takes the
   helm; after 8 s idle (under way, against a bank, or stopped by one) the autopilot takes over again. Left bow-on to a
-  bank, it backs her off astern before going ahead (`pursue`'s recovery). Arriving boats in her lane step aside to
+  bank, it backs her off astern before going ahead (`pursue`'s recovery). Lost 100 m or more off the line near the
+  start, it steers and recovers like anywhere else (the straight, slow start is only within 40 m of the quay's line),
+  and if back-and-fill has not freed her after 45 simulated seconds more than 60 m off the line, the tow-assist puts
+  her back on it (`state.towed`). Arriving boats in her lane step aside to
   their own starboard (up to 25 m) and hold until she has passed. After かなえ大橋, 湾口へ（早送り） skips to the bay mouth.
 - **Act 2:** the line is set from the stern, then the soak, then the haul at the starboard forward 舷門: キープ or
   放流 for each fish on the scale. A bluefin under 30 kg cannot be kept. Each kept bluefin gets a `DEMO-7KFY-26-xxxx`
@@ -76,6 +79,7 @@ Everything is added with `ctx.add` (the dynamic root), so it is never merged int
 | `world/ship/acts.js`, `tags.js` | The pure act machine and the DEMO tags. |
 | `world/ship/sendoff.js`, `ocean.js`, `chain.js`, `voyage.js` | The scenes and the director ([acts.md](acts.md)). |
 | `ui/ship.js`, `data/ship/i18n.json` | The voyage UI and the boarding chip; every string in JA and EN. |
+| `world/explore/storypins.js`, `data/ship/story-pins.json` | The 波怒棄館遺跡 story pin (see Story pin below). |
 | `world/explore/index.js`, `ui.js` | The places entry first in the list, `goTo` runs a place's `action`, streaming ahead of her bow while sailing. |
 
 ## Flags
@@ -90,6 +94,17 @@ fetched at run time from `data/ship/shofukumaru1/`, so every deploy serves those
 `scripts/serve.js` does, `scripts/public-mirror.js` passes them (its nendo DENY is gone), and a static host follows the
 pattern in `docs/ARCHITECTURE.md` (Static deploy). `test/ship-model.test.js` checks all of this.
 
+## Story pin
+
+The Living City's first story pin, 波怒棄館遺跡 in 唐桑 (next-pass-usui.md item 5), is a short sourced story at a real
+place: an early Jōmon shell midden of about 5,500 years ago with more than 140 kg of tuna bones. It sits in the places
+list under its own group 「まちの物語」, flies the drone there and opens a story card. Files:
+`src/anime/world/explore/storypins.js`, `data/ship/story-pins.json`, `test/ship-story.test.js` (13 tests), the shot
+`acts_ui_story`; the hook is `window.__story.open('story-hanukidate')`. Real: the site, its age, the bones, fish over
+2 m, the stone blades, the possible butchering site and the 唐桑町荒谷前 address. Stylised: the pin's position (an
+estimate, within about 300 m), the wooden 説明板 model with its roof and lettering (invented; no source shows a signboard
+there), and the drone framing. Details and sources: [SHOFUKUMARU.md](SHOFUKUMARU.md) section 9b and section 10.
+
 ## Phone tier
 
 The phone tier builds the 60 k-triangle model (about 11 k triangles), 6 people, 18 tapes and 3 flags at the send-off,
@@ -100,7 +115,7 @@ the section Results.
 ## Tests
 
 ```sh
-env -u NODE_OPTIONS bun test test/ship-integrate.test.js test/ship-acts.test.js test/ship-sail.test.js test/ship-model.test.js test/ship-livery-paint.test.js
+env -u NODE_OPTIONS bun test test/ship-integrate.test.js test/ship-acts.test.js test/ship-sail.test.js test/ship-model.test.js test/ship-livery-paint.test.js test/ship-story.test.js
 ```
 
 - `ship-integrate`: the URL parameters, the boarding entry, the module order, and the **whole voyage headless through
@@ -108,17 +123,22 @@ env -u NODE_OPTIONS bun test test/ship-integrate.test.js test/ship-acts.test.js 
   past the market rows, under かなえ大橋 and past 商港 (`passed` is `['kanae', 'shoko']` at BAY_MOUTH), and no
   arriving harbour boat or name label drawn while she is at sea.
 - `ship-livery-paint`: a probe 2D context replays `paintAtlas` and reads texels back: the transom is white in both
-  liveries, the stern triangles reach the quarter, the transom lettering paints, and the starboard aft sheer triangle
-  (WCPFC) is drawn over the circle.
+  liveries, the stern triangles reach the quarter, the transom lettering paints, the starboard aft sheer triangle
+  (WCPFC) is drawn over the circle, and the starboard stern hourglass X is complete (the texel 1 m above its centre is
+  black; the large triangle's aft edge is one straight segment).
+- `ship-story`: the story pin's data, position, edge rule, drone view, places entry, card, board and wiring.
 - `ship-acts`: tags, the act machine with its guards, the haul rules, the Act 3 order, i18n, the phone budget.
-- `ship-sail`: `boatStep`, shore collision (500 random runs), the route clearances and かなえ大橋.
+- `ship-sail`: `boatStep`, shore collision (500 random runs), the route clearances and かなえ大橋, the autopilot's
+  recovery (also when lost 150 m off the line at s 40–79) and the tow-assist.
 - `ship-model`: dimensions, the starboard-only 舷門, budgets, the flags and the fallback livery.
 
 ## Shots
 
 ```sh
-tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port 8964 --w 1920 --h 1080 --livery fallback --out shots/ship-int/fb
-tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-profile.mjs --port 8964 --livery fallback
+tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port 8964 --w 1920 --h 1080 --out shots/ship-int/a   # nendo, the default
+tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port 8964 --q phone --w 390 --h 844 --list a1_sendoff,a2_haul,a2_stow,a3_card,a3_shimizu --out shots/ship-int/p
+tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port 8964 --w 1920 --h 1080 --ui 1 --out shots/ship-int/u   # the chip, the places list, the story pin
+tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-profile.mjs --port 8964
 tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/phonemem.mjs --port 8964 --params "ship=1&act=2&livery=fallback" --start --eval tools/anime/ship-memdiag.js
 ```
 
@@ -129,10 +149,10 @@ leave the intro card (`body.playing`), and without it phonemem measures the city
 
 ## Results (2026-10-03, this branch)
 
-**Tests.** `bun test`: 670 pass, 24 skip, 1 fail (fix round 2). The one failure is the known `test/v4-explore.test.js`
-"matches the committed file" (shared `data/cache` drift from other packages; it predates this branch). The six ship
-files (`ship-model`, `ship-sail`, `ship-acts`, `ship-integrate`, `ship-livery-paint`, and `v3-fix` for the public
-mirror) are 150 pass, 0 fail.
+**Tests.** `bun test`: 709 pass, 24 skip, 1 fail (fix round 3, 734 tests in 43 files). The one failure is the known
+`test/v4-explore.test.js` "matches the committed file" (`data/buildings/city.json` exists only in the main repo; it
+predates this branch). The seven ship suites (`ship-model`, `ship-sail`, `ship-acts`, `ship-integrate`,
+`ship-livery-paint`, `ship-story`, and `v3-fix` for the public mirror) are 189 pass, 0 fail.
 `env -u NODE_OPTIONS bun run scripts/build-web.js` builds clean.
 
 **Phone tier** (`phonemem.mjs`, 390×844 at DPR 3, iPhone UA, forced phone tier, nendo livery on the local host):
@@ -179,19 +199,17 @@ lines and the dark open foredeck count as black. Aft of s 44 the black score com
 and the stern quarter triangle (fix round 2); the red score there is low because the crescent sits about 1 m off
 under the fit (see the open item below), and the fit itself is the weak part aft of the radar mast.
 
-**Shots** (`docs/ship/shots/`, 1920×1080, the fallback livery; the nendo renders `*_nendo.png` stay local; re-shot in fix round 2):
+**Shots** (`docs/ship/shots/`, 1920×1080 JPEGs of the nendo livery, the default; the lossless `*_nendo.png` renders stay
+local; all re-shot at the head of fix round 3):
 
 | Act | Beats |
 |---|---|
 | 1 | `acts_a1_docked`, `acts_a1_docked_night`, `acts_a1_side_port` (compare photo 02), `acts_a1_sendoff`, `acts_a1_sendoff_close`, `acts_a1_tapes_snap`, `acts_a1_kanae`, `acts_a1_kanae_chase`, `acts_a1_market`, `acts_a1_shoko`, `acts_a1_transom` (the lettered transom), `acts_a1_baymouth` |
-| 2 | `acts_a2_set`, `acts_a2_wait`, `acts_a2_haul`, `acts_a2_haul_night`, `acts_a2_side_stbd` (compare photo 03 and the WCPFC photo), `acts_a2_transom` (compare photo 04), `acts_a2_stow` |
-| 3 | `acts_a3_laspalmas`, `acts_a3_reefer`, `acts_a3_shimizu` and `acts_a3_shimizu_en` (the landing inspection, Usui next pass), `acts_a3_home_approach`, `acts_a3_home`, `acts_a3_card` and `acts_a3_card_en` (the closing line) |
-| Facts | `acts_a1_facts`, `acts_a1_facts_en` (the facts panel: fleet, voyage, crew, aroma, trivia) |
-| Town UI | `acts_ui_chip` (the boarding chip at the quay), `acts_ui_places` (the places list) |
+| 2 | `acts_a2_set`, `acts_a2_wait`, `acts_a2_haul` and `acts_a2_haul_night` (the quota label and its context line), `acts_a2_side_stbd` (compare photo 03 and the WCPFC photo), `acts_a2_transom` (compare photo 04), `acts_a2_stern_quarter` and `acts_a2_stern_side` (the starboard stern hourglass X), `acts_a2_stow` |
+| 3 | `acts_a3_laspalmas`, `acts_a3_reefer`, `acts_a3_shimizu` and `acts_a3_shimizu_en` (the landing inspection; the dressed fish have no tails), `acts_a3_home_approach`, `acts_a3_home` (the crew line), `acts_a3_card` and `acts_a3_card_en` (the closing line) |
+| Facts | `acts_a1_facts`, `acts_a1_facts_en` (the facts panel: fleet, voyage, crew, aroma, trivia, the source line) |
+| Town UI | `acts_ui_chip` (the boarding chip at the quay), `acts_ui_places` (the places list), `acts_ui_story` (the story pin) |
 | Phone | `acts_phone_a1_sendoff`, `acts_phone_a2_haul`, `acts_phone_a2_stow`, `acts_phone_a3_card`, `acts_phone_a3_shimizu` |
-
-The Usui next-pass shots (`acts_a3_shimizu*`, `acts_a3_card*`, `acts_a1_facts*`, `acts_phone_a3_shimizu`) show the
-nendo livery, now the default.
 
 The side-on comparisons with the photos themselves are `profile-*-ref-sbs.png` and `profile-*-ref-overlay.png`, which
 stay local because the photos are copyrighted.
@@ -208,14 +226,18 @@ shared by about 100 boats, 48 of them on Atlantic bluefin), −60 °C and about
 the minister's allocation to this one ship, about 80 t (Usui's public talk, 2026-10-03; marked ⚠, so shown as
 "about"), the chain Las Palmas → reefer container → the Shimizu landing inspection, the fleet of 6 (one retired in
 2026), voyages of 9–15 months with 6–7 Japanese and about 18 Indonesian crew and the bedtime forest scent, the homecoming under 大漁旗,
-北かつまぐろ屋 海の市店, and IUCN EN → LC in September 2021.
+北かつまぐろ屋 海の市店, the first MSC certification of Atlantic bluefin (2020; MSC Japan, 2020-08-13), IUCN EN → LC in
+September 2021, and the story pin's site, its age, the tuna bones, fish over 2 m, the stone blades, the possible
+butchering site and the 唐桑町荒谷前 address.
 
 Stylised: 6 kn in the harbour (a harbour pace chosen for the game; no harbour limit for 気仙沼 is sourced, and her
 service speed is 12.3 kn), time compression (4x in the bay, the set in 40 s), the handling constants, the hull lines between the measured
 profile and the beam, the crowd size and tape lengths, the order and weights of the fish, the ocean palette and the hours
 (the HUD clock runs 05:30 → 10:00 over the set and on from 10:00 through the soak; the sky sits at 11:00 for the soak
 and 16:12 for the haul), the floodlight pools of the night haul, and the
-chain cards as flat illustrations. Details: [MODEL.md](MODEL.md) and [acts.md](acts.md).
+chain cards as flat illustrations (the Shimizu vignette's figures, 富士山 and numbered badges), the in-game declared-versus-weighed
+check, the story pin's ±300 m position, its 説明板 model and the drone framing, and the tow-assist. Details:
+[MODEL.md](MODEL.md) and [acts.md](acts.md).
 
 ## Deviations
 

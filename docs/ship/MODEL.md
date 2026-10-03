@@ -85,6 +85,23 @@ are ignored. Caveat: aft of the radar mast the projective fit compresses s again
 against 0.036 m/px), so at the local vertical scale the top would be 3.6 m wide rather than 2.8 m (the port
 counterpart is 4.2 m wide); the position along the hull is the fit's.
 
+**The starboard stern hourglass X** (fix round 3). Both the real ship (WCPFC, x 40–170, y 683–873) and photo 04 show a
+black hourglass on the starboard quarter: a small down-triangle on the sheer whose apex meets the apex of a large
+up-triangle. The first build had the large one as the traced 5-point polygon (s 55.06–58.47), which the quarter
+knuckle clipped into a ragged near-vertical edge, and a `stern-x-top` whose top edge (s 56.9–58.9) lay mostly aft of the
+knuckle, under the white transom, and over the model's open stern bay (`SHIP.sternOpening`: no shell at s ≥ 56.6 between
+h 5.8 and 7.2, both sides). Now the traced polygon and its diagonal are ignored, and two clean marks are measured the
+way X1 and X2 were. The X centre is the apex at x 82, y 730 (h 5.75): s 57.16 by the projective fit, 56.74 at the local
+vertical scale of the compressed stern, and **56.0** on the model, 1.2 m forward of the fit, so that the whole small
+triangle stands on plating (its aft top corner is at s 56.47, forward of the bay and of `knuckleS(7)` = 57.795; inside
+the ±1 m that the open item below allows aft of the radar mast). `stern-x-bottom`: apex (56.0, 5.75), forward foot on
+the waterline at s 54.5 (x 167: 55.14 by the fit, 54.1–54.5 at the local scale), aft foot at s 56.25 on the quarter
+knuckle (`knuckleS(0)` = 56.33), so its aft edge is one straight segment and the white transom clips none of it.
+`stern-x-top`: top edge s 54.7–56.47 on the sheer, the same apex. Two crossing lines run through the apex: the aft
+arm of the X runs over the white from the apex to the knuckle, and the other follows the small triangle's aft edge down
+to the large one's forward foot. The real ship's lower triangle flares aft below its apex; on the model the rounded
+stern leaves little room, so its aft edge is nearly vertical. `ship-livery-paint` reads it back texel by texel.
+
 `cleanNendo()` turns each traced fragment into its convex hull. It merges a fragment with a touching fragment of the same colour only while the union stays compact. It then simplifies the shape to the fewest corners that keep 92 % of its area, and snaps corners at the waterline and at the stem. Nothing is snapped to the stern (fix round 2: snapping corners past s 57 to the atlas edge made the stern triangles meet across the transom); the white transom clips them at the quarter knuckle instead. `paintAtlas` order: shapes, circles, `over` shapes, lines, the white transom, text, the gunwale edge, the antifouling.
 
 **Flag** (`flags.js`). Livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.
