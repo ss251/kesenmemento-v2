@@ -195,7 +195,19 @@ export function createOcean(ctx, { ship, rig = null }) {
     const frost = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2).rotateX(-Math.PI / 2), ctx.mat.toon('#e9f4fb', { noSnow: true, emissive: '#bfe6ff', emissiveIntensity: 0.4 })); frost.position.y = 0.29;
     hatch.add(coam, frost, lid); hatch.userData.lid = lid;
     hatch.position.set(gang.x + 2.6, gang.y, gang.z - 4.2);
-    const station = new THREE.Group(); station.name = 'haul-station'; station.add(hauler, scale, hatch);
+    // [ship:integrate] the floodlights of a night haul (hauling often runs to midnight): additive warm pools on the
+    // working deck, the inner side of the 舷門 and the sea under it, faded in with ctx.shared.uNight (the cel materials
+    // take no point lights). Three quads, one shared material.
+    const glowTex = ctx.tex?.draw ? ctx.tex.draw(128, 128, (g) => { g.clearRect(0, 0, 128, 128); const gr = g.createRadialGradient(64, 64, 2, 64, 64, 64); gr.addColorStop(0, 'rgba(255,240,205,1)'); gr.addColorStop(0.55, 'rgba(255,232,185,0.45)'); gr.addColorStop(1, 'rgba(255,232,185,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }, { key: 'ship-worklight' }) : null;
+    const workMat = new THREE.MeshBasicMaterial({ map: glowTex, color: '#ffe2b0', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, side: THREE.DoubleSide });
+    const work = new THREE.Group(); work.name = 'haul-worklights'; work.visible = false;
+    const q = (w, h, rot, x, y, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), workMat); m.rotation.set(...rot); m.position.set(x, y, z); m.renderOrder = 3; work.add(m); return m; };
+    q(6.5, 10, [-Math.PI / 2, 0, 0], gang.x + 2.6, gang.y + 0.04, gang.z - 1.0);          // the working deck
+    q(10, 3.4, [0, Math.PI / 2, 0], gang.x + 4.2, gang.y + 1.5, gang.z - 1.0);             // the inner side of the opening
+    q(12, 16, [-Math.PI / 2, 0, 0], gang.x - 5.0, -gang.y + 0.06, gang.z - 1.0);           // the sea under the 舷門
+    ctx.noOutline?.(work);
+    S.work = work; S.workMat = workMat;
+    const station = new THREE.Group(); station.name = 'haul-station'; station.add(hauler, scale, hatch, work);
     ship.group.add(station); S.station = station;
     // fish slot
     S.fishG = new THREE.Group(); S.fishG.name = 'haul-fish'; root.add(S.fishG);
@@ -398,6 +410,7 @@ export function createOcean(ctx, { ship, rig = null }) {
       placeFloats(t);
       poseLine(t);
       if (hauler) hauler.userData.drum.rotation.x -= (S.stage === 'haul' ? 2.4 : 0) * dt;
+      if (S.work) { const n = Math.max(0, Math.min(1, ((ctx.shared?.uNight?.value || 0) - 0.15) / 0.45)); const on = n > 0.01 && (S.stage === 'haul' || S.stage === 'stow'); S.work.visible = on; S.workMat.opacity = 0.62 * n; }
       poseFish(dt, t);
     },
     dispose() {
@@ -405,6 +418,7 @@ export function createOcean(ctx, { ship, rig = null }) {
       if (S.station) { S.station.parent?.remove(S.station); S.station.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); }
       if (root) { root.parent?.remove(root); root.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); }
       root = sea = ring = floats = floatLines = hauler = scale = hatch = lineMesh = wake = null;
+      S.workMat?.dispose(); S.work = S.workMat = null;
       S.built = false; S.buoys = []; S.floatsDropped = 0; S.lineKm = 0; S.station = null;
     },
     get stats() { return { built: S.built, grid: B.grid, floats: floats?.count || 0, floatsDropped: S.floatsDropped, buoys: S.buoys.length, hidden: S.hidden.length }; },
