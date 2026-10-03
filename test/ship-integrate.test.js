@@ -211,13 +211,13 @@ describe("ship: the bundle still starts the app (Bun HTML entry guard)", () => {
     expect(fixHtmlEntry([{ kind: "entry-point", path: html }])).toEqual([]);   // no JS entry: nothing to be sure of
     rmSync(dir, { recursive: true, force: true });
   });
-  test("a real build of src/anime/index.html: after the guard, the page's script is main.js's chunk", async () => {
+  test("a real build of src/anime/index.html: after the guard, the page's script is main.js's chunk", () => {
+    // in its own process: Bun.build inside the test runner can trip over other tests' module mocks
     const dir = mkdtempSync(resolve(tmpdir(), "klc-bundle-"));
-    const r = await Bun.build({ entrypoints: [resolve(ROOT, "src/anime/index.html")], outdir: dir, target: "browser", splitting: true });
-    expect(r.success).toBe(true);
-    fixHtmlEntry(r.outputs);
-    const src = readFileSync(resolve(dir, "index.html"), "utf8").match(/<script[^>]*src="\.\/([^"]+)"/)[1];
-    expect(readFileSync(resolve(dir, src), "utf8")).toContain("町の暮らし");   // main.js's module labels
+    const p = Bun.spawnSync([process.execPath, resolve(ROOT, "scripts/anime/html-entry.js"), dir], { cwd: ROOT, env: { ...process.env, NODE_OPTIONS: "" } });
+    const out = JSON.parse(String(p.stdout).trim().split("\n").pop());
+    expect(out.ok).toBe(true);
+    expect(out.main).toBe(true);   // main.js's module labels are in the page's script chunk
     rmSync(dir, { recursive: true, force: true });
   }, 60000);
 });

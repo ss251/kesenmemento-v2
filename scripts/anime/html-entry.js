@@ -25,3 +25,17 @@ export function fixHtmlEntry(outputs) {
   }
   return fixed;
 }
+
+/** CLI (the test runs it in its own process): build src/anime/index.html into <outdir>, apply the guard, and print
+ *  { ok, fixed, src, main } where main tells whether the page's script is main.js's chunk. */
+if (import.meta.main) {
+  const { resolve, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+  const out = process.argv[2];
+  const r = await Bun.build({ entrypoints: [resolve(ROOT, "src/anime/index.html")], outdir: out, target: "browser", splitting: true });
+  if (!r.success) { console.log(JSON.stringify({ ok: false, logs: r.logs.map(String) })); process.exit(1); }
+  const fixed = fixHtmlEntry(r.outputs);
+  const src = readFileSync(resolve(out, "index.html"), "utf8").match(/<script[^>]*src="\.\/([^"]+)"/)[1];
+  console.log(JSON.stringify({ ok: true, fixed, src, main: readFileSync(resolve(out, src), "utf8").includes("町の暮らし") }));
+}
