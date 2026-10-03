@@ -10,7 +10,7 @@ import { createContext } from "../src/anime/core/ctx.js";
 import { listModules } from "../scripts/anime/registry.js";
 import { parseShipParams, nearBerth, introDone, ACT_START, PLACE, BOARD, BLOCKED_KEYS, build } from "../src/anime/world/ship/index.js";
 import { STATES, ACT_OF } from "../src/anime/world/ship/acts.js";
-import { BERTH } from "../src/anime/world/ship/route.js";
+import { BERTH, KANAE_CROSSING, SHOKO } from "../src/anime/world/ship/route.js";
 import { isDemoTag } from "../src/anime/world/ship/tags.js";
 import { BUDGET } from "../src/anime/world/ship/shofukumaru1.js";
 import { fixHtmlEntry } from "../scripts/anime/html-entry.js";
@@ -142,12 +142,14 @@ describe("ship: the module at runtime (headless, phone tier)", () => {
     ctx.services.ship.board();
     expect(V.active).toBe(true);
     const seen = [V.state];
-    let t = 0, hiddenAtSea = true, shownAshore = true, maxHomeTurn = 0, lastYaw = null, homeStates = 0;
+    let t = 0, hiddenAtSea = true, shownAshore = true, maxHomeTurn = 0, lastYaw = null, homeStates = 0, passedAtBay = null;
+    const departS = [];
     const dt = 1 / 15;
     for (let i = 0; i < 15 * 1500 && V.state !== "CARD"; i++) {
       t += dt; step(ctx, dt, t);
       const st = V.state;
-      if (st !== seen.at(-1)) seen.push(st);
+      if (st !== seen.at(-1)) { seen.push(st); if (st === "BAY_MOUTH") passedAtBay = [...V.acts.data.passed]; }
+      if (st === "DEPART" && sail.active) departS.push(sail.state.s);
       if (ACT_OF[st] === 2) hiddenAtSea &&= ctx.staticRoot.visible === false && H.life.visible === false;
       if (st === "DOCKED" || st === "SENDOFF" || st === "DEPART") shownAshore &&= ctx.staticRoot.visible === true;
       if (st === "HOMECOMING") {
@@ -175,6 +177,11 @@ describe("ship: the module at runtime (headless, phone tier)", () => {
     expect(tags.length).toBeGreaterThan(0);
     for (const tg of tags) expect(isDemoTag(tg)).toBe(true);
     expect(d.passed).toContain("kanae");
+    // Act 1 as the dossier tells it: out past the market rows, under かなえ大橋, past 商港, out to the bay mouth
+    expect(passedAtBay).toEqual(["kanae", "shoko"]);
+    expect(departS.some((s) => s > 300 && s < 700)).toBe(true);                                      // the market beat
+    expect(departS.some((s) => s > KANAE_CROSSING.s - 250 && s < KANAE_CROSSING.s)).toBe(true);     // the bridge approach
+    expect(departS.some((s) => s > SHOKO.s)).toBe(true);                                            // sailed past 商港
   }, 120000);
 
   test("exit returns to town: she is back alongside in her send-off pose, the town visible, the voyage idle", () => {

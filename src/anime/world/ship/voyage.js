@@ -25,6 +25,9 @@ export const TIMING = {
   fishGap: 0.8, autoDecide: 1.6, cardSeconds: 7,
   homeApproach: 24, homeHornAt: 20,
   ff: 5,                                              // the 早送り button
+  // the hands-free demo (?auto=1) through Act 1, in OUTBOUND arclength (m) and sim seconds: past the 出漁準備岸壁 and
+  // market rows (s 300-700), the approach to かなえ大橋, then past みらい造船 and 商港, then on to the bay mouth
+  autoMarketS: 330, autoMarketSeconds: 12, autoKanaeBefore: 220, autoAfterKanae: 6, autoShokoBefore: 150, autoAfterShoko: 4,
 };
 const KN = 0.514444;
 /** The set on the HUD clock: from STAGE_HOURS.set - 0.4 (05:30) for 4.5 h (dossier §5: 4-5 h from near dawn). */
@@ -144,7 +147,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
   // ------------------------------------------------------------------------------------------------ state entry
   function enter(state, from) {
     V.t = 0; V.ff = 1; V.prog = 0;
-    if (state === 'DEPART') { V.cutKanae = false; V.afterKanae = 0; }
+    if (state === 'DEPART') { V.cut = null; V.cutT = 0; V.afterKanae = 0; V.afterShoko = 0; }
     const d = acts.data;
     switch (state) {
       case 'DOCKED':
@@ -243,13 +246,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
       case 'DEPART':
         // the crowd waves until she is well out (then it is freed: the phone never holds it through the transit)
         if (sendoff.active && Math.hypot(rig.x - BERTH.x, rig.z - BERTH.z) > 450) sendoff.dispose();
-        // hands-free demo: once the tapes are gone, cut to the approach to かなえ大橋, then on to the bay mouth
-        if (auto && sail?.enter && !V.cutKanae && (V.t > 45 || (sendoff.active && sendoff.stats.snapped === sendoff.stats.tapes)) && route.OUTBOUND_PATH && route.KANAE_CROSSING) {
-          V.cutKanae = true; sendoff.dispose();
-          const P = route.OUTBOUND_PATH, k = route.KANAE_CROSSING.s - 220, [x, z] = P.at(k), [dx, dz] = P.dirAt(k);
-          sail.enter({ x, z, yaw: Math.atan2(dx, dz), u: 3.0, autopilot: true });
-        }
-        if (auto && acts.data.passed.includes('kanae')) { V.afterKanae = (V.afterKanae || 0) + fdt; if (V.afterKanae > 8) action('skipBay'); }
+        if (auto && sail?.enter && route.OUTBOUND_PATH && route.KANAE_CROSSING) autoDepart(fdt);
         if (!sail) {   // stand-in follower along OUTBOUND (no sail mode wired)
           V.followS += fdt * Math.min(TIMING.departAuto, 1 + V.t * 0.6);
           const p = outbound.at(V.followS); rig.set(p.x, p.z, p.yaw);
@@ -306,6 +303,32 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
     ui?.update(model);
     applyCam(dt);
   }
+  /**
+   * The hands-free demo through DEPART, in cuts along the outbound line (the dossier's Act 1: out past the market,
+   * under かなえ大橋, past 商港, out to the bay mouth). Each cut re-enters the sail mode on the line, under way.
+   *   tapes gone (or 45 s) -> the market rows (s 330), sailed for 12 s
+   *   -> 220 m before かなえ大橋, until she has passed under it (+6 s)
+   *   -> 150 m before 商港 (past みらい造船), until she has passed it (+4 s) -> skipBay (the bay mouth)
+   */
+  function autoDepart(fdt) {
+    const P = route.OUTBOUND_PATH, passed = acts.data.passed;
+    const cutTo = (name, s) => { V.cut = name; V.cutT = 0; const [x, z] = P.at(s), [dx, dz] = P.dirAt(s); sail.enter({ x, z, yaw: Math.atan2(dx, dz), u: 3.0, autopilot: true }); };
+    V.cutT += fdt;
+    if (!V.cut) {
+      if (V.t > 45 || (sendoff.active && sendoff.stats.snapped === sendoff.stats.tapes)) {
+        sendoff.dispose();
+        if ((sail.state?.s ?? 0) < TIMING.autoMarketS) cutTo('market', TIMING.autoMarketS); else { V.cut = 'market'; V.cutT = 0; }
+      }
+    } else if (V.cut === 'market') {
+      if (V.cutT > TIMING.autoMarketSeconds || (sail.state?.s ?? 0) > 700) cutTo('kanae', route.KANAE_CROSSING.s - TIMING.autoKanaeBefore);
+    } else if (V.cut === 'kanae') {
+      if (passed.includes('kanae') && (V.afterKanae += fdt) > TIMING.autoAfterKanae) {
+        if (route.SHOKO?.s) cutTo('shoko', route.SHOKO.s - TIMING.autoShokoBefore); else action('skipBay');
+      }
+    } else if (V.cut === 'shoko') {
+      if (passed.includes('shoko') && (V.afterShoko += fdt) > TIMING.autoAfterShoko) action('skipBay');
+    }
+  }
   function horn() {
     if (['SENDOFF', 'DEPART', 'HOMECOMING'].includes(acts.state)) acts.send('HORN');
     try { sendoff.horn(); } catch (e) { /* no audio */ }
@@ -328,7 +351,14 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
     if (a === 'exit') return api.exit();
     if (a === 'ff') { V.ff = V.ff > 1 ? 1 : TIMING.ff; return; }
     if (a === 'helm') { if (sail) sail.setAutopilot(!sail.state.autopilot); ui?.show(acts.state, acts.data); return; }
-    if (a === 'skipBay') { if (acts.data.passed.includes('kanae')) { if (sail?.active) sail.exit(); rig.set(BAY.x, BAY.z, Math.PI * 0.98); onSail({ type: 'bayMouth' }); } return; }
+    if (a === 'skipBay') {
+      // 湾口へ（早送り）: the fast-forward still passes 商港 on the way (its PASS and toast), then she is at the bay mouth
+      if (acts.data.passed.includes('kanae')) {
+        if (!acts.data.passed.includes('shoko')) onSail({ type: 'passShoko' });
+        if (sail?.active) sail.exit(); rig.set(BAY.x, BAY.z, Math.PI * 0.98); onSail({ type: 'bayMouth' });
+      }
+      return;
+    }
     if (a === 'HORN') return horn();
     if (a === 'KEEP') return keep();
     if (a === 'RELEASE') return release();
