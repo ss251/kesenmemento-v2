@@ -5,7 +5,7 @@
 import { describe, test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { ATLAS, COLORS, NAME, sidePx, fallbackPlan, cleanNendo, paintAtlas, stubCanvas } from '../src/anime/world/ship/livery.js';
+import { ATLAS, COLORS, NAME, transomBands, sidePx, fallbackPlan, cleanNendo, paintAtlas, stubCanvas } from '../src/anime/world/ship/livery.js';
 import { SHIP, sheerAt, sternS, halfBreadth, knuckleS, zOf, transomDecalGeometry, buildShofukumaru } from '../src/anime/world/ship/shofukumaru1.js';
 
 const ROOT = resolve(import.meta.dir, '..');
@@ -111,10 +111,13 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
     expect(c.ops.some((o) => o[0] === 'clearRect' && o[1] === x && o[2] === y && o[3] === w && o[4] === h)).toBe(true);
     expect(NAME.portEn).toBe('KESENNUMA');
   });
-  test('the stern cell lettering really paints (probe): ink inside each line box, clear between the lines', () => {
-    const [x, y, w, h] = ATLAS.cells.stern, T = NAME.transom, ky = h / (T.h1 - T.h0);
-    const mid = (h0, h1) => y + (T.h1 - (h0 + h1) / 2) * ky;
-    const pts = T.lines.map(([, h0, h1]) => [x + w / 2, mid(h0, h1)]).concat([[x + 3, y + 3]]);
+  test('the stern cell lettering really paints (probe): ink in each line band, the cell corner clear', () => {
+    const [x, y, w, h] = ATLAS.cells.stern;
+    const bands = transomBands();
+    expect(bands.map((b) => b.key)).toEqual(['ja', 'portEn', 'en']);
+    expect(bands[0].v1).toBe(1); expect(bands[2].v0).toBeCloseTo(0, 9);
+    for (let i = 1; i < bands.length; i++) expect(bands[i].v1).toBeCloseTo(bands[i - 1].v0, 9);
+    const pts = bands.map((b) => [x + w / 2, y + (1 - (b.v0 + b.v1) / 2) * h]).concat([[x + 1, y + 1]]);
     const col = sample(PLANS.fallback, pts);
     expect(col.slice(0, 3)).toEqual([COLORS.text, COLORS.text, COLORS.text]);
     expect(col[3]).toBe('transparent');

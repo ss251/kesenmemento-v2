@@ -16,7 +16,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { nightMat } from '../harbor/lights.js';
-import { ATLAS, NAME, sideUV, cellUV, fallbackPlan, cleanNendo, loadNendo, paintAtlas, makeCanvas } from './livery.js';
+import { ATLAS, NAME, transomBands, sideUV, cellUV, fallbackPlan, cleanNendo, loadNendo, paintAtlas, makeCanvas } from './livery.js';
 import { resolveFlags } from './flags.js';
 
 // ------------------------------------------------------------------------------------------------- particulars
@@ -179,11 +179,12 @@ export function hullGeometry(tier = 'high') {
 }
 
 /**
- * The transom lettering decal: a grid laid on the hull shell of this tier (each row's station polyline, blended between
- * the loft rows the way the hull's triangles are), 4 cm proud of it, facing aft, mapped to the atlas 'stern' cell.
- * Seen from aft, port (+x) is on the left: u runs from +x to -x.
+ * The transom lettering decal: one strip per line of lettering (livery.transomBands), laid on the hull shell of this
+ * tier (each row's station polyline, blended between the loft rows the way the hull's triangles are), 4 cm proud of
+ * it, facing aft, each strip mapped to its band of the atlas 'stern' cell. Seen from aft, port (+x) is on the left: u
+ * runs from +x to -x.
  */
-export function transomDecalGeometry(tier = 'high', T = NAME.transom) {
+export function transomDecalGeometry(tier = 'high') {
   const S = stations(tier).filter((s) => s >= 50), rowsH = TIERS[tier].above;
   const rowS = (h, x) => {   // the shell's s at half-breadth |x| along the station polyline at height h
     const pts = S.map((s) => { const a = sternS(h); return s > a ? [a, 0] : [s, halfBreadth(s, h)]; });
@@ -198,16 +199,19 @@ export function transomDecalGeometry(tier = 'high', T = NAME.transom) {
     const h0 = rowsH[j], h1 = rowsH[j + 1], t = clamp((h - h0) / (h1 - h0 || 1));
     return rowS(h0, x) * (1 - t) + rowS(h1, x) * t;
   };
-  const NU = tier === 'phone' ? 8 : 14, NV = tier === 'phone' ? 3 : 5;
+  const NU = tier === 'phone' ? 8 : 14, NV = tier === 'phone' ? 1 : 2;
   const pos = [], uv = [], idx = [];
-  for (let j = 0; j <= NV; j++) for (let i = 0; i <= NU; i++) {
-    const u = i / NU, v = j / NV, x = T.w / 2 - u * T.w, h = T.h0 + v * (T.h1 - T.h0);
-    pos.push(x, h, zOf(shellS(h, Math.abs(x))) - 0.04);
-    uv.push(...cellUV('stern', u, v));
-  }
-  for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
-    const a = j * (NU + 1) + i, b = a + 1, c = a + NU + 1, d = c + 1;
-    idx.push(a, b, c, b, d, c);   // counter-clockwise seen from aft (-z)
+  for (const B of transomBands()) {
+    const o = pos.length / 3;
+    for (let j = 0; j <= NV; j++) for (let i = 0; i <= NU; i++) {
+      const u = i / NU, v = j / NV, x = B.width / 2 - u * B.width, h = B.h0 + v * (B.h1 - B.h0);
+      pos.push(x, h, zOf(shellS(h, Math.abs(x))) - 0.04);
+      uv.push(...cellUV('stern', u, B.v0 + v * (B.v1 - B.v0)));
+    }
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
+      const a = o + j * (NU + 1) + i, b = a + 1, c = a + NU + 1, d = c + 1;
+      idx.push(a, b, c, b, d, c);   // counter-clockwise seen from aft (-z)
+    }
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));

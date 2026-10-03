@@ -31,11 +31,11 @@ export const ATLAS = {
   side: { port: 0, starboard: 448 }, sideH: 448,
   strip: 896, stripH: 128,
   cells: {
-    board7kfy: [0, 896, 320, 128],
-    boardMG: [320, 896, 320, 128],
-    crest: [640, 896, 128, 128],
-    deck7kfy: [768, 896, 256, 128],
-    stern: [1024, 896, 256, 128],
+    board7kfy: [0, 896, 288, 128],
+    boardMG: [288, 896, 288, 128],
+    crest: [576, 896, 128, 128],
+    deck7kfy: [704, 896, 256, 128],
+    stern: [960, 896, 320, 128],
     flag0: [1280, 896, 192, 128], flag1: [1472, 896, 192, 128], flag2: [1664, 896, 192, 128], flag3: [1856, 896, 192, 128],
   },
 };
@@ -55,7 +55,9 @@ export const NAME = {
   // the transom (shofukumaru04, starboard quarter from aft, about 7.9 px/m there): three lines centred on the
   // centreline below the stern bay. The hull name, a romanised line read as the port of registry (KESENNUMA: seven to
   // nine bold capitals, too small in the photo to read letter by letter) and the romanised name. The decal box is
-  // w metres wide, h0-h1 high; each line is [text, h0, h1, width] in metres, painted into the 'stern' cell.
+  // w metres wide at most, h0-h1 high; each line is [text, h0, h1, width] in metres. The 'stern' cell packs the three
+  // lines one under the other, each band as tall as its line (no texels spent on the white between them); the decal
+  // maps each line's strip on the transom to its band (transomBands).
   transom: {
     w: 3.2, h0: 1.25, h1: 3.55,
     lines: [['ja', 2.85, 3.45, 3.0], ['portEn', 2.05, 2.4, 2.3], ['en', 1.35, 1.63, 2.4]],
@@ -64,6 +66,16 @@ export const NAME = {
 
 /** Generic hull portholes (structure, both liveries): read off shofukumaru02/05. */
 export const PORTHOLES = [[45.7, 5.7], [50.3, 5.7], [53.4, 5.7], [48.6, 4.4], [56.3, 3.6], [19.0, 4.1], [21.5, 4.1]];
+
+/**
+ * The transom lettering lines and their bands in the 'stern' cell: [{ key, h0, h1, width, v0, v1 }], v in 0..1 up the
+ * cell (v1 at the top), the first line on top, each band's share of the cell equal to its line's share of the height.
+ */
+export function transomBands(T = NAME.transom) {
+  const tot = T.lines.reduce((a, l) => a + (l[2] - l[1]), 0);
+  let top = 1;
+  return T.lines.map(([key, h0, h1, width]) => { const v1 = top, v0 = top - (h1 - h0) / tot; top = v0; return { key, h0, h1, width, v0, v1 }; });
+}
 
 // --------------------------------------------------------------------------------------------- mapping
 /** Canvas pixel of (s, h) on a side band. */
@@ -313,13 +325,11 @@ function paintStrip(g, plan) {
   board('boardMG', NAME.reg, true);
   { const [x, y, w, h] = C.deck7kfy; g.clearRect(x, y, w, h); boxText(g, NAME.call, [x + 8, y + 10], [x + w - 8, y + h - 10], FONT_SANS, 900, '#2a2c34', 0.18); }
   { // the transom lettering (both liveries: the name and port of registry are not livery): transparent background,
-    // laid out in metres inside the decal box NAME.transom, read from aft (port on the left)
-    const [x, y, w, h] = C.stern, T = NAME.transom; g.clearRect(x, y, w, h);
-    const kx = w / T.w, ky = h / (T.h1 - T.h0);
-    for (const [key, h0, h1, lw] of T.lines) {
-      const a = [x + (T.w - lw) / 2 * kx, y + (T.h1 - h1) * ky], b = [x + (T.w + lw) / 2 * kx, y + (T.h1 - h0) * ky];
-      const ja = key === 'ja';
-      boxText(g, NAME[key], a, b, ja ? FONT_SERIF : FONT_SANS, ja ? 900 : 700, COLORS.text, ja ? 0.3 : 0.12);
+    // one band per line (transomBands), read from aft (port on the left)
+    const [x, y, w, h] = C.stern; g.clearRect(x, y, w, h);
+    for (const { key, v0, v1 } of transomBands()) {
+      const ja = key === 'ja', top = y + (1 - v1) * h, bot = y + (1 - v0) * h, pad = (bot - top) * 0.06;
+      boxText(g, NAME[key], [x + w * 0.02, top + pad], [x + w * 0.98, bot - pad], ja ? FONT_SERIF : FONT_SANS, ja ? 900 : 700, COLORS.text, ja ? 0.18 : 0.1);
     }
   }
   // the crest cell: white, plus the crest strokes only in the nendo plan
