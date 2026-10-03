@@ -53,6 +53,8 @@ const SHOTS = [
 const UI_SHOTS = [
   ['ui_chip', `(__voyage.exit(), __lookAt([548, 24, -18], [575, 6, -99]), 'ok')`, 1],
   ['ui_places', `(__voyage.exit(), __lookAt([548, 24, -18], [575, 6, -99]), __explore.ui.openSearch(true), 'ok')`, 1],
+  // [ship:story] the 波怒棄館遺跡 story pin: the drone flies to 唐桑 and the card opens (explore/storypins.js)
+  ['ui_story', `(__voyage.exit(), __explore.ui.openSearch(false), __story.open('story-hanukidate'), 'ok')`, 16],
 ];
 const want = args.list ? new Set(args.list.split(',')) : null;
 
@@ -78,6 +80,7 @@ try {
     // [ship:acts] the hands-free voyage end to end (auto mode): every state in order, a shot at each, no errors
     await page.eval('(__voyageInit({ auto: true }), __voyage.start(), true)');
     const seen = [];
+    let passed = 0;   // [ship:story] a shot as each landmark is logged passed (かなえ大橋, 商港) on the way out
     let t = await page.eval('window.__ctx.time');
     for (let i = 0; i < 400; i++) {
       const st = await page.eval('__voyage.state');
@@ -86,6 +89,13 @@ try {
         await page.frames(3);
         await page.shot(resolve(ROOT, `${out}_auto_${String(seen.length).padStart(2, '0')}_${st}.png`));
         console.log(JSON.stringify({ t: Math.round(t), state: st, data: await page.eval('({ km: __voyage.acts.data.setKm, kept: __voyage.acts.data.kept.length, released: __voyage.acts.data.released.length, landed: __voyage.acts.data.landedKg, haulEnd: __voyage.acts.data.haulEnd, passed: __voyage.acts.data.passed.slice() })') }));
+      }
+      const ps = await page.eval('__voyage.acts.data.passed.slice()');
+      if (ps.length > passed) {
+        passed = ps.length;
+        await page.frames(3);
+        await page.shot(resolve(ROOT, `${out}_auto_pass_${ps.at(-1)}.png`));
+        console.log(JSON.stringify({ t: Math.round(t), pass: ps.at(-1), passed: ps, state: st, sail: await page.eval('({ x: Math.round(__sail.state.x), z: Math.round(__sail.state.z), kn: +(__sail.state.u * 1.944).toFixed(1) })') }));
       }
       if (st === 'CARD') break;
       t += 2; await page.eval(`__simTo(${t})`);
