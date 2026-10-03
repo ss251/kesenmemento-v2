@@ -160,7 +160,7 @@ committed.
 
 | Part | High | Phone |
 |---|---|---|
-| Ship model (budget / built) | 150 k / — | 60 k / about 11 k triangles |
+| Ship model triangles (budget / built) | 150 k / 22.9 k | 60 k / 10.9 k |
 | Livery atlas | 2048 × 1024 | 2048 × 1024 (about 11 MB with mipmaps) |
 | Send-off crowd / tapes / flags | 14 / 40 / 6 | 6 / 18 / 3 |
 | Ocean grid / floats | 96² / 24 | 40² / 14 |
