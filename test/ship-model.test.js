@@ -275,3 +275,81 @@ describe('runtime API', () => {
     const parent = new THREE.Group(); parent.add(S.group); S.dispose(); expect(S.group.parent).toBeNull();
   });
 });
+
+describe('lettering reads right from both sides (大漁旗, 7KFY, MG1-2112, crest)', () => {
+  // for every triangle of a single-sided lettered face: u must increase toward the viewer's right (viewer on the
+  // face's normal side, looking along -n, head up). A mirrored face (the back of a double-sided plane) fails this.
+  const readsRight = (mesh) => {
+    const geo = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry;
+    const P = geo.attributes.position, U = geo.attributes.uv;
+    const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), right = new THREE.Vector3();
+    let bad = 0, faces = 0;
+    for (let t = 0; t < P.count; t += 3) {
+      a.fromBufferAttribute(P, t); b.fromBufferAttribute(P, t + 1); c.fromBufferAttribute(P, t + 2);
+      n.subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a));
+      if (n.lengthSq() < 1e-12 || Math.abs(n.normalize().y) > 0.5) continue;   // vertical faces only
+      right.copy(n).negate().cross(up);
+      faces++;
+      const pts = [[a, U.getX(t)], [b, U.getX(t + 1)], [c, U.getX(t + 2)]];
+      for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) {
+        const dr = new THREE.Vector3().subVectors(pts[j][0], pts[i][0]).dot(right), du = pts[j][1] - pts[i][1];
+        if (Math.abs(dr) > 1e-3 && Math.abs(du) > 1e-6 && Math.sign(dr) !== Math.sign(du)) bad++;
+      }
+    }
+    return { bad, faces };
+  };
+  const S = built.high;
+  const flags = []; S.group.getObjectByName('tairyo-flags').traverse((o) => { if (o.isMesh && o.name === '大漁旗') flags.push(o); });
+  test('every 大漁旗 is single-sided, has a front and a back face, and reads right from both', () => {
+    expect(flags.length).toBeGreaterThan(5);
+    for (const m of flags) {
+      expect(m.material.side).toBe(THREE.FrontSide);
+      const nx = new Set(); const P = m.geometry.attributes.position;
+      for (let t = 0; t < P.count; t += 3) {
+        const a = new THREE.Vector3().fromBufferAttribute(P, t), b = new THREE.Vector3().fromBufferAttribute(P, t + 1), c = new THREE.Vector3().fromBufferAttribute(P, t + 2);
+        nx.add(Math.sign(new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).x));
+      }
+      expect([...nx].sort()).toEqual([-1, 1]);   // port face and starboard face
+      const r = readsRight(m);
+      expect(r.faces).toBeGreaterThanOrEqual(4);
+      expect(r.bad).toBe(0);
+    }
+  });
+  test("the back face mirrors the front face's u at the same point (within the flag's atlas cell)", () => {
+    for (const m of flags) {
+      const P = m.geometry.attributes.position, U = m.geometry.attributes.uv, by = { 1: new Map(), '-1': new Map() };
+      for (let t = 0; t < P.count; t += 3) {
+        const a = new THREE.Vector3().fromBufferAttribute(P, t), b = new THREE.Vector3().fromBufferAttribute(P, t + 1), c = new THREE.Vector3().fromBufferAttribute(P, t + 2);
+        const side = Math.sign(new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).x);
+        for (let k = 0; k < 3; k++) { const v = new THREE.Vector3().fromBufferAttribute(P, t + k); by[side].set(`${v.y.toFixed(3)}|${v.z.toFixed(3)}`, U.getX(t + k)); }
+      }
+      const us = [...by[1].values()], lo = Math.min(...us), hi = Math.max(...us);
+      expect(hi - lo).toBeGreaterThan(0.01);
+      for (const [key, u] of by[1]) { expect(by[-1].has(key)).toBe(true); expect(by[-1].get(key)).toBeCloseTo(lo + hi - u, 6); }
+    }
+  });
+  test('7KFY, MG1-2112 (and the crest with the nendo livery) are single-sided, read right, and have plain backs', async () => {
+    const N = buildShofukumaru(fakeCtx({ real: true }), { tier: 'high', livery: 'nendo', liveryData: NENDO });
+    await N.ready;
+    for (const B of [S, N]) {
+      const boards = []; B.group.traverse((o) => { if (o.isMesh && /7KFY-rail|MG1-2112|crest/.test(o.name) && o.material.map) boards.push(o); });
+      expect(boards.length).toBeGreaterThan(0);
+      for (const m of boards) {
+        expect(m.material.side).toBe(THREE.FrontSide);
+        expect(readsRight(m).bad).toBe(0);
+      }
+      const names = []; B.group.traverse((o) => { if (o.isMesh) names.push(o.name); });
+      expect(names.some((n) => /7KFY-rail-back/.test(n))).toBe(true);
+      expect(names.some((n) => /MG1-2112-back/.test(n))).toBe(true);
+    }
+    expect(N.livery).toBe('nendo');
+    const crest = []; N.group.traverse((o) => { if (o.isMesh && o.name === 'crest:違い山星一') crest.push(o); });
+    expect(crest.length).toBe(2);
+    N.dispose();
+  });
+  test('no lettered material is double-sided any more', () => {
+    for (const B of [built.high, built.phone]) B.group.traverse((o) => {
+      if (o.isMesh && /大漁旗|7KFY-rail|MG1-2112|crest/.test(o.name) && o.material.map) expect(o.material.side).not.toBe(THREE.DoubleSide);
+    });
+  });
+});

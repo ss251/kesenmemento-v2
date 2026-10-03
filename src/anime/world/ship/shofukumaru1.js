@@ -229,6 +229,33 @@ function atlasPlane(cell, w, hgt, facing, flipU = false) {
   return g;
 }
 
+const OPPOSITE = { '+x': '-x', '-x': '+x', '+z': '-z', '-z': '+z' };
+/**
+ * A two-faced atlas plane for single-sided materials: the face toward `facing` and, back to back, a face toward the
+ * opposite side whose u runs the other way in world space, so the lettering reads right from BOTH sides (a
+ * double-sided material shows the back of a plane mirrored: 「漁大」 for 大漁). One geometry, one draw.
+ */
+function twoFacedPlane(cell, w, hgt, facing) {
+  const parts = [atlasPlane(cell, w, hgt, facing), atlasPlane(cell, w, hgt, OPPOSITE[facing])];
+  const out = new THREE.BufferGeometry();
+  for (const k of ['position', 'normal', 'uv']) {
+    const arrs = parts.map((g) => (g.index ? g.toNonIndexed() : g).attributes[k]);
+    const size = arrs[0].itemSize, n = arrs.reduce((a, b) => a + b.count, 0), A = new Float32Array(n * size);
+    let o = 0; for (const a of arrs) { A.set(a.array, o); o += a.array.length; }
+    out.setAttribute(k, new THREE.BufferAttribute(A, size));
+  }
+  for (const g of parts) g.dispose();
+  out.computeBoundingSphere();
+  out.userData.twoFaced = true;
+  return out;
+}
+/** A plain back for a sign board (seen from inboard: the board, not its lettering mirrored or a hole). */
+function boardBack(w, hgt, facing) {
+  const g = new THREE.PlaneGeometry(w, hgt), f = OPPOSITE[facing];
+  if (f === '+x') g.rotateY(Math.PI / 2); else if (f === '-x') g.rotateY(-Math.PI / 2); else if (f === '-z') g.rotateY(Math.PI);
+  return g;
+}
+
 /** Horizontal deck strip following the hull plan at height hAt(s), from s0 to s1, inset from the shell. */
 function deckGeometry(s0, s1, hAt, inset = 0.0, { step = 0.6, down = false, widthAt = null } = {}) {
   const pos = [], n = Math.max(2, Math.ceil((s1 - s0) / step));
@@ -350,7 +377,10 @@ function materials(ctx, atlasTex, uNight) {
   const nm = (day, night, k, o) => nightMat(lctx, day, night, k, o);
   return {
     hull: toon('#ffffff', { map: atlasTex, side: 'double', paint: 0.025 }),
-    board: toon('#ffffff', { map: atlasTex, side: 'double', paint: 0 }),
+    // lettered boards, the crest and the 大漁旗: SINGLE-sided (a double-sided board reads mirrored from behind);
+    // twoFacedPlane() gives the flags a correct second face, boardBack() gives the boards a plain back
+    board: toon('#ffffff', { map: atlasTex, side: 'front', paint: 0 }),
+    boardBack: toon('#e4e6e1', { paint: 0 }),
     decal: toon('#ffffff', { map: atlasTex, alphaTest: 0.5, polygonOffset: -2, paint: 0 }),
     house: toon('#eceee9', { paint: 0.03 }), roof: toon('#d6dbd7'), deck: toon('#c9cfcb'), deckDark: toon('#4b505a'), inner: toon('#e2e5e0'),
     rail: toon('#eef0ea', { paint: 0 }), mast: toon('#e9ebe5', { paint: 0.02 }), black: toon('#25262e'), dark: toon('#3b3f4b'), steel: toon('#9aa1a8'),
@@ -446,7 +476,12 @@ export function buildShofukumaru(ctx, opts = {}) {
   const rr = [[-hw2 + 0.05, B1.roof + 0.15, zOf(B1.s0 + 0.05)], [hw2 - 0.05, B1.roof + 0.15, zOf(B1.s0 + 0.05)], [hw2 - 0.05, B1.roof + 0.15, zOf(B1.s1 - 0.05)], [-hw2 + 0.05, B1.roof + 0.15, zOf(B1.s1 - 0.05)], [-hw2 + 0.05, B1.roof + 0.15, zOf(B1.s0 + 0.05)]];
   k.railing(M.rail, rr, 0.75);
   { const bd = k.mesh(atlasPlane('boardMG', 2.4, 0.62, '+z'), M.board, [0, B1.roof + 0.5, zOf(B1.s0) + 0.06]); bd.name = 'MG1-2112';
-    for (const sd of [1, -1]) { const b2 = k.mesh(atlasPlane('boardMG', 2.8, 0.62, sd > 0 ? '+x' : '-x'), M.board, [sd * (hw2 + 0.0), B1.roof + 0.5, zOf(36.2)]); b2.name = 'MG1-2112'; } }
+    k.mesh(boardBack(2.4, 0.62, '+z'), M.boardBack, [0, B1.roof + 0.5, zOf(B1.s0) + 0.06]).name = 'MG1-2112-back';
+    for (const sd of [1, -1]) {
+      const f = sd > 0 ? '+x' : '-x', at = [sd * (hw2 + 0.0), B1.roof + 0.5, zOf(36.2)];
+      const b2 = k.mesh(atlasPlane('boardMG', 2.8, 0.62, f), M.board, at); b2.name = 'MG1-2112';
+      k.mesh(boardBack(2.8, 0.62, f), M.boardBack, at).name = 'MG1-2112-back';
+    } }
   for (const [s, x] of [[29.6, -1.6], [33.6, 1.6]]) {
     k.post(M.steel, s, x, B1.roof + 0.15, B1.roof + 0.6, 0.16);
     k.post(M.radome, s, x, B1.roof + 0.6, B1.roof + 1.25, 0.56);
@@ -558,6 +593,7 @@ export function buildShofukumaru(ctx, opts = {}) {
     k.railing(M.rail, pts, AS.rail - y0, { rails: [0.34, 0.67] });   // three rails round the setting-shelter roof (05, designboom-1800)
     const b = halfBreadth(51.8, 8.0) - 0.06;
     const bd = k.mesh(atlasPlane('board7kfy', 4.0, 1.1, sd > 0 ? '+x' : '-x'), M.board, [sd * b, 8.0, zOf(51.8)]); bd.name = '7KFY-rail';
+    k.mesh(boardBack(4.0, 1.1, sd > 0 ? '+x' : '-x'), M.boardBack, [sd * b, 8.0, zOf(51.8)]).name = '7KFY-rail-back';   // inboard: a plain board, never 'YFK7'
   }
   { // the fenced cage aft of the funnel (designboom-1800, 05): close vertical bars, two rails, rounded top 10.3 m
     const c0 = 49.4, c1 = 53.4, cw = 2.3, ch = 10.2, loop = [[-cw, zOf(c0)], [cw, zOf(c0)], [cw, zOf(c1)], [-cw, zOf(c1)], [-cw, zOf(c0)]];
@@ -626,7 +662,7 @@ export function buildShofukumaru(ctx, opts = {}) {
       const t = d / L[i], a = dress[i], b = dress[i + 1];
       const p = [0, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
       const fw = 2.0, fh = 1.33;
-      const geo = atlasPlane('flag' + (f % 4), fw, fh, '+x');
+      const geo = twoFacedPlane('flag' + (f % 4), fw, fh, '+x');   // reads 大漁 / 福来 from port AND starboard (the crowd)
       geo.translate(0, -fh / 2 - 0.05, 0);
       const m = new THREE.Mesh(geo, M.board); m.position.set(p[0], p[1], p[2]); m.castShadow = true; m.name = '大漁旗';
       flags.add(m); flagMeshes.push(m); anchors.flagPoints.push(p);
