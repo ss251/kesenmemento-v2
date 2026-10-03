@@ -9,8 +9,10 @@ This page is the entry point. For more detail:
 - [README.md](README.md): the wiring, the results and the deviations;
 - [MODEL.md](MODEL.md): the model, the livery and the profile check;
 - [acts.md](acts.md): the act machine and the scenes;
-- [shofukumaru-dossier.md](shofukumaru-dossier.md): the captain's sourced dossier, committed verbatim. Every number
-  in the build comes from it.
+- [shofukumaru-dossier.md](shofukumaru-dossier.md): the captain's sourced dossier, committed verbatim under the
+  captain's confirmed UPDATE header of 2026-10-03 (the livery permission). Every number in the build comes from it;
+- [next-pass-usui.md](next-pass-usui.md): the facts from 臼井壯太朗's talk at Hackatsuon (2026-10-03) that the build
+  uses, and only those.
 
 ## 1. Run it
 
