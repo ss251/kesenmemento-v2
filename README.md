@@ -252,6 +252,8 @@ The numbers below were measured on an M2 Max. The machine was shared, so the bro
 - [docs/DEMO.md](docs/DEMO.md): the 3-minute Oct 10 demo script, with an offline fallback.
 - [docs/anime/BUILDER-GUIDE.md](docs/anime/BUILDER-GUIDE.md), [docs/anime/TOWN.md](docs/anime/TOWN.md) and
   [docs/anime/landmarks/](docs/anime/landmarks/): the engineering contract and the landmark reference sheets.
+- [docs/ship/SHOFUKUMARU.md](docs/ship/SHOFUKUMARU.md): 第一昭福丸 (7KFY). How to board and sail her, the three acts,
+  the URL parameters, the livery flag, the APIs, the tests and the phone budget. Open `?ship=1` to board her.
 
 ## Credits
 
