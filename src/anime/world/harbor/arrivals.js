@@ -216,6 +216,10 @@ export function createArrivals(ctx, opts = {}) {
   let listSig = '';
   const clock = { lastH: null, t0: 0 };
   const stats = { boats: 0, dryRoutePts: 0, built: 0, ms: 0 };
+  // [ship] one root for every carrier and label: hiding the world (ship/ocean.js hideWorld, Act 2 at sea) hides this one
+  // group, and the per-boat visibility toggles below can no longer show a boat or a name label through it
+  const root = new THREE.Group(); root.name = 'arrivals'; ctx.add(root);
+  const addToRoot = (o) => { o.traverse((q) => { q.userData.dynamic = true; }); root.add(o); return o; };
 
   function hoursNow() { return ctx.sky?.hours ?? ctx.services?.time?.hours ?? 16.5; }
 
@@ -249,7 +253,7 @@ export function createArrivals(ctx, opts = {}) {
       const detail = [];
       b.group.traverse((o2) => { if (!o2.isMesh || o2 === b.group) return; const m = o2.material; const body = m && m.isMeshToonMaterial && m.vertexColors && !m.map && !m.transparent; if (!body) { detail.push(o2); o2.castShadow = false; if (m?.map || m?.transparent) ctx.noOutline(o2); } });
       // carrier: position + heading only (the wake rides on it, flat on the water); the hull pitches and rolls inside
-      const carrier = new THREE.Group(); carrier.name = 'arrival:' + a.vessel; ctx.add(carrier); carrier.add(b.group);
+      const carrier = new THREE.Group(); carrier.name = 'arrival:' + a.vessel; carrier.add(b.group); addToRoot(carrier);
       // wake (local +Z = bow; the wake trails toward -Z)
       const wakeMat = new THREE.MeshBasicMaterial({ map: wakeTex, transparent: true, depthWrite: false, opacity: 0, toneMapped: false, color: 0xffffff, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
       const wl = S.L * 1.9, ww = S.B * 3.6;
@@ -259,7 +263,7 @@ export function createArrivals(ctx, opts = {}) {
       // label
       const lm = new THREE.SpriteMaterial({ map: labelTexture(ctx, a, sample), transparent: true, depthWrite: false, toneMapped: false, sizeAttenuation: false });
       const label = new THREE.Sprite(lm); label.center.set(0.5, 0); label.scale.set(0.2, 0.0625, 1); label.renderOrder = 20; label.name = 'arrival-label';
-      ctx.noOutline(label); ctx.add(label);
+      ctx.noOutline(label); addToRoot(label);
       boats.push({ a, h, si, type, S, route, carrier, group: b.group, wake, label, detail, lod: true, handle: b.anchors.lightHandle, air: (b.dims.air || 14) + 6, phase: 'sea', x: 0, z: 0 });
     }
     stats.boats = boats.length; stats.built += boats.length; stats.ms = Math.round(performance.now() - t0);
@@ -349,6 +353,6 @@ export function createArrivals(ctx, opts = {}) {
     update(dt, t);
   });
 
-  const api = { setArrivals, state, update, slots, stats, clear };
+  const api = { setArrivals, state, update, slots, stats, clear, root };
   return api;
 }

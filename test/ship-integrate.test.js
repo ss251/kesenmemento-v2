@@ -11,6 +11,7 @@ import { listModules } from "../scripts/anime/registry.js";
 import { parseShipParams, nearBerth, introDone, ACT_START, PLACE, BOARD, BLOCKED_KEYS, build } from "../src/anime/world/ship/index.js";
 import { STATES, ACT_OF } from "../src/anime/world/ship/acts.js";
 import { BERTH, KANAE_CROSSING, SHOKO } from "../src/anime/world/ship/route.js";
+import { createArrivals } from "../src/anime/world/harbor/arrivals.js";
 import { isDemoTag } from "../src/anime/world/ship/tags.js";
 import { BUDGET } from "../src/anime/world/ship/shofukumaru1.js";
 import { fixHtmlEntry } from "../scripts/anime/html-entry.js";
@@ -204,6 +205,31 @@ describe("ship: the module at runtime (headless, phone tier)", () => {
     S.voyage.exit();
     globalThis.fetch = realFetch;
   });
+});
+
+describe("ship: at sea the harbour's arriving boats stay hidden (fix round 2)", () => {
+  const visibleUp = (o) => { for (let p = o; p; p = p.parent) if (p.visible === false) return false; return true; };
+  test("after jump('OCEAN_SET') and 20 s of updates, no arrival boat or name label is drawn; ashore they come back", async () => {
+    const { ctx } = headlessCtx();
+    ctx.sky = { hours: 10.5 };
+    await build(ctx);
+    const A = createArrivals(ctx, { follow: false });
+    A.setArrivals(Array.from({ length: 10 }, (_, i) => ({ vessel: `QA海上丸${i + 1}`, time: `10:${String(32 + i * 3).padStart(2, "0")}`, kind: i % 2 ? "longline" : "saury" })));
+    let t = 0; const dt = 1 / 15;
+    for (let i = 0; i < 15; i++) { t += dt; step(ctx, dt, t); }
+    const drawn = () => { const out = []; ctx.dynamicRoot.traverse((o) => { if (/^arrival/.test(o.name) && o !== A.root && visibleUp(o)) out.push(o.name); }); return out; };
+    expect(drawn().length).toBeGreaterThan(0);                       // the harbour has arriving boats in view
+    const S = ctx.services.ship;
+    expect(S.board("OCEAN_SET")).toBe("OCEAN_SET");
+    for (let i = 0; i < 15 * 20; i++) { t += dt; step(ctx, dt, t); }
+    expect(S.voyage.state).toBe("OCEAN_SET");
+    expect(ctx.dynamicRoot.children.filter((c) => c.visible && /^arrival/.test(c.name)).map((c) => c.name)).toEqual([]);
+    expect(drawn()).toEqual([]);
+    S.voyage.exit();
+    for (let i = 0; i < 15; i++) { t += dt; step(ctx, dt, t); }
+    expect(drawn().length).toBeGreaterThan(0);                       // back in town
+    A.clear();
+  }, 60000);
 });
 
 describe("ship: the bundle still starts the app (Bun HTML entry guard)", () => {
