@@ -92,11 +92,17 @@ function container(g, x, y, w, h, c, label) {
   g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 1; for (let i = 1; i < 10; i++) { g.beginPath(); g.moveTo(x + (w * i) / 10, y + 3); g.lineTo(x + (w * i) / 10, y + h - 3); g.stroke(); }
   if (label) { g.fillStyle = '#ffffff'; g.font = `700 ${Math.round(h * 0.26)}px "Noto Sans JP", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(label, x + w / 2, y + h / 2); }
 }
-function frozenTuna(g, x, y, l) {
+/** A frozen tuna as the catch is landed: DRESSED, head on (right), gills, guts and tail removed (dossier section 5; Act 2
+ *  copy `ship.haul.kept`). The body ends in a straight cut at the tail stock, with no caudal fin; the blue tag sits on
+ *  the stub. (x, y) is the centre, l the length from the head to the cut plus the stub. */
+export function frozenTuna(g, x, y, l) {
+  const cutX = x - l * 0.44, cutH = l * 0.14 * Math.sqrt(1 - 0.88 * 0.88);   // half-height of the ellipse at the cut
   g.fillStyle = '#e7eef3'; g.strokeStyle = INK; g.lineWidth = 2;
+  g.save(); g.beginPath(); g.rect(cutX, y - l, l * 2, l * 2); g.clip();
   g.beginPath(); g.ellipse(x, y, l / 2, l * 0.14, 0, 0, 7); g.fill(); g.stroke();
-  g.beginPath(); g.moveTo(x - l / 2, y); g.lineTo(x - l / 2 - l * 0.12, y - l * 0.12); g.lineTo(x - l / 2 - l * 0.12, y + l * 0.12); g.closePath(); g.fill(); g.stroke();
-  g.fillStyle = '#2f6fd6'; g.fillRect(x - l * 0.42, y - l * 0.16, l * 0.05, l * 0.32);   // the blue tag at the tail stock
+  g.restore();
+  g.beginPath(); g.moveTo(cutX, y - cutH); g.lineTo(cutX, y + cutH); g.stroke();   // the straight cut
+  g.fillStyle = '#2f6fd6'; g.fillRect(cutX + l * 0.015, y - l * 0.16, l * 0.05, l * 0.32);   // the blue tag on the stub of the tail stock
 }
 
 /** A Fisheries Agency inspector, flat anime style: navy cap and jacket, white rubber boots, a reader gun in the right

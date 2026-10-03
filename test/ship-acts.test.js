@@ -5,7 +5,7 @@ import { test, expect, describe } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { formatTag, isDemoTag, REAL_TAG_RE, DEMO_TAG_RE, tagSerial } from "../src/anime/world/ship/tags.js";
 import { createActs, STATES, ACT_OF, CHAIN_ORDER, EVENTS, RULES, makeCatch, seasonOpen, forkLengthCm, japanSharePct, weighIn, SHIMIZU_STEPS } from "../src/anime/world/ship/acts.js";
-import { CHAIN, chainCards, CLOSING } from "../src/anime/world/ship/chain.js";
+import { CHAIN, chainCards, CLOSING, frozenTuna } from "../src/anime/world/ship/chain.js";
 import { BUDGET as SENDOFF_BUDGET, tapeState, TAPE_COLOURS, hornSpec, MELODY, musicProbeAllowed } from "../src/anime/world/ship/sendoff.js";
 import { BUDGET as OCEAN_BUDGET, swellAt, OCEAN_LABEL_KEYS } from "../src/anime/world/ship/ocean.js";
 import { PHONE } from "../src/anime/core/tier.js";
@@ -504,6 +504,29 @@ describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", ()
   test("the facts panel's source line names every body its numbers come from, including MSC (the 2020 certification) and IUCN (EN to LC)", () => {
     for (const k of ["ICCAT", "IUCN", "MSC", "WCPFC", "JASNAOE"]) expect(D.en["ship.facts.src"]).toContain(k);
     for (const k of ["ICCAT", "IUCN", "MSC", "WCPFC", "臼福本店", "臼井壯太朗"]) expect(D.ja["ship.facts.src"]).toContain(k);
+  });
+  test("Act 3 art: the frozen tuna are dressed (gills, guts and tail off): no tail fin, the body ends in one straight cut, the tag on the stub", () => {
+    const calls = [], line = [], ell = [], rects = [];
+    const g = new Proxy({}, { get: (_, k) => (...a) => {
+      calls.push(k);
+      if (k === "moveTo" || k === "lineTo") line.push(a);
+      if (k === "ellipse") ell.push(a);
+      if (k === "fillRect") rects.push(a);
+    }, set: () => true });
+    const x = 500, y = 200, l = 300, cut = x - l * 0.44;
+    frozenTuna(g, x, y, l);
+    expect(calls).not.toContain("closePath");                 // the old tail was a closed triangle behind the body
+    expect(line.length).toBe(2);                              // the only line is the cut: one vertical segment
+    expect(line[0][0]).toBe(cut); expect(line[1][0]).toBe(cut);
+    expect(line[0][1]).toBeLessThan(y); expect(line[1][1]).toBeGreaterThan(y);
+    expect(ell.length).toBe(1);                               // one body, clipped at the cut
+    expect(ell[0][0] - ell[0][2]).toBeGreaterThanOrEqual(x - l * 0.5);   // nothing drawn tailward of the body's own end
+    expect(calls).toContain("clip");
+    const tag = rects.find((r) => r[2] === l * 0.05);
+    expect(tag).toBeTruthy();
+    expect(tag[0]).toBeGreaterThan(cut);                       // the blue tag sits on the stub, inside the cut
+    expect(tag[0] + tag[2]).toBeLessThan(x - l * 0.3);
+    for (const k of ["ship.haul.kept", "ship.haul.keptOther"]) { expect(D.ja[k]).toContain("尾"); expect(D.en[k]).toContain("tail"); }
   });
   test("the Precure trivia says the same in JA and EN: a tuna-boat captain, no 'their' boat", () => {
     expect(D.ja["ship.facts.trivia"]).toContain("主人公の父がまぐろ船の船長");
