@@ -81,6 +81,14 @@ export function seasonOpen(date) {
   return mo >= RULES.season.from[0] || mo <= RULES.season.to[0];
 }
 
+/** Today's date in Japan ('YYYY-MM-DD'; UTC+9), the clock the live claim about the real ship is checked against. */
+export const todayJst = (now = Date.now()) => new Date(now + 9 * 3600e3).toISOString().slice(0, 10);
+/**
+ * The ocean banner's second sentence. "The real ship is fishing these waters right now" is true only inside the Aug-Jan
+ * season (the page stays up all year); outside it the banner says she fishes here each season. -> an i18n key.
+ */
+export const oceanNoposKey = (today = todayJst()) => (seasonOpen(today) ? 'ship.ocean.nopos' : 'ship.ocean.nopos.off');
+
 // Length-weight relations (W kg, FL cm): bluefin a = 3.5e-5, b = 2.878 maps 30 kg to 115 cm, the two halves of the
 // ICCAT minimum; bigeye and albacore use common Atlantic relations. Display only (the rule is on the weight).
 const LW = { bluefin: [3.5e-5, 2.878], bigeye: [2.396e-5, 2.9774], albacore: [1.3718e-5, 3.0973] };

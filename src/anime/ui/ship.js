@@ -7,7 +7,7 @@
 //   view: the acts.js state; model: live numbers from the voyage (knots, heading, km, kg, ...)
 import { pickLang } from './i18n.js';
 import DATA from '../../../data/ship/i18n.json';
-import { RULES, SPECIES, ACT_OF, STATES } from '../world/ship/acts.js';
+import { RULES, SPECIES, ACT_OF, STATES, oceanNoposKey } from '../world/ship/acts.js';
 import { chainCards, drawChainArt, SHOP } from '../world/ship/chain.js';
 
 export const SHIP_STRINGS = DATA;
@@ -207,7 +207,7 @@ export function mountShipUI(ctx, { onAction = () => {}, lang } = {}) {
     el.innerHTML = `
       <div class="top"><div class="acts glass">${actChips()}</div>
         <div class="tools"><button data-a="facts" aria-pressed="${ui.facts}">${esc(t('ship.btn.facts'))}</button><button data-a="lang">${esc(t('ship.btn.lang'))}</button><button data-a="exit">${esc(t('ship.btn.exit'))}</button></div></div>
-      ${ocean ? `<div class="where glass">${esc(t('ship.ocean.where'))}<small>${esc(t('ship.ocean.nopos'))} · ${esc(t('ship.ocean.seasonNote'))}</small></div>` : ''}
+      ${ocean ? `<div class="where glass">${esc(t('ship.ocean.where'))}<small>${esc(t(oceanNoposKey(ui.model.today)))} · ${esc(t('ship.ocean.seasonNote'))}</small></div>` : ''}
       <div class="titlecard" data-f="title"><b>${esc(t('ship.act' + act))}</b><span>${esc(t('ship.act' + act + '.sub'))}</span></div>
       <div class="toast glass" data-f="toast"></div>
       ${isCard || v === 'HOMECOMING' ? chainCard(v, d) : `<div class="panel glass">${panelFor(v, d)}</div>`}

@@ -25,7 +25,7 @@ export const BUDGET = {
 };
 const budgetFor = (q) => (q?.phone || q?.name === 'low' ? BUDGET.phone : q?.name === 'medium' ? BUDGET.medium : BUDGET.high);
 /** The i18n keys the ocean scene shows (the UI renders them). */
-export const OCEAN_LABEL_KEYS = ['ship.ocean.where', 'ship.ocean.nopos', 'ship.ocean.seasonNote'];
+export const OCEAN_LABEL_KEYS = ['ship.ocean.where', 'ship.ocean.nopos', 'ship.ocean.nopos.off', 'ship.ocean.seasonNote'];
 /**
  * The sun in each stage (JST hour on the app's sun model). Dossier §5: the set runs 4-5 h from near dawn (the HUD clock
  * 05:30 -> 10:00), the 縄待ち soak 2-3 h (about 10:00-12:30, so the sky sits at 11:00), then the 10-12 h haul that

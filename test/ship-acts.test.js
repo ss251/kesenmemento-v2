@@ -405,10 +405,11 @@ function withStubDOM(fn) {
   globalThis.document = { getElementById: () => null, createElement: () => mk(), head: mk(), body: mk() };
   try { return fn(); } finally { if (prev === undefined) delete globalThis.document; else globalThis.document = prev; }
 }
-async function renderView(view, data, lang, { facts = false } = {}) {
+async function renderView(view, data, lang, { facts = false, today = null } = {}) {
   const { mountShipUI } = await import("../src/anime/ui/ship.js");
   return withStubDOM(() => {
     const ui = mountShipUI({}, { lang });
+    if (today) ui.update({ today });
     ui.show(view, data);
     // the 船のデータ button: a click through the UI's own handler opens the facts panel
     if (facts) ui.el.on({ target: { closest: () => ({ disabled: false, dataset: { a: "facts" } }) } });
@@ -491,13 +492,34 @@ describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", ()
       expect(text).toContain(D[lang]["ship.facts.title"]);
     }
     expect(D.ja["ship.facts.trivia"]).toContain("デリシャスパーティ♡プリキュア"); expect(D.ja["ship.facts.trivia"]).toContain("主人公の父がまぐろ船の船長");
-    expect(D.en["ship.facts.trivia"]).toContain("the heroine's father is the captain of their tuna boat");
+    expect(D.en["ship.facts.trivia"]).toContain("the heroine's father is a tuna-boat captain");
+    expect(D.en["ship.facts.trivia"]).not.toContain("their");
     // text only: no Precure image, file or URL anywhere in the app
     const files = [];
     const walk = (d) => { for (const e of readdirSync(ROOT + d, { withFileTypes: true })) { const p = d + "/" + e.name; if (e.isDirectory()) walk(p); else files.push(p); } };
     walk("src"); walk("data/ship");
     expect(files.filter((f) => /precure|cure|プリキュア/i.test(f))).toEqual([]);
     for (const f of files.filter((x) => /\.(js|html|css)$/.test(x))) expect(readFileSync(ROOT + f, "utf8")).not.toMatch(/precure|プリキュア/i);
+  }, 30000);   // reads every file under src/ and data/ship: it timed out at the 5 s default under machine load
+  test("the Precure trivia says the same in JA and EN: a tuna-boat captain, no 'their' boat", () => {
+    expect(D.ja["ship.facts.trivia"]).toContain("主人公の父がまぐろ船の船長");
+    expect(D.en["ship.facts.trivia"]).toBe("Trivia: in the anime デリシャスパーティ♡プリキュア, the heroine's father is a tuna-boat captain");
+  });
+  test("the ocean banner claims the real ship is fishing 'right now' only inside the Aug-Jan season (the page stays up all year)", async () => {
+    const { oceanNoposKey, todayJst } = await import("../src/anime/world/ship/acts.js");
+    for (const d of ["2026-10-10", "2026-08-01", "2027-01-31", "2026-12-25"]) expect(oceanNoposKey(d)).toBe("ship.ocean.nopos");
+    for (const d of ["2027-02-01", "2027-03-15", "2026-07-31", "2026-06-30"]) expect(oceanNoposKey(d)).toBe("ship.ocean.nopos.off");
+    expect(todayJst(Date.UTC(2026, 9, 3, 16, 0))).toBe("2026-10-04");   // JST is UTC+9
+    expect(D.ja["ship.ocean.nopos"]).toContain("いまこの海で操業しています");
+    expect(D.en["ship.ocean.nopos"]).toContain("fishing these waters right now");
+    expect(D.ja["ship.ocean.nopos.off"]).toContain("毎年8月〜1月の漁期"); expect(D.ja["ship.ocean.nopos.off"]).not.toContain("いま");
+    expect(D.en["ship.ocean.nopos.off"]).toContain("each Aug–Jan season"); expect(D.en["ship.ocean.nopos.off"]).not.toContain("right now");
+    for (const lang of ["ja", "en"]) {
+      const inSeason = textOf((await renderView("OCEAN_SET", driveTo("OCEAN_SET").data, lang, { today: "2026-10-10" })).el.innerHTML).join("\n");
+      const off = textOf((await renderView("OCEAN_SET", driveTo("OCEAN_SET").data, lang, { today: "2027-03-01" })).el.innerHTML).join("\n");
+      expect(inSeason).toContain(D[lang]["ship.ocean.nopos"]); expect(inSeason).not.toContain(D[lang]["ship.ocean.nopos.off"]);
+      expect(off).toContain(D[lang]["ship.ocean.nopos.off"]); expect(off).not.toContain(D[lang]["ship.ocean.nopos"]);
+    }
   });
   test("item 7: the final card ends on Usui's line, attributed to 臼井壯太朗 (臼福本店) at Hackatsuon on 2026-10-03", async () => {
     expect(CLOSING).toEqual({ line: "ship.card.closing", by: "ship.card.closingBy" });
