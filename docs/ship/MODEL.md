@@ -54,7 +54,15 @@ If you leave out `livery`, `flags.js` picks it. If you leave out `tier`, `ctx.qu
 All of it is in one atlas of 2048 × 1024 px, on both tiers:
 - **Port band:** drawn bow-left, as in photo 02.
 - **Starboard band:** drawn bow-right, as in photo 03.
-- **Strip:** the 7KFY board, the MG1-2112 board, the crest, the 7KFY deck lettering and four 大漁旗.
+- **Strip:** the 7KFY board, the MG1-2112 board, the crest, the 7KFY deck lettering, the transom lettering and four 大漁旗.
+
+**The transom** (both liveries, photo 04). Aft of the quarter knuckle, where the rounded stern's half-breadth falls to
+2.6 m (`knuckleS(h)`: about s 57.8 above h 3, 57.3 at h 1), the shell faces aft. Both side bands are painted white
+there over every livery shape, so the stern triangles stop at the quarter as on the model. A decal laid on the shell
+(`transomDecalGeometry`, 4 cm proud, facing aft, the atlas `stern` cell, alpha-tested) carries three lines centred on
+the centreline, as on photo 04: 第一昭福丸 (h 2.85–3.45, 3.0 m wide), KESENNUMA (h 2.05–2.4; the photo shows a
+romanised line of seven to nine bold capitals, too small to read letter by letter, taken as the port of registry) and
+SHOFUKU MARU No.1 (h 1.35–1.63). It is structure, not livery: the public build has it too.
 
 The sides are painted separately, never mirrored. On starboard the hull name reads 丸福昭一第 from left to right, because Japanese hull names read from the bow aft.
 
@@ -67,7 +75,17 @@ The sides are painted separately, never mirrored. On starboard the hull name rea
 
 **Starboard frame.** Photo 03 is a three-quarter view, traced at one uniform 0.1266 m/px, which stretches s near the bow (the foremast reads 16.6 m, not 14.2) and h where the camera looks down. `marks.starboard.fit` maps the traced data into the true frame before anything else: `fit.s` is piecewise-linear through anchors measured on 03 (stem x 652, foremast 521, bridge front 430, radar mast 303.5, aft mast 232.5, transom 189 → s 0, 14.2, 28.3, 42.8, 53.7, 58.6), and `fit.h` scales h by the side height on 03 over the model's sheer (0.74 at the stem head to 1.0 from the bridge aft). Ignore zones and marks are in the true frame; an ignore zone with `lines: true` also drops the traced lines whose midpoint falls in it. X1 (the red down-triangle on the sheer that straddles the foremast, the black up-triangle under it, the X lines through their common vertex), X2 (the band and its black foot), the bow wedge, the bow line and the hull name are measured on the WCPFC registry photo of the real ship, because the model in 03 places X1 3–4 m further aft than the real ship.
 
-`cleanNendo()` turns each traced fragment into its convex hull. It merges a fragment with a touching fragment of the same colour only while the union stays compact. It then simplifies the shape to the fewest corners that keep 92 % of its area, and snaps corners at the waterline and at the stem or stern ends.
+**The aft sheer triangle** (fix round 2). On 03 the black down-triangle aft of the star circle traces as a 2.3 m by
+1.8 m fragment (s 52.3–54.8, h 5.3–7.3), most of it then erased by the circle's white disc. On the real ship (WCPFC,
+x 203–302, y 683–802) it runs from the sheer to 63 % of the side below it and tapers into the diagonal that runs to
+the circle's foot. The mark `aft-sheer-triangle` is measured the way X1 and X2 were: top on the sheer from s 51.47 to
+54.29, apex (52.19, 2.85), and the line from the apex to (50.99, −0.2). It overlaps the aft part of the circle's disc
+on the real ship, so it carries `over: true` and is painted after the circles. The traced fragment and its diagonal
+are ignored. Caveat: aft of the radar mast the projective fit compresses s against the vertical scale (about 0.029
+against 0.036 m/px), so at the local vertical scale the top would be 3.6 m wide rather than 2.8 m (the port
+counterpart is 4.2 m wide); the position along the hull is the fit's.
+
+`cleanNendo()` turns each traced fragment into its convex hull. It merges a fragment with a touching fragment of the same colour only while the union stays compact. It then simplifies the shape to the fewest corners that keep 92 % of its area, and snaps corners at the waterline and at the stem. Nothing is snapped to the stern (fix round 2: snapping corners past s 57 to the atlas edge made the stern triangles meet across the transom); the white transom clips them at the quarter knuckle instead. `paintAtlas` order: shapes, circles, `over` shapes, lines, the white transom, text, the gunwale edge, the antifouling.
 
 **Flag** (`flags.js`):
 - `?livery=nendo|fallback` wins.
@@ -98,6 +116,6 @@ Reading the scores:
 - Silhouette IoU on port must be at least 0.85.
 - Starboard is a three-quarter view, so it scores lower. It is also reported at its own fitted scale.
 - The livery IoU is computed against the traced shapes (starboard in the fitted frame) and against the photo's own pixels.
-- Starboard only: `wcpfcIoU` scores the livery against the WCPFC photo of the real ship (x → s by a projective fit through six anchors, h by a vertical scale measured from the waterline to the sheer), forward of s 44 and over the whole side, and writes `profile-starboard-<livery>-<tier>-wcpfc-ref-overlay.png` (local only).
+- Starboard only: `wcpfcIoU` scores the livery against the WCPFC photo of the real ship (x → s by a projective fit through six anchors, h by a vertical scale measured from the waterline to the sheer), forward of s 44, aft of s 44 (the weaker check: see the caveat above) and over the whole side, and writes `profile-starboard-<livery>-<tier>-wcpfc-ref-overlay.png` (local only).
 
 Composites that contain the reference photos (`*-ref-*.png`) and renders of the nendo livery stay local, through a `.gitignore` in that folder.

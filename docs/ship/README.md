@@ -96,11 +96,16 @@ the section Results.
 ## Tests
 
 ```sh
-env -u NODE_OPTIONS bun test test/ship-integrate.test.js test/ship-acts.test.js test/ship-sail.test.js test/ship-model.test.js
+env -u NODE_OPTIONS bun test test/ship-integrate.test.js test/ship-acts.test.js test/ship-sail.test.js test/ship-model.test.js test/ship-livery-paint.test.js
 ```
 
 - `ship-integrate`: the URL parameters, the boarding entry, the module order, and the **whole voyage headless through
-  the real module**: quay to card in order, the town hidden only at sea, DEMO tags, a homecoming without a snap.
+  the real module**: quay to card in order, the town hidden only at sea, DEMO tags, a homecoming without a snap, Act 1
+  past the market rows, under かなえ大橋 and past 商港 (`passed` is `['kanae', 'shoko']` at BAY_MOUTH), and no
+  arriving harbour boat or name label drawn while she is at sea.
+- `ship-livery-paint`: a probe 2D context replays `paintAtlas` and reads texels back: the transom is white in both
+  liveries, the stern triangles reach the quarter, the transom lettering paints, and the starboard aft sheer triangle
+  (WCPFC) is drawn over the circle.
 - `ship-acts`: tags, the act machine with its guards, the haul rules, the Act 3 order, i18n, the phone budget.
 - `ship-sail`: `boatStep`, shore collision (500 random runs), the route clearances and かなえ大橋.
 - `ship-model`: dimensions, the starboard-only 舷門, budgets, the flags and the fallback livery.
@@ -110,16 +115,20 @@ env -u NODE_OPTIONS bun test test/ship-integrate.test.js test/ship-acts.test.js 
 ```sh
 tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port 8964 --w 1920 --h 1080 --livery fallback --out shots/ship-int/fb
 tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-profile.mjs --port 8964 --livery fallback
-tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/phonemem.mjs --port 8964 --params "ship=1&act=2"
+tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/phonemem.mjs --port 8964 --params "ship=1&act=2&livery=fallback" --start --eval tools/anime/ship-memdiag.js
 ```
 
-`tools/anime/ship-memdiag.js` is the `--eval` for phonemem: it reports the voyage state and whether the town is hidden.
+`tools/anime/ship-memdiag.js` is the `--eval` for phonemem: it reports the voyage state, whether the town is hidden
+and how many arriving harbour boats are drawn. `--start` is required for Act 2: a URL voyage waits for the visitor to
+leave the intro card (`body.playing`), and without it phonemem measures the city on the intro card (state DOCKED,
+`active: false`, `oceanActive: false`).
 
 ## Results (2026-10-03, this branch)
 
-**Tests.** `bun test`: 652 pass, 24 skip, 1 fail (fix round 1). The one failure is the known `test/v4-explore.test.js`
-"matches the committed file" (shared `data/cache` drift from other packages; it predates this branch). The five ship
-files (`ship-model`, `ship-sail`, `ship-acts`, `ship-integrate`, and `v3-fix` for the public mirror) are 132 pass, 0 fail.
+**Tests.** `bun test`: 670 pass, 24 skip, 1 fail (fix round 2). The one failure is the known `test/v4-explore.test.js`
+"matches the committed file" (shared `data/cache` drift from other packages; it predates this branch). The six ship
+files (`ship-model`, `ship-sail`, `ship-acts`, `ship-integrate`, `ship-livery-paint`, and `v3-fix` for the public
+mirror) are 150 pass, 0 fail.
 `env -u NODE_OPTIONS bun run scripts/build-web.js` builds clean.
 
 **Phone tier** (`phonemem.mjs`, 390×844 at DPR 3, iPhone UA, forced phone tier, nendo livery on the local host):
@@ -128,12 +137,14 @@ files (`ship-model`, `ship-sail`, `ship-acts`, `ship-integrate`, and `v3-fix` fo
 |---|---|---|---|---|---|---|
 | City, no ship (`?only=` without `ship`) | 372 MB | 129 MB | 220 MB | 503 | 3.61 M | none (the dev server's `/api/live` 404 only) |
 | City with the ship berthed | 377 MB | 130 MB | 231 MB (+11 MB) | 488 | 3.40 M | none |
-| Act 2 at sea (`?ship=1&act=2`) | 373 MB | 129 MB | 231 MB | 128 | 34 k | none |
+| Act 2 at sea (`?ship=1&act=2&livery=fallback --start`, fix round 2) | 387 MB | 131 MB | 231 MB | 135 mean, 162 max | 36.5 k mean, 43 k max | none (the dev server's `/api/live` 404 only) |
 
 - The ship adds about 11 MB of texture (its 2048×1024 livery atlas with mipmaps) and about 10.9 k triangles; its
   module builds in about 0.2 s.
-- At sea the town is hidden: the static root is invisible, 6 of 61 dynamic groups are drawn (the ship, the sail
-  carrier, the ocean), and the frame draws 128 calls and 34 k triangles.
+- At sea the town is hidden: `ship-memdiag.js` reports state OCEAN_SET, `active: true`, `oceanActive: true`, the
+  static root invisible, 2 of 54 dynamic groups drawn and no arriving harbour boat drawn. The fix-round-1 row (128
+  calls, 34 k triangles) was taken without `--start` and could not be reproduced with the documented command: that
+  run measured the city on the intro card. The row above is re-recorded with `--start`.
 - Fix round 1 re-run (`phonemem.mjs --params livery=nendo`, the ship berthed): heap after GC 130 MB, texture estimate
   231 MB, the ship module 10.95 k triangles in 0.19 s, no page errors besides the dev server's `/api/live` 404. The
   load peak was 422 MB, reached while `explore` builds (the ship module had finished at 283 MB); the table's 377 MB
@@ -151,7 +162,8 @@ on the real ship (see Deviations, row g).
 | Score | Before | After |
 |---|---|---|
 | WCPFC photo of the real ship, forward of s 44: red / black | 0.001 / 0.09 | **0.750 / 0.297** |
-| WCPFC photo, whole side: red / black | 0.03 / 0.17 | 0.632 / 0.295 |
+| WCPFC photo, whole side: red / black | 0.03 / 0.17 | 0.632 / 0.393 (fix round 2) |
+| WCPFC photo, aft of s 44 (added in fix round 2): red / black | — | 0.038 / 0.559 |
 | Photo 03 at its fitted uniform scale (`photoLiveryIoU`): red / black | 0.35 / 0.22 | 0.095 / 0.156 |
 
 The 03 score falls because the nendo model in photo 03 and the real ship disagree at X1: on 03 the red triangle
@@ -159,14 +171,16 @@ starts at the foremast and runs aft; on the real ship it straddles the foremast,
 follows the real ship. The "before" WCPFC numbers come from the same method run on the previous marks
 (scratch script); the "after" numbers are the tool's own (`wcpfcIoU`, overlay
 `shots/profile-starboard-nendo-high-wcpfc-ref-overlay.png`, local only). Black stays low because the photo's thin
-lines and the dark open foredeck count as black.
+lines and the dark open foredeck count as black. Aft of s 44 the black score comes mostly from the aft sheer triangle
+and the stern quarter triangle (fix round 2); the red score there is low because the crescent sits about 1 m off
+under the fit (see the open item below), and the fit itself is the weak part aft of the radar mast.
 
-**Shots** (`docs/ship/shots/`, 1920×1080, the fallback livery; the nendo renders `*_nendo.png` stay local):
+**Shots** (`docs/ship/shots/`, 1920×1080, the fallback livery; the nendo renders `*_nendo.png` stay local; re-shot in fix round 2):
 
 | Act | Beats |
 |---|---|
-| 1 | `acts_a1_docked`, `acts_a1_docked_night`, `acts_a1_side_port` (compare photo 02), `acts_a1_sendoff`, `acts_a1_sendoff_close`, `acts_a1_tapes_snap`, `acts_a1_kanae`, `acts_a1_kanae_chase`, `acts_a1_baymouth` |
-| 2 | `acts_a2_set`, `acts_a2_wait`, `acts_a2_haul`, `acts_a2_haul_night`, `acts_a2_side_stbd` (compare photo 03), `acts_a2_stow` |
+| 1 | `acts_a1_docked`, `acts_a1_docked_night`, `acts_a1_side_port` (compare photo 02), `acts_a1_sendoff`, `acts_a1_sendoff_close`, `acts_a1_tapes_snap`, `acts_a1_kanae`, `acts_a1_kanae_chase`, `acts_a1_market`, `acts_a1_shoko`, `acts_a1_transom` (the lettered transom), `acts_a1_baymouth` |
+| 2 | `acts_a2_set`, `acts_a2_wait`, `acts_a2_haul`, `acts_a2_haul_night`, `acts_a2_side_stbd` (compare photo 03 and the WCPFC photo), `acts_a2_transom` (compare photo 04), `acts_a2_stow` |
 | 3 | `acts_a3_laspalmas`, `acts_a3_reefer`, `acts_a3_shimizu`, `acts_a3_home_approach`, `acts_a3_home`, `acts_a3_card` |
 | Town UI | `acts_ui_chip` (the boarding chip at the quay), `acts_ui_places` (the places list) |
 | Phone | `acts_phone_a1_sendoff`, `acts_phone_a2_haul`, `acts_phone_a2_stow`, `acts_phone_a3_card` |
@@ -177,16 +191,19 @@ stay local because the photos are copyrighted.
 ## Real and stylised
 
 Real: her particulars (58.60 m LOA, 9.2 m beam, 486 t, air draft about 21 m), the measured profile, the 舷門 on the
-starboard side only, MG1-2112 and 7KFY, the berth on the コの字岸壁 east face, the route under かなえ大橋 with 11.7 m to
-spare, the 11:00 send-off with five-colour tapes, 福来旗, music and the horn, the 150 km line with
+starboard side only, MG1-2112 and 7KFY, the berth on the コの字岸壁 east face, the route under かなえ大橋 with about
+11 m to spare (32 m official clearance against about 21 m air draft; the model's girder sits at 32.7 m where she
+crosses), the 11:00 send-off with five-colour tapes, 福来旗, music and the horn, the 150 km line with
 about 3,000 hooks, the ICCAT 30 kg / 115 cm minimum and the Aug–Jan season, Japan's 3,779 t of 43,296 t, −60 °C and about
-36 h to the core, the chain Las Palmas → reefer container → Shimizu bonded weigh-in, the homecoming under 大漁旗,
+36 h to the core, the catch bled, spiked and dressed (gills, guts and tail off) before the freezer, the quota bar as
+the ship's share of about 80 t (Usui's public talk, 2026-10-03; the captain's notes mark it ⚠), the chain Las Palmas → reefer container → Shimizu bonded weigh-in, the homecoming under 大漁旗,
 北かつまぐろ屋 海の市店, and IUCN EN → LC in September 2021.
 
 Stylised: 6 kn in the harbour (a harbour pace chosen for the game; no harbour limit for 気仙沼 is sourced, and her
 service speed is 12.3 kn), time compression (4x in the bay, the set in 40 s), the handling constants, the hull lines between the measured
-profile and the beam, the crowd size and tape lengths, the order and weights of the fish, the 900 kg allowance bar (a game
-setting, never the ship's real quota), the ocean palette and the hours, the floodlight pools of the night haul, and the
+profile and the beam, the crowd size and tape lengths, the order and weights of the fish, the ocean palette and the hours
+(the HUD clock runs 05:30 → 10:00 over the set and on from 10:00 through the soak; the sky sits at 11:00 for the soak
+and 16:12 for the haul), the floodlight pools of the night haul, and the
 chain cards as flat illustrations. Details: [MODEL.md](MODEL.md) and [acts.md](acts.md).
 
 ## Deviations
@@ -203,6 +220,8 @@ chain cards as flat illustrations. Details: [MODEL.md](MODEL.md) and [acts.md](a
 | f | Usufuku crest "on the front" of the funnel (§3) | On both side faces of the funnel | The build | designboom-1800 shows the 違い山星一 crest on the funnel's side face. |
 | g | Starboard livery traced on 03 (§4): X1 at s 17–21, X2 band at s 40.4–42.0, bow wedge s 0.1–6.8 | 03 trace re-mapped through measured anchors; X1 red s 9.2–16.1 on the sheer, vertex (12.7, 1.85), black s 10.5–14.5; X2 band from s 37.1–38.5 at the sheer to 40.5–42.4, black foot 40.6–42.4; bow wedge s −0.6–3.3; hull name s 5.4–8.9 | The build | 03 is a three-quarter view traced at one uniform 0.1266 m/px, which stretches the near bow (the foremast reads 16.6 m, not 14.2). The X1/X2 positions come from the WCPFC photo of the real ship through a projective fit on six anchors (residuals ≤ 0.7 m). Scores above. |
 | h | コの字岸壁 at 38.901 N, 141.580 E (§6, the fishery DB point of the 出漁準備岸壁) | The 魚浜町 pier's east face | The build | That coordinate is the 港町 出漁準備岸壁 north of the market, a different quay. The つばき会 page names the venue 「気仙沼市魚浜町コの字岸壁（セレモニー会場）・港町出港岸壁」; `route.js` holds the evidence. The §6 point was deliberately not used. |
+| i | "The quota bar is the ship's share" (§5); the dossier gives no figure | The bar is about 80 t, 「この船1隻への配分 約80t（臼井社長, 2026-10-03）」, with this set's catch as a slice (fix round 1 showed a 900 kg per-set game allowance) | The build, pending the captain | The figure is from the captain's own notes of Usui's public talk (`usui-talk-notes.md`), marked ⚠: not yet confirmed in writing. It fits the 76.3 t MSC catch of 2024. If the captain does not clear it, `RULES.shipShareKg` and the label are the two places to change. |
+| j | Starboard livery traced on 03 aft of the circle: a black triangle at s 52.3–54.8, h 5.3–7.3 | The real ship's triangle (WCPFC): top on the sheer s 51.5–54.3, apex (52.2, 2.85), its diagonal to the circle's foot; painted over the circle's disc | The build | The WCPFC photo (x 203–302, y 683–802): the triangle runs 63 % of the side below the sheer. Aft of the radar mast the fit compresses s: at the local vertical scale the top would be 3.6 m wide, not 2.8 m (port counterpart 4.2 m). |
 
 Open, not changed in this round: the WCPFC photo puts the starboard star circle about 1 m forward of the 03-derived
 centre (s ≈ 50.2 against 51.0), and the 03 fit puts the 舷門's forward edge near s 21.4 against the dossier's 22.8.
@@ -216,5 +235,5 @@ Aft of the radar mast the WCPFC anchors are centreline masts and a rounded stern
   side to it, bow out). This avoids turning a 58.6 m ship end for end in the basin on screen.
 - **The haul at night** adds floodlight pools at the 舷門 (hauling often runs to midnight); the cel materials take no
   point lights.
-- **Not done in this pass** (from the captain's next-pass notes, kept out of git): the 80 t allocation on the quota bar, the six-ship fleet line,
+- **Not done in this pass** (from the captain's next-pass notes, kept out of git): the six-ship fleet line,
   the tag's IC chip and QR wording and the Shimizu inspectors, the 波怒棄館 story pin, and Usui's closing line on the card.
