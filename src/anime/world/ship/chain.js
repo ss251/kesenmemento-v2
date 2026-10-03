@@ -163,10 +163,10 @@ export function drawChainArt(state, g, w, h, data = {}) {
     g.fillStyle = '#d8d6cf'; g.fillRect(w * 0.56, h * 0.2, w * 0.44, h * 0.32); g.strokeStyle = INK; g.lineWidth = 2; g.strokeRect(w * 0.56, h * 0.2, w * 0.44, h * 0.32);   // bonded warehouse
     g.fillStyle = '#2b3f73'; g.fillRect(w * 0.6, h * 0.24, w * 0.13, h * 0.07); g.fillStyle = '#ffffff'; g.font = `900 ${Math.round(h * 0.05)}px "Noto Sans JP", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('保税', w * 0.665, h * 0.275);
     g.fillStyle = '#5b5e66'; g.fillRect(0, h * 0.5, w, h * 0.5);   // apron
-    g.fillStyle = '#4f6fa8'; g.fillRect(w * 0.06, h * 0.8, w * 0.5, h * 0.16); g.strokeStyle = INK; g.lineWidth = 2; g.strokeRect(w * 0.06, h * 0.8, w * 0.5, h * 0.16);   // the landing tarp
+    g.fillStyle = '#4f6fa8'; g.fillRect(w * 0.05, h * 0.8, w * 0.52, h * 0.16); g.strokeStyle = INK; g.lineWidth = 2; g.strokeRect(w * 0.05, h * 0.8, w * 0.52, h * 0.16);   // the landing tarp
     // (4) the truck scale: a flush steel deck with yellow edges, the truck on it, the readout on the warehouse wall
     g.fillStyle = '#7c8088'; g.fillRect(w * 0.58, h * 0.78, w * 0.4, h * 0.05); g.strokeStyle = '#f2c230'; g.lineWidth = 4; g.strokeRect(w * 0.58, h * 0.78, w * 0.4, h * 0.05);
-    container(g, w * 0.6, h * 0.55, w * 0.25, h * 0.19, '#f3f6f8', 'REEFER −60°C');
+    container(g, w * 0.6, h * 0.55, w * 0.25, h * 0.19, '#2f6fae', 'REEFER −60°C');
     g.fillStyle = '#2b3550'; g.fillRect(w * 0.855, h * 0.58, w * 0.1, h * 0.16); g.fillStyle = '#e2b54a'; g.fillRect(w * 0.855, h * 0.66, w * 0.1, h * 0.025); g.strokeStyle = INK; g.lineWidth = 2; g.strokeRect(w * 0.855, h * 0.58, w * 0.1, h * 0.16);
     g.fillStyle = '#bfe1f2'; g.fillRect(w * 0.905, h * 0.6, w * 0.045, h * 0.05);
     for (const xx of [0.64, 0.7, 0.81, 0.88, 0.93]) { g.fillStyle = '#2a2a33'; g.beginPath(); g.arc(w * xx, h * 0.765, h * 0.03, 0, 7); g.fill(); }
@@ -174,7 +174,8 @@ export function drawChainArt(state, g, w, h, data = {}) {
     g.fillText(`${(data.weighed ?? 0).toFixed(1)} kg`, w * 0.885, h * 0.395);
     // three frozen bluefin on the tarp, head to the right; each with its blue tag (IC chip + QR) at the tail
     const tags = (data.tags || []).slice(0, 3);
-    const fish = [0.18, 0.34, 0.5].map((fx, i) => ({ x: w * fx, y: h * 0.885, l: w * 0.13, no: tags[i] ? tags[i].slice(-4) : String(i + 1).padStart(4, '0') }));
+    const fish = [0.165, 0.33, 0.495].map((fx, i) => ({ x: w * fx, y: h * 0.885, l: w * 0.14,   // a 2 m-class bluefin beside a 1.7 m inspector
+      no: tags[i] ? tags[i].slice(-4) : String(i + 1).padStart(4, '0') }));
     for (const f of fish) frozenTuna(g, f.x, f.y, f.l);
     // (1) about 3 Fisheries Agency inspectors behind the fish; (2) each scans a chip with a reader gun
     for (let i = 0; i < 3; i++) {
@@ -198,7 +199,7 @@ export function drawChainArt(state, g, w, h, data = {}) {
     badge(g, fish[1].x - fish[1].l * 0.4 - 52 * s0 * 1.3, h * 0.33, h * 0.04, '1');
     badge(g, fish[0].x - fish[0].l * 0.4 + w * 0.03, h * 0.68, h * 0.04, '2');
     badge(g, fish[2].x + fish[2].l * 0.3, fish[2].y - fish[2].l * 0.2, h * 0.04, '3');
-    badge(g, w * 0.6, h * 0.9, h * 0.04, '4');
+    badge(g, w * 0.6, h * 0.69, h * 0.04, '4');
   } else if (state === 'HOMECOMING') {
     sky(g, w, h, '#86bde6', '#fde6c8');
     sea(g, w, h, h * 0.62, '#3d84ad', '#79b2d2');
