@@ -40,7 +40,7 @@ If you leave out `livery`, `flags.js` picks it. If you leave out `tier`, `ctx.qu
 
 | Real (sourced or measured) | Stylised |
 |---|---|
-| LOA 58.60, beam 9.2, depth 3.91 and design draft 3.54 come from the registries. The keel sits 4.25 m under the paint line, as measured on the model. | The cel materials, ink outlines and studio colours follow the app's look rules. |
+| LOA 58.60, beam 9.2, depth 3.91 and design draft 3.54 come from the registries. The keel sits 4.05 m (forward) to 4.25 m (amidships) under the paint line, as measured on the model photo 02 (34–35 px; the dossier's 32 px under-reads the edge, see the README's Deviations, row b). | The cel materials, ink outlines and studio colours follow the app's look rules. |
 | The profile (sheer, raked stem, knuckle-bulb, rounded stern, skeg, rudder and propeller) is measured on `shofukumaru02` at 0.1226 m/px, using the tool's segmentation. | The hull lines between the measured profile and the 9.2 m beam are a fair fishing-hull loft. No lines plan is public. |
 | The 舷門 is on starboard only, at s 22.8–31.3 and h 3.0–4.7, with the line hauler, slow conveyor, branch-line reel and fish boxes in the well. | The well and stern-bay gear is simplified, and the interiors are dark recesses. |
 | The masts are the foremast (s 14.2, top 16.1), the white lattice radar mast (s 42.8, top 20.7) and the aft mast (s 53.7, top 19.1). | The lattice bracing pattern is generic. |
@@ -64,6 +64,8 @@ The sides are painted separately, never mirrored. On starboard the hull name rea
 - `data/ship/shofukumaru1/livery-nendo.json` (traced shapes);
 - `lines-nendo.json` (traced diagonals);
 - `livery-nendo-marks.json` (this builder's measured supplements: the star circles fitted to the red segment boundary, the triangles the tracer missed because they were lit grey, the bow lines, the starboard ignore zones for the 舷門 and the hawse, and the crest strokes).
+
+**Starboard frame.** Photo 03 is a three-quarter view, traced at one uniform 0.1266 m/px, which stretches s near the bow (the foremast reads 16.6 m, not 14.2) and h where the camera looks down. `marks.starboard.fit` maps the traced data into the true frame before anything else: `fit.s` is piecewise-linear through anchors measured on 03 (stem x 652, foremast 521, bridge front 430, radar mast 303.5, aft mast 232.5, transom 189 → s 0, 14.2, 28.3, 42.8, 53.7, 58.6), and `fit.h` scales h by the side height on 03 over the model's sheer (0.74 at the stem head to 1.0 from the bridge aft). Ignore zones and marks are in the true frame; an ignore zone with `lines: true` also drops the traced lines whose midpoint falls in it. X1 (the red down-triangle on the sheer that straddles the foremast, the black up-triangle under it, the X lines through their common vertex), X2 (the band and its black foot), the bow wedge, the bow line and the hull name are measured on the WCPFC registry photo of the real ship, because the model in 03 places X1 3–4 m further aft than the real ship.
 
 `cleanNendo()` turns each traced fragment into its convex hull. It merges a fragment with a touching fragment of the same colour only while the union stays compact. It then simplifies the shape to the fewest corners that keep 92 % of its area, and snaps corners at the waterline and at the stem or stern ends.
 
@@ -95,6 +97,7 @@ Each view goes through the app's pipeline with outlines on, at 2× resolution, a
 Reading the scores:
 - Silhouette IoU on port must be at least 0.85.
 - Starboard is a three-quarter view, so it scores lower. It is also reported at its own fitted scale.
-- The livery IoU is computed against the traced shapes and against the photo's own pixels.
+- The livery IoU is computed against the traced shapes (starboard in the fitted frame) and against the photo's own pixels.
+- Starboard only: `wcpfcIoU` scores the livery against the WCPFC photo of the real ship (x → s by a projective fit through six anchors, h by a vertical scale measured from the waterline to the sheer), forward of s 44 and over the whole side, and writes `profile-starboard-<livery>-<tier>-wcpfc-ref-overlay.png` (local only).
 
 Composites that contain the reference photos (`*-ref-*.png`) and renders of the nendo livery stay local, through a `.gitignore` in that folder.

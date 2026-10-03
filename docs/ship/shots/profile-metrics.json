@@ -1,5 +1,5 @@
 {
- "date": "2026-10-03T07:46:58.122Z",
+ "date": "2026-10-03T10:42:34.537Z",
  "mpp": 0.1226,
  "runs": [
   {
@@ -9,7 +9,7 @@
     "livery": "nendo",
     "error": null,
     "tier": "high",
-    "triangles": 22724,
+    "triangles": 22778,
     "anchors": {
      "mastTop": [
       0,
@@ -41,17 +41,17 @@
       "silhouetteIoU": 0.7334,
       "silhouetteIoUalpha": 0.7131,
       "photoLiveryIoU": {
-       "black": 0.0818,
-       "red": 0.0611
+       "black": 0.0599,
+       "red": 0.0751
       }
      },
      "fitted": {
       "mpp": 0.1265658747300216,
-      "silhouetteIoU": 0.7384,
+      "silhouetteIoU": 0.7383,
       "silhouetteIoUalpha": 0.7124,
       "photoLiveryIoU": {
-       "black": 0.2189,
-       "red": 0.3509
+       "black": 0.1555,
+       "red": 0.0954
       }
      }
     }
@@ -62,14 +62,24 @@
      "red": 0.8
     },
     "starboard": {
-     "black": 0.47305597404102445,
-     "red": 0.923405553860238
+     "black": 0.4409002832016694,
+     "red": 0.19119904485758143
+    }
+   },
+   "wcpfcIoU": {
+    "fwdOf44": {
+     "black": 0.2974,
+     "red": 0.7496
+    },
+    "all": {
+     "black": 0.2953,
+     "red": 0.6317
     }
    },
    "pageErrors": [
     {
      "type": "log-error",
-     "text": "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:8961/favicon.ico"
+     "text": "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:8967/favicon.ico"
     }
    ]
   },
@@ -80,7 +90,7 @@
     "livery": "nendo",
     "error": null,
     "tier": "phone",
-    "triangles": 10824,
+    "triangles": 10858,
     "anchors": {
      "mastTop": [
       0,
@@ -101,7 +111,7 @@
       "silhouetteIoU": 0.8616,
       "silhouetteIoUalpha": 0.8397,
       "photoLiveryIoU": {
-       "black": 0.4726,
+       "black": 0.4725,
        "red": 0.6248
       }
      }
@@ -112,8 +122,8 @@
       "silhouetteIoU": 0.7225,
       "silhouetteIoUalpha": 0.7039,
       "photoLiveryIoU": {
-       "black": 0.0843,
-       "red": 0.0615
+       "black": 0.0613,
+       "red": 0.0755
       }
      },
      "fitted": {
@@ -121,8 +131,8 @@
       "silhouetteIoU": 0.7272,
       "silhouetteIoUalpha": 0.7032,
       "photoLiveryIoU": {
-       "black": 0.2213,
-       "red": 0.3537
+       "black": 0.1588,
+       "red": 0.0957
       }
      }
     }
@@ -133,8 +143,18 @@
      "red": 0.8
     },
     "starboard": {
-     "black": 0.47305597404102445,
-     "red": 0.923405553860238
+     "black": 0.4409002832016694,
+     "red": 0.19119904485758143
+    }
+   },
+   "wcpfcIoU": {
+    "fwdOf44": {
+     "black": 0.2974,
+     "red": 0.7496
+    },
+    "all": {
+     "black": 0.2953,
+     "red": 0.6317
     }
    }
   },
@@ -145,7 +165,7 @@
     "livery": "fallback",
     "error": null,
     "tier": "high",
-    "triangles": 22720,
+    "triangles": 22774,
     "anchors": {
      "mastTop": [
       0,
@@ -177,7 +197,7 @@
       "silhouetteIoU": 0.7334,
       "silhouetteIoUalpha": 0.7131,
       "photoLiveryIoU": {
-       "black": 0.0534,
+       "black": 0.0533,
        "red": 0
       }
      },
@@ -186,7 +206,7 @@
       "silhouetteIoU": 0.7384,
       "silhouetteIoUalpha": 0.7124,
       "photoLiveryIoU": {
-       "black": 0.0612,
+       "black": 0.0611,
        "red": 0
       }
      }
@@ -200,7 +220,7 @@
     "livery": "fallback",
     "error": null,
     "tier": "phone",
-    "triangles": 10820,
+    "triangles": 10854,
     "anchors": {
      "mastTop": [
       0,

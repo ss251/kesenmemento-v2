@@ -26,6 +26,8 @@ scenes). Marker in code: `[ship]`, `[ship:acts]`, `[ship:integrate]`.
 | `&auto=1` | The hands-free demo, about 5 minutes from the quay to the card. |
 | `&livery=nendo` / `fallback` | The livery (see Flags). |
 
+Without `?shot`, a URL voyage waits for the viewer to leave the intro card (「まちへ出る」 sets `body.playing`): nothing
+boards and the director does not run behind the card, so the send-off, the tapes, the music and the horn are seen.
 With `?shot=1&t=S` the beat is entered on the first simulation step and the scene runs S seconds before the frame.
 
 ## Playing
@@ -33,8 +35,10 @@ With `?shot=1&t=S` the beat is entered on the first simulation step and the scen
 - **Act 1:** 出船おくりを始める starts the send-off (tapes, 福来旗, the music sting). Sound the horn (汽笛), then
   もやいを解く. The sail mode takes her out on autopilot. W / S (or the arrows) move the engine telegraph, A / D put
   the rudder over, X stops the engine, Shift holds the 4x time compression, P toggles the autopilot. On a phone, the
-  left half of the screen is the stick. Touching the controls takes the helm; after 8 s idle under way the autopilot
-  takes over again. After かなえ大橋, 湾口へ（早送り） skips to the bay mouth.
+  left half of the screen is the stick and a drag on the right half looks around. Touching the controls takes the
+  helm; after 8 s idle (under way, against a bank, or stopped by one) the autopilot takes over again. Left bow-on to a
+  bank, it backs her off astern before going ahead (`pursue`'s recovery). Arriving boats in her lane step aside to
+  their own starboard (up to 25 m) and hold until she has passed. After かなえ大橋, 湾口へ（早送り） skips to the bay mouth.
 - **Act 2:** the line is set from the stern, then the soak, then the haul at the starboard forward 舷門: キープ or
   放流 for each fish on the scale. A bluefin under 30 kg cannot be kept. Each kept bluefin gets a `DEMO-7KFY-26-xxxx`
   tag and goes to the −60 °C freezer. 早送り speeds the counters up 5x.
@@ -113,8 +117,9 @@ tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/phonemem.mjs --po
 
 ## Results (2026-10-03, this branch)
 
-**Tests.** `bun test`: 636 pass, 24 skip, 1 fail. The one failure is the known `test/v4-explore.test.js` "matches the
-committed file" (shared `data/cache` drift from other packages; it predates this branch).
+**Tests.** `bun test`: 652 pass, 24 skip, 1 fail (fix round 1). The one failure is the known `test/v4-explore.test.js`
+"matches the committed file" (shared `data/cache` drift from other packages; it predates this branch). The five ship
+files (`ship-model`, `ship-sail`, `ship-acts`, `ship-integrate`, and `v3-fix` for the public mirror) are 132 pass, 0 fail.
 `env -u NODE_OPTIONS bun run scripts/build-web.js` builds clean.
 
 **Phone tier** (`phonemem.mjs`, 390×844 at DPR 3, iPhone UA, forced phone tier, nendo livery on the local host):
@@ -129,11 +134,32 @@ committed file" (shared `data/cache` drift from other packages; it predates this
   module builds in about 0.2 s.
 - At sea the town is hidden: the static root is invisible, 6 of 61 dynamic groups are drawn (the ship, the sail
   carrier, the ocean), and the frame draws 128 calls and 34 k triangles.
+- Fix round 1 re-run (`phonemem.mjs --params livery=nendo`, the ship berthed): heap after GC 130 MB, texture estimate
+  231 MB, the ship module 10.95 k triangles in 0.19 s, no page errors besides the dev server's `/api/live` 404. The
+  load peak was 422 MB, reached while `explore` builds (the ship module had finished at 283 MB); the table's 377 MB
+  run predates the shared `data/cache` drift. The two-faced 大漁旗 and the board backs add no draw call per flag (one
+  geometry each) and one merged mesh for the backs.
 - Entering Act 2 straight from the URL leaves the town's CPU geometry copies in memory until the town has been drawn
   once (the phone tier frees them on the first upload); in play, Act 2 always follows the town.
 
 **Profile check** (`ship-profile.mjs`, against model photo 02 at 0.1226 m/px): port silhouette IoU 0.864 (high) and
 0.862 (phone), target 0.85. Starboard (photo 03, a three-quarter view) 0.733, 0.738 at its fitted scale.
+
+**Starboard livery** (nendo, high tier; fix round 1). Before: X1 and X2 as traced on 03. After: re-mapped and measured
+on the real ship (see Deviations, row g).
+
+| Score | Before | After |
+|---|---|---|
+| WCPFC photo of the real ship, forward of s 44: red / black | 0.001 / 0.09 | **0.750 / 0.297** |
+| WCPFC photo, whole side: red / black | 0.03 / 0.17 | 0.632 / 0.295 |
+| Photo 03 at its fitted uniform scale (`photoLiveryIoU`): red / black | 0.35 / 0.22 | 0.095 / 0.156 |
+
+The 03 score falls because the nendo model in photo 03 and the real ship disagree at X1: on 03 the red triangle
+starts at the foremast and runs aft; on the real ship it straddles the foremast, as port X1 does on 02. The build
+follows the real ship. The "before" WCPFC numbers come from the same method run on the previous marks
+(scratch script); the "after" numbers are the tool's own (`wcpfcIoU`, overlay
+`shots/profile-starboard-nendo-high-wcpfc-ref-overlay.png`, local only). Black stays low because the photo's thin
+lines and the dark open foredeck count as black.
 
 **Shots** (`docs/ship/shots/`, 1920×1080, the fallback livery; the nendo renders `*_nendo.png` stay local):
 
@@ -165,11 +191,30 @@ chain cards as flat illustrations. Details: [MODEL.md](MODEL.md) and [acts.md](a
 
 ## Deviations
 
+### From the dossier's numbers
+
+| | Dossier | Build | Which is right | Evidence |
+|---|---|---|---|---|
+| a | Rudder and propeller at s 56–58 (§3) | Propeller s 51.9; rudder s 53.4–55.0 | The build | On photo 02 the propeller hub is at x ≈ 577 px: (577 − 158) × 0.1226 = s 51.4. The dossier row is wrong. |
+| b | Keel −3.54 (design draft), measured "32 px, ≈ 3.9 m" (§3, §8) | Keel 4.05 m forward, 4.25 m amidships (`keelModel`), 4.5 m at s 46 | The build, as a model of the photo | Column profiles of photo 02 put the keel edge 34–35 px under the y 291 waterline from s 11 to 44 (4.17–4.29 m), 36 px at s 47 (4.5 m). Overlay: `shots/profile-port-keel-ref-overlay.png` (local only). Her in-game draft is therefore 0.5–1 m more than the 3.54 m design draft. The dossier's 32 px stops about 2 px short of the keel edge, where the column profiles fall from about 200 to under 10 (difference from the background). |
+| c | Port star circle centre (46, 3), r ≈ 2.4 (§4) | Centre (47.21, 4.30), r 2.70 | The build | A least-squares circle fit to the red segment's outer edge on 02 (rms 0.04 m), `livery-nendo-marks.json` `method.circles`. |
+| d | Bulb nose s ≈ 2.3 (§3) | s 1.95 | Either (within the ±0.5 m the dossier gives) | Measured on 02 at the bulb's foremost point. |
+| e | Bridge roof ≈ 10.9 (§3) | Roof 10.0, rail top 10.9 | The build | The 10.9 m the dossier reads is the top of the roof railing on 02; the roof deck is 0.9 m under it. |
+| f | Usufuku crest "on the front" of the funnel (§3) | On both side faces of the funnel | The build | designboom-1800 shows the 違い山星一 crest on the funnel's side face. |
+| g | Starboard livery traced on 03 (§4): X1 at s 17–21, X2 band at s 40.4–42.0, bow wedge s 0.1–6.8 | 03 trace re-mapped through measured anchors; X1 red s 9.2–16.1 on the sheer, vertex (12.7, 1.85), black s 10.5–14.5; X2 band from s 37.1–38.5 at the sheer to 40.5–42.4, black foot 40.6–42.4; bow wedge s −0.6–3.3; hull name s 5.4–8.9 | The build | 03 is a three-quarter view traced at one uniform 0.1266 m/px, which stretches the near bow (the foremast reads 16.6 m, not 14.2). The X1/X2 positions come from the WCPFC photo of the real ship through a projective fit on six anchors (residuals ≤ 0.7 m). Scores above. |
+| h | コの字岸壁 at 38.901 N, 141.580 E (§6, the fishery DB point of the 出漁準備岸壁) | The 魚浜町 pier's east face | The build | That coordinate is the 港町 出漁準備岸壁 north of the market, a different quay. The つばき会 page names the venue 「気仙沼市魚浜町コの字岸壁（セレモニー会場）・港町出港岸壁」; `route.js` holds the evidence. The §6 point was deliberately not used. |
+
+Open, not changed in this round: the WCPFC photo puts the starboard star circle about 1 m forward of the 03-derived
+centre (s ≈ 50.2 against 51.0), and the 03 fit puts the 舷門's forward edge near s 21.4 against the dossier's 22.8.
+Aft of the radar mast the WCPFC anchors are centreline masts and a rounded stern, too uncertain to move either.
+
+### Other choices
+
 - **The berth** is the 魚浜町 pier's east face (the send-off ceremony venue), not the fishery-database point north of
   the market; the evidence is in `route.js`.
 - **The homecoming** brings her in bow first and lays her port side to the same berth (the send-off has her starboard
   side to it, bow out). This avoids turning a 58.6 m ship end for end in the basin on screen.
 - **The haul at night** adds floodlight pools at the 舷門 (hauling often runs to midnight); the cel materials take no
   point lights.
-- **Not done in this pass** (from `next-pass-usui.md`): the 80 t allocation on the quota bar, the six-ship fleet line,
+- **Not done in this pass** (from the captain's next-pass notes, kept out of git): the 80 t allocation on the quota bar, the six-ship fleet line,
   the tag's IC chip and QR wording and the Shimizu inspectors, the 波怒棄館 story pin, and Usui's closing line on the card.
