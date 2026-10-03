@@ -39,6 +39,10 @@ const SHOTS = [
   ['a2_wait', `__voyageShot('WAIT')`, 3],
   ['a2_haul', `__voyageShot('HAUL', { keep: 2, fishOnScale: true })`, 0.6],
   ['a2_haul_night', `(__voyageShot('HAUL', { keep: 3, fishOnScale: true }), __setHours(22.5), 'ok')`, 0.6],
+  // [ship] fix round 3: the starboard stern hourglass X (a small down-triangle over a large up-triangle meeting at one apex)
+  // from the quarter and from abeam; the 'stern_quarter' ids are not part of the committed act list
+  ['a2_stern_quarter', `(__voyageShot('WAIT'), document.getElementById('klc-ship').hidden = true, 'ok')`, 0.5, `__shipLook([-8.5, 7.8, -41], [-2.2, 4.3, -29.3])`],
+  ['a2_stern_side', `(__voyageShot('WAIT'), document.getElementById('klc-ship').hidden = true, 'ok')`, 0.5, `__shipLook([-17, 5.2, -37], [-4.5, 4.0, -27.5])`],
   ['a2_side_stbd', `(__voyageShot('HAUL', { keep: 1 }), __voyageCam('side'), document.getElementById('klc-ship').hidden = true)`, 0.4],
   ['a2_stow', `__voyageShot('STOW')`, 1.5],
   ['a3_laspalmas', `__voyageShot('TRANSSHIP_LAS_PALMAS')`, 0.5],
