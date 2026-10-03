@@ -1,0 +1,101 @@
+// [ship:acts] Headless shots of the three acts of 第一昭福丸 (and the side-on views compared with the model photos
+// 02 port / 03 starboard). Run ONLY through the machine gate (one headless Chrome machine-wide):
+//   tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/ship-acts-shots.mjs --port 8963 --out shots/ship-acts/a
+// --only   world modules (default environment,water,town,harbor,life)   --w/--h size (1280x720)   --q high|low|phone
+// --list   comma list of shot ids to take (default: all)                 --nobuild reuse the last build
+// --livery nendo|fallback (default: the flag; a local host shows nendo)   --auto 1 the hands-free voyage end to end
+// Prints a JSON line per shot (state, tags, frame stats) and the page errors; exits non-zero on a page error.
+import { join, resolve, relative } from 'node:path';
+import { build, serve, launch, ROOT } from './cdp.mjs';
+
+const args = {};
+for (let i = 2; i < process.argv.length; i++) { const a = process.argv[i]; if (a.startsWith('--')) { const k = a.slice(2); const v = process.argv[i + 1] !== undefined && !process.argv[i + 1].startsWith('--') ? process.argv[++i] : '1'; args[k] = v; } }
+const port = Number(args.port || 8963);
+if ([8787, 8790, 8791].includes(port)) throw new Error('port reserved');
+const W = Math.min(1920, Number(args.w || 1280)), H = Math.min(1080, Number(args.h || 720));
+const out = args.out || 'shots/ship-acts/a';
+const dist = join(ROOT, `dist/anime-${port}-voyage`);
+const only = (args.only || 'environment,water,town,harbor,life').split(',').map((s) => s.trim());
+
+// id -> page JS (returns a summary) and the sim seconds to run after it
+const SHOTS = [
+  ['a1_docked', `__voyageShot('DOCKED')`, 1.5],
+  ['a1_side_port', `(__voyageShot('DOCKED'), __voyageCam('sidePort'), document.getElementById('klc-ship').hidden = true)`, 0.5],
+  ['a1_sendoff', `__voyageShot('SENDOFF')`, 6.5],
+  ['a1_sendoff_close', `(__voyageShot('SENDOFF'), __voyage.setCam('crowd', true), 'ok')`, 5],
+  ['a1_tapes_snap', `(__voyageShot('SENDOFF'), window.__c = __voyage.camRig('berth'), __voyage.send('HORN'), __voyage.send('CAST_OFF'), 'ok')`, 26, `__lookAt(__c.pos.toArray(), __c.look.toArray())`],
+  ['a1_kanae', `__voyageKanae(100)`, 33, `(() => { const s = __sail.state, px = Math.cos(s.yaw), pz = -Math.sin(s.yaw); __lookAt([s.x + px * 170 - Math.sin(s.yaw) * 60, 26, s.z + pz * 170 - Math.cos(s.yaw) * 60], [s.x, 16, s.z]); })()`],
+  ['a1_kanae_chase', `__voyageKanae(100)`, 26],
+  ['a1_baymouth', `__voyageShot('BAY_MOUTH')`, 2],
+  ['a2_set', `__voyageShot('OCEAN_SET')`, 14],
+  ['a2_wait', `__voyageShot('WAIT')`, 3],
+  ['a2_haul', `__voyageShot('HAUL', { keep: 2, fishOnScale: true })`, 0.6],
+  ['a2_side_stbd', `(__voyageShot('HAUL', { keep: 1 }), __voyageCam('side'), document.getElementById('klc-ship').hidden = true)`, 0.4],
+  ['a2_stow', `__voyageShot('STOW')`, 1.5],
+  ['a3_laspalmas', `__voyageShot('TRANSSHIP_LAS_PALMAS')`, 0.5],
+  ['a3_reefer', `__voyageShot('REEFER')`, 0.5],
+  ['a3_shimizu', `__voyageShot('SHIMIZU_WEIGH')`, 0.5],
+  ['a3_home', `__voyageShot('HOMECOMING')`, 27],
+  ['a3_card', `__voyageShot('CARD')`, 0.5],
+];
+const want = args.list ? new Set(args.list.split(',')) : null;
+
+const t0 = Date.now();
+if (!args.nobuild) {
+  const r = await build({ entry: resolve(ROOT, 'tools/anime/debug/voyage/index.html'), outdir: dist, only });
+  console.log(`build ${r.reused ? 'FAILED (reused last good build)' : 'ok'} ${r.ms ?? ''} ms`);
+  if (r.reused) process.exitCode = 1;
+}
+const srv = serve({ port, dist });
+let browser;
+try {
+  browser = await launch({ quiet: !args.verbose });
+  const page = await browser.page({ width: W, height: H });
+  const q = new URLSearchParams({ shot: '1', w: String(W), h: String(H), t: '0', q: args.q || 'high', only: only.join(','), hours: '11' });
+  if (args.q === 'phone') q.set('unsafe', '1');
+  if (args.livery) q.set('livery', args.livery);   // nendo | fallback (ship/flags.js: the URL wins); commit only fallback renders
+  await page.goto(`${srv.url}index.html?${q}`);
+  await page.waitFor('window.__ready === true', { timeout: 280000 });
+  console.log(`ready in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+  if (args.auto) {
+    // [ship:acts] the hands-free voyage end to end (auto mode): every state in order, a shot at each, no errors
+    await page.eval('(__voyageInit({ auto: true }), __voyage.start(), true)');
+    const seen = [];
+    let t = await page.eval('window.__ctx.time');
+    for (let i = 0; i < 400; i++) {
+      const st = await page.eval('__voyage.state');
+      if (seen.at(-1) !== st) {
+        seen.push(st);
+        await page.frames(3);
+        await page.shot(resolve(ROOT, `${out}_auto_${String(seen.length).padStart(2, '0')}_${st}.png`));
+        console.log(JSON.stringify({ t: Math.round(t), state: st, data: await page.eval('({ km: __voyage.acts.data.setKm, kept: __voyage.acts.data.kept.length, released: __voyage.acts.data.released.length, landed: __voyage.acts.data.landedKg, haulEnd: __voyage.acts.data.haulEnd })') }));
+      }
+      if (st === 'CARD') break;
+      t += 2; await page.eval(`__simTo(${t})`);
+    }
+    console.log('AUTO SEQUENCE', seen.join(' > '));
+    if (seen.at(-1) !== 'CARD') { console.log('AUTO FAILED: did not reach CARD'); process.exitCode = 1; }
+  } else await page.eval('__voyageInit()');
+  for (const [id, js, secs, cam] of args.auto ? [] : SHOTS) {
+    if (want && !want.has(id)) continue;
+    const sum = await page.eval(`(() => { const r = ${js}; return r; })()`);
+    const tNow = await page.eval('window.__ctx.time');
+    if (secs) await page.eval(`__simTo(${tNow + secs})`);
+    if (cam) await page.eval(cam);
+    await page.frames(4);
+    const file = resolve(ROOT, `${out}_${id}.png`);
+    await page.shot(file);
+    const st = await page.eval(`({ state: __voyage.state, calls: __stats.calls, tris: __stats.triangles, heapMB: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1e6) : null, sendoff: __voyage.sendoff.stats, ocean: __voyage.ocean.stats, events: __sail.state.events.map((e) => e.type) })`);
+    console.log(JSON.stringify({ id, file: relative(ROOT, file), sum, ...st }));
+  }
+  const errs = page.errors();
+  const modErr = await page.eval('window.__errors');
+  if (modErr?.length) { console.log('MODULE ERRORS:', JSON.stringify(modErr).slice(0, 2000)); process.exitCode = 1; }
+  if (errs.length) { console.log('PAGE ERRORS:'); for (const l of errs.slice(0, 30)) console.log('  ', l.type, l.text.slice(0, 600)); process.exitCode = 1; }
+} catch (e) {
+  console.log('SHOTS FAILED:', e.message);
+  process.exitCode = 1;
+} finally {
+  await browser?.close();
+  srv.stop();
+}
