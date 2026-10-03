@@ -28,6 +28,7 @@ import * as THREE from 'three';
 import * as L from '../layout.js';
 import { OUTBOUND_PATH, BERTH, KANAE_CROSSING, SHOKO, MIRAI, BAY_MOUTH, makePath, SHIP_DIMS } from '../ship/route.js';
 import { KANAE } from '../harbor/real.js';
+import { wakeTexture } from '../harbor/arrivals.js';   // the harbour's painted V wake (shared texture)
 
 export const KN = 0.514444;   // m/s per knot
 
@@ -397,50 +398,63 @@ export function makeStandIn(ctx) {
   return { group: g, anchors: {}, setFlags() {}, setNight() {}, update() {}, dispose() { g.traverse((o) => { o.geometry?.dispose?.(); }); } };
 }
 
-/** Foam ribbon along the recent stern track (one draw call) + a V wake and a bow wave that grow with speed. */
+/** Wake: a soft foam ribbon along the recent stern track (prop wash: bright on the centreline, fading to the edges and
+ *  with age; it follows her turns), the harbour's painted V wake (harbor/arrivals.js wakeTexture, shared with the AI
+ *  boats) and a bow wave, all growing with speed. Three draw calls; the ribbon has 24 rows on the phone tier. */
 function makeWake(ctx, { phone }) {
-  const N = phone ? 24 : 64, group = new THREE.Group(); group.name = 'sail:wake';
-  const pos = new Float32Array(N * 2 * 3), col = new Float32Array(N * 2 * 4);
+  const N = phone ? 24 : 64, C = 3, group = new THREE.Group(); group.name = 'sail:wake';
+  const pos = new Float32Array(N * C * 3), col = new Float32Array(N * C * 4);
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
   const idx = [];
-  for (let i = 0; i < N - 1; i++) { const a = i * 2, b = a + 1, c = a + 2, d = a + 3; idx.push(a, c, b, b, c, d); }
+  for (let i = 0; i < N - 1; i++) for (let k = 0; k < C - 1; k++) { const a = i * C + k, b = a + 1, c = a + C, d = c + 1; idx.push(a, c, b, b, c, d); }
   geo.setIndex(idx);
   const mat = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, toneMapped: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const ribbon = new THREE.Mesh(geo, mat); ribbon.frustumCulled = false; ribbon.renderOrder = 2; ribbon.name = 'sail:ribbon';
   group.add(ribbon);
+  const flat = (tex) => new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  // the painted V wake (local +Z = toward the stern once laid flat, see arrivals.js), 1.9 LOA long
+  let vTex = null; try { vTex = ctx.tex?.draw ? wakeTexture(ctx) : null; } catch (e) { vTex = null; }
+  const vmat = flat(vTex), WL = SHIP_DIMS.loa * 1.9, WW = SHIP_DIMS.beam * 3.6;
+  const vWake = new THREE.Mesh(new THREE.PlaneGeometry(WW, WL).rotateX(-Math.PI / 2), vmat);
+  vWake.renderOrder = 2; vWake.visible = !!vTex; vWake.name = 'sail:vwake'; group.add(vWake);
   // bow wave: a painted moustache of foam either side of the stem
   const bowTex = ctx.tex?.draw ? ctx.tex.draw(128, 128, (g) => {
     g.clearRect(0, 0, 128, 128);
     for (const sd of [-1, 1]) for (let i = 0; i < 26; i++) { const u = i / 26; g.fillStyle = `rgba(246,250,248,${(0.85 * (1 - u)).toFixed(3)})`; g.beginPath(); g.ellipse(64 + sd * (6 + u * 52), 18 + u * 96, 7 * (1 - u * 0.5), 3.2, sd * 0.5, 0, 7); g.fill(); }
   }, { key: 'sail-bowwave' }) : null;
-  const bmat = new THREE.MeshBasicMaterial({ map: bowTex, color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  const bmat = flat(bowTex);
   const bowWave = new THREE.Mesh(new THREE.PlaneGeometry(16, 22).rotateX(-Math.PI / 2).rotateY(Math.PI), bmat);
   bowWave.renderOrder = 2; bowWave.visible = !!bowTex; group.add(bowWave);
   try { ctx.noOutline?.(group); } catch (e) { /* tests */ }
-  const trail = [];   // [x, z, age]
+  const LIFE = 60;    // seconds (model time) a stretch of wash stays visible
+  const trail = [];   // [x, z, age, speed]
   let acc = 0;
   function update(b, dt) {
-    const sy = Math.sin(b.yaw), cy = Math.cos(b.yaw), F = SHIP_DIMS.loa / 2, sp = Math.abs(b.u) / BOAT.vMax;
+    const sy = Math.sin(b.yaw), cy = Math.cos(b.yaw), F = SHIP_DIMS.loa / 2, sp = Math.min(1, Math.abs(b.u) / BOAT.vMax);
     const sx = b.x - sy * (F - 2), sz = b.z - cy * (F - 2);
     acc += dt;
     for (const p of trail) p[2] += dt * b.tc;
     if (!trail.length || acc > 0.25 || Math.hypot(trail[0][0] - sx, trail[0][1] - sz) > 6) { trail.unshift([sx, sz, 0, sp]); acc = 0; }
     else { trail[0][0] = sx; trail[0][1] = sz; trail[0][3] = sp; }
-    while (trail.length > N || (trail.length && trail[trail.length - 1][2] > 90)) trail.pop();
+    while (trail.length > N || (trail.length && trail[trail.length - 1][2] > LIFE)) trail.pop();
     for (let i = 0; i < N; i++) {
       const p = trail[Math.min(i, trail.length - 1)] || [sx, sz, 0, 0], q = trail[Math.min(i + 1, trail.length - 1)] || p;
       let dx = p[0] - q[0], dz = p[1] - q[1]; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
-      const age = p[2], w = SHIP_DIMS.beam * 0.45 + age * 0.35, a = i < trail.length ? Math.max(0, 0.7 * (p[3] ?? 0) * (1 - age / 90)) : 0;
-      for (const [k, sd] of [[0, 1], [1, -1]]) {
-        const o = (i * 2 + k) * 3; pos[o] = p[0] - dz * w * sd; pos[o + 1] = 0.07; pos[o + 2] = p[1] + dx * w * sd;
-        const c = (i * 2 + k) * 4; col[c] = 0.96; col[c + 1] = 0.98; col[c + 2] = 0.97; col[c + 3] = a;
+      const age = p[2], w = SHIP_DIMS.beam * 0.4 + age * 0.3, fade = (1 - age / LIFE) ** 2;
+      const a = i < trail.length && i > 0 ? 0.42 * (p[3] ?? 0) * fade : 0;
+      for (let k = 0; k < C; k++) {
+        const sd = k - 1, o = (i * C + k) * 3, c = (i * C + k) * 4;
+        pos[o] = p[0] - dz * w * sd; pos[o + 1] = 0.07; pos[o + 2] = p[1] + dx * w * sd;
+        col[c] = 0.95; col[c + 1] = 0.98; col[c + 2] = 0.98; col[c + 3] = sd === 0 ? a : 0;
       }
     }
     geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
+    vWake.position.set(b.x - sy * (F * 0.72 + WL / 2), 0.06, b.z - cy * (F * 0.72 + WL / 2)); vWake.rotation.set(0, b.yaw, 0);
+    vmat.opacity = 0.8 * sp; vWake.visible = !!vTex && sp > 0.02;
     bowWave.position.set(b.x + sy * (F - 7), 0.08, b.z + cy * (F - 7)); bowWave.rotation.set(0, b.yaw, 0);
     bmat.opacity = Math.min(0.9, sp * 0.9);
   }
-  return { group, update, dispose() { geo.dispose(); mat.dispose(); bmat.dispose(); } };
+  return { group, update, dispose() { geo.dispose(); mat.dispose(); bmat.dispose(); vmat.dispose(); } };
 }

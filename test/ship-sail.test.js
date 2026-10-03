@@ -384,6 +384,6 @@ describe("createSail (runtime, true-size stub)", () => {
   });
   test("phone tier: the wake ribbon is small (24 segments)", () => {
     const src = read("src/anime/world/explore/sail.js");
-    expect(src).toContain("const N = phone ? 24 : 64");
+    expect(src).toContain("const N = phone ? 24 : 64, C = 3");
   });
 });
