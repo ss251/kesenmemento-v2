@@ -5,7 +5,7 @@
 //   - a rate-limited rudder, a first-order (Nomoto) yaw response whose rate scales with speed (a ship turns on a circle
 //     of roughly fixed size whatever her speed: tactical diameter ~3.5 LOA), a little sideslip outward in a turn, and
 //     a little speed lost while turning;
-//   - harbour speed 6 kn (3.1 m/s); "boost" is TIME COMPRESSION (x4): the whole model runs four times faster, so she
+//   - a harbour pace of 6 kn (3.1 m/s), a game setting (no sourced harbour limit for 気仙沼); "boost" is TIME COMPRESSION (x4): the whole model runs four times faster, so she
 //     covers the bay at an apparent 24 kn but turns on the same circle and keeps the same feel;
 //   - the shore: L.shoreDist (signed distance to the coastline, + at sea) sampled at the bow, the stern and the beam
 //     corners; she slides along a quay, never through it, and loses speed on contact.
@@ -35,7 +35,7 @@ export const KN = 0.514444;   // m/s per knot
 /** Ship handling constants (sources in the comments; the "game" values are tuned to the real ones' proportions). */
 export const BOAT = {
   L: SHIP_DIMS.loa, B: SHIP_DIMS.beam,
-  vMax: 6 * KN,          // 3.09 m/s: harbour speed (港内 6 kn; her service speed is 12.3 kn, JASNAOE SOY 2020)
+  vMax: 6 * KN,          // 3.09 m/s: a harbour pace chosen for the game (no sourced limit for 気仙沼); service speed is 12.3 kn (JASNAOE SOY 2020)
   accel: 0.16,           // m/s^2 at full ahead from rest: 0 -> 90 % of harbour speed in ~28 s (a 486 GT hull)
   astern: 0.3,           // astern thrust / ahead thrust (fixed-pitch propeller going astern)
   linDrag: 0.012,        // 1/s: lets her come to rest instead of coasting forever on the quadratic drag

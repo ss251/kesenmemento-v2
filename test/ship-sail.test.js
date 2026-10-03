@@ -40,7 +40,7 @@ const LOA = SHIP_DIMS.loa;
 const run = (s, input, secs, dt = 0.05) => { for (let t = 0; t < secs; t += dt) s = boatStep(s, input, dt); return s; };
 
 describe("boatStep: surge (inertia, no brakes, astern thrust)", () => {
-  test("accelerates slowly to the 6 kn harbour speed and never past it", () => {
+  test("accelerates slowly to the 6 kn harbour pace (a game setting) and never past it", () => {
     let s = boatState(0, 0, 0), t = 0, t50 = null, t90 = null, vmax = 0;
     for (; t < 120; t += 0.05) {
       s = boatStep(s, { throttle: 1 }, 0.05);
