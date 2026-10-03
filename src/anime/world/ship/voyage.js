@@ -179,7 +179,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
         const keep = { x: rig.x, z: rig.z, yaw: rig.yaw }; berthHome(); sendoff.start({ mode: 'homecoming' }); rig.set(keep.x, keep.z, keep.yaw);
         setCam('home', true); V.hornDone = false; break;
       }
-      case 'CARD': break;
+      case 'CARD': if (!from) { if (ocean.active) ocean.exit(); hours(14.5); ship.setFlags?.(true); berthHome(); setCam('home', true); } break;   // [ship:integrate] a jump (?beat=CARD) lands her home behind the card
     }
     ui?.show(state, d);
   }

@@ -397,8 +397,11 @@ export function createOcean(ctx, { ship, rig = null }) {
       if (stage === 'set') return { pos: W(-22 + Math.sin(t * 0.05) * 3, 15, -62), look: W(0, 3, -24) };
       if (stage === 'wait') return { pos: W(-70, 26, 40), look: W(0, 4, -8) };
       // outside the starboard side, level with the 舷門: the opening sits right of centre (the HUD is on the left)
-      if (stage === 'haul') return { pos: W(gang.x - 6.8, gang.y + 2.1, gang.z - 4.6), look: W(gang.x + 1.6, gang.y + 0.35, gang.z - 2.5) };
-      if (stage === 'stow') return { pos: W(gang.x - 6.0, gang.y + 2.3, gang.z - 9.0), look: W(gang.x + 2.4, gang.y + 0.3, gang.z - 6.0) };
+      // [ship:integrate] a portrait phone: further out and aimed below the sill, so the opening, the scale and the fish sit
+      // in the upper half of the screen, above the haul panel
+      const portrait = (ctx.camera?.aspect ?? 1.6) < 1;
+      if (stage === 'haul') return portrait ? { pos: W(gang.x - 12.5, gang.y + 1.4, gang.z - 2.4), look: W(gang.x + 1.6, gang.y - 2.6, gang.z - 1.2) } : { pos: W(gang.x - 6.8, gang.y + 2.1, gang.z - 4.6), look: W(gang.x + 1.6, gang.y + 0.35, gang.z - 2.5) };
+      if (stage === 'stow') return portrait ? { pos: W(gang.x - 12.0, gang.y + 1.8, gang.z - 6.5), look: W(gang.x + 2.4, gang.y - 2.4, gang.z - 5.0) } : { pos: W(gang.x - 6.0, gang.y + 2.3, gang.z - 9.0), look: W(gang.x + 2.4, gang.y + 0.3, gang.z - 6.0) };
       if (stage === 'side') return { pos: W(-75, 6, 0), look: W(0, 5, 0) };
       return { pos: W(-40, 18, -40), look: W(0, 4, 0) };
     },
