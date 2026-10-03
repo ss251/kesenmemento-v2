@@ -148,3 +148,41 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
     }
   });
 });
+
+describe('starboard aft sheer triangle (fix round 2): the real ship, WCPFC photo', () => {
+  const plan = PLANS.nendo.starboard;
+  const tri = plan.shapes.find((q) => q.tag === 'aft-sheer-triangle');
+  test('measured mark: top on the sheer, apex at about 63 % of the side below it, painted over the circle', () => {
+    expect(tri).toBeTruthy(); expect(tri.over).toBe(true); expect(tri.colour).toBe('black');
+    const top = tri.pts.filter((p) => p[1] >= SHIP.aftShelter.roof), apex = tri.pts.reduce((a, p) => (p[1] < a[1] ? p : a));
+    expect(top.length).toBe(2);
+    const wTop = Math.abs(top[0][0] - top[1][0]);
+    expect(wTop).toBeGreaterThan(2.6);                                       // the 03 sliver was 2.3 m wide
+    expect((sheerAt(apex[0]) - apex[1]) / sheerAt(apex[0])).toBeGreaterThan(0.55);
+    expect(apex[1]).toBeGreaterThan(2.4); expect(apex[1]).toBeLessThan(3.2);  // the 03 trace stopped at h 5.3
+    expect(apex[0]).toBeGreaterThan(Math.min(top[0][0], top[1][0])); expect(apex[0]).toBeLessThan(Math.max(top[0][0], top[1][0]));
+  });
+  test('size check against its port counterpart (s 48.4-52.6, h 3.2-7.1)', () => {
+    const port = PLANS.nendo.port.shapes.find((q) => q.colour === 'black' && q.tag === 'traced' && q.pts.every((p) => p[0] > 47 && p[0] < 53.5) && q.pts.some((p) => p[1] > 6.5));
+    expect(port).toBeTruthy();
+    const area = (pts) => { let a = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; a += p[0] * q[1] - q[0] * p[1]; } return Math.abs(a) / 2; };
+    const tall = (pts) => Math.max(...pts.map((p) => p[1])) - Math.min(...pts.map((p) => p[1]));
+    expect(area(tri.pts) / area(port.pts)).toBeGreaterThan(0.6);
+    expect(tall(tri.pts)).toBeGreaterThan(0.9 * tall(port.pts));
+  });
+  test('the traced 03 fragment and its diagonal are gone; the diagonal runs from the apex to the circle foot', () => {
+    for (const q of plan.shapes.filter((x) => x.tag === 'traced')) { const c = q.pts.reduce((a, p) => [a[0] + p[0] / q.pts.length, a[1] + p[1] / q.pts.length], [0, 0]); expect(c[0] > 52 && c[0] < 55.2 && c[1] > 3 && c[1] < 7.5).toBe(false); }
+    const apex = tri.pts.reduce((a, p) => (p[1] < a[1] ? p : a));
+    expect(plan.lines.some(({ l }) => l[0] === apex[0] && l[1] === apex[1] && l[3] < 0)).toBe(true);
+    expect(plan.lines.some(({ l }) => Math.abs(l[0] - 54.758) < 1e-3)).toBe(false);
+  });
+  test('it is visible in the painted atlas: black at mid-height inside it, even where the circle disc lies', () => {
+    const apex = tri.pts.reduce((a, p) => (p[1] < a[1] ? p : a)), top = tri.pts.filter((p) => p !== apex);
+    const c = [(apex[0] + top[0][0] + top[1][0]) / 3, (apex[1] + top[0][1] + top[1][1]) / 3];
+    const circ = plan.circles[0];
+    expect(Math.hypot(c[0] - circ.c[0], c[1] - circ.c[1])).toBeLessThan(circ.r + 0.6);   // near or on the disc
+    const col = sample(PLANS.nendo, [sidePx('starboard', c[0], c[1]), sidePx('starboard', apex[0], apex[1] + 0.6)]);
+    expect(col).toEqual([COLORS.black, COLORS.black]);
+  });
+});
+

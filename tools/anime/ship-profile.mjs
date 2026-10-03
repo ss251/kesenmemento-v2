@@ -105,8 +105,9 @@ export function tracedIoU(atlas, traced, marks, side, step = 0.05) {
 // The starboard livery against the real ship: the WCPFC registry photo (7KFY_..._29_January_2020.jpg, 2400 x 1800, a
 // starboard view from forward of the beam). Photo x -> s by a projective fit through the stem, foremast, bridge front,
 // radar mast, aft mast and transom (its residuals, within 0.7 m, removed piecewise); h from the waterline (y 879) by
-// a vertical m/px measured on the hull side (waterline to sheer). Scored forward of s 44 by default: aft of the radar
-// mast the anchors are centreline masts and the rounded stern, and the fit there disagrees with the vertical scale.
+// a vertical m/px measured on the hull side (waterline to sheer). Scored forward of s 44, aft of s 44 and overall: aft
+// of the radar mast the anchors are centreline masts and the rounded stern, and the fit there compresses s against the
+// vertical scale (about 0.029 against 0.036 m/px), so the aft score is the weaker check (fix round 2 added it).
 export const WCPFC = {
   file: '7KFY_SHOFUKU%20MARU%20NO_1_29_January_2020.jpg', wlY: 879,
   anchors: [[22, 58.6], [228, 53.7], [595, 42.8], [1125, 28.3], [1745, 14.2], [2309, 0]],
@@ -125,14 +126,14 @@ export function wcpfcS(anchors = WCPFC.anchors) {
   const corr = anchors.map(([x, s]) => [x, s - f(x)]).sort((a, b) => a[0] - b[0]);
   return (x) => f(x) + lerpT(corr, x);
 }
-export function wcpfcIoU(atlas, photo, { sMax = 44, outPx = null } = {}) {
+export function wcpfcIoU(atlas, photo, { sMin = 0.6, sMax = 44, outPx = null } = {}) {
   const S = wcpfcS(), res = {}, { data, W } = photo;
   const sOf = new Float32Array(W); for (let x = 0; x < W; x++) sOf[x] = S(x);
   for (const colour of ['black', 'red']) {
     let I = 0, U = 0;
     for (let y = 450; y < 900; y++) for (let x = 0; x < W; x++) {
       const s = sOf[x], h = (WCPFC.wlY - y) * lerpT(WCPFC.vScale, x);
-      if (s < 0.6 || s > Math.min(58.2, sMax) || h < 0.15 || h > sheerAt(s) - 0.25) continue;
+      if (s < Math.max(0.6, sMin) || s > Math.min(58.2, sMax) || h < 0.15 || h > sheerAt(s) - 0.25) continue;
       if (WCPFC.ignore.some((z) => s >= z.s[0] && s <= z.s[1] && h >= z.h[0] && h <= z.h[1])) continue;
       const k = (y * W + x) * 4, r = data[k], g = data[k + 1], b = data[k + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b);
       const ref = colour === 'black' ? mx < 62 && mx - mn < 30 : r > g + 28 && r > b + 12 && r > 55;   // a scanned, darker photo
@@ -215,7 +216,7 @@ async function main() {
             const col = colour === 'red' ? (mine && ref ? [220, 30, 40] : ref ? [255, 210, 0] : [0, 200, 230]) : (mine && ref ? [20, 20, 20] : ref ? [150, 90, 0] : [60, 60, 230]);
             const i = (y * photo.W + x) * 3; ov[i] = col[0]; ov[i + 1] = col[1]; ov[i + 2] = col[2];
           };
-          run.wcpfcIoU = { fwdOf44: wcpfcIoU(atl, photo, { outPx: paint }), all: wcpfcIoU(atl, photo, { sMax: 99 }) };
+          run.wcpfcIoU = { fwdOf44: wcpfcIoU(atl, photo, { outPx: paint }), aftOf44: wcpfcIoU(atl, photo, { sMin: 44, sMax: 99, outPx: paint }), all: wcpfcIoU(atl, photo, { sMax: 99 }) };
           await sharp(ov, { raw: { width: photo.W, height: photo.H, channels: 3 } }).extract({ left: 0, top: 450, width: photo.W, height: 470 }).png().toFile(join(out, `profile-starboard-${livery}-${tier}-wcpfc-ref-overlay.png`));
           console.log('WCPFC photo livery IoU (starboard)', JSON.stringify(run.wcpfcIoU));
         }
