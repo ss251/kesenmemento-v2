@@ -13,6 +13,9 @@ import { STATES, ACT_OF } from "../src/anime/world/ship/acts.js";
 import { BERTH } from "../src/anime/world/ship/route.js";
 import { isDemoTag } from "../src/anime/world/ship/tags.js";
 import { BUDGET } from "../src/anime/world/ship/shofukumaru1.js";
+import { fixHtmlEntry } from "../scripts/anime/html-entry.js";
+import { mkdtempSync, writeFileSync as writeFile, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 
 // DOM stubs (canvas drawing is a no-op), as in test/ship-sail.test.js: the wake and the crowd paint canvases; the UI
 // needs a real DOM and stays unmounted here
@@ -194,4 +197,27 @@ describe("ship: the module at runtime (headless, phone tier)", () => {
     S.voyage.exit();
     globalThis.fetch = realFetch;
   });
+});
+
+describe("ship: the bundle still starts the app (Bun HTML entry guard)", () => {
+  test("fixHtmlEntry points the HTML's module script at the JS entry chunk, and leaves a right one alone", () => {
+    const dir = mkdtempSync(resolve(tmpdir(), "klc-html-"));
+    const html = resolve(dir, "index.html");
+    writeFile(html, '<html><script type="module" crossorigin src="./chunk-wrong.js"></script></html>');
+    const outs = [{ kind: "entry-point", path: resolve(dir, "chunk-main.js") }, { kind: "entry-point", path: html }, { kind: "chunk", path: resolve(dir, "chunk-wrong.js") }];
+    expect(fixHtmlEntry(outs)).toEqual([{ html: "index.html", from: "chunk-wrong.js", to: "chunk-main.js" }]);
+    expect(readFileSync(html, "utf8")).toContain('src="./chunk-main.js"');
+    expect(fixHtmlEntry(outs)).toEqual([]);
+    expect(fixHtmlEntry([{ kind: "entry-point", path: html }])).toEqual([]);   // no JS entry: nothing to be sure of
+    rmSync(dir, { recursive: true, force: true });
+  });
+  test("a real build of src/anime/index.html: after the guard, the page's script is main.js's chunk", async () => {
+    const dir = mkdtempSync(resolve(tmpdir(), "klc-bundle-"));
+    const r = await Bun.build({ entrypoints: [resolve(ROOT, "src/anime/index.html")], outdir: dir, target: "browser", splitting: true });
+    expect(r.success).toBe(true);
+    fixHtmlEntry(r.outputs);
+    const src = readFileSync(resolve(dir, "index.html"), "utf8").match(/<script[^>]*src="\.\/([^"]+)"/)[1];
+    expect(readFileSync(resolve(dir, src), "utf8")).toContain("町の暮らし");   // main.js's module labels
+    rmSync(dir, { recursive: true, force: true });
+  }, 60000);
 });

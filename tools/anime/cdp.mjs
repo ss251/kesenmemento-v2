@@ -66,6 +66,8 @@ export async function build({ entry = join(ROOT, 'src/anime/index.html'), outdir
     if (!strict && existsSync(join(outdir, 'index.html'))) { console.error(`[build] failed; reusing the last good build in ${outdir}\n${msg}`); return { outdir, reused: true }; }
     throw new Error('anime build failed:\n' + msg);
   }
+  // [ship:integrate] Bun can write the HTML's <script src> for the wrong chunk (scripts/anime/html-entry.js)
+  try { const { fixHtmlEntry } = await import(join(ROOT, 'scripts/anime/html-entry.js')); for (const f of fixHtmlEntry(res.outputs)) if (!quiet) console.error(`[build] fixed ${f.html}: ${f.from} -> ${f.to}`); } catch (e) { console.error('[build] html entry check', e.message); }
   rmSync(outdir, { recursive: true, force: true }); renameSync(tmp, outdir);
   if (!quiet) console.error(`[build] ${outdir} in ${Math.round(performance.now() - t0)} ms`);
   return { outdir, reused: false, ms: Math.round(performance.now() - t0) };
