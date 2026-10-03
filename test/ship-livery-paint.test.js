@@ -95,8 +95,9 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
     });
   }
   test('nendo: the stern triangles still reach the quarter (black just forward of the knuckle on both sides)', () => {
-    // port: the big stern triangle (05); starboard: the stern quarter triangle (03, WCPFC)
-    const pts = [sidePx('port', knuckleS(0.5) - 0.3, 0.5), sidePx('starboard', knuckleS(2.5) - 0.3, 2.5)];
+    // port: the big stern triangle (05); starboard: the stern hourglass X's large triangle (WCPFC, fix round 3), whose
+    // aft edge runs from the apex to the knuckle at the waterline, so it is black just inside that edge
+    const pts = [sidePx('port', knuckleS(0.5) - 0.3, 0.5), sidePx('starboard', 56.55 - 0.3, 0.9)];
     const col = sample(PLANS.nendo, pts);
     expect(col).toEqual([COLORS.black, COLORS.black]);
   });
@@ -190,3 +191,70 @@ describe('starboard aft sheer triangle (fix round 2): the real ship, WCPFC photo
   });
 });
 
+
+describe('starboard stern hourglass X (fix round 3): the real ship, WCPFC photo x 40-170, y 683-873', () => {
+  const plan = PLANS.nendo.starboard;
+  const bottom = plan.shapes.find((q) => q.tag === 'stern-x-bottom'), top = plan.shapes.find((q) => q.tag === 'stern-x-top');
+  const apexOf = (q) => q.pts.reduce((a, p) => (p[1] < a[1] ? p : a));
+  const XC = apexOf(top);   // the X centre
+  test('two clean 3-point marks that meet at one apex: a down-triangle on the sheer over an up-triangle on the waterline', () => {
+    expect(bottom).toBeTruthy(); expect(top).toBeTruthy();
+    expect(bottom.pts.length).toBe(3); expect(top.pts.length).toBe(3);
+    expect(bottom.colour).toBe('black'); expect(top.colour).toBe('black');
+    const ab = bottom.pts.reduce((a, p) => (p[1] > a[1] ? p : a));   // the up-triangle's apex is its highest point
+    expect(ab).toEqual(XC);                                           // apex meets apex
+    expect(XC[1]).toBeGreaterThan(5.3); expect(XC[1]).toBeLessThan(6.2);
+    expect(XC[0]).toBeGreaterThan(56.8); expect(XC[0]).toBeLessThan(57.6);   // x 82 on the WCPFC photo
+    expect(bottom.pts.filter((p) => p[1] <= 0).length).toBe(2);       // its base is on the waterline
+    const topEdge = top.pts.filter((p) => p[1] >= SHIP.aftShelter.roof);
+    expect(topEdge.length).toBe(2);                                    // its top edge is on the sheer
+    expect(XC[1]).toBeLessThan(Math.min(...topEdge.map((p) => p[1])));
+  });
+  test('nothing of it lies aft of the quarter knuckle, so the white transom clips none of it', () => {
+    for (const [s, h] of top.pts) expect(s).toBeLessThanOrEqual(knuckleS(Math.min(7, Math.max(h, 0))) - 0.05 + 1e-9);   // knuckleS(7) = 57.795 for every h >= 3
+    expect(Math.max(...top.pts.map((p) => p[0]))).toBeLessThan(knuckleS(7));
+    // the aft edge, from the apex to the waterline corner, stays forward of the knuckle at every height
+    const aft = bottom.pts.filter((p) => p[1] <= 0).reduce((a, p) => (p[0] > a[0] ? p : a));
+    for (let h = 0; h <= XC[1]; h += 0.1) {
+      const sEdge = aft[0] + ((XC[0] - aft[0]) * (h - aft[1])) / (XC[1] - aft[1]);
+      expect(sEdge).toBeLessThanOrEqual(knuckleS(h) + 1e-6);
+    }
+  });
+  test('the traced 5-point stern polygon and its diagonal are gone; two crossing lines run through the apex', () => {
+    for (const q of plan.shapes.filter((x) => x.tag === 'traced')) { const c = q.pts.reduce((a, p) => [a[0] + p[0] / q.pts.length, a[1] + p[1] / q.pts.length], [0, 0]); expect(c[0] > 55.3 && c[1] < 6.0).toBe(false); }
+    expect(plan.lines.some(({ l }) => Math.abs(l[0] - 57.14) < 0.05 && Math.abs(l[1] - 4.8) < 0.1)).toBe(false);   // the traced diagonal
+    const through = plan.lines.filter(({ l }) => {
+      const t = (XC[1] - l[1]) / (l[3] - l[1]); if (!(t > 0.05 && t < 0.95)) return false;
+      return Math.abs(l[0] + t * (l[2] - l[0]) - XC[0]) < 0.01;
+    });
+    expect(through.length).toBe(2);
+    const slope = (l) => (l[2] - l[0]) / (l[3] - l[1]);
+    expect(Math.sign(slope(through[0].l))).not.toBe(Math.sign(slope(through[1].l)));   // they cross
+  });
+  test('it is painted: the texel at the X centre plus 1 m up is black, and so are the apex and the texel 1 m below it just forward', () => {
+    const col = sample(PLANS.nendo, [sidePx('starboard', XC[0], XC[1] + 1), sidePx('starboard', XC[0] - 0.2, XC[1] - 1), sidePx('starboard', XC[0], XC[1])]);
+    expect(col).toEqual([COLORS.black, COLORS.black, COLORS.black]);
+  });
+  test("the large triangle's aft edge is one straight segment, with no notch: the painted rows follow a line", () => {
+    const hs = [], ss = [];
+    for (let h = 0.4; h <= 4.41; h += 0.4) hs.push(Math.round(h * 100) / 100);
+    for (let s = 55.0; s <= 58.2; s += 0.02) ss.push(Math.round(s * 100) / 100);
+    const pts = [], at = [];
+    for (const h of hs) for (const s of ss) { pts.push(sidePx('starboard', s, h)); at.push([s, h]); }
+    const col = sample(PLANS.nendo, pts);
+    const aft = hs.map((h) => { let m = -Infinity; at.forEach(([s, hh], i) => { if (hh === h && col[i] === COLORS.black) m = Math.max(m, s); }); return [h, m]; });
+    for (const [, m] of aft) expect(Number.isFinite(m)).toBe(true);
+    const [h0, s0] = aft[0], [h1, s1] = aft[aft.length - 1];
+    let worst = 0;
+    for (const [h, m] of aft) worst = Math.max(worst, Math.abs(m - (s0 + ((s1 - s0) * (h - h0)) / (h1 - h0))));
+    expect(worst).toBeLessThan(0.06);                                  // straight (one pixel is 0.03 m)
+    expect(s1).toBeGreaterThan(s0);                                    // it leans aft going up, toward the apex
+    // and the black runs unbroken from that edge to the forward edge on every row (no ragged gaps)
+    for (const h of hs) {
+      const row = at.map((p, i) => [p, col[i]]).filter(([p]) => p[1] === h);
+      const blacks = row.filter(([, c]) => c === COLORS.black).map(([p]) => p[0]);
+      expect(blacks.length).toBeGreaterThan(0);
+      expect(Math.round((Math.max(...blacks) - Math.min(...blacks)) / 0.02) + 1).toBe(blacks.length);
+    }
+  });
+});
