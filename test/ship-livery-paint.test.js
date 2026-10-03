@@ -96,8 +96,8 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
   }
   test('nendo: the stern triangles still reach the quarter (black just forward of the knuckle on both sides)', () => {
     // port: the big stern triangle (05); starboard: the stern hourglass X's large triangle (WCPFC, fix round 3), whose
-    // aft edge runs from the apex to the knuckle at the waterline, so it is black just inside that edge
-    const pts = [sidePx('port', knuckleS(0.5) - 0.3, 0.5), sidePx('starboard', 56.55 - 0.3, 0.9)];
+    // aft edge runs from the apex down to the knuckle at the waterline, so it is black just inside that edge
+    const pts = [sidePx('port', knuckleS(0.5) - 0.3, 0.5), sidePx('starboard', 56.15 - 0.1, 0.9)];
     const col = sample(PLANS.nendo, pts);
     expect(col).toEqual([COLORS.black, COLORS.black]);
   });
@@ -204,15 +204,19 @@ describe('starboard stern hourglass X (fix round 3): the real ship, WCPFC photo 
     const ab = bottom.pts.reduce((a, p) => (p[1] > a[1] ? p : a));   // the up-triangle's apex is its highest point
     expect(ab).toEqual(XC);                                           // apex meets apex
     expect(XC[1]).toBeGreaterThan(5.3); expect(XC[1]).toBeLessThan(6.2);
-    expect(XC[0]).toBeGreaterThan(56.8); expect(XC[0]).toBeLessThan(57.6);   // x 82 on the WCPFC photo
+    expect(XC[0]).toBeGreaterThan(55.5); expect(XC[0]).toBeLessThan(57.3);   // x 82 on the WCPFC photo: s 57.2 by the fit, 56.7 at the local scale, 56.0 on the model's plating
     expect(bottom.pts.filter((p) => p[1] <= 0).length).toBe(2);       // its base is on the waterline
     const topEdge = top.pts.filter((p) => p[1] >= SHIP.aftShelter.roof);
     expect(topEdge.length).toBe(2);                                    // its top edge is on the sheer
     expect(XC[1]).toBeLessThan(Math.min(...topEdge.map((p) => p[1])));
   });
+  test('the top triangle stands on plating: forward of the open stern bay (no shell at s >= 56.6, h 5.8-7.2) and of the knuckle', () => {
+    expect(SHIP.sternOpening.s0).toBeCloseTo(56.6, 6);
+    for (const [s] of top.pts) expect(s).toBeLessThan(SHIP.sternOpening.s0 - 0.1);   // else the hull has a hole where the mark is
+    expect(Math.max(...top.pts.map((p) => p[0]))).toBeLessThan(knuckleS(7));
+  });
   test('nothing of it lies aft of the quarter knuckle, so the white transom clips none of it', () => {
     for (const [s, h] of top.pts) expect(s).toBeLessThanOrEqual(knuckleS(Math.min(7, Math.max(h, 0))) - 0.05 + 1e-9);   // knuckleS(7) = 57.795 for every h >= 3
-    expect(Math.max(...top.pts.map((p) => p[0]))).toBeLessThan(knuckleS(7));
     // the aft edge, from the apex to the waterline corner, stays forward of the knuckle at every height
     const aft = bottom.pts.filter((p) => p[1] <= 0).reduce((a, p) => (p[0] > a[0] ? p : a));
     for (let h = 0; h <= XC[1]; h += 0.1) {
@@ -238,23 +242,30 @@ describe('starboard stern hourglass X (fix round 3): the real ship, WCPFC photo 
   test("the large triangle's aft edge is one straight segment, with no notch: the painted rows follow a line", () => {
     const hs = [], ss = [];
     for (let h = 0.4; h <= 4.41; h += 0.4) hs.push(Math.round(h * 100) / 100);
-    for (let s = 55.0; s <= 58.2; s += 0.02) ss.push(Math.round(s * 100) / 100);
+    for (let s = 53.5; s <= 58.2; s += 0.02) ss.push(Math.round(s * 100) / 100);
     const pts = [], at = [];
     for (const h of hs) for (const s of ss) { pts.push(sidePx('starboard', s, h)); at.push([s, h]); }
     const col = sample(PLANS.nendo, pts);
-    const aft = hs.map((h) => { let m = -Infinity; at.forEach(([s, hh], i) => { if (hh === h && col[i] === COLORS.black) m = Math.max(m, s); }); return [h, m]; });
-    for (const [, m] of aft) expect(Number.isFinite(m)).toBe(true);
+    // each row's black run through the triangle (the crossing line's aft arm is a separate stroke over white)
+    const aftOf = (h) => bottom.pts.filter((p) => p[1] <= 0).reduce((a, p) => (p[0] > a[0] ? p : a))[0] + ((XC[0] - bottom.pts.filter((p) => p[1] <= 0).reduce((a, p) => (p[0] > a[0] ? p : a))[0]) * (h + 0.2)) / (XC[1] + 0.2);
+    const fwdOf = (h) => { const f = bottom.pts.filter((p) => p[1] <= 0).reduce((a, p) => (p[0] < a[0] ? p : a)); return f[0] + ((XC[0] - f[0]) * (h + 0.2)) / (XC[1] + 0.2); };
+    const aft = hs.map((h) => {
+      const mid = (aftOf(h) + fwdOf(h)) / 2, row = at.map((p, i) => [p, col[i]]).filter(([p]) => p[1] === h);
+      const black = (s) => row.some(([p, c]) => Math.abs(p[0] - s) < 0.011 && c === COLORS.black);
+      let lo = mid, hi = mid; expect(black(mid)).toBe(true);
+      while (black(Math.round((hi + 0.02) * 100) / 100)) hi = Math.round((hi + 0.02) * 100) / 100;
+      while (black(Math.round((lo - 0.02) * 100) / 100)) lo = Math.round((lo - 0.02) * 100) / 100;
+      return [h, hi, lo];
+    });
     const [h0, s0] = aft[0], [h1, s1] = aft[aft.length - 1];
-    let worst = 0;
-    for (const [h, m] of aft) worst = Math.max(worst, Math.abs(m - (s0 + ((s1 - s0) * (h - h0)) / (h1 - h0))));
-    expect(worst).toBeLessThan(0.06);                                  // straight (one pixel is 0.03 m)
-    expect(s1).toBeGreaterThan(s0);                                    // it leans aft going up, toward the apex
-    // and the black runs unbroken from that edge to the forward edge on every row (no ragged gaps)
-    for (const h of hs) {
-      const row = at.map((p, i) => [p, col[i]]).filter(([p]) => p[1] === h);
-      const blacks = row.filter(([, c]) => c === COLORS.black).map(([p]) => p[0]);
-      expect(blacks.length).toBeGreaterThan(0);
-      expect(Math.round((Math.max(...blacks) - Math.min(...blacks)) / 0.02) + 1).toBe(blacks.length);
-    }
+    let worst = 0, worstF = 0;
+    for (const [h, hi, lo] of aft) { worst = Math.max(worst, Math.abs(hi - aftOf(h))); worstF = Math.max(worstF, Math.abs(lo - fwdOf(h))); }
+    expect(worst).toBeLessThan(0.06);                                  // the painted aft edge follows the mark's straight edge (a pixel is 0.03 m)
+    expect(worstF).toBeLessThan(0.12);                                 // the forward edge carries the crossing line's 0.17 m stroke (half a width outside the fill)
+    // and the aft edge is straight: the rows' aft ends are collinear
+    const l0 = aft[0], l1 = aft[aft.length - 1];
+    for (const [h, hi] of aft) expect(Math.abs(hi - (l0[1] + ((l1[1] - l0[1]) * (h - l0[0])) / (l1[0] - l0[0])))).toBeLessThan(0.06);
+    // the whole painted triangle is forward of the knuckle (nothing clipped): its aft end is not the knuckle line
+    for (const [h, hi] of aft) expect(hi).toBeLessThan(knuckleS(h) - 0.05);
   });
 });
