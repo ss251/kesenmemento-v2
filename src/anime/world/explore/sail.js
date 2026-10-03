@@ -251,6 +251,9 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     s: 0, xte: 0, contact: 0, events: [], idle: 0, recovering: false,
   };
   const orbit = { yaw: 0, pitch: -0.12, back: 0 };
+  // the look drag handed over by player.js while she sails (see place())
+  const lookIn = { dx: 0, dy: 0 };
+  const captureLook = (dx, dy) => { lookIn.dx += dx; lookIn.dy += dy; };
   const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
   let camInit = false, t = 0;
 
@@ -352,12 +355,14 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     hullG.position.y = Math.sin(t * 0.9) * 0.08;
     wake.update(boat, dt);
     if (!state.active) return;
-    // touch look-around: player.js accumulates a right-half drag in playerObj.look (it is disabled while sailing, so
-    // nothing else reads it; its mouse look is gated off too, so a mouse drag is not counted twice)
+    // touch look-around: player.js accumulates a right-half drag in playerObj.look (its mouse look is gated off while
+    // sailing, so a mouse drag is not counted twice). player.update() runs before this in the frame and would consume
+    // it, so while she sails it hands the drag to lookCapture (set in enter) and it collects in lookIn
     const plk = ctx.playerObj?.look;
-    if (plk && (plk.dx || plk.dy)) {
-      orbit.yaw -= plk.dx * 0.0018; orbit.pitch = clamp(orbit.pitch - plk.dy * 0.0014, -0.8, 0.3); orbit.back = 3;
-      plk.dx = plk.dy = 0;
+    const ldx = lookIn.dx + (plk?.dx || 0), ldy = lookIn.dy + (plk?.dy || 0);
+    lookIn.dx = lookIn.dy = 0; if (plk) plk.dx = plk.dy = 0;
+    if (ldx || ldy) {
+      orbit.yaw -= ldx * 0.0018; orbit.pitch = clamp(orbit.pitch - ldy * 0.0014, -0.8, 0.3); orbit.back = 3;
     }
     // chase camera: behind and above the ship; the mouse orbit eases back behind her
     if (dt > 0 && orbit.back > 0) orbit.back -= dt; else if (dt > 0) orbit.yaw *= 1 - Math.min(1, dt * 1.2);
@@ -379,7 +384,8 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     progress = { s: path.project(boat.x, boat.z).s, d: 0 };
     state.active = true; state.autopilot = at?.autopilot ?? true; state.idle = 0;
     orbit.yaw = 0; orbit.pitch = -0.12; camInit = false;
-    const pl = ctx.playerObj; if (pl) { pl.enabled = false; pl.fly = true; if (pl.look) pl.look.dx = pl.look.dy = 0; }
+    const pl = ctx.playerObj; if (pl) { pl.enabled = false; pl.fly = true; if (pl.look) pl.look.dx = pl.look.dy = 0; pl.lookCapture = captureLook; }
+    lookIn.dx = lookIn.dy = 0;
     ctx.services.life?.tour?.stop?.();
     sync(); place(0);
     return true;
@@ -389,6 +395,7 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     state.active = false; keys.clear();
     const pl = ctx.playerObj;
     if (pl) {
+      if (pl.lookCapture === captureLook) pl.lookCapture = null;   // the walker's own look again
       pl.enabled = typeof document !== 'undefined' ? (document.body?.classList?.contains('playing') ?? true) : true;
       // at the berth: step ashore on the quay apron by the gangway; underway: hover where the camera is
       if (Math.hypot(boat.x - BERTH.x, boat.z - BERTH.z) < 60) { pl.fly = false; pl.setPose?.(BERTH.quay[0], BERTH.quay[1], (BERTH.yaw + Math.PI / 2) * 180 / Math.PI, 0); }

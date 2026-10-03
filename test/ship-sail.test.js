@@ -494,6 +494,37 @@ describe("createSail (runtime, true-size stub)", () => {
     expect(Math.abs(Math.atan2(Math.sin(bearing() - b0), Math.cos(bearing() - b0)))).toBeLessThan(0.05);
     sail.dispose();
   });
+  test("touch look-around in the app's frame order: player.update() runs first, and the drag still reaches the chase camera", async () => {
+    // main.js frame(): player.update(dt) -> stepUpdates (sail). Fix round 1's sail-only read never saw the drag: the
+    // walker consumed playerObj.look first. The real Player class, its _bind skipped (no DOM).
+    const { Player } = await import("../src/anime/core/player.js");
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 30000);
+    const ctx = createContext({ scene, camera, renderer: null, audio: null, quality: { name: "low", phone: true }, sunDir: new THREE.Vector3(...L.SUN_DIR).normalize() });
+    const pl = Object.assign(Object.create(Player.prototype), {
+      camera, physics: { groundHeight: () => 0, resolve() {} }, bounds: { x0: -1e5, x1: 1e5, z0: -1e5, z1: 1e5 },
+      pos: new THREE.Vector3(), vel: new THREE.Vector3(), vy: 0, yaw: 0, pitch: 0, eye: 1.52, radius: 0.3, height: 1.7,
+      walk: 3.1, run: 6.4, fly: false, enabled: true, onGround: true, keys: new Set(), bob: 0, smoothY: null,
+      look: { dx: 0, dy: 0 }, touchMove: new THREE.Vector2(), distance: 0,
+    });
+    ctx.playerObj = pl;
+    const sail = createSail(ctx, {});
+    sail.enter({ autopilot: false });
+    expect(typeof pl.lookCapture).toBe("function");
+    const frame = (dt) => { pl.update(dt); sail.update(dt); };
+    const bearing = () => Math.atan2(camera.position.x - sail.state.x, camera.position.z - sail.state.z);
+    for (let i = 0; i < 40; i++) frame(0.05);
+    const b0 = bearing(), yaw0 = pl.yaw;
+    pl.look.dx += 150 * 2.2;   // a 150 px right-half touch drag, between two frames (player.js touchmove)
+    for (let i = 0; i < 10; i++) frame(0.05);
+    const swung = Math.abs(Math.atan2(Math.sin(bearing() - b0), Math.cos(bearing() - b0)));
+    expect(swung).toBeGreaterThan(0.3);
+    expect(pl.yaw).toBe(yaw0);   // the walker's own view did not take it
+    sail.exit();
+    expect(pl.lookCapture ?? null).toBe(null);
+    pl.look.dx += 100; pl.update(0.05);
+    expect(pl.yaw).not.toBe(yaw0);   // back ashore, the drag turns the walker again
+    sail.dispose();
+  });
   test("phone tier: the wake ribbon is small (24 segments)", () => {
     const src = read("src/anime/world/explore/sail.js");
     expect(src).toContain("const N = phone ? 24 : 64, C = 3");

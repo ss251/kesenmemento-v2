@@ -84,7 +84,11 @@ export class Player {
     // halved the flying speed
     dt = Math.min(dt, this.fly ? 0.1 : 0.05);
     const sens = 0.0022;
-    this.yaw -= this.look.dx * sens; this.pitch -= this.look.dy * sens; this.look.dx = this.look.dy = 0;
+    // [ship] a mode that owns the camera (the sail chase camera) takes the look drag instead: this update runs first in
+    // the frame, so consuming it here left nothing for that mode to read (the touch look-around never turned)
+    if (typeof this.lookCapture === 'function') this.lookCapture(this.look.dx, this.look.dy);
+    else { this.yaw -= this.look.dx * sens; this.pitch -= this.look.dy * sens; }
+    this.look.dx = this.look.dy = 0;
     this.pitch = THREE.MathUtils.clamp(this.pitch, -85 * DEG, 85 * DEG);
     const k = this.keys;
     let f = 0, s = 0, u = 0;
