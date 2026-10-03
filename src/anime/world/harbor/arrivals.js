@@ -141,6 +141,20 @@ export function planArrivals(list, slots = arrivalSlots()) {
   return out;
 }
 
+// [ship] Yield to 第一昭福丸 under way (explore/sail.js publishes ctx.services.sail): an arriving boat within YIELD_R
+// of her holds its position. Its schedule slips by the time it waited (`delay`, seconds on the arrival clock), so it
+// resumes from where it stopped once she has passed. Pure: returns the number of boats holding.
+export const YIELD_R = 120;   // [ship]
+export function yieldHold(boats, ship, dt, { radius = YIELD_R, rate = RATE } = {}) {   // [ship]
+  let n = 0;
+  for (const b of boats) {
+    const hold = !!ship && b.phase === 'approach' && Math.hypot(b.x - ship.x, b.z - ship.z) < radius;
+    b.yielding = hold;
+    if (hold) { b.delay = (b.delay || 0) + dt * rate; n++; }
+  }
+  return n;
+}
+
 // [v3:fix] stills hide the floating name labels (a UI element, and the fixture's サンプル tag floated over the market
 // hero frame): URL ?labels=0 or window.__klcLabels = false
 let _labelsParam = null;
@@ -219,9 +233,10 @@ export function createArrivals(ctx, opts = {}) {
     lastT = t;
     const H = hoursNow();
     if (clock.lastH == null || Math.abs(H - clock.lastH) > 1e-5) { clock.lastH = H; clock.t0 = t; }
-    const A = H + ((t - clock.t0) * RATE) / 3600;             // the arrival clock (hours)
+    const A0 = H + ((t - clock.t0) * RATE) / 3600;            // the arrival clock (hours)   // [ship] A0: per boat A below
     const cam = ctx.camera?.position;
     for (const b of boats) {
+      const A = A0 - (b.delay || 0) / 3600;                  // [ship] this boat's clock, less the time it held for the ship
       const tau = (b.h - A) * 3600;                          // seconds until berthed
       const R = b.route;
       let phase, dist;                                        // dist = metres still to go
@@ -258,6 +273,9 @@ export function createArrivals(ctx, opts = {}) {
       b.label.position.y += (b.route.berth.row === 1 ? 9 : 0) * Math.min(1, d / 300);
       b.label.material.opacity = Math.min(1, (far - d) / 300) * Math.min(1, (d - 18) / 30);
     }
+    // [ship] boats near the sailing ship hold position next frame (their own clock stops)
+    const sail = ctx.services?.sail;
+    yieldHold(boats, sail?.active ? sail.state : null, Math.max(0, Math.min(dt || 0, 0.25)));   // [ship]
     declutter();
   }
 
@@ -270,7 +288,7 @@ export function createArrivals(ctx, opts = {}) {
     for (const s of shown) { if (kept.some((k) => Math.abs(k.x - s.x) < 0.32 && Math.abs(k.y - s.y) < 0.2)) s.b.label.visible = false; else kept.push(s); }
   }
 
-  function state() { return boats.map((b) => ({ vessel: b.a.vessel, type: b.type, phase: b.phase, eta: b.a.time, slot: b.si, x: Math.round(b.x), z: Math.round(b.z), dry: b.route.dry })); }
+  function state() { return boats.map((b) => ({ vessel: b.a.vessel, type: b.type, phase: b.phase, eta: b.a.time, slot: b.si, x: Math.round(b.x), z: Math.round(b.z), dry: b.route.dry, yielding: !!b.yielding, delay: Math.round(b.delay || 0) })); }   // [ship] yielding, delay
 
   // follow life's live list (life builds after harbor: subscribe on the first frame it exists)
   let subscribed = false;
