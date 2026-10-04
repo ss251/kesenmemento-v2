@@ -119,7 +119,7 @@ stem and h is metres above the waterline.
 | `ship/livery.js` | `paintAtlas`, `fallbackPlan`, `loadNendo` (with the default nendo livery; never with the fallback), `cleanNendo`. |
 | `ship/route.js` | `BERTH {x, z, yaw}`, `SHOKO`, `BAY_MOUTH`, `OUTBOUND` (polyline), `OUTBOUND_PATH`, `KANAE_CROSSING {s, x, z, clearance, margin}`, `routeClearance(path)`. |
 | `explore/sail.js` | `BOAT` (handling constants); `AUTO` (autopilot constants, the tow-assist's among them); `boatStep(s, input, dt, P)` (pure); `sailStep` (with shore); `pursue` (autopilot); `createSail(ctx, { ship, route })` → `{ enter(at), exit(), active, state, setAutopilot(on), focus(), onEvent(cb) }`. Events: `passKanae`, `passShoko`, `bayMouth`, `arrived`. |
-| `ship/acts.js` | `createActs(snapshot?)` (pure, serialisable with `snapshot()`); `STATES`, `EVENTS` (guards), `RULES`, `makeCatch`, `seasonOpen`, `weighIn`; `oceanNoposKey(today)` (the Act 2 banner says the real ship is fishing "right now" only inside the Aug–Jan season; otherwise she "fishes these waters each Aug–Jan season"). |
+| `ship/acts.js` | `createActs(snapshot?)` (pure, serialisable with `snapshot()`); `STATES`, `EVENTS` (guards), `RULES`, `makeCatch`, `seasonOpen`, `weighIn`; `oceanNoposKey(today)` (the Act 2 banner never says the real ship is fishing "right now": inside the Aug–Jan season it says the season is open and she fishes these waters in it every year; otherwise she "fishes these waters each Aug–Jan season"). |
 | `ship/tags.js` | `formatTag(n, yy = 26)` → `DEMO-7KFY-26-0001`; `isDemoTag(s)`; `REAL_TAG_RE` (`/^7KFY-\d{2}-\d{4}$/`), which a demo tag never matches. |
 | `ship/sendoff.js`, `ocean.js`, `chain.js` | The scenes for Acts 1, 2 and 3. |
 | `ship/voyage.js` | `createVoyage(ctx, { ship, sail, route, livery, auto })`: the director. It runs the machine, the scenes, the cameras and the UI. |
@@ -171,7 +171,7 @@ freed once she is 450 m out. The measured numbers (390 × 844 at DPR 3, iPhone U
 [README.md § Results](README.md#results-2026-10-03-this-branch). The ship adds about 11 MB of texture to the city. At
 sea the frame draws about 135 calls and 36 k triangles.
 
-## 9b. Story pin: 5,500 years of tuna in 唐桑
+## 9b. Story pin: tuna bones from about 5,500 years ago in 唐桑
 
 The Living City's first **story pin** is the 波怒棄館遺跡 in 唐桑 (next-pass-usui.md item 5): an early Jōmon shell
 midden with more than 140 kg of tuna bones. A story pin is a short sourced story tied to a real place. It is listed in
@@ -182,7 +182,7 @@ search. Selecting it flies the drone to the site, pins its label and opens a sto
 |---|---|
 | The module | `src/anime/world/explore/storypins.js` (marker `[ship:story]`), wired in `explore/index.js` |
 | The data: JA and EN strings, the lat/lon, the sources | `data/ship/story-pins.json` |
-| The tests | `test/ship-story.test.js` (13 tests) |
+| The tests | `test/ship-story.test.js` (14 tests) |
 | The shot | `docs/ship/shots/acts_ui_story.jpg` (`ship-acts-shots.mjs --ui 1 --list ui_story`) |
 
 **API.**
@@ -202,7 +202,7 @@ search. Selecting it flies the drone to the site, pins its label and opens a sto
 | The site, 波怒棄館遺跡, a 貝塚 on a hilltop overlooking 広田湾 (Nikkei 2013-05-20) | The pin's position: it is placed at lat 38.958, lon 141.627, inside the 荒谷前 district. No source publishes the exact spot, and 荒谷前 is a district about 1 km or more across (the GSI reverse geocoder gives 荒谷前 within about ±300 m of that point and a different district about 1 km out), so `accuracyM` is 1000 and the card says "the exact spot is not published, up to about 1 km". An estimate from the address, not a surveyed point |
 | Its age: early Jōmon, about 5,500 years ago | The wooden 説明板 model, its roof and its lettering: invented. No source shows a real signboard at the site, and the area was a housing-relocation dig |
 | The bones: more than 140 kg of tuna bones (press reports; Usui's talk); fish over 2 m; stone blades stuck in some bones | The drone framing (the sea on the far side of the board) |
-| A possible butchering site (the press, as a "may have been"); the card's last line says only that tuna were butchered here about 5,500 years ago, and claims no continuity since | |
+| A possible butchering site: Nikkei 2013-05-20 has the city board saying 「マグロを解体する施設があった可能性がある」 under the headline 「解体場か」. The card says it as "may have been" in paragraph 2 and again in the last line (「…すでにマグロが解体されていたのかもしれません。」 / "People may already have been butchering tuna here about 5,500 years ago."), and claims no continuity since | |
 | The address: 気仙沼市唐桑町荒谷前 (the prefecture's 2013 dig list; the GSI reverse geocode of 38.958, 141.627 returns 唐桑町荒谷前) | |
 
 The pin's strings carry no disaster framing, and `ship-story` tests that.
