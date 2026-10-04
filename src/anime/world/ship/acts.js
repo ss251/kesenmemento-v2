@@ -84,8 +84,9 @@ export function seasonOpen(date) {
 /** Today's date in Japan ('YYYY-MM-DD'; UTC+9), the clock the live claim about the real ship is checked against. */
 export const todayJst = (now = Date.now()) => new Date(now + 9 * 3600e3).toISOString().slice(0, 10);
 /**
- * The ocean banner's second sentence. "The real ship is fishing these waters right now" is true only inside the Aug-Jan
- * season (the page stays up all year); outside it the banner says she fishes here each season. -> an i18n key.
+ * The ocean banner's second sentence. No wording says the real ship is fishing "right now" (the dossier supports that
+ * for 14 Sep 2026 only): inside the Aug-Jan season the banner says the season is open and she fishes here in it every
+ * year; outside it, that she fishes here each season. -> an i18n key.
  */
 export const oceanNoposKey = (today = todayJst()) => (seasonOpen(today) ? 'ship.ocean.nopos' : 'ship.ocean.nopos.off');
 

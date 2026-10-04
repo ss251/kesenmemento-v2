@@ -541,13 +541,13 @@ describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", ()
     expect(D.ja["ship.facts.trivia"]).toContain("主人公の父がまぐろ船の船長");
     expect(D.en["ship.facts.trivia"]).toBe("Trivia: in the anime デリシャスパーティ♡プリキュア, the heroine's father is a tuna-boat captain");
   });
-  test("the ocean banner claims the real ship is fishing 'right now' only inside the Aug-Jan season (the page stays up all year)", async () => {
+  test("the ocean banner never claims the real ship is fishing 'right now' (a seasonal statement, worded differently inside the Aug-Jan season; the page stays up all year)", async () => {
     const { oceanNoposKey, todayJst } = await import("../src/anime/world/ship/acts.js");
     for (const d of ["2026-10-10", "2026-08-01", "2027-01-31", "2026-12-25"]) expect(oceanNoposKey(d)).toBe("ship.ocean.nopos");
     for (const d of ["2027-02-01", "2027-03-15", "2026-07-31", "2026-06-30"]) expect(oceanNoposKey(d)).toBe("ship.ocean.nopos.off");
     expect(todayJst(Date.UTC(2026, 9, 3, 16, 0))).toBe("2026-10-04");   // JST is UTC+9
-    expect(D.ja["ship.ocean.nopos"]).toContain("いまこの海で操業しています");
-    expect(D.en["ship.ocean.nopos"]).toContain("fishing these waters right now");
+    expect(D.ja["ship.ocean.nopos"]).toContain("毎年この漁期にこの海で操業します"); expect(D.ja["ship.ocean.nopos"]).not.toContain("本物の"); expect(D.ja["ship.ocean.nopos"]).not.toContain("操業しています");
+    expect(D.en["ship.ocean.nopos"]).toContain("she fishes these waters in it every year"); expect(D.en["ship.ocean.nopos"]).not.toMatch(/right now|is fishing/);
     expect(D.ja["ship.ocean.nopos.off"]).toContain("毎年8月〜1月の漁期"); expect(D.ja["ship.ocean.nopos.off"]).not.toContain("いま");
     expect(D.en["ship.ocean.nopos.off"]).toContain("each Aug–Jan season"); expect(D.en["ship.ocean.nopos.off"]).not.toContain("right now");
     for (const lang of ["ja", "en"]) {
@@ -556,6 +556,12 @@ describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", ()
       expect(inSeason).toContain(D[lang]["ship.ocean.nopos"]); expect(inSeason).not.toContain(D[lang]["ship.ocean.nopos.off"]);
       expect(off).toContain(D[lang]["ship.ocean.nopos.off"]); expect(off).not.toContain(D[lang]["ship.ocean.nopos"]);
     }
+  });
+  test("round 3 copy: the set clock cites Usui's own 4-8 h, and no 'at sea' is added to the tag chain (dossier: weighed and measured, then tagged)", () => {
+    expect(D.ja["ship.set.time"]).toContain("4〜8時間"); expect(D.en["ship.set.time"]).toContain("4–8 hours");
+    expect(D.en["ship.chain.shimizu.body"]).toBe("Every fish was weighed, measured and tagged. At the Shimizu landing, each one is checked again.");
+    expect(D.en["ship.card.body"]).toContain("Each one is weighed and tagged, so the Shimizu inspection");
+    expect(D.en["ship.chain.shimizu.body"] + D.en["ship.card.body"]).not.toMatch(/at sea/);
   });
   test("item 7: the final card ends on Usui's line, attributed to 臼井壯太朗 (臼福本店) at Hackatsuon on 2026-10-03", async () => {
     expect(CLOSING).toEqual({ line: "ship.card.closing", by: "ship.card.closingBy" });
