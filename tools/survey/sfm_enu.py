@@ -3,7 +3,7 @@
   raw/survey/.venv/bin/python tools/survey/sfm_enu.py --area minami [--db raw/survey/minami/lg.db]
         [--seed raw/survey/minami/sparse_lg/0] [--refs data/survey/minami/refs.json] [--out raw/survey/minami/enu]
 
-Why: Sailesh shot the south shore from ~12 standing spots, turning on the spot (IMG_0803-0813 in 20 s, 0825-0832 in 14 s).
+Why: the south shore was photographed from ~12 standing spots, turning on the spot (IMG_0803-0813 in 20 s, 0825-0832 in 14 s).
 Shots from one spot share a centre (no baseline); COLMAP's incremental mapper cannot start from or triangulate such pairs
 and splits the set into fragments. This solver:
 

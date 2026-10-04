@@ -12,7 +12,7 @@
 | Total floor area | 28,944 m²; site 52,248 m² | hospital |
 | Beds | 340 | hospital; 復興庁 |
 | Opened | moved here **2017-10-29** from 田中 | 復興庁; hospital history |
-| Heliport | a new heliport for disaster medicine | search summary of 復興庁 and hospital pages; the exact location is not verified |
+| Heliport | a new heliport for emergency medical transport | search summary of 復興庁 and hospital pages; the exact location is not verified |
 | BRT | the 気仙沼市立病院 BRT station stands at the hospital (OSM node 7117374801) | OSM |
 
 - Roof on the ortho: #c5d4d2 → light grey #c7c9c6, with rooftop plant.
@@ -39,21 +39,19 @@ footprint (way 761699198) at 38.90491, 141.57268, on the 南町 共同化 block.
 
 - Built in 1964. The hospital moved out in 2017, and the buildings were **demolished from September 2022 to January 2024**.
 - The site (38.89435, 141.56471 → (−892, 1293)) is now the **new city hall construction site** (see `city-hall.md`).
-- The GSI footprints and the ortho in the repo still show the old hospital blocks.
+- The GSI footprints and the ortho in the repo predate the demolition; the app removes those lots.
 
 ## Sources
 
 - https://www.kesennuma-hospital.jp/introduction/summary/ (structure, floors, areas, beds, address)
-- https://www.reconstruction.go.jp/portal/chiiki/2017/20171101153510.html (the 2017 completion; disaster base hospital)
+- https://www.reconstruction.go.jp/portal/chiiki/2017/20171101153510.html (the 2017 completion)
 - https://kahoku.news/articles/20220901khn000033.html (demolition of the old hospital)
 - OSM ways 761241989, 761402305, 761402304 and 761699198; nodes 5162610024 and 7117374801 (© OpenStreetMap contributors)
 - Crops: `ortho/hospital.jpg`, `ortho/otomo.jpg`, `ortho/newcityhall.jpg`
 
-## What the app renders
+## In the app
 
-- `app/city_hospital.jpg`: far lot 16/58539/25072/122, **one 142.6 × 66.8 m box, 8 storeys, 26.4 m**. The real building
-  is 6 storeys (about 25 to 28 m with the isolation pit and the roof plant), so the height is fine, but the plan is a
-  single slab instead of the real multi-wing plan.
-- `app/otomo.jpg`: lot 16/58539/25068/388, `public`, **4 storeys, 14 m**, with a **slate hip roof**. Real: 5 storeys
-  with mint-green flat roofs.
-- `app/new_cityhall_site.jpg`: the demolished hospital still stands in the app.
+- **市立病院:** the outline as a 3-storey podium with the 6-storey ward bar along the NE edge, rooftop plant, the name,
+  the entrance canopy, and the ground-level heliport (OSM helipad) with its H and windsock.
+- **大友病院:** 5 storeys (OSM) on the outline, the mint-green flat roofs, a penthouse and the name.
+- The former hospital's lots are removed, and the new city hall site stands in their place (`city-hall.md`).

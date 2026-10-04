@@ -1,0 +1,7 @@
+# gitleaks configuration: the default rules plus one allowlisted false positive.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "texture cache keys that look like API keys"
+regexes = ['''plaza-sign2-v6''']

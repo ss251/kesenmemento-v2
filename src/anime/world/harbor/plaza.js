@@ -191,7 +191,7 @@ export function buildPlazaHotel(ctx) {
     const ks = ctx.kit(S);
     ks.boxB(9, 3.6, 3, M.signBox, [0, 0, 0]);
     const st = plazaSignTex(ctx, '#cfcac0');
-    const sub = textTex(ctx, '港ふれあい', { w: 512, h: 128, color: '#b5607c', bg: '#cfcac0', font: FONT.round, weight: 700, size: 0.6, key: 'plaza-sign2-v6' });
+    const sub = textTex(ctx, '港ふれあい', { w: 512, h: 128, color: '#b5607c', bg: '#cfcac0', font: FONT.round, weight: 700, size: 0.6, key: 'plaza-sign2-v6' });   // gitleaks:allow (a texture cache key, not a secret)
     for (const s of [-1, 1]) {
       ks.mesh(new THREE.PlaneGeometry(8.4, 1.6), mapMat(ctx, 'toon', '#ffffff', st, { paint: 0, nightGlow: 0.8 }), [0, 1.3, s * 1.52], [0, s < 0 ? Math.PI : 0, 0]);
       ks.mesh(new THREE.PlaneGeometry(4.2, 1.05), mapMat(ctx, 'toon', '#ffffff', sub, { paint: 0, nightGlow: 0.8 }), [0, 2.75, s * 1.52], [0, s < 0 ? Math.PI : 0, 0]);

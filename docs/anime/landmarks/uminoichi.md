@@ -43,7 +43,7 @@
 
 ## Current state
 
-Open. The Shark Museum reopened in April 2024 after a renewal. The building survived and was repaired after 2011.
+Open. The Shark Museum reopened in April 2024 after a renewal.
 
 ## Sources
 
@@ -52,19 +52,19 @@ Open. The Shark Museum reopened in April 2024 after a renewal. The building surv
 - OSM way 761720497; nodes 3666892545, 7181952803, 7181952816 and 7181952807 (© OpenStreetMap contributors)
 - GSI seamlessphoto z18. Crop: `ortho/uminoichi.jpg`
 
-## What the app renders
+## In the app
 
-- `app/uminoichi.jpg`
-- The lot is tagged `landmark: 'fishMarket'` (16/58541/25069/401). harbor builds it as **one of the white fish-market
-  halls** (72 × 45 m, 12.7 m high) with skylit gable roofs.
-- There is no red A-frame and no signage.
+- A red board-and-batten block on the OSM outline (0 m). Its ridge runs NE-SW corner to corner, so each corner reads as
+  the photo's A-frame. It has a recessed shop floor, the three sign panels, and an east block with the timber roof deck and
+  the footbridge to the market.
+- Frame: `app-v4/uminoichi.jpg`.
 
-## v5 fix round 2 (2026-10-01): the walk spot
+## v5 (2026-10-01): the walk spot
 
 - The tour stop's street-level spot moved from (381, 732) to **(311.7, 704), yaw −60, pitch 5** on the 魚市場前 road
   south-west of the block (`WALK_SET.uminoichi` in `explore/places.js`). The new 3-storey office of
   `overrides/c11.json#newLots/0` at (375, 713) and the 4-storey lots at (404, 716) / (406, 710) left only a 15 m slot
-  onto the front from the old spot (review2 walk/w_11).
+  onto the front from the old spot.
 - Chosen with `tools/anime/debug/walkprobe.mjs` (renderer depth: 45 of 49 candidates clear) and checked by screenshot:
   the whole red A-frame with 「気仙沼 海の市 / シャークミュージアム」 and 「UMI ICHI」, nothing in between. The closer
   (350, 690) cut the A-frame at the frame's left edge.

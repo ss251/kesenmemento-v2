@@ -54,7 +54,7 @@
 - The **気仙沼ベイクルーズ** (50 minutes, under both bridges) departs from the PIER7 pontoon. The boats are **「ファンタジー」
   and 「やしま丸」**. Commons photos from August 2026 show ファンタジー: white hull, **deep blue bow swoosh #1f4fa8, red
   stern panel #cc2b2b**, blue dots, cabin on two decks, the name in script and katakana.
-- The scale model of the inner bay (Sailesh's photos) is displayed inside.
+- The scale model of the inner bay is displayed inside (photographed on site: IMG_0582, IMG_0598).
 
 ## Sources
 
@@ -65,12 +65,6 @@
 - https://www.pier7.info/ ; https://kesennuma-kanko.jp/kesennuma_baycruise2025/ (cruise from 南町海岸1-11 PIER7; boats ファンタジー and やしま丸)
 - Commons "Oshima Kisen Fantasy at Kesennuma Port 202608a.jpg" and "…202608b.jpg"
 - OSM ways 775150081, 819508304, 1464061063, 1464061061 and 1464061062 (© OpenStreetMap contributors). Crop: `ortho/pier7_mukaeru.jpg`
-
-## What the app renders
-
-- `app/pier7_oblique.jpg`, `app/pier7_mukaeru_top.jpg`
-- Lot 16/58541/25068/65 is kind `warehouse`, 1 storey, 8.4 m, 54.6 × 22.1 m OBB. The layout's roof colour is white, but it
-  renders as a **red-roofed gable warehouse**.
 
 ## v5 (2026-10-01): surfaces checked against Google Earth (imagery 2026-03-11)
 
@@ -112,10 +106,10 @@
   shrub spheres.
 - **Landing over the wall**: #b5ab9f (was #c7b7a6, which read salmon at noon).
 
-## v5 photos (2026-10-01): rebuilt against the author's own photos (IMG_0799-0823, 17:18-17:20 JST)
+## v5 photos (2026-10-01): rebuilt against on-site photos (IMG_0799-0823, 17:18-17:20 JST)
 
-The client's photos outrank Google Earth (docs/anime/OVERRIDES.md). Code: `harbor/minami5.js` (`buildPier7Photos`,
-`buildPlazaPhotos`), called from `harbor/minami.js`; pairs: `docs/shots/v5_photos/`.
+The on-site photos outrank Google Earth (docs/anime/OVERRIDES.md). Code: `harbor/minami5.js` (`buildPier7Photos`,
+`buildPlazaPhotos`), called from `harbor/minami.js`.
 
 - **Bay side:** the T.P. 6.2 m seawall is the bay-side ground storey (board-formed concrete). The 2F terrace sits on its
   crest, with a 3.6 m deck on slim white stilts and tie rods (the GSI deck footprints `pier7Deck` / `pier7Deck2`), a
@@ -142,7 +136,7 @@ The client's photos outrank Google Earth (docs/anime/OVERRIDES.md). Code: `harbo
 
 ## v6 survey (2026-10-03)
 
-Measured from the author's photos with solved cameras (53 of 57 photos, 0.72 px): `docs/anime/survey/minami.md`,
+Measured from on-site photos with solved cameras (53 of 57 photos, 0.72 px): `docs/anime/survey/minami.md`,
 `data/survey/minami/features.json`. The plaza's stair cage, bleachers, winch and ring benches, 迎's 3F box and ANCHOR face,
 and the NAIWAN totems have surveyed positions; the app's BEFORE errors are in `data/survey/minami/diff-before.json`.
 

@@ -44,8 +44,8 @@ The plaque reads 五十鈴神社. A tourism board at the entrance says 神明崎
 
 ## Current state
 
-The shrine survived on the knoll. The 浮見堂 and walkway below were rebuilt in 2020. The seawalls round the peninsula
-are new (post-2011).
+The shrine stands on the knoll. The 浮見堂 and walkway below were rebuilt in 2020, and the seawalls round the peninsula
+are new (finished around 2019–2021).
 
 ## Sources
 
@@ -55,8 +55,8 @@ are new (post-2011).
 - https://genbu.net/data/mutu/isuzu_title.htm (「コンクリート造のような石造社」, precinct shrines)
 - OSM nodes 2495986401, 2495986403 and 7653079720 (© OpenStreetMap contributors); core DEM. Crop: `ortho/shinmeizaki.jpg`
 
-## What the app renders
+## In the app
 
-- `app/isuzu_torii.jpg`, `app/shinmeizaki_top.jpg`
-- A plain-wood 神明造 hall with a copper roof, 鰹木 and 千木, on a stone platform at (363, −126), 10 steps.
-- A vermilion torii at (340.5, −150).
+- The cream RC hall stands on its GSI footprint on the knoll (the OSM node lies inside it: 0 m), with the steep stair and
+  red rails from the road-bend torii. 猪狩神社 has its own torii, and the 社務所 is a one-storey building.
+- Frame: `app-v4/isuzu_stair.jpg`.

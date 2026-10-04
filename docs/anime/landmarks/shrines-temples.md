@@ -36,10 +36,9 @@ Typical palette:
 - Commons 「気仙沼魚町と安波山Kesennuma-Mt.Anba - panoramio.jpg」 (the church on the hill)
 - GSI seamlessphoto z18 (`ortho/ikkeijima.jpg`, `ortho/otomo.jpg` for 少林寺)
 
-## What the app renders
+## In the app
 
-- These are **generic town lots**: 清護寺 is a 1-storey `house` with a slate hip roof, and 少林寺 a 2-storey `house`.
-- The church has no lot in the hero or mid list at its OSM centroid (no match), so it has no spire or green roof.
-- 一景島神社 (`app/ikkeijima.jpg`) is a light-green blob with a few trees and small huts. The real grove is dense and
-  dark.
-- No temple-specific roof shapes (入母屋), no 山門 and no torii except at 五十鈴神社.
+- 少林寺 and 清護寺 have big 入母屋 tile roofs, white plaster and dark timber, a 向拝 porch and a stair.
+- The Orthodox church is white with green copper roofs, the apse, the belfry, the green cupola and the Orthodox cross.
+- The 一景島 grove is dense and dark, with its halls and a torii on the west path.
+- 松尾神社, the 南町 shrine (unnamed), 愛宕神社, 大杉神社 and 稲荷大明神 have small halls and torii.

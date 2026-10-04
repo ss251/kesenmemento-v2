@@ -5,34 +5,21 @@
 //         /fixtures/...      src/web/fixtures (synthetic stand-ins, used when data/ lacks a group)
 //         /api/live          src/server/live.js liveRoutes() when present, else the last state/sample snapshot
 //         /api/splat-transform  POST {name, transform} from the ?dev=1 panel -> data/splats/{name}/transform.json
-//         /api/config        [v2:render] { provider, token, source, assetId } for the photoreal tiles (scripts/tokens.js;
-//                            the token is never logged). { provider: null } when none resolves (the app falls back to look=photo).
-//                            [v3:fix] only with --v2 (the old photoreal app): the v3 anime app never calls it, so by default
-//                            the route is 404 and no token is resolved at all.
-//         /vendor/...        [v2:render] local copies of runtime assets so nothing depends on GitHub at runtime:
+//         /vendor/...        local copies of runtime assets so nothing depends on GitHub at runtime:
 //                            /vendor/atmosphere/* (takram precomputed textures, stars), /vendor/clouds/* (weather, shape,
-//                            turbulence), /vendor/stbn.bin (data/real/vendor), /vendor/draco/* (three's Draco decoder).
+//                            turbulence), /vendor/draco/* (three's Draco decoder).
 import { resolve, join, normalize } from "node:path";
 import { existsSync, mkdirSync, copyFileSync } from "node:fs";
 import { buildWeb } from "./build-web.js";
-import { resolveTokens, describe as describeToken } from "./tokens.js";
 
 const ROOT = resolve(import.meta.dir, "..");
 const DIST = join(ROOT, "dist"), DATA = join(ROOT, "data"), FIX = join(ROOT, "src/web/fixtures");
-// [v2:render] vendored runtime assets (V2-SPEC §3)
+// vendored runtime assets
 export const VENDOR = {
   atmosphere: join(ROOT, "node_modules/@takram/three-atmosphere/assets"),
   clouds: join(ROOT, "node_modules/@takram/three-clouds/assets"),
   draco: join(ROOT, "node_modules/three/examples/jsm/libs/draco/gltf"),
-  real: join(ROOT, "data/real/vendor"),
 };
-let tokenCfg; // undefined = not resolved yet, null = none
-async function apiConfig() {
-  if (tokenCfg === undefined) tokenCfg = await resolveTokens();
-  if (!tokenCfg) return Response.json({ provider: null, token: null, source: null }, { headers: { "cache-control": "no-store" } });
-  const { provider, token, source, assetId = null } = tokenCfg;
-  return Response.json({ provider, token, source, assetId }, { headers: { "cache-control": "no-store" } });
-}
 
 let liveRoutes = null;
 async function loadLive() {
@@ -63,7 +50,7 @@ async function liveFallback() {
   return new Response("no live data", { status: 404 });
 }
 
-export async function start({ port = 8787, build = true, quiet = false, dist = DIST, v2 = false } = {}) {   // [v2:portal-cinema] dist: serve a private build (scripts/render/cdp.js); [v3:fix] v2: serve /api/config
+export async function start({ port = 8787, build = true, quiet = false, dist = DIST } = {}) {   // dist: serve a private build (scripts/render/cdp.js)
   if (build) await buildWeb({ quiet });
   await loadLive();
   const server = Bun.serve({
@@ -71,10 +58,8 @@ export async function start({ port = 8787, build = true, quiet = false, dist = D
     hostname: "127.0.0.1",
     async fetch(req) {
       const url = new URL(req.url), p = decodeURIComponent(url.pathname);
-      if (p === "/api/config") return v2 ? apiConfig() : new Response("not found", { status: 404 });   // [v2:render] [v3:fix] v2 only
-      if (p.startsWith("/vendor/")) {                               // [v2:render]
+      if (p.startsWith("/vendor/")) {
         const rest = p.slice(8), slash = rest.indexOf("/");
-        if (rest === "stbn.bin") return sendFile(fileIn(VENDOR.real, "stbn.bin"), req, "max-age=86400");
         const base = VENDOR[rest.slice(0, slash)];
         return base ? sendFile(fileIn(base, rest.slice(slash + 1)), req, "max-age=86400") : new Response("not found", { status: 404 });
       }
@@ -103,18 +88,15 @@ export async function start({ port = 8787, build = true, quiet = false, dist = D
       }
       if (p.startsWith("/data/")) return sendFile(fileIn(DATA, p.slice(6)), req, "max-age=60");
       if (p.startsWith("/fixtures/")) return sendFile(fileIn(FIX, p.slice(10)), req, "max-age=60");
-      return sendFile(fileIn(dist, p === "/" ? "index.html" : p.slice(1)), req, p === "/" || p.endsWith(".html") ? "no-cache" : "max-age=3600");   // [v2:portal-cinema] dist
+      return sendFile(fileIn(dist, p === "/" ? "index.html" : p.slice(1)), req, p === "/" || p.endsWith(".html") ? "no-cache" : "max-age=3600");
     },
   });
   const u = `http://127.0.0.1:${server.port}/`;
-  if (!quiet) {
-    console.log(`Kesennuma Living City -> ${u}${liveRoutes ? "  (live routes from src/server/live.js)" : ""}`);
-    if (v2) resolveTokens().then((c) => { tokenCfg = c; console.log(`tiles: ${describeToken(c)}`); });   // [v2:render] never prints the token; [v3:fix] v2 only
-  }
+  if (!quiet) console.log(`Kesennuma Living City -> ${u}${liveRoutes ? "  (live routes from src/server/live.js)" : ""}`);
   return { server, url: u };
 }
 
 if (import.meta.main) {
   const i = process.argv.indexOf("--port");
-  await start({ port: i > 0 ? Number(process.argv[i + 1]) : 8787, build: !process.argv.includes("--no-build"), v2: process.argv.includes("--v2") || process.env.KLC_APP === "v2" });
+  await start({ port: i > 0 ? Number(process.argv[i + 1]) : 8787, build: !process.argv.includes("--no-build") });
 }

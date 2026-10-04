@@ -18,7 +18,7 @@ export const ALLOW = [
 ];
 export const DENY = [/\.\./, /\/\./, /^\/api\/splat-transform/, /^\/api\/config/, /\.map$/];   // [v3:fix] never the token route
 // [ship] The nendo livery trace of 第一昭福丸 (data/ship/shofukumaru1/*nendo*.json) is served like any other app data:
-// livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.
+// when present (the livery is 臼福本店's, used with permission in the live demo; not included in this repository).
 
 export function allowed(pathname) {
   let p;

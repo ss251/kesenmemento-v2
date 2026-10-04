@@ -8,7 +8,7 @@
 // card says so (edgeNote).
 //
 // The first pin is 波怒棄館遺跡 (唐桑町荒谷前): an early Jōmon shell midden of about 5,500 years ago with more than 140 kg of
-// tuna bones, some from fish over 2 m, stone blades still stuck in some, perhaps a butchering site (next-pass-usui.md
+// tuna bones, some from fish over 2 m, stone blades still stuck in some, perhaps a butchering site (Usui's public talk (2026-10-03)
 // item 5; the location from the prefecture's 2013 dig list and GSI, see the JSON's sources).
 //
 //   storyPlaces(L)                      -> places-list entries { id, ja, en, cat, at, group, groupLabel, story }

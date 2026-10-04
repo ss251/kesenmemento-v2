@@ -17,7 +17,7 @@
 
 - **65 rooms** (pkanyo.jp) and 3 room types (port view, mountain view, special). A lift links the hotel directly to the
   お魚いちば below (pkanyo.jp facility page: 「お魚いちばまで直結のエレベーター」).
-- [v6:c7] **2026 references** (they supersede the 2013 photo below): the author's photo IMG_0896 (2026-10-02 14:59, from
+- [v6:c7] **2026 references** (they supersede the 2013 photo below): the on-site photo IMG_0896 (2026-10-02 14:59, from
   (133, 69) on the 港町 quay road, heading 125°, 48 mm) and Wikimedia Commons "Cityscape of Kessennuma City, 2026"
   (2026-03-29, from the 安波山 lookout, 1,220 m away); the roof decks from Google Earth 3D (imagery 2026-03-11):
   - the tower is clad in **dusty salmon-pink tile** (sunlit slab bands #d9bcab / #d4bdb0, the shaded side #8a7a76), with a
@@ -58,5 +58,5 @@
 - Wikimedia Commons, File:Kesennnuma plaza hotel 20130601.JPG (Opqr, CC BY-SA), used as a shape and colour reference only
 - Wikimedia Commons, File:Cityscape of Kessennuma City, 2026.jpg (2026-03-29), the crown height and the cladding,
   reference only
-- The client's photos IMG_0895 and IMG_0896 (2026-10-02), reference only (not in git)
+- On-site photos IMG_0895 and IMG_0896 (2026-10-02), reference only (not in git)
 - OpenStreetMap way 761729140 (© OpenStreetMap contributors); the GSI z18 photo and footprints; the GSI DEM

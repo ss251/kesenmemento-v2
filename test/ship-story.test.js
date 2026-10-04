@@ -1,5 +1,5 @@
 // [ship:story] The Living City story pins (src/anime/world/explore/storypins.js, data/ship/story-pins.json): the
-// 波怒棄館遺跡 pin in 唐桑 (next-pass-usui.md item 5). Its facts, its sourced position inside the map, the edge rule for a
+// 波怒棄館遺跡 pin in 唐桑 (Usui's public talk, 2026-10-03). Its facts, its sourced position inside the map, the edge rule for a
 // pin outside the map, the places-list entry, the card, the signboard and the explore wiring.
 import { describe, test, expect } from "bun:test";
 import { readFileSync } from "node:fs";

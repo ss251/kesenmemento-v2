@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "kesennuma-living-city",
+      "name": "kesenmemento-v2",
       "dependencies": {
         "3d-tiles-renderer": "0.5.3",
         "@mapbox/vector-tile": "2",

@@ -1,6 +1,6 @@
 // [ship] 第一昭福丸 (SHOFUKU MARU No.1, call sign 7KFY, MG1-2112) at true scale, anime cel style.
 //
-// Sources: docs/ship/shofukumaru-dossier.md (the captain's sourced dossier) and the reference photos it lists. The
+// Sources: the project's sourced notes on the ship (not included) and the reference photos it lists. The
 // profile below was measured by this builder from the side-on model photo shofukumaru02 (port, 0.1226 m/px,
 // stem head x = 158, waterline y = 291) with the silhouette segmentation in tools/anime/ship-profile.mjs, and
 // cross-checked on shofukumaru03 (starboard), 05 and designboom-1800 (aft details), 07 (aerial deck plan) and the
@@ -33,12 +33,12 @@ export const SHIP = {
   GT: 486, speedKn: 12.3, engineKW: 735,         // registries; SOY; WCPFC
   holdM3: 523.1, holdC: -60,                     // WCPFC; 北かつ
   crew: 23,                                      // berths (nendo); 25 normal complement (WCPFC)
-  crewMix: { japanese: [6, 7], indonesian: 18 }, // slide; Usui's talk 2026-10-03 (docs/ship/next-pass-usui.md item 4)
-  voyageMonths: [9, 15],                         // about a year on average (next-pass-usui.md item 4)
-  fleet: { ships: 6, retired: { n: 1, year: 2026 } },   // 臼福本店 now runs 6 tuna vessels (next-pass-usui.md item 1; usufuku.jp still lists 7)
+  crewMix: { japanese: [6, 7], indonesian: 18 }, // slide; Usui's talk 2026-10-03 (Usui's public talk at Hackatsuon, 2026-10-03)
+  voyageMonths: [9, 15],                         // about a year on average (Usui's public talk, 2026-10-03)
+  fleet: { ships: 6, retired: { n: 1, year: 2026 } },   // 臼福本店 now runs 6 tuna vessels (Usui's public talk, 2026-10-03; usufuku.jp still lists 7)
   midS: 29.3,                                    // local origin (the builders' shared frame)
-  airDraft: 21.0,                                // dossier §2: ≈ 21 m to the top of the radar lattice (mast top measured 20.7 + lamp); かなえ大橋 clearance 32 m
-  stemHead: 6.2, sheerMid: 5.0,                  // measured (dossier section 3)
+  airDraft: 21.0,                                // source notes §2: ≈ 21 m to the top of the radar lattice (mast top measured 20.7 + lamp); かなえ大橋 clearance 32 m
+  stemHead: 6.2, sheerMid: 5.0,                  // measured (source notes section 3)
   foremast: { s: 14.2, top: 16.1 },              // measured
   bridge: { s0: 28.3, s1: 40.0, roof: 10.0, rail: 10.9, house1: [28.3, 42.6] },   // measured; level-1 house to the aft shelter
   radarMast: { s: 42.8, top: 20.7 },             // measured: white lattice tower, the tallest point

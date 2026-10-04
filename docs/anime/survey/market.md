@@ -1,6 +1,6 @@
 # Fish-market survey (気仙沼市魚市場): C棟 roof deck and the north-facility quay hall
 
-Survey of 2026-10-03 (v6:survey). The client's photos are measured in metres and the app is checked against them. The photos
+Survey of 2026-10-03 (v6:survey). The on-site photos are measured in metres and the app is checked against them. The photos
 themselves never enter git: `raw/survey/market/` (images, COLMAP databases, point clouds) and `docs/shots/v6_survey/`
 (overlays) are gitignored.
 
@@ -89,7 +89,7 @@ quay edge and 27 m inside the open hall, eye T.P. 3.6 — 28 to 132 m from their
 and its GPS fix (no feature it shares with another deck photo was picked): its horizontal position is good to a few metres
 only, and the plates come out at deck height, 0.4 m lower than a car plate sits. Features measured from it are not used.
 
-## Features (BEFORE: the app at commit 7c8cb8c)
+## Features (BEFORE: the app before the rebuild)
 
 | Feature | ENU x, y, z (m) | 1σ (m) | Method | App Δ (m, 3D) |
 |---|---|---|---|---|

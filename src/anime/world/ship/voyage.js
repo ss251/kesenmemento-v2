@@ -30,7 +30,7 @@ export const TIMING = {
   autoMarketS: 330, autoMarketSeconds: 12, autoKanaeBefore: 220, autoAfterKanae: 6, autoShokoBefore: 150, autoAfterShoko: 4,
 };
 const KN = 0.514444;
-/** The set on the HUD clock: from STAGE_HOURS.set - 0.4 (05:30) for 4.5 h (dossier §5: 4-5 h from near dawn). */
+/** The set on the HUD clock: from STAGE_HOURS.set - 0.4 (05:30) for 4.5 h (source notes §5: 4-5 h from near dawn). */
 export const SET_CLOCK = { start: STAGE_HOURS.set - 0.4, hours: 4.5 };
 
 function polyline(pts) {
@@ -304,7 +304,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
     applyCam(dt);
   }
   /**
-   * The hands-free demo through DEPART, in cuts along the outbound line (the dossier's Act 1: out past the market,
+   * The hands-free demo through DEPART, in cuts along the outbound line (the source notes' Act 1: out past the market,
    * under かなえ大橋, past 商港, out to the bay mouth). Each cut re-enters the sail mode on the line, under way.
    *   tapes gone (or 45 s) -> the market rows (s 330), sailed for 12 s
    *   -> 220 m before かなえ大橋, until she has passed under it (+6 s)

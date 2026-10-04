@@ -23,7 +23,7 @@
 // Outputs (docs/ship/shots/): profile-<side>-<livery>-<tier>.png (the render), *-ref-sbs.png (reference | render),
 // *-ref-overlay.png (grey both, red reference only, blue render only), atlas-<livery>.png, profile-metrics.json.
 // Composites that contain the reference photos (*-ref-*.png) are local-only (.gitignore there): the photos are
-// copyrighted. Plain nendo renders may be committed (臼福本店's livery permission to the captain, 2026-10-03).
+// copyrighted. Renders that show the nendo livery are not committed to this repository.
 import { join, resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

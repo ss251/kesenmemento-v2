@@ -1,13 +1,13 @@
-// [ship:acts] ACT 3, 帰港: the TRUE chain of the catch (dossier section 5, "How the catch gets to Japan").
+// [ship:acts] ACT 3, 帰港: the TRUE chain of the catch (source notes section 5, "How the catch gets to Japan").
 //
 // She does NOT sail home with the fish. The frozen catch moves at Las Palmas (her overseas base) into reefer containers
 // (or reefer carriers) and lands mostly at Shimizu, a bonded port. The landing inspection there is a vignette, in order
-// (SHIMIZU_STEPS; Usui's talk 2026-10-03, docs/ship/next-pass-usui.md item 3): about 3 Fisheries Agency inspectors
+// (SHIMIZU_STEPS; Usui's talk 2026-10-03, Usui's public talk at Hackatsuon, 2026-10-03): about 3 Fisheries Agency inspectors
 // check by eye and scan each fish's chip with a reader gun, a sticker with the same number goes on the fish's cheek, and
 // the trucks are weighed on truck scales; 1 kg over the quota costs the licences of all 6 ships, plus fines or prison.
 // The ship and crew come home to Kesennuma under 大漁旗 for refit and crew change. The player's tagged fish then becomes
 // a card: 「まぐろの日は北かつまぐろ屋へ」 (北かつまぐろ屋 海の市店, 魚市場前7-13), with no discount promise, closing on
-// Usui's call to the hackers (next-pass-usui.md item 7).
+// Usui's call to the hackers (Usui's public talk, 2026-10-03).
 //
 //   CHAIN                 the steps in order, with their i18n keys (tested: exactly the acts.js CHAIN_ORDER)
 //   SHIMIZU_STEPS         (acts.js) the inspection substeps; chainCards puts them on the Shimizu card as `steps`
@@ -25,7 +25,7 @@ export const CHAIN = [
   { state: 'CARD', title: 'ship.card.title', body: 'ship.card.body', fact: 'ship.card.fact', carrier: null, withCatch: false },
 ];
 
-/** The final card's last line: Usui's call to the hackers, attributed (next-pass-usui.md item 7). */
+/** The final card's last line: Usui's call to the hackers, attributed (Usui's public talk, 2026-10-03). */
 export const CLOSING = { line: 'ship.card.closing', by: 'ship.card.closingBy' };
 
 /** 北かつまぐろ屋 海の市店 (OSM node n7181952808, layout place p1m5usud, inside the 海の市 lot 16/58541/25069/401). */
@@ -65,7 +65,7 @@ function sea(g, w, h, y, c1, c2) {
   g.strokeStyle = c2; g.lineWidth = 2;
   for (let i = 0; i < 9; i++) { const yy = y + 8 + i * ((h - y) / 9); g.beginPath(); for (let x = -20; x < w + 20; x += 40) { g.moveTo(x + (i % 2) * 20, yy); g.quadraticCurveTo(x + 10 + (i % 2) * 20, yy - 3, x + 20 + (i % 2) * 20, yy); } g.stroke(); }
 }
-/** 第一昭福丸 in profile from the dossier's measured stations (s aft of the stem, h above the waterline), plain livery. */
+/** 第一昭福丸 in profile from the source notes' measured stations (s aft of the stem, h above the waterline), plain livery. */
 export function drawShip(g, x0, wl, scale, { flags = false, facing = 1 } = {}) {
   const X = (s) => x0 + facing * (58.6 / 2 - s) * scale, Y = (h) => wl - h * scale;
   g.save(); g.lineJoin = 'round'; g.strokeStyle = INK; g.lineWidth = Math.max(1.2, scale * 0.12);
@@ -92,7 +92,7 @@ function container(g, x, y, w, h, c, label) {
   g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 1; for (let i = 1; i < 10; i++) { g.beginPath(); g.moveTo(x + (w * i) / 10, y + 3); g.lineTo(x + (w * i) / 10, y + h - 3); g.stroke(); }
   if (label) { g.fillStyle = '#ffffff'; g.font = `700 ${Math.round(h * 0.26)}px "Noto Sans JP", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(label, x + w / 2, y + h / 2); }
 }
-/** A frozen tuna as the catch is landed: DRESSED, head on (right), gills, guts and tail removed (dossier section 5; Act 2
+/** A frozen tuna as the catch is landed: DRESSED, head on (right), gills, guts and tail removed (source notes section 5; Act 2
  *  copy `ship.haul.kept`). The body ends in a straight cut at the tail stock, with no caudal fin; the blue tag sits on
  *  the stub. (x, y) is the centre, l the length from the head to the cut plus the stub. */
 export function frozenTuna(g, x, y, l) {

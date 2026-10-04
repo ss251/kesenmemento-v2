@@ -21,7 +21,7 @@ import { shopGlass } from './detail5.js';   // [v5:detail]
 import { buildPier7Photos, buildMukaeruPhotos, buildPlazaPhotos, buildSlowStreetPhotos, buildKonbiniPhotos, buildMarkingsPhotos, buildEastPromenade, clipAxis, LAWN6, PIER7_6, P7POLY6, P7_1F6 } from './minami5.js';   // [v5:photos]
 
 const C = { white: '#f1f1ee', roof: '#eceeed', timber: '#d6b88e', timberDark: '#a9825a', render: '#f0efe9', deck: '#b08a62', steel: '#5d6470', concrete: '#c9c6bc', stepTop: '#d7d3c8', lawn: '#8a9566', paveA: '#c6c3b8', paveB: '#b9b6ac', tanStep: '#b5ab9f', ringWhite: '#e9e7e1', soil: '#4f4a3e', lowPlant: '#4d5e3c', louver: '#cdbfa8', pontoon: '#b9bcb6', membrane: '#f4f5f2', glassPale: '#a9bccb', terraceA: '#6d6664', terraceB: '#57545b', p7deck: '#a7a39c', mukGrey: '#cfcfca', mukDark: '#8f8d8b', tanDeck: '#ae9a90',
-  // [v5:fix3] 迎 from Sailesh's photos (IMG_0818 / IMG_0824) + Earth 2026-03-11: silver rib siding, khaki render, grey metal roofs
+  // [v5:fix3] 迎 from the author's photos (IMG_0818 / IMG_0824) + Earth 2026-03-11: silver rib siding, khaki render, grey metal roofs
   mukSiding: '#c8cbc8', mukKhaki: '#b3a58e', mukRoof: '#a9aca7', mukSoffit: '#55585d', mukTimberDark: '#5b4636', mukFrame: '#8d9094', mukShop: '#dedbd3' };
 
 /** [v5:fix1] PIER7's footprint split across its depth (Google Earth 2026-03-11): `upper` = the 3F on the street-side

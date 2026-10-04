@@ -3,7 +3,7 @@
 // a private web build so concurrent agents rebuilding dist/ never break a render, and the machine rules of V2-SPEC §13.
 //
 //   import { launch, machine } from "./cdp.js";
-//   const b = await launch({ port: 8803 });              // builds src/web -> dist/.cinema-web and serves it on 8803
+//   const b = await launch({ serve });                    // serve: async ({ port }) => { server, url }
 //   const p = await b.page({ width: 1920, height: 1080 });
 //   await p.nav("?stop=bay&t=golden&portal=0&ui=0"); await p.ready();
 //   const png = await p.shot();                          // Buffer
@@ -62,23 +62,11 @@ export const machine = {
 
 // ------------------------------------------------------------------ private build
 /**
- * Build src/web into a private dir. Other packages edit src/web concurrently; if their work in progress does not
- * build, the last good private build is kept (with a warning) unless `strict`.
+ * The v1/v2 viewer that this private build served has been removed; callers pass `serve` (the anime app brings its
+ * own server, see scripts/render/anime-page.js).
  */
-export async function buildPrivate({ outdir = PRIVATE_DIST, minify = true, strict = false } = {}) {
-  const tmp = outdir + ".tmp";
-  rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true });
-  let res;
-  try { res = await Bun.build({ entrypoints: [join(ROOT, "src/web/index.html")], outdir: tmp, minify, sourcemap: "linked", target: "browser" }); }
-  catch (e) { res = { success: false, logs: [e] }; }
-  if (!res.success) {
-    const msg = res.logs.map((l) => String(l?.message ?? l)).join("\n").slice(0, 1500);
-    rmSync(tmp, { recursive: true, force: true });
-    if (!strict && existsSync(join(outdir, "index.html"))) { console.error(`[cdp] web build failed; reusing the last good build in ${outdir}\n${msg}`); return { outdir, reused: true }; }
-    throw new Error("private web build failed:\n" + msg);
-  }
-  rmSync(outdir, { recursive: true, force: true }); renameSync(tmp, outdir);
-  return { outdir, reused: false };
+export async function buildPrivate() {
+  throw new Error("buildPrivate: the v1/v2 viewer was removed; call launch({ serve }) with the anime app's server");
 }
 
 // ------------------------------------------------------------------ browser

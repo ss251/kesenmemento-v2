@@ -38,13 +38,7 @@
    "cluster": "deck",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:01 17:07:12",
    "f35": 24,
-   "gps": [
-    595.4,
-    1029.35
-   ],
-   "gps_alt": 11.09,
    "R_w2c": [
     [
      0.8029156611842125,
@@ -111,13 +105,7 @@
    "cluster": "deck0793",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:01 17:07:14",
    "f35": 24,
-   "gps": [
-    707.93,
-    1044.15
-   ],
-   "gps_alt": -0.6723041018,
    "R_w2c": [
     [
      0.999615286817773,
@@ -184,13 +172,7 @@
    "cluster": "deck",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:01 17:07:18",
    "f35": 24,
-   "gps": [
-    707.93,
-    1038.6
-   ],
-   "gps_alt": 2.514531902,
    "R_w2c": [
     [
      -0.940109608227494,
@@ -257,13 +239,7 @@
    "cluster": "deck",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:01 17:07:24",
    "f35": 14,
-   "gps": [
-    717.08,
-    1038.29
-   ],
-   "gps_alt": 5.245076989,
    "R_w2c": [
     [
      -0.4734710788580056,
@@ -330,13 +306,7 @@
    "cluster": "deck",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:01 17:07:30",
    "f35": 14,
-   "gps": [
-    715.88,
-    1042.3
-   ],
-   "gps_alt": 4.98353309,
    "R_w2c": [
     [
      -0.5194207619782408,
@@ -403,13 +373,7 @@
    "cluster": "deck",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:01 17:07:38",
    "f35": 14,
-   "gps": [
-    714.43,
-    1056.79
-   ],
-   "gps_alt": 4.188560833,
    "R_w2c": [
     [
      0.5593296228196463,
@@ -476,13 +440,7 @@
    "cluster": "deck",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:01 17:07:45",
    "f35": 14,
-   "gps": [
-    717.08,
-    1061.11
-   ],
-   "gps_alt": 9.060500074,
    "R_w2c": [
     [
      -0.761525399144806,
@@ -549,13 +507,7 @@
    "cluster": "canopy",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:02 06:52:57",
    "f35": 78,
-   "gps": [
-    419.26,
-    587.14
-   ],
-   "gps_alt": 4.955658181,
    "R_w2c": [
     [
      -0.2521038022587736,
@@ -622,13 +574,7 @@
    "cluster": "canopy",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:02 06:53:05",
    "f35": 78,
-   "gps": [
-    437.82,
-    668.55
-   ],
-   "gps_alt": 2.550030731,
    "R_w2c": [
     [
      -0.24596219041200346,
@@ -695,13 +641,7 @@
    "cluster": "canopy",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:02 06:53:17",
    "f35": 77,
-   "gps": [
-    431.31,
-    672.56
-   ],
-   "gps_alt": 4.642628058,
    "R_w2c": [
     [
      -0.18152983385005422,
@@ -768,13 +708,7 @@
    "cluster": "canopy",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:02 06:54:10",
    "f35": 77,
-   "gps": [
-    494.68,
-    660.53
-   ],
-   "gps_alt": 3.504111459,
    "R_w2c": [
     [
      -0.2440752746969555,
@@ -841,13 +775,7 @@
    "cluster": "canopy",
    "registered": true,
    "method": "survey adjustment (picks + hard references)",
-   "time": "2026:10:02 06:54:11",
    "f35": 77,
-   "gps": [
-    505.28,
-    654.06
-   ],
-   "gps_alt": 2.74874031,
    "R_w2c": [
     [
      -0.16758639542832,

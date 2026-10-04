@@ -1263,10 +1263,6 @@
   {
    "id": "IMG_0833",
    "registered": false,
-   "gps": [
-    -32.05,
-    84.8
-   ],
    "heading_deg": 132.2512513,
    "f35": 24
   },
@@ -1535,7 +1531,7 @@
    "gps_offset_m": 1.31,
    "eye_m": 1.49,
    "registered": true,
-   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns \u62d3's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
+   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns 拓's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
   },
   {
    "id": "IMG_0841",
@@ -1574,15 +1570,11 @@
    "gps_offset_m": 1.95,
    "eye_m": 1.47,
    "registered": true,
-   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns \u62d3's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
+   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns 拓's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
   },
   {
    "id": "IMG_0842",
    "registered": false,
-   "gps": [
-    -42.65,
-    84.19
-   ],
    "heading_deg": 319.5969238,
    "f35": 24
   },
@@ -1855,10 +1847,6 @@
   {
    "id": "IMG_0906",
    "registered": false,
-   "gps": [
-    -33.25,
-    79.87
-   ],
    "heading_deg": 60.66402439,
    "f35": 77
   },
@@ -1941,10 +1929,6 @@
   {
    "id": "IMG_0910",
    "registered": false,
-   "gps": [
-    -26.75,
-    74.32
-   ],
    "heading_deg": 48.77447127,
    "f35": 77
   },

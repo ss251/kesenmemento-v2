@@ -2,9 +2,9 @@
 // Built after life (the send-off crowd uses life's character kit) and before explore (it lists the boarding entry in
 // the places list, the map and the labels). Everything it adds is dynamic (ctx.add): never batched, never merged.
 //
-//   - the model (ship/shofukumaru1.js) at the tier's budget, with the nendo livery by default on every host (ship/flags.js;
-//     臼福本店 granted the captain permission on 2026-10-03). The plain fallback is opt-in: ?livery=fallback or a build
-//     with KLC_NENDO=0; with it, nothing nendo is fetched.
+//   - the model (ship/shofukumaru1.js) at the tier's budget, with the nendo livery by default when its traced files are
+//     present (ship/flags.js; used with 臼福本店's permission in the live demo, not included here). The plain fallback
+//     is used otherwise, or forced with ?livery=fallback or a build with KLC_NENDO=0; then nothing nendo is fetched.
 //   - the sail mode (explore/sail.js) holds her pose: by default she lies alongside the コの字岸壁 east face.
 //   - the director (ship/voyage.js) and its UI (ui/ship.js), started from the 「第一昭福丸に乗る」 chip near the quay, the
 //     places list, or the URL.

@@ -15,7 +15,8 @@
 //   'nendo'     drawn at runtime from data/ship/shofukumaru1/livery-nendo.json (traced shapes), lines-nendo.json
 //               (traced diagonals) and livery-nendo-marks.json (circles, missed pieces, ignore zones, the crest).
 //               Those files are fetched unless ?livery=fallback or the build define KLC_NENDO=0 (see ./flags.js); they
-//               are never imported, so no bundle contains them. Livery permission: 臼福本店 to the captain, 2026-10-03.
+//               are never imported, so no bundle contains them. They are not in this repository (臼福本店's livery, used in
+//               the live demo with permission); without them the plain livery is painted.
 //
 // The clean-up (cleanNendo) turns the noisy traces into crisp anime shapes: same-colour fragments that touch are
 // merged (only while their union stays compact, so the two triangles of an X never fuse), each shape becomes its convex hull simplified to the fewest corners that keep 92 % of its area, corners

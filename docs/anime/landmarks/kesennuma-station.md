@@ -52,10 +52,13 @@ sign is green #2e8b57 with white letters.
 - OSM way 761402296; nodes 2729956033, 3156209281, 7448102315–7448102319 and 2982484371 (© OpenStreetMap contributors)
 - Crop: `ortho/station.jpg`
 
-## What the app renders
+## In the app
 
-- `app/station.jpg`
-- The station is in the far zone. Two instanced far lots overlap here: an 83 × 27.7 m `warehouse` shed and a 56 × 15 m
-  5-storey `apartment`.
-- The result is a **tangle of intersecting roofs**, with no arcade, no mural, no platform and no JR sign.
-- The 駅前プラザ renders as a 6-storey office.
+- One storey on the OSM outline: the five round arches in off-white stone tile, the dark hip roof with the centre gable
+  and its triangular window, the swordfish mural on the square-side slope, the JR board and the blue pillar sign.
+- The covered BRT platform 1 behind the hall, the island platform with its light-blue canopy and the rails of the city
+  (OSM).
+- The square with the white lighthouse 「ようこそ気仙沼へ！」 tower, the カジキマグロ and three カツオ, and the taxi rank.
+- An enterable waiting hall: automatic doors, ticket gates, machines, a timetable, benches and the tourist desk.
+- The GSI footprint that covers the station and its platform roof (83 × 28 m) belongs to the station model.
+- 駅前プラザ is a white-roofed two-storey block (its storey count is not verified).

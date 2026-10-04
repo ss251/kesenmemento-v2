@@ -9,9 +9,9 @@ street-level place in town and must be right.
 |---|---|---|
 | Line | along 県道 気仙沼港線 on the north shore, from the NW corner of the bay at about (15, −25) east to the 神明崎 neck at about (300, −150). On the ortho it is a straight wall with a pink-red paved strip | ortho `ortho/seawall.jpg`; the app's `SPOTS.promenade` runs (7.7, −22.6) → (298, −116.6) |
 | Length | **311 m** (the measured line above is 311 m) | 土木学会デザイン賞 2022; 今川悟 blog: 312 m of works |
-| Crest | **T.P. 4.1 m**. As built it was **22 cm too high**, because the crustal rebound after 2011 was not applied. The correction was argued over in 2018–2019 | 今川悟 blog; Miyagi Prefecture page |
-| Seen from the land | **only 1.3 m** above the pavement (1.08 m after the planned correction). The land behind is at most T.P. 2.8 m | 今川悟 blog |
-| Flap gates | a **1 m freeboard (余裕高) of flap gates** on the crest that rise with a tsunami, with no power and no operator. There are **21 gates**, 13.7 m wide each, which replace a planned T.P. 5.1 m solid wall | the prefecture via the search summary; 今川悟 blog; 気仙沼市 video page |
+| Crest | **T.P. 4.1 m** | 今川悟 blog; Miyagi Prefecture page |
+| Seen from the land | **only 1.3 m** above the pavement. The land behind is at most T.P. 2.8 m | 今川悟 blog |
+| Flap gates | a **1 m freeboard (余裕高) of flap gates** on the crest that rise by themselves with the water, with no power and no operator. There are **21 gates**, 13.7 m wide each, which replace a planned T.P. 5.1 m solid wall | the prefecture via the search summary; 今川悟 blog; 気仙沼市 video page |
 | Extras | **陸閘 (gates for fishermen), stair-shaped rest decks (階段状の休憩デッキ), night lighting** | デザイン賞 |
 | Road behind | 気仙沼港線, 11.5 m wide | 今川悟 blog |
 
@@ -48,17 +48,16 @@ All finished. The seawalls were completed in June 2021, and the last landscape w
 
 - https://design-prize.sakura.ne.jp/archives/result/1932 (魚町 311 m flap gates with rest decks and lighting; 南町 243 m; cantilevered decks; the park)
 - https://www.s-onsite.com/works/001340.html (T.P. 6.2 m, 4.4 m high, stepped garden, lawn, March 2025)
-- https://imakawa.net/blog/4847.html (T.P. 4.1 m, 1.3 m from the land, the 22 cm error, 13.7 m gates, the land at T.P. 2.8 m, the road 11.5 m)
-- https://www.pref.miyagi.jp/soshiki/gyofuku/kesennuma-sakanamachi-boutyoutei.html (the prefecture on the construction error)
+- https://imakawa.net/blog/4847.html (T.P. 4.1 m, 1.3 m from the land, 13.7 m gates, the land at T.P. 2.8 m, the road 11.5 m)
+- https://www.pref.miyagi.jp/soshiki/gyofuku/kesennuma-sakanamachi-boutyoutei.html (the prefecture's page on the 魚町 seawall)
 - https://www.kesennuma.miyagi.jp/sec/s077/content/010/20230117112525.html (the flap-gate video page)
 - Ortho: `ortho/seawall.jpg`, `ortho/pier7_mukaeru.jpg`
 
-## What the app renders
+## In the app
 
-- `app/promenade_walk.jpg`, `app/seawall_oblique.jpg`
-- **Timber-plank boardwalk** with a wooden handrail on dark posts. There is no flap-gate crest band, no pink paving, no
-  rest-deck stairs and no 陸閘.
-- The seawall "sea-view windows" in V3-SPEC section 1 describe an older idea. The real 魚町 wall has **no windows**; it
-  is kept low instead.
-- Nothing distinguishes the 南町 side's stepped garden, lawn and cantilevered decks.
-- Per the harbor stats, the lengths are promenade:hero 384 m and seawall:hero 123 m, against a real 311 m + 243 m.
+- **魚町 wall:** T.P. 4.1 m crest, 1.3 m over the pavement, 21 flap gates of 13.9 m along the 293 m crest line measured
+  on the z18 photo (21 × 13.7 m = 288 m of gates; 311 m of works with the ends), 13 rest-deck stairs and footlights,
+  with no windows.
+- **南町 side:** the 2F decks of 迎 and PIER7 over the T.P. 6.2 m wall, the lawn and the plaza, as described in
+  `pier7.md` and `mukaeru.md` and measured in `docs/anime/survey/minami.md`.
+- Frames: `app-v4/seawall_landside.jpg`, `app-v4/seawall_oblique.jpg`.

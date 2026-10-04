@@ -19,7 +19,7 @@
 - **Opened 2026-07-19 (Sunday):** **「亀山テラス360°-KESENNUMA OSHIMA-」**.
   - A summit terrace with sofa seating, a rest house and a café stand (open Friday to Sunday and holidays).
   - A **monorail from the foot to the summit, 6 to 7 minutes one way**.
-  - The client's photo IMG_0603, taken in PIER7, shows the 「2026.7.19 OPEN」 poster.
+  - A photo taken in PIER7 (IMG_0603) shows the 「2026.7.19 OPEN」 poster.
 - Before that, the summit had the **亀山展望台** and 「亀山ほしのてらす」, and the old 亀山 rest house. Commons has an
   earlier 「亀山 slopecar」 photo: a low steel-roofed open shelter at the summit car park.
 - The ortho (about 2020–2022) shows a small cluster of buildings and a car park just below the summit (the rest house
@@ -42,7 +42,10 @@ photo found). Use a low timber and glass pavilion with a dark metal roof until a
 - OSM nodes 3663140756, 3668222567 and 8871013335; ways 363067537 and 362542444 (© OpenStreetMap contributors); city DEM
 - Crop: `ortho/kameyama.jpg`
 
-## What the app renders
+## In the app
 
-- `app/kameyama.jpg`: a bare forested summit with **nothing at the top**: no terrace, rest house, monorail or road.
+- 亀山テラス360°: the monorail (the 亀山通信 overview map is registered on 愛宕神社 and 大嶋神社; 376 m along the track
+  against the city's 409 m, 108 m of climb) with two glazed cars that run the 20-minute round trip; the dark-timber
+  駐車場駅舎 and 待合・休憩棟; the parking; the summit station; terrace 1 (three tiers, 49 sofas); terraces 2 and 3;
+  ほしのてらす; the café; the two kept rest houses (a fan-shaped hall and a teal-roofed block); and the summit post.
 - Far houses are scattered on the slopes.

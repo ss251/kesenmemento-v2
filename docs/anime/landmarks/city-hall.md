@@ -57,9 +57,17 @@ The main building carries a vertical 「気仙沼市役所」 name plate at the 
 - OSM ways 602638650, 819508283–6 and 631751376 (© OpenStreetMap contributors); GSI address search
 - Crops: `ortho/cityhall.jpg`, `ortho/newcityhall.jpg`
 
-## What the app renders
+## In the app
 
-- `app/cityhall.jpg`: a generic white flat box.
-  - The OSM main-building centroid falls on a 152 m² `warehouse` lot (the GSI footprints split the building).
-  - 第二庁舎 is a 6-storey (19.8 m) flat-roofed office, although the real building is a 2-storey timber school.
-- `app/new_cityhall_site.jpg`: the demolished 気仙沼市立病院 blocks (the pre-2022 GSI footprints) are still rendered.
+- **本庁舎:** 3 storeys of beige-grey render with green-tinted ribbon windows on the OSM outline, the penthouse, the two
+  lattice masts, the entrance canopy, the 「気仙沼市役所」 plate and the pine. The floor follows the DEM (8.4 m; the hill
+  rises 3 m behind it).
+- **第二庁舎:** the two-storey former wooden school: dark siding, white 4-pane sashes, a long grey gable roof, the stair
+  bays.
+- **ワン・テン:** the mauve two-storey base with the teal band and shop glazing, two open parking decks with parked cars
+  on the roof, the corner tower with the 「One-Ten」 logo.
+- **The 田中 site:** the 21 pre-2022 lots inside OSM 819508282 are gone. The new city hall stands as in September 2026:
+  the B1/1F concrete base, the 2–4F steel frame on the plan grids (45.35 × 54.55 m, 24.75 m high, 実施設計 2024-09), the
+  first white cement-panel band and glazing on the south and east, scaffold sheeting north and west, a crawler crane,
+  site offices, bare earth and white hoarding. The progress on the day is inferred from the schedule (frame 2025–26,
+  completion 2027-10), not from a photo.

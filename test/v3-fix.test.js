@@ -100,7 +100,7 @@ describe("serving and live data", () => {
   test("the public mirror never passes the tiles token route", () => {
     expect(allowed("/api/config")).toBe(false);
     expect(allowed("/api/live")).toBe(true);
-    expect(read("scripts/serve.js")).toMatch(/\/api\/config"\) return v2 \? apiConfig\(\)/);
+    expect(read("scripts/serve.js")).not.toMatch(/api\/config/);   // the photoreal-tiles token route is gone
   });
   test("cached data over 1 h old or an old port date is labelled stale, never ライブ", () => {
     const now = Date.parse("2026-09-30T03:00:00Z");   // 12:00 JST

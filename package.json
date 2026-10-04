@@ -1,10 +1,15 @@
 {
-  "name": "kesennuma-living-city",
+  "name": "kesenmemento-v2",
   "version": "0.1.0",
   "private": true,
-  "description": "A living, explorable 3D Kesennuma built from open government data, citizen captures and today's port activity.",
-  "type": "module",
+  "description": "KesenMemento v2: Kesennuma Living City. The real Kesennuma as an explorable anime-style 3D world in the browser, built from open data (GSI, OpenStreetMap, JMA).",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ss251/kesenmemento-v2.git"
+  },
+  "homepage": "https://kesennuma-living-city-production.up.railway.app/",
+  "type": "module",
   "scripts": {
     "test": "bun test",
     "data": "bun run scripts/build-data.js",

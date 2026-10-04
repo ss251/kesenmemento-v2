@@ -1,6 +1,6 @@
 # Landmark reference sheets (v4)
 
-These are the reality references for V3-SPEC section 10. Each sheet gives the position (checked on the GSI aerial photo
+These are the reality references for the landmark accuracy log. Each sheet gives the position (checked on the GSI aerial photo
 and the DEM), dimensions, structure, colours, signage, current state and sources, followed by what the app renders
 today.
 
@@ -29,13 +29,13 @@ today.
 | [hospitals.md](hospitals.md) | 市立病院, 大友病院, 猪苗代病院, the old hospital site |
 | [schools.md](schools.md) | schools in the core |
 | [shrines-temples.md](shrines-temples.md) | shrines, temples, the Orthodox church |
-| [AUDIT.md](AUDIT.md) | **app vs reality: every discrepancy, with severity, owner and fix order** |
+| [AUDIT.md](AUDIT.md) | **the accuracy log: how each landmark was checked and how it is built** |
 
 Supporting material:
 
 - `landmarks.json` is a machine-readable summary.
 - `ortho/` holds GSI aerial crops (出典：国土地理院) with OSM (red, © OpenStreetMap contributors) and GSI lot (yellow/cyan)
   outlines.
-- `app/` holds downscaled app screenshots from 2026-09-30.
+- `app-v4/` holds downscaled app screenshots of the rebuilt landmarks (2026-09-30).
 
 Web photos were used only as shape and colour references and are not stored here.

@@ -81,7 +81,7 @@ describe("v5 detail pass", () => {
     expect(L.heightAt(-12, 52)).toBeLessThanOrEqual(2.31); expect(L.heightAt(-6, 54)).toBeLessThanOrEqual(2.31);
     expect(L.heightAt(20, 50)).toBeLessThan(1.8);   // [v6:rebuild] the plaza pad under the T.P. 1.83 paving
     expect(L.heightAt(-16.5, 57.4)).toBeCloseTo(2.12, 1);
-    expect(L.GROUND_PADS.length).toBeGreaterThan(0); for (const p of L.GROUND_PADS) expect(p.src.startsWith("sailesh")).toBe(true);
+    expect(L.GROUND_PADS.length).toBeGreaterThan(0); for (const p of L.GROUND_PADS) expect(p.src.startsWith("author photos")).toBe(true);
   });
   test("the ANCHOR face is the 10.4 m street segment of 迎's footprint; the eave rises from the box to the glazed corner", () => {
     // [v6:rebuild] P1 / P2 sit on the surveyed façade plane (data/survey/minami/picks.json planes['anchor.face']), 0.6-2 m from

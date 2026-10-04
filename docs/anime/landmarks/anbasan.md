@@ -44,7 +44,10 @@ A summit post 「安波山 山頂 239m」 (plausible; not verified from a photo)
 - OSM nodes 7113790418 and 7113790413 (© OpenStreetMap contributors); GSI seamlessphoto z17/z18; core DEM
 - Crops: `ortho/anba.jpg`, `ortho/anba_top.jpg`
 
-## What the app renders
+## In the app
 
-- `app/anba_lookout.jpg`: a 12 × 7 m raised timber deck with a roofed gazebo, on a 20 × 16 m gravel pad at the summit.
-- There are no ひのでのてらす / ほしのてらす terraces and no dragon park.
+- The summit lookout is the grass clearing with a post, benches and a plaque (no gazebo), at the summit (0 m).
+- ひのでのてらす and ほしのてらす are roofed terraces (ひので 0 m from OSM, ほし ±3 m from the z17 photo), joined by
+  the path with log steps and footlights.
+- Not modelled: the 5合目 安波山公園 dragons (their position is not verified).
+- Frames: `app-v4/anba_hoshi.jpg`, `app-v4/anba_walk.jpg`.

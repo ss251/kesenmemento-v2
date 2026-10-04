@@ -1,6 +1,6 @@
 // [ship:acts] The three acts of 第一昭福丸 as a PURE, serialisable state machine (no DOM, no three.js; tested in
 // test/ship-acts.test.js). The director (ship/voyage.js) feeds it events from the scenes; the UI (ui/ship.js) reads
-// its state. Every rule here follows the captain's dossier (docs/ship/shofukumaru-dossier.md, section 5 and "What this
+// its state. Every rule here follows the project's sourced notes on the ship ( section 5 and "What this
 // means for the three acts"):
 //
 //   ACT 1 出船  DOCKED -> SENDOFF -> DEPART -> BAY_MOUTH
@@ -10,7 +10,7 @@
 // The catch does NOT sail home: it is transshipped at Las Palmas into reefer containers, landed at the bonded port of
 // Shimizu for the landing inspection (about 3 Fisheries Agency inspectors, a reader gun on each fish's chip, a
 // same-number sticker on its cheek, the trucks on truck scales; 1 kg over the quota costs the licences of all 6 ships:
-// docs/ship/next-pass-usui.md item 3), while the ship and crew come home to Kesennuma under 大漁旗.
+// Usui's public talk at Hackatsuon, 2026-10-03), while the ship and crew come home to Kesennuma under 大漁旗.
 //
 //   const acts = createActs({ seed, date })     acts.state / acts.data / acts.act
 //   acts.can(ev, payload) -> { ok, reason? }    acts.send(ev, payload) -> { ok, state, reason?, auto? }
@@ -30,13 +30,13 @@ export const ACT_OF = {
 /** Act 3 runs in exactly this order (the true chain). */
 export const CHAIN_ORDER = ['TRANSSHIP_LAS_PALMAS', 'REEFER', 'SHIMIZU_WEIGH', 'HOMECOMING', 'CARD'];
 /**
- * The Shimizu landing inspection, in order (Usui's talk, 2026-10-03; docs/ship/next-pass-usui.md item 3): about 3
+ * The Shimizu landing inspection, in order (Usui's talk, 2026-10-03; Usui's public talk at Hackatsuon, 2026-10-03): about 3
  * Fisheries Agency inspectors check by eye, scan each fish's chip with a reader gun, put a sticker with the same number
  * on its cheek, and the trucks are weighed on truck scales; the last caption is the rule.
  */
 export const SHIMIZU_STEPS = ['inspectors', 'chip', 'sticker', 'truck', 'rule'];
 
-/** Sourced rules and numbers (dossier section 5). */
+/** Sourced rules and numbers (source notes section 5). */
 export const RULES = {
   minKg: 30,              // ICCAT Rec. 22-08 (= 18-02): Atlantic bluefin under 30 kg (or 115 cm fork length) is released
   minFL: 115,             // cm, the other half of the same minimum
@@ -53,11 +53,11 @@ export const RULES = {
   japanT: 3779,           // Japan's 2025/26 E. Atlantic bluefin quota (Usui's slide)
   tacT: 43296,            // the E. Atlantic + Mediterranean TAC (slide)
   japanBoats: 100,        // about 100 registered boats share Japan's quota, 48 of them fish Atlantic bluefin
-  japanBluefinBoats: 48,  // (Usui's talk, 2026-10-03; next-pass-usui.md item 2)
-  inspectors: 3,          // about 3 Fisheries Agency inspectors at the Shimizu landing (next-pass-usui.md item 3)
+  japanBluefinBoats: 48,  // (Usui's talk, 2026-10-03; Usui's public talk, 2026-10-03)
+  inspectors: 3,          // about 3 Fisheries Agency inspectors at the Shimizu landing (Usui's public talk, 2026-10-03)
   fleetShips: 6,          // 1 kg over the quota costs the licences of all 6 of the company's ships (item 3)
-  // The quota bar is the ship's share (dossier §5): the minister's allocation to this one ship is about 80 t, as Usui
-  // said in his public talk on 2026-10-03 (docs/ship/next-pass-usui.md item 2, marked ⚠, so it is shown as 'about';
+  // The quota bar is the ship's share (source notes §5): the minister's allocation to this one ship is about 80 t, as Usui
+  // said in his public talk on 2026-10-03 (Usui's public talk at Hackatsuon, 2026-10-03, marked ⚠, so it is shown as 'about';
   // it fits the 76.3 t MSC catch of 2024). This set's catch is a slice of it.
   shipShareKg: 80000,
   allowanceKg: 80000,
@@ -84,7 +84,7 @@ export function seasonOpen(date) {
 /** Today's date in Japan ('YYYY-MM-DD'; UTC+9), the clock the live claim about the real ship is checked against. */
 export const todayJst = (now = Date.now()) => new Date(now + 9 * 3600e3).toISOString().slice(0, 10);
 /**
- * The ocean banner's second sentence. No wording says the real ship is fishing "right now" (the dossier supports that
+ * The ocean banner's second sentence. No wording says the real ship is fishing "right now" (the source notes support that
  * for 14 Sep 2026 only): inside the Aug-Jan season the banner says the season is open and she fishes here in it every
  * year; outside it, that she fishes here each season. -> an i18n key.
  */
@@ -182,7 +182,7 @@ export const EVENTS = {
     act(d) {
       const f = d.onScale;
       const tag = SPECIES[f.species]?.tagged ? formatTag(d.nextTag++, d.yy) : null;
-      // dossier §5: bled and spiked at once (神経締め); gills, guts and tail removed; frozen at -60 °C
+      // source notes §5: bled and spiked at once (神経締め); gills, guts and tail removed; frozen at -60 °C
       d.kept.push({ ...f, tag, bled: true, spiked: true, dressed: true, frozenC: RULES.freezeC });
       if (SPECIES[f.species]?.quota) d.landedKg = r1(d.landedKg + f.kg);
       d.onScale = null;

@@ -1,15 +1,15 @@
 // [ship] Feature flags for the 第一昭福丸 build.
 //
-// nendoLivery: the full nendo livery (2020, nendo for 臼福本店). Livery permission granted to the captain by 臼福本店 on
-// 2026-10-03; nendo livery is the default in all builds (docs/ship/shofukumaru-dossier.md, the UPDATE header). The plain
-// fallback stays in the code as an OPT-IN only:
+// nendoLivery: the full nendo livery (2020, nendo for 臼福本店), used in the live demo with 臼福本店's permission
+// (2026-10-03). Its traced data is NOT in this repository; without it the app paints the plain livery. The plain
+// fallback can also be forced:
 //   1. the URL parameter ?livery=fallback|nendo wins;
 //   2. otherwise a build that defines KLC_NENDO=0 gets the fallback (Bun.build({ define: { KLC_NENDO: '"0"' } }) or
 //      the env at bundle time); KLC_NENDO=1 (or no define) keeps nendo;
-//   3. otherwise nendo, on every host: localhost, the tailnet, the public Funnel link and any public deploy alike.
+//   3. otherwise nendo on every host (it falls back to the plain livery when the traced files are absent).
 // With the fallback, ./livery.js paints the plain livery and never fetches data/ship/shofukumaru1/*-nendo*.json.
 
-// isDevHost no longer decides the livery; ship/sendoff.js still uses it to look for the captain's local music file.
+// isDevHost no longer decides the livery; ship/sendoff.js still uses it to look for an optional local music file.
 export const DEV_HOST_RE = /^(localhost|127\.0\.0\.1|\[?::1\]?)$|\.localhost$/i;
 export const isDevHost = (h) => DEV_HOST_RE.test(String(h || '').trim());
 

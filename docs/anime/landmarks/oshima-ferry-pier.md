@@ -41,10 +41,10 @@ finger piers, and fresh reclaimed land with new buildings (the terminal area).
 - Commons "Oshima Kisen Fantasy at Kesennuma Port 202608a.jpg" and "…202608b.jpg"
 - OSM ways 819508304 and 1464061063; node 8666220817 (© OpenStreetMap contributors)
 
-## What the app renders
+## In the app
 
-- world.js moors a **ferry named 「うみねこ丸」** at `SPOTS.ferryPiers[0]`. The pontoon positions are correct, within
-  5 m, but the vessel is fictional.
-  - The real boat at this pier in 2026 is the cruise boat ファンタジー (blue and red livery).
-  - "Oshima ferry" framing is out of date since 2019.
-- 浦の浜 (`app/uranohama.jpg`) has no pontoon, terminal or boat basin; only a few far boxes stand there.
+- The boat moored at the PIER7 pontoon is ファンタジー: 32 × 7 m, a blue bow swoosh, a red stern panel, blue dots and the
+  'Fantasy' script. The pontoons stand on their OSM outlines.
+- 浦の浜: the timber welcome terminal with its bay terrace, the cruise floating pier on its gangway with the 「のりば」
+  board, and the basin jetty.
+- Frame: `app-v4/fantasy.jpg`.

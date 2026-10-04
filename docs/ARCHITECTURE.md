@@ -1,12 +1,11 @@
 # Architecture
 
-Kesennuma Living City (v4: the v3 anime engine, made accurate and explorable) is a static web app with a small local
-server. Bun bundles the browser code into `dist/`. When the page loads, the browser builds the city from precomputed
-layout data, and then streams street-level detail in tiles around the player. `scripts/serve.js` serves the page, the
-data and one live endpoint.
+Kesennuma Living City is a static web app with a small local server. Bun bundles the browser code into `dist/`. When
+the page loads, the browser builds the city from precomputed layout data, and then streams street-level detail in tiles
+around the player. `scripts/serve.js` serves the page, the data and one live endpoint.
 
-The engineering contract for module authors is [anime/BUILDER-GUIDE.md](anime/BUILDER-GUIDE.md). This page explains
-how the parts fit together.
+This page explains how the parts fit together. A world module exports `build(ctx)` and stays inside a triangle and
+texture budget, which `bun tools/anime/check.mjs <module>` reports without a GPU.
 
 ```
 GSI tiles (raw/tiles, cached)   OSM extract (raw/osm, ODbL)    JMA + 気仙沼漁協 pages (fetched live, cached in data/cache/live)
@@ -46,7 +45,7 @@ origin is 38.9060 N, 141.5750 E, and `x = (lon − 141.575)·86744`, `z = −(la
 
 ## 2. How the layout is derived from real data
 
-Everything a module places comes from `src/anime/world/layout.js` (V3-SPEC section 3). It loads precomputed files from
+Everything a module places comes from `src/anime/world/layout.js`. It loads precomputed files from
 `data/anime/`. These files are built by deterministic scripts; the pure maths is in `scripts/anime/derive.js` and is
 tested in `test/v3-layout.test.js`.
 
@@ -59,7 +58,7 @@ tested in `test/v3-layout.test.js`.
 3. **Layout** (`vt.js`, then `build-layout.js`). This step produces `data/anime/layout.json`:
    - **Zones.** The hero zone is a circle of radius 380 m centred on (180, −20), covering the inner-bay ring. The mid
      zone is a circle of radius 1,100 m centred on (250, 150). The far zone is the whole city bbox.
-   - **Lots.** There is one lot per GSI footprint, 50,826 in total (506 hero, 2,756 mid).
+   - **Lots.** There is one lot per GSI footprint, about 50,800 in the shipped layout (495 hero, 2,760 mid, 47,570 far).
      - Each lot gets a minimum-area oriented box. Its frontage is the side that faces the nearest road.
      - Its `kind` comes from the GSI code, the area, the zone, the distance to the shore and the road class. Big boxes
        near the quays become warehouses or factories, small ones become houses, and boxes on main streets get shop
@@ -72,9 +71,9 @@ tested in `test/v3-layout.test.js`.
        x1.3 round its mean), with no anime lift or saturation boost: the photo-coloured roofs of the 12 cells averaged
        RGB (160, 166, 167) with 681 teal-blue roofs, and now (151, 146, 148) with 149, beside (148, 146, 149) for the
        Earth-checked ones.
-   - **Roads.** There are 14,473 roads. Hero and mid road widths are measured from the GSI road-edge lines (RdEdg);
+   - **Roads.** There are 14,469 roads. Hero and mid road widths are measured from the GSI road-edge lines (RdEdg);
      the rest use the nominal width of their `rnkWidth` class.
-   - **Other features.** The layout also holds the quays and seawalls (coastline pieces of at most 24 m), 455
+   - **Other features.** The layout also holds the quays and seawalls (coastline pieces of at most 24 m), 453
      utility-pole runs 28 to 36 m apart, and named spots (浮見堂, the torii, Pier 7, the fish market, the bridges, the
      安波山 lookout, vending and cat spots).
    - **Tour.** The tour stops come from `data/landmarks.json`, whose positions were checked against the aerial photo
@@ -89,9 +88,9 @@ tested in `test/v3-layout.test.js`.
      `roof:shape` and hand labels (97 % precision).
    - `match.js`: OSM outlines to GSI footprints (overlap), POIs and facilities to the building under or next to them.
    - `fold.js`: the precedence OSM > aerial > GSI facility > derived, recorded per value in `lot.src`; road names from
-     the OSM way that runs along each GSI road; river widths from the GSI water areas; disaster names filtered.
+     the OSM way that runs along each GSI road; river widths from the GSI water areas; sensitive names filtered (`SENSITIVE` in `fold.js`).
    - [v4:overrides] the last fold step: every `data/anime/overrides/*.json`, in file-name order, patches, removes or
-     adds lots, land use, roads and props for one cell with values read from newer references (the author's photos,
+     adds lots, land use, roads and props for one cell with values read from newer references (on-site photos,
      Google Earth 2026-03-11 via `tools/anime/earth-ref.mjs`), after `LOT_FIX`; the provenance is `lot.src.ovr` /
      `ovrWhy`. Schema and workflow: [anime/OVERRIDES.md](anime/OVERRIDES.md).
    The layout gains `landuse`, `rivers`, `places` (search and labels), `signals`, `crossings`, `bridges`, `rail` and
@@ -99,7 +98,7 @@ tested in `test/v3-layout.test.js`.
 5. **Land cover and trees** (`build-landcover.js`, `build-trees.js`). The aerial photo is classified into forest,
    grass, paved and sand and painted in the anime ground palette, and trees are scattered where the camera gets close.
    [v5:fix2] In the core town (ground up to 8 m within 1.5 km of (250, 150)) grey ground far from buildings stays town
-   ground (it was turned into grass and field, which painted lawns over the cleared post-2011 lots and car parks). Every
+   ground (it was turned into grass and field, which painted lawns over cleared lots and car parks). Every
    footprint is town ground, and every car park, apron, plaza, gravel lot and building site is paving or town ground;
    the override woods (`forest`, `cedar`) and clear-cuts (`felled`) are painted too. On the hills of cells c1, c2 and c5
    above 30 m, canopy with a hue over 95 or a value under 0.45 is cedar (Earth 2026: dark 杉 plantations), and 88 % of the
@@ -113,8 +112,8 @@ Everything is seeded by lot and road ids, so the same data always gives the same
 `z/x/y/featureIndex` in the GSI vector tiles.
 
 **Rebuilding the data.** The committed files in `data/anime/` are enough to run the app. To rebuild them from the
-cached sources (`raw/tiles`, `raw/osm`; neither is committed), run these steps in this order. Run the longer ones
-through `tools/anime/gate.sh run` on the shared machine.
+cached sources (`raw/tiles`, `raw/osm`; neither is committed), run these steps in this order. The longer ones can run
+through `tools/anime/gate.sh run`, which waits for a quiet machine (see [Tools](#tools)).
 
 ```sh
 env -u NODE_OPTIONS bun run scripts/anime/vt.js                   # decode the GSI vector tiles -> data/cache/anime/vt.json
@@ -129,16 +128,12 @@ env -u NODE_OPTIONS bun run scripts/anime/enrich/eval.js          # optional: ro
 ```
 
 Every step is deterministic: the same inputs give byte-identical outputs, and `bun test` checks the layout contract,
-the enrichment and the determinism. On 2026-09-30 (20:10Z) the whole chain was re-run from the caches. Every output came back
-byte-identical except `enrich.json` and `layout.json`: the enrichment rules changed after those two files were last
-built. The rebuild changes 5 lots and 2 of the 3,524 places, and it gave 気仙沼仲町郵便局 the English name
-"Katsuya" (a shop POI in the same footprint); that bug is fixed in `enrich/build-enrich.js` ([v4:overrides]: a POI's
-`name:en` only when the name is the POI's). Re-run on 2026-10-01 with the override step: every output is byte-identical
-except `enrich.json` and `layout.json`, where the GSI-facility-first naming rule of v4:polish1 still differs from the
-shipped files: `src.name` reads `osm` for names that come from the GSI facility (5 hero / mid lots, 8 far lots),
-気仙沼市シルバー人材センター loses its name, and three government offices take the GSI facility name over the OSM one.
-The shipped `enrich.json` and `layout.json` were kept; with them the layout step is byte-identical. `sources.json` is
-regenerated by `build-enrich.js`, and it matched apart from the edited text.
+the enrichment and the determinism. A rebuild from the caches reproduces every output byte for byte except
+`enrich.json` and `layout.json`: the enrichment rules (the GSI-facility-first naming of v4:polish1) have changed since
+those two files were last built, so a rebuild differs in a handful of lots (`src.name` reads `osm` for names that come
+from the GSI facility, and a few government offices take the GSI facility name over the OSM one). The shipped
+`enrich.json` and `layout.json` were kept; with them the layout step is byte-identical. `sources.json` is regenerated
+by `build-enrich.js`.
 
 ## 3. World modules (`src/anime/world/`)
 
@@ -150,12 +145,12 @@ service is missing.
 |---|---|---|
 | `environment` | The terrain skin, land-cover colours, painted forest crowns (the photo's dark cedar greens), 25,000 3D trees ([v4:polish3] 1.5 km round the hero zone and on 亀山, a 6-8 triangle crown beyond 380 m) and the far mountains. [v4:polish3] Near the eye (< ~60 m up) the land cover fades to painted grass and paving detail. Beyond the mid grid, a fine 5 m patch sits round each tour walk spot (かなえ大橋, 大島). Its edge follows the city grid's own triangles, so there is no crack, and it replaces the flat 70 m triangles. Hand-placed dressing (`scatter.js`) adds trees below the 安波山 lookout, and grass tufts, rocks, shrubs and trees at the two bridge spots. Beyond the city bbox, land blends into the sea over kilometres, with no wall at the border. | `environment` (`groundAt`, `surfaceAt`, `terrainMaterial`, `trees`) |
 | `water` | The whole bay: depth bands, shore foam, glints, the sky mirror after sunset, night light columns | `water` |
-| `town/` | Hero buildings from Sakura's house kit (houses, 64 fictional shops with interiors, apartment blocks, warehouses), simplified mid buildings, instanced far buildings, streets, markings, poles and wires, parking, gardens and props. [v4] Buildings on their real footprints (`wings.js`), real names on public facilities and shops (`realnames.js`), OSM land use on the ground (`landuse.js`), rivers and bridges (`rivers.js`), traffic signals, crossings and route shields (`signals.js`) | `town`, `street` (walk paths), `poles` |
+| `town/` | Hero buildings from the Sakuragaoka Station house kit (houses, 64 fictional shops with interiors, apartment blocks, warehouses), simplified mid buildings, instanced far buildings, streets, markings, poles and wires, parking, gardens and props. [v4] Buildings on their real footprints (`wings.js`), real names on public facilities and shops (`realnames.js`), OSM land use on the ground (`landuse.js`), rivers and bridges (`rivers.js`), traffic signals, crossings and route shields (`signals.js`) | `town`, `street` (walk paths), `poles` |
 | `harbor/` | Quays; the 魚町 flap-gate seawall and its apron; 70 moored boats in rows; boats arriving from the live list; the fish market's four parts and 海の市; かなえ大橋 and 大島大橋 at their measured places; 神明崎 (浮見海道, 浮見堂, 恵比寿像, 五十鈴神社, 猪狩神社, the grove); 南町 (PIER7, 迎, 結, 拓, the stepped garden, the pontoons and ファンタジー); 安波山's summit and terraces; gulls. Measured geometry: `harbor/real.js` [v4:landmarks-A]; [v4:polish1] 風待ち地区's 角星店舗 and 武山米店 (`kazemachi.js`), 気仙沼プラザホテル on the 柏崎 bluff with its lift tower (`plaza.js`), the 養殖筏 only where the aerial photo shows them | `harbor` (`boats`, `rows`, `market.workSpots`, `bollards`, `setArrivals`, …) |
 | `landmarks/` | [v4:landmarks-B] The civic landmarks on their OSM outlines at true dimensions (`landmarks/sites.js`, the reference sheets in `docs/anime/landmarks/`): 気仙沼市役所 (本庁舎, 第二庁舎 (the 1909 wooden school), 第三庁舎, 東分庁舎, ワン・テン庁舎) and the new city hall under construction on the old hospital site at 田中 (frame, scaffold, crane, the site's bare earth and hoarding); JR/BRT 気仙沼駅 (the five-arch arcade, the swordfish roof mural, the BRT and island platforms, the lighthouse welcome tower, the fish sculptures, an enterable waiting hall with ticket gates) and the rails of the whole city (OSM); 駅前プラザ; リアス・アーク美術館; 気仙沼市立病院 with its heliport and 大友病院; every building of eight school grounds (gyms with barrel roofs, the stair cylinder of 気仙沼小, seven pools, gates with name plates); 少林寺 and 清護寺 (入母屋), 気仙沼ハリストス正教会, the 一景島神社 grove and small shrines with torii; 大島: 亀山テラス360° (the monorail with its moving cars, both stations, terraces and sofas, café, rest houses) and 浦の浜 (the welcome terminal, the cruise pier, the basin jetty); the far-zone land use around them (town/landuse.js on polygons outside town's disc). The lots they replace are tagged `landmark` by `build-layout.js`. | `landmarks` (`built`, `places` (17 JA/EN places), `ms`), `monorail` (`pos(t)`, `at(s)`) |
 | `life/` | Time presets and transitions, one light registry for lamps, windows and boat and bridge lights; 33 people and 7 cats; rain and wet streets; sound; live data; the tour camera; seasons; the UI | `time`, `lights`, `arrivals`, `life` |
-| `ship/` | [ship] 第一昭福丸 (SHOFUKU MARU No.1, 7KFY), the 58.6 m Atlantic-bluefin longliner, at true scale, berthed at the コの字岸壁 east face (魚浜町); the nendo livery by default in all builds (臼福本店's permission to the captain, 2026-10-03; the plain livery is opt-in with `?livery=fallback` or `KLC_NENDO=0`); the sail mode (`explore/sail.js`) and the three acts (send-off and departure under かなえ大橋, the North Atlantic longline set and haul, the true catch chain via Las Palmas, a reefer and the Shimizu bonded weigh-in, the homecoming and the まぐろの日 card). Boarding: the places list, a chip near the quay, or `?ship=1&act=1\|2\|3`. Guide: `docs/ship/README.md`. | `ship` (`ship`, `sail`, `voyage`, `place`, `board`), `sail` |
-| `explore/` | [v4:explore] The explorable core: streamed 100 m tiles around the player over the whole z18 core (town's simplified buildings for the mid zone at load; far streets, poles and wires, and far buildings on their real footprints within ~600 m; every lot at hero-kit detail within ~100 m on foot or in the car), all packed into a few `BatchedMesh` pools with per-level colliders ([v4:polish3] rebuilt through one FIFO across the pools, a change such as an L0 swap drawn whole in one frame); a kei car on the real roads (C); the minimap and the full map (N); place search in JA and EN over every real name (/); POI labels that fade with distance; 27 more real places plus landmarks-B's 17 in the tour (51 stops in all); walk-in interiors (the fish market C hall's gallery over the landing floor, 男山本店's shop; the station hall is landmarks-B's). Street data: `data/anime/explore.json` (`scripts/anime/build-explore.js`). Guide: BUILDER-GUIDE.md section 14. | `explore` (`stream`, `net`, `drive`, `search`, `labels`, `ui`, `places`, `interiors`), `farTown` (from town: hide / show far instances) |
+| `ship/` | [ship] 第一昭福丸 (SHOFUKU MARU No.1, 7KFY), the 58.6 m Atlantic-bluefin longliner, at true scale, berthed at the コの字岸壁 east face (魚浜町); the livery is 臼福本店's (design by nendo), used with permission in the live demo and not included in this repository (without its data she is painted in a plain livery, which `?livery=fallback` or `KLC_NENDO=0` also forces); the sail mode (`explore/sail.js`) and the three acts (send-off and departure under かなえ大橋, the North Atlantic longline set and haul, the true catch chain via Las Palmas, a reefer and the Shimizu bonded weigh-in, the homecoming and the まぐろの日 card). Boarding: the places list, a chip near the quay, or `?ship=1&act=1\|2\|3`. Guide: `docs/ship/README.md`. | `ship` (`ship`, `sail`, `voyage`, `place`, `board`), `sail` |
+| `explore/` | [v4:explore] The explorable core: streamed 100 m tiles around the player over the whole z18 core (town's simplified buildings for the mid zone at load; far streets, poles and wires, and far buildings on their real footprints within ~600 m; every lot at hero-kit detail within ~100 m on foot or in the car), all packed into a few `BatchedMesh` pools with per-level colliders ([v4:polish3] rebuilt through one FIFO across the pools, a change such as an L0 swap drawn whole in one frame); a kei car on the real roads (C); the minimap and the full map (N); place search in JA and EN over every real name (/); POI labels that fade with distance; 27 more real places plus landmarks-B's 17 in the tour (51 stops in all); walk-in interiors (the fish market C hall's gallery over the landing floor, 男山本店's shop; the station hall is landmarks-B's). Street data: `data/anime/explore.json` (`scripts/anime/build-explore.js`). | `explore` (`stream`, `net`, `drive`, `search`, `labels`, `ui`, `places`, `interiors`), `farTown` (from town: hide / show far instances) |
 
 ### How exploring works (walk, drive, fly, search, map, interiors)
 
@@ -211,22 +206,23 @@ and parsed by `scripts/live/arrivals.js`.
 `/data/...` from the project's `data/`, `/fixtures/...` from `src/web/fixtures`, and `/vendor/...` from the vendored
 assets. A static host (one process serving one directory, as on Railway) needs the same tree: a publish root with
 `dist/*` at its top and `data/` copied to `data/` beside it. Copy `data/` whole: the app fetches its JSON at run time, and
-the bundle holds none of it. In particular `data/ship/shofukumaru1/livery-nendo.json`, `lines-nendo.json` and
-`livery-nendo-marks.json` must be there: [ship] the nendo livery of 第一昭福丸 is the default in all builds (livery
-permission granted to the captain by 臼福本店 on 2026-10-03), it is fetched from `data/ship/shofukumaru1/`, and without
-those files she falls back to the plain livery. `scripts/public-mirror.js` passes them; `test/ship-model.test.js` checks
-that `scripts/serve.js` serves them and that the mirror allows them.
+the bundle holds none of it. The ship's livery data (`data/ship/shofukumaru1/*nendo*.json`) is not part of this
+repository; the app fetches it at run time when it is present and otherwise paints 第一昭福丸 in the plain livery.
+`scripts/public-mirror.js` is a read-only allow-list proxy (GET and HEAD only, no writes and no source maps) for sharing
+a local server.
 
 ## Tools
 
-Run every browser tool through `tools/anime/gate.sh chrome …` on the shared machine. The gate waits for a safe load and
-holds the single headless-Chrome lock. The tools launch Chrome with the real GPU (`--use-angle=metal`, never
-`--disable-gpu`).
+Run the browser tools through `tools/anime/gate.sh chrome …` (macOS). The gate waits until the machine is quiet (a
+5-minute load of at most 14 and at least 25 % free memory), holds a single headless-Chrome lock, runs the command at low
+priority and exports `KLC_GATE=1`, which `tools/anime/cdp.mjs` requires before it starts Chrome. `tools/anime/gate.sh run …`
+does the same without the browser lock, for builds and long tests. The tools launch Chrome with the real GPU
+(`--use-angle=metal`, never `--disable-gpu`).
 
 | Command | Purpose |
 |---|---|
-| `bun tools/anime/qa3.mjs --port P [--build 1] [--dist <dir>] [--phone 1] [--bench 1] [--out <prefix>]` | The end-to-end QA: builds the bundle (into `dist/`, or a private `--dist` directory), serves it on port P and drives the production page like a visitor. It fails on any console error and saves a screenshot per step. It checks all seven modules, the HUD, every time preset and season, rain, the tiny planet, photo mode, walking (the player stays on land and on the promenade deck) and fly mode. **Every stop's walk spot** (all 51) must stand on land, outside every building, with no single colour over 45 % of the frame and no more than 25 % of a 16 × 9 ray grid closer than 6 m (`pipeline.nearShare`); every extra place must be in view (aim within 25°, pre-pass depth at least min(0.8 d, d − r − 2)). After the loop, 気仙沼簡易裁判所 must draw as before, with every stream pool intact (`sb.validate()`). **The explore flow:** search in JA and EN, the full map and its © OpenStreetMap credit clear of the minimap, streaming in the far core (kit tiles with colliders), walking into buildings (blocked), the car on the roads, the three interiors and the labels. `--phone 1` adds the 390×844 low-tier layout, and `--bench 1` prints per-tier frame times. `--noexplore` skips the explore flow. 147 checks with `--phone 1`. |
-| `bun tools/anime/accuracy.mjs --port P [--region core\|ortho] [--res 0.5] [--tile 500] [--out dist/qa4] [--tag t] [--lmshots 1] [--nobuild]` | The accuracy audit (V3-SPEC section 10). It builds a private bundle in `dist/anime-P`, then renders the app straight down with an orthographic camera: 1000 × 1000 px tiles at 0.5 m/px, first in colour at 12:00 with a clear sky, then as a float height pass and a road pass. It compares them with the GSI footprints (building IoU), the GSI z18 aerial photo with each roof's relief offset (roof CIEDE2000), OSM highways (road precision and recall) and the landmark sheets (positions, heights). It writes `accuracy[_tag].json`, `side_*.jpg` (photo, render, coverage diff), `mosaic_*.jpg` over the whole region, and `lm_*.jpg` with `--lmshots 1` ([v5] `--saveraw 1` also keeps each tile's full render and photo crop; `--tiles "x,z;..."` audits chosen tiles). It takes about 2 minutes. |
+| `bun tools/anime/qa3.mjs --port P [--build 1] [--dist <dir>] [--phone 1] [--bench 1] [--out <prefix>]` | The end-to-end QA: builds the bundle (into `dist/`, or a private `--dist` directory), serves it on port P and drives the production page like a visitor. It fails on any console error and saves a screenshot per step. It checks all seven modules, the HUD, every time preset and season, rain, the tiny planet, photo mode, walking (the player stays on land and on the promenade deck) and fly mode. **Every stop's walk spot** (all 51) must stand on land, outside every building, with no single colour over 45 % of the frame and no more than 25 % of a 16 × 9 ray grid closer than 6 m (`pipeline.nearShare`); every extra place must be in view (aim within 25°, pre-pass depth at least min(0.8 d, d − r − 2)). After the loop, 気仙沼簡易裁判所 must draw as before, with every stream pool intact (`sb.validate()`). **The explore flow:** search in JA and EN, the full map and its © OpenStreetMap credit clear of the minimap, streaming in the far core (kit tiles with colliders), walking into buildings (blocked), the car on the roads, the three interiors and the labels. `--phone 1` adds the 390×844 low-tier layout, and `--bench 1` prints per-tier frame times. `--noexplore` skips the explore flow. |
+| `bun tools/anime/accuracy.mjs --port P [--region core\|ortho] [--res 0.5] [--tile 500] [--out dist/qa4] [--tag t] [--lmshots 1] [--nobuild]` | The accuracy audit. It builds a private bundle in `dist/anime-P`, then renders the app straight down with an orthographic camera: 1000 × 1000 px tiles at 0.5 m/px, first in colour at 12:00 with a clear sky, then as a float height pass and a road pass. It compares them with the GSI footprints (building IoU), the GSI z18 aerial photo with each roof's relief offset (roof CIEDE2000), OSM highways (road precision and recall) and the landmark sheets (positions, heights). It writes `accuracy[_tag].json`, `side_*.jpg` (photo, render, coverage diff), `mosaic_*.jpg` over the whole region, and `lm_*.jpg` with `--lmshots 1` ([v5] `--saveraw 1` also keeps each tile's full render and photo crop; `--tiles "x,z;..."` audits chosen tiles). It takes about 2 minutes. |
 | `bun tools/anime/earth-ref.mjs --cell C --port P [--views top,o0,...] [--noearth] [--noapp] [--out raw/ref/earth/<dir>]` | [v4:overrides] Reference captures of a cell (`data/anime/cells.json`) from Google Earth web and the app from the same cameras, into `raw/ref/earth/<cell>/` or `--out` (under `raw/` only; never committed or shipped): pairs, a top view annotated with the lot numbers, road ids and a 20 m ENU grid, the registration on the GSI photo, and the per-lot roof ΔE (Earth vs app). [anime/OVERRIDES.md](anime/OVERRIDES.md). [v5] `tools/anime/earth-de.mjs` scores a before / after pair with one registration. The 12-cell sweep's before / after metrics and images: `docs/shots/v5_cells/` and its README. |
 | `bun tools/anime/shot.mjs --port P [--only a,b] --cams "hero;walk;tour:market;tourwalk:lm-station;x,y,z>lx,ly,lz" [--hours 16.5] [--q high] [--w 1920 --h 1080] [--eval js] --out shots/x/y` | Screenshots of chosen cameras (and, with `--only`, chosen modules). It waits up to 60 s for explore's stops, settles the stream per camera, and exits non-zero when a camera spec does not resolve. `--eval` runs page JS after each camera is set (for example to open the map). Add `--bench 30` for frame times. |
 | `bun scripts/render/life-shots.js --cams "yoru@hero;yuyake@ltour:kanae"` | Screenshots with a time preset per camera. It also takes `--ui 1`, `--weather rain` and `--photo 0.5`. |
@@ -239,47 +235,21 @@ holds the single headless-Chrome lock. The tools launch Chrome with the real GPU
 | `bun tools/anime/serve.mjs --port P [--watch]` | Dev server with rebuild on change. |
 | `bun tools/anime/debug/walkprobe.mjs`, `stream-repro.mjs` | Probes used to find walk spots with a clear view (renderer depth) and to reproduce streaming faults. |
 
-Tests: `bun test` runs 29 files and 474 tests (2026-09-30 19:55Z: 473 pass, 1 skip, 0 fail, in about 27 s). The v3 files
-(`test/v3-*.test.js`) cover layout derivation, determinism, no `Math.random`, no real brands in the fictional shop
+Tests: `bun test` runs the unit tests in `test/`; the end-to-end touch test needs `KLC_E2E=1` and the Chrome gate. The v3
+files (`test/v3-*.test.js`) cover layout derivation, determinism, no `Math.random`, no real brands in the fictional shop
 catalogue, the budgets, the live parsers, i18n completeness and the harbour routes staying on water. The v4 files cover
 the enrichment and its sources (`v4-data`: the OSM parser, matching, the fold precedence, the ODbL credit on screen),
 town accuracy (`v4-town-accuracy`: footprints, real names, land use, rivers, signals), the landmarks at true size
 (`v4-landmarks-a`, `v4-landmarks-b`), the explorable core (`v4-explore`: tiles, stream batching, the road network, the
-car, search, walk framings), and the three polish rounds (`v4-polish1` to `v4-polish3`).
+car, search, walk framings), the per-cell overrides (`v4-overrides`) and the three polish rounds (`v4-polish1` to
+`v4-polish3`). The v5 and v6 files cover the photo-matched geometry, the surveys and the rebuilds of the fish market and
+the south shore; the `mobile-pad` and `ship-*` files cover the touch pad and the ship.
 
 ## Performance
 
-These frame times were measured under the machine gate at background priority, at 1920×1080 on the high tier
-(`dist/qa3/bench_report.json`; single 30-frame samples vary by up to ±40 % between runs): drone 12 to 17 ms,
-promenade 11 to 14, night 11 to 14, whole city 13 to 17 and fish market 17 to 19. A frame has about 560 to 1,060 draw
-calls and 9 to 15 M triangles (summed over the pre-pass, shadow and colour passes). The live app ran at 52 fps at
-1600×900. The medium tier is not reliably faster than high (same draw calls); low is 20 to 40 % faster.
-
-Halving the resolution did not change the frame time, so the renderer is limited by CPU work per draw call. Further
-gains would come from merging the remaining distinct materials: harbour night lamps, repeating textures and emissive
-colours.
-
-The medium and low tiers lower the pixel ratio, MSAA, the shadow map size and the hero radius; phones default to low.
-On a portrait screen, the camera keeps about 64° across; the vertical FOV is capped at 88°. The hero stop then uses its own portrait drone pose (`FRAMES.hero.portrait` in `life/tour.js`).
-The browser builds the city in about 20 s under the gate, of which town takes about 8 s, mostly drawing Japanese text
-into canvas textures. Every shader is compiled at load, hidden meshes (season particles, night-only lights) and the
-tiny planet's fold pass included, so the first season or planet toggle no longer hitches.
-
-### v4 (integration, 2026-09-30)
-
-All seven modules in one build. `qa3.mjs --phone 1` passed 98 of 98 checks on the production bundle, with no console
-errors. The benchmarks could not be taken cleanly: another project's Blender renders and ffmpeg encodes shared the
-machine, and the gate runs Chrome at background priority. At 1920×1080 on high the frames measured 38–81 ms
-(`shots/v4int/bench_*`), and the live loop ran at 15 fps (10.8 fps in the streamed far core). Those numbers are not
-comparable with v3's quiet-machine 12–17 ms. The draw calls are comparable: 1,124 on the hero drone (v3: about 700–840),
-888 on the promenade, 1,142 at the market and 1,531 over the whole city, with 12–16 M triangles. They grew with the
-harbour models, the civic landmarks and explore's BatchedMesh pools. The first thing to re-measure on a quiet machine is
-the 60 fps target on high.
-
-### v4 (final docs pass, 2026-09-30 20:00Z)
-
-`qa3.mjs --bench 1 --phone 1` on the production bundle (145 of 145 checks then; 146 with the map-credit check),
-1920×1080 under the gate (`nice 15`, `taskpolicy -b`), a moderately loaded machine (5-minute load about 4):
+These frame times were measured at 1920×1080 on one Apple M2 Max with the browser running at background priority, which
+is how `tools/anime/gate.sh` runs Chrome (single 30-frame samples vary by up to ±40 % between runs).
+`qa3.mjs --bench 1 --phone 1` on the production bundle:
 
 | View | High | Medium | Low | Draw calls (high) | Triangles (high) |
 |---|---|---|---|---|---|
@@ -289,16 +259,28 @@ the 60 fps target on high.
 | Night | 30.3 | 26.3 | 19.4 | 1,117 | 13.1 M |
 | Whole city | 32.0 | 32.1 | 22.4 | 1,551 | 14.1 M |
 
-The live loop ran at 14.8 fps at 1600×900 on high, and at 15.3 fps while walking the streamed far core (a second
-run, with the map-credit check: 12.6 and 15.8 fps). Medium is
-still no faster than high (the same draw calls); low is 5 to 35 % faster. The page was ready after 46 to 55 s; the
-world modules took 20 to 27 s of it (town 10 to 15 s, harbour 3 to 4, explore 2.7, life 1.5 to 2, landmarks 1.4 to
-1.6, environment 0.6 to 1.3, water 0.1 to 0.3). These are single samples on a shared machine, not the 60 fps
-measurement, which still has to be taken on a quiet Mac.
+The live loop ran at about 13 to 16 fps at 1600×900 on high, on the inner bay and while walking the streamed far core.
+Medium is no faster than high (the same draw calls); low is 5 to 35 % faster. The page was ready after 46 to 55 s; the
+world modules took 20 to 27 s of that (town 10 to 15 s, harbour 3 to 4, explore 2.7, life 1.5 to 2, landmarks 1.4 to 1.6,
+environment 0.6 to 1.3, water 0.1 to 0.3). These are single samples under the throttle, not the 60 fps measurement,
+which still has to be taken on an idle machine. For comparison, the first build (v3, about 560 to 1,060 draw calls and
+9 to 15 M triangles per frame) took 11 to 19 ms per frame under the same throttle and ran at 52 fps at 1600×900.
 
-## Legacy
+Draw calls grew from v3 to v4 (about 700 to 840 on the hero drone, then more than 1,100) with the harbour models, the
+civic landmarks and explore's BatchedMesh pools. Halving the resolution did not change the frame time, so the renderer is
+limited by CPU work per draw call. Further gains would come from merging the remaining distinct materials: harbour night
+lamps, repeating textures and emissive colours.
 
-`src/web/` is the v1/v2 app: a GIS viewer and photoreal tiles. It is kept for reference. `bun run scripts/build-web.js --v2`
-builds it instead of v3; this was not re-run for v3, and it replaces the v3 `dist/index.html`. The v3 app does not use
-the photoreal tiles. `scripts/serve.js` answers `/api/config` (the v2 tiles token) only when started with `--v2` (or
-`KLC_APP=v2`), and `scripts/public-mirror.js` never passes that route, so a public link cannot hand out the token.
+The medium and low tiers lower the pixel ratio, MSAA, the shadow map size and the hero radius; phones default to low.
+On a portrait screen, the camera keeps about 64° across; the vertical FOV is capped at 88°. The hero stop then uses its own portrait drone pose (`FRAMES.hero.portrait` in `life/tour.js`).
+Most of the load time goes into drawing Japanese text into canvas textures. Every shader is compiled at load, hidden
+meshes (season particles, night-only lights) and the tiny planet's fold pass included, so the first season or planet
+toggle no longer hitches.
+
+## The earlier viewer
+
+`src/web/` keeps code shared with an earlier viewer, which has been removed: libraries (`lib/`), `config.js`, live-data
+helpers (`data/`), scene modules (`scene/`) and the synthetic dev fixtures in `fixtures/`. The anime app imports only the
+boat routes from it (`scene/boats/routes.json`, read by the harbour and the ship); the scripts and some tests use the
+solar-position and live-data helpers. `scripts/build-web.js` copies `src/web/fixtures` to `dist/fixtures/`, and
+`scripts/serve.js` serves them under `/fixtures/` when `data/` lacks a group.

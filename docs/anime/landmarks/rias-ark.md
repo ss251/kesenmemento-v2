@@ -22,8 +22,7 @@
     #b98580). A tall narrow concrete chimney or mast and antenna masts stand next to them.
   - A **wide roof deck** with a railing.
 - Roof: ortho #d0dfe1 → light grey metal #cfd2d2, with a white vaulted/curved roof over the gallery (seen on the ortho).
-- Museum content: art, and the permanent exhibition on the history and disaster record of the region. The app must not
-  depict this (V3-SPEC section 5).
+- The museum's exhibitions are not modelled; the app draws the building only.
 
 ## Signage
 
@@ -37,8 +36,8 @@ A small plate reading 「リアス・アーク美術館 RIAS ARK MUSEUM OF ART�
 - Photo reference: Commons "Riasu ark museum.jpg"
 - OSM way 761761293 (© OpenStreetMap contributors); city DEM; GSI seamlessphoto z18. Crop: `ortho/riasark.jpg`
 
-## What the app renders
+## In the app
 
-- `app/riasark.jpg`
-- Far lot 16/58536/25074/6, a 6-storey 17.4 m white box of 53.6 × 39.6 m (`apartment`, hip → drawn flat).
-- No aluminium skin, no pink pods and no roof deck.
+- The ribbed-aluminium gallery bar with its vault and portholes; the main block (pink render below, aluminium above,
+  white vaulted roof); the roof deck and railing; the two salmon-pink pods on tripod stilts; the chimney-mast; and the
+  name plate. It stands on its hilltop at T.P. 94, on the OSM outline (0 m).

@@ -362,9 +362,9 @@ describe("ship: sendoff and ocean (pure parts)", () => {
 });
 
 // ---------------------------------------------------------------------------------------------------------- fix round 2
-describe("ship: fix round 2 (the dossier's processing, clock and quota bar)", () => {
+describe("ship: fix round 2 (the source notes' processing, clock and quota bar)", () => {
   const I18N = JSON.parse(readFileSync(ROOT + "data/ship/i18n.json", "utf8"));
-  test("every kept fish is bled, spiked and dressed (gills, guts and tail off), then frozen at -60 °C (dossier §5)", () => {
+  test("every kept fish is bled, spiked and dressed (gills, guts and tail off), then frozen at -60 °C (source notes §5)", () => {
     const M = driveTo("STOW");
     expect(M.data.kept.length).toBeGreaterThan(0);
     for (const f of M.data.kept) { expect(f.bled).toBe(true); expect(f.spiked).toBe(true); expect(f.dressed).toBe(true); expect(f.frozenC).toBe(-60); }
@@ -397,7 +397,7 @@ describe("ship: fix round 2 (the dossier's processing, clock and quota bar)", ()
 });
 
 // ---------------------------------------------------------------------------------------------------------- Usui's talk
-// docs/ship/next-pass-usui.md (the captain's product-safe notes of 臼井壯太朗's talk at Hackatsuon, 2026-10-03):
+// docs/ship/Usui's public talk (2026-10-03) (the captain's product-safe notes of 臼井壯太朗's talk at Hackatsuon, 2026-10-03):
 // items 1, 2, 3, 4, 6 and 7. The UI is rendered for real through mountShipUI on a minimal DOM stub.
 function withStubDOM(fn) {
   const mk = () => ({ id: "", hidden: false, innerHTML: "", textContent: "", style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(type, fn) { this.on = fn; }, querySelectorAll() { return []; }, querySelector() { return null; }, appendChild() {}, classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } } });
@@ -418,7 +418,7 @@ async function renderView(view, data, lang, { facts = false, today = null } = {}
 }
 const textOf = (html) => html.replace(/<[^>]+>/g, "\n").replace(/&quot;/g, '"').replace(/&amp;/g, "&").split("\n").map((x) => x.trim()).filter(Boolean);
 
-describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", () => {
+describe("ship: Usui's talk, 2026-10-03 (Usui's public talk, 2026-10-03)", () => {
   const D = JSON.parse(readFileSync(ROOT + "data/ship/i18n.json", "utf8"));
   const NEW_KEYS = [
     "ship.facts.fleet", "ship.facts.voyage", "ship.facts.aroma", "ship.facts.trivia",
@@ -557,7 +557,7 @@ describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", ()
       expect(off).toContain(D[lang]["ship.ocean.nopos.off"]); expect(off).not.toContain(D[lang]["ship.ocean.nopos"]);
     }
   });
-  test("round 3 copy: the set clock cites Usui's own 4-8 h, and no 'at sea' is added to the tag chain (dossier: weighed and measured, then tagged)", () => {
+  test("round 3 copy: the set clock cites Usui's own 4-8 h, and no 'at sea' is added to the tag chain (source notes: weighed and measured, then tagged)", () => {
     expect(D.ja["ship.set.time"]).toContain("4〜8時間"); expect(D.en["ship.set.time"]).toContain("4–8 hours");
     expect(D.en["ship.chain.shimizu.body"]).toBe("Every fish was weighed, measured and tagged. At the Shimizu landing, each one is checked again.");
     expect(D.en["ship.card.body"]).toContain("Each one is weighed and tagged, so the Shimizu inspection");

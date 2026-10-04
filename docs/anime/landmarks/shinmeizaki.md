@@ -32,7 +32,7 @@ Colours from the aerial photo:
 
 ## Current state
 
-The peninsula seawalls, the west revetment, the walkway and the 浮見堂 are all post-2011 works, finished around
+The peninsula seawalls, the west revetment, the walkway and the 浮見堂 are all recent works, finished around
 2019–2021. To the east, 魚町's inner-bay seawall (T.P. 4.1 m flap-gate type) ends at the peninsula neck.
 
 ## Sources
@@ -42,11 +42,9 @@ The peninsula seawalls, the west revetment, the walkway and the 浮見堂 are al
 - https://kesennuma-kanko.jp/ukimido/ and https://tavitan.com/kanko/miya/p_kesennuma_wan.html (神明崎 as a spot that seems to float in the bay)
 - raw/photos IMG_0582, IMG_0598 (the scale model)
 
-## What the app renders
+## In the app
 
-- `app/shinmeizaki_top.jpg`
-- The outline matches the ortho well.
-- Tree cover is dense in the middle but thin on the west slope. The ortho shows a revetment there, not trees, so the app
-  is right in that respect.
-- The long building has a brown roof.
-- See AUDIT.md for the 浮見堂 and walkway error.
+- The outline matches the ortho. Tree cover is dense in the middle and thin on the west slope, where the ortho shows a
+  revetment, not trees. The long building has a brown roof.
+- The 浮見海道 and the 浮見堂 are described in `ukimido.md`.
+- Frame: `app-v4/shinmeizaki_top.jpg`.

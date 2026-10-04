@@ -1,7 +1,7 @@
 // [ship] 第一昭福丸 model, livery and flags: true-scale dimensions from the built geometry, the starboard-only 舷門,
 // triangle and texture budgets per tier, flag resolution, and proof that the fallback livery holds nothing of nendo's.
 import { describe, test, expect } from 'bun:test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import * as THREE from 'three';
 import { createMaterials } from '../src/anime/core/materials.js';
@@ -14,11 +14,13 @@ import { allowed } from '../scripts/public-mirror.js';
 
 const ROOT = resolve(import.meta.dir, '..');
 const read = (p) => readFileSync(resolve(ROOT, p), 'utf8');
-const NENDO = {
+// The nendo livery traces are 臼福本店's (not in the public repository): their tests skip when the files are absent.
+const HAVE_NENDO = existsSync(resolve(ROOT, 'data/ship/shofukumaru1/livery-nendo.json'));
+const NENDO = HAVE_NENDO ? {
   traced: JSON.parse(read('data/ship/shofukumaru1/livery-nendo.json')),
   lines: JSON.parse(read('data/ship/shofukumaru1/lines-nendo.json')),
   marks: JSON.parse(read('data/ship/shofukumaru1/livery-nendo-marks.json')),
-};
+} : null;
 function fakeCtx({ real = false } = {}) {
   const shared = { uTime: { value: 0 }, uWind: { value: new THREE.Vector2(0.9, 0.35) }, uNight: { value: 0 } };
   return { shared, ...(real ? { mat: createMaterials(shared) } : {}) };
@@ -37,7 +39,7 @@ function topNear(group, s, dz = 0.35, dx = 0.6) {
   return top;
 }
 
-describe('principal particulars (dossier section 2)', () => {
+describe('principal particulars (source notes section 2)', () => {
   test('SHIP carries the registry numbers', () => {
     expect(SHIP.LOA).toBe(58.6); expect(SHIP.B).toBe(9.2); expect(SHIP.D).toBe(3.91); expect(SHIP.d).toBe(3.54);
     expect(SHIP.callSign).toBe('7KFY'); expect(SHIP.registration).toBe('MG1-2112'); expect(SHIP.GT).toBe(486);
@@ -159,7 +161,7 @@ describe('flags.js: nendo by default on every host (臼福本店 permission, 202
     expect(allowed('/data/ship/i18n.json')).toBe(true);
     expect(allowed('/data/ship/shofukumaru1/../../../.env')).toBe(false);
   });
-  test('the local server and the static-server pattern serve the nendo trace from data/ship/shofukumaru1/', async () => {
+  test.skipIf(!HAVE_NENDO)('the local server and the static-server pattern serve the nendo trace from data/ship/shofukumaru1/', async () => {
     const { start } = await import('../scripts/serve.js');
     const { server, url } = await start({ port: 8971, build: false, quiet: true });
     try {
@@ -170,7 +172,7 @@ describe('flags.js: nendo by default on every host (臼福本店 permission, 202
       }
     } finally { server.stop(true); }
   });
-  test('the nendo files are tracked data, not ignored', () => {
+  test.skipIf(!HAVE_NENDO)('the nendo files are tracked data, not ignored', () => {
     const ignore = read('.gitignore');
     expect(ignore).not.toMatch(/nendo/);
     expect(ignore).not.toMatch(/^\/?data\/ship\/?$/m);
@@ -211,8 +213,8 @@ describe('fallback livery holds nothing of the nendo design', () => {
   });
 });
 
-describe('nendo livery (the default)', () => {
-  const plan = cleanNendo(NENDO);
+if (HAVE_NENDO) describe('nendo livery (the default)', () => {
+  const plan = HAVE_NENDO ? cleanNendo(NENDO) : null;
   test('traced shapes are cleaned into crisp polygons, both sides, not mirrored', () => {
     for (const side of ['port', 'starboard']) {
       expect(plan[side].shapes.length).toBeGreaterThanOrEqual(6);
@@ -307,7 +309,7 @@ describe('livery helpers', () => {
     expect(h.length).toBeLessThanOrEqual(4);
     expect(polyArea(h)).toBeGreaterThan(0.9 * polyArea(convexHull(notched)));
   });
-  test('painting works on a stub canvas (no DOM) and paints the antifouling last', () => {
+  test.skipIf(!HAVE_NENDO)('painting works on a stub canvas (no DOM) and paints the antifouling last', () => {
     const c = stubCanvas(ATLAS.W, ATLAS.H); const g = c.getContext('2d');
     paintAtlas(g, cleanNendo(NENDO), { profile: { sheerAt } });
     const fills = c.ops.filter((o) => o[0] === 'set:fillStyle').map((o) => o[1]);
@@ -391,7 +393,7 @@ describe('lettering reads right from both sides (大漁旗, 7KFY, MG1-2112, cres
       for (const [key, u] of by[1]) { expect(by[-1].has(key)).toBe(true); expect(by[-1].get(key)).toBeCloseTo(lo + hi - u, 6); }
     }
   });
-  test('7KFY, MG1-2112 (and the crest with the nendo livery) are single-sided, read right, and have plain backs', async () => {
+  test.skipIf(!HAVE_NENDO)('7KFY, MG1-2112 (and the crest with the nendo livery) are single-sided, read right, and have plain backs', async () => {
     const N = buildShofukumaru(fakeCtx({ real: true }), { tier: 'high', livery: 'nendo', liveryData: NENDO });
     await N.ready;
     for (const B of [S, N]) {

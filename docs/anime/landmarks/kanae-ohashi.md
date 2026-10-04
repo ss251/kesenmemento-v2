@@ -32,7 +32,7 @@ shadow and a closure crane at mid-span. These fix the pylons to about ±8 m:
 | Total length | 1,344 m: sea part 680 m + land part 664 m | Wikipedia (ja); 長大 |
 | Sea part | 3-span continuous steel cable-stayed bridge, **160 + 360 + 160 m** | 土木学会デザイン賞 2024 |
 | Land part | 3 + 7 span continuous steel box girders (鋼3+7径間連続箱桁) | 長大 |
-| Pylons | **steel, inverted Y (逆Y型)**, octagonal section. Structural height **100.0 m**, about **115 m above sea**. They stand on an **RC pier 15 m high** (built so a tsunami-driven ship cannot hit the steel) | デザイン賞; 大日本ダイヤコンサルタント |
+| Pylons | **steel, inverted Y (逆Y型)**, octagonal section. Structural height **100.0 m**, about **115 m above sea**. They stand on an **RC pier 15 m high** (a concrete base that keeps vessels clear of the steel) | デザイン賞; 大日本ダイヤコンサルタント |
 | Pylon form | a single column in the upper part that divides into two legs lower down, joined by smooth curves. The legs straddle the deck and splay out toward the RC base | デザイン賞; photos |
 | Cables | a **single plane in the median (1面吊り)**, a semi-fan of about 11 to 13 stays per side per pylon | デザイン賞; photos |
 | Girder | a **flattened hexagonal** steel box (扁平六角形) | デザイン賞 |
@@ -67,10 +67,10 @@ south of the land viaduct. The north end lands at 浪板.
 - Photo references: Wikimedia Commons 「気仙沼湾横断橋.jpg」 and "Kesennuma Bay Crossing Bridge at night.jpg"
 - OSM way 964443110 (© OpenStreetMap contributors); GSI seamlessphoto z18. Crops: `ortho/kanae.jpg`, `ortho/kanae_towers.jpg`
 
-## What the app renders
+## In the app
 
-- `app/kanae_oblique.jpg`, `app/kanae_tower.jpg`, `app/kanae_side.jpg`
-- The main-span centre is at (1492, 1465). The towers are placed at (1582, 1310) and (1402, 1621), on the correct 120°
-  axis but **shifted about 75 m NNE along the axis**.
-- The cables are in two planes.
-- See AUDIT.md for the full list.
+- The deck follows the OSM line (≤ 1 m from GSI RdCL 2703). The pylons stand at s 818 and 1178 along it, 360 m apart,
+  with 160 m side spans and the south pylon on the quay.
+- One central cable plane (12 stays × 4 per pylon); inverted-Y steel pylons on 15 m RC piers rising to 115 m; a
+  hexagonal girder; the 10-span land viaduct.
+- Frames: `app-v4/kanae_oblique.jpg`, `app-v4/kanae_walk.jpg`, `app-v4/kanae_night.jpg`.

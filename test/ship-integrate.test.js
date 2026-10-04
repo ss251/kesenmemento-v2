@@ -178,7 +178,7 @@ describe("ship: the module at runtime (headless, phone tier)", () => {
     expect(tags.length).toBeGreaterThan(0);
     for (const tg of tags) expect(isDemoTag(tg)).toBe(true);
     expect(d.passed).toContain("kanae");
-    // Act 1 as the dossier tells it: out past the market rows, under かなえ大橋, past 商港, out to the bay mouth
+    // Act 1 as the source notes tell it: out past the market rows, under かなえ大橋, past 商港, out to the bay mouth
     expect(passedAtBay).toEqual(["kanae", "shoko"]);
     expect(departS.some((s) => s > 300 && s < 700)).toBe(true);                                      // the market beat
     expect(departS.some((s) => s > KANAE_CROSSING.s - 250 && s < KANAE_CROSSING.s)).toBe(true);     // the bridge approach

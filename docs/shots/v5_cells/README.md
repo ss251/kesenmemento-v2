@@ -50,7 +50,7 @@ for both runs (`tools/anime/earth-de.mjs`).
 The GSI scores go down on purpose. They score the 2020–22 footprints and photo as truth, so each change the newer
 imagery shows counts as an error: 72 demolished buildings removed, 59 buildings built since then added, and roofs
 repainted or re-roofed with solar panels. The photo's cyan-green cast is also no longer copied. The core IoU stays
-above the V3-SPEC target of 0.8.
+above the target of 0.8.
 
 ## Reproduce
 

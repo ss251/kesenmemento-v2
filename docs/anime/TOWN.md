@@ -1,7 +1,7 @@
 # Town package (v3:town)
 
 The town of Kesennuma on the real GSI data: every building footprint, every road centre-line and every pole run from
-`src/anime/world/layout.js`, built as a Sakura-grade anime town around the inner bay and as simplified / instanced
+`src/anime/world/layout.js`, built as a detailed anime-style town around the inner bay and as simplified / instanced
 buildings out to the edge of the city. Module: `src/anime/world/town/index.js` (`build(ctx)`), built after
 `environment` and `water`, before `harbor` and `life`.
 
@@ -13,7 +13,7 @@ local brands.
 
 | Part | File | What |
 |---|---|---|
-| Hero buildings | `hero.js`, `kit/*` | Sakura's house generator on the real footprints (houses, 2-3 storey shop houses), front yards with block walls, gates, garden trees and pots; rows of potted plants where a house sits on a lane |
+| Hero buildings | `hero.js`, `kit/*` | The Sakuragaoka Station house generator on the real footprints (houses, 2-3 storey shop houses), front yards with block walls, gates, garden trees and pots; rows of potted plants where a house sits on a lane |
 | Shops | `shops.js`, `signs.js`, `names.js` | 64 fictional shops (鮮魚, 寿司, 酒店, 喫茶, 乾物, ふかひれ, 食堂, 菓子, 青果 ...). Ground floor set back into a real room: tiled or wooden floor, painted shelf wall, counter, warm ceiling lights. Fronts: `wa` (lattice, noren, brush board, pent roof, lanterns, sugidama), `modern` (aluminium glass front, fascia board, awning), `open` (tilted display tables of fish trays / crates / dried goods, bare bulbs, price cards), `cafe` (tiled sill, chalk menu), `shutter` (closed today). Projecting vertical signs on the corner |
 | Big buildings | `blocks.js` | マンション blocks: balconies on the sunny long face (parapets, partitions, sliding doors with curtains, laundry, AC units), open corridors with steel doors, stair tower, elevator shaft, rooftop tank, vertical building name. Offices and public buildings: ribbon windows using life's window material, spandrels, glass entrance with canopy, rooftop plant |
 | Port sheds | `industrial.js` | warehouses, cold stores, fish-processing plants: corrugated walls (rust-streaked near the quays), loading docks, roll-up shutters (some open onto pallets and fish boxes), company names painted on the walls (`COMPANIES`), turbine vents, refrigeration units, saw-tooth roofs, stainless tanks and a chimney on plants |
@@ -60,8 +60,8 @@ into the sunset), `-114,-179,-150,3` (八日町 lane with the sake shop), `-160,
 - Triangles: 3.12 M (budget 3.2 M): hero kit 1.29 M, streets 0.27 M, poles 0.38 M, parking 0.25 M, props 0.38 M,
   gardens 0.23 M, mid 0.11 M, far 0.39 M.
 - Canvas textures: 23.4 M px (budget 24 M).
-- Build: about 2.3 s headless (bun); 8 to 11 s inside the gated headless Chrome (`nice` + `taskpolicy -b` background
-  QoS, so several times slower than a normal browser tab).
+- Build: about 2.3 s headless (bun); 8 to 11 s inside headless Chrome at background priority (`nice` + `taskpolicy -b`,
+  so several times slower than a normal browser tab).
 - Detail follows the street hearts (`FOCI` in `index.js`): full detail within about 100 m, medium within about 220 m, and
   quiet back lots use the simplified builder. `quality.heroR` shrinks the full-detail radius; the low tier keeps
   8 detailed cars and a 650 m garden radius.
@@ -69,6 +69,6 @@ into the sunset), `-114,-179,-150,3` (八日町 lane with the sake shop), `-160,
 ## Look notes
 
 - Fictional names only (`names.js`); real place names appear only as place signage (気仙沼駅, 魚市場, 内湾, 八日町 ...).
-  No references to the 2011 disaster anywhere (a test enforces both).
+  Sensitive names and wording are left out everywhere (a test enforces both).
 - Deterministic: every random choice comes from `ctx.rng(<lot id / road id>)`; two builds are identical (tested).
 - 止まれ glyphs read upright for the approaching driver (top of the canvas cell = far end).

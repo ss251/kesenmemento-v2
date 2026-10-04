@@ -2,7 +2,7 @@
   "version": 1,
   "cell": "photos",
   "bbox": [-120, -20, 100, 170],
-  "note": "[v5:photos] The author's ground-truth photos of the 内湾 / 南町 waterfront (Sailesh, 2026-10-01 17:18-17:22 JST, raw/photos-sailesh IMG_0799-0842 with GPS and compass). Applies last (zz-), over the accuracy sweep's cell files. The buildings themselves (PIER7, 迎, 結, 拓, the plaza, the store) are modelled in src/anime/world/harbor/minami5.js; this file carries the layout data they imply. Pairs: docs/shots/v5_photos/.",
+  "note": "[v5:photos] The author's ground-truth photos of the 内湾 / 南町 waterfront (Sailesh, 2026-10-01 17:18-17:22 JST, raw/photos-sailesh IMG_0799-0842 with GPS and compass). Applies last (zz-), over the accuracy sweep's cell files. The buildings themselves (PIER7, 迎, 結, 拓, the plaza, the store) are modelled in src/anime/world/harbor/minami5.js; this file carries the layout data they imply. Photo/app pairs are not included.",
   "sources": [
     { "id": "sailesh", "what": "author photos raw/photos-sailesh/jpg (IMG_0799-0842; GPS, heading and 35 mm focal length in raw/photos-sailesh/index.json), the highest-priority source (docs/anime/OVERRIDES.md)", "date": "2026-10-01" }
   ],

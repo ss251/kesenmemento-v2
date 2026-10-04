@@ -53,13 +53,6 @@ garden were finished by 2021–2025.
 - OSM ways 775150093, 791393331 and 791393332; nodes 7653079709, 7653079711 and 7653079710 (© OpenStreetMap contributors)
 - Crop: `ortho/pier7_mukaeru.jpg`
 
-## What the app renders
-
-- `app/pier7_mukaeru_top.jpg`
-- 迎 is lot 16/58540/25068/381: kind `warehouse`, **1 storey, 8.3 m**, 59.3 × 16.6 m. The layout's roof is white, but it
-  renders with a **red-orange gable roof**.
-- 拓 is rendered as a 4-storey hip-roofed apartment (11.6 m). 結 is a 2-storey house.
-
 ## v5 fix round 1 (2026-10-01): roofline against Google Earth (imagery 2026-03-11)
 
 - Earth top and o180 show a **broken roofline in three sections** (a lower light-grey north wing, a taller dark middle
@@ -68,7 +61,7 @@ garden were finished by 2021–2025.
   roofs -0.7 m / +0.7 m / ±0 against the old 10.7 m roof), draws the 2F bay terrace in tan #ae9a90 (it was timber
   brown), and adds four tan steps from the terrace down to the turf at the NW end (`MUKAERU_STEPS`).
 
-## v5 photos (2026-10-01): 迎, 結, 拓 and the slow street from the author's photos (IMG_0824-0842)
+## v5 photos (2026-10-01): 迎, 結, 拓 and the slow street from on-site photos (IMG_0824-0842)
 
 `harbor/minami5.js` (`buildMukaeruPhotos`, `buildSlowStreetPhotos`); `PHOTOS5` in `harbor/minami.js` switches back to the
 v5:fix3 迎 and garden, which are kept intact.
@@ -106,7 +99,7 @@ v5:fix3 迎 and garden, which are kept intact.
 
 ## v6 survey (2026-10-03)
 
-Measured from the author's photos with solved cameras (53 of 57 photos, 0.72 px): `docs/anime/survey/minami.md`,
+Measured from on-site photos with solved cameras (53 of 57 photos, 0.72 px): `docs/anime/survey/minami.md`,
 `data/survey/minami/features.json`. The plaza's stair cage, bleachers, winch and ring benches, 迎's 3F box and ANCHOR face,
 and the NAIWAN totems have surveyed positions; the app's BEFORE errors are in `data/survey/minami/diff-before.json`.
 

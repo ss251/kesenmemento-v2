@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fish-market survey, step 1: COLMAP 4.1.1 structure-from-motion over Sailesh's full-resolution market photos.
+# Fish-market survey, step 1: COLMAP 4.1.1 structure-from-motion over the author's full-resolution market photos.
 #   Images: raw/survey/market/images/{uw14,w24,t77}/IMG_*.jpg (HEIC -> JPEG q95 via heif-convert, EXIF kept, the
 #   rotation applied so every frame is upright portrait, Orientation = 1).
 #     w24  = 6.765 mm main lens, 4284 x 5712 (IMG_0792-0794, C棟 roof deck)                       -> OPENCV

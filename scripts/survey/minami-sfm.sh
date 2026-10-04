@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# South-shore (minami) survey, step 1: structure from motion over Sailesh's full-resolution photos.
+# South-shore (minami) survey, step 1: structure from motion over the author's full-resolution photos.
 #   Images: raw/survey/minami/images/{uw14,w24,w48,t77}/IMG_*.jpg (HEIC -> JPEG q95, EXIF kept, rotation applied); one
 #   COLMAP camera per lens / 35 mm focal: uw14 = 2.22 mm ultra-wide (OPENCV, strong distortion), w24 = 6.765 mm main
 #   (OPENCV), w48 = 2x crop of the main sensor (RADIAL), t77 = 9 mm tele (RADIAL). Focal priors from the diagonal 35 mm

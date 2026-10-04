@@ -56,11 +56,11 @@ export const SEA = { level: 0.0 };
 export const GROUND_PADS = [
   // 迎's SE end: the ANCHOR shopfront, its deck and the plaza corner stand on a flat pavement at T.P. ~2.3 (IMG_0824-0827,
   // 0820); the DEM rises to 5 m there (the pre-2018 wall and 迎's own bulk), which buried the shopfront in a mound
-  { ring: [[-17.4, 43.4], [-9.5, 50.1], [-3.9, 47.4], [2, 44], [6, 52], [6, 62], [-6, 64], [-20, 62], [-24, 50], [-20, 44]], max: 2.3, feather: 2.5, src: 'sailesh IMG_0824-0827, 0820' },
+  { ring: [[-17.4, 43.4], [-9.5, 50.1], [-3.9, 47.4], [2, 44], [6, 52], [6, 62], [-6, 64], [-20, 62], [-24, 50], [-20, 44]], max: 2.3, feather: 2.5, src: 'author photos IMG_0824-0827, 0820' },
   // [v6:rebuild] the plaza south of 内湾 and its forecourt up to the bleachers' far block: the photo survey puts the paving at
   // T.P. 1.83 (the cage foot, the ring and winch feet; docs/anime/survey/minami.md); the DEM's 2.1-3.6 m there is the
   // pre-2018 ground and the old wall. The pad sits 13 cm under the paving (harbor/minami5.js) so the plaza landuse surface (+4 cm) stays below it.
-  { ring: [[-9.5, 50.1], [-3.9, 47.4], [-9.9, 31.1], [-9.5, 14], [4, 10], [20, 22], [40.2, 64.8], [23.9, 72.6], [7.6, 67.8], [-4.5, 74.9]], max: 1.70, feather: 2.0, src: 'sailesh IMG_0807-0813 via the photo survey: data/survey/minami/features.json (cage.foot, ring, winch.foot)' },
+  { ring: [[-9.5, 50.1], [-3.9, 47.4], [-9.9, 31.1], [-9.5, 14], [4, 10], [20, 22], [40.2, 64.8], [23.9, 72.6], [7.6, 67.8], [-4.5, 74.9]], max: 1.70, feather: 2.0, src: 'author photos IMG_0807-0813 via the photo survey: data/survey/minami/features.json (cage.foot, ring, winch.foot)' },
 ].map((p) => { const xs = p.ring.map((q) => q[0]), zs = p.ring.map((q) => q[1]); return { ...p, x0: Math.min(...xs) - p.feather, x1: Math.max(...xs) + p.feather, z0: Math.min(...zs) - p.feather, z1: Math.max(...zs) + p.feather }; });
 function padded(x, z, h) {
   for (const p of GROUND_PADS) {

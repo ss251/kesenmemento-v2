@@ -11,7 +11,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // WHERE IS THE コの字岸壁? (two candidates disagreed; decided on the evidence below)
 //   - OSM node 8660824619 "コの字岸壁" (tourism=viewpoint) sits at ENU (530, -100).
-//   - The captain's dossier gives 38.901 N 141.580 E = ENU (434, 555). That point comes from the 農水省 漁港 DB entry
+//   - The sourced notes give 38.901 N 141.580 E = ENU (434, 555). That point comes from the 農水省 漁港 DB entry
 //     "気仙沼港（出漁準備岸壁）", whose address is 港町～魚市場前 (jl-db.nfaj.go.jp/location/040100784): the long quay
 //     north of the fish market where the longliners lie stern-to (harbor/rows.js 'market-north'). That is the 出漁準備
 //     岸壁, not the コの字岸壁.

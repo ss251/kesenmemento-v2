@@ -1,6 +1,6 @@
 // [v4:landmarks-A] 神明崎 as measured (harbor/real.js SHINMEI; sheets docs/anime/landmarks/shinmeizaki.md, ukimido.md,
 // isuzu-jinja.md):
-//   浮見海道   the vermilion walkway over the sea round the tip (the author's scale model shows the same red rim), from
+//   浮見海道   the vermilion walkway over the sea round the tip (the scale model of the inner bay shows the same red rim), from
 //              the foot of the west revetment round 浮見堂 and up the east seawall; deck on piles, 朱 rails both sides
 //   浮見堂     the small open 四阿 (宝形造, light-grey roof, 朱 posts) on the tip's seawall line, half over the water
 //   恵比寿像   the 3rd-generation standing Ebisu (2020, 1.8 m) holding a bonito, right foot forward (kesennuma-kanko)

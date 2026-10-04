@@ -24,5 +24,8 @@ tools/*.tar.xz
 docs/shots/v6_survey/
 tools/survey/__pycache__/
 
-# [ship:acts] the captain's own send-off music (optional, local only; ship/sendoff.js plays it when present)
+# [ship:acts] optional local send-off music (never committed; ship/sendoff.js plays it when present)
 data/ship/sendoff-music.mp3
+
+# 臼福本店 livery traces (nendo design): used with permission in the live demo, never committed here
+data/ship/shofukumaru1/*nendo*

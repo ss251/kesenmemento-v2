@@ -1,22 +1,26 @@
-# The living-city plan
+# Roadmap
 
 Kesennuma Living City is the real Kesennuma, drawn as a hand-painted anime town. People can fly over it, walk and
 drive through it, find any place by name and step inside a few buildings, and it is kept alive with today's weather
-and today's boats. This page covers where it stands, what it
-shows on Oct 10, what the city gets from it, and what it needs from the city to become the city's own.
+and today's boats. This page covers where it stands, what the demo shows, what the city and its people could get from
+it, and what would help it grow. It is the plan of an unofficial hackathon project: nothing in it has been agreed with
+the city or any other organisation.
 
-## Where it stands (v4, 2026-10-01)
+## Where it stands (October 2026)
 
-These features are built and checked by `bun test` (474 tests) and by the end-to-end browser QA
-(`tools/anime/qa3.mjs`, 146 checks including the phone layout).
+These features are built and covered by `bun test` and by the end-to-end browser QA (`tools/anime/qa3.mjs`, which
+includes the phone layout).
 
-- **The whole city from real data.** Terrain, coastline, 14,473 roads and all 50,826 building footprints come from
+- **The whole city from real data.** Terrain, coastline, 14,469 roads and about 50,800 building footprints come from
   GSI. OpenStreetMap adds building levels, roof shapes, names, land use, rivers, signals and road names, and the GSI
   aerial photo gives every roof its colour and shape. Each value records its source.
 - **Accuracy, measured.** An automated audit renders the town from straight above and compares it with the aerial
-  photo and the maps. On the core, building coverage IoU is 0.87 (target 0.8), all 15 reference landmarks are within
-  5 m (largest error 3.7 m), and the median roof colour difference is ΔE 7.2. The landmarks are modelled from reference
-  sheets at their true size.
+  photo and the maps. On the core, building coverage IoU is 0.84 (target 0.8), all 15 reference landmarks are within
+  5 m, and the median roof colour difference is ΔE 10.2 against the 2020-22 aerial photo (the town follows newer
+  references where they differ from it). The landmarks are modelled from reference sheets at their true size.
+- **Survey-grade rebuilds.** The PIER7 plaza on the south shore and the fish market's roof deck and quay hall were
+  rebuilt from on-site photos with structure from motion and are checked against the survey, feature by feature
+  ([anime/survey/](anime/survey/)).
 - **The whole core is explorable.** About 4.3 × 4.4 km, from 気仙沼駅 to the bay and from 鹿折 to 南気仙沼, streams in
   street-level detail around you. You can walk everywhere (buildings, quay edges and rivers are walls), drive a kei
   car on the real roads, or fly.
@@ -29,6 +33,10 @@ These features are built and checked by `bun test` (474 tests) and by the end-to
   shops have fictional names for their trade.
 - **The harbour.** Boats in rows, the fish market's four halls and 海の市, 浮見堂, 五十鈴神社, the seawall with its
   flap gates, PIER7 and 迎, かなえ大橋 and 大島大橋, 亀山's monorail and the 浦の浜 terminal.
+- **A playable ship.** 第一昭福丸, a 58.6 m tuna longliner at true scale, with three acts: the send-off, the longline
+  set and haul, and the chain that brings the catch to Japan ([ship/](ship/)).
+- **A phone tier.** A game-style touch pad and a low tier that fits phone memory
+  ([MOBILE-CONTROLS.md](MOBILE-CONTROLS.md)).
 - **Living layers.**
   - Five times of day and four seasons.
   - Rain and wet streets, and traffic signals that cycle.
@@ -43,16 +51,16 @@ Anything shown from saved data is labelled サンプル.
 
 **Open gaps.**
 
-- Frame rate on a quiet machine is not yet measured for v4. Under the shared-machine throttle a 1080p frame on high
-  took 20 to 32 ms and the live app ran at 13 to 16 fps at 1600×900; the v3 build ran at 52 fps on the same Mac when
-  it was quieter. 60 fps on high is the target.
+- Frame rate on an idle machine has not been measured for the current build. With the browser throttled to background
+  priority, a 1080p frame on high took 20 to 32 ms and the live app ran at 13 to 16 fps at 1600×900; the first build ran
+  at 52 fps on the same Mac. 60 fps on high is the target.
 - The first load takes 45 to 55 s under the throttle. The target is 10 s.
 - Street-level streaming covers the core only; 唐桑, the outer 大島 and the far suburbs have terrain, footprints and
   roads but no street-level detail.
 - 4K output has not been rendered yet.
-- The sun keeps the Oct 10 path in every season, and the sea level does not follow the tide.
+- The sun keeps the 10 October path in every season, and the sea level does not follow the tide.
 
-## Oct 10: the demo
+## The demo
 
 The demo shows the town to people who know it and aims for one reaction: "that's Kesennuma." The 3-minute script is in
 [DEMO.md](DEMO.md). It covers:
@@ -66,19 +74,19 @@ The demo shows the town to people who know it and aims for one reaction: "that's
 - today's first boat at the fish market at 06:30;
 - winter and spring;
 - the tiny planet;
-- for questions: the walk-ins (the fish market gallery, 男山本店, the station) and the town at night.
+- for questions: the walk-ins (the fish market gallery, 男山本店, the station), the town at night and the ship.
 
 PIER7（ピアセブン）, the base of the Hackatsuon residency, is tour stop 3.
 
-**What success looks like on the day:**
+**What success looks like:**
 
 1. People point at their own street or shop.
 2. Someone asks, "can my shop be in it?"
-3. Someone from the city asks what it would take to publish it.
+3. Someone asks what it would take to make it public.
 
 The rest of this plan answers those questions.
 
-## What the city gets
+## What it could give Kesennuma
 
 ### 1. Tourism PR that looks like nothing else
 
@@ -86,10 +94,9 @@ A painted Kesennuma at any hour and in any season can be used for posters, socia
 screen at the station and at 海の市.
 
 - The tools already exist. `scripts/render/stills.js` renders the 16 hero frames and `scripts/render/film.js` renders
-  a deterministic 30 s film along the inner bay at sunset.
+  a deterministic 30 s film along the inner bay at sunset. Both can render at 4K (`--size 4k`).
 - Every published frame carries the credit line (© OpenStreetMap contributors · 出典：国土地理院 …) in its caption or
   on the frame.
-- From Oct 1 the machine can render them at 4K.
 - New frames are camera and time settings in a plan file, not new artwork. A seasonal campaign (sakura on 安波山's
   slopes in April, snow on the harbour in January) is therefore a render job, not a production.
 
@@ -121,7 +128,7 @@ Residents can walk and drive the whole core today, find their street by name and
   and PIER7 are the next candidates.
 - **Resident review.** Hold short sessions, for example at Pier 7, where residents fly to their own street and flag
   anything wrong: a missing shop, a wrong roof colour, a building that isn't there any more. Each fix is a small data
-  edit keyed to the building.
+  edit keyed to the building (see [anime/OVERRIDES.md](anime/OVERRIDES.md)).
 
 ## Features on the roadmap
 
@@ -139,7 +146,8 @@ Residents can walk and drive the whole core today, find their street by name and
 ### Citizen stories on buildings
 
 Tap a building and read what it means to someone: "my grandmother's shop", "where we waited for the boats", "the
-best coffee on 八日町". Stories make the model more than a map.
+best coffee on 八日町". Stories make the model more than a map. The first story pin, a short sourced story about an
+archaeological site in 唐桑, is already in the app (see [ship/SHOFUKUMARU.md](ship/SHOFUKUMARU.md)).
 
 - **Data model.** Each story attaches to a building footprint.
   - The layout's lot ids (`z/x/y/featureIndex`) come from GSI tile indexing and can change when GSI updates its tiles.
@@ -188,15 +196,16 @@ to put its name up where the maps have none, or to choose how it looks.
 
 ### Engineering track
 
-- **60 fps at 1080p on an M-series Mac.** First measure v4 on a quiet machine. The renderer is limited by draw calls
-  (about 900 to 1,500 per frame in v4, up from 560 to 1,060 in v3, with the landmarks and the streamed pools). The
-  next steps are to merge the harbour's night-lamp materials and the remaining distinct emissive and textured
-  materials into atlases, to use a coarser batching cell for the harbour, and to cap the stream pools per frame.
+- **60 fps at 1080p on an M-series Mac.** First measure the current build on an idle machine. The renderer is limited
+  by draw calls (about 900 to 1,500 per frame in v4, up from 560 to 1,060 in v3, with the landmarks and the streamed
+  pools). The next steps are to merge the harbour's night-lamp materials and the remaining distinct emissive and
+  textured materials into atlases, to use a coarser batching cell for the harbour, and to cap the stream pools per
+  frame.
 - **Load time under 10 s.** About 4 s goes into drawing Japanese text into canvas textures. Bake the sign atlases at
   build time instead.
-- **4K.** Once the build machine allows it (2026-10-01 00:00Z), render the stills, the film and photo mode at full
-  size and review every frame. Some v3 stills were framed on things v4 removed as inaccurate (the timber promenade
-  deck of `promenade_deck`, for example), so review those frames first.
+- **4K.** Render the stills, the film and photo mode at full size and review every frame. Some v3 stills were framed
+  on things v4 removed as inaccurate (the timber promenade deck of `promenade_deck`, for example), so review those
+  frames first.
 - **Accuracy.** Keep the audit in the loop: re-run `tools/anime/accuracy.mjs` after every change to the town, and
   extend it beyond the core disc (the whole z18 ortho with `--region ortho`).
 - **Hosting.** A public URL: the static `dist/` on a CDN plus the small `/api/live` service, with the same polite
@@ -204,16 +213,17 @@ to put its name up where the maps have none, or to choose how it looks.
 - **Phones.** The low tier already loads on a 390×844 phone. Tune the hero radius and props for mid-range Android
   devices.
 
-## What it needs from the city
+## What would help
 
-1. **A contact and a home.** Name one person in the city (for example 企画課 or the tourism section) who can say yes
-   to a public launch. Agree where the app lives, for example a link from the city's tourism pages.
-2. **気仙沼漁協's blessing for the arrivals.** The app reads the co-op's public 入船情報 pages today and credits the
-   co-op on screen. Before launch we need its permission, and ideally a simple official feed. Landings and prices by
+1. **A contact and a home.** If the city or a local organisation wants to host the app or link to it, one person who
+   can say yes to a public launch (for example in the planning or tourism section), and an agreed place for it to
+   live, such as a link from the city's tourism pages.
+2. **The co-op's agreement for the arrivals.** The app reads the 気仙沼漁協's public 入船情報 pages today and credits the
+   co-op on screen. An official feed, or the co-op's explicit agreement, would be a better basis. Landings and prices by
    species would also need the market's agreement.
 3. **A shop-claim partner.** Someone who can confirm that "this storefront belongs to this shop": the city, the
-   chamber of commerce, or the Crew Card network. We also need their help reaching the first 20 shops on the inner
-   bay.
+   chamber of commerce, or the Crew Card network. Help reaching the first 20 shops on the inner bay would also be
+   welcome.
 4. **A story partner.** A community group that can collect and approve residents' stories, and run a review session
    or two.
 5. **Place knowledge.**
@@ -224,13 +234,13 @@ to put its name up where the maps have none, or to choose how it looks.
    - Residents' corrections. Many can go straight into OpenStreetMap, which the app reads; the rest become data fixes
      keyed to the building (`src/anime/world/lotfix.js` holds these, each with its source).
 6. **Brand guidance.** How the app may use the city's name, and whether it may use the city's logo or mascot.
-   Until we hear back, the app uses only the place name 気仙沼.
+   Until there is guidance, the app uses only the place name 気仙沼 and no logos or mascots.
 
 ## Principles
 
 - **Real place, real public names.** The geography is real, and so are the names of public places and of the shops
-  that the open maps name. Other businesses get fictional names until they claim their storefront. Names that refer
-  to the 2011 disaster are never shown.
+  that the open maps name. Other businesses get fictional names until they claim their storefront. Sensitive names are
+  filtered out (`SENSITIVE` in `scripts/anime/enrich/fold.js`).
 - **Accuracy over invention.** Every value records its source, uncertain things are researched rather than guessed,
   and the audit measures the result against the aerial photo.
 - **Honest data.** Anything live says ライブ, and anything saved says サンプル. Nothing from a sample is ever shown as

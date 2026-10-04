@@ -10,14 +10,14 @@ Code: `scripts/anime/enrich/overrides.js` (re-exported by `enrich/fold.js`). Tes
 
 ## Ground truth, in priority order
 
-1. **The client's own photos** (`raw/photos-sailesh/` when it exists; `raw/photos/` holds his photos of the inner-bay
-   scale model). [v6:survey] Where an area has a photo survey (`data/survey/<area>/features.json`: solved cameras,
-   features measured in metres with a 1-sigma; `docs/anime/survey/<area>.md`), its numbers replace anything placed by
-   eye against the photos (phone GPS is 3–10 m off); check a rebuild with `tools/anime/survey-diff.mjs` and
-   `tools/anime/photo-align.mjs`. [v6:rebuild] The south shore (PIER7, the plaza, 迎 / ANCHOR, 結, the east promenade) is rebuilt to
-   `data/survey/minami/features.json`: every named feature within its 1-sigma (`test/v6-rebuild-minami.test.js`); the survey
-   constants live in `harbor/minami5.js` (`CAGE6`, `BLEACH6`, `WINCH6`, `RINGS6`, `WALK6`, `ANCHOR`, `MUK6`, `PIER7_6`) and the
-   plaza's paving level in `world/layout.js` `GROUND_PADS`.
+1. **The project's own on-site photos** (kept under `raw/`, which is not committed). [v6:survey] Where an area has a
+   photo survey (`data/survey/<area>/features.json`: solved cameras, features measured in metres with a 1-sigma;
+   `docs/anime/survey/<area>.md`), its numbers replace anything placed by eye against the photos (phone GPS is 3–10 m
+   off); check a rebuild with `tools/anime/survey-diff.mjs` and `tools/anime/photo-align.mjs`. [v6:rebuild] The south
+   shore (PIER7, the plaza, 迎 / ANCHOR, 結, the east promenade) is rebuilt to `data/survey/minami/features.json`: every
+   named feature within its 1-sigma (`test/v6-rebuild-minami.test.js`); the survey constants live in `harbor/minami5.js`
+   (`CAGE6`, `BLEACH6`, `WINCH6`, `RINGS6`, `WALK6`, `ANCHOR`, `MUK6`, `PIER7_6`) and the plaza's paving level in
+   `world/layout.js` `GROUND_PADS`.
 2. **Google Earth** (photoreal 3D, imagery dated 2026-03-11), captured for reference only with
    `tools/anime/earth-ref.mjs` (below). **Never ship, commit or paste these captures into the app.** They stay in
    `raw/ref/earth/<cell>/` (gitignored).
@@ -85,7 +85,7 @@ The folder is `data/anime/overrides/*.json`.
   "note": "optional free text",
   "sources": [                              // at least one; every operation's src starts with one of these ids
     { "id": "earth", "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/pier7)", "date": "2026-03-11" },
-    { "id": "sailesh", "what": "author photo raw/photos-sailesh/IMG_0701.HEIC", "date": "2026-10-01" }
+    { "id": "photos", "what": "on-site photo IMG_0701.HEIC", "date": "2026-10-01" }
   ],
   "lots": [ ... ], "newLots": [ ... ], "landuse": [ ... ], "roads": [ ... ], "props": [ ... ]
 }

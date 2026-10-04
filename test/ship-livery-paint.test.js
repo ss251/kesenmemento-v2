@@ -3,14 +3,16 @@
 // with the name in both liveries, the stern triangles stop at the quarter knuckle, and the starboard aft sheer triangle
 // is the real ship's (WCPFC photo), not the half-height 03 trace.
 import { describe, test, expect } from 'bun:test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ATLAS, COLORS, NAME, transomBands, sidePx, fallbackPlan, cleanNendo, paintAtlas, stubCanvas } from '../src/anime/world/ship/livery.js';
 import { SHIP, sheerAt, sternS, halfBreadth, knuckleS, zOf, transomDecalGeometry, buildShofukumaru } from '../src/anime/world/ship/shofukumaru1.js';
 
 const ROOT = resolve(import.meta.dir, '..');
 const read = (p) => JSON.parse(readFileSync(resolve(ROOT, p), 'utf8'));
-const NENDO = { traced: read('data/ship/shofukumaru1/livery-nendo.json'), lines: read('data/ship/shofukumaru1/lines-nendo.json'), marks: read('data/ship/shofukumaru1/livery-nendo-marks.json') };
+// The nendo livery traces are 臼福本店's (not in the public repository): their tests skip when the files are absent.
+const HAVE_NENDO = existsSync(resolve(ROOT, 'data/ship/shofukumaru1/livery-nendo.json'));
+const NENDO = HAVE_NENDO ? { traced: read('data/ship/shofukumaru1/livery-nendo.json'), lines: read('data/ship/shofukumaru1/lines-nendo.json'), marks: read('data/ship/shofukumaru1/livery-nendo-marks.json') } : null;
 const PROFILE = { sheerAt, knuckleAt: knuckleS };
 
 /**
@@ -74,7 +76,7 @@ function sample(plan, pts) {
   paintAtlas(g, plan, { profile: PROFILE });
   return col;
 }
-const PLANS = { fallback: fallbackPlan(), nendo: cleanNendo(NENDO) };
+const PLANS = { fallback: fallbackPlan(), ...(HAVE_NENDO ? { nendo: cleanNendo(NENDO) } : {}) };
 const WHITE = COLORS.white.toLowerCase();
 
 describe('the transom (shofukumaru04): white, lettered, in both liveries', () => {
@@ -86,7 +88,7 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
     }
     expect(knuckleS(4)).toBeGreaterThan(57.3); expect(knuckleS(4)).toBeLessThan(58.0);
   });
-  for (const mode of ['fallback', 'nendo']) {
+  for (const mode of HAVE_NENDO ? ['fallback', 'nendo'] : ['fallback']) {
     test(`${mode}: the atlas texel at the transom centreline (s 58.4, h 2-4) is white on both side bands`, () => {
       const pts = [], where = [];
       for (const side of ['port', 'starboard']) for (const h of [2, 2.5, 3, 3.5, 4]) { pts.push(sidePx(side, 58.4, h)); where.push(`${side} h ${h}`); }
@@ -94,14 +96,14 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
       col.forEach((c, i) => expect(`${where[i]}: ${String(c).toLowerCase()}`).toBe(`${where[i]}: ${WHITE}`));
     });
   }
-  test('nendo: the stern triangles still reach the quarter (black just forward of the knuckle on both sides)', () => {
+  test.skipIf(!HAVE_NENDO)('nendo: the stern triangles still reach the quarter (black just forward of the knuckle on both sides)', () => {
     // port: the big stern triangle (05); starboard: the stern hourglass X's large triangle (WCPFC, fix round 3), whose
     // aft edge runs from the apex down to the knuckle at the waterline, so it is black just inside that edge
     const pts = [sidePx('port', knuckleS(0.5) - 0.3, 0.5), sidePx('starboard', 56.15 - 0.1, 0.9)];
     const col = sample(PLANS.nendo, pts);
     expect(col).toEqual([COLORS.black, COLORS.black]);
   });
-  test('nendo: nothing is snapped to the stern any more (no shape corner at s 59)', () => {
+  test.skipIf(!HAVE_NENDO)('nendo: nothing is snapped to the stern any more (no shape corner at s 59)', () => {
     for (const side of ['port', 'starboard']) for (const sh of PLANS.nendo[side].shapes) for (const [s] of sh.pts) expect(s).toBeLessThan(ATLAS.S1);
   });
   test('the stern cell holds 第一昭福丸, KESENNUMA and SHOFUKU MARU No.1, centred, on a transparent background', () => {
@@ -143,7 +145,7 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
     g.dispose();
   });
   test('both liveries build the transom decal with the decal material', async () => {
-    for (const livery of ['fallback', 'nendo']) {
+    for (const livery of HAVE_NENDO ? ['fallback', 'nendo'] : ['fallback']) {
       const S = buildShofukumaru({ shared: { uTime: { value: 0 }, uNight: { value: 0 } } }, { tier: 'phone', livery, liveryData: NENDO });
       await S.ready;
       let found = false;
@@ -154,8 +156,8 @@ describe('the transom (shofukumaru04): white, lettered, in both liveries', () =>
   });
 });
 
-describe('starboard aft sheer triangle (fix round 2): the real ship, WCPFC photo', () => {
-  const plan = PLANS.nendo.starboard;
+if (HAVE_NENDO) describe('starboard aft sheer triangle (fix round 2): the real ship, WCPFC photo', () => {
+  const plan = PLANS.nendo?.starboard;
   const tri = plan.shapes.find((q) => q.tag === 'aft-sheer-triangle');
   test('measured mark: top on the sheer, apex at about 63 % of the side below it, painted over the circle', () => {
     expect(tri).toBeTruthy(); expect(tri.over).toBe(true); expect(tri.colour).toBe('black');
@@ -192,8 +194,8 @@ describe('starboard aft sheer triangle (fix round 2): the real ship, WCPFC photo
 });
 
 
-describe('starboard stern hourglass X (fix round 3): the real ship, WCPFC photo x 40-170, y 683-873', () => {
-  const plan = PLANS.nendo.starboard;
+if (HAVE_NENDO) describe('starboard stern hourglass X (fix round 3): the real ship, WCPFC photo x 40-170, y 683-873', () => {
+  const plan = PLANS.nendo?.starboard;
   const bottom = plan.shapes.find((q) => q.tag === 'stern-x-bottom'), top = plan.shapes.find((q) => q.tag === 'stern-x-top');
   const apexOf = (q) => q.pts.reduce((a, p) => (p[1] < a[1] ? p : a));
   const XC = apexOf(top);   // the X centre
@@ -270,8 +272,8 @@ describe('starboard stern hourglass X (fix round 3): the real ship, WCPFC photo 
   }, 30000);
 });
 
-describe('starboard star red (review fix 2026-10-04): a thin crescent on the forward-lower arc, not the port half-disc (WCPFC photo x 331-422, y 730-851)', () => {
-  const port = PLANS.nendo.port, plan = PLANS.nendo.starboard;
+if (HAVE_NENDO) describe('starboard star red (review fix 2026-10-04): a thin crescent on the forward-lower arc, not the port half-disc (WCPFC photo x 331-422, y 730-851)', () => {
+  const port = PLANS.nendo?.port, plan = PLANS.nendo?.starboard;
   const cres = plan.shapes.find((q) => q.tag === 'star-crescent');
   // share of the star's disc that is painted red, sampled on a grid of the disc (the white disc is under both)
   const redShare = (side, circ) => {

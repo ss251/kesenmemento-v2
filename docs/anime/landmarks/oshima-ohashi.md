@@ -52,10 +52,8 @@ Open since April 2019. It replaced the 大島汽船 ferry (see `oshima-ferry-pie
 - Photo references: Wikimedia Commons "Kesennumaooshima.jpg" and "Miyagi-Ohshima bridge, black-tailed gull-xl.jpg"
 - OSM way 669276579 (© OpenStreetMap contributors); GSI seamlessphoto z18. Crop: `ortho/oshima_br.jpg`
 
-## What the app renders
+## In the app
 
-- `app/oshima_side.jpg`
-- The arch is fitted through the true centre at **105°** instead of 108.2°, with half-length 178. Its ends therefore land
-  about 9 to 10 m from the OSM ends.
-- `deckY` is 30, below the 32 m clearance plus the girder.
-- The ribs read grey-blue in the render.
+- On the OSM ends (0 m at both), bearing 108.2°: arch span 297 m with a 54 m rise, spans 24.7 + 40.5 + 224 + 40.5 + 24.7 m,
+  a 9.5 m deck at 34.8 m, white, with ladder struts.
+- Frames: `app-v4/oshima_side.jpg`, `app-v4/oshima_night.jpg`.

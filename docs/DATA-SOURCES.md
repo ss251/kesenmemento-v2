@@ -66,8 +66,8 @@ kit or in a video description.
   named shops and amenities mapped as points inside a building; land use (parks, fields, cemeteries, schoolyards,
   parking, forest, sport, beaches); rivers and streams with their names (大川, 神山川, 鹿折川, 面瀬川, ...); road names,
   refs, lanes, one-way and speed limits; traffic signals and crossings; rail; named bridges.
-- Names that refer to the 2011 disaster are never shown (V3-SPEC section 5); `scripts/anime/enrich/fold.js`
-  (`SENSITIVE`) filters them from lot names, places, roads, rivers and land use.
+- Sensitive names, such as memorials and similar facilities, are never shown, so the app shows Kesennuma as it lives
+  today: `scripts/anime/enrich/fold.js` (`SENSITIVE`) filters them from lot names, places, roads, rivers and land use.
 
 ## 国土地理院 Anno (注記) and the aerial photo, per building [v4]
 
@@ -93,7 +93,7 @@ kit or in a video description.
 - **Trees:** `scripts/anime/build-trees.js` read the forest mask as one byte per pixel from a 3-channel PNG, which
   scattered trees over the wrong pixels (207 on the 気仙沼小 / 中学校 playing fields). It now reads channel 0 per pixel
   and keeps OSM pitches, car parks, fields and building sites clear.
-- **Audit truth** (`tools/anime/accuracy.mjs`, V3-SPEC section 10): GSI footprints (building IoU), the GSI z18 photo in
+- **Audit truth** (`tools/anime/accuracy.mjs`): GSI footprints (building IoU), the GSI z18 photo in
   `data/ortho/core.jpg` with the per-roof relief offset of `aerial.js` (roof CIEDE2000), OpenStreetMap highways
   (road overlap; an independent source from the GSI centre lines the streets are built on) and
   `docs/anime/landmarks/landmarks.json` (landmark positions), plus OSM `height` / `building:levels` and the sheets for
@@ -117,8 +117,8 @@ kit or in a video description.
 - **Credit line:** 出典：気象庁ホームページ（アメダス・天気予報・潮位表）を加工して作成.
 - The `bosai` JSON files are the data behind the JMA website, not a documented API. They may change without notice. If
   they do, the server falls back to the last good copy and then to the saved sample (see below).
-- Polling is polite. The server fetches each source at most once per TTL and sends the user agent
-  `KesennumaLivingCity/2 (civic 3D demo for Kesennuma City; polls <= every 10 min)`.
+- Polling is polite. The server fetches each source at most once per TTL and sends a user agent that names the
+  project and its polling interval (`scripts/live/http.js`).
 
 ## 気仙沼漁協 (気仙沼漁業協同組合): today's arrivals
 
@@ -128,9 +128,10 @@ kit or in a video description.
 - **What the app shows:** vessel name, expected time, fishery type, catch and tonnage, in the arrivals panel and as
   labels on the boats that glide in.
 - **Terms:** the pages do not state an open licence. The app uses them as factual public notices, credits the co-op
-  on screen, and polls at most every 10 minutes.
-- **Before a public launch, ask the co-op for permission** or, better, for an official feed. This is listed in
-  [PLAN.md](PLAN.md#what-it-needs-from-the-city).
+  on screen, and polls at most every 10 minutes per source.
+- **An official feed** or the co-op's explicit agreement would be a better basis than reading the public mobile pages.
+  Anyone who runs a busy public copy should ask the co-op first. This is listed in
+  [PLAN.md](PLAN.md#what-would-help).
 - **Credit line:** 入船情報：気仙沼漁業協同組合.
 
 ## Saved samples (offline and fallback)
@@ -154,8 +155,9 @@ URLs. They are grouped in `data/anime/sources.json` as `landmark-refs`, `landmar
   proportion. None is copied into the app.
 - **The station's departure board** shows the next weekday departures from the 2026 JR East timetables (read on
   Yahoo!路線情報 and 駅探 on 2026-09-30). Only times and destinations are used.
-- **The client's scale-model photos** (`raw/photos`, not committed) of the inner-bay model were compared with 浮見堂,
-  神明崎, PIER7 and 亀山. They are not shipped.
+- **On-site photos** (kept under `raw/`, not committed) of the inner-bay scale model displayed in PIER7 were compared
+  with 浮見堂, 神明崎, PIER7 and 亀山. The photo surveys in `docs/anime/survey/` measure other on-site photos in the same
+  way. The photos are not shipped; only the measured results (`data/survey/`) are.
 
 Facts (dimensions, dates, positions) are cited from these pages; no text or image from them is shipped.
 
@@ -173,7 +175,7 @@ Facts (dimensions, dates, positions) are cited from these pages; no text or imag
     [宮城県](https://www.pref.miyagi.jp/site/oshimakakyozigyo/kakyouhontai.html)).
 - **Shops and companies:** a lot that OSM or GSI Anno names carries its real name in `lot.name` (with `lot.use`, e.g.
   `shop:seafood`), and its signs show that name (`src/anime/world/town/realnames.js`). Names of administrative
-  buildings (共同化建物, 旧..., JV) and names that refer to the 2011 disaster are dropped. Every other shop takes a name
+  buildings (共同化建物, 旧..., JV) and sensitive names (see above) are dropped. Every other shop takes a name
   from the town's fictional catalogue (`src/anime/world/town/names.js`), chosen for its trade;
   `test/v3-town.test.js` checks that catalogue against a blocklist of real brands.
 
@@ -184,16 +186,15 @@ Facts (dimensions, dates, positions) are cited from these pages; no text or imag
 | Sakuragaoka Station by Kenton-GMI (engine, materials, renderer, player, house kit, characters, street furniture, page design) | MIT | `src/anime/LICENSE-sakuragaoka-station`. Every ported or vendored file keeps a credit header. |
 | three.js 0.186.1 | MIT | runtime, bundled |
 | `@mapbox/vector-tile` 2.0.5, `pbf` 4.0.2 | BSD-3-Clause | build scripts only |
-| `earcut` 3.2.4 | ISC | build scripts only |
+| `earcut` 3.2.4 | ISC | runtime (bundled) and build scripts |
 | `sharp` 0.35.5 | Apache-2.0 | build scripts only |
 | Noto Sans JP, Noto Serif JP, Zen Maru Gothic, Yusei Magic, Yuji Syuku | SIL Open Font License 1.1 | loaded from Google Fonts at runtime (`src/anime/index.html`) |
-| This project's own code | MIT (`package.json`) | the repo has no root LICENSE file yet. The build copies the Sakuragaoka Station and three.js licence texts to `dist/licenses/`, and the in-app credit links to them. |
+| This project's own code | MIT ([LICENSE](../LICENSE)) | The build copies the Sakuragaoka Station and three.js licence texts to `dist/licenses/`, and the in-app credit links to them. [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md) lists every dependency. |
 
 ## Not shipped
 
 - `raw/ref/` holds the look references: Sakura Crossing and Sakuragaoka Station frames, the promo sheet, and Google
   Earth screenshots of Kesennuma. They are only for comparison. `raw/` is not committed, and nothing from these
   images is copied into the app.
-- The v1/v2 app (`src/web/`) used photoreal 3D tiles through a user-supplied Cesium ion or Google token. v3 needs no
-  token and does not call `/api/config`; the server only serves that route with `--v2`, and the public mirror refuses
-  it. If a token was ever served through a public link, rotate it unless it is URL-restricted.
+- The app needs no API token or key, and the repository holds none. The earlier photoreal viewer, which used a
+  user-supplied map-tile token, has been removed, and `scripts/serve.js` has no token route.

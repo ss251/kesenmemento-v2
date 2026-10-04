@@ -1,7 +1,7 @@
 // [v4:explore] The explore package: streamed core tiles, the road network and the car, the places and their framings,
 // search, stream batching, physics tags, the interiors' lot, i18n and wiring. Pure modules only (no browser).
 import { describe, expect, test } from "bun:test";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import * as THREE from "three";
 import * as L from "../src/anime/world/layout.js";
@@ -30,7 +30,8 @@ const idx = makeLotIndex(L.LOTS.filter((l) => inCore(l.obb.cx, l.obb.cz, 50)));
 const inLot = (x, z) => !!idx.at(x, z, 0.4);
 
 describe("explore.json (scripts/anime/build-explore.js)", () => {
-  test("is deterministic and matches the committed file", async () => {
+  // needs data/buildings/city.json, a build product of scripts/buildings/build.js from GSI tiles (not committed)
+  test.skipIf(!existsSync(join(ROOT, "data/buildings/city.json")))("is deterministic and matches the committed file", async () => {
     const { out } = await buildExplore();
     expect(JSON.stringify(out)).toBe(readFileSync(join(ROOT, "data/anime/explore.json"), "utf8"));
   }, 60000);

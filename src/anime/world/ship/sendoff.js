@@ -1,4 +1,4 @@
-// [ship:acts] ACT 1, 出船おくり: the send-off of 第一昭福丸 at the コの字岸壁 (魚浜町), 11:00 (dossier section 5:
+// [ship:acts] ACT 1, 出船おくり: the send-off of 第一昭福丸 at the コの字岸壁 (魚浜町), 11:00 (source notes section 5:
 // usually 11:00 on a 大安 or 先勝 day; families and townspeople hold five-colour paper tapes and wave 福来旗; the ship
 // plays the captain's favourite music and sounds her horn; people wave until she is out of sight).
 //
@@ -8,8 +8,8 @@
 //   - 福来旗 (大漁旗) waved on poles, cloth from harbor/boats.js FLAG_DESIGNS;
 //   - the horn: three prolonged blasts (長音三声, the farewell), synthesized in WebAudio inside the COLREG Annex III
 //     band for a vessel under 75 m (250-700 Hz, a prolonged blast 4-6 s);
-//   - a music sting: an ORIGINAL pentatonic tune synthesized here (no recorded or copyrighted music). If the captain
-//     drops data/ship/sendoff-music.mp3 next to the data (gitignored, never committed), that plays instead.
+//   - a music sting: an ORIGINAL pentatonic tune synthesized here (no recorded or copyrighted music). If a local
+//     data/ship/sendoff-music.mp3 sits next to the data (gitignored, never committed), that plays instead.
 //
 //   const so = createSendoff(ctx, { ship })     so.start({ mode: 'sendoff' | 'homecoming' })   so.update(dt, t)
 //   so.stats -> { people, tapes, snapped }      so.onSnap(cb)   so.horn()   so.music()   so.dispose()
@@ -98,8 +98,8 @@ export function playHorn(ctx, { blasts } = {}) {
   return n * (H.blast + H.gap);
 }
 
-/** Look for the captain's local music file? On a local host (flags.js isDevHost: localhost, 127.0.0.1, *.localhost; not
- *  *.ts.net, which is also the public Funnel link) in a real browser,
+/** Look for the optional local music file? On a local host (flags.js isDevHost: localhost, 127.0.0.1, *.localhost) in a
+ *  real browser,
  *  never in shot mode or under automation (a missing file would log a 404 in QA); ?music=local forces it, ?music=0
  *  turns it off. A public deploy never asks for the file. */
 export function musicProbeAllowed({ host = '', search = '', webdriver = false } = {}) {
@@ -110,10 +110,10 @@ export function musicProbeAllowed({ host = '', search = '', webdriver = false } 
   return isDevHost(host);
 }
 
-/** The original sting (or the captain's local file when present). Returns the length in seconds. */
+/** The original sting (or the optional local file when present). Returns the length in seconds. */
 export async function playSting(ctx, { tonicHz = 523.25 } = {}) {
   const beat = 60 / TEMPO, dur = MELODY.reduce((s, [, b]) => s + b, 0) * beat;
-  // the captain's own music, if he dropped it next to the data (never bundled or committed)
+  // an optional local music file next to the data (never bundled or committed)
   try {
     const probe = typeof location !== 'undefined' && musicProbeAllowed({ host: location.hostname, search: location.search, webdriver: typeof navigator !== 'undefined' && !!navigator.webdriver });
     if (probe && typeof fetch === 'function' && typeof Audio !== 'undefined' && !ctx.audio?.muted) {

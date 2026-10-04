@@ -21,11 +21,11 @@
   - The rails are vermilion. This walkway is the 「海上に作られた赤い遊歩道」 of the city page.
   - It runs from the west-side quay around the tip past the pavilion and up the east side. The ortho shows it as a thin
     red-brown band hugging the rocks, about 2 to 2.5 m wide.
-  - The client's scale model (raw/photos IMG_0582, IMG_0598) shows the same **red rim around the whole tip** of the
-    peninsula.
+  - The inner-bay scale model displayed in PIER7 (raw/photos IMG_0582, IMG_0598) shows the same **red rim around the
+    whole tip** of the peninsula.
   - It is **not** a straight pier from the shore to a pavilion standing out in the sea.
-- History: built in **1932 (昭和7年) by young volunteers of 魚町**. It collapsed in 2011. Rebuilding started in June 2019
-  and was **completed in May 2020 (令和2年)**.
+- History: built in **1932 (昭和7年) by young volunteers of 魚町**, and rebuilt between June 2019 and **May 2020
+  (令和2年)**.
 - Lighting: lit up **from sunset to 22:00**.
 - Nearby: the **3rd-generation standing 恵比寿像 (2020)** holding a bonito (カツオ) instead of a sea bream, right foot
   stepping forward. It is 「全国でも珍しい立ち恵比寿像」.
@@ -47,14 +47,14 @@ A plaque 浮見堂 under the eave (existing app detail; plausible, not verified 
 ## Sources
 
 - https://kesennuma-kanko.jp/ukimido/ (red walkway over the sea, light-up until 22:00, 3rd 恵比寿像 holding a カツオ)
-- Search summary of kesennuma-kanko and 4travel (built 1932 by 魚町 youth, destroyed 2011, rebuilt June 2019 to May 2020): https://4travel.jp/dm_shisetsu_tips/14364637
+- Search summary of kesennuma-kanko and 4travel (built 1932 by 魚町 youth, rebuilt June 2019 to May 2020): https://4travel.jp/dm_shisetsu_tips/14364637
 - https://tanji-sendai.blog.jp/archives/shinmei-zaki.kesennuma.html (朱塗りの四阿, the 2020 恵比寿像 with a カツオ)
 - https://4travel.jp/dm_shisetsu/11340236 (「浮見堂という遊歩道が巡っていて」, red fences along the shore)
 - raw/photos IMG_0582, IMG_0598 (the inner-bay scale model in PIER7)
 - GSI seamlessphoto z18; OSM node 7580455850 (恵比寿像). Crops: `ortho/ukimido.jpg`, `ortho/shinmeizaki.jpg`
 
-## What the app renders
+## In the app
 
-- `app/ukimido.jpg`: a vermilion pavilion on stilts standing out in the water, a straight arched walkway running north to
-  the rocks, a sea-side torii at the shore end, and a dark tile roof.
-- See AUDIT.md.
+- The vermilion ring walkway runs round the tip on piles (176 m), and the pavilion stands on the tip's seawall line with a
+  light-grey 宝形造 roof (position error 0 m).
+- Frames: `app-v4/ukimido_walk.jpg`, `app-v4/ukimido_drone.jpg`.

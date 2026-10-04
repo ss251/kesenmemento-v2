@@ -1,6 +1,6 @@
 # 気仙沼市魚市場 (Kesennuma City Fish Market)
 
-Reference sheet for v4 (V3-SPEC section 10). Researched 2026-09-30 by v4:landmark-research. Web photos were used only as
+Reference sheet for the landmark accuracy log. Researched 2026-09-30. Web photos were used only as
 shape and colour references and are not in the repository. ENU follows `src/core/geo.js`: `x = (lon − 141.575)·86744`,
 `z = −(lat − 38.906)·111014`.
 
@@ -27,8 +27,8 @@ north). From north to south:
     grey pyramid roof-lights, and a curved ramp up from the landside road at the north end.
   - The quay-side face is an open unloading apron under the building (荷捌場), with roll shutters.
   - Its height is about 2 storeys: the ground-floor apron plus a 2F observation level.
-  - South 施設 A棟 (June 2007, 上屋 124 m) and B棟 (April 2009, 上屋 99 m) were rebuilt after 2011. In today's layout they
-    form the southern part of this long shed; the separate outlines are not distinguishable on the aerial photo.
+  - South 施設 A棟 (June 2007, 上屋 124 m) and B棟 (April 2009, 上屋 99 m): in today's layout they form the southern
+    part of this long shed; the separate outlines are not distinguishable on the aerial photo.
 - **C棟 and D棟 (高度衛生管理型, operating since April 2019).** C棟 is 195 m and D棟 135 m long. The total project cost was
   18.12 billion yen, including the purification plant. Both are closed, temperature-controlled halls.
   - IC-card access and electric forklifts only.
@@ -67,8 +67,7 @@ large lettering; confirm its exact text before building. The pair 「気仙沼�
 
 ## Current state (2026)
 
-All four parts are in service. The 2019 C and D halls replaced the temporary post-2011 canopies. The ortho (about
-2020–2022) already shows C and D complete.
+All four parts are in service. The ortho (about 2020–2022) already shows C and D complete.
 
 ## Sources
 
@@ -79,10 +78,16 @@ All four parts are in service. The 2019 C and D halls replaced the temporary pos
 - OSM ways 105732020, 761258023 and 761720498 (© OpenStreetMap contributors, ODbL); GSI seamlessphoto z17/z18
 - Ortho crops: `ortho/market_all.jpg`, `ortho/market_north.jpg`, `ortho/market_south.jpg`
 
-## What the app renders (see AUDIT.md)
+## In the app
 
-- `app/market_north.jpg`, `app/market_top.jpg`, `app/market_c_oblique.jpg`, `app/market_d.jpg`
-- The four generated white gable halls with skylights stand on the north facility. C棟 and D棟 are generic town boxes.
+- **North facility:** the rooftop car park (painted bays, pyramid roof-lights, a glazed vault and the curved ramp from the
+  street) and, on the quay side, the open 1F unloading hall (walkable). OSM outlines (0 m).
+- **C棟 and D棟:** closed white halls with the 2F glazed observation deck, the 気仙沼市魚市場 / 海と生きる lettering and
+  the roof terrace; D棟 has its PV rows and roof hoods, and both halls have a colour wash at night. C棟 is on its OSM
+  outline, D棟 on the z18 photo (±1.5 m).
+- The sections below record later refinements. The current C棟 roof deck and quay hall are described in the survey,
+  `docs/anime/survey/market.md`.
+- Frames: `app-v4/market_c.jpg`, `app-v4/market_d_pv_top.jpg`, `app-v4/market_north.jpg`, `app-v4/market_walk.jpg`.
 
 ## v5 fix round 2 (2026-10-01): the roof deck and the land side, against Google Earth (imagery 2026-03-11)
 
@@ -91,14 +96,14 @@ All four parts are in service. The 2019 C and D halls replaced the temporary pos
   (`town/carcolors.js`: 45 % white or pearl, 20 % black, 15 % silver, 10 % grey, 10 % dark blue or red).
 - **Green walkway stripe** along the land side of the deck, 3 m wide and 2 m in from the parapet, with white edge lines
   (#6f9a7f); no car stands on it.
-- **Land side** (review2 walk/w_12 showed a 300 m plain white wall over an empty plain): a 1.1 m dock plinth along the
+- **Land side** (it was a 300 m plain white wall over an empty plain): a 1.1 m dock plinth along the
   land-facing walls with loading-dock shutters every 8.5 m and black rubber bumpers, painted truck bays 12 m long, 4 t
   trucks backed onto about one bay in five, and 「気仙沼市魚市場」 lettered on the 2F band every 110 m. The bays and trucks
   stop where the ramp to the north roof runs along the wall, and nothing is drawn on the party wall with the north block.
 - Still open: the inland strip is beige in the land cover where Earth shows asphalt (an `apron` surface in
   `data/anime/overrides/c11.json`, for the accuracy pass).
 
-## v5 photos (2026-10-01): C棟's roof deck from the author's photos (IMG_0792-0798, 17:07 JST)
+## v5 photos (2026-10-01): C棟's roof deck from on-site photos (IMG_0792-0798, 17:07 JST)
 
 The photos were taken on C棟's roof deck: GPS z ≈ 1040 lies inside C棟, at 11 m altitude, looking over the parapet to the
 bay. `harbor/market5.js` (`buildCRoofPhotos`) replaces the v4 equipment boxes there with:

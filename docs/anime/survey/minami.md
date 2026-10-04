@@ -1,6 +1,6 @@
 # South-shore survey (南町 / 内湾): PIER7, the plaza, 迎 / ANCHOR, 結, 拓, the slow street and the east promenade
 
-Survey of 2026-10-03 (v6:survey). The client's photos are measured in metres and the app is checked against them. The
+Survey of 2026-10-03 (v6:survey). The on-site photos are measured in metres and the app is checked against them. The
 photos never enter git: `raw/survey/minami/` (images, databases, point cloud) and `docs/shots/v6_survey/minami/`
 (overlays) are gitignored.
 
@@ -11,14 +11,14 @@ ENU, as everywhere in the app: x = (lon − 141.5750) × 86744 (east), z = −(l
 57 photos: IMG_0799–0842 (2026-10-01, 17:18–17:22 JST, dusk), 0906–0913 (2026-10-02 16:29, sun: PIER7 street side,
 the orange arch) and 0888–0896 (14:59, the east promenade, ~130 m east). Full-resolution JPEGs from the HEICs (EXIF kept,
 rotation applied) in `raw/survey/minami/images/{uw14,w24,w48,t77}`; one COLMAP camera per lens: 14 mm ultra-wide and
-24 mm main (OPENCV), 48 mm (2× crop of the main sensor) and 77 mm tele (RADIAL). Sailesh shot from ~12 standing spots,
+24 mm main (OPENCV), 48 mm (2× crop of the main sensor) and 77 mm tele (RADIAL). The photos were shot from ~12 standing spots,
 turning on the spot (0803–0813 in 20 s, 0825–0832 in 14 s, 0834–0839, 0893–0896, 0907–0913): most pairs have no baseline.
 
 ## Method
 
 1. **Matching** (`tools/survey/lgmatch.py`). ALIKED keypoints (COLMAP 4.1.1's own ONNX model, onnxruntime on the CPU) at
    two scales per photo — 2400 px, and an angular-resolution-normalised level (focal ≈ 1150 px, so a 77 mm and a 24 mm
-   shot meet at the same pixels per degree) — and LightGlue (PyTorch on the Apple GPU, memory capped at 25 %) over
+   shot meet at the same pixels per degree) — and LightGlue (PyTorch on the Apple GPU) over
    1355 frustum-overlap pairs; MAGSAC fundamental check. 203 verified pairs (COLMAP's GPU SIFT gave the plaza sweep
    0807–0812 no link to any other spot; CPU FLANN SIFT 106 pairs). `tools/survey/lgdb.py` writes them into a COLMAP
    database; `colmap geometric_verifier` keeps 157 pairs (≥ 15 inliers).
