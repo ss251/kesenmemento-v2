@@ -16,7 +16,7 @@
 //   pad.registerMode(name, { buttons: [{ id, label, icon, hold?, toggle?, visible?, onDown, onUp }], stick: 'analog' | 'none' })
 //   pad.setMode(name)   a registered mode (the first button is the big primary one); setMode(null | 'walk' | 'fly' | 'drive')
 //                       hands the buttons back to the game (walk / fly / drive follow the player and the car by themselves)
-// docs/MOBILE-PAD.md has the full API.
+// docs/MOBILE-CONTROLS.md has the full API.
 import * as THREE from 'three';
 import DATA from '../../../data/ui-touch-i18n.json';
 import { pickLang } from './i18n.js';

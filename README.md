@@ -148,7 +148,7 @@ otherwise. The place's label stays pinned until you move about 300 m away.
 | M | Sound on or off |
 | \` | Frame counter (fps, draw calls, triangles) |
 
-On a phone the town plays like a mobile game (`docs/MOBILE-PAD.md`): a floating thumbstick on the left (past 85 % you run,
+On a phone the town plays like a mobile game (`docs/MOBILE-CONTROLS.md`): a floating thumbstick on the left (past 85 % you run,
 or boost in the car), a drag on the right to look, and an arc of buttons at the bottom right that follows the mode:
 ジャンプ / ダッシュ / 飛ぶ / 乗る or 入る on foot, 上昇 / 下降 / 加速 / 歩く in flight, ブレーキ / ブースト / 降りる in the car.
 The chip at the top left switches 歩く / 飛ぶ / 運転, and its settings button swaps the sides (left-handed), inverts the look and

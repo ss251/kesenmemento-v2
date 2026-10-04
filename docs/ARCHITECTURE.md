@@ -178,7 +178,7 @@ service is missing.
 pipeline at 3840×2160 and saves it as a PNG.
 
 **Touch pad** (`ui/touchpad.js`, `ui/touchpad-style.js`, strings in `data/ui-touch-i18n.json`; guide and API in
-[MOBILE-PAD.md](MOBILE-PAD.md)). [v7:pad] On a phone (`(pointer: coarse)`, a first touch, or `?touch=1`) the pad owns the
+[MOBILE-CONTROLS.md](MOBILE-CONTROLS.md)). [v7:pad] On a phone (`(pointer: coarse)`, a first touch, or `?touch=1`) the pad owns the
 canvas's touches: a floating analog stick on the left (dead zone, eased, RUN past 85 %), a smoothed drag look on the right,
 and a context action cluster in an arc (walk, fly and drive sets; `pad.registerMode(name, { buttons, stick })` and
 `pad.setMode(name)` for the sail mode). `main.js` creates it (`ctx.pad`, `window.__pad`); `Player.attachPad` consumes

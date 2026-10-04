@@ -222,7 +222,7 @@ async function build() {
 // ------------------------------------------------------------------ player / cameras
 const player = new Player(camera, canvas, ctx.physics, L.WORLD.play);
 ctx.playerObj = player;
-// [v7:pad] touch: the pad owns the canvas's touches (docs/MOBILE-PAD.md); ?touch=1 forces it on (desktop testing), ?touch=0 off
+// [v7:pad] touch: the pad owns the canvas's touches (docs/MOBILE-CONTROLS.md); ?touch=1 forces it on (desktop testing), ?touch=0 off
 const pad = createTouchpad({ canvas, ctx, player });
 ctx.pad = pad; player.attachPad(pad); window.__pad = pad;
 const DEG = 180 / Math.PI;
