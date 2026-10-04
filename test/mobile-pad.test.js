@@ -335,6 +335,22 @@ describe("pad: strings", () => {
   });
 });
 
+describe("round 2 regressions", () => {
+  test("a thumb promoted from a HUD panel anchors the stick where it landed (startStick takes the origin)", () => {
+    const src = readFileSync(join(ROOT, "src/anime/ui/touchpad.js"), "utf8");
+    expect(src).toMatch(/function startStick\(t, ox = t\.clientX, oy = t\.clientY\)/);
+    expect(src).toContain("startStick(t, g.x0, g.y0)");
+    expect(src).toMatch(/role: 'stick', x0: ox, y0: oy/);
+  });
+  test("the landscape places strip is wide enough and never stacks or wraps its header", () => {
+    const css = readFileSync(join(ROOT, "src/anime/ui/touchpad-style.js"), "utf8");
+    const w = css.match(/body\.klc-pad #klc-ui \.places \{ width: (\d+)px/);
+    expect(w).not.toBeNull(); expect(Number(w[1])).toBeGreaterThanOrEqual(180);
+    expect(css).toMatch(/\.places \.ph \.lbl \{ display: none/);
+    expect(css).toMatch(/\.places \.ph \.cur \{[^}]*white-space: nowrap; overflow: hidden; text-overflow: ellipsis/);
+  });
+});
+
 /** A pad with the registry only (no DOM): createTouchpad needs a document, so this builds one from a tiny stub. */
 function fakePad() {
   const el = () => new Proxy(function () {}, { get: (t, k) => (k === "style" ? { setProperty() {} } : k === "classList" ? { add() {}, remove() {}, contains: () => false, toggle() {} } : k === "dataset" ? {} : k === "querySelector" || k === "querySelectorAll" ? () => (k === "querySelector" ? el() : []) : () => el()), apply: () => el(), set: () => true });

@@ -140,10 +140,13 @@ html.klc-pad-root { touch-action: manipulation; }
   body.klc-pad #klc-x .mini canvas { width: 96px; height: 96px; }
   body.klc-pad #klc-x .mini .cap { max-width: 150px; padding: 3px 8px; font-size: 10.5px; }
   body.klc-pad #klc-x .mini .cap small { display: none; }
-  body.klc-pad #klc-ui .places { width: 160px; left: calc(12px + env(safe-area-inset-left, 0px)); }
+  body.klc-pad #klc-ui .places { width: 186px; left: calc(8px + env(safe-area-inset-left, 0px)); }
+  body.klc-pad #klc-ui .places .ph .lbl { display: none; }   /* (めぐる stacked one glyph per line in 160 px; the place name and the caret say what it is) */
+  body.klc-pad #klc-ui .places .ph .cur { margin-left: 0; flex: 1 1 auto; text-align: left; }
+  body.klc-pad #klc-ui .places .ph .cur { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   body.klc-pad #klc-ui .places .auto { display: none; }
   body.klc-pad #klc-ui .dock .pill[data-act="view"], body.klc-pad #klc-ui .dock .div { display: none; }
-  body.klc-pad #klc-ui .dock .seg button { min-width: 56px; padding: 7px 8px 6px; }
+  body.klc-pad #klc-ui .dock .seg button { min-width: 46px; padding: 7px 5px 6px; }   /* (the dock is centred; the places strip needs the room on its left) */
 }
 @media (prefers-reduced-motion: reduce) { #klc-pad *, #klc-pad { transition-duration: 0s !important; animation: none !important; } }
 `;

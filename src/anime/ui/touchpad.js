@@ -452,11 +452,13 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   const ignoring = () => !pad.active || pad.hidden;
   const poke = () => { lastTouchAt = performance.now(); if (root && root.dataset.idle !== '0') root.dataset.idle = '0'; };
 
-  function startStick(t) {
+  // (ox, oy: where the thumb first landed, when it is promoted from a HUD panel after some travel; the base and the dead zone are
+  // anchored there, not at the current point, so none of the travel is lost)
+  function startStick(t, ox = t.clientX, oy = t.clientY) {
     stickId = t.identifier;
-    touches.set(t.identifier, { role: 'stick', x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY });
+    touches.set(t.identifier, { role: 'stick', x0: ox, y0: oy, x: t.clientX, y: t.clientY });
     spring.on = false;
-    base.style.transform = `translate3d(${t.clientX - geom.baseR}px, ${t.clientY - geom.baseR}px, 0)`;
+    base.style.transform = `translate3d(${ox - geom.baseR}px, ${oy - geom.baseR}px, 0)`;
     base.dataset.on = '1'; base.dataset.run = '0'; root.dataset.stick = '1';
     setKnob(0, 0);
     pad.stickActive = true;
@@ -523,7 +525,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
         if (d === 'wait') continue;
         if (d === 'scroll') { g.state = 'dead'; continue; }
         const zone = touchZone(g.x0, g.y0, win.innerWidth, win.innerHeight, { leftHanded: pad.settings.leftHanded, stick: modes.get(pad.mode)?.stick });
-        if (zone === 'stick' && stickId == null) startStick(t); else if (lookId == null) startLook(t); else { g.state = 'dead'; continue; }
+        if (zone === 'stick' && stickId == null) startStick(t, g.x0, g.y0); else if (lookId == null) startLook(t); else { g.state = 'dead'; continue; }
         g.state = 'live'; poke();
       }
       moveTouch(t); took = true;

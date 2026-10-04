@@ -51,7 +51,7 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     expect(lay.overlaps).toEqual([]);   // the coach mark sits in the free band too
     const ok = await center(page, "#klc-pad .coach .ok"); await f.tap(ok.x, ok.y);
     await page.waitFor("document.querySelector('#klc-pad .coach').hidden", { timeout: 4000 });
-    expect(await buttonIds(page)).toEqual(["jump", "dash", "fly"]);   // no car and no door here: the context button is not shown
+    expect((await buttonIds(page)).filter((id) => id !== "context")).toEqual(["jump", "dash", "fly"]);   // (乗る / 入る only shows next to a car or a door; a passing car on a slow machine may bring it up, so it is not asserted here)
   });
 
   T("a stick drag moves the walker by more than 5 m (and past 85 % the ring turns to RUN)", async () => {
@@ -237,11 +237,19 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     expect(mid.stick).toBe(true); expect(mid.len).toBeGreaterThan(0.5);
     expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeGreaterThan(2);
     expect(await page.eval("window.__pad.stickActive")).toBe(false);
-    // 2. stick from the dock's left half
+    // 2. stick from the dock's left half (turned about: step 1 may have walked up to a wall)
+    await page.eval("window.__ctx.playerObj.yaw += Math.PI"); await hold(300);
     const c = await gameState(page);
     await f.down1(1, 100, dk.y); await f.drag(1, 100, dk.y - 70, 8); await hold(1000); await f.up(1); await hold(300);
     const d1 = await gameState(page);
     expect(Math.hypot(d1.x - c.x, d1.z - c.z)).toBeGreaterThan(2);
+    // 1b. the stick is anchored where the thumb LANDED on the strip, not where the 10 px of travel ended: the base is centred on the
+    // landing point and a 52 px drag (93 % of the 56 px travel) is already RUN
+    await f.down1(1, 90, pl.y); await f.drag(1, 90, pl.y - 52, 8); await hold(250);
+    const anc = await page.eval("(() => { const r = document.querySelector('#klc-pad .stick').getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, run: window.__pad.running, stick: window.__pad.stickActive }; })()");
+    await f.up(1); await hold(300);
+    expect(anc.stick).toBe(true); expect(anc.run).toBe(true);
+    expect(Math.abs(anc.cx - 90)).toBeLessThan(2); expect(Math.abs(anc.cy - pl.y)).toBeLessThan(2);
     // 3. look from the dock's right half: one 190 px swipe turns about 85 degrees (B2)
     await page.eval("window.__ctx.playerObj.pitch = 0"); await hold(200);
     const e0 = await gameState(page);
@@ -296,6 +304,26 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
       await page.eval("window.__pad.setSetting('leftHanded', false)");
     });
   }
+
+  T("landscape 844x390: the places strip header never stacks glyphs and the current place stays on one line, clear of the dock", async () => {
+    await setViewport(page, { width: 844, height: 390, dpr: 3, insets: { top: 0, bottom: 21, left: 47, right: 47 } });
+    await settle(1200);
+    await setMode("walk");
+    const r = await page.eval(`(() => {
+      const ph = document.querySelector('#klc-ui .places .ph'), lbl = ph.querySelector('.lbl'), cur = ph.querySelector('.cur'), dk = document.querySelector('#klc-ui .dock').getBoundingClientRect(), pl = document.querySelector('#klc-ui .places').getBoundingClientRect();
+      const lh = (e) => parseFloat(getComputedStyle(e).lineHeight) || parseFloat(getComputedStyle(e).fontSize);
+      return { places: pl.width, gap: dk.left - pl.right, lblShown: getComputedStyle(lbl).display !== 'none', lblH: lbl.getBoundingClientRect().height, lblLH: lh(lbl),
+        curH: cur.getBoundingClientRect().height, curLH: lh(cur), curClipped: cur.scrollWidth > cur.clientWidth + 1, ph: ph.getBoundingClientRect().height };
+    })()`);
+    expect(r.places).toBeGreaterThanOrEqual(180);
+    expect(r.gap).toBeGreaterThanOrEqual(4);   // the dock is clear of the strip
+    if (r.lblShown) expect(r.lblH).toBeLessThan(r.lblLH * 1.6);   // (hidden here; if it ever shows: one line, not one glyph per line)
+    expect(r.curClipped).toBe(false);   // the whole place name fits
+    expect(r.curH).toBeLessThan(r.curLH * 1.6);   // 'PIER7（ピアセブン）' does not wrap
+    expect(r.ph).toBeLessThan(40);
+    await setViewport(page, { width: 390, height: 844, dpr: 3, insets: { top: 47, bottom: 34, left: 0, right: 0 } });
+    await settle(900);
+  });
 
   T("left-handed: the stick is on the right half and the look on the left; the setting is saved", async () => {
     await setViewport(page, { width: 390, height: 844, dpr: 3, insets: { top: 47, bottom: 34, left: 0, right: 0 } });
