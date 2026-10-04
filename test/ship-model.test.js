@@ -216,7 +216,7 @@ describe('nendo livery (the default)', () => {
   test('traced shapes are cleaned into crisp polygons, both sides, not mirrored', () => {
     for (const side of ['port', 'starboard']) {
       expect(plan[side].shapes.length).toBeGreaterThanOrEqual(6);
-      for (const s of plan[side].shapes) { expect(s.pts.length).toBeLessThanOrEqual(8); expect(s.src).toBe('nendo'); }
+      for (const s of plan[side].shapes) { expect(s.pts.length).toBeLessThanOrEqual(s.tag === 'traced' ? 8 : 24); expect(s.src).toBe('nendo'); }   // the measured marks may carry a curve (the starboard star's crescent has 18 points)
       expect(plan[side].circles.length).toBe(1);
       expect(plan[side].lines.length).toBeGreaterThanOrEqual(side === 'port' ? 8 : 7);
     }
