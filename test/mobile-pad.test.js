@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   STICK, LOOK, BTN, stickMath, easeStick, padScale, touchZone, mirrorX, lookDelta, smoothTake, clusterLayout, layoutBounds,
-  rectsOverlap, liftClear, touchEnabled, loadSettings, builtinModes, buttonIds, BUILTIN_NAMES, ICONS, createTouchpad,
+  rectsOverlap, liftClear, grabDecision, HUD_GRAB, touchEnabled, loadSettings, builtinModes, buttonIds, BUILTIN_NAMES, ICONS, createTouchpad,
 } from "../src/anime/ui/touchpad.js";
 import { Player } from "../src/anime/core/player.js";
 
@@ -99,8 +99,10 @@ describe("pad: zones and left-handed mirroring", () => {
 });
 
 describe("pad: look", () => {
-  test("phone-tuned sensitivity, 0.004-0.005 rad / px", () => {
-    expect(LOOK.sens).toBeGreaterThanOrEqual(0.004); expect(LOOK.sens).toBeLessThanOrEqual(0.005);
+  test("Genshin / PUBG sensitivity: about 0.008 rad / px, so one 190 px swipe turns about 85 degrees", () => {
+    expect(LOOK.sens).toBeGreaterThanOrEqual(0.0075); expect(LOOK.sens).toBeLessThanOrEqual(0.0085);
+    const deg = lookDelta(190, 0).dx * 180 / Math.PI;
+    expect(deg).toBeGreaterThan(80); expect(deg).toBeLessThan(90);
     const d = lookDelta(100, -50);
     expect(d.dx).toBeCloseTo(100 * LOOK.sens, 9); expect(d.dy).toBeCloseTo(-50 * LOOK.sens, 9);
   });
@@ -114,6 +116,26 @@ describe("pad: look", () => {
     for (let i = 0; i < 120; i++) { const t = smoothTake(pending, 1 / 60); pending -= t; got += t; expect(t).toBeGreaterThanOrEqual(0); }
     expect(got).toBeCloseTo(1, 3);
     expect(smoothTake(1, 1 / 60)).toBeLessThan(1); expect(smoothTake(1, 1 / 60)).toBeGreaterThan(0.2);   // light: about a third per frame
+  });
+});
+
+describe("pad: a drag that starts on a HUD panel", () => {
+  test("a tap (under 10 px) waits; a drag past 10 px is promoted to the pad", () => {
+    expect(HUD_GRAB.move).toBe(10);
+    expect(grabDecision(0, 0)).toBe("wait");
+    expect(grabDecision(6, -6)).toBe("wait");
+    expect(grabDecision(0, -70)).toBe("promote");
+    expect(grabDecision(11, 0)).toBe("promote");
+  });
+  test("a panel's own scroller keeps a drag that goes along its axis, and gives up one across it", () => {
+    expect(grabDecision(40, 4, "x")).toBe("scroll");
+    expect(grabDecision(4, -40, "x")).toBe("promote");   // the strip scrolls sideways: a thumb dragging up is the stick
+    expect(grabDecision(4, 40, "y")).toBe("scroll");
+    expect(grabDecision(40, 4, "y")).toBe("promote");
+  });
+  test("the grab list names the places strip, the dock and the credit line, and skips inputs", () => {
+    for (const s of ["#klc-places", ".dock", ".attr"]) expect(HUD_GRAB.selector).toContain(s);
+    expect(HUD_GRAB.skip).toContain("input");
   });
 });
 

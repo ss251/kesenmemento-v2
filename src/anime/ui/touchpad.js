@@ -25,8 +25,9 @@ import { CSS as PAD_CSS } from './touchpad-style.js';
 // ------------------------------------------------------------------ pure parts (bun test: test/mobile-pad.test.js)
 /** The stick: 56 CSS px of travel (scaled on small screens), a 12 % dead zone, RUN past 85 % of the travel. */
 export const STICK = { travel: 56, deadZone: 0.12, runAt: 0.85, runHysteresis: 0.05, base: 8, knob: 52 };
-/** Look: phone-tuned radians per CSS px, a light smoothing (time constant, s) and the safe pitch limit. */
-export const LOOK = { sens: 0.0045, tau: 0.035, pitchMax: 80 * Math.PI / 180 };
+/** Look: radians per CSS px (0.008 = about 85 degrees for a 190 px swipe, the Genshin / PUBG feel; the slider scales it 0.5 to 1.8),
+ *  a light smoothing (time constant, s) and the safe pitch limit. */
+export const LOOK = { sens: 0.008, tau: 0.035, pitchMax: 80 * Math.PI / 180 };
 /** The arc: sizes and gaps in CSS px at scale 1; every button is at least 56 px. */
 export const BTN = { primary: 76, size: 60, min: 56, ring: 92, gap: 12 };
 export const IDLE_MS = 4000, IDLE_OPACITY = 0.35;
@@ -59,6 +60,21 @@ export function stickMath(dx, dy, { scale = 1, travel = STICK.travel, deadZone =
 export function touchZone(x, y, vw, vh, { leftHanded = false, stick = 'analog' } = {}) {
   const inHalf = leftHanded ? x >= vw / 2 : x < vw / 2;
   return stick !== 'none' && inHalf && y >= vh * 0.25 ? 'stick' : 'look';
+}
+
+/** HUD panels a thumb may land on: a drag that starts on one still drives the pad (the stick or the look); a tap still reaches the panel. */
+export const HUD_GRAB = {
+  move: 10,   // CSS px of travel before a touch on a panel becomes a stick / look touch
+  selector: '#klc-places, #klc-ui .places, #klc-ui .dock, #klc-ui .attr, #klc-x .mini, #klc-x .xdrive, #klc-pad .chip, #klc-pad .gear',
+  skip: 'input, select, textarea, .xsearch, .arrivals, .xmap, [data-scroll], #klc-pad .settings',   // (these keep their own drags)
+};
+/** What a touch that began on a HUD panel does at its current offset: 'wait' (still a tap), 'promote' (a drag: the pad takes it) or
+ *  'scroll' (the panel's own scroller is going the way the finger goes: leave it). `axis` is the panel scroller's axis, 'x' | 'y' | null. */
+export function grabDecision(dx, dy, axis = null) {
+  if (Math.hypot(dx, dy) < HUD_GRAB.move) return 'wait';
+  if (axis === 'x' && Math.abs(dx) > Math.abs(dy)) return 'scroll';
+  if (axis === 'y' && Math.abs(dy) > Math.abs(dx)) return 'scroll';
+  return 'promote';
 }
 export const mirrorX = (x, width, mirrored) => (mirrored ? width - x : x);
 
@@ -472,23 +488,68 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       if (touches.has(t.identifier)) continue;
       const zone = touchZone(t.clientX, t.clientY, win.innerWidth, win.innerHeight, { leftHanded: pad.settings.leftHanded, stick: modes.get(pad.mode)?.stick });
       if (zone === 'stick' && stickId == null) startStick(t);
-      else if (lookId == null) { lookId = t.identifier; touches.set(t.identifier, { role: 'look', x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY }); dismissCoach(); }
+      else if (lookId == null) startLook(t);
     }
     e.preventDefault();
+  }
+  function startLook(t) { lookId = t.identifier; touches.set(t.identifier, { role: 'look', x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY }); dismissCoach(); }
+
+  // ---- a thumb that lands on a HUD panel (places strip, time dock, credit line, minimap, mode chip): the panel owns the touch for a
+  // tap, but a drag of more than HUD_GRAB.move px hands it to the pad (the zone of where it landed: stick or look). Document capture
+  // phase, because the panel (not the canvas) is the touch's target.
+  const grabs = new Map();   // touch id -> { x0, y0, axis, state: 'pending' | 'live' | 'dead' }
+  const scrollAxis = (el) => {
+    const u = el.closest?.('ul, ol'); if (!u) return null;
+    if (u.scrollWidth > u.clientWidth + 1) return 'x';
+    if (u.scrollHeight > u.clientHeight + 1) return 'y';
+    return null;
+  };
+  function onGrabStart(e) {
+    if (!pad.active || pad.hidden) return;
+    for (const t of e.changedTouches) {
+      const el = t.target;
+      if (touches.has(t.identifier) || grabs.has(t.identifier) || !el || el === canvas || !el.closest) continue;
+      if (!el.closest(HUD_GRAB.selector) || el.closest(HUD_GRAB.skip) || el.closest('#klc-pad .cluster')) continue;
+      grabs.set(t.identifier, { x0: t.clientX, y0: t.clientY, axis: scrollAxis(el), state: 'pending' });
+    }
+  }
+  function onGrabMove(e) {
+    if (!pad.active || !grabs.size) return;
+    let took = false;
+    for (const t of e.changedTouches) {
+      const g = grabs.get(t.identifier); if (!g || g.state === 'dead') continue;
+      if (g.state === 'pending') {
+        const d = grabDecision(t.clientX - g.x0, t.clientY - g.y0, g.axis);
+        if (d === 'wait') continue;
+        if (d === 'scroll') { g.state = 'dead'; continue; }
+        const zone = touchZone(g.x0, g.y0, win.innerWidth, win.innerHeight, { leftHanded: pad.settings.leftHanded, stick: modes.get(pad.mode)?.stick });
+        if (zone === 'stick' && stickId == null) startStick(t); else if (lookId == null) startLook(t); else { g.state = 'dead'; continue; }
+        g.state = 'live'; poke();
+      }
+      moveTouch(t); took = true;
+    }
+    if (took && e.cancelable) e.preventDefault();
+  }
+  function onGrabEnd(e) {
+    if (!grabs.size) return;
+    let live = false;
+    for (const t of e.changedTouches) { const g = grabs.get(t.identifier); if (g) { live = live || g.state === 'live'; grabs.delete(t.identifier); } }
+    if (live) { onTouchEnd(e); if (e.type === 'touchend' && e.cancelable) e.preventDefault(); }   // (no ghost click on the panel under the finger)
   }
   const acc = { dx: 0, dy: 0 };
   function onTouchMove(e) {
     if (!pad.active) return;
     poke();
-    for (const t of e.changedTouches) {
-      const s = touches.get(t.identifier); if (!s) continue;
-      if (s.role === 'stick') moveStick(t);
-      else {
-        const d = lookDelta(t.clientX - s.x, t.clientY - s.y, { mult: pad.settings.sens, invertY: pad.settings.invertY });
-        acc.dx += d.dx; acc.dy += d.dy; s.x = t.clientX; s.y = t.clientY;
-      }
-    }
+    for (const t of e.changedTouches) moveTouch(t);
     e.preventDefault();
+  }
+  function moveTouch(t) {
+    const s = touches.get(t.identifier); if (!s) return;
+    if (s.role === 'stick') moveStick(t);
+    else {
+      const d = lookDelta(t.clientX - s.x, t.clientY - s.y, { mult: pad.settings.sens, invertY: pad.settings.invertY });
+      acc.dx += d.dx; acc.dy += d.dy; s.x = t.clientX; s.y = t.clientY;
+    }
   }
   function onTouchEnd(e) {
     for (const t of e.changedTouches) {
@@ -602,6 +663,9 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     let lastEnd = 0;
     doc.addEventListener('touchend', (e) => { const n = performance.now(); if (pad.active && n - lastEnd < 350 && (e.target === canvas || e.target.closest?.('#klc-pad .cluster'))) e.preventDefault(); lastEnd = n; }, { passive: false });
     doc.addEventListener('touchstart', poke, { capture: true, passive: true });
+    doc.addEventListener('touchstart', onGrabStart, { capture: true, passive: true });
+    doc.addEventListener('touchmove', onGrabMove, { capture: true, passive: false });
+    doc.addEventListener('touchend', onGrabEnd, { capture: true, passive: false }); doc.addEventListener('touchcancel', onGrabEnd, { capture: true, passive: false });
     canvas?.addEventListener('contextmenu', (e) => { if (pad.active) e.preventDefault(); });
   }
 
@@ -618,7 +682,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   }
   function deactivate() {
     if (!pad.active) return;
-    pad.active = false; endStick(); lookId = null; touches.clear(); acc.dx = acc.dy = 0;
+    pad.active = false; endStick(); lookId = null; touches.clear(); grabs.clear(); acc.dx = acc.dy = 0;
     doc.body.classList.remove('klc-pad'); doc.documentElement.classList.remove('klc-pad-root'); root?.remove(); root = null; pad.ready = false;
   }
 
@@ -640,7 +704,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       || !!tour()?.playing || !!tour()?.flying || !!ctx?.planet?.active || suppress.size > 0;
     if (hide !== pad.hidden) {
       pad.hidden = hide; root.dataset.hidden = hide ? '1' : '0';
-      if (hide) { endStick(); lookId = null; for (const [k, v] of touches) if (v.role === 'look') touches.delete(k); for (const id of [...held]) releaseId(id, true); settingsEl.hidden = true; }
+      if (hide) { endStick(); lookId = null; grabs.clear(); for (const [k, v] of touches) if (v.role === 'look') touches.delete(k); for (const id of [...held]) releaseId(id, true); settingsEl.hidden = true; }
       else { dirty.layout = true; if (mayCoach()) setTimeout(() => { if (!pad.hidden) showCoach(); }, 700); }
     }
     if (dirty.text) { renderText(); dirty.text = false; }
