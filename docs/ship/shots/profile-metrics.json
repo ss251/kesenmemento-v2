@@ -1,5 +1,5 @@
 {
- "date": "2026-10-03T12:34:31.184Z",
+ "date": "2026-10-04T05:20:21.453Z",
  "mpp": 0.1226,
  "runs": [
   {
@@ -30,7 +30,7 @@
       "silhouetteIoU": 0.8635,
       "silhouetteIoUalpha": 0.8468,
       "photoLiveryIoU": {
-       "black": 0.4599,
+       "black": 0.46,
        "red": 0.6206
       }
      }
@@ -41,8 +41,8 @@
       "silhouetteIoU": 0.7334,
       "silhouetteIoUalpha": 0.7131,
       "photoLiveryIoU": {
-       "black": 0.0896,
-       "red": 0.0752
+       "black": 0.1169,
+       "red": 0.0872
       }
      },
      "fitted": {
@@ -50,8 +50,8 @@
       "silhouetteIoU": 0.7383,
       "silhouetteIoUalpha": 0.7125,
       "photoLiveryIoU": {
-       "black": 0.153,
-       "red": 0.0955
+       "black": 0.0938,
+       "red": 0.0395
       }
      }
     }
@@ -62,8 +62,8 @@
      "red": 0.8
     },
     "starboard": {
-     "black": 0.47818566211800884,
-     "red": 0.19119904485758143
+     "black": 0,
+     "red": 0.1711340206185567
     }
    },
    "wcpfcIoU": {
@@ -72,18 +72,18 @@
      "red": 0.7496
     },
     "aftOf44": {
-     "black": 0.5586,
-     "red": 0.0382
+     "black": 0.23,
+     "red": 0.1279
     },
     "all": {
-     "black": 0.3932,
-     "red": 0.6317
+     "black": 0.2699,
+     "red": 0.6208
     }
    },
    "pageErrors": [
     {
      "type": "log-error",
-     "text": "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:8967/favicon.ico"
+     "text": "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:8975/favicon.ico"
     }
    ]
   },
@@ -126,8 +126,8 @@
       "silhouetteIoU": 0.7225,
       "silhouetteIoUalpha": 0.7039,
       "photoLiveryIoU": {
-       "black": 0.0912,
-       "red": 0.0755
+       "black": 0.119,
+       "red": 0.0877
       }
      },
      "fitted": {
@@ -135,8 +135,8 @@
       "silhouetteIoU": 0.727,
       "silhouetteIoUalpha": 0.7033,
       "photoLiveryIoU": {
-       "black": 0.1559,
-       "red": 0.0958
+       "black": 0.0968,
+       "red": 0.0397
       }
      }
     }
@@ -147,8 +147,8 @@
      "red": 0.8
     },
     "starboard": {
-     "black": 0.47818566211800884,
-     "red": 0.19119904485758143
+     "black": 0,
+     "red": 0.1711340206185567
     }
    },
    "wcpfcIoU": {
@@ -157,12 +157,12 @@
      "red": 0.7496
     },
     "aftOf44": {
-     "black": 0.5586,
-     "red": 0.0382
+     "black": 0.23,
+     "red": 0.1279
     },
     "all": {
-     "black": 0.3932,
-     "red": 0.6317
+     "black": 0.2699,
+     "red": 0.6208
     }
    }
   },
