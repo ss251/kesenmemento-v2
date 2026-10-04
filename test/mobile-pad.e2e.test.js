@@ -223,6 +223,45 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     await f.release(); await hold(300);
   });
 
+  T("B1: a thumb that lands on the places strip or the dock still gets the stick or the look; a quick tap still reaches the panel", async () => {
+    await page.eval("window.__camSpec('walk')"); await settle(900);
+    const pl = await center(page, '#klc-ui .places'), dk = await center(page, '#klc-ui .dock');
+    expect(pl).not.toBeNull(); expect(dk).not.toBeNull();
+    // 1. stick from a thumb that lands on the places strip (left half), dragged 70 px up
+    const a = await gameState(page);
+    await f.down1(1, 60, pl.y); await f.drag(1, 60, pl.y - 70, 8); await hold(250);
+    const mid = await page.eval("({ stick: window.__pad.stickActive, len: Math.hypot(window.__pad.move.x, window.__pad.move.y) })");
+    await hold(1000); await f.up(1); await hold(300);
+    const b = await gameState(page);
+    expect(mid.stick).toBe(true); expect(mid.len).toBeGreaterThan(0.5);
+    expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeGreaterThan(2);
+    expect(await page.eval("window.__pad.stickActive")).toBe(false);
+    // 2. stick from the dock's left half
+    const c = await gameState(page);
+    await f.down1(1, 100, dk.y); await f.drag(1, 100, dk.y - 70, 8); await hold(1000); await f.up(1); await hold(300);
+    const d1 = await gameState(page);
+    expect(Math.hypot(d1.x - c.x, d1.z - c.z)).toBeGreaterThan(2);
+    // 3. look from the dock's right half: one 190 px swipe turns about 85 degrees (B2)
+    await page.eval("window.__ctx.playerObj.pitch = 0"); await hold(200);
+    const e0 = await gameState(page);
+    await f.down1(2, 330, dk.y); await f.drag(2, 140, dk.y, 12); await f.up(2); await hold(900);
+    const e1 = await gameState(page);
+    const deg = Math.abs(dAngle(e0.yaw, e1.yaw)) * 180 / Math.PI;
+    expect(deg).toBeGreaterThan(70); expect(deg).toBeLessThan(100);
+    // 4. a quick tap on the panel still works: the places header folds / unfolds the strip
+    const hd = await center(page, '#klc-ui .places .ph');
+    const open0 = await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')");
+    await f.tap(hd.x, hd.y); await hold(500);
+    const open1 = await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')");
+    expect(open1).not.toBe(open0);
+    await f.tap(hd.x, hd.y); await hold(500);
+    expect(await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')")).toBe(open0);
+    // 5. a drag that starts on a panel does not click it
+    const hd2 = await center(page, '#klc-ui .places .ph');
+    await f.down1(1, hd2.x, hd2.y); await f.drag(1, hd2.x, hd2.y - 60, 6); await f.up(1); await hold(400);
+    expect(await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')")).toBe(open0);
+  });
+
   const MODES = ["walk", "fly", "drive"];
   for (const [label, w, h, insets] of [["portrait 390x844", 390, 844, { top: 47, bottom: 34, left: 0, right: 0 }], ["landscape 844x390", 844, 390, { top: 0, bottom: 21, left: 47, right: 47 }]]) {
     T(`no pad element overlaps the dock, time bar, places, minimap, credit line, tools or each other: ${label} (walk, fly, drive; right- and left-handed)`, async () => {
