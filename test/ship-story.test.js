@@ -36,8 +36,8 @@ describe("story pins: data", () => {
   });
   test("the third paragraph claims no 5,500-year continuity: tuna were butchered at the site about 5,500 years ago", () => {
     const ja = pin.story.ja, en = pin.story.en;
-    expect(ja[2]).toBe("約5500年前、この地ですでにマグロが解体されていました。");
-    expect(en[2]).toBe("People were already butchering tuna here about 5,500 years ago.");
+    expect(ja[2]).toBe("約5500年前、この地ですでにマグロが解体されていたのかもしれません。");
+    expect(en[2]).toBe("People may already have been butchering tuna here about 5,500 years ago.");
     expect(JSON.stringify(pin.story)).not.toMatch(/lived with tuna|とともに暮らして/);
   });
   test("no disaster framing anywhere in the pins' strings or sources", () => {
