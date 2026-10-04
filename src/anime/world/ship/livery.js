@@ -239,19 +239,20 @@ export function paintAtlas(g, plan, { profile = null, layers = null } = {}) {
       const [cx, cy] = P(c.c[0], c.c[1]);
       const disc = () => { g.beginPath(); g.ellipse(cx, cy, c.r * KX, c.r * KY, 0, 0, Math.PI * 2); };
       g.fillStyle = COLORS.white; disc(); g.fill();
+      if (c.red !== 'none') {   // 'none': the red is a separate crescent shape mark (the starboard star), no half-disc and no cut line
       g.save(); disc(); g.clip();
       const [a, b, e, d] = c.cut; let dx = e - a, dy = d - b; const L = Math.hypot(dx, dy); dx /= L; dy /= L;
       let nx = -dy, ny = dx; if ((nx < 0) !== (c.red === 'fwd')) { nx = -nx; ny = -ny; }
       g.fillStyle = COLORS.red;
       poly([[a - dx * 20, b - dy * 20], [e + dx * 20, d + dy * 20], [e + dx * 20 + nx * 20, d + dy * 20 + ny * 20], [a - dx * 20 + nx * 20, b - dy * 20 + ny * 20]]); g.fill();
-      g.restore();
+      g.restore(); }
       g.strokeStyle = COLORS.black; g.lineWidth = 0.13 * KX; disc(); g.stroke();
     }
     if (on('shapes')) fillShapes(true);
     if (on('lines')) {
       g.strokeStyle = COLORS.black; g.lineWidth = 0.17 * KX; g.lineCap = 'butt';
       for (const { l } of sp.lines) { const [x0, y0b] = P(l[0], l[1]), [x1, y1] = P(l[2], l[3]); g.beginPath(); g.moveTo(x0, y0b); g.lineTo(x1, y1); g.stroke(); }
-      for (const c of sp.circles) { const [a, b, e, d] = c.cut; const [x0, y0b] = P(a, b), [x1, y1] = P(e, d); g.beginPath(); g.moveTo(x0, y0b); g.lineTo(x1, y1); g.stroke(); }
+      for (const c of sp.circles) { if (c.red === 'none') continue; const [a, b, e, d] = c.cut; const [x0, y0b] = P(a, b), [x1, y1] = P(e, d); g.beginPath(); g.moveTo(x0, y0b); g.lineTo(x1, y1); g.stroke(); }
     }
     if (profile?.knuckleAt && (on('transom') || on('shapes'))) {
       // the transom: white aft of the quarter knuckle, from below the waterline to the top of the band

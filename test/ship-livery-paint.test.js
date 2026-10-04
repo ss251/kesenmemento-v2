@@ -267,5 +267,37 @@ describe('starboard stern hourglass X (fix round 3): the real ship, WCPFC photo 
     for (const [h, hi] of aft) expect(Math.abs(hi - (l0[1] + ((l1[1] - l0[1]) * (h - l0[0])) / (l1[0] - l0[0])))).toBeLessThan(0.06);
     // the whole painted triangle is forward of the knuckle (nothing clipped): its aft end is not the knuckle line
     for (const [h, hi] of aft) expect(hi).toBeLessThan(knuckleS(h) - 0.05);
+  }, 30000);
+});
+
+describe('starboard star red (review fix 2026-10-04): a thin crescent on the forward-lower arc, not the port half-disc (WCPFC photo x 331-422, y 730-851)', () => {
+  const port = PLANS.nendo.port, plan = PLANS.nendo.starboard;
+  const cres = plan.shapes.find((q) => q.tag === 'star-crescent');
+  // share of the star's disc that is painted red, sampled on a grid of the disc (the white disc is under both)
+  const redShare = (side, circ) => {
+    const pts = [], n = 14;
+    for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) { const x = (i / n) * circ.r, y = (j / n) * circ.r; if (Math.hypot(x, y) <= circ.r - 0.12) pts.push([circ.c[0] + x, circ.c[1] + y]); }
+    const col = sample(PLANS.nendo, pts.map(([s, h]) => sidePx(side, s, h)));
+    return col.filter((c) => c === COLORS.red).length / pts.length;
+  };
+  test('the starboard circle has no half-disc red (red: none, no cut line) and carries a red crescent shape mark painted over it', () => {
+    expect(plan.circles[0].red).toBe('none');
+    expect(cres).toBeTruthy(); expect(cres.colour).toBe('red'); expect(cres.over).toBe(true);
+    expect(port.circles[0].red).toBe('fwd');   // the port star keeps its half-disc (photo 02)
+  });
+  test('painted in the atlas, the starboard star is mostly white with a thin red part (10-24 % of the disc; the old cut segment was 37 %, the WCPFC crescent is 19 %); the port star keeps its larger cut segment', () => {
+    const sb = redShare('starboard', plan.circles[0]), pt = redShare('port', port.circles[0]);
+    expect(sb).toBeGreaterThan(0.10); expect(sb).toBeLessThan(0.24);
+    expect(pt).toBeGreaterThan(0.18);
+  }, 30000);
+  test('the crescent hugs the circle\'s forward-lower arc: every vertex within the disc, the area under a fifth of the disc', () => {
+    const [cs, ch] = plan.circles[0].c, r = plan.circles[0].r;
+    for (const [s, h] of cres.pts) expect(Math.hypot(s - cs, h - ch)).toBeLessThan(r + 0.05);
+    const area = (pts) => Math.abs(pts.reduce((a, p, i) => { const q = pts[(i + 1) % pts.length]; return a + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+    expect(area(cres.pts)).toBeLessThan((Math.PI * r * r) / 5);
+    expect(area(cres.pts)).toBeGreaterThan(1.5);   // but it is a visible mark
+    // forward (smaller s) and below the centre: its centroid is on the forward-lower side
+    const cx = cres.pts.reduce((a, p) => a + p[0], 0) / cres.pts.length, cy = cres.pts.reduce((a, p) => a + p[1], 0) / cres.pts.length;
+    expect(cx).toBeLessThan(cs); expect(cy).toBeLessThan(ch);
   });
 });
