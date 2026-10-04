@@ -23,3 +23,6 @@ tools/*.tar.xz
 # [v6:survey] photo/app overlays embed the author photos: never commit them
 docs/shots/v6_survey/
 tools/survey/__pycache__/
+
+# [ship:acts] the captain's own send-off music (optional, local only; ship/sendoff.js plays it when present)
+data/ship/sendoff-music.mp3

@@ -722,13 +722,13 @@ function floodLights(T, list) {
 }
 
 // 大漁旗: festival flags dressed from the fore mast to the stem and the bridge mast (anime colour!)
-const FLAG_DESIGNS = [
+export const FLAG_DESIGNS = [   // [ship:acts] exported: the send-off and homecoming 福来旗
   { bg: '#d9463b', fg: '#f7f1e3', a: '#f2c230', t: '大漁' },
   { bg: '#2f64b5', fg: '#f7f1e3', a: '#e94b3c', t: '大漁' },
   { bg: '#f2c230', fg: '#b3302a', a: '#2f64b5', t: '祝' },
   { bg: '#3f8f5b', fg: '#f7f1e3', a: '#f2c230', t: '満船' },
 ];
-function flagTex(ctx, d) {
+export function flagTex(ctx, d) {   // [ship:acts] exported
   return ctx.tex.draw(256, 160, (g, w, h) => {
     g.fillStyle = d.bg; g.fillRect(0, 0, w, h);
     // rising sun rays + wave band, painted flat

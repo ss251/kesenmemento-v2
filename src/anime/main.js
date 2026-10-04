@@ -18,7 +18,7 @@ import { TIER, PHONE } from './core/tier.js';   // [v4:phone]
 import { mergeCells } from './core/phonecells.js';   // [v4:phone]
 
 /** Build order. A module may read ctx.services of earlier modules at build time (life reads everyone). */
-export const MODULES = ['environment', 'water', 'town', 'harbor', 'landmarks', 'life', 'explore'];   // [v4:explore] streamed core, drive mode, map, search, labels, interiors; [v4:landmarks-B] civic landmarks after harbor
+export const MODULES = ['environment', 'water', 'town', 'harbor', 'landmarks', 'life', 'ship', 'explore'];   // [ship:integrate] 第一昭福丸 after life (its crowd) and before explore (its places entry)   // [v4:explore] streamed core, drive mode, map, search, labels, interiors; [v4:landmarks-B] civic landmarks after harbor
 /** [v3:integrate] static batching cells (m): near the hero zone, beyond it, and the hero half-size. */
 export const BATCH = { nearCell: 400, farCell: 2000, farR: 600 };   // measured vs 48/200: -35 % draw calls, market 25 -> 13 ms, hero 18 -> 16 ms (1080p, gate-throttled); [v3:fix] 300/1000/400 -> 400/2000/600: -10..-16 % calls again (city 1203 -> 1060, drone 837 -> 699)
 
@@ -92,7 +92,7 @@ function setProgress(frac, label) {
   const bar = $('bar'); if (bar) bar.style.transform = `scaleX(${frac})`;
   const lab = $('loadlabel'); if (lab && label !== undefined) lab.textContent = label;   // [v3:fix] '' clears 仕上げ中… (the ready line is CSS)
 }
-const LABELS = { _ground: '下地', environment: '山と地形', water: '内湾の海', town: '町並み', harbor: '港と船', landmarks: '名所と施設', life: '町の暮らし', explore: '街の地図' };
+const LABELS = { _ground: '下地', environment: '山と地形', water: '内湾の海', town: '町並み', harbor: '港と船', landmarks: '名所と施設', life: '町の暮らし', ship: '第一昭福丸', explore: '街の地図' };
 
 /** [v4:phone] Triangles in the scene (instanced meshes times their count) and the JS heap (Chrome only; else null). */
 function sceneTris() {
@@ -384,7 +384,7 @@ async function main() {
   }
   document.body.classList.add('loaded');
   const go = $('go'); if (go) { go.disabled = false; go.focus(); go.addEventListener('click', start); }
-  canvas.addEventListener('click', () => { if (started) player.requestLock(); });
+  canvas.addEventListener('click', () => { if (started && !ctx.services.ship?.voyage?.active) player.requestLock(); });   // [ship:integrate] the voyage UI needs the cursor
   document.addEventListener('pointerlockchange', () => { document.body.classList.toggle('locked', document.pointerLockElement === canvas); });
   addEventListener('keydown', (e) => {
     if (e.code === 'Enter' && !started) start();

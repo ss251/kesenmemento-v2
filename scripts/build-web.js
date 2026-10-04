@@ -20,6 +20,7 @@ export async function buildWeb({ minify = process.env.KLC_MINIFY !== "0", quiet 
   const entry = app === "v2" ? join(ROOT, "src/web/index.html") : join(ROOT, "src/anime/index.html");
   const res = await Bun.build({ entrypoints: [entry], outdir: DIST, minify, sourcemap: "linked", target: "browser", splitting: app !== "v2" });
   if (!res.success) { for (const l of res.logs) console.error(l); throw new Error("bun build failed"); }
+  if (app !== "v2") { const { fixHtmlEntry } = await import("./anime/html-entry.js"); for (const f of fixHtmlEntry(res.outputs)) console.error(`[build] Bun pointed ${f.html} at ${f.from}; fixed to the entry chunk ${f.to}`); }   // [ship:integrate]
   const fx = join(ROOT, "src/web/fixtures");
   if (existsSync(fx)) { rmSync(join(DIST, "fixtures"), { recursive: true, force: true }); cpSync(fx, join(DIST, "fixtures"), { recursive: true }); }
   // [v3:fix] ship the MIT licence texts the credit line links to (dist/licenses/*.txt)

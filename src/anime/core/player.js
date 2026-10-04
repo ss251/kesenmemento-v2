@@ -87,8 +87,12 @@ export class Player {
     // halved the flying speed
     dt = Math.min(dt, this.fly ? 0.1 : 0.05);
     const sens = 0.0022;
-    this.yaw -= this.look.dx * sens; this.pitch -= this.look.dy * sens; this.look.dx = this.look.dy = 0;
-    if (this.pad) {   // the pad's drag look, already in radians and smoothed; the car's chase camera takes it while driving (lookSink)
+    // [ship] a mode that owns the camera (the sail chase camera) takes the mouse/legacy look drag instead: this update runs
+    // first in the frame, so consuming it here left nothing for that mode to read (the touch look-around never turned)
+    if (typeof this.lookCapture === 'function') this.lookCapture(this.look.dx, this.look.dy);
+    else { this.yaw -= this.look.dx * sens; this.pitch -= this.look.dy * sens; }
+    this.look.dx = this.look.dy = 0;
+    if (this.pad) {   // the pad's drag look, already in radians and smoothed; the car's and the ship's chase cameras take it (lookSink)
       const l = this.pad.takeLook(dt);
       if (this.lookSink) this.lookSink(l.dx, l.dy); else { this.yaw -= l.dx; this.pitch -= l.dy; }
     }

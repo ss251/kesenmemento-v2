@@ -9,6 +9,7 @@ export const MODULE_LOADERS = {
   "landuse_aerial": () => import("./landuse_aerial.js"),
   "life": () => import("./life/index.js"),
   "lotfix": () => import("./lotfix.js"),
+  "ship": () => import("./ship/index.js"),
   "town": () => import("./town/index.js"),
   "water": () => import("./water.js"),
 };

@@ -31,6 +31,7 @@ import { buildAnba4 } from './anba.js';
 import { buildKazemachi } from './kazemachi.js';   // [v4:polish1] 風待ち地区: 角星店舗, 武山米店
 import { buildPlazaHotel } from './plaza.js';   // [v4:polish1] 気仙沼プラザホテル on the 柏崎 bluff
 import { PHONE } from '../../core/tier.js';   // [v4:phone]
+import { BERTH_RESERVE, inBerthReserve } from '../ship/route.js';   // [ship] 第一昭福丸's berth at the コの字岸壁 stays free
 
 const D2 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 
@@ -207,7 +208,7 @@ export function buildHarbor(ctx, opts = {}) {
   const heroTypes = hull(['small', 'sanma', 'small', 'small', 'maguro', 'small', 'katsuo', 'small', 'sanma']);   // [v3:fix] more working hulls in the inner bay
   for (const run of heroRuns) {
     if (out.boats.length >= maxBoats) break;
-    out.boats.push(...moorRun(ctx, run, heroTypes.slice(r.int(0, 3)).concat(heroTypes), r, { fender: 0.9, gap: 3, isWater, max: Math.min(low ? 5 : 9, maxBoats - out.boats.length), raft: 0.45, smallNear: heroNear }));   // [v3:fix] 9 per run
+    out.boats.push(...moorRun(ctx, run, heroTypes.slice(r.int(0, 3)).concat(heroTypes), r, { fender: 0.9, gap: 3, isWater, max: Math.min(low ? 5 : 9, maxBoats - out.boats.length), raft: 0.45, smallNear: heroNear, avoid: BERTH_RESERVE }));   // [ship] avoid   // [v3:fix] 9 per run
   }
   // [v4:landmarks-A] the Oshima ferry ended in April 2019: the PIER7 pontoon now serves the bay-cruise boat ファンタジー
   // (大島汽船, 32 × 7 m), moored along the pontoon's north side, bow out to the bay
@@ -225,6 +226,15 @@ export function buildHarbor(ctx, opts = {}) {
     for (const { boat } of out.rows) out.boats.push(boat);
     out.stats.rows = out.rows.length; out.stats.rowsMs = Math.round(performance.now() - tr);
   }
+  // [ship] safety net: no moored hull (any builder) in 第一昭福丸's send-off berth (ship/route.js BERTH_RESERVE)
+  if (opts.shipBerth !== false) {   // [ship]
+    out.boats = out.boats.filter((b) => {   // [ship]
+      const p = b.group.position, hit = inBerthReserve(p.x, p.z, b.spec?.L || 20);   // [ship]
+      if (hit) b.group.parent?.remove(b.group);   // [ship] (moorRun's `avoid` keeps hulls and their ropes out in the first place)
+      return !hit;   // [ship]
+    });   // [ship]
+    if (out.rows) out.rows = out.rows.filter(({ boat }) => out.boats.includes(boat));   // [ship]
+  }   // [ship]
   for (const b of out.boats) out.perches.push(...b.perches);
   out.stats.boats = out.boats.length; out.stats.boatsMs = Math.round(performance.now() - t0);
 

@@ -1,0 +1,280 @@
+{
+ "date": "2026-10-04T05:20:21.453Z",
+ "mpp": 0.1226,
+ "runs": [
+  {
+   "livery": "nendo",
+   "tier": "high",
+   "info": {
+    "livery": "nendo",
+    "error": null,
+    "tier": "high",
+    "triangles": 22946,
+    "anchors": {
+     "mastTop": [
+      0,
+      20.7,
+      -13.499999999999996
+     ],
+     "gangwayStbd": [
+      -4.6,
+      3,
+      2.8000000000000007
+     ]
+    }
+   },
+   "sides": {
+    "port": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.8635,
+      "silhouetteIoUalpha": 0.8468,
+      "photoLiveryIoU": {
+       "black": 0.46,
+       "red": 0.6206
+      }
+     }
+    },
+    "starboard": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.7334,
+      "silhouetteIoUalpha": 0.7131,
+      "photoLiveryIoU": {
+       "black": 0.1169,
+       "red": 0.0872
+      }
+     },
+     "fitted": {
+      "mpp": 0.1265658747300216,
+      "silhouetteIoU": 0.7383,
+      "silhouetteIoUalpha": 0.7125,
+      "photoLiveryIoU": {
+       "black": 0.0938,
+       "red": 0.0395
+      }
+     }
+    }
+   },
+   "tracedIoU": {
+    "port": {
+     "black": 0.7032699619771863,
+     "red": 0.8
+    },
+    "starboard": {
+     "black": 0,
+     "red": 0.1711340206185567
+    }
+   },
+   "wcpfcIoU": {
+    "fwdOf44": {
+     "black": 0.2974,
+     "red": 0.7496
+    },
+    "aftOf44": {
+     "black": 0.23,
+     "red": 0.1279
+    },
+    "all": {
+     "black": 0.2699,
+     "red": 0.6208
+    }
+   },
+   "pageErrors": [
+    {
+     "type": "log-error",
+     "text": "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:8975/favicon.ico"
+    }
+   ]
+  },
+  {
+   "livery": "nendo",
+   "tier": "phone",
+   "info": {
+    "livery": "nendo",
+    "error": null,
+    "tier": "phone",
+    "triangles": 10906,
+    "anchors": {
+     "mastTop": [
+      0,
+      20.7,
+      -13.499999999999996
+     ],
+     "gangwayStbd": [
+      -4.6,
+      3,
+      2.8000000000000007
+     ]
+    }
+   },
+   "sides": {
+    "port": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.8615,
+      "silhouetteIoUalpha": 0.8397,
+      "photoLiveryIoU": {
+       "black": 0.4658,
+       "red": 0.6248
+      }
+     }
+    },
+    "starboard": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.7225,
+      "silhouetteIoUalpha": 0.7039,
+      "photoLiveryIoU": {
+       "black": 0.119,
+       "red": 0.0877
+      }
+     },
+     "fitted": {
+      "mpp": 0.1265658747300216,
+      "silhouetteIoU": 0.727,
+      "silhouetteIoUalpha": 0.7033,
+      "photoLiveryIoU": {
+       "black": 0.0968,
+       "red": 0.0397
+      }
+     }
+    }
+   },
+   "tracedIoU": {
+    "port": {
+     "black": 0.7032699619771863,
+     "red": 0.8
+    },
+    "starboard": {
+     "black": 0,
+     "red": 0.1711340206185567
+    }
+   },
+   "wcpfcIoU": {
+    "fwdOf44": {
+     "black": 0.2974,
+     "red": 0.7496
+    },
+    "aftOf44": {
+     "black": 0.23,
+     "red": 0.1279
+    },
+    "all": {
+     "black": 0.2699,
+     "red": 0.6208
+    }
+   }
+  },
+  {
+   "livery": "fallback",
+   "tier": "high",
+   "info": {
+    "livery": "fallback",
+    "error": null,
+    "tier": "high",
+    "triangles": 22942,
+    "anchors": {
+     "mastTop": [
+      0,
+      20.7,
+      -13.499999999999996
+     ],
+     "gangwayStbd": [
+      -4.6,
+      3,
+      2.8000000000000007
+     ]
+    }
+   },
+   "sides": {
+    "port": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.8635,
+      "silhouetteIoUalpha": 0.8468,
+      "photoLiveryIoU": {
+       "black": 0.0462,
+       "red": 0
+      }
+     }
+    },
+    "starboard": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.7334,
+      "silhouetteIoUalpha": 0.7131,
+      "photoLiveryIoU": {
+       "black": 0.0532,
+       "red": 0
+      }
+     },
+     "fitted": {
+      "mpp": 0.1265658747300216,
+      "silhouetteIoU": 0.7384,
+      "silhouetteIoUalpha": 0.7125,
+      "photoLiveryIoU": {
+       "black": 0.061,
+       "red": 0
+      }
+     }
+    }
+   }
+  },
+  {
+   "livery": "fallback",
+   "tier": "phone",
+   "info": {
+    "livery": "fallback",
+    "error": null,
+    "tier": "phone",
+    "triangles": 10902,
+    "anchors": {
+     "mastTop": [
+      0,
+      20.7,
+      -13.499999999999996
+     ],
+     "gangwayStbd": [
+      -4.6,
+      3,
+      2.8000000000000007
+     ]
+    }
+   },
+   "sides": {
+    "port": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.8615,
+      "silhouetteIoUalpha": 0.8397,
+      "photoLiveryIoU": {
+       "black": 0.0462,
+       "red": 0
+      }
+     }
+    },
+    "starboard": {
+     "strict": {
+      "mpp": 0.1226,
+      "silhouetteIoU": 0.7225,
+      "silhouetteIoUalpha": 0.7039,
+      "photoLiveryIoU": {
+       "black": 0.0553,
+       "red": 0
+      }
+     },
+     "fitted": {
+      "mpp": 0.1265658747300216,
+      "silhouetteIoU": 0.727,
+      "silhouetteIoUalpha": 0.7033,
+      "photoLiveryIoU": {
+       "black": 0.0645,
+       "red": 0
+      }
+     }
+    }
+   }
+  }
+ ]
+}
