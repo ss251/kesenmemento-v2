@@ -199,10 +199,10 @@ search. Selecting it flies the drone to the site, pins its label and opens a sto
 
 | Real (sourced) | Stylised (the game's choice) |
 |---|---|
-| The site, 波怒棄館遺跡, a 貝塚 on a hilltop overlooking 広田湾 (Nikkei 2013-05-20) | The pin's position: it stands at lat 38.958, lon 141.627, near where 荒谷前 meets Route 45, to within about 300 m (the card says so): an estimate from the address, not a surveyed point |
+| The site, 波怒棄館遺跡, a 貝塚 on a hilltop overlooking 広田湾 (Nikkei 2013-05-20) | The pin's position: it is placed at lat 38.958, lon 141.627, inside the 荒谷前 district. No source publishes the exact spot, and 荒谷前 is a district about 1 km or more across (the GSI reverse geocoder gives 荒谷前 within about ±300 m of that point and a different district about 1 km out), so `accuracyM` is 1000 and the card says "the exact spot is not published, up to about 1 km". An estimate from the address, not a surveyed point |
 | Its age: early Jōmon, about 5,500 years ago | The wooden 説明板 model, its roof and its lettering: invented. No source shows a real signboard at the site, and the area was a housing-relocation dig |
 | The bones: more than 140 kg of tuna bones (press reports; Usui's talk); fish over 2 m; stone blades stuck in some bones | The drone framing (the sea on the far side of the board) |
-| A possible butchering site (the press, as a "may have been") | |
+| A possible butchering site (the press, as a "may have been"); the card's last line says only that tuna were butchered here about 5,500 years ago, and claims no continuity since | |
 | The address: 気仙沼市唐桑町荒谷前 (the prefecture's 2013 dig list; the GSI reverse geocode of 38.958, 141.627 returns 唐桑町荒谷前) | |
 
 The pin's strings carry no disaster framing, and `ship-story` tests that.
@@ -228,6 +228,23 @@ The pin's strings carry no disaster framing, and `ship-story` tests that.
 - MSC (the facts panel's 「2020年、大西洋クロマグロで初めてMSC認証」): the MSC Japan press release of 2020-08-13,
   <https://www.msc.org/jp/what-you-can-do/media-centre/press-releases/200813>, and
   <https://www.usufuku.jp/msc_cert.html>. Neither the dossier nor `next-pass-usui.md` has this line.
+- みなと新聞 2020-09-01 (<https://www.minato-yamaguchi.co.jp/minato/e-minato/articles/104423>): the first MSC-certified
+  frozen Atlantic bluefin at the Toyosu auction, one 142 kg GG fish at ¥6,800/kg, 「キロ3000円（約2倍）高い」, that is about
+  ¥3,000/kg above the usual price. It is one auction, not a standing price; the reefer card says so. (The dossier cites a
+  Sustainable Brands interview for "¥6,800 against about ¥3,000"; that source could not be opened, so it is not used,
+  and this article reads the ¥3,000 as the premium.)
+- The captain's dossier and slides for the other in-app facts: about 45 days' leave (usufuku.jp), the bases Kesennuma,
+  Cape Town and Las Palmas (3, 3 and 1 of the 7 ships before the 2026 retirement; Usui's talk), Good Design Award 2020 and
+  Ship of the Year 2020 (slide, JASNAOE), Starlink as "日本船初" (the slide's words).
+- 10 October as まぐろの日: set by the 日本かつお・まぐろ漁業協同組合 in 1986, after Yamabe no Akahito's poem of 10 October
+  726 (<https://prtimes.jp/magazine/today/tuna-day/>, <https://www.kngyoren.com/pages/265/>). The dossier never states it.
+- ICCAT Rec. 22-08 (<https://www.iccat.int/Documents/Recs/compendiopdf-e/2022-08-e.pdf>) and the bluefin catch
+  document (BCD / eBCD): the tags and the quota are for bluefin only. Bigeye and albacore are other species, so the game
+  does not tag them or count them against the quota. Usui's item says "every fish is tagged", which the game does not
+  contradict for bluefin; the tag and quota rule for other species is not claimed.
+- 気仙沼観光, the saury fleet's 大型サンマ漁船一斉出漁 event page (<https://kesennuma-kanko.jp/sanma-defune2024>): the
+  ceremony at the コの字岸壁 in 魚浜町 and the departure at the 港町出港岸壁; and a 2024-03-15 report of 第一昭福丸 at the
+  コの字岸壁 (<https://shintomisushi.com/blog/21997/>). The berth is inferred from these.
 - The story pin (section 9b): 日本経済新聞 2013-05-20 「縄文期のマグロ解体場か」
   (<https://www.nikkei.com/article/DGXNASDG17039_Q3A520C1CR0000/>: 広田湾を望む高台, about 5,500 years ago, fish over
   2 m); 共同通信 2013-05-17 via 四国新聞 (<https://www.shikoku-np.co.jp/national/culture_entertainment/print.aspx?id=20130517000543>:

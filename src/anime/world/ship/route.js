@@ -15,8 +15,10 @@
 //     "気仙沼港（出漁準備岸壁）", whose address is 港町～魚市場前 (jl-db.nfaj.go.jp/location/040100784): the long quay
 //     north of the fish market where the longliners lie stern-to (harbor/rows.js 'market-north'). That is the 出漁準備
 //     岸壁, not the コの字岸壁.
-//   - 気仙沼観光 (kesennuma-kanko.jp/sanma-defune2024) names the send-off venue "気仙沼市魚浜町コの字岸壁（セレモニー
-//     会場）・港町出港岸壁": the ceremony quay is in 魚浜町, a separate place from 港町.
+//   - 気仙沼観光 (kesennuma-kanko.jp/sanma-defune2024) names, for the saury fleet's 大型サンマ漁船一斉出漁 event, the ceremony
+//     venue "気仙沼市魚浜町コの字岸壁（セレモニー会場）" and, separately, the departure quay "港町出港岸壁": the ceremony quay is in
+//     魚浜町, a separate place from 港町. A blog report (shintomisushi.com/blog/21997, 2024-03-15) has 第一昭福丸 at the コの字岸壁.
+//     The berth is inferred from this; it is not stated for her.
 //   - The GSI aerial (data/ortho/core.jpg, seamlessphoto z18, measured on a 10 m grid) shows, at the OSM node, a
 //     rectangular reclaimed pier (corners ~ (450,-184) NW, (588,-148) NE, (550,-54) SE, (430,-106) SW) whose north, east
 //     and south faces are all berths with ships alongside: a quay shaped like コ. The OSM viewpoint is on that pier.

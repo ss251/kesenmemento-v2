@@ -102,7 +102,7 @@ list under its own group 「まちの物語」, flies the drone there and opens 
 `src/anime/world/explore/storypins.js`, `data/ship/story-pins.json`, `test/ship-story.test.js` (13 tests), the shot
 `acts_ui_story`; the hook is `window.__story.open('story-hanukidate')`. Real: the site, its age, the bones, fish over
 2 m, the stone blades, the possible butchering site and the 唐桑町荒谷前 address. Stylised: the pin's position (an
-estimate, within about 300 m), the wooden 説明板 model with its roof and lettering (invented; no source shows a signboard
+estimate: the exact spot is not published, so up to about 1 km off, inside the 荒谷前 district), the wooden 説明板 model with its roof and lettering (invented; no source shows a signboard
 there), and the drone framing. Details and sources: [SHOFUKUMARU.md](SHOFUKUMARU.md) section 9b and section 10.
 
 ## Phone tier
@@ -236,7 +236,7 @@ profile and the beam, the crowd size and tape lengths, the order and weights of 
 (the HUD clock runs 05:30 → 10:00 over the set and on from 10:00 through the soak; the sky sits at 11:00 for the soak
 and 16:12 for the haul), the floodlight pools of the night haul, and the
 chain cards as flat illustrations (the Shimizu vignette's figures, 富士山 and numbered badges), the in-game declared-versus-weighed
-check, the story pin's ±300 m position, its 説明板 model and the drone framing, and the tow-assist. Details:
+check, the story pin's position (inside 荒谷前, up to about 1 km off), its 説明板 model and the drone framing, and the tow-assist. Details:
 [MODEL.md](MODEL.md) and [acts.md](acts.md).
 
 ## Deviations
@@ -252,7 +252,7 @@ check, the story pin's ±300 m position, its 説明板 model and the drone frami
 | e | Bridge roof ≈ 10.9 (§3) | Roof 10.0, rail top 10.9 | The build | The 10.9 m the dossier reads is the top of the roof railing on 02; the roof deck is 0.9 m under it. |
 | f | Usufuku crest "on the front" of the funnel (§3) | On both side faces of the funnel | The build | designboom-1800 shows the 違い山星一 crest on the funnel's side face. |
 | g | Starboard livery traced on 03 (§4): X1 at s 17–21, X2 band at s 40.4–42.0, bow wedge s 0.1–6.8 | 03 trace re-mapped through measured anchors; X1 red s 9.2–16.1 on the sheer, vertex (12.7, 1.85), black s 10.5–14.5; X2 band from s 37.1–38.5 at the sheer to 40.5–42.4, black foot 40.6–42.4; bow wedge s −0.6–3.3; hull name s 5.4–8.9 | The build | 03 is a three-quarter view traced at one uniform 0.1266 m/px, which stretches the near bow (the foremast reads 16.6 m, not 14.2). The X1/X2 positions come from the WCPFC photo of the real ship through a projective fit on six anchors (residuals ≤ 0.7 m). Scores above. |
-| h | コの字岸壁 at 38.901 N, 141.580 E (§6, the fishery DB point of the 出漁準備岸壁) | The 魚浜町 pier's east face | The build | That coordinate is the 港町 出漁準備岸壁 north of the market, a different quay. The つばき会 page names the venue 「気仙沼市魚浜町コの字岸壁（セレモニー会場）・港町出港岸壁」; `route.js` holds the evidence. The §6 point was deliberately not used. |
+| h | コの字岸壁 at 38.901 N, 141.580 E (§6, the fishery DB point of the 出漁準備岸壁) | The 魚浜町 pier's east face | The build, inferred (not settled) | That coordinate is the 港町 出漁準備岸壁 north of the market, a different quay. The evidence is 気仙沼観光's page <https://kesennuma-kanko.jp/sanma-defune2024> (not the つばき会 page, which names no venue). It is the report of the saury fleet's 大型サンマ漁船一斉出漁 event, and it names two quays: the ceremony at 「気仙沼市魚浜町コの字岸壁（セレモニー会場）」 and the departure at 「港町出港岸壁」, which also supports the dossier's 38.901 N 141.580 E point as a different quay. So the berth is inferred from the ceremony venue; a blog report of 第一昭福丸 at the コの字岸壁 on 2024-03-15 after her return (<https://shintomisushi.com/blog/21997/>) supports it. `route.js` holds the evidence. The §6 point was deliberately not used. |
 | i | "The quota bar is the ship's share" (§5); the dossier gives no figure | The bar is about 80 t, 「大臣からこの船1隻への配分 約80t（臼井社長, 2026-10-03）」, with this set's catch as a slice (fix round 1 showed a 900 kg per-set game allowance), and the context line: about 3,700 t for Japan (3,779 t of 43,296 t, 8.7%) shared by about 100 boats, 48 on Atlantic bluefin | The build, per [next-pass-usui.md](next-pass-usui.md) item 2 | The figure is the captain's product-safe note of Usui's public talk, marked ⚠, so it is shown as "about". It fits the 76.3 t MSC catch of 2024. `RULES.shipShareKg` and the label are the two places to change. |
 | j | Starboard livery traced on 03 aft of the circle: a black triangle at s 52.3–54.8, h 5.3–7.3 | The real ship's triangle (WCPFC): top on the sheer s 51.5–54.3, apex (52.2, 2.85), its diagonal to the circle's foot; painted over the circle's disc | The build | The WCPFC photo (x 203–302, y 683–802): the triangle runs 63 % of the side below the sheer. Aft of the radar mast the fit compresses s: at the local vertical scale the top would be 3.6 m wide, not 2.8 m (port counterpart 4.2 m). |
 
@@ -262,8 +262,8 @@ Aft of the radar mast the WCPFC anchors are centreline masts and a rounded stern
 
 ### Other choices
 
-- **The berth** is the 魚浜町 pier's east face (the send-off ceremony venue), not the fishery-database point north of
-  the market; the evidence is in `route.js`.
+- **The berth** is the 魚浜町 pier's east face, inferred from the ceremony venue named on 気仙沼観光's saury-fleet send-off
+  page (deviation h), not the fishery-database point north of the market; the evidence is in `route.js`.
 - **The homecoming** brings her in bow first and lays her port side to the same berth (the send-off has her starboard
   side to it, bow out). This avoids turning a 58.6 m ship end for end in the basin on screen.
 - **The haul at night** adds floodlight pools at the 舷門 (hauling often runs to midnight); the cel materials take no
