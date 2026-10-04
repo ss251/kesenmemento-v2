@@ -1,6 +1,7 @@
 // Ported from Sakuragaoka Station (Kenton-GMI/sakuragaoka-station, MIT; see src/anime/LICENSE-sakuragaoka-station).
 // First-person walker: pointer-lock mouse look (drag-look fallback), WASD / arrows, Shift run,
-// Space jump, F fly (noclip), touch joystick + drag look on phones.
+// Space jump, F fly (noclip). Touch (the floating stick, the drag look, the jump / fly buttons) lives in ui/touchpad.js:
+// the player consumes pad.move, pad.takeLook() and the pad's jump / fly / land events (attachPad).
 import * as THREE from 'three';
 import { STEP_HEIGHT } from './physics.js';
 
@@ -22,10 +23,29 @@ export class Player {
     this.keys = new Set();
     this.bob = 0; this.smoothY = null;
     this.look = { dx: 0, dy: 0 };
-    this.touchMove = new THREE.Vector2();
+    this._touchMove = new THREE.Vector2();   // the stick when there is no pad (tests, the ship branch's fallback)
+    this.pad = null; this.lookSink = null;
     this.distance = 0;
     this._bind();
   }
+
+  /** Backward compatible: the touch stick as a Vector2 (x right, y down, length 0..1). The pad's when it is attached. */
+  get touchMove() { return this.pad ? this.pad.move : this._touchMove; }
+  set touchMove(v) { this._touchMove.copy(v); }
+
+  /** Take the touch pad's input: its stick, its look deltas and the jump / fly / land buttons. */
+  attachPad(pad) {
+    this.pad = pad;
+    pad?.on?.((e) => {
+      if (e.type !== 'action') return;
+      if (e.id === 'jump') this.jump();
+      else if (e.id === 'fly') { this.fly = true; this.vy = 0; this.onGround = false; }
+      else if (e.id === 'land') this.fly = false;
+    });
+    return this;
+  }
+  /** A jump from the ground (the Space key's one). */
+  jump() { if (this.enabled && this.onGround && !this.fly) { this.vy = 4.2; return true; } return false; }
 
   _bind() {
     const d = this.dom;
@@ -46,23 +66,6 @@ export class Player {
       if (document.pointerLockElement === d) { this.look.dx += e.movementX; this.look.dy += e.movementY; }
       else if (dragging) { this.look.dx += (e.clientX - lx) * 1.4; this.look.dy += (e.clientY - ly) * 1.4; lx = e.clientX; ly = e.clientY; }
     });
-    // touch: left half = move stick, right half = look
-    const touches = new Map();
-    d.addEventListener('touchstart', (e) => {
-      for (const t of e.changedTouches) touches.set(t.identifier, { x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY, left: t.clientX < innerWidth * 0.45 });
-      e.preventDefault();
-    }, { passive: false });
-    d.addEventListener('touchmove', (e) => {
-      for (const t of e.changedTouches) {
-        const s = touches.get(t.identifier); if (!s) continue;
-        if (s.left) { this.touchMove.set((t.clientX - s.x0) / 60, (t.clientY - s.y0) / 60).clampLength(0, 1); }
-        else { this.look.dx += (t.clientX - s.x) * 2.2; this.look.dy += (t.clientY - s.y) * 2.2; }
-        s.x = t.clientX; s.y = t.clientY;
-      }
-      e.preventDefault();
-    }, { passive: false });
-    const end = (e) => { for (const t of e.changedTouches) { const s = touches.get(t.identifier); if (s && s.left) this.touchMove.set(0, 0); touches.delete(t.identifier); } };
-    d.addEventListener('touchend', end); d.addEventListener('touchcancel', end);
   }
 
   requestLock() { try { const p = this.dom.requestPointerLock?.(); if (p && p.catch) p.catch(() => {}); } catch (e) { /* drag-look fallback */ } }
@@ -85,6 +88,10 @@ export class Player {
     dt = Math.min(dt, this.fly ? 0.1 : 0.05);
     const sens = 0.0022;
     this.yaw -= this.look.dx * sens; this.pitch -= this.look.dy * sens; this.look.dx = this.look.dy = 0;
+    if (this.pad) {   // the pad's drag look, already in radians and smoothed; the car's chase camera takes it while driving (lookSink)
+      const l = this.pad.takeLook(dt);
+      if (this.lookSink) this.lookSink(l.dx, l.dy); else { this.yaw -= l.dx; this.pitch -= l.dy; }
+    }
     this.pitch = THREE.MathUtils.clamp(this.pitch, -85 * DEG, 85 * DEG);
     const k = this.keys;
     let f = 0, s = 0, u = 0;
@@ -96,8 +103,11 @@ export class Player {
       if (k.has('KeyE') || k.has('Space')) u += 1;
       if (k.has('KeyQ') || k.has('ControlLeft')) u -= 1;
       f -= this.touchMove.y; s += this.touchMove.x;
+      if (this.pad) u += this.pad.vertical;   // 上昇 / 下降 (fly)
     }
-    const running = k.has('ShiftLeft') || k.has('ShiftRight') || this.touchMove.length() > 0.95;
+    // Shift, or the stick pushed past 85 % (RUN), the ダッシュ toggle on foot, 加速 in flight
+    const running = k.has('ShiftLeft') || k.has('ShiftRight') || (!this.pad && this.touchMove.length() > 0.95)
+      || (!!this.pad && (this.pad.running || (this.fly ? this.pad.boost : this.pad.dash && this.touchMove.lengthSq() > 0)));
     // [v4:polish3] fly: 25 m/s, Shift 70 m/s (a 5 km city; walk x 2.6 was 8 m/s)
     let speed = this.fly ? (running ? FLY_RUN : FLY) : (running ? this.run : this.walk);
     const fx = -Math.sin(this.yaw), fz = -Math.cos(this.yaw); // forward

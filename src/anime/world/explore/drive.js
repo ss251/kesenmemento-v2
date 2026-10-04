@@ -5,10 +5,12 @@
 // when you are not steering. Chase camera behind the car; the mouse (or a drag) orbits it.
 //
 // Keys: C enter / leave the car. W / S or the arrows: accelerate, brake and reverse; A / D steer; Space handbrake;
-// Shift: faster (60 km/h instead of 40). Touch: the left stick drives, a drag on the right looks around.
+// Shift: faster (60 km/h instead of 40). Touch (ui/touchpad.js): the stick steers and throttles (past 85 % = boost),
+// ブレーキ holds the handbrake, ブースト boosts, 降りる gets out, and a drag on the right orbits the chase camera.
 //
 //   const drive = createDrive(ctx, { net })   drive.enter() / drive.exit() / drive.toggle() / drive.active
 //   drive.state -> { x, z, y, yaw, speed (m/s), kmh, road }   drive.focus() -> streaming focus ahead of the car
+//   drive.canEnter(r = 14) -> is there a road within r metres of the player (the touch pad's 乗る button)
 import * as THREE from 'three';
 import { makeKeiCar } from '../town/sakura/vehicles_cars.js';
 
@@ -86,6 +88,17 @@ export function createDrive(ctx, { net }) {
     return Math.max(g, L.heightAt(x, z)) + 0.1;   // streets are laid ~0.1 m over the terrain
   }
 
+  /** The touch pad's drag look while driving: the same orbit the mouse gives (radians in, a little less pitch). */
+  function padLook(dx, dy) {
+    if (!state.active || (!dx && !dy)) return;
+    orbit.yaw -= dx * 0.9; orbit.pitch = Math.max(-0.7, Math.min(0.25, orbit.pitch - dy * 0.7)); orbit.back = 2.5;
+  }
+  /** Is there a road (the car's spawn) within r metres of where the player stands? */
+  function canEnter(r = 14) {
+    const p = ctx.playerObj?.pos || cam.position;
+    const n = net.nearest(p.x, p.z, r);
+    return !!n && Math.hypot(n.x - p.x, n.z - p.z) <= r;
+  }
   function enter(at = null) {
     const p = at || ctx.playerObj?.pos || cam.position;
     const yaw = at?.yaw ?? ctx.playerObj?.yaw ?? 0;
@@ -97,7 +110,7 @@ export function createDrive(ctx, { net }) {
     orbit.yaw = 0; orbit.pitch = -0.18; camInit = false;
     car.visible = true;
     const pl = ctx.playerObj;
-    if (pl) { pl.enabled = false; pl.fly = true; }
+    if (pl) { pl.enabled = false; pl.fly = true; pl.lookSink = padLook; }   // touch look orbits the chase camera
     ctx.services.life?.tour?.stop?.();
     place(0);
     emit();
@@ -108,6 +121,7 @@ export function createDrive(ctx, { net }) {
     state.active = false;
     if (car) car.visible = false;
     const pl = ctx.playerObj;
+    if (pl) pl.lookSink = null;
     // step out on the kerb side (left of the car), facing the way the car faced
     const lx = -Math.cos(state.yaw), lz = Math.sin(state.yaw);
     let ox = state.x + lx * 1.9, oz = state.z + lz * 1.9;
@@ -119,8 +133,8 @@ export function createDrive(ctx, { net }) {
   function emit() { for (const f of listeners) try { f(api); } catch (e) { console.error(e); } }
 
   function readInput() {
-    const k = keys, pl = ctx.playerObj;
-    const t = pl?.touchMove || { x: 0, y: 0 };
+    const k = keys, pl = ctx.playerObj, pad = ctx.pad;
+    const t = pad?.move || pl?.touchMove || { x: 0, y: 0 };
     let th = 0, st = 0;
     if (k.has('KeyW') || k.has('ArrowUp')) th += 1;
     if (k.has('KeyS') || k.has('ArrowDown')) th -= 1;
@@ -128,7 +142,9 @@ export function createDrive(ctx, { net }) {
     if (k.has('KeyD') || k.has('ArrowRight')) st += 1;
     th -= t.y; st += t.x;
     input.throttle = Math.max(-1, Math.min(1, th)); input.steer = Math.max(-1, Math.min(1, st));
-    input.brake = k.has('Space'); input.boost = k.has('ShiftLeft') || k.has('ShiftRight');
+    input.brake = k.has('Space') || !!pad?.brake;
+    // boost: Shift, the ブースト button, or the stick pushed forward past 85 %
+    input.boost = k.has('ShiftLeft') || k.has('ShiftRight') || !!pad?.boost || (!!pad?.running && t.y < -0.3);
     // lane assist: no steering input and moving: ease the heading onto the road ahead
     input.assist = Math.abs(st) < 0.05 && Math.abs(state.speed) > 1.2;
   }
@@ -229,7 +245,7 @@ export function createDrive(ctx, { net }) {
   });
 
   const api = {
-    enter, exit, toggle, update, focus, place,
+    enter, exit, toggle, update, focus, place, canEnter,
     get active() { return state.active; }, state,
     get kmh() { return Math.abs(state.speed) * 3.6; },
     get car() { return car; },

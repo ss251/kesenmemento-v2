@@ -9,6 +9,7 @@ import { createContext } from './core/ctx.js';
 import { createRenderPipeline } from './core/renderer.js';
 import { createSky } from './core/sky.js';
 import { Player } from './core/player.js';
+import { createTouchpad } from './ui/touchpad.js';   // [v7:pad] floating stick, look, context buttons
 import { batchStatic } from './core/batch.js';
 import { batchStatic as batchStatic2, ATLAS } from './core/batch2.js';
 import { createAudio } from './core/audio.js';
@@ -221,6 +222,9 @@ async function build() {
 // ------------------------------------------------------------------ player / cameras
 const player = new Player(camera, canvas, ctx.physics, L.WORLD.play);
 ctx.playerObj = player;
+// [v7:pad] touch: the pad owns the canvas's touches (docs/MOBILE-PAD.md); ?touch=1 forces it on (desktop testing), ?touch=0 off
+const pad = createTouchpad({ canvas, ctx, player });
+ctx.pad = pad; player.attachPad(pad); window.__pad = pad;
 const DEG = 180 / Math.PI;
 /** Free camera at pos looking at a point (drone). */
 function lookAt(pos, look) {

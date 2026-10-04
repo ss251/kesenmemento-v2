@@ -10,6 +10,7 @@ export async function takePhoto(ctx, T, o = {}) {
   const { w: W, h: H } = photoSize(o.scale ?? 1);
   const aspect0 = cam.aspect;
   let url = null, blob = null;
+  document.body.classList.add('klc-photo');   // [v7:pad] the touch pad steps aside while the photo is taken
   try {
     r.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix();
     pipe.setSize(W, H, 1); ctx.wires?.setResolution?.(pipe.size.x, pipe.size.y);
@@ -19,6 +20,7 @@ export async function takePhoto(ctx, T, o = {}) {
     if (o.data || !r.domElement.toBlob) url = r.domElement.toDataURL('image/png');
     else blob = await new Promise((res) => r.domElement.toBlob(res, 'image/png'));
   } finally {
+    document.body.classList.remove('klc-photo');
     cam.aspect = aspect0; cam.updateProjectionMatrix();
     dispatchEvent(new Event('resize'));
   }
