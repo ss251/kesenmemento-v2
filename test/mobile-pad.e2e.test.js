@@ -224,6 +224,7 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
   });
 
   T("B1: a thumb that lands on the places strip or the dock still gets the stick or the look; a quick tap still reaches the panel", async () => {
+    await setMode('walk');   // (an earlier failure must not leave the car or the flight on)
     await page.eval("window.__camSpec('walk')"); await settle(900);
     const pl = await center(page, '#klc-ui .places'), dk = await center(page, '#klc-ui .dock');
     expect(pl).not.toBeNull(); expect(dk).not.toBeNull();
@@ -248,18 +249,18 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     const e1 = await gameState(page);
     const deg = Math.abs(dAngle(e0.yaw, e1.yaw)) * 180 / Math.PI;
     expect(deg).toBeGreaterThan(70); expect(deg).toBeLessThan(100);
-    // 4. a quick tap on the panel still works: the places header folds / unfolds the strip
-    const hd = await center(page, '#klc-ui .places .ph');
-    const open0 = await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')");
-    await f.tap(hd.x, hd.y); await hold(500);
-    const open1 = await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')");
-    expect(open1).not.toBe(open0);
-    await f.tap(hd.x, hd.y); await hold(500);
-    expect(await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')")).toBe(open0);
-    // 5. a drag that starts on a panel does not click it
-    const hd2 = await center(page, '#klc-ui .places .ph');
-    await f.down1(1, hd2.x, hd2.y); await f.drag(1, hd2.x, hd2.y - 60, 6); await f.up(1); await hold(400);
-    expect(await page.eval("document.querySelector('#klc-ui .places .ph').getAttribute('aria-expanded')")).toBe(open0);
+    // 4. a quick tap on the panel still works: a time-of-day button on the dock presses
+    const presets = await page.eval("[...document.querySelectorAll('#klc-ui .dock .seg button[data-act=\"preset\"]')].map((b) => ({ id: b.dataset.id, on: b.getAttribute('aria-pressed') === 'true' }))");
+    const idle = presets.filter((p) => !p.on).map((p) => p.id);
+    expect(idle.length).toBeGreaterThan(2);
+    const pressed = (id) => page.eval(`document.querySelector('#klc-ui .dock button[data-id="${id}"]').getAttribute('aria-pressed') === 'true'`);
+    const t1 = await center(page, `#klc-ui .dock button[data-id="${idle[0]}"]`);
+    await f.tap(t1.x, t1.y); await hold(600);
+    expect(await pressed(idle[0])).toBe(true);
+    // 5. a drag that starts on a panel button does not click it (it is the stick or the look)
+    const t2 = await center(page, `#klc-ui .dock button[data-id="${idle[1]}"]`);
+    await f.down1(1, t2.x, t2.y); await f.drag(1, t2.x, t2.y - 60, 6); await f.up(1); await hold(500);
+    expect(await pressed(idle[1])).toBe(false);
   });
 
   const MODES = ["walk", "fly", "drive"];
