@@ -446,6 +446,15 @@ describe("ship: Usui's talk, 2026-10-03 (next-pass-usui.md items 1-4, 6, 7)", ()
     expect([RULES.japanBoats, RULES.japanBluefinBoats]).toEqual([100, 48]);
     expect(japanSharePct()).toBe("8.7");
   });
+  test("the reefer card's price is one 2020 Toyosu auction, with ¥3,000/kg as the premium, not the regular price", () => {
+    const en = D.en["ship.chain.reefer.fact"], ja = D.ja["ship.chain.reefer.fact"];
+    expect(en).toContain("In 2020"); expect(en).toContain("¥6,800/kg"); expect(en).toContain("Toyosu auction");
+    expect(en).toContain("about ¥3,000/kg above the usual price"); expect(en).toContain("2020-09-01");
+    expect(en).not.toMatch(/sells for|regular grade/);
+    expect(ja).toContain("2020年"); expect(ja).toContain("6,800円"); expect(ja).toContain("豊洲の競り");
+    expect(ja).toContain("通常より約3,000円高い"); expect(ja).toContain("2020年9月1日");
+    expect(ja).not.toContain("通常品は約3,000円");
+  });
   test("item 3: Act 3 runs Las Palmas, reefer, the Shimizu inspection steps in order, home, card", () => {
     expect(SHIMIZU_STEPS).toEqual(["inspectors", "chip", "sticker", "truck", "rule"]);
     const M = driveTo("SHIMIZU_WEIGH");
