@@ -34,6 +34,12 @@ describe("story pins: data", () => {
     expect(en).toContain("5,500 years ago"); expect(en).toContain("early Jōmon"); expect(en).toContain("more than 140 kg");
     expect(en).toContain("over 2 m"); expect(en).toContain("stone blades"); expect(en).toContain("may have been a place where tuna were butchered");
   });
+  test("the third paragraph claims no 5,500-year continuity: tuna were butchered at the site about 5,500 years ago", () => {
+    const ja = pin.story.ja, en = pin.story.en;
+    expect(ja[2]).toBe("約5500年前、この地ですでにマグロが解体されていました。");
+    expect(en[2]).toBe("People were already butchering tuna here about 5,500 years ago.");
+    expect(JSON.stringify(pin.story)).not.toMatch(/lived with tuna|とともに暮らして/);
+  });
   test("no disaster framing anywhere in the pins' strings or sources", () => {
     expect(/震災|津波|防災|被災|東日本大震災|tsunami|disaster|遺構/i.test(JSON.stringify(STORY))).toBe(false);
   });
@@ -43,8 +49,13 @@ describe("story pins: data", () => {
     expect(urls).toContain("nikkei.com");
     expect(urls).toContain("gsi.go.jp");
     expect(pin.where.ja).toContain("唐桑町荒谷前");
-    expect(pin.accuracyM).toBeLessThanOrEqual(500);
-    // 荒谷前 meets 国道45号 by 唐桑大沢 (GSI reverse geocoder): 38.958 N, 141.627 E
+    // 荒谷前 is a district about 1 km or more across and no source publishes the spot: the pin is "in the district",
+    // with an error of up to about 1 km (the GSI reverse geocoder gives 荒谷前 at ±300 m of 38.958 N, 141.627 E and
+    // another district about 1 km out)
+    expect(pin.accuracyM).toBe(1000);
+    expect(pin.where.ja).toContain("約1km"); expect(pin.where.ja).toContain("公表されておらず");
+    expect(pin.where.en).toContain("up to about 1 km"); expect(pin.where.en).toContain("not published");
+    expect(JSON.stringify(pin.where)).not.toMatch(/300 ?m|300m|唐桑大沢|Ōsawa/);
     expect(pin.lat).toBeCloseTo(38.958, 3); expect(pin.lon).toBeCloseTo(141.627, 3);
   });
 });

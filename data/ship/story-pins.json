@@ -11,7 +11,7 @@
       "cat": "landmark",
       "lat": 38.958,
       "lon": 141.627,
-      "accuracyM": 300,
+      "accuracyM": 1000,
       "sign": { "title": "波怒棄館遺跡", "sub": "縄文時代前期・約5500年前" },
       "title": { "ja": "波怒棄館遺跡 — 5500年前のマグロ", "en": "Hanukidate site: tuna 5,500 years ago" },
       "kicker": { "ja": "唐桑町・縄文時代前期", "en": "Karakuwa, early Jōmon period" },
@@ -19,17 +19,17 @@
         "ja": [
           "約5500年前（縄文時代前期）、唐桑の高台にあった貝塚から、140kgを超えるマグロの骨が見つかりました。",
           "骨の大きさから、体長2mを超えるマグロもいたとみられます。石の刃が刺さったままの骨もあり、ここはマグロを解体する場所だったのかもしれません。",
-          "気仙沼の人びとは、5500年前からマグロとともに暮らしてきました。"
+          "約5500年前、この地ですでにマグロが解体されていました。"
         ],
         "en": [
           "About 5,500 years ago, in the early Jōmon period, people on a hilltop in Karakuwa left a shell midden holding more than 140 kg of tuna bones.",
           "Some came from fish over 2 m long. Some bones still have stone blades stuck in them: this may have been a place where tuna were butchered.",
-          "People in Kesennuma have lived with tuna for 5,500 years."
+          "People were already butchering tuna here about 5,500 years ago."
         ]
       },
       "where": {
-        "ja": "気仙沼市唐桑町荒谷前（国道45号沿い、岩手県境の近く）。ピンは荒谷前が国道45号に接する唐桑大沢付近で、誤差は約300m。",
-        "en": "Karakuwa-chō Araya-mae, Kesennuma, by Route 45 near the Iwate border. The pin stands where Araya-mae meets Route 45 by Karakuwa-Ōsawa, to within about 300 m."
+        "ja": "気仙沼市唐桑町荒谷前（国道45号沿い、岩手県境の近く）。ピンは荒谷前の地区内に置いています。正確な場所は公表されておらず、誤差は最大で約1km。",
+        "en": "Karakuwa-chō Araya-mae, Kesennuma, by Route 45 near the Iwate border. The pin is placed in the Araya-mae district; the exact spot is not published, so it may be off by up to about 1 km."
       },
       "sources": [
         { "label": "宮城県 2013年発掘調査情報（所在地: 気仙沼市唐桑町荒谷前、国道45号沿い）", "url": "https://www.pref.miyagi.jp/site/maizou/hakkutujyouhou.html" },
@@ -37,7 +37,7 @@
         { "label": "共同通信 2013-05-17（四国新聞掲載）「マグロ解体場か」（石器が刺さった骨）", "url": "https://www.shikoku-np.co.jp/national/culture_entertainment/print.aspx?id=20130517000543" },
         { "label": "気仙沼市教育委員会『波怒棄館遺跡』発掘調査報告書 2022（大沢B地区）", "url": "https://ci.nii.ac.jp/ncid/BC13429351" },
         { "label": "臼井壯太朗（臼福本店）Hackatsuon 2026-10-03 の講演（140kg超）", "url": null },
-        { "label": "国土地理院 逆ジオコーダ（荒谷前の範囲）", "url": "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress?lat=38.958&lon=141.627" }
+        { "label": "国土地理院 逆ジオコーダ（荒谷前の地区名の確認。約±300 mで荒谷前、約1 km離れると別の地区）", "url": "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress?lat=38.958&lon=141.627" }
       ]
     }
   ]
