@@ -135,6 +135,11 @@ env -u NODE_OPTIONS bun test test/ship-model.test.js test/ship-sail.test.js test
   test/ship-integrate.test.js test/ship-livery-paint.test.js test/ship-story.test.js test/v3-fix.test.js
 ```
 
+Counts measured 2026-10-04 (review pass 2): the seven files give 196 pass, 0 fail (`ship-model` 44, `ship-sail` 34,
+`ship-acts` 47, `ship-integrate` 17, `ship-livery-paint` 23, `ship-story` 14, `v3-fix` 17). The full `bun test` gives
+716 pass, 24 skip, 1 fail (the known `v4-explore` cache test; `data/buildings/city.json` exists only in the main repo),
+741 tests. The last fixes (`020c735` to `4d00990`) have had no reviewer pass after the round 3 verdict.
+
 | File | Covers |
 |---|---|
 | `ship-sail` | `boatStep` (inertia, astern, a tactical diameter of 3 to 4 LOA, rudder and yaw lag, purity and determinism); shore collision (500 random runs never bring a hull sample within 1 m of the shore, and she slides along a quay); OUTBOUND is water every 5 m and at least 40 m from the shore beyond the berth approach; かなえ大橋 is crossed between the pylons with at least 10 m above her 21 m air draft; the autopilot and its recovery, including lost off the line near the start (s 40–79, 150 m off: it steers toward the line) and the tow-assist (the mid-harbour pocket is cleared within 60 s; it never fires on a clean run or under the helm); AI boats giving way. |
