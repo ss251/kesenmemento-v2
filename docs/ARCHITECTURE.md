@@ -31,7 +31,7 @@ their credit headers, and the licence is at `src/anime/LICENSE-sakuragaoka-stati
 | `materials.js` | `ctx.mat.toon / decal / emissive / glass / foliage`, all cel materials. They are cached by their arguments, so equal materials batch together. At night, glass reflects a night sky and thins out. |
 | `ctx.js` | Builds the `ctx` object that every module receives: `kit`, `geo`, `wires`, `physics`, `tex`, `rng`, `shared` uniforms, `services`, `addStatic` / `add`, `onUpdate`. |
 | `batch.js`, `batch2.js` | Static batching. After every module has built, static meshes are merged by material into cells: 400 m near the inner bay and 2,000 m beyond (`BATCH` in `main.js`). Coarse cells won because the renderer is limited by draw calls. `renderer.js` then skips whole cells by distance each frame (beyond the outline range in the pre-pass, fogged out in the colour pass, and beyond 3.5 / 6 km on low / medium). |
-| `player.js`, `physics.js` | Walking and flying: pointer-lock look, WASD, run, jump, fly, touch sticks, and colliders against walk boxes and the terrain. The sea is a wall on foot: `physics.standable()` refuses a step onto the sea, in front of a quay face, or onto the low strip at a hard shore unless a deck (walk box) covers it, and the player slides along the edge. |
+| `player.js`, `physics.js` | Walking and flying: pointer-lock look, WASD, run, jump, fly, the touch pad's stick / look / jump / fly / land (`attachPad`; `player.touchMove` is kept as a getter), and colliders against walk boxes and the terrain. The sea is a wall on foot: `physics.standable()` refuses a step onto the sea, in front of a quay face, or onto the low strip at a hard shore unless a deck (walk box) covers it, and the player slides along the edge. |
 | `season.js` | `ctx.shared.uSeason` and `patchSnow()`, which puts winter snow on every surface that faces up. [v5:fix1] `?season=early` (`PRESETS.early`): 早春 without snow, bare broadleaf and dormant tan turf, the look of the Google Earth 2026-03-11 imagery for side-by-side comparisons (`uSeason.extra`: snow, dry). The default autumn keeps the 紅葉 tint to about 2 % of the crowns. |
 | `planet.js` | The tiny planet. It renders six 96° views (3° overlap on every side) through the real pipeline without vignette, light leak or bloom, with one fog density and one shadow box for all six, and folds them into a slowly turning stereographic world. The fold adds the only vignette. |
 | `textures.js`, `geo.js`, `audio.js` | Canvas textures (signage and Japanese text), shared geometry, and the WebAudio base. |
@@ -176,6 +176,17 @@ service is missing.
 **UI** (`src/anime/ui/`). The life module mounts the UI (`hud.js`, `style.js`, `photo.js`). Every string is in
 `data/i18n.json` (JA and EN) and is bundled at build time. Photo mode renders a 16:9 frame off-screen through the full
 pipeline at 3840×2160 and saves it as a PNG.
+
+**Touch pad** (`ui/touchpad.js`, `ui/touchpad-style.js`, strings in `data/ui-touch-i18n.json`; guide and API in
+[MOBILE-PAD.md](MOBILE-PAD.md)). [v7:pad] On a phone (`(pointer: coarse)`, a first touch, or `?touch=1`) the pad owns the
+canvas's touches: a floating analog stick on the left (dead zone, eased, RUN past 85 %), a smoothed drag look on the right,
+and a context action cluster in an arc (walk, fly and drive sets; `pad.registerMode(name, { buttons, stick })` and
+`pad.setMode(name)` for the sail mode). `main.js` creates it (`ctx.pad`, `window.__pad`); `Player.attachPad` consumes
+`pad.move`, `pad.takeLook()` and the jump / fly / land events; `explore/drive.js` reads `pad.move`, the brake and boost buttons and
+turns the touch look into the chase camera's orbit. The pad measures the dock, the places strip, the credit line and the
+speed chip and lifts itself clear of them; `body.klc-pad` re-seats a few panels. `test/mobile-pad.test.js` covers the pure parts
+and `test/mobile-pad.e2e.test.js` (`KLC_E2E=1`, through `tools/anime/gate.sh chrome`) the real touches at 390×844 and 844×390;
+`tools/anime/pad-shots.mjs` makes the screenshots in `docs/shots/mobile/`.
 
 ## 4. Live layer
 

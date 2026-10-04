@@ -148,7 +148,11 @@ otherwise. The place's label stays pinned until you move about 300 m away.
 | M | Sound on or off |
 | \` | Frame counter (fps, draw calls, triangles) |
 
-On a phone, drag on the left side of the screen to move (or to drive) and on the right side to look.
+On a phone the town plays like a mobile game (`docs/MOBILE-PAD.md`): a floating thumbstick on the left (past 85 % you run,
+or boost in the car), a drag on the right to look, and an arc of buttons at the bottom right that follows the mode:
+ジャンプ / ダッシュ / 飛ぶ / 乗る or 入る on foot, 上昇 / 下降 / 加速 / 歩く in flight, ブレーキ / ブースト / 降りる in the car.
+The chip at the top left switches 歩く / 飛ぶ / 運転, and its settings button swaps the sides (left-handed), inverts the look and
+sets the sensitivity. `?touch=1` shows the pad on a desktop, `?touch=0` turns it off.
 
 **Interiors.** No key is needed: walk in through the door.
 
@@ -169,8 +173,8 @@ On a phone, drag on the left side of the screen to move (or to drive) and on the
 - **Bottom edge:** the data credit, © OpenStreetMap contributors · 出典：国土地理院, 気象庁, 気仙沼漁協 · Sakuragaoka
   Station (MIT) by Kenton-GMI, with a link to the licences. The full map repeats the map-data credit.
 
-On a phone, the buttons are a column on the right edge (44 px each). The minimap moves to the top left, and at most
-10 labels show at a time.
+On a phone, the minimap moves to the top left (the top centre in landscape) with the search, map and drive buttons beside
+it, the touch pad takes the lower half of the screen, and at most 10 labels show at a time.
 
 **URL options:** `?preset=asa|hiru|yugata|yuyake|yoru`, `?hours=17.1`, `?season=spring|summer|autumn|winter`,
 `?weather=clear|cloudy|rain|live`, `?wet=0..1`, `?lang=ja|en`, `?q=high|medium|low`, `?fixtures=1` (force the sample
