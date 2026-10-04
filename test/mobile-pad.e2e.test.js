@@ -30,7 +30,7 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     await page.waitFor("document.body.classList.contains('loaded')", { timeout: 280000 });
     f = fingers(page);
   }, 330000);
-  afterAll(async () => { await f?.release?.().catch(() => {}); await browser?.close(); srv?.stop(); });
+  afterAll(async () => { await f?.release?.().catch(() => {}); await browser?.close(); srv?.stop(); }, 60000);
 
   T("it is a phone: coarse pointer, touch, iPhone UA; the pad turns itself on and hides behind the intro card", async () => {
     const r = await page.eval(`({ coarse: matchMedia('(pointer: coarse)').matches, dpr: devicePixelRatio, w: innerWidth, h: innerHeight, ua: navigator.userAgent.includes('iPhone'), pad: !!document.getElementById('klc-pad'), hidden: window.__pad.hidden,

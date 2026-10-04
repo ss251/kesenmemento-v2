@@ -348,7 +348,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       return `<button type="button" class="btn${i === 0 ? ' primary' : ''}" data-id="${id}" data-i="${i}" ${tg ? `aria-pressed="${toggled.has(id)}"` : ''} aria-label="${text(b.label)}">
         <span class="ico">${iconOf(b.icon)}</span><span class="lbl">${text(b.label)}</span></button>`;
     }).join('');
-    root.dataset.mode = pad.mode;
+    root.dataset.mode = pad.mode; root.dataset.nostick = modes.get(pad.mode)?.stick === 'none' ? '1' : '0';
     for (const m of chip.querySelectorAll('button[data-mode]')) m.setAttribute('aria-pressed', String(pad.mode === m.dataset.mode));
     syncButtons();
     dirty.buttons = false; dirty.layout = true;

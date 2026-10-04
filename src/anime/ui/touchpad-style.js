@@ -29,6 +29,7 @@ export const CSS = /* css */`
 #klc-pad .ghost .knob { opacity: .8; animation: klc-pad-breathe 3.2s ease-in-out infinite; }
 #klc-pad .ghost .dir { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; --r: calc(var(--base, 128px) / 2 - 13px);
   box-shadow: 0 calc(var(--r) * -1) 0 0 rgba(31, 58, 104, 0.4), 0 var(--r) 0 0 rgba(31, 58, 104, 0.4), var(--r) 0 0 0 rgba(31, 58, 104, 0.4), calc(var(--r) * -1) 0 0 0 rgba(31, 58, 104, 0.4); }
+#klc-pad[data-nostick="1"] .ghost { display: none; }   /* a registered mode with stick: 'none' */
 #klc-pad[data-stick="1"] .ghost { opacity: 0; transition: opacity .12s; }
 #klc-pad[data-stick="0"] .ghost { transition: opacity .3s .1s; }
 @keyframes klc-pad-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(0.9); } }
