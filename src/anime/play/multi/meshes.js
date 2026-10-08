@@ -6,9 +6,8 @@
 //           His colour tints the whole van (livery). Plates, glass and the
 //           garage's decal atlas stay on the car you drive; one batch cannot
 //           carry eight different textures.
-//   avatar — ホヤぼーや baked in a walk pose when the approval record allows
-//           him and ?hoya3d is not 0. Otherwise the faceless walker stand-in.
-//           He is never recolored.
+//   avatar — the faceless walker stand-in. A custom character is not baked
+//           into a friend's body. He is never recolored.
 //   gull  — flockGeo() from the gull lane (beak at +Z, same as the bird you fly).
 //   fish  — fishGeometry() with a belly and a back painted in, because the
 //           swim shader cannot be instanced.
@@ -20,14 +19,10 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { makeKeiVan } from '../../world/town/sakura/vehicles_cars.js';
-import { buildHoya } from '../avatar/hoya-model.js';
-import { resolveModel } from '../avatar/approval.js';
 import { flockGeo } from '../gull/bird.js';
 import { fishGeometry } from '../underwater/fish.js';
 import { SHIP } from '../../world/ship/shofukumaru1.js';
 import { KATSUO } from '../../world/ship/boat-params.js';
-import record from '../../../../data/hoyaboya-approval.json';
-
 /** Eye height the sail code writes into the pose. The hull sits this far below it. */
 export const BOAT_DROP = [6, 2.8];
 
@@ -98,71 +93,6 @@ function bakeVan(ctx) {
   return geo;
 }
 
-function skinBake(mesh, colorAttr) {
-  mesh.skeleton.update();
-  const geo = mesh.geometry;
-  const pos = geo.attributes.position;
-  const si = geo.attributes.skinIndex;
-  const sw = geo.attributes.skinWeight;
-  const col = colorAttr || null;
-  const bones = mesh.skeleton.boneMatrices;
-  const idx = geo.index;
-  const count = idx ? idx.count : pos.count;
-  const P = new Float32Array(count * 3);
-  const C = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const vi = idx ? idx.getX(i) : i;
-    const x = pos.getX(vi);
-    const y = pos.getY(vi);
-    const z = pos.getZ(vi);
-    let ox = 0;
-    let oy = 0;
-    let oz = 0;
-    const w = [sw.getX(vi), sw.getY(vi), sw.getZ(vi), sw.getW(vi)];
-    const id = [si.getX(vi), si.getY(vi), si.getZ(vi), si.getW(vi)];
-    for (let k = 0; k < 4; k++) {
-      const wk = w[k];
-      if (!wk) continue;
-      const o = id[k] * 16;
-      ox += wk * (bones[o] * x + bones[o + 4] * y + bones[o + 8] * z + bones[o + 12]);
-      oy += wk * (bones[o + 1] * x + bones[o + 5] * y + bones[o + 9] * z + bones[o + 13]);
-      oz += wk * (bones[o + 2] * x + bones[o + 6] * y + bones[o + 10] * z + bones[o + 14]);
-    }
-    const d = i * 3;
-    P[d] = ox;
-    P[d + 1] = oy;
-    P[d + 2] = oz;
-    if (col) {
-      C[d] = col.getX(vi);
-      C[d + 1] = col.getY(vi);
-      C[d + 2] = col.getZ(vi);
-    }
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.BufferAttribute(P, 3));
-  g.setAttribute('color', new THREE.BufferAttribute(C, 3));
-  g.computeVertexNormals();
-  return g;
-}
-
-function hoyaAllowed() {
-  let url = null;
-  try { url = new URLSearchParams(location.search).get('hoya3d'); } catch { url = null; }
-  return resolveModel({ record, url, mesh: true }).model === 'hoya';
-}
-
-function bakeHoya() {
-  const built = buildHoya(THREE, { quality: 'phone', blink: false, calm: true });
-  built.poseAt('walk', 0.42, { speed: 1.3 });
-  const body = skinBake(built.mesh, built.mesh.geometry.attributes.color);
-  const line = skinBake(built.hull, null);
-  const g = mergeGeometries([body, line], false);
-  body.dispose();
-  line.dispose();
-  built.dispose();
-  return g;
-}
-
 /** Geometries keyed by mode. Missing keys mean "use the stand-in". */
 export function realGeos(ctx) {
   const kind = { avatar: 'stand-in', car: 'stand-in', gull: 'stand-in', fish: 'stand-in', boat: 'proxy', boat1: 'proxy' };
@@ -178,12 +108,6 @@ export function realGeos(ctx) {
       out.car = bakeVan(ctx);
       if (out.car) kind.car = 'kei';
     } catch (e) { out.car = null; }
-    if (hoyaAllowed()) {
-      try {
-        out.avatar = bakeHoya();
-        if (out.avatar) kind.avatar = 'hoya';
-      } catch (e) { out.avatar = null; }
-    }
   }
   return out;
 }

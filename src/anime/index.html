@@ -23,8 +23,7 @@
    v4: the town is the hero. The UI sits on it with a vignette and two scrims (鉄紺 behind the corner controls, 紺→鉄紺 under the bottom third);
    one material (生成り glass at 92 %, a 紺 hairline, one soft shadow) and one radius (22 px, inner radii concentric) for the corner controls,
    the tip bar and the notice. The start prompt has no box: one line of display type between two 山吹 ◆, the Japanese line under it.
-   The ホヤぼーや still (.hoya) has NO animation, NO transition and NO animated ancestor while he is visible: he is cut with display:none at the
-   hand-off (docs/loading/HOYABOYA.md). He stands whole beside the tip bar (official pose NO.1-9), never behind or under a panel. */
+   The gauge's head is the logo's own カツオ. */
 #intro {
   --ai: #165E83;       /* 藍色 ai: the sea, the tip label */
   --kon: #223A70;      /* 紺色 kon: night, lettering */
@@ -60,7 +59,6 @@
   --m: 16px;
   --edge: 8px;
   --logo-w: min(84vw, 380px, 42vh);
-  --hoya-h: 84px;
   position: fixed; inset: 0; z-index: 5; height: 100%; overflow: hidden; color: var(--kon);
   font-family: var(--font); line-break: strict; background: transparent; pointer-events: none;
 }
@@ -111,16 +109,9 @@ html[data-input="mouse"] #intro .k-tap, html:not([data-input="mouse"]) #intro .k
   background: radial-gradient(closest-side, rgba(23, 24, 75, .5), rgba(23, 24, 75, .3) 45%, rgba(23, 24, 75, .1) 75%, rgba(23, 24, 75, 0)); }
 #intro .logo svg { width: 100%; height: auto; display: block; overflow: visible; }
 
-/* the bottom: the tip bar with ホヤぼーや, then the gauge or the prompt, then the footer */
+/* the bottom: the tip bar, then the gauge or the prompt, then the footer */
 #intro .bottom { position: absolute; left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 54px); display: grid; gap: 14px; }   /* (a phone sets the footer in two lines) */
 #intro .tiprow { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: end; min-width: 0; }   /* (above the prompt's wide target, so the pager always gets its taps) */
-
-/* ホヤぼーや, whole: the city's still at its own proportions, the manual's credit centred under him (13Q : 16Q, p.4), never boxed */
-#intro .hoya { display: grid; justify-items: center; align-self: end; justify-self: start; }
-#intro .hoya img { width: auto; height: var(--hoya-h); display: block; }
-#intro .credit { margin-top: 4px; font: 500 12px/1.35 var(--gothic); color: var(--kinari); text-align: center; white-space: nowrap; letter-spacing: 0; text-shadow: var(--ink-shadow); }
-html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
-html[lang="en"] #intro .credit { font-size: 10.5px; }
 
 /* the tip bar: as tall as what it says */
 #intro .tip { position: relative; min-width: 0; box-sizing: border-box; padding: 10px 12px 12px 16px; border-radius: var(--r); background: var(--glass); box-shadow: var(--mat); }
@@ -175,13 +166,6 @@ html[data-capture] #intro #ld-ride { transform: none !important; }
 }
 #intro.ld-idle .runner { animation-duration: 2.4s; }
 html[data-capture] #intro .runner { animation: none !important; }
-/* the standing mascot, on the localhost-only ?hoya=run preview (docs/loading/RUNNER.md): only his POSITION may move, never a turn or a squash (the city's manual): two steps up and down */
-html.klc-hoya-dev #intro .runner { animation: klc-bob2 500ms steps(1, end) infinite; }
-@keyframes klc-bob2 {
-  0% { transform: translate(-72%, -52%) translateY(0); }
-  50% { transform: translate(-72%, -52%) translateY(-3px); }
-}
-html.klc-hoya-dev #intro.ld-idle .runner { animation-duration: 1.2s; }
 
 /* the start prompt: no box. White display type with a soft 紺 shadow, two 山吹 ◆, the Japanese line under it; the whole band around it is the target */
 #intro .prompt, #intro .ld-cta { display: none; justify-items: center; }
@@ -220,10 +204,9 @@ html[lang="en"] #intro .ld-errmsg .m-ja, html:not([lang="en"]) #intro .ld-errmsg
 #intro #ld-retry { -webkit-appearance: none; appearance: none; margin-top: 12px; min-height: 44px; padding: 8px 24px; border: 0; border-radius: var(--r); background: var(--akane); color: var(--kinari); font: 700 15px/24px var(--font); cursor: pointer; touch-action: manipulation; transition: transform 140ms var(--ease-out); }
 #intro #ld-retry:active { transform: scale(.97); }
 #intro #ld-retry:focus-visible { outline: 3px solid var(--tekkon); outline-offset: 3px; }
-#intro.ld-failed .ld-card, #intro.ld-failed .gauge, #intro.ld-failed .hoya { display: none; }   /* (the notice takes the tip bar's place; ホヤぼーや steps out with his credit, never under or over a panel) */
+#intro.ld-failed .ld-card, #intro.ld-failed .gauge { display: none; }   /* (the notice takes the tip bar's place) */
 #intro.ld-failed .ld-err { display: block; }
 
-body.playing #intro .hoya img, body.playing #intro .credit { display: none; }
 /* once the town is playing the title layer is gone for good: faded to opacity 0 it would still catch taps meant for the HUD
    under it (the ☰ under the language toggle); the exit animation and the camera flight are over by the time `playing` is set */
 body.playing #intro { display: none !important; }
@@ -254,16 +237,12 @@ body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s
     linear-gradient(rgba(23, 24, 75, .38), rgba(23, 24, 75, .15) 64px, rgba(23, 24, 75, 0) 140px),
     linear-gradient(to top, rgba(23, 24, 75, .7), rgba(23, 24, 75, .58) 12%, rgba(28, 43, 94, .42) 26%, rgba(34, 58, 112, .2) 40%, rgba(34, 58, 112, .06) 50%, rgba(34, 58, 112, 0) 58%); }
 }
-/* a wide portrait screen (iPad, a narrow window): ホヤぼーや stands beside the tip bar; the stack is centred */
+/* a wide portrait screen (iPad, a narrow window): the stack is centred */
 @media (min-width: 600px) {
-  #intro { --m: 32px; --edge: 16px; --logo-w: min(64vw, 520px); --hoya-h: 112px; }
+  #intro { --m: 32px; --edge: 16px; --logo-w: min(64vw, 520px); }
   #intro .logo { top: calc(var(--sat) + 96px); }
   #intro .bottom { bottom: calc(var(--sab) + 44px); justify-items: center; gap: 18px; }
-  #intro .tiprow { grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; width: min(100%, 640px); }
-  #intro .hoya { justify-self: center; }
-  #intro .credit { font-size: 12px; }
-  html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
-  html[lang="en"] #intro .credit { font-size: 11px; }
+  #intro .tiprow { width: min(100%, 640px); }
   #intro .tip { padding: 12px 14px 14px 18px; }
   #intro .gauge { width: min(100%, 420px); }
   #intro #go b { font-size: 24px; }
@@ -273,12 +252,12 @@ body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s
 /* a landscape tablet or a small desktop window (≥ 900 px, wider than tall): the mark sits as on a desktop, its optical centre at 29 %;
    the bottom stays the centred stack until there is room for three columns */
 @media (min-width: 900px) and (min-aspect-ratio: 1/1) and (min-height: 561px) {
-  #intro { --edge: 24px; --logo-w: min(32vw, 600px, 58vh); --hoya-h: 120px; }
+  #intro { --edge: 24px; --logo-w: min(32vw, 600px, 58vh); }
   #intro .logo { top: calc(29% - var(--logo-w) * .2983); }
 }
-/* a desktop (≥ 1400 px): the mark top-centre, the prompt bottom-centre, the tip bar and ホヤぼーや bottom-left, all on one baseline */
+/* a desktop (≥ 1400 px): the mark top-centre, the prompt bottom-centre, the tip bar bottom-left, all on one baseline */
 @media (min-width: 1400px) and (min-height: 561px) {
-  #intro { --m: 32px; --edge: 24px; --logo-w: min(32vw, 600px, 58vh); --hoya-h: 128px; }
+  #intro { --m: 32px; --edge: 24px; --logo-w: min(32vw, 600px, 58vh); }
   #intro .logo { top: calc(29% - var(--logo-w) * .2983); }
   #intro .bottom { bottom: calc(var(--sab) + 44px); grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 24px; align-items: end; justify-items: stretch; }
   #intro .tiprow { grid-column: 1; grid-row: 1; justify-self: start; width: auto; max-width: 600px; }
@@ -291,20 +270,15 @@ body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s
   #intro #go { --dia: 9px; }
 }
 @media (min-width: 1600px) and (min-height: 861px) {
-  #intro { --hoya-h: 140px; }
   #intro .tip p { font-size: 15px; }
   #intro #go b { font-size: 26px; }
 }
 /* a big desktop (2000×1195 at DPR 1): the bottom UI grows with the screen, the corner controls keep their 44 px */
 @media (min-width: 1800px) and (min-height: 1000px) {
-  #intro { --hoya-h: 160px; }
   #intro .tip { width: min(520px, 100%); padding: 14px 16px 16px 20px; }
   #intro .tip .tab { font-size: 13px; }
   #intro .tip p { font-size: 17px; }
   #intro .tip .src { font-size: 12px; }
-  #intro .credit { font-size: 13px; }
-  html:not([lang="en"]) #intro .credit::first-line { font-size: 11px; }
-  html[lang="en"] #intro .credit { font-size: 12px; }
   #intro .cta { min-width: 420px; }
   #intro .gauge { width: 400px; }
   #intro .gauge .row { font-size: 13px; }
@@ -314,19 +288,16 @@ body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s
   #intro #go .go-line { gap: 18px; }
   #intro footer { font-size: 12px; }
 }
-/* a short landscape phone (852×393, and the shorter windows ui-b row 8 measures): one row along the bottom (ホヤぼーや, the tip bar,
+/* a short landscape phone (852×393, and the shorter windows ui-b row 8 measures): one row along the bottom (the tip bar,
    the prompt) under a smaller mark. The landscape poster keeps the bay in frame. */
 @media (orientation: landscape) and (max-height: 520px) {
-  #intro { --hz: 66%; --m: 16px; --edge: 8px; --logo-w: min(32vw, 54vh, 300px); --hoya-h: min(64px, 17vh); }
+  #intro { --hz: 66%; --m: 16px; --edge: 8px; --logo-w: min(32vw, 54vh, 300px); }
   #intro header { top: calc(var(--sat) + var(--edge)); }
   #intro .logo { top: calc(var(--sat) + 10px); }
   #intro .bottom { left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 30px); grid-template-columns: minmax(0, 1fr) auto; gap: 0 16px; align-items: end; justify-items: stretch; }
-  #intro .tiprow { grid-column: 1; grid-row: 1; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; width: auto; max-width: 560px; justify-self: start; }
+  #intro .tiprow { grid-column: 1; grid-row: 1; width: auto; max-width: 560px; justify-self: start; }
   #intro .ld-err { grid-column: 1; grid-row: 1; padding: 10px; }
   #intro .cta { grid-column: 2; grid-row: 1; align-self: end; width: auto; min-width: 200px; min-height: 56px; }
-  #intro .credit { font-size: 12px; }
-  html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
-  html[lang="en"] #intro .credit { font-size: 10.5px; }
   #intro .tip { padding: 6px 10px 9px 14px; }
   #intro .tip-head { height: 24px; margin-bottom: 0; }
   #intro .tip p { font-size: 13px; line-height: 1.5; }
@@ -337,12 +308,7 @@ body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s
   #intro #go small { font-size: 12px; }
   #intro footer { bottom: calc(var(--sab) + 6px); }
 }
-/* too narrow (under 740 px) or too short (300 px) for a whole figure beside the tip and the prompt: he steps out with his credit, the tip keeps its room */
-@media (orientation: landscape) and (max-height: 520px) and (max-width: 739px) {
-  #intro .hoya { display: none; }
-}
 @media (orientation: landscape) and (max-height: 300px) {
-  #intro .hoya { display: none; }
   #intro .tip .src { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -480,14 +446,13 @@ body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s
 </svg><!--/klc:logo--></div>
   <div class="bottom">
     <div class="tiprow">
-      <div class="hoya"><img src="./assets/hoyaboya/1-9.png" width="1300" height="1693" alt="ホヤぼーや" decoding="async"><div class="credit" id="ld-hoya-credit">気仙沼市観光キャラクター<br>「海の子 ホヤぼーや」</div></div>
-      <div class="tip ld-card"><div class="tip-head"><span class="tab"><span class="l-ja">まめ知識</span><span class="l-en">Trivia</span></span><div class="pager"><button type="button" id="tip-prev" aria-label="前のまめ知識"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg></button><span class="n"><b id="tip-n">1</b><i>/</i><span id="tip-N">27</span></span><button type="button" id="tip-next" aria-label="次のまめ知識"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5"/></svg></button></div></div><p id="tip-body"></p><div class="src" id="tip-src"></div></div>
+      <div class="tip ld-card"><div class="tip-head"><span class="tab"><span class="l-ja">まめ知識</span><span class="l-en">Trivia</span></span><div class="pager"><button type="button" id="tip-prev" aria-label="前のまめ知識"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg></button><span class="n"><b id="tip-n">1</b><i>/</i><span id="tip-N">21</span></span><button type="button" id="tip-next" aria-label="次のまめ知識"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5"/></svg></button></div></div><p id="tip-body"></p><div class="src" id="tip-src"></div></div>
     </div>
     <div class="ld-err"><p class="ld-errmsg" data-kind="slow"><span class="m m-slow m-ja">読み込みに<wbr>時間が<wbr>かかっています。<wbr>電波の<wbr>よい<wbr>場所で、<wbr>もう一度<wbr>お試しください。</span><span class="m m-slow m-en">This is taking a while. Please try again on a better connection.</span><span class="m m-offline m-ja">インターネットに<wbr>つながって<wbr>いないようです。<wbr>つながってから、<wbr>もう一度<wbr>お試しください。</span><span class="m m-offline m-en">You seem to be offline. Please reconnect and try again.</span><span class="m m-failed m-ja">うまく<wbr>読み込めませんでした。<wbr>もう一度<wbr>お試しください。</span><span class="m m-failed m-en">Something went wrong while loading. Please try again.</span></p><button type="button" id="ld-retry"><span class="l-ja">もう一度読み込む</span><span class="l-en">Try again</span></button></div>
     <div class="cta">
       <div class="gauge">
         <div class="row"><span id="loadlabel" data-title="1"><span class="l-ja">まちを よみこんでいます</span><span class="l-en">Reading the town…</span></span><span class="pct" id="ld-pct">0<small>%</small></span></div>
-        <div class="bar" id="ld-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="loadlabel"><i></i><div class="ld-work" id="ld-work"><div class="ld-work-in" id="ld-work-in"></div></div><div class="ld-fill" id="ld-fill"><div class="ld-fill-in" id="ld-fill-in"></div></div><div class="ld-ride" id="ld-ride"><!--klc:runner--><svg class="runner" id="fish" data-character="bonito" viewBox="-66 -32 122 61" aria-hidden="true"></svg><template id="klc-hoya-dev" data-src="/data/hoyaboya-dev/runner-a.png" data-aspect="0.6406"></template><!--/klc:runner--></div></div>
+        <div class="bar" id="ld-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="loadlabel"><i></i><div class="ld-work" id="ld-work"><div class="ld-work-in" id="ld-work-in"></div></div><div class="ld-fill" id="ld-fill"><div class="ld-fill-in" id="ld-fill-in"></div></div><div class="ld-ride" id="ld-ride"><!--klc:runner--><svg class="runner" id="fish" data-character="bonito" viewBox="-66 -32 122 61" aria-hidden="true"></svg><!--/klc:runner--></div></div>
       </div>
       <button id="go" class="prompt ld-cta" type="button" disabled><span class="go-line"><i class="dia" aria-hidden="true"></i><b><span class="k-tap">TAP TO START</span><span class="k-click">CLICK TO START</span></b><i class="dia" aria-hidden="true"></i></span><small lang="ja"><span class="k-tap">タップしてスタート</span><span class="k-click">クリックしてスタート</span></small></button>
     </div>
@@ -635,7 +600,7 @@ function posterForQuery(search, now = new Date()) {
   }
 })();
 </script><!--/klc:sky-->
-<!--klc:tips--><script type="application/json" id="klc-tips">[{"id":"mascot-sword-belt","ja":"ホヤぼーやの​剣は​サンマで、​ベルトは​ホタテなんだよ。","en":"Hoya Boya’s sword is a Pacific saury, and his belt is a scallop.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-shark-cape","ja":"ホヤぼーやは、​サメの​皮でできた​マントをつけているよ。","en":"Hoya Boya wears a cape made of shark skin.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-sea-prince","ja":"ホヤぼーやは、​仲間と​気仙沼の​海を​守る、​海の​王子さまなんだよ。","en":"Hoya Boya is a prince of the sea who protects Kesennuma’s ocean with his friends.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-hobbies","ja":"ホヤぼーやのしゅみと​特技は、はまらいんやおどりと​サメ​乗り​サーフィンだよ。","en":"Hoya Boya’s hobby and skill are the Hamarainya dance and surfing on a shark.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-favorite-word","ja":"ホヤぼーやの​好きな​言葉​「はまらいんや」は、​気仙沼​弁で​「仲間に​入ろう」だよ。","en":"Hoya Boya’s favorite word “Hamarainya” is Kesennuma dialect for “let’s join in.”","src":"みんな​大好き！​「海の​子​ホヤぼーや」​（気仙沼さ​来てけらいん）","srcEn":"Everyone loves Hoya Boya (Kesennuma tourism site)"},{"id":"mascot-debut-2007","ja":"ホヤぼーやは、みんなから​集めた​案の​中から​選ばれ、​2007​年​7​月に​デビューしたよ。","en":"Hoya Boya was chosen from a public call and debuted in July 2007.","src":"気仙沼​市​観光​キャラクター​「海の​子​ホヤぼーや」​について​（気仙沼​市役所）","srcEn":"About Hoya Boya (Kesennuma City Hall)"},{"id":"katsuo-modori","ja":"秋に​南へもどる、あぶらがのった​カツオは​「もどり​ガツオ」と​よばれるよ。","en":"Bonito that return south in autumn are fatty and are known as “modori-gatsuo.”","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"sanma-sashimi","ja":"気仙沼では、​サンマをさしみやたたきにしても​食べるんだよ。","en":"In Kesennuma, people eat saury not only grilled but also as sashimi and tataki.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"mekajiki-harmonica","ja":"メカジキの​背びれの​つけ根は、​「ハーモニカ」と​よばれる​部分だよ。","en":"The part at the base of a swordfish’s back fin is called the “harmonica.”","src":"極上の​旨みを​味わう！​宮城​県が​誇る​「メカジキ」の​魅力​（宮城​旬​鮮​探訪）","srcEn":"Miyagi’s prized swordfish (Miyagi seasonal food guide)"},{"id":"same-all-used","ja":"サメは、​ヒレを​フカ​ヒレに、​肉をおもにねりものに、​皮を​革にして、ぜんぶ​使うんだよ。","en":"Sharks are used fully: fins for shark fin, meat mostly for fish paste, skin for leather.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"hoya-sea-pineapple","ja":"ホヤは、​ごつごつした​形から​「海の​パイナップル」と​よばれるよ。","en":"Hoya, or sea squirts, are nicknamed “sea pineapples” for their bumpy shape.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"kaki-forest","ja":"気仙沼の​カキは、​森の​栄養が​川から​海へ​流れこんで​育つんだよ。","en":"Kesennuma oysters grow on nutrients that rivers carry from the forests to the sea.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"horumon-cabbage","ja":"気仙沼​ホルモンは、​千切り​キャベツと​食べるのが​気仙沼​流だよ。","en":"Kesennuma-style grilled pork offal, called “horumon,” is eaten with shredded cabbage.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"hotate-swim","ja":"ホタテは、​貝がらを​開け​閉めして、​海の​中を​泳ぐように​進むんだよ。","en":"Scallops move through the sea by opening and closing their shells, like swimming.","src":"宮城​県​産​「ホタテガイ」​徹底​ガイド​（宮城​旬​鮮​探訪）","srcEn":"A guide to Miyagi scallops (Miyagi seasonal food guide)"},{"id":"bay-oshima-calm","ja":"「みどりの​真珠」の​大島が、​気仙沼湾を​一年中​おだやかにしているよ。","en":"Oshima, the “Green Pearl,” sits at the bay’s mouth and keeps Kesennuma Bay calm all year.","src":"気仙沼の​水産​（気仙沼​市役所）","srcEn":"Kesennuma’s fisheries (Kesennuma City Hall)"},{"id":"sanma-light","ja":"サンマ​漁では、​集魚灯という​ライトで​サンマを​よびよせるんだよ。","en":"Saury fishing uses lamps called shugyoto to lure the fish.","src":"水産​情報​等​発信​施設​（気仙沼​市​魚市場）","srcEn":"Fisheries information center (Kesennuma Fish Market)"},{"id":"katsuo-barbless","ja":"カツオの​一本づりの​針には、とげのような​「返し」がないんだよ。","en":"The hooks used for pole-and-line bonito fishing have no barb.","src":"水産​情報​等​発信​施設​（気仙沼​市​魚市場）","srcEn":"Fisheries information center (Kesennuma Fish Market)"},{"id":"defune-okuri","ja":"漁に​出る​船を、​色とりどりの​テープと​大漁​旗で​見送る​「出船おくり」があるよ。","en":"Boats heading out to fish are sent off with streamers and flags (Defune Okuri).","src":"はじめての​気仙沼​（気仙沼さ​来てけらいん）","srcEn":"First time in Kesennuma (Kesennuma tourism site)"},{"id":"market-viewing","ja":"魚市場の​見学​エリアでは、​水揚げや​入札のようすを​見られることがあるよ。","en":"At the fish market’s viewing areas, you can sometimes watch fish being landed and sold.","src":"おすすめ​見学​コース​（気仙沼​市​魚市場）","srcEn":"Recommended viewing route (Kesennuma Fish Market)"},{"id":"ukimido-ebisu","ja":"浮​見​堂​（うきみどう）のそばのえびすさまは、​タイではなく​カツオを​つり上げているよ。","en":"Near Ukimido, the god Ebisu holds up a bonito instead of the usual sea bream.","src":"みなとまち​散策​モデル​コース​（気仙沼さ​来てけらいん）","srcEn":"Harbor town walking route (Kesennuma tourism site)"},{"id":"anbasan-239","ja":"安​波山​（あんばさん）は、​海面から​239​メートルの​高さで、​気仙沼湾が​見​わたせるよ。","en":"Mount Anba rises 239 meters above sea level and overlooks Kesennuma Bay and the town.","src":"安​波山​（気仙沼さ​来てけらいん）","srcEn":"Mount Anba (Kesennuma tourism site)"},{"id":"kugunari-singing-sand","ja":"十八​鳴浜​（くぐなりはま）は、​砂が​キュッキュッと​鳴る、​国の​天然記念物の​浜だよ。","en":"Oshima’s Kugunari Beach has squeaking sand and is a national natural monument.","src":"国​指定​文化財​（史跡・​名勝・​天然記念物）​（気仙沼​市役所）","srcEn":"National cultural properties (Kesennuma City Hall)"},{"id":"tsurukame-bridge","ja":"気仙沼​大島​大橋の​あだ名​「鶴​亀​（つるかめ）​大橋」は、​鶴​ヶ​浦と​亀山からついたよ。","en":"Oshima Bridge’s nickname, Tsurukame, comes from the places Tsurugaura and Kameyama.","src":"道路や​橋などの​名称と​愛称​について​（宮城​県）","srcEn":"Names of roads and bridges (Miyagi Prefecture)"},{"id":"kanae-bridge-name","ja":"かなえ​大橋の​名前は、​気仙沼湾の​昔の​名前​「鼎​（かなえ）が​浦」からきているよ。","en":"Kanae Bridge, which crosses Kesennuma Bay, is named after the bay’s old name, Kanae-ga-ura.","src":"気仙沼湾​横断​橋​（気仙沼さ​来てけらいん）","srcEn":"Kesennuma Bay Crossing Bridge (Kesennuma tourism site)"},{"id":"iwaisaki-fossils","ja":"岩井崎​（いわいさき）の​岩には、​約​2​億​5​千万​年前の​サンゴなどの​化石があるんだよ。","en":"Rocks at Iwaisaki hold fossils of corals and other sea life about 250 million years old.","src":"岩井崎​（気仙沼さ​来てけらいん）","srcEn":"Iwaisaki (Kesennuma tourism site)"},{"id":"naiwan-waterfront","ja":"内湾​（ないわん）の​岸では、あみを​直す​漁師さんや、つりを​楽しむ​人が​見られるよ。","en":"At the Naiwan waterfront you may see fishers mending nets and people enjoying fishing.","src":"みなとまち​散策​モデル​コース​（気仙沼さ​来てけらいん）","srcEn":"Harbor town walking route (Kesennuma tourism site)"},{"id":"hoya-farming-karakuwa","ja":"ホヤの​養殖は、​100​年​以上​前に​気仙沼の​唐桑​（からくわ）ではじまったんだよ。","en":"Sea squirt farming began over 100 years ago in Karakuwa, now part of Kesennuma.","src":"蒸しほや​（むしほや）​｜​にっぽん​伝統​食​図鑑​（農林​水産​省）","srcEn":"Steamed sea squirt (Japan’s agriculture ministry)"}]</script><!--/klc:tips-->
+<!--klc:tips--><script type="application/json" id="klc-tips">[{"id":"katsuo-modori","ja":"秋に​南へもどる、あぶらがのった​カツオは​「もどり​ガツオ」と​よばれるよ。","en":"Bonito that return south in autumn are fatty and are known as “modori-gatsuo.”","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"sanma-sashimi","ja":"気仙沼では、​サンマをさしみやたたきにしても​食べるんだよ。","en":"In Kesennuma, people eat saury not only grilled but also as sashimi and tataki.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"mekajiki-harmonica","ja":"メカジキの​背びれの​つけ根は、​「ハーモニカ」と​よばれる​部分だよ。","en":"The part at the base of a swordfish’s back fin is called the “harmonica.”","src":"極上の​旨みを​味わう！​宮城​県が​誇る​「メカジキ」の​魅力​（宮城​旬​鮮​探訪）","srcEn":"Miyagi’s prized swordfish (Miyagi seasonal food guide)"},{"id":"same-all-used","ja":"サメは、​ヒレを​フカ​ヒレに、​肉をおもにねりものに、​皮を​革にして、ぜんぶ​使うんだよ。","en":"Sharks are used fully: fins for shark fin, meat mostly for fish paste, skin for leather.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"hoya-sea-pineapple","ja":"ホヤは、​ごつごつした​形から​「海の​パイナップル」と​よばれるよ。","en":"Hoya, or sea squirts, are nicknamed “sea pineapples” for their bumpy shape.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"kaki-forest","ja":"気仙沼の​カキは、​森の​栄養が​川から​海へ​流れこんで​育つんだよ。","en":"Kesennuma oysters grow on nutrients that rivers carry from the forests to the sea.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"horumon-cabbage","ja":"気仙沼​ホルモンは、​千切り​キャベツと​食べるのが​気仙沼​流だよ。","en":"Kesennuma-style grilled pork offal, called “horumon,” is eaten with shredded cabbage.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"hotate-swim","ja":"ホタテは、​貝がらを​開け​閉めして、​海の​中を​泳ぐように​進むんだよ。","en":"Scallops move through the sea by opening and closing their shells, like swimming.","src":"宮城​県​産​「ホタテガイ」​徹底​ガイド​（宮城​旬​鮮​探訪）","srcEn":"A guide to Miyagi scallops (Miyagi seasonal food guide)"},{"id":"bay-oshima-calm","ja":"「みどりの​真珠」の​大島が、​気仙沼湾を​一年中​おだやかにしているよ。","en":"Oshima, the “Green Pearl,” sits at the bay’s mouth and keeps Kesennuma Bay calm all year.","src":"気仙沼の​水産​（気仙沼​市役所）","srcEn":"Kesennuma’s fisheries (Kesennuma City Hall)"},{"id":"sanma-light","ja":"サンマ​漁では、​集魚灯という​ライトで​サンマを​よびよせるんだよ。","en":"Saury fishing uses lamps called shugyoto to lure the fish.","src":"水産​情報​等​発信​施設​（気仙沼​市​魚市場）","srcEn":"Fisheries information center (Kesennuma Fish Market)"},{"id":"katsuo-barbless","ja":"カツオの​一本づりの​針には、とげのような​「返し」がないんだよ。","en":"The hooks used for pole-and-line bonito fishing have no barb.","src":"水産​情報​等​発信​施設​（気仙沼​市​魚市場）","srcEn":"Fisheries information center (Kesennuma Fish Market)"},{"id":"defune-okuri","ja":"漁に​出る​船を、​色とりどりの​テープと​大漁​旗で​見送る​「出船おくり」があるよ。","en":"Boats heading out to fish are sent off with streamers and flags (Defune Okuri).","src":"はじめての​気仙沼​（気仙沼さ​来てけらいん）","srcEn":"First time in Kesennuma (Kesennuma tourism site)"},{"id":"market-viewing","ja":"魚市場の​見学​エリアでは、​水揚げや​入札のようすを​見られることがあるよ。","en":"At the fish market’s viewing areas, you can sometimes watch fish being landed and sold.","src":"おすすめ​見学​コース​（気仙沼​市​魚市場）","srcEn":"Recommended viewing route (Kesennuma Fish Market)"},{"id":"ukimido-ebisu","ja":"浮​見​堂​（うきみどう）のそばのえびすさまは、​タイではなく​カツオを​つり上げているよ。","en":"Near Ukimido, the god Ebisu holds up a bonito instead of the usual sea bream.","src":"みなとまち​散策​モデル​コース​（気仙沼さ​来てけらいん）","srcEn":"Harbor town walking route (Kesennuma tourism site)"},{"id":"anbasan-239","ja":"安​波山​（あんばさん）は、​海面から​239​メートルの​高さで、​気仙沼湾が​見​わたせるよ。","en":"Mount Anba rises 239 meters above sea level and overlooks Kesennuma Bay and the town.","src":"安​波山​（気仙沼さ​来てけらいん）","srcEn":"Mount Anba (Kesennuma tourism site)"},{"id":"kugunari-singing-sand","ja":"十八​鳴浜​（くぐなりはま）は、​砂が​キュッキュッと​鳴る、​国の​天然記念物の​浜だよ。","en":"Oshima’s Kugunari Beach has squeaking sand and is a national natural monument.","src":"国​指定​文化財​（史跡・​名勝・​天然記念物）​（気仙沼​市役所）","srcEn":"National cultural properties (Kesennuma City Hall)"},{"id":"tsurukame-bridge","ja":"気仙沼​大島​大橋の​あだ名​「鶴​亀​（つるかめ）​大橋」は、​鶴​ヶ​浦と​亀山からついたよ。","en":"Oshima Bridge’s nickname, Tsurukame, comes from the places Tsurugaura and Kameyama.","src":"道路や​橋などの​名称と​愛称​について​（宮城​県）","srcEn":"Names of roads and bridges (Miyagi Prefecture)"},{"id":"kanae-bridge-name","ja":"かなえ​大橋の​名前は、​気仙沼湾の​昔の​名前​「鼎​（かなえ）が​浦」からきているよ。","en":"Kanae Bridge, which crosses Kesennuma Bay, is named after the bay’s old name, Kanae-ga-ura.","src":"気仙沼湾​横断​橋​（気仙沼さ​来てけらいん）","srcEn":"Kesennuma Bay Crossing Bridge (Kesennuma tourism site)"},{"id":"iwaisaki-fossils","ja":"岩井崎​（いわいさき）の​岩には、​約​2​億​5​千万​年前の​サンゴなどの​化石があるんだよ。","en":"Rocks at Iwaisaki hold fossils of corals and other sea life about 250 million years old.","src":"岩井崎​（気仙沼さ​来てけらいん）","srcEn":"Iwaisaki (Kesennuma tourism site)"},{"id":"naiwan-waterfront","ja":"内湾​（ないわん）の​岸では、あみを​直す​漁師さんや、つりを​楽しむ​人が​見られるよ。","en":"At the Naiwan waterfront you may see fishers mending nets and people enjoying fishing.","src":"みなとまち​散策​モデル​コース​（気仙沼さ​来てけらいん）","srcEn":"Harbor town walking route (Kesennuma tourism site)"},{"id":"hoya-farming-karakuwa","ja":"ホヤの​養殖は、​100​年​以上​前に​気仙沼の​唐桑​（からくわ）ではじまったんだよ。","en":"Sea squirt farming began over 100 years ago in Karakuwa, now part of Kesennuma.","src":"蒸しほや​（むしほや）​｜​にっぽん​伝統​食​図鑑​（農林​水産​省）","srcEn":"Steamed sea squirt (Japan’s agriculture ministry)"}]</script><!--/klc:tips-->
 <!--klc:boot--><script>
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, u) => a + (b - a) * u;
@@ -655,7 +620,7 @@ function createMotion(stage, opts = {}) {
   const fish = svg.querySelector('.fish'), splash = svg.querySelector('.splash'), spark = svg.querySelector('.spark'), shine = svg.querySelector('.shine');
   const sub = [...svg.querySelectorAll('.sub path')].map((p) => ({ p, base: p.getAttribute('transform') || '' })), rules = svg.querySelector('.rules');
   const $ = (s) => stage.querySelector(s);
-  const ui = { logo: $('.logo'), header: $('header'), tip: $('.tip'), gauge: $('.gauge'), prompt: $('.prompt'), footer: $('footer'), hoya: $('.hoya'), bg: $('.bg'), bg2: $('.bg2'), bar: $('.bar i'), runner: $('.bar .runner'), pct: $('.pct'), dia: [...stage.querySelectorAll('#go .dia')] };
+  const ui = { logo: $('.logo'), header: $('header'), tip: $('.tip'), gauge: $('.gauge'), prompt: $('.prompt'), footer: $('footer'), bg: $('.bg'), bg2: $('.bg2'), bar: $('.bar i'), runner: $('.bar .runner'), pct: $('.pct'), dia: [...stage.querySelectorAll('#go .dia')] };
   const wave = (y0, ph) => { let d = `M-40 ${f2(y0 + M.wave.a * Math.sin(-40 / M.wave.f + ph))}`; for (let X = -35; X <= M.W + 46; X += 5) d += `L${X} ${f2(y0 + M.wave.a * Math.sin(X / M.wave.f + ph))}`; return d; };
   const window1 = (t, t0, d) => clamp((t - t0) / d);
   function letters(t) {
@@ -738,9 +703,7 @@ function createMotion(stage, opts = {}) {
     if (rise > 0.01) ui.prompt.style.transform = `translateY(${f2(rise)}px)`; else if (ui.prompt.style.transform) ui.prompt.style.transform = '';
   }
   function exit(t) {
-    const still = ui.hoya.querySelectorAll('img, .credit');
-    if (t < tapAt) { still.forEach((e) => (e.style.display = '')); for (const k of ['logo', 'header', 'tip', 'gauge', 'prompt', 'footer']) if (ui[k] && k !== 'gauge' && k !== 'prompt') ui[k].style.opacity = ''; ui.bg.style.transform = ''; if (ui.bg2) ui.bg2.style.opacity = 0; ui.dia.forEach((e) => (e.style.transform = '')); return; }
-    still.forEach((e) => (e.style.display = 'none'));
+    if (t < tapAt) { for (const k of ['logo', 'header', 'tip', 'gauge', 'prompt', 'footer']) if (ui[k] && k !== 'gauge' && k !== 'prompt') ui[k].style.opacity = ''; ui.bg.style.transform = ''; if (ui.bg2) ui.bg2.style.opacity = 0; ui.dia.forEach((e) => (e.style.transform = '')); return; }
     const pinch = 5 * Math.sin(Math.PI * window1(t, tapAt, 0.24));
     ui.dia.forEach((e, i) => (e.style.transform = `translateX(${f2(i ? -pinch : pinch)}px) rotate(45deg)`));
     const e = inOut(window1(t, tapAt + 0.12, 0.42)), u = inOut(window1(t, tapAt + 0.1, 0.35));
@@ -757,9 +720,7 @@ function createMotion(stage, opts = {}) {
     for (const l of L) l.p.setAttribute('transform', l.base);
     for (const k of ['header', 'tip', 'footer']) if (ui[k]) ui[k].style.opacity = String(a);
     hud(t);
-    const still = ui.hoya ? ui.hoya.querySelectorAll('img, .credit') : [];
-    if (t < tapAt) { still.forEach((e) => (e.style.display = '')); return; }
-    still.forEach((e) => (e.style.display = 'none'));
+    if (t < tapAt) return;
     const u = window1(t, tapAt, 0.2);
     if (ui.logo) { ui.logo.style.opacity = String(1 - u); ui.logo.style.transform = 'translateX(-50%)'; }
     for (const k of ['header', 'tip', 'footer', 'prompt']) if (ui[k]) ui[k].style.opacity = String(1 - u);
@@ -806,7 +767,6 @@ function createMotion(stage, opts = {}) {
     try { localStorage.setItem('klc.lang', lang); } catch (e) {  }
     d.querySelectorAll('.lang button').forEach(function (b) { var on = b.getAttribute('data-lang') === lang; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     var mc = d.getElementById('ld-map'); if (mc) mc.textContent = lang === 'en' ? 'Map © GSI Japan · OpenStreetMap' : '地図 © 国土地理院・OpenStreetMap';
-    var hc = d.getElementById('ld-hoya-credit'); if (hc) hc.innerHTML = lang === 'en' ? 'Kesennuma City Mascot,<br>Hoya Boya the Ocean Boy' : '気仙沼市観光キャラクター<br>「海の子 ホヤぼーや」';
     paintTip();
     var b = d.getElementById('ld-sound'); if (b) b.setAttribute('aria-label', soundLabel(b.getAttribute('aria-pressed') === 'true'));
   }
@@ -903,14 +863,6 @@ function createMotion(stage, opts = {}) {
   addEventListener('offline', health); addEventListener('online', health);
   var hb = setInterval(function () { if (d.body.classList.contains('loaded') || d.body.classList.contains('playing')) { clearInterval(hb); return; } health(); }, 2000);
   var retry = d.getElementById('ld-retry'); if (retry) retry.addEventListener('click', function () { location.reload(); });
-  try {
-    var host = location.hostname, local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]', tpl = d.getElementById('klc-hoya-dev');
-    if (local && tpl && new URLSearchParams(location.search).get('hoya') === 'run') {
-      var run = d.querySelector('.runner');
-      if (run) run.innerHTML = '<div class="sr" data-character="hoyaboya" data-n="1"><div class="sr-bob"><div class="sr-win"><img class="sr-strip" alt=""></div></div></div>';
-      d.documentElement.classList.add('klc-hoya-dev');
-    }
-  } catch (e) {  }
   try {
     if (reduced || typeof stage.animate !== 'function') {  }
   } catch (e) {  }

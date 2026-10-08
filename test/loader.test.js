@@ -1,14 +1,13 @@
 // [loader] KesenMemento 「帰港」: the loading screen and the title screen (docs/loading/README.md, docs/CRAFT.md).
-// Static checks of index.html, loader.css, the sky, the runner, the progress bar, the tips and the Hoya Boya rules. The browser-side checks (first paint, frame times, the real hand-off) are in
+// Static checks of index.html, loader.css, the sky, the runner, the progress bar and the tips. The browser-side checks (first paint, frame times, the real hand-off) are in
 // tools/anime/loader-check.mjs (through the machine gate).
 import { describe, test, expect } from "bun:test";
 import { readFileSync, existsSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { resolve, join } from "node:path";
 import { parseCss, decl, styleBlocks, keyframes, rulesOf } from "./lib/css-rules.js";
 import { skyState, stopsFor, mix, contrast, pinnedSky, WA, KESENNUMA, SKY_NAMES } from "../src/anime/ui/loader/sky.js";
 import { sunPosition } from "../src/web/lib/solar.js";
-import { normalizeRunner, assertRunnerAllowed, runnerHtml, assertHoyaAllowed, hoyaRunnerHtml, HOYABOYA_CREDIT, frameAt, aspectOf } from "../src/anime/ui/loader/sprite-runner.js";
+import { normalizeRunner, assertRunnerAllowed, runnerHtml, frameAt, aspectOf } from "../src/anime/ui/loader/sprite-runner.js";
 import { createLoadBar, bezier, MARK_MS } from "../src/anime/core/loadbar.js";
 import { createMotion } from "../src/anime/ui/loader/title-motion.js";
 import { loadPlan, labelEn, MODULE_LABELS, FINISH_LABELS, MODULE_LABELS_EN, FINISH_LABELS_EN } from "../src/anime/core/loadplan.js";
@@ -125,7 +124,6 @@ describe("loader.css follows docs/CRAFT.md", () => {
   });
   test("no layout property is animated, and the tip bar is as tall as what it says (no reserved height, no empty band)", () => {
     expect(decl(R, ".tip", "min-height")).toBeUndefined(); expect(decl(R, ".tip", "height")).toBeUndefined();
-    expect(decl(R, ".credit", "white-space")).toBe("nowrap");
     expect(css).not.toMatch(/animation[^;]*(width|height|margin|padding)/);
   });
   test("the start prompt has no box: display type between two 山吹 diamonds, it says what the input is, and the ring is for the keyboard", () => {
@@ -210,86 +208,32 @@ describe("the sky follows the real clock in Kesennuma (ui/loader/sky.js)", () =>
 });
 
 // ------------------------------------------------------------------------------------------------------------ the runner
-describe("the sprite runner and the Hoya Boya switch (ui/loader/sprite-runner.js, docs/loading/RUNNER.md)", () => {
+describe("the sprite runner is our bonito (ui/loader/sprite-runner.js, docs/loading/RUNNER.md)", () => {
   const cfg = JSON.parse(read("src/anime/assets/runner/runner.json"));
-  test("the shipped runner is our own bonito and Hoya Boya is OFF: nothing of the mascot moves until the city approves", () => {
-    expect(cfg.character).toBe("bonito"); expect(cfg.hoya.mode).toBe("off");
-    expect(() => assertHoyaAllowed(cfg.hoya)).not.toThrow();
+  test("the shipped runner is the logo's bonito, and the page does not carry a standing figure", () => {
+    expect(cfg.character).toBe("bonito");
+    expect(cfg.hoya).toBeUndefined();
     const region = html.match(/<!--klc:runner-->([\s\S]*?)<!--\/klc:runner-->/)[1];
-    expect(region).toContain('data-character="bonito"'); expect(region).not.toContain("hoyaboya\"");   // (the dev flag builds its markup in script, and only on localhost)
-    expect([...new Set([...html.matchAll(/assets\/hoyaboya\/([\w.-]+)/g)].map((m) => m[1]))]).toEqual(["1-9.png"]);   // no moving pose is bundled: only the standing still
-  });
-  test("a Hoya Boya runner without the city's approval record, the credit or a named pose is refused", () => {
-    expect(() => assertHoyaAllowed({ mode: "still", pose: "15-10" })).toThrow(/approval/);
-    expect(() => assertHoyaAllowed({ mode: "still", pose: "15-10", approval: { by: "気仙沼市産業部観光課", ref: "", date: "2026-10-09" } })).toThrow(/approval/);
-    expect(() => assertHoyaAllowed({ mode: "still", pose: "15-10", approval: { by: "気仙沼市産業部観光課", ref: "R8-1", date: "9 Oct" } })).toThrow(/approval/);
-    expect(() => assertHoyaAllowed({ mode: "still", pose: "", approval: { by: "x", ref: "y", date: "2026-10-09" } })).toThrow(/pose/);
-    expect(() => assertHoyaAllowed({ mode: "still", pose: "15-10", credit: "none", approval: { by: "x", ref: "y", date: "2026-10-09" } })).toThrow(/credit/);
-    expect(() => assertHoyaAllowed({ mode: "cycle", pose: "15-10", frames: 1, approval: { by: "x", ref: "y", date: "2026-10-09" } })).toThrow(/frames/);
-    expect(() => assertHoyaAllowed({ mode: "party" })).toThrow(/mode/);
-    const ok = { mode: "still", pose: "15-10", aspect: 1.05, approval: { by: "気仙沼市産業部観光課", ref: "R8-1", date: "2026-10-09" } };
-    expect(assertHoyaAllowed(ok).mode).toBe("still");
-    expect(hoyaRunnerHtml(ok, "./a.png")).toContain('data-character="hoyaboya" data-n="1"');
-    expect(() => assertRunnerAllowed({ character: "hoyaboya", src: "x.png", frames: 1, fps: 1, frameW: 1, frameH: 1 })).toThrow(/approval/);
+    expect(region).toContain('data-character="bonito"');
+    expect(html).not.toContain('class="hoya"');
+    expect(html).not.toContain("ld-hoya-credit");
   });
   test("the config is checked: a bad frame count, rate or file name is a readable error", () => {
     expect(() => normalizeRunner({ ...cfg, frames: 0 })).toThrow(/frames/); expect(() => normalizeRunner({ ...cfg, fps: 0 })).toThrow(/fps/);
     expect(() => normalizeRunner({ ...cfg, src: "../x.svg" })).toThrow(/src/); expect(() => normalizeRunner({ ...cfg, character: "ship" })).toThrow(/character/);
     expect(aspectOf(normalizeRunner(cfg))).toBe(2); expect(frameAt({ frames: 6, fps: 8 }, 0.9)).toBe(1); expect(frameAt({ frames: 6, fps: 8 }, 0)).toBe(0);
   });
-  test("the gauge's fish is our own bonito; the sprite module still refuses a moving Hoya Boya", () => {
+  test("the gauge's fish is our own bonito", () => {
     const m = runnerHtml(normalizeRunner(cfg), "data:x");
     expect(m).toContain('data-n="6"'); expect(m).toContain("--sr-n:6;--sr-fps:8;--sr-aspect:2");
     const region = html.match(/<!--klc:runner-->([\s\S]*?)<!--\/klc:runner-->/)[1];
     expect(region).toContain('data-character="bonito"');
     expect(region).not.toContain('class="sr-strip"');
   });
-  test("the dev flag ?hoya=run is honoured on localhost only and needs the dev asset", () => {
-    expect(html).toContain("host === 'localhost' || host === '127.0.0.1' || host === '[::1]'");
-    expect(html).toMatch(/get\('hoya'\) === 'run'/);
-    if (cfg.hoya.pose) { expect(html).toContain(`data-src="/data/hoyaboya-dev/${cfg.hoya.src}"`); expect(existsSync(join(ROOT, "data/hoyaboya-dev", cfg.hoya.src))).toBe(true); }
-    expect(read("server/app/stage.sh")).not.toMatch(/hoyaboya-dev/);   // never staged for production
-  });
-});
-
-// ------------------------------------------------------------------------------------------------------------ the official still
-describe("Hoya Boya, the standing still: exactly what the design manual allows (docs/loading/HOYABOYA.md)", () => {
-  const notice = read("src/anime/assets/hoyaboya/NOTICE.md"), png = readFileSync(join(ROOT, "src/anime/assets/hoyaboya/1-9.png"));
-  test("1-9.png is byte for byte the city's file (SHA-256 in NOTICE.md), and the notice names the owner, the source, the date and the licence boundary", () => {
-    const sha = createHash("sha256").update(png).digest("hex");
-    expect(notice).toContain(sha); expect(sha).toBe("1b40e75f0aab528f6b5d0a0fe7dd9e64ae85491f1ef829c33a58efcb93e1ee48");
-    for (const t of ["© 気仙沼市", "NOT under this project's MIT licence", "2026-10-07", "https://www.kesennuma.miyagi.jp/sec/s084/030/010/010/", "manualvariation1-2.zip", "デザインマニュアル", "NO.1-9"]) expect(notice).toContain(t);
-    expect(existsSync(join(ROOT, "src/anime/assets/hoyaboya/13-2.png"))).toBe(false);   // (the peeking art is no longer shipped)
-  });
-  test("the credit is the manual's, character for character (p.4): two centred lines, in the page and in the runner module", () => {
-    expect(html).toContain('<div class="credit" id="ld-hoya-credit">気仙沼市観光キャラクター<br>「海の子 ホヤぼーや」</div>');
-    // English mode shows the manual's own English credit, unaltered (two lines after the comma, like the Japanese),
-    // and the toggle, both credits and the tip are synced to the language picked before first paint
-    expect(html).toContain("'Kesennuma City Mascot,<br>Hoya Boya the Ocean Boy'");
+  test("an unknown character is refused, and the map credit follows the language", () => {
+    expect(() => assertRunnerAllowed({ character: "ship", src: "x.png", frames: 1, fps: 1, frameW: 1, frameH: 1 })).toThrow(/character/);
     expect(html).toContain("'Map © GSI Japan · OpenStreetMap'");
     expect(html).toContain("setLang(lang);");
-    expect(HOYABOYA_CREDIT.ja.join("")).toBe("気仙沼市観光キャラクター「海の子 ホヤぼーや」"); expect(HOYABOYA_CREDIT.ja[1]).toBe("「海の子 ホヤぼーや」");
-    expect(HOYABOYA_CREDIT.en.join("")).toBe("Kesennuma City Mascot,Hoya Boya the Ocean Boy");
-    expect(notice).toContain("気仙沼市観光キャラクター「海の子 ホヤぼーや」");
-  });
-  test("the still has no animation, transition, transform or crop, and it is cut (display: none) at the hand-off; the credit is a caption, not a box", () => {
-    const bad = /^(animation|transition|transform|filter|opacity|clip-path|clip|mask|mask-image|backdrop-filter|mix-blend-mode|overflow|object-fit)$/;
-    for (const sel of [".hoya", ".hoya img", ".credit"]) for (const r of rulesOf(R, sel)) for (const k of Object.keys(r.decl)) expect(k).not.toMatch(bad);
-    expect(decl(R, ".credit", "background")).toBeUndefined(); expect(decl(R, ".credit", "border")).toBeUndefined();
-    expect(decl(R, ".credit", "text-align")).toBe("center"); expect(decl(R, ".hoya", "justify-items")).toBe("center");   // centred under him (manual p.4)
-    expect(decl(R, "html:not([lang=\"en\"]) .credit::first-line", "font-size")).toBe("10px"); expect(decl(R, ".credit", "font")).toMatch(/^500 12px\//);   // the manual's balance: the first line smaller
-    expect(decl(R, "body.playing .hoya img", "display")).toBe("none");
-    expect(decl(R, "body.playing .credit", "display")).toBe("none");
-    expect(html).toMatch(/<div class="hoya"><img src="\.\/assets\/hoyaboya\/1-9\.png" width="1300" height="1693" alt="ホヤぼーや" decoding="async">/);
-    expect(html).toContain("display: none");
-    expect(read("src/anime/ui/loader/title-motion.js")).toContain("querySelectorAll('img, .credit')");
-  });
-  test("the still keeps its proportions (1300 x 1693): its height is set and its width follows, whole, never inside or behind the tip bar", () => {
-    expect(decl(R, ".hoya img", "width")).toBe("auto"); expect(decl(R, ".hoya img", "height")).toBe("var(--hoya-h)");
-    const tiprow = html.match(/<div class="tiprow">([\s\S]*?)<div class="ld-err">/)[1];
-    expect(tiprow.indexOf('<div class="hoya">')).toBeLessThan(tiprow.indexOf('<div class="tip ld-card">'));
-    expect(tiprow.match(/<div class="tip ld-card">[\s\S]*$/)[0]).not.toContain("hoya");   // (he is a sibling of the bar, never in it)
-    expect(+(1300 / 1693).toFixed(4)).toBe(0.7679);
   });
 });
 
@@ -514,19 +458,15 @@ describe("the gauge: the solid fill and the number are the mark, the working lay
     expect(decl(R, ".runner", "animation", ["@media (prefers-reduced-motion: reduce)"])).toBe("none !important");
     expect(decl(R, "html[data-capture] .runner", "animation")).toBe("none !important");
   });
-  test("the standing mascot (the localhost-only ?hoya=run preview) only changes position, in two steps: no turn, squash or skew (the city's manual)", () => {
-    const k = keyframes(css, "klc-bob2"); expect(k).toBeTruthy(); expect(k).not.toMatch(/rotate|scale|skew|matrix/);
-    expect(decl(R, "html.klc-hoya-dev .runner", "animation")).toBe("klc-bob2 500ms steps(1, end) infinite");
-  });
 });
 
 // ------------------------------------------------------------------------------------------------------------ the tips
 describe("the 気仙沼まめ知識 tips (data/loading-tips.json)", () => {
   const data = JSON.parse(read("data/loading-tips.json")), tips = data.tips;
   test("26 or more tips, each with an id, a topic, Japanese, English and a source URL and title; ids are unique", () => {
-    expect(tips.length).toBeGreaterThanOrEqual(24); expect(new Set(tips.map((t) => t.id)).size).toBe(tips.length);
+    expect(tips.length).toBeGreaterThanOrEqual(20); expect(new Set(tips.map((t) => t.id)).size).toBe(tips.length);
     for (const t of tips) {
-      expect(t.id).toMatch(/^[a-z0-9-]+$/); expect(["mascot", "food", "port", "places", "nature", "culture"]).toContain(t.topic);
+      expect(t.id).toMatch(/^[a-z0-9-]+$/); expect(["food", "port", "places", "nature", "culture"]).toContain(t.topic);
       expect(typeof t.ja).toBe("string"); expect(typeof t.en).toBe("string"); expect(t.source.url).toMatch(/^https:\/\//); expect(t.source.title.length).toBeGreaterThan(3);
     }
   });
@@ -549,18 +489,17 @@ describe("the 気仙沼まめ知識 tips (data/loading-tips.json)", () => {
       expect(t.ja.endsWith("。")).toBe(true);
     }
   });
-  test("the mascot tips come from the city: the design manual or the city's page (with the page of the manual noted), the official tourism site for the rest", () => {
-    const mascot = tips.filter((t) => t.topic === "mascot"); expect(mascot.length).toBeGreaterThanOrEqual(5);
-    for (const t of mascot) expect(t.source.url).toMatch(/^https:\/\/(www\.kesennuma\.miyagi\.jp|kesennuma-kanko\.jp)\//);
-    const belt = tips.find((t) => t.id === "mascot-sword-belt"); expect(belt.ja).toBe("ホヤぼーやの剣はサンマで、ベルトはホタテなんだよ。");
-    expect(belt.source.url).toBe("https://www.kesennuma.miyagi.jp/sec/s084/030/010/010/20260520hoyaboyadesignmanual.pdf"); expect(belt.source.page).toMatch(/p\.1/);
+  test("the seafood tips stay: the sea squirt is a catch, not a character", () => {
+    const food = tips.filter((t) => t.id === "hoya-sea-pineapple" || t.id === "hoya-farming-karakuwa");
+    expect(food.length).toBe(2);
+    for (const t of food) { expect(["food", "culture"]).toContain(t.topic); expect(t.ja).toContain("ホヤ"); }
   });
   test("the page carries them with phrase breaks (zero-width spaces), and removing those gives back the data file's text", () => {
     const inline = JSON.parse(html.match(/<script type="application\/json" id="klc-tips">([\s\S]*?)<\/script>/)[1]);
     expect(inline.length).toBe(tips.length);
     inline.forEach((t, i) => { expect(t.ja.split(ZW).join("")).toBe(tips[i].ja); expect(t.en).toBe(tips[i].en); expect(t.id).toBe(tips[i].id); expect(t).not.toHaveProperty("source"); });
-    expect(phrases("ホヤぼーやの剣はサンマで、ベルトはホタテなんだよ。").split(ZW).join("")).toBe("ホヤぼーやの剣はサンマで、ベルトはホタテなんだよ。");
-    expect(phrases("ホヤぼーやの剣はサンマで、ベルトはホタテなんだよ。")).toContain(ZW);
+    expect(phrases("秋に南へもどる、あぶらがのったカツオは「もどりガツオ」とよばれるよ。").split(ZW).join("")).toBe("秋に南へもどる、あぶらがのったカツオは「もどりガツオ」とよばれるよ。");
+    expect(phrases("秋に南へもどる、あぶらがのったカツオは「もどりガツオ」とよばれるよ。")).toContain(ZW);
     expect(tipsJson({ tips: [{ id: "x", ja: "</script>", en: "<!--" }] })).not.toMatch(/</);
   });
 });
@@ -592,9 +531,9 @@ describe("the 大漁旗 drawings stay available; the v3 title does not hang them
 function TRAD() { return ["#165E83", "#223A70", "#17184B", "#00A3AF", "#89C3EB", "#F19072", "#F8B500", "#B7282E", "#FBFAF5", "#595857", "#EB6101", "#FEEEED", "#A0D8EF", "#78C2C4", "#1C1C1C"]; }
 
 // ------------------------------------------------------------------------------------------------------------ the hand-off
-describe("the hand-off cuts the still and fades the title; there is no iris", () => {
-  test("the still is display:none at once, a short landscape screen has its own layout, the prompt shows no focus ring on touch", () => {
-    expect(decl(R, "body.playing .hoya img", "display")).toBe("none");
+describe("the hand-off fades the title; there is no iris and no standing figure", () => {
+  test("a short landscape screen has its own layout, the prompt shows no focus ring on touch", () => {
+    expect(html).not.toContain('class="hoya"');
     expect(decl(R, "#go:focus-visible", "outline", ["@media (hover: none) and (pointer: coarse)"])).toBe("none");
     expect(decl(R, "#intro", "--hz", ["@media (orientation: landscape) and (max-height: 520px)"])).toBe("66%");
     expect(html).not.toContain("function iris(");
@@ -609,7 +548,7 @@ describe("a load that cannot go on says so, politely, with a way forward (docs/C
   test("the notice has a message for each case in Japanese and English, a retry button of at least 44 px, and replaces the card", () => {
     const err = html.match(/<div class="ld-err"[\s\S]*?<\/button><\/div>/)[0].replace(/<wbr>/g, "");   // (the Japanese is hand-set with <wbr> at each phrase)
     expect(html).toContain("読み込みに<wbr>時間が<wbr>かかっています。<wbr>電波の<wbr>よい<wbr>場所で、<wbr>もう一度<wbr>お試しください。");
-    expect(decl(R, "#intro.ld-failed .hoya", "display")).toBe("none");
+    expect(decl(R, "#intro.ld-failed .ld-card", "display")).toBe("none");
     for (const kind of ["slow", "offline", "failed"]) { expect(err).toContain(`m-${kind} m-ja`); expect(err).toContain(`m-${kind} m-en`); }
     expect(err).toContain("読み込みに時間がかかっています。電波のよい場所で、もう一度お試しください。"); expect(err).toContain("You seem to be offline. Please reconnect and try again.");
     expect(err).not.toMatch(/[,!?]/.exec("") ? /$^/ : /。。|、、/); expect(err).toContain('<button type="button" id="ld-retry">');

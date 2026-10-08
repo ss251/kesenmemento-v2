@@ -88,7 +88,7 @@ const desk = (page, w, h) => page.S("Emulation.setDeviceMetricsOverride", { widt
 const RECT = `const rc = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return { l: +b.left.toFixed(1), t: +b.top.toFixed(1), r: +b.right.toFixed(1), b: +b.bottom.toFixed(1), w: +b.width.toFixed(1), h: +b.height.toFixed(1) }; };`;
 /** The title screen (v3, docs/loading/README.md): where 「タップしてスタート」 is, whether anything covers it, and whether the still, the mark and the button overlap. */
 const INTRO_JS = `(() => { ${RECT}
-  const go = document.querySelector('#go'), intro = document.querySelector('#intro'), brand = document.querySelector('#logo'), peek = document.querySelector('.hoya img'), credit = document.querySelector('.credit'), run = document.querySelector('.runner'), tip = document.querySelector('.tip');
+  const go = document.querySelector('#go'), intro = document.querySelector('#intro'), brand = document.querySelector('#logo'), peek = document.querySelector('.hoya img'), credit = document.querySelector('#intro .credit'), run = document.querySelector('.runner'), tip = document.querySelector('.tip');
   const g = rc(go), cs = getComputedStyle(intro), hit = go ? document.elementFromPoint(g.l + g.w / 2, g.t + g.h / 2) : null;
   const ov = (a, b) => !!(a && b && a.l < b.r - 0.5 && a.r > b.l + 0.5 && a.t < b.b - 0.5 && a.b > b.t + 0.5);
   const B = rc(brand), P = rc(peek), C = rc(credit), R = rc(run), G = g, TB = tip && getComputedStyle(tip).display !== 'none' ? rc(tip) : null;
@@ -174,7 +174,8 @@ d("ui-b, a phone: the intro card, the story card, the ship UI's top bar, the sea
     M.row8 = out;
     for (const k of Object.keys(out)) {
       expect(out[k].goInside).toBe(true); expect(out[k].goHit).toBe(true); expect(out[k].go.h).toBeGreaterThanOrEqual(44);
-      if (!["480x200", "568x240"].includes(k)) { expect(out[k].peekInside).toBe(true); expect(out[k].creditInside).toBe(true); expect(Object.entries(out[k].clash).filter(([, v]) => v).map(([n]) => n)).toEqual([]); }   // (the two smallest windows are shorter than any picture can be)
+      expect(out[k].peek).toBeNull(); expect(out[k].credit).toBeNull();
+      if (!["480x200", "568x240"].includes(k)) { expect(Object.entries(out[k].clash).filter(([, v]) => v).map(([n]) => n)).toEqual([]); }   // (the two smallest windows are shorter than any picture can be)
     }
   });
 
@@ -182,7 +183,7 @@ d("ui-b, a phone: the intro card, the story card, the ship UI's top bar, the sea
     await vp(390, 844);
     const ring = await ev(`(() => { const g = document.getElementById('go'), cs = getComputedStyle(g); return { active: document.activeElement === g, focusVisible: g.matches(':focus-visible'), outlineStyle: cs.outlineStyle, outlineWidth: cs.outlineWidth }; })()`);
     await ev(`(() => { const X = window.__x = { t0: 0, peek: null, credit: null, irisAt: null };
-      new MutationObserver(() => { if (document.body.classList.contains('playing') && !X.t0) { X.t0 = performance.now(); X.peek = getComputedStyle(document.querySelector('.hoya img')).display; X.credit = getComputedStyle(document.querySelector('.credit')).display; X.irisAt = !!document.getElementById('klc-iris'); } }).observe(document.body, { attributes: true, attributeFilter: ['class'] }); })()`);
+      new MutationObserver(() => { if (document.body.classList.contains('playing') && !X.t0) { X.t0 = performance.now(); X.peek = document.querySelector('.hoya img'); X.credit = document.querySelector('#intro .credit'); X.irisAt = !!document.getElementById('klc-iris'); } }).observe(document.body, { attributes: true, attributeFilter: ['class'] }); })()`);
     const g = await center(page, "#go"); await f.tap(g.x, g.y);
     await page.waitFor("document.body.classList.contains('playing')", { timeout: 20000 });
     await sleep(1500);
@@ -192,7 +193,7 @@ d("ui-b, a phone: the intro card, the story card, the ship UI's top bar, the sea
     await page.waitFor("window.__pad && !window.__pad.hidden", { timeout: 30000 }).catch(() => {});
     await ev("window.__pad && window.__pad.dismissCoach && window.__pad.dismissCoach()");
     expect(ring.outlineStyle).toBe("none");
-    expect(x.peek).toBe("none"); expect(x.credit).toBe("none");   // the still and its credit are cut, never faded
+    expect(x.peek).toBeNull(); expect(x.credit).toBeNull();   // no standing figure, no credit pill
     expect(x.irisAt).toBe(false); expect(after.iris).toBe(false);
     // gone = taken out of the page (display none, so it cannot catch a tap meant for the HUD), or faded and inert
     expect(after.display === "none" || (after.opacity === 0 && after.pointer === "none")).toBe(true); expect(after.backdrop).toBe("none");

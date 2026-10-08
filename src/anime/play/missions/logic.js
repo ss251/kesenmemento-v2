@@ -2,7 +2,9 @@
 // Step types: talk, reach, collect, medal, ippon, photo, deliver, gull, swim, race.
 // Events that do not exist yet are still named here; docs/play/MISSIONS.md lists them for the other lanes.
 
-export const TALK_R = 3;
+import COURSES from '../../../../data/play/courses.json';
+
+export const TALK_R = 4.5;
 export const CPS = 40;
 /** A quest mark stays fully visible out to here, then fades, and is gone at BALLOON_FAR. */
 export const BALLOON_NEAR = 60;
@@ -17,6 +19,24 @@ export const RING_WORLD_M = 1.7;
 /** Dialogue body. The box grows with the type; it is not squeezed to keep the old height. */
 export const DIALOGUE_PHONE_PX = 22;
 export const DIALOGUE_DESK_PX = 24;
+/** A reach step farther than this offers 飛んで行く. */
+export const FLY_AWAY = 300;
+
+/** Course and night-race starts, so a medal or a race still has an arrow. */
+export const COURSE_START = {
+  'race-minato': { x: 105.2, y: 2.4, z: 105.7 },
+};
+for (const course of COURSES.courses) {
+  if (course?.start) COURSE_START[course.id] = { x: course.start.x, y: course.start.y, z: course.start.z };
+}
+
+const MODE_KEY = {
+  walk: 'play.quest.mode.walk',
+  fly: 'play.quest.mode.fly',
+  drive: 'play.quest.mode.drive',
+  sail: 'play.quest.mode.sail',
+  swim: 'play.quest.mode.swim',
+};
 
 const MEDAL = { bronze: 1, silver: 2, gold: 3 };
 
@@ -46,8 +66,10 @@ export function emptyProgress() {
     ippon: { kg: 0, count: 0, maxCm: 0 },
     perch: null,
     swim: null,
+    diving: false,
     photos: [],
     raceMs: null,
+    races: {},
     rewards: {},
     pending: [],
     introduced: false,
@@ -71,6 +93,9 @@ export function hydrate(saved) {
   if (saved.swim && typeof saved.swim === 'object') s.swim = saved.swim;
   if (Array.isArray(saved.photos)) s.photos = saved.photos.slice(-24);
   if (Number.isFinite(saved.raceMs)) s.raceMs = saved.raceMs;
+  if (saved.races && typeof saved.races === 'object') {
+    for (const k in saved.races) if (Number.isFinite(+saved.races[k])) s.races[k] = +saved.races[k];
+  }
   if (saved.rewards && typeof saved.rewards === 'object') s.rewards = saved.rewards;
   if (saved.introduced) s.introduced = true;
   if (saved.coach && typeof saved.coach === 'object') s.coach = saved.coach;
@@ -91,6 +116,7 @@ export function serialize(state) {
     swim: state.swim,
     photos: state.photos.slice(-24),
     raceMs: state.raceMs,
+    races: state.races,
     rewards: state.rewards,
     introduced: !!state.introduced,
     coach: state.coach || {},
@@ -380,20 +406,23 @@ export function stepMet(step, world) {
     }
     case 'gull': {
       const p = world.perch;
-      if (!p) return false;
+      if (!p || p.perched === false) return false;
       if (step.perch && p.id === step.perch) return true;
       if (step.x == null) return false;
       const dx = p.x - step.x, dz = p.z - step.z;
       return dx * dx + dz * dz <= step.r * step.r;
     }
     case 'swim': {
+      if (!world.diving) return false;
       const s = world.swim;
       if (!s) return false;
-      const dx = s.x - step.x, dy = (s.y || 0) - (step.y || 0), dz = s.z - step.z;
-      return dx * dx + dy * dy + dz * dz <= step.r * step.r;
+      const dx = s.x - step.x, dz = s.z - step.z;
+      return dx * dx + dz * dz <= step.r * step.r;
     }
-    case 'race':
-      return world.raceMs != null && world.raceMs <= step.ms;
+    case 'race': {
+      const ms = step.course ? world.races?.[step.course] : world.raceMs;
+      return ms != null && ms <= step.ms;
+    }
     default:
       return false;
   }
@@ -434,10 +463,10 @@ export function noteIppon(state, ev) {
   if ((+cm || 0) > ip.maxCm) ip.maxCm = +cm;
 }
 
-/** The car lane stores its quay race on courses['race-minato']. Keep the best time. */
+/** The night race stores its best on courses['race-minato']. A drive course's medal stays on its own id. */
 export function absorbCourses(state, courses) {
   const race = courses && courses['race-minato'];
-  if (race && Number.isFinite(+race.best)) noteRace(state, +race.best);
+  if (race && Number.isFinite(+race.best)) noteRace(state, +race.best, 'race-minato');
 }
 
 export function notePhoto(state, photo) {
@@ -446,12 +475,30 @@ export function notePhoto(state, photo) {
   if (state.photos.length > 24) state.photos.splice(0, state.photos.length - 24);
 }
 
-export function notePerch(state, perch) { if (perch) state.perch = perch; }
+export function notePerch(state, perch) {
+  if (!perch) return;
+  state.perch = {
+    x: +perch.x || 0, y: +perch.y || 0, z: +perch.z || 0,
+    id: perch.id || null,
+    perched: perch.perched !== false,
+  };
+}
 
-export function noteSwim(state, swim) { if (swim) state.swim = swim; }
+export function noteSwim(state, swim) {
+  if (!swim) return;
+  state.swim = { x: +swim.x || 0, y: +swim.y || 0, z: +swim.z || 0 };
+  if (swim.diving != null) state.diving = !!swim.diving;
+}
 
-export function noteRace(state, ms) {
+/** `courseId` binds the time to that race. Without one, only an unnamed race step can read it. */
+export function noteRace(state, ms, courseId) {
   if (!Number.isFinite(ms)) return;
+  if (courseId) {
+    if (!state.races) state.races = {};
+    const prev = state.races[courseId];
+    if (prev == null || ms < prev) state.races[courseId] = ms;
+    return;
+  }
   if (state.raceMs == null || ms < state.raceMs) state.raceMs = ms;
 }
 
@@ -499,30 +546,109 @@ export function onTalk(state, quests, npcId, now) {
   return acted;
 }
 
-/** Where the tracker arrow points, or null when the step has no place (a medal, a catch, a race). */
-export function stepTarget(step, npcs) {
+/** Quests that are started and not finished, in quest-list order. */
+export function activeIds(state, quests) {
+  const ids = [];
+  if (!state || !quests) return ids;
+  for (let i = 0; i < quests.length; i++) {
+    const p = state.progress[quests[i].id];
+    if (p && !p.done) ids.push(quests[i].id);
+  }
+  return ids;
+}
+
+/** Move the tracked quest among the ones still open. `dir` is 1 or -1. */
+export function cycleActive(state, quests, dir) {
+  const ids = activeIds(state, quests);
+  if (!ids.length) return state.active || null;
+  let i = ids.indexOf(state.active);
+  if (i < 0) i = 0;
+  const n = ids.length;
+  const step = dir < 0 ? n - 1 : 1;
+  state.active = ids[(i + step) % n];
+  return state.active;
+}
+
+function nearestCharm(step, places) {
+  const list = places?.charms;
+  if (!list || !list.length) return null;
+  const found = places.found || {};
+  const pos = places.pos;
+  let best = null;
+  let bestD = Infinity;
+  for (let i = 0; i < list.length; i++) {
+    const c = list[i];
+    if (!c || found[c.id]) continue;
+    const d = pos ? Math.hypot(c.x - pos.x, c.z - pos.z) : 0;
+    if (d < bestD) { bestD = d; best = c; }
+  }
+  if (!best) return null;
+  return { x: best.x, y: best.y == null ? 1.6 : best.y, z: best.z, mode: best.mode || null };
+}
+
+/** Where the tracker arrow points. A medal, a race, a boat and a charm still have a place. */
+export function stepTarget(step, npcs, places) {
   if (!step) return null;
   if (step.type === 'talk' || step.type === 'deliver') {
     const n = findNpc(npcs, step.type === 'talk' ? step.npc : step.to);
     return n ? { x: n.x, y: (n.y || 0) + 1.7, z: n.z } : null;
   }
+  if (step.type === 'collect') return nearestCharm(step, places);
+  if (step.type === 'medal' || step.type === 'race') {
+    const st = COURSE_START[step.course];
+    return st ? { x: st.x, y: st.y == null ? 1.6 : st.y, z: st.z } : null;
+  }
+  if (step.type === 'ippon') {
+    const n = findNpc(npcs, 'captain');
+    return n ? { x: n.x, y: (n.y || 0) + 1.7, z: n.z } : null;
+  }
   if (step.x == null || step.z == null) return null;
-  if (step.type === 'medal' || step.type === 'collect' || step.type === 'ippon' || step.type === 'race') return null;
   return { x: step.x, y: step.y == null ? 1.6 : step.y, z: step.z };
 }
 
-/** The chip for the tracked quest. */
-export function tracker(state, quests, npcs, world) {
+/**
+ * The one travel button for this step, or null.
+ * Photo only while you are inside its radius. A long walk offers the flight.
+ */
+export function trackerAction(step, world) {
+  if (!step) return null;
+  const pos = world?.pos;
+  const dist = (x, z) => (pos ? Math.hypot((x || 0) - pos.x, (z || 0) - pos.z) : Infinity);
+  if (step.type === 'photo' && step.x != null && dist(step.x, step.z) <= (step.r || 0)) {
+    return { id: 'photo', key: 'play.quest.go.photo' };
+  }
+  if (step.type === 'swim') return { id: 'dive', key: 'play.quest.go.dive' };
+  if (step.type === 'gull') return { id: 'gull', key: 'play.quest.go.gull' };
+  if (step.type === 'ippon') return { id: 'boat', key: 'play.quest.go.boat' };
+  if (step.type === 'race') return { id: 'race', key: 'play.quest.go.race' };
+  if (step.type === 'reach' && step.x != null && dist(step.x, step.z) > FLY_AWAY) {
+    return { id: 'fly', key: 'play.quest.go.fly' };
+  }
+  return null;
+}
+
+/** 「漁師！」 or 「案内人？」 on the full map. Other people stay a dot. */
+export function mapLabel(npc, quests, state, name) {
+  const kind = markerFor(npc, quests, state);
+  if (kind !== 'quest' && kind !== 'turnin') return null;
+  return (name || '') + (kind === 'turnin' ? '？' : '！');
+}
+
+/** The chip for the tracked quest. `places.charms` and `places.found` aim a collect step. */
+export function tracker(state, quests, npcs, world, places) {
   const id = state.active;
   if (!id) return null;
   const q = questById(quests, id);
   const p = state.progress[id];
   if (!q || !p || p.done) return null;
   const step = q.steps[p.step] || null;
-  const target = stepTarget(step, npcs);
+  const bag = places ? { charms: places.charms, found: places.found, pos: world?.pos } : null;
+  const target = stepTarget(step, npcs, bag);
   let dist = null;
   if (target && world?.pos) dist = Math.hypot(target.x - world.pos.x, target.z - world.pos.z);
-  return { quest: q, step, index: p.step, target, dist };
+  const action = trackerAction(step, world);
+  const modeKey = step?.type === 'collect' && target?.mode ? (MODE_KEY[target.mode] || null) : null;
+  return { quest: q, step, index: p.step, target, dist, action, modeKey };
 }
 
 /** Fill a reused world object. The caller owns `world` and `world.pos`. */
@@ -534,7 +660,9 @@ export function fillWorld(world, state, pos, katsuo, courses, now) {
   world.photos = state.photos;
   world.perch = state.perch;
   world.swim = state.swim;
+  world.diving = !!state.diving;
   world.raceMs = state.raceMs;
+  world.races = state.races || {};
   world.now = now;
   return world;
 }

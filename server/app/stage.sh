@@ -20,7 +20,7 @@ rm -rf "$OUT/data"
 # Paths the commit may not have yet (a feature merged later) are skipped, so one recipe stages any commit.
 present() { local out=""; for f in "$@"; do git -C "$REPO" cat-file -e "$C:$f" 2>/dev/null && out="$out $f"; done; echo $out; }
 git -C "$REPO" archive "$C" data/anime data/live data/landmarks.json data/i18n.json data/tour.json data/buildings/coast.json data/ship \
-  data/ui-touch-i18n.json data/ui-contrib-i18n.json data/ui-jpyc-i18n.json data/shops $(present data/play data/hoyaboya-approval.json) | tar -x -C "$OUT"   # (data/shops/ holds jpyc.json, the /api/jpyc allowlist that server.js reads at start; data/play/ holds the hub's card stills; hoyaboya-approval.json is the record the walker reads before it shows ホヤぼーや in 3D)
+  data/ui-touch-i18n.json data/ui-contrib-i18n.json data/ui-jpyc-i18n.json data/shops $(present data/play) | tar -x -C "$OUT"   # (data/shops/ holds jpyc.json, the /api/jpyc allowlist that server.js reads at start; data/play/ holds the hub's card stills)
 rm -rf "$OUT/src" "$OUT/scripts"   # the /api/live modules
 git -C "$REPO" archive "$C" src/server/live.js src/core/geo.js src/web/lib/solar.js scripts/live.js scripts/live/fixtures \
   scripts/live/{arrivals,tide,snapshot,sky,jma,http}.js $(present src/server/ais.js src/anime/world/life/ais.js) | tar -x -C "$OUT"

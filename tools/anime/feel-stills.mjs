@@ -1,4 +1,4 @@
-// [feel] The 出荷前チェック's looks for the walk (CRAFT.md §8): ホヤぼーや walking in third person on an iPhone in portrait (390x844 @3) and
+// [feel] The 出荷前チェック's looks for the walk (CRAFT.md §8): the walker in third person on an iPhone in portrait (390x844 @3) and
 // landscape (844x390 @3), a 1600x900 desktop and a Retina 1440x900 @2, in Japanese and English, by day and at night, and under reduced
 // motion, with the もぐる chip up once to show the credit clear of it, and the candidate places for the credit on a landscape phone. One page load per device class; small JPEGs into
 // docs/play/shots/feel/stills/. Each still records his height on screen and what the credit covers (`hits`: the pad's buttons and ring, the chips, the panels, him).
@@ -28,10 +28,10 @@ async function enter(page, phone) {
   await page.waitFor("document.body.classList.contains('playing')", { timeout: 30000 });
   await page.waitFor('!window.__ctx.services.life?.tour?.flying', { timeout: 30000 }).catch(() => {});
 }
-/** In the page: every HUD piece ホヤぼーや's credit must never cover, by name (the pad's buttons and stick ring, the chips, the panels),
+/** In the page: every HUD piece, by name (the pad's buttons and stick ring, the chips, the panels),
  *  him (his projected box: soles to knob tops, 0.55 m either side across the view), the credit's rect and what it hits. */
 const SCENE_JS = `
-  const c = window.__ctx, cam = c.camera; let root = null; c.scene.traverse((o) => { if (o.name === 'hoya3d' && o.visible) root = o; });
+  const c = window.__ctx, cam = c.camera; let root = null; c.scene.traverse((o) => { if (typeof o.name === 'string' && o.name.indexOf('chr_play-') === 0 && o.visible) root = o; });
   const R = (e) => { if (!e || e.closest('[hidden]')) return null; const st = getComputedStyle(e); if (st.display === 'none' || st.visibility === 'hidden') return null;
     const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 ? { l: +b.left.toFixed(1), t: +b.top.toFixed(1), r: +b.right.toFixed(1), b: +b.bottom.toFixed(1) } : null; };
   const hit = (a, b) => !!(a && b && a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t);
@@ -46,7 +46,7 @@ const SCENE_JS = `
     const pts = [[0, 0], [0, 1.1], [0.55, 0.55], [-0.55, 0.55]].map(([s, y]) => { const v = p.clone().addScaledVector(side, s).setY(p.y + y).project(cam); return [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]; });
     obs.him = { l: +Math.min(...pts.map((q) => q[0])).toFixed(1), r: +Math.max(...pts.map((q) => q[0])).toFixed(1), t: +Math.min(...pts.map((q) => q[1])).toFixed(1), b: +Math.max(...pts.map((q) => q[1])).toFixed(1) };
   }
-  const credit = R(document.querySelector('#klc-play .hoya-credit'));
+  const credit = null;
   const hits = Object.keys(obs).filter((k) => hit(credit, obs[k]));
 `;
 /** A walk pose at the hero spot, a short walk so the camera settles behind him, then the still and its numbers. */
@@ -87,7 +87,7 @@ async function spots(page) {
   const set = (css) => page.eval(`(() => { let s = document.getElementById('feel-spot'); if (!s) { s = document.createElement('style'); s.id = 'feel-spot'; document.head.appendChild(s); } s.textContent = ${JSON.stringify(css)}; })()`);
   let first = true;
   for (const [name, css] of Object.entries(SPOTS)) {
-    await set(`${LAND} { body.klc-pad #klc-play .hoya-credit { ${css} } }`);
+    await set(`${LAND} { body.klc-pad #klc-play .avatar-note { ${css} } }`);
     await still(page, 'phone-land-spot-' + name, { walk: false, dump: first });
     await still(page, 'phone-land-spot-' + name + '-moguru', { walk: false, dive: true });
     first = false;

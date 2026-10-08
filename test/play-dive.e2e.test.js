@@ -18,26 +18,26 @@ const T = (name, fn) => test(name, fn, 300000);
 const hit = (a, b) => a.l < b.r - 0.5 && a.r > b.l + 0.5 && a.t < b.b - 0.5 && a.b > b.t + 0.5;
 const COACH_UP = "(() => { const c = document.querySelector('#klc-play .coach'); return !!c && !c.hidden; })()";
 const ACTIVE = '!!(window.__swim && window.__swim.active)';
-/** The third-person walker during a dive: his mesh, his shadow and his credit stay off while the fish is the body.
- *  A child's own visible flag stays true when its group is hidden, so this walks the parents. */
+/** The third-person walker during a dive: the original figure stays off while the fish is the body.
+ *  A child's own visible flag stays true when its group is hidden, so this walks the parents. There is no credit pill. */
 const WALKER = `(() => {
   const ctx = window.__ctx;
   const root = ctx.dynamicRoot || ctx.scene;
   const chain = (o) => { for (let p = o; p; p = p.parent) if (!p.visible) return false; return true; };
-  const hoya = root.getObjectByName('hoya3d');
-  const body = hoya && hoya.getObjectByName('hoya3d-body');
   const drawn = [];
+  let shadow = false;
   root.traverse((o) => {
     if (!o.name || !chain(o)) return;
-    if (o.name === 'hoya3d' || o.name === 'hoya3d-body' || o.name === 'chr_play-navy' || o.name === 'chr_play-kinari' || o.name === 'chr_play-asagi') drawn.push(o.name);
+    if (o.name === 'chr_play-navy' || o.name === 'chr_play-kinari' || o.name === 'chr_play-asagi') {
+      drawn.push(o.name);
+      o.traverse((m) => { if (m.castShadow) shadow = true; });
+    }
   });
-  const creditEl = document.querySelector('#klc-play .hoya-credit');
-  const cs = creditEl ? getComputedStyle(creditEl) : null;
   const p = ctx.playerObj;
   return {
     person: p.person, fly: !!p.fly, swim: !!(window.__swim && window.__swim.active),
-    drawn, shadow: !!(body && body.castShadow && chain(body)),
-    credit: !!(creditEl && !creditEl.hidden && cs.display !== 'none' && cs.visibility !== 'hidden' && +cs.opacity > 0.05),
+    drawn, shadow,
+    credit: false,
   };
 })()`;
 /** The page's own errors. Not counted: the local server has no /api/live, and a headless Chrome on this machine sometimes fails to
@@ -50,7 +50,7 @@ const LAND = `(() => {
   const hud = [...document.querySelectorAll('#klc-ui button, #klc-ui .brand, #klc-ui .pbar, #klc-ui .chip, #klc-x .mini, #klc-x .xbar > *, #klc-play .topbar > *, #klc-play .counters > *, #klc-pad .ghost, #klc-pad .cluster .btn, #klc-play .cluster .act')]
     .filter((e) => { const cs = getComputedStyle(e); const r = e.getBoundingClientRect(); return cs.display !== 'none' && cs.visibility !== 'hidden' && +cs.opacity > 0.05 && r.width > 1 && r.width * r.height < innerWidth * innerHeight * 0.4 && e.dataset.show !== '0'; })
     .map((e) => ({ id: (e.className || e.tagName) + (e.dataset.id ? ':' + e.dataset.id : '') + (e.dataset.act ? ':' + e.dataset.act : ''), ...R(e) }));
-  return { board: shown('#klc-board.show'), drive: shown('#klc-x [data-act="drive"]'), view: shown('#klc-ui [data-act="view"]'), credit: shown('#klc-play .hoya-credit'), swim: document.body.classList.contains('klc-swim'), hud };
+  return { board: shown('#klc-board.show'), drive: shown('#klc-x [data-act="drive"]'), view: shown('#klc-ui [data-act="view"]'), credit: false, swim: document.body.classList.contains('klc-swim'), hud };
 })()`;
 
 /** Shared checks for a dive that has just started. */
@@ -285,8 +285,8 @@ d('海の中 on a phone (390x844 @3, touch)', () => {
     expect(back.person).toBe('third');
     const boom = await page.eval('window.__ctx.services.play.avatar.boom');
     if (boom > 0.7) {
-      expect(back.drawn.length).toBeGreaterThan(0);
-      expect(back.credit).toBe(back.drawn.includes('hoya3d'));
+      expect(back.drawn.some((n) => n.startsWith('chr_play-'))).toBe(true);
+      expect(back.credit).toBe(false);
     }
   });
 });

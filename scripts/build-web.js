@@ -18,7 +18,8 @@ export async function buildWeb({ minify = process.env.KLC_MINIFY !== "0", quiet 
   { const { writeRegistry } = await import("./anime/registry.js"); writeRegistry(); }   // [v3:foundation]
   const entry = join(ROOT, "src/anime/index.html");
   const define = (await import("./anime/buildinfo.js")).buildDefines(ROOT);   // [contrib] the build stamp every report carries (core/buildinfo.js)
-  const res = await Bun.build({ entrypoints: [entry], outdir: DIST, minify, sourcemap: "linked", target: "browser", splitting: true, define });
+  const plugins = [(await import("./anime/optional-meme.js")).optionalMemePlugin(ROOT)];
+  const res = await Bun.build({ entrypoints: [entry], outdir: DIST, minify, sourcemap: "linked", target: "browser", splitting: true, define, plugins });
   if (!res.success) { for (const l of res.logs) console.error(l); throw new Error("bun build failed"); }
   { const { fixHtmlEntry } = await import("./anime/html-entry.js"); for (const f of fixHtmlEntry(res.outputs)) console.error(`[build] Bun pointed ${f.html} at ${f.from}; fixed to the entry chunk ${f.to}`); }   // [ship:integrate]
   { const { installTitleAssets } = await import("./anime/title-assets.js"); installTitleAssets(DIST, ROOT); }   // [title] posters and the font-face urls

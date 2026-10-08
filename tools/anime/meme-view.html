@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>メメ 3D viewer</title>
+<style>
+  /* the sheet's palette: 生成り paper, 紺 ink, 墨 secondary (docs/CRAFT.md) */
+  :root { --kinari: #FBFAF5; --kon: #223A70; --sumi: #595857; --hair: #E1E3E5; }
+  html, body { margin: 0; height: 100%; background: var(--kinari); color: var(--kon); overflow: hidden;
+    font: 500 14px/1.6 "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", system-ui, sans-serif; }
+  #view { display: block; width: 100vw; height: 100vh; touch-action: none; cursor: grab; }
+  #view:active { cursor: grabbing; }
+  #panel { position: fixed; left: calc(16px + env(safe-area-inset-left, 0px)); top: calc(16px + env(safe-area-inset-top, 0px)); width: 296px; max-width: calc(100vw - 32px);
+    padding: 16px; border-radius: 16px; background: rgba(251, 250, 245, 0.92); box-shadow: 0 8px 28px rgba(35, 40, 70, 0.14); backdrop-filter: blur(8px); }
+  #panel h1 { margin: 0 0 4px; font-size: 22px; line-height: 1.3; font-weight: 900; letter-spacing: 0.04em; }
+  #panel p.sub { margin: 0 0 12px; color: var(--sumi); font-size: 12px; line-height: 1.5; }
+  .row { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 12px; }
+  .row b { width: 100%; font-size: 12px; color: var(--sumi); font-weight: 700; letter-spacing: 0.06em; }
+  button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: #EEF0F2; color: var(--kon); font: inherit; font-size: 13px; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--kon); color: var(--kinari); }
+  button:focus-visible { outline: 2px solid #165E83; outline-offset: 2px; }
+  #stats { margin: 4px 0 0; font: 500 12px/1.5 ui-monospace, "SF Mono", Menlo, monospace; color: var(--sumi); white-space: pre-line; }
+  #credit { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: var(--sumi); pointer-events: none; }
+  body.capture #panel, body.capture #credit { display: none; }
+  @media (max-width: 520px) { #panel { width: auto; right: 16px; padding: 12px; } #panel p.sub { display: none; } }
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="panel" role="region" aria-label="viewer controls">
+  <h1>メメ</h1>
+  <p class="sub">ケセンメメントの案内役 · 1.15 m · drag to turn him</p>
+  <div class="row" id="poses"><b>うごき · POSE</b></div>
+  <div class="row" id="cams"><b>カメラ · CAMERA</b></div>
+  <div class="row" id="lights"><b>ひかり · LIGHT</b></div>
+  <div class="row" id="opts"><b>せってい · OPTIONS</b></div>
+  <div id="stats"></div>
+</div>
+<div id="credit">An original character by the KesenMemento team, 2026</div>
+<script type="module" src="./meme-view.mjs"></script>
+</body>
+</html>

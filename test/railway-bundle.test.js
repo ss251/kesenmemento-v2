@@ -77,18 +77,18 @@ describe("makeBundle on a small checkout", () => {
       expect(existsSync(join(out, "public/old-chunk.js"))).toBe(false); expect(existsSync(join(out, "public/chunk-abc123.css"))).toBe(false);
     } finally { rmSync(root, { recursive: true, force: true }); }
   });
-  test("the entries a checkout may lack ship when it has them (the play data, the approval record, the AIS modules, the voucher check)", () => {
+  test("the entries a checkout may lack ship when it has them (the play data, the AIS modules, the voucher check)", () => {
     const { root, dist } = checkout(), out = join(root, "bundle");
     try {
-      put(root, "data/play/courses.json", "{}"); put(root, "data/play/art/a.webp"); put(root, "data/hoyaboya-approval.json", "{}");
+      put(root, "data/play/courses.json", "{}"); put(root, "data/play/art/a.webp");
       put(root, "data/play-i18n.json", "{}");                    // beside data/play, not under it: bundled into the build, must not ship
       put(root, "src/server/ais.js"); put(root, "src/anime/world/life/ais.js"); put(root, "src/anime/play/missions/voucher.js");
       put(root, "src/anime/play/missions/logic.js");             // beside the voucher check: must not ship
       const r = makeBundle({ root, dist, out, compress: false, log: () => {} });
       const got = walk(out);
-      for (const f of ["data/play/courses.json", "data/play/art/a.webp", "data/hoyaboya-approval.json", "src/server/ais.js", "src/anime/world/life/ais.js", "src/anime/play/missions/voucher.js"]) expect([f, got.includes(f)]).toEqual([f, true]);
+      for (const f of ["data/play/courses.json", "data/play/art/a.webp", "src/server/ais.js", "src/anime/world/life/ais.js", "src/anime/play/missions/voucher.js"]) expect([f, got.includes(f)]).toEqual([f, true]);
       for (const f of ["data/play-i18n.json", "src/anime/play/missions/logic.js", "data/local/crew.json", "scripts/live/secret-helper.js"]) expect([f, got.includes(f)]).toEqual([f, false]);
-      expect(r.data).toBe(7); expect(r.modules).toBe(8);
+      expect(r.data).toBe(6); expect(r.modules).toBe(8);
     } finally { rmSync(root, { recursive: true, force: true }); }
   });
   test("precompression writes .br and .gz beside the large compressible files only", () => {

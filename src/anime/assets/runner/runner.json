@@ -8,13 +8,5 @@
   "alt": {
     "ja": "カツオ",
     "en": "Bonito"
-  },
-  "hoya": {
-    "mode": "off",
-    "pose": "1-5",
-    "src": "runner-a.png",
-    "aspect": 0.6406,
-    "credit": "ja",
-    "approval": null
   }
 }

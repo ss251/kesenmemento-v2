@@ -55,7 +55,7 @@
 - **Rhythm.** Japanese body line-height 1.6–1.8, headings 1.3. `font-feature-settings: "palt"` on headings only.
 - **Integrity.**
   - No faux bold or italic, and no stretched type.
-  - No text on top of ホヤぼーや (its design manual).
+  - No text on top of the walker.
   - Kid-facing copy avoids hard kanji, or gives them ruby.
 
 ## 3. 余白とかたち: spacing, shape, layout
@@ -98,7 +98,7 @@
 - **Facts** (まめ知識, place notes, tips) each carry a source in their data file. No guesses.
 - **Content rules:**
   - The town is shown as the living place it is today. No text may match `SENSITIVE` in `scripts/anime/enrich/fold.js`.
-  - No third-party characters or logos except as licensed: ホヤぼーや only as Kesennuma City's design manual allows, with its credit.
+  - No third-party characters or logos. The walker is original to this project.
   - No Google Maps, Street View, listing or other third-party photos.
 
 ## 7. おもてなし: hospitality

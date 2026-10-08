@@ -106,13 +106,13 @@ try {
         await page.S('Input.dispatchMouseEvent', { type: 'mousePressed', x: c.x, y: c.y, button: 'left', clickCount: 1 });
         await page.S('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: 1 });
         let cut = 'shown';
-        for (let i = 0; i < 8 && cut !== 'none'; i++) { await sleep(16); cut = await page.eval(`(() => { const e = document.querySelector('.hoya img'); return e ? getComputedStyle(e).display : 'missing'; })()`); }
+        for (let i = 0; i < 8 && cut !== 'missing'; i++) { await sleep(16); cut = await page.eval(`(() => { const e = document.querySelector('.hoya img'); return e ? getComputedStyle(e).display : 'missing'; })()`); }
         try { await page.waitFor("document.body.classList.contains('playing')", { timeout: 12000 }); } catch { /* the check below records it */ }
         await cast.stop();
         const after = await page.eval(`({ fd: window.__fd.slice(), iris: !!document.getElementById('klc-iris'), playing: document.body.classList.contains('playing') })`);
         const fd = after.fd.slice(2, 60);
         numbers.load[tier].push({ readyMs: ready.t, firstFrameMs: ready.stats.first, bootMs: ready.stats.boot, marks: ready.marks, paints: ready.paints, longestTaskMs: ready.longest, handoff: { p50: pct(fd, 0.5), p95: pct(fd, 0.95), p99: pct(fd, 0.99), over50: fd.filter((d) => d > 50).length, frames: fd.length } });
-        check(`load ${tier} #${run + 1}: the still is cut on the tap, there is no iris, and the town is playing`, cut === 'none' && !after.iris && after.playing, { cut, iris: after.iris, playing: after.playing });
+        check(`load ${tier} #${run + 1}: there is no standing figure, there is no iris, and the town is playing`, cut === 'missing' && !after.iris && after.playing, { cut, iris: after.iris, playing: after.playing });
         check(`load ${tier} #${run + 1}: the hand-off frames (p95 ${pct(fd, 0.95)} ms, over 50 ms: ${fd.filter((d) => d > 50).length})`, true);
         // the compositor proof: during the longest stretch of the load the screencast still changes
         const frames = cast.frames;

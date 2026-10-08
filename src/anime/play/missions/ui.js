@@ -21,15 +21,32 @@ const CSS = `
 #klc-m button:focus-visible { outline: 2px solid #c4521f; outline-offset: 2px; }
 #klc-m .m-track {
   position: absolute; pointer-events: auto; text-align: left;
-  display: flex; align-items: center; gap: 12px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
   top: calc(76px + env(safe-area-inset-top)); left: calc(12px + env(safe-area-inset-left));
-  max-width: min(360px, calc(100% - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)));
-  min-height: 72px; padding: 12px 16px;
+  max-width: min(400px, calc(100% - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  min-height: 72px; padding: 8px;
   background: rgba(251, 250, 245, 0.94); color: #17184b;
   border: 2px solid #223A70; border-radius: 12px;
   box-shadow: 0 4px 16px rgba(23, 24, 75, 0.16);
 }
+#klc-m .m-track-open {
+  flex: 1 1 160px; min-width: 0; min-height: 44px; padding: 4px 8px;
+  display: flex; align-items: center; gap: 12px;
+  background: transparent; border: 0; color: inherit; text-align: left;
+}
 #klc-m .m-track-copy { display: flex; flex-direction: column; min-width: 0; }
+#klc-m .m-track-nav {
+  width: 44px; height: 44px; flex: none; padding: 0; border-radius: 999px;
+  border: 2px solid #223A70; background: #FBFAF5; color: #223A70;
+  font: 700 18px/1 "Zen Maru Gothic", "Noto Sans JP", sans-serif;
+}
+#klc-m .m-track-go {
+  flex: 1 0 100%; min-height: 44px; padding: 8px 16px; border: 0; border-radius: 999px;
+  background: #F8B500; color: #17184b;
+  font-family: "Zen Maru Gothic", "Noto Sans JP", sans-serif; font-weight: 700; font-size: 16px;
+  box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px #223A70;
+}
+#klc-m .m-track-go:active, #klc-m .m-track-nav:active { transform: scale(0.94); }
 #klc-m .m-track-arrow {
   width: 28px; height: 28px; flex: none; display: block;
 }
@@ -353,9 +370,14 @@ export function mountUi(o) {
   style.textContent = CSS;
   root.appendChild(style);
 
-  const track = el(doc, 'button', 'm-track');
-  track.setAttribute('type', 'button');
+  const track = el(doc, 'div', 'm-track');
   track.hidden = true;
+  const trackPrev = el(doc, 'button', 'm-track-nav');
+  trackPrev.type = 'button';
+  trackPrev.hidden = true;
+  trackPrev.textContent = '◀';
+  const trackOpen = el(doc, 'button', 'm-track-open');
+  trackOpen.type = 'button';
   const trackArrow = el(doc, 'span', 'm-track-arrow');
   trackArrow.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="#223A70" stroke="#F8B500" stroke-width="1.5" stroke-linejoin="round" d="M12 2.5l4.2 7.2H14v12h-4v-12H7.8z"/></svg>';
   trackArrow.hidden = true;
@@ -366,9 +388,28 @@ export function mountUi(o) {
   trackCopy.appendChild(trackTitle);
   trackCopy.appendChild(trackStep);
   trackCopy.appendChild(trackDist);
-  track.appendChild(trackArrow);
-  track.appendChild(trackCopy);
-  track.addEventListener('click', () => o.onOpenLog?.());
+  trackOpen.appendChild(trackArrow);
+  trackOpen.appendChild(trackCopy);
+  const trackNext = el(doc, 'button', 'm-track-nav');
+  trackNext.type = 'button';
+  trackNext.hidden = true;
+  trackNext.textContent = '▶';
+  const trackGo = el(doc, 'button', 'm-track-go');
+  trackGo.type = 'button';
+  trackGo.hidden = true;
+  const stop = (e) => e.stopPropagation();
+  trackPrev.addEventListener('click', (e) => { stop(e); o.onPrev?.(); });
+  trackNext.addEventListener('click', (e) => { stop(e); o.onNext?.(); });
+  trackGo.addEventListener('click', (e) => { stop(e); o.onGo?.(); });
+  track.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t && t.closest && (t.closest('.m-track-go') || t.closest('.m-track-nav'))) return;
+    o.onOpenLog?.();
+  });
+  track.appendChild(trackPrev);
+  track.appendChild(trackOpen);
+  track.appendChild(trackNext);
+  track.appendChild(trackGo);
   track.addEventListener('animationend', () => track.classList.remove('m-flash'));
 
   const book = el(doc, 'button', 'm-book');
@@ -544,13 +585,19 @@ export function mountUi(o) {
   function setTracker(m) {
     if (!m) { track.hidden = true; trackKey = ''; return; }
     track.hidden = false;
-    const key = m.title + '\n' + m.step + '\n' + (m.dist || '');
+    const key = m.title + '\n' + m.step + '\n' + (m.dist || '') + '\n' + (m.action || '') + '\n' + (m.nav ? '1' : '0');
     if (key === trackKey) return;
     trackKey = key;
     trackTitle.textContent = m.title;
     trackStep.textContent = m.step || '';
     trackDist.textContent = m.dist || '';
     trackDist.hidden = !m.dist;
+    trackGo.hidden = !m.action;
+    trackGo.textContent = m.action || '';
+    trackPrev.hidden = !m.nav;
+    trackNext.hidden = !m.nav;
+    if (m.prev) trackPrev.setAttribute('aria-label', m.prev);
+    if (m.next) trackNext.setAttribute('aria-label', m.next);
     if (m.lit) track.classList.add('m-lit');
   }
 

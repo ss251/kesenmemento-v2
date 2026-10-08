@@ -15,6 +15,7 @@ import { createVeil, interruptFlight, skyColor } from './veil.js';   // [ui-a2] 
 import { mountJpycStore, ICON as JPYC_ICON } from './jpyc-store.js';   // [jpyc] 「JPYCで買えるお店」: the shop list and each shop's products on JPYC EC, a link out to buy (docs/jpyc/README.md)
 import PLAY from '../../../data/play-i18n.json';   // [play] 「みんなであそぶ」: the menu label only. The sheet lives in play/multi.
 import { nextView, viewId, viewLabelKey } from '../play/avatar/view.js';
+import { viewCycleAllowed } from '../play/kit/modes.js';   // [view] a person swap inside walk is not a mode change
 
 const ICON = {
   tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',   // [mobile] the 地名ラベル toggle
@@ -379,6 +380,11 @@ export function mountHud(ctx, life, o = {}) {
     const gull = ctx.services?.play?.gull;
     const was = !!gull?.active;
     if (was) { try { gull.leave(next === 'fly' ? 'drone' : 'walk'); } catch (e) { /* */ } }
+    else {
+      const pl = ctx.playerObj;
+      const from = ctx.services?.play?.graphMode?.() || (pl?.fly ? 'fly' : 'walk');
+      if (!viewCycleAllowed(from, next, pl?.allowMode)) return;
+    }
     applyPlayView(next, { fromGull: was });
   }
   // [v3:integrate] tiny-planet overview (core/planet.js): the whole bay as a small turning world
@@ -393,6 +399,8 @@ export function mountHud(ctx, life, o = {}) {
   // photo mode (./photo.js): a desktop saves a 16:9 3840x2160 PNG at scale 1; a phone shoots 1920 px on the long side at the screen's aspect and shows a card whose button opens the share sheet.
   // [ui-c2] photo.js says what it is doing through `note` and these two strings: 撮影中… before the render, and 保存しました only AFTER the share sheet (or the download) has resolved, never before.
   async function photo(scale = 1, o = {}) {
+    const pl = ctx.playerObj;
+    if (typeof pl?.allowMode === 'function' && !pl.allowMode('photo', { via: 'key' })) return null;
     if (!ctx.renderer || !ctx.pipeline) { note(I.t('photo.unavailable')); return null; }
     try { return await takePhoto(ctx, T, { ...o, scale, lang: I.lang, note, text: { saving: I.t('v3.photo.saving'), saved: I.t('v3.photo.saved') } }); }
     catch (e) { console.warn('photo', e); note(I.t('photo.unavailable')); return null; }   // (a failed shot on a phone: the card says so too; the click handler never sees a rejection)
@@ -451,7 +459,12 @@ export function mountHud(ctx, life, o = {}) {
     // [ui-a2] a movement key takes the camera back. The auto tour stops, as before. A flight to a place is finished with skip(), never with stop() (which freezes the camera in mid-air):
     // a quarter-second glide when it is near its destination, a veil dip when it is far (ui/veil.js). A held key is one press: repeats are ignored, so the flight is ended once.
     else if (FLY_BREAK.has(e.code) && !e.metaKey && !e.ctrlKey && !e.altKey && (tour.playing || (tour.flying && !e.repeat))) { if (tour.playing) { tour.stop(); syncState(); } else interruptFlight(tour, ctx.veil); }
-    else if (/^Digit[1-9]$/.test(e.code)) { const s = tour.stops[Number(e.code.slice(5)) - 1]; if (s) { e.stopImmediatePropagation?.(); tour.stop(); if (!(ui.view === 'walk' && tour.walkTo(s.id))) { ui.view = 'drone'; tour.flyTo(s.id); } syncState(); } }   // [v3:fix] number keys follow the view, like the places panel
+    else if (/^Digit[1-9]$/.test(e.code)) {
+      const play = ctx.services?.play;
+      const mode = play?.graphMode?.();
+      if (mode && play.padChipsHidden?.(mode)) return;
+      const s = tour.stops[Number(e.code.slice(5)) - 1]; if (s) { e.stopImmediatePropagation?.(); tour.stop(); if (!(ui.view === 'walk' && tour.walkTo(s.id))) { ui.view = 'drone'; tour.flyTo(s.id); } syncState(); }
+    }   // [v3:fix] number keys follow the view, like the places panel
   }, true);
   T.onChange((s, why) => { if (why === 'end' || why === 'instant' || why === 'hours' || why === 'live' || why === 'start') syncState(); });
   tour.onChange(() => syncState());   // the stop the camera is at, the tour button, the places planet (explore's tour.add): all in place; a changed stop count rebuilds the list once

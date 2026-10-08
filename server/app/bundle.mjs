@@ -27,8 +27,8 @@ export const BUNDLE_DATA = [
   "data/anime", "data/live", "data/landmarks.json", "data/i18n.json", "data/tour.json", "data/buildings/coast.json", "data/ship",
   "data/ui-touch-i18n.json", "data/ui-contrib-i18n.json", "data/ui-jpyc-i18n.json", "data/shops",
 ];
-/** Data a checkout may not have (a feature merged later): stage.sh's `present(...)` after the first list. data/play holds the hub's card stills; the approval record is read before the 3D walker is shown. */
-export const BUNDLE_DATA_OPTIONAL = ["data/play", "data/hoyaboya-approval.json"];
+/** Data a checkout may not have (a feature merged later): stage.sh's `present(...)` after the first list. data/play holds the hub's card stills. */
+export const BUNDLE_DATA_OPTIONAL = ["data/play"];
 /** The /api/live modules and what they import: the second `git archive` in stage.sh. */
 export const BUNDLE_MODULES = [
   "src/server/live.js", "src/core/geo.js", "src/web/lib/solar.js", "scripts/live.js", "scripts/live/fixtures",

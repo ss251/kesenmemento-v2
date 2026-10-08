@@ -1,6 +1,6 @@
 // [play] The original walker. Three gender-neutral looks on the cast-kit rig
 // (sex is the proportion set, not a person). No likeness of anyone in town.
-// The ホヤぼーや mesh, when it lands, replaces this group; this file never models him.
+// A custom character, when its module loads, replaces this group. This file never models that character.
 
 import { Human } from '../../world/life/characters/human.js';
 import { Driver, rotMul } from '../../world/life/characters/anim.js';

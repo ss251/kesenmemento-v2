@@ -120,7 +120,7 @@ export function layoutBounds(boxes) {
 }
 export const rectsOverlap = (a, b, pad = 0) => a.l < b.r + pad && a.r > b.l - pad && a.t < b.b + pad && a.b > b.t - pad;
 /** Lift a box (anchored at the bottom) until it clears the given panel rects { l, t, r, b }: returns its bottom edge. */
-/** [emil-ui] A portrait phone's bottom band (CSS px above the safe area's bottom): the pad's floor, where the pill row was (34 + 44), and ホヤぼーや's credit's place under it. */
+/** [emil-ui] A portrait phone's bottom band (CSS px above the safe area's bottom): the pad's floor, where the pill row was (34 + 44). */
 export const PHONE_BAND = 78;
 export function liftClear(box, bottom, panels, gap = 8, floor = -Infinity) {
   let y1 = bottom;
@@ -367,6 +367,10 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
         <span class="ico">${iconOf(b.icon)}</span><span class="lbl">${text(b.label)}</span></button>`;
     }).join('');
     root.dataset.mode = pad.mode; root.dataset.custom = custom.has(pad.mode) ? '1' : '0'; root.dataset.nostick = modes.get(pad.mode)?.stick === 'none' ? '1' : '0';
+    const play = ctx.services?.play;
+    const special = !!(play?.padChipsHidden && play.graphMode && play.padChipsHidden(play.graphMode()));
+    root.dataset.special = special ? '1' : '0';
+    if (chip) chip.hidden = special;
     for (const m of chip.querySelectorAll('button[data-mode]')) m.setAttribute('aria-pressed', String(pad.mode === m.dataset.mode));
     syncButtons();
     dirty.buttons = false; dirty.layout = true;
@@ -418,7 +422,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     const sa = safe.getBoundingClientRect();
     const panels = panelRects();
     // [emil-ui] a portrait phone lost its bottom pill row (hud.js); its band, the 78 px above the safe area's bottom, stays the pad's floor. The stick and the buttons
-    // sit where they did on #7, and the band under them is ホヤぼーや's credit's (play/avatar/index.js; touchpad-style.js keeps the HUD's sheets above it).
+    // sit where they did on #7. touchpad-style.js keeps the HUD's sheets above the pad.
     if (win.matchMedia?.('(max-width: 720px) and (orientation: portrait)')?.matches) panels.push({ l: sa.left, t: sa.bottom - PHONE_BAND, r: sa.right, b: sa.bottom });
     const M = 12 * sc + 4, floor = sa.top + 56;
     // the action cluster: bottom corner of the thumb's side, lifted clear of the panels
@@ -675,6 +679,8 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   /** The mode chip: 歩く / 飛ぶ / 運転 as quick switches. */
   function switchTo(m) {
     const p = pl(), dr = drive();
+    const to = m === 'drive' ? 'drive' : m === 'fly' ? 'fly' : 'walk';
+    if (typeof p?.allowMode === 'function' && !p.allowMode(to, { via: 'pad', atPlace: to === 'drive' ? !!dr?.canEnter?.() : true, atShore: to === 'walk' })) return;
     explicit = false;
     if (m === 'drive') { if (!dr?.active && !dr?.enter()) note(tr('touch.note.noRoad')); }
     else {

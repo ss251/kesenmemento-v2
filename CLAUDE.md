@@ -7,7 +7,7 @@
    - No Google Maps, Street View, listing or other third-party photos.
    - Only shops that have consented appear.
    - No faces from real photos.
-   - ホヤぼーや only as Kesennuma City's design manual allows: official stills as published, with the credit. Animation, 3D or commercial use needs the city's approval.
+   - The walker is original to this project. A custom character (working name メメ) fills `src/anime/play/avatar/characters.js` when its module is in the build. Until then the original figure walks. No city mascot.
    - Never commit `raw/`, photos, secrets or symlinks.
 4. **Commits:**
    - Conventional, atomic, with explicit paths.

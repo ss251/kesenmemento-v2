@@ -64,7 +64,8 @@ describe("the phone HUD (ui/hud.js, touchpad-style.js): one top bar, a ☰ menu,
     expect(Object.keys(JSON.parse(read("data/i18n.json")).ja).some((k) => k.startsWith("touch."))).toBe(false);
   });
   test("a custom pad mode hides the 歩く / 飛ぶ / 運転 chip (it would unhook the sail buttons)", () => {
-    expect(css).toMatch(/#klc-pad\[data-custom="1"\] \.chip \{ display: none;/);
+    // the one rule may list more selectors (a dive, gull, car, boat, race or game sets data-special): the custom one must be among them
+    expect(css).toMatch(/#klc-pad\[data-custom="1"\] \.chip(, [^{]+)? \{ display: none;/);
     expect(read("src/anime/ui/touchpad.js")).toContain("root.dataset.custom");
   });
   test("the ship UI keeps clear of the notch (safe-area insets) and the helm panel is a slim strip while the pad is on", () => {

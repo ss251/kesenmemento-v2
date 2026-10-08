@@ -9,12 +9,15 @@ import { t, langOf } from './strings.js';
 import {
   TALK_R, CPS, BALLOON_FAR, katsuoCount, hydrate, serialize, questById, questLog, nearest, advance, onTalk,
   acceptQuest, noteIppon, notePhoto, notePerch, noteSwim, noteRace, absorbCourses, tracker, fillWorld,
-  markerFor, balloonOpacity, balloonMark, bearingDeg, stampRows, stampGlyph, forceComplete,
+  markerFor, mapLabel, activeIds, cycleActive, balloonOpacity, balloonMark, bearingDeg, stampRows, stampGlyph, forceComplete,
   balloonPx, ringWidth, markIsBang, handoffOf, countStamps, stampLine, modeIsNew, nearestBang, questMode,
 } from './logic.js';
 import { scriptFor, heardAmbient, openLine, stepLine, skipLine, visible, blipFor, voicePitch } from './dialogue.js';
 import { sightBlocked } from './place.js';
 import { presentReward, deviceIdOf, formatWhen, inkOn, glyphOnPaper } from './voucher.js';
+import { readMode } from '../kit/mode.js';
+
+const TRACK_KEY = 'klc.missions.tracked';
 
 const SIM = 0.25;
 
@@ -68,7 +71,7 @@ export function mount(ctx, kit) {
   let promptHandle = null;
   let promptNpc = null;
   let arrowHandle = null;
-  const bound = { photo: false, ippon: false, gull: false, swim: false, race: false, courses: false, car: false };
+  const bound = { photo: false, ippon: false, gull: false, swim: false, race: false, courses: false, car: false, night: false };
   const world = { pos: { x: 0, y: 0, z: 0 } };
   const pos = { x: 0, y: 0, z: 0 };
   const _hold = new THREE.Vector3();
@@ -109,6 +112,9 @@ export function mount(ctx, kit) {
       if (talk) endTalk();
       ui.showLog(logModel());
     },
+    onPrev() { cycleTrack(-1); },
+    onNext() { cycleTrack(1); },
+    onGo() { performAction(); },
     onLogClose() {
       if (coachPending) revealCoach();
     },
@@ -129,6 +135,8 @@ export function mount(ctx, kit) {
       const meta = kit.store.get('meta') || {};
       const saved = savedQ && savedQ.v === 1 && savedQ.progress ? savedQ : meta.missions;
       state = hydrate(saved);
+      const remembered = recallTrack();
+      if (remembered && state.progress[remembered] && !state.progress[remembered].done) state.active = remembered;
       deviceId = deviceIdOf(meta, Math.random);
       if (!meta.deviceId) kit.store.update('meta', (m) => { m.deviceId = deviceId; return m; });
     } catch { state = hydrate(null); }
@@ -211,15 +219,19 @@ export function mount(ctx, kit) {
       promptNpc = null;
       return;
     }
-    if (promptNpc === near.id) return;
+    if (promptNpc === near.id && promptHandle?.shown) return;
     promptHandle?.hide?.();
     promptNpc = near.id;
     try {
       promptHandle = kit.ui?.prompt?.(tr('play.quest.talk'), {
         onPress: () => { if (near) beginTalk(near); },
         key: 'Enter',
+        keycap: 'E',
+        priority: 3,
+        talk: true,
       }) || null;
-    } catch { promptHandle = null; }
+      if (promptHandle && promptHandle.shown === false) { promptHandle = null; promptNpc = null; }
+    } catch { promptHandle = null; promptNpc = null; }
   }
 
   function beginTalk(npc) {
@@ -459,8 +471,94 @@ export function mount(ctx, kit) {
     return tr('play.quest.dist', { m: String(Math.round(dist)) });
   }
 
+  function recallTrack() {
+    try { return win.localStorage?.getItem(TRACK_KEY) || ''; } catch { return ''; }
+  }
+
+  function rememberTrack(id) {
+    try { win.localStorage?.setItem(TRACK_KEY, id || ''); } catch { /* private mode */ }
+  }
+
+  function placeBag() {
+    let charms = null;
+    let found = null;
+    try { charms = win.__play?.spots || null; } catch { charms = null; }
+    try { found = kit.store.get('katsuo')?.found || null; } catch { found = null; }
+    if (!charms && !found) return null;
+    return { charms, found };
+  }
+
+  function notePhotoKey(action) {
+    try {
+      const live = win.__play || (win.__play = {});
+      live.photoOwnsP = readMode(ctx) === 'walk' || action?.id === 'photo';
+    } catch { /* no window */ }
+  }
+
+  function cycleTrack(dir) {
+    cycleActive(state, quests, dir);
+    rememberTrack(state.active);
+    dirty = true;
+    saveIf();
+    refreshTracker();
+  }
+
+  function diveAt(step) {
+    const swim = ctx.services?.swim || win.__swim;
+    if (!swim?.enterAt || !step) return;
+    const px = world.pos?.x ?? step.x;
+    const pz = world.pos?.z ?? step.z;
+    let dx = px - step.x;
+    let dz = pz - step.z;
+    const len = Math.hypot(dx, dz);
+    if (len > 0.5) { dx /= len; dz /= len; } else { dx = 0; dz = -1; }
+    const x = step.x + dx * 8;
+    const z = step.z + dz * 8;
+    swim.enterAt({ x, y: step.y == null ? -1.2 : step.y, z, yaw: Math.atan2(step.x - x, step.z - z) });
+  }
+
+  function flyToward(target) {
+    const pl = ctx.playerObj;
+    if (!pl || !target) return;
+    if (typeof pl.allowMode === 'function' && !pl.allowMode('fly', { via: 'mission' })) return;
+    const dx = target.x - pl.pos.x;
+    const dz = target.z - pl.pos.z;
+    pl.fly = true;
+    pl.vy = 0;
+    pl.onGround = false;
+    pl.yaw = Math.atan2(-dx, -dz);
+    if (pl.face != null) pl.face = pl.prevFace = pl.yaw;
+    try {
+      const g = ctx.physics?.groundHeight?.(pl.pos.x, pl.pos.z, pl.pos.y);
+      if (Number.isFinite(g) && pl.pos.y < g + 8) pl.liftTo = g + 28;
+    } catch { /* stay at this height */ }
+  }
+
+  function startBoundRace(step) {
+    if (!step?.course) return;
+    if (step.course === 'race-minato') {
+      const race = ctx.services?.playCar?.race;
+      try { if (race?.start) { race.start(); return; } } catch { /* fall through */ }
+    }
+    try { ctx.services?.play?.courses?.start?.(step.course); } catch { /* no course */ }
+  }
+
+  function performAction() {
+    const info = tracker(state, quests, people.list, world, placeBag());
+    const act = info?.action;
+    if (!act) return;
+    if (act.id === 'photo') { try { win.__photo?.(1); } catch { /* no camera */ } }
+    else if (act.id === 'dive') diveAt(info.step);
+    else if (act.id === 'gull') {
+      try { (ctx.services?.play?.gull || win.__gull)?.beginNear?.({ x: info.step.x, z: info.step.z }); } catch { /* */ }
+    }
+    else if (act.id === 'boat') { try { win.__ippon?.start?.(); } catch { /* */ } }
+    else if (act.id === 'race') startBoundRace(info.step);
+    else if (act.id === 'fly') flyToward(info.target);
+  }
+
   function refreshTracker(opt) {
-    const info = tracker(state, quests, people.list, world);
+    const info = tracker(state, quests, people.list, world, placeBag());
     const key = info ? info.quest.id + '#' + info.index : '';
     const prev = trackKey;
     const changed = !!prev && key !== prev;
@@ -476,16 +574,28 @@ export function mount(ctx, kit) {
       ui.setTracker(null);
       syncArrow(null);
       _bear.on = false;
+      notePhotoKey(null);
       return;
     }
     if (info.target) { _bear.x = info.target.x; _bear.z = info.target.z; _bear.on = true; }
     else _bear.on = false;
+    let dist = distLabel(info.dist);
+    if (info.modeKey) {
+      const word = tr(info.modeKey);
+      dist = dist ? word + ' · ' + dist : word;
+    }
+    const open = activeIds(state, quests);
     ui.setTracker({
       title: tr(info.quest.title),
       step: info.step?.hint ? tr(info.step.hint) : '',
-      dist: distLabel(info.dist),
+      dist,
+      action: info.action ? tr(info.action.key) : '',
+      nav: open.length > 1,
+      prev: tr('play.quest.go.prev'),
+      next: tr('play.quest.go.next'),
       lit: !!opt?.lit,
     });
+    notePhotoKey(info.action);
     syncArrow(info.target);
   }
 
@@ -633,6 +743,11 @@ export function mount(ctx, kit) {
       race.on('finish', (ev) => { noteFinish(ev); });
       bound.race = true;
     }
+    const night = ctx.services?.playCar?.race;
+    if (!bound.night && night && typeof night.on === 'function') {
+      night.on('finish', (ev) => { noteFinish(ev, 'race-minato'); });
+      bound.night = true;
+    }
     const coursesBus = w.__courses;
     if (!bound.courses && coursesBus && typeof coursesBus.on === 'function') {
       coursesBus.on('finish', (ev) => { noteFinish(ev); });
@@ -645,9 +760,10 @@ export function mount(ctx, kit) {
     }
   }
 
-  function noteFinish(ev) {
+  function noteFinish(ev, courseId) {
     const ms = ev?.ms ?? ev?.time ?? (typeof ev === 'number' ? ev : null);
-    if (Number.isFinite(ms)) noteRace(state, ms);
+    const id = courseId || (ev && typeof ev === 'object' ? ev.id : null);
+    if (Number.isFinite(ms) && id === 'race-minato') noteRace(state, ms, 'race-minato');
     if (ev && ev.id && (ev.medal || Number.isFinite(ms))) {
       const prev = heardCourses[ev.id] || {};
       heardCourses[ev.id] = {
@@ -659,20 +775,37 @@ export function mount(ctx, kit) {
     afterEvent();
   }
 
+  function liveSwim() {
+    const svc = ctx.services?.swim;
+    if (svc) return { on: !!svc.active, pos: svc.pos || svc.state || null };
+    const w = win.__swim;
+    return { on: !!w?.active, pos: w?.pos || null };
+  }
+  function livePerch() {
+    const gull = ctx.services?.play?.gull || win.__gull;
+    if (!gull?.active) return null;
+    if (gull.perch && gull.perch.perched !== false) return gull.perch;
+    const st = gull.state;
+    if (st?.perched) return { x: st.x, y: st.y, z: st.z, perched: true, id: null };
+    return null;
+  }
   function poll() {
-    const swim = win.__swim?.pos;
-    if (swim && Number.isFinite(swim.x)) {
+    const swim = liveSwim();
+    const wasDiving = !!state.diving;
+    state.diving = !!swim.on;
+    const p = swim.on ? swim.pos : null;
+    if (p && Number.isFinite(p.x)) {
       if (!state.swim) state.swim = { x: 0, y: 0, z: 0 };
-      if (state.swim.x !== swim.x || state.swim.y !== swim.y || state.swim.z !== swim.z) {
-        state.swim.x = +swim.x; state.swim.y = +swim.y || 0; state.swim.z = +swim.z;
+      if (state.swim.x !== p.x || state.swim.y !== p.y || state.swim.z !== p.z || wasDiving !== state.diving) {
+        state.swim.x = +p.x; state.swim.y = +p.y || 0; state.swim.z = +p.z;
         dirty = true;
       }
-    }
-    const perch = win.__gull?.perch;
+    } else if (wasDiving !== state.diving) dirty = true;
+    const perch = livePerch();
     if (perch && Number.isFinite(perch.x)) {
-      if (!state.perch) state.perch = { x: 0, y: 0, z: 0, id: null };
-      if (state.perch.x !== perch.x || state.perch.z !== perch.z || state.perch.id !== (perch.id || null)) {
-        state.perch.x = +perch.x; state.perch.y = +perch.y || 0; state.perch.z = +perch.z; state.perch.id = perch.id || null;
+      if (!state.perch) state.perch = { x: 0, y: 0, z: 0, id: null, perched: true };
+      if (state.perch.x !== perch.x || state.perch.z !== perch.z || state.perch.perched !== true) {
+        notePerch(state, perch);
         dirty = true;
       }
     }
@@ -1078,6 +1211,7 @@ export function mount(ctx, kit) {
       ui.hideLog();
       if (cardUp) ui.hideCard();
       state.active = null;
+      rememberTrack('');
       skipChime = true;
       refreshTracker();
     },
@@ -1092,13 +1226,21 @@ export function mount(ctx, kit) {
       if (!questById(quests, id)) return false;
       if (!state.progress[id]) return false;
       state.active = id;
+      rememberTrack(id);
       dirty = true;
       saveIf();
       pump(Date.now());
       refreshTracker();
       return true;
     },
-    noteRace(ms) { noteRace(state, ms); afterEvent(); },
+    noteRace(ms, courseId) { noteRace(state, ms, courseId); afterEvent(); },
+    travelCourse() {
+      const info = tracker(state, quests, people.list, world);
+      const step = info?.step;
+      if (!step) return null;
+      if (step.type === 'race' || step.type === 'medal') return step.course || null;
+      return null;
+    },
     get state() { return state; },
     cost: () => lastMs,
     adopt(next) {
@@ -1169,6 +1311,11 @@ export function mount(ctx, kit) {
     g.fillStyle = '#F8B500';
     g.strokeStyle = '#223A70';
     g.lineWidth = full ? 1.5 : 1;
+    if (full) {
+      g.font = '700 16px "Zen Maru Gothic", "Noto Sans JP", sans-serif';
+      g.textAlign = 'left';
+      g.textBaseline = 'middle';
+    }
     for (let i = 0; i < people.list.length; i++) {
       const n = people.list[i];
       const xy = P(n.x, n.z);
@@ -1177,6 +1324,28 @@ export function mount(ctx, kit) {
       g.arc(xy[0], xy[1], r, 0, Math.PI * 2);
       g.fill();
       g.stroke();
+      if (!full) continue;
+      const label = mapLabel(n, quests, state, tr(n.role));
+      if (!label) continue;
+      g.fillStyle = '#17184B';
+      g.fillText(label, xy[0] + r + 4, xy[1]);
+      g.fillStyle = '#F8B500';
+    }
+    const aim = tracker(state, quests, people.list, world, placeBag());
+    const target = aim?.target;
+    if (target) {
+      const xy = P(target.x, target.z);
+      if (xy && xy[0] >= -8 && xy[1] >= -8 && xy[0] <= W + 8 && xy[1] <= H + 8) {
+        const pr = full ? 7 : 4.5;
+        g.beginPath();
+        g.moveTo(xy[0], xy[1] - pr);
+        g.lineTo(xy[0] + pr * 0.72, xy[1]);
+        g.lineTo(xy[0], xy[1] + pr);
+        g.lineTo(xy[0] - pr * 0.72, xy[1]);
+        g.closePath();
+        g.fill();
+        g.stroke();
+      }
     }
     g.restore();
   }

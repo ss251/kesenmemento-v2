@@ -259,7 +259,7 @@
       "voucher": false,
       "reward": { "stamp": "quay", "title": "play.quest.quay-run.reward" },
       "steps": [
-        { "type": "race", "ms": 480000, "hint": "play.quest.quay-run.s0" }
+        { "type": "race", "course": "race-minato", "ms": 480000, "hint": "play.quest.quay-run.s0" }
       ]
     }
   ]

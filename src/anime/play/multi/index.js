@@ -29,7 +29,6 @@ import { createSession } from './session.js';
 import { mountBodies, setStandIn } from './bodies.js';
 import { compileQuiet } from '../kit/lazy.js';
 import { mountSheet } from './sheet.js';
-import { mountCredit } from './credit.js';
 
 export { setStandIn };
 
@@ -97,10 +96,10 @@ export function mountMulti(ctx) {
   };
   const sheet = mountSheet(document, sheetOpts);
 
-  // [mobile-play] The friends' bodies (the van, the boats, the gull, the fish, the ホヤぼーや) are baked when a room is joined,
-  // not at mount: deploy #5 baked them in every phone's load (the ホヤぼーや alone is 12.7k vertices), whether or not anyone
-  // played together. Until then a stand-in with nothing to draw.
-  const IDLE = { aim: { on: false, x: 0, y: 0, z: 0 }, hoya: false, sawAvatar: false, kind: {}, draw() {} };
+  // [mobile-play] The friends' bodies (the van, the boats, the gull, the fish, the walker) are baked when a room is joined,
+  // not at mount: deploy #5 baked them in every phone's load, whether or not anyone played together.
+  // Until then a stand-in with nothing to draw.
+  const IDLE = { aim: { on: false, x: 0, y: 0, z: 0 }, kind: {}, draw() {} };
   let bodies = IDLE;
   /** [mobile-play] A phone frees the bodies when the room is left or closed; the next room bakes them again. */
   function freeBodies() {
@@ -118,7 +117,6 @@ export function mountMulti(ctx) {
     compileQuiet(ctx, bodies.accent);
     return bodies;
   }
-  const credit = mountCredit(sheet.root);
   const session = createSession({ url: resolveWs(location) });
   const pose = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, look: 0, mode: 'avatar', vehicle: 0 };
   const slots = [];
@@ -146,9 +144,6 @@ export function mountMulti(ctx) {
   let arrowWant = false;
   let peopleN = -1;
   let peopleShow = false;
-  let creditOn = false;
-  let avatarCredit = null;
-  let avatarCreditLooked = false;
   let racing = false;
   let clockCs = -1;
   let coached = false;
@@ -436,19 +431,6 @@ export function mountMulti(ctx) {
     });
   }
 
-  function paintCredit() {
-    const show = !!(bodies.hoya && bodies.sawAvatar);
-    if (show && !avatarCreditLooked) {
-      avatarCreditLooked = true;
-      try { avatarCredit = document.querySelector('#klc-play .hoya-credit'); } catch { avatarCredit = null; }
-    }
-    const already = !!(show && avatarCredit && !avatarCredit.hidden);
-    const on = show && !already;
-    if (on === creditOn) return;
-    creditOn = on;
-    credit.set(on);
-  }
-
   function draw(nowMs) {
     const order = session.order;
     if (session.self) ensureBodies();
@@ -587,7 +569,6 @@ export function mountMulti(ctx) {
     draw(nowMs);
     paintPeople();
     syncArrow();
-    paintCredit();
     if (t0) frameMs = performance.now() - t0;
   });
   ctx.__mod = prevMod;

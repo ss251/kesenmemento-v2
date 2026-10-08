@@ -199,7 +199,7 @@ function handoffStep(kind) {
   return hold(0.1);
 }
 function creditOn() {
-  const el = document.querySelector('.hoya-credit');
+  const el = document.querySelector('.avatar-credit');
   return { hidden: !el || el.hidden, text: el ? el.textContent.replace(/\\s+/g, ' ').trim() : '' };
 }
 function diag() {
@@ -247,10 +247,10 @@ function writeJpeg(file, dataUrl) {
 async function waitModel(wk) {
   for (let i = 0; i < 40; i++) {
     const m = await wk.eval(PAGE + 'advance(0.05); return (av() && av().model) || "";');
-    if (m === 'hoya') { log('hoya ready', i); return 'hoya'; }
+    if (m === 'original' || m === 'meme') { log('walker ready', i, m); return m; }
     await sleep(250);
   }
-  log('hoya missing', JSON.stringify(await wk.eval(PAGE + 'return diag();')));
+  log('walker missing', JSON.stringify(await wk.eval(PAGE + 'return diag();')));
   return 'original';
 }
 

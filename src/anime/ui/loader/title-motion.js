@@ -2,7 +2,6 @@
 // drives it from requestAnimationFrame and a capture can step it exactly (window.__T).
 // Timeline: letters drop and squash 0.15–1.2, the sea fills each line, the カツオ leaps 1.05, a spark 1.36,
 // the English line 1.45, a shine 1.95, the gauge completes 2.3 → the prompt breathes, the tap at TAP exits.
-// ホヤぼーや is never animated (the city's manual): his still is cut with display:none at the hand-off.
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, u) => a + (b - a) * u;
 const outCubic = (u) => 1 - (1 - u) ** 3;
@@ -22,7 +21,7 @@ export function createMotion(stage, opts = {}) {
   const fish = svg.querySelector('.fish'), splash = svg.querySelector('.splash'), spark = svg.querySelector('.spark'), shine = svg.querySelector('.shine');
   const sub = [...svg.querySelectorAll('.sub path')].map((p) => ({ p, base: p.getAttribute('transform') || '' })), rules = svg.querySelector('.rules');
   const $ = (s) => stage.querySelector(s);
-  const ui = { logo: $('.logo'), header: $('header'), tip: $('.tip'), gauge: $('.gauge'), prompt: $('.prompt'), footer: $('footer'), hoya: $('.hoya'), bg: $('.bg'), bg2: $('.bg2'), bar: $('.bar i'), runner: $('.bar .runner'), pct: $('.pct'), dia: [...stage.querySelectorAll('#go .dia')] };
+  const ui = { logo: $('.logo'), header: $('header'), tip: $('.tip'), gauge: $('.gauge'), prompt: $('.prompt'), footer: $('footer'), bg: $('.bg'), bg2: $('.bg2'), bar: $('.bar i'), runner: $('.bar .runner'), pct: $('.pct'), dia: [...stage.querySelectorAll('#go .dia')] };
 
   const wave = (y0, ph) => { let d = `M-40 ${f2(y0 + M.wave.a * Math.sin(-40 / M.wave.f + ph))}`; for (let X = -35; X <= M.W + 46; X += 5) d += `L${X} ${f2(y0 + M.wave.a * Math.sin(X / M.wave.f + ph))}`; return d; };
   const window1 = (t, t0, d) => clamp((t - t0) / d);
@@ -128,9 +127,7 @@ export function createMotion(stage, opts = {}) {
   }
 
   function exit(t) {
-    const still = ui.hoya.querySelectorAll('img, .credit');
-    if (t < tapAt) { still.forEach((e) => (e.style.display = '')); for (const k of ['logo', 'header', 'tip', 'gauge', 'prompt', 'footer']) if (ui[k] && k !== 'gauge' && k !== 'prompt') ui[k].style.opacity = ''; ui.bg.style.transform = ''; if (ui.bg2) ui.bg2.style.opacity = 0; ui.dia.forEach((e) => (e.style.transform = '')); return; }
-    still.forEach((e) => (e.style.display = 'none'));                  // the still is cut, never faded (its cell keeps its width)
+    if (t < tapAt) { for (const k of ['logo', 'header', 'tip', 'gauge', 'prompt', 'footer']) if (ui[k] && k !== 'gauge' && k !== 'prompt') ui[k].style.opacity = ''; ui.bg.style.transform = ''; if (ui.bg2) ui.bg2.style.opacity = 0; ui.dia.forEach((e) => (e.style.transform = '')); return; }
     // the press is answered: the two ◆ close in on the words (240 ms) while the line holds full strength, then everything leaves
     const pinch = 5 * Math.sin(Math.PI * window1(t, tapAt, 0.24));
     ui.dia.forEach((e, i) => (e.style.transform = `translateX(${f2(i ? -pinch : pinch)}px) rotate(45deg)`));
@@ -149,9 +146,7 @@ export function createMotion(stage, opts = {}) {
     for (const l of L) l.p.setAttribute('transform', l.base);
     for (const k of ['header', 'tip', 'footer']) if (ui[k]) ui[k].style.opacity = String(a);
     hud(t);
-    const still = ui.hoya ? ui.hoya.querySelectorAll('img, .credit') : [];
-    if (t < tapAt) { still.forEach((e) => (e.style.display = '')); return; }
-    still.forEach((e) => (e.style.display = 'none'));
+    if (t < tapAt) return;
     const u = window1(t, tapAt, 0.2);
     if (ui.logo) { ui.logo.style.opacity = String(1 - u); ui.logo.style.transform = 'translateX(-50%)'; }
     for (const k of ['header', 'tip', 'footer', 'prompt']) if (ui[k]) ui[k].style.opacity = String(1 - u);

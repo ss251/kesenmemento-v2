@@ -16,6 +16,7 @@ import { mount as mountMissions } from './missions/index.js';
 import { mountAvatar } from './avatar/index.js';
 import { mountGull } from './gull/index.js';
 import { mountMulti } from './multi/index.js';
+import { canSwitch, graphFrom, padChipsHidden } from './kit/modes.js';
 
 export function mountPlay(ctx) {
   let off = false;
@@ -35,5 +36,11 @@ export function mountPlay(ctx) {
   try { mountGull(ctx); } catch (e) { console.error('[play] gull', e); }
   // みんなで last: it arms courses and the race on their own clocks, so they must exist first.
   try { mountMulti(ctx); } catch (e) { console.error('[play] multi', e); }
-  return ctx.services.play;
+  const play = ctx.services.play;
+  play.graphMode = () => graphFrom(ctx);
+  play.padChipsHidden = padChipsHidden;
+  play.canSwitch = (to, extra) => canSwitch(graphFrom(ctx), to, extra);
+  const pl = ctx.playerObj;
+  if (pl) pl.allowMode = (to, extra) => play.canSwitch(to, extra);
+  return play;
 }

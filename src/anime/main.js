@@ -36,6 +36,7 @@ import { bootStart, bootOk, bootLeft, liteLevel, liteOverrides, liteNote } from 
 import { createDynRes, readHeld, writeHeld } from './core/dynres.js';   // [smooth] dynamic resolution; [mobile-perf] the scale this device held last time
 import { splitTwoSided } from './core/twosided.js';   // [smooth] transparent double-sided meshes without the per-draw program check
 import { mountPlay } from './play/index.js';
+import { welcomePose } from './play/missions/arrive.js';
 import { mountIppon } from './play/ippon/index.js';   // [integration] static too: a module that is both imported and import()ed trips Bun 1.3.14's splitter ("Could not resolve")   // [play] static: a dynamic import('./play/…') is left as a browser fetch under splitting (404 /play/index.js)
 
 /** Build order. A module may read ctx.services of earlier modules at build time (life reads everyone). */
@@ -645,6 +646,34 @@ window.__pacer = pacer;
 let renderT = 0, stepT = 0;
 window.__clock = simClock;
 let started = false, last = performance.now(), fpsAcc = 0, fpsN = 0, fps = 0;
+let arrive = null;
+const arriveToP = new THREE.Vector3();
+const arriveToQ = new THREE.Quaternion();
+function blendArrive(dt) {
+  if (!arrive) return;
+  arrive.t += dt > 0 ? dt : 0;
+  const u = arrive.dur > 0 ? Math.min(1, arrive.t / arrive.dur) : 1;
+  const k = 1 - (1 - u) * (1 - u);
+  arriveToP.copy(camera.position);
+  arriveToQ.copy(camera.quaternion);
+  camera.position.lerpVectors(arrive.fromP, arriveToP, k);
+  camera.quaternion.copy(arrive.fromQ).slerp(arriveToQ, k);
+  if (u >= 1) { arrive = null; if (!player.fly) player.requestLock(); }
+}
+function landWelcome() {
+  const pose = welcomePose();
+  const fromP = camera.position.clone();
+  const fromQ = camera.quaternion.clone();
+  player.gull = false;
+  player.fly = false;
+  player.person = 'third';
+  player.setPose(pose.x, pose.z, pose.yawDeg, 0);
+  try { ctx.services?.life?.hud?.noteMode?.('walk3'); } catch (e) { /* the HUD can arrive a moment later */ }
+  let reduce = false;
+  try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* motion on */ }
+  if (reduce || pose.dur <= 0) { arrive = null; return; }
+  arrive = { fromP, fromQ, t: 0, dur: pose.dur };
+}
 function frame(now) {
   requestAnimationFrame(frame);
   if (survive?.lost) { last = now; return; }   // [ui-c] the phone took the WebGL context: draw nothing until the reload (core/survive.js)
@@ -673,6 +702,7 @@ function frame(now) {
   if (pass === ALL) ctx.physics.refreshDynamic();
   perf.section('updates');
   stepUpdates(dt, simT, pass);
+  blendArrive(dt);
   perf.section('audio');
   try { audio.update(camera, dt); } catch (e) { if (!audio.__err) { audio.__err = 1; console.error('audio', e); } }
   perf.section('view');
@@ -708,7 +738,9 @@ function start() {
   if (LITE.level) setTimeout(() => showToast(liteNote(document.documentElement.lang === 'en' ? 'en' : 'ja')), 4200);   // [mobile-perf] after the place's name
   player.enabled = true;
   document.body.classList.add('playing');
-  if (!player.fly) player.requestLock();
+  const scripted = !!(ctx.resumed || params.has('cam') || params.has('fly') || params.has('at'));
+  if (!scripted) landWelcome();
+  if (!arrive && !player.fly) player.requestLock();
   try { audio.start(); } catch (e) { console.warn(e); }
   showToast(areaAt(player.pos.x, player.pos.z) || L.NAMES.bay);   // [sys:22] overlay || areaAtGsi || the bay
 }

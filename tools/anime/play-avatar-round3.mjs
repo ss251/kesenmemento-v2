@@ -128,7 +128,7 @@ function shot(name, cssW, cssH, scale, bufW, bufH, lang, q) {
       const ups = window.__ctx._updates || [];
       const nudge = () => { for (const fn of ups) { try { fn(1 / 30, window.__simClock); } catch (e) {} } };
       let lean = 0;
-      for (let i = 0; i < 18; i++) { p.yaw += 0.1; p.step(1 / 30); nudge(); lean = av.hoyaLean; }
+      for (let i = 0; i < 18; i++) { p.yaw += 0.1; p.step(1 / 30); nudge(); lean = av.characterLean; }
       bake();
       return JSON.stringify({ deg: +(lean * 180 / Math.PI).toFixed(2) });
     `, wait: 200, out: join(dir, 'lean1.png') },

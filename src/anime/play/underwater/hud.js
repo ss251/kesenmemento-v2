@@ -1,7 +1,7 @@
 // [play:underwater] The dive prompt, the species chip, the stamina ring, the leap line, the one-line hints.
 // Glass, 4 px grid, 44 px targets, strict line breaks. No keep-all.
 // [fish-fix] While the dive runs, body.klc-swim is set (as the voyage sets body.klc-ship) and the land controls step out: the
-// boarding chip, the car, the walk / drone view toggle, the ホヤぼーや credit (he is not on screen). The chip and the hint are
+// boarding chip, the car, and the walk / drone view toggle. The chip and the hint are
 // placed against the live HUD (findSlot), never at fixed pixels: the HUD moved under the old fixed top (120 px on a phone, under
 // the あそぶ row since the HUD redesign) and the old hint sat on the coach and the buttons.
 
@@ -27,7 +27,7 @@ const CSS = `
 .swim-hint{position:absolute;left:0;top:0;margin:0;width:max-content;max-width:min(320px,calc(100vw - 32px));padding:10px 16px;border-radius:16px;background:rgba(251,250,245,.88);box-shadow:0 6px 20px rgba(23,24,75,.16);text-align:center;font-size:14px;font-weight:700;line-height:1.6;color:#223A70;line-break:strict;text-wrap:pretty;opacity:0;transition:opacity .2s ease-out}
 .swim-hint.on{opacity:1}
 @media (prefers-reduced-motion:reduce){.swim-hint{transition:none}}
-body.klc-swim #klc-board,body.klc-swim #klc-x [data-act="drive"],body.klc-swim #klc-ui [data-act="view"],body.klc-swim #klc-play .hoya-credit,body.klc-swim .swim-ui .swim-dive{display:none!important}
+body.klc-swim #klc-board,body.klc-swim #klc-x [data-act="drive"],body.klc-swim #klc-ui [data-act="view"],body.klc-swim .swim-ui .swim-dive{display:none!important}
 `;
 
 export function t(key, lang = pickLang()) {

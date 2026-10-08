@@ -1,21 +1,21 @@
 // [play] Soft footsteps by surface. The engine's 'footstep' one-shot stays silent.
 // The spacing matches the foot that is actually planting: the original rig's
-// cycle, or ホヤぼーや's cadence (hoya-model.js, not edited here).
+// cycle, or a custom character's cadence when that model is on screen.
 
 import { cycleLength } from './pose.js';
 
-/** Cycles per second in the ホヤぼーや animator: clamp(1.9 + speed * 0.42, 1.9, 3.6). */
-export function hoyaCadence(speed) {
+/** Cycles per second for a custom character that has not offered gait(): clamp(1.9 + speed * 0.42, 1.9, 3.6). */
+export function characterCadence(speed) {
   if (!(speed > 0.03)) return 0;
   const c = 1.9 + speed * 0.42;
   return c < 1.9 ? 1.9 : c > 3.6 ? 3.6 : c;
 }
 
-/** Metres between footfalls. Two plants per cycle. [feel] `cadence`: the cycle the walk drives (avatar/index.js gaitCadence), else his own. */
+/** Metres between footfalls. Two plants per cycle. [feel] `cadence`: the cycle the walk drives (avatar/index.js gaitCadence), else the character's own. */
 export function stepSpacing(speed, model, k, cadence) {
   if (!(speed > 0.45)) return 0;
-  if (model === 'hoya') {
-    const c = cadence > 0 ? cadence : hoyaCadence(speed);
+  if (model === 'meme') {
+    const c = cadence > 0 ? cadence : characterCadence(speed);
     return c > 0 ? speed / (c * 2) : 0;
   }
   return cycleLength(speed, k) / 2;

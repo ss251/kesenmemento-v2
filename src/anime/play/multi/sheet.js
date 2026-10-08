@@ -58,10 +58,6 @@ const CSS = `
   box-shadow: 0 4px 12px rgba(23,24,75,.35), inset 0 0 0 2px rgba(255,255,255,.7); }
 #klc-multi .people[hidden] { display: none; }
 #klc-multi .tag[hidden], #klc-multi .tag span[hidden] { display: none; }
-#klc-multi .multi-hoya-credit { position: absolute; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%); margin: 0; padding: 4px 10px; border-radius: 999px; background: rgba(251, 250, 245, 0.9);
-  color: var(--k-navy); font: 600 12px/1.4 var(--k-round); text-align: center; max-width: min(92vw, 420px); }
-#klc-multi .multi-hoya-credit[hidden] { display: none; }
 #klc-multi .dialog[hidden], #klc-multi .count[hidden], #klc-multi .race[hidden], #klc-multi .flash[hidden],
 #klc-multi .results[hidden], #klc-multi .hub[hidden], #klc-multi .go[hidden], #klc-multi .goal[hidden],
 #klc-multi .wait-float[hidden], #klc-multi .coach[hidden], #klc-multi .race-time[hidden] { display: none; }

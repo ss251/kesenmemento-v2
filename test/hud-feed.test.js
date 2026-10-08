@@ -56,7 +56,7 @@ function world(state = S.live(), { lang = null, season = null } = {}) {
 const withWorld = (state, fn, o) => { const w = world(state, o); try { return fn(w); } finally { w.cleanup(); } };
 
 describe("the chip says what the weather is, or why it has none", () => {
-  test("a good answer: weather, count and the green ライブ tag, as before", () => withWorld(S.live(), (w) => {
+  test("a good answer: weather, count and the green 実データ tag, as before", () => withWorld(S.live(), (w) => {
     expect(w.read()).toMatchObject({ wx: "☁ くもり 16℃", boats: "入船2隻", tag: J["v3.live"], tag2: J["v3.live"], rows: 2 });
     expect(w.read().tagClass).toContain("live");
   }));
@@ -72,15 +72,15 @@ describe("the chip says what the weather is, or why it has none", () => {
     expect(J["v3.weather.none"]).toBe("天気情報なし"); expect(E["v3.weather.none"]).toBe("Weather unavailable");
   }));
 
-  test("a feed that never answered (a dead API at the first load): the chip says ライブ情報なし, no count, no tag, and the panel says it could not load arrivals instead of 'no arrivals'", () => withWorld(S.failedFirst(), (w) => {
+  test("a feed that never answered (a dead API at the first load): the chip says 今日の情報なし, no count, no tag, and the panel says it could not load arrivals instead of 'no arrivals'", () => withWorld(S.failedFirst(), (w) => {
     const r = w.read();
-    expect(r).toMatchObject({ wx: "ライブ情報なし", boats: "", tag: null, tag2: null, rows: 1 });
+    expect(r).toMatchObject({ wx: "今日の情報なし", boats: "", tag: null, tag2: null, rows: 1 });
     expect(r.list).toBe("入船情報を取得できませんでした"); expect(r.list).not.toBe(J["v3.arrivals.empty"]);
-    expect(J["v3.feed.error"]).toBe("ライブ情報なし"); expect(E["v3.feed.error"]).toBe("Live data unavailable");
+    expect(J["v3.feed.error"]).toBe("今日の情報なし"); expect(E["v3.feed.error"]).toBe("Today's data unavailable");
   }));
 
   test("a refresh that failed after a good answer: the old weather, count and rows stay, labelled キャッシュ with the time of that answer (JST), and the panel header says the live feed is gone", () => withWorld(S.failedAfterAnswer(), (w) => {
-    expect(w.read()).toMatchObject({ wx: "☁ くもり 16℃", boats: "入船2隻", tag: "キャッシュ 12:04", tag2: "ライブ情報なし · キャッシュ 12:04", rows: 2 });
+    expect(w.read()).toMatchObject({ wx: "☁ くもり 16℃", boats: "入船2隻", tag: "キャッシュ 12:04", tag2: "今日の情報なし · キャッシュ 12:04", rows: 2 });
     expect(w.read().tagClass).not.toContain("live");   // the amber tag, not the green one
   }));
 
@@ -93,7 +93,7 @@ describe("the chip says what the weather is, or why it has none", () => {
   test("a cached answer that was already old (live.js: stale, staleAt) keeps its own time, and a failed refresh after it keeps the older of the two (staleAt, not updated)", () => {
     const at = Date.parse("2026-10-05T02:01:00Z");   // 11:01 JST
     withWorld(S.live({ stale: true, staleAt: at }), (w) => { expect(w.read()).toMatchObject({ tag: "キャッシュ 11:01", tag2: "キャッシュ 11:01" }); });
-    withWorld(S.failedAfterAnswer({ stale: true, staleAt: at }), (w) => { expect(w.read()).toMatchObject({ tag: "キャッシュ 11:01", tag2: "ライブ情報なし · キャッシュ 11:01" }); });
+    withWorld(S.failedAfterAnswer({ stale: true, staleAt: at }), (w) => { expect(w.read()).toMatchObject({ tag: "キャッシュ 11:01", tag2: "今日の情報なし · キャッシュ 11:01" }); });
     withWorld(S.live({ stale: true, staleAt: null }), (w) => { expect(w.read().tag).toBe("キャッシュ"); });   // (a stale list with no time to give: no time is made up)
     expect(staleness({ port: { origin: "cache", fetchedAt: "2026-10-05T02:01:00Z", date: "2026-10-05" }, origins: { port: "cache" } }, "live", Date.parse("2026-10-05T05:30:00Z")).at).toBe(at);   // (the shape the tag reads)
   });
@@ -116,7 +116,7 @@ describe("the chip says what the weather is, or why it has none", () => {
   test("it recovers: every transition lands on the right words, and the nodes stay (a patch, never a rebuild)", () => withWorld(S.loading(), (w) => {
     const chip = w.q('[data-act="arrivals"]'), wx = w.q('[data-f="wx"]'), tag = w.q('[data-f="tag"]'), rendered = w.hud.el.htmlSets;
     const seq = [[S.live(), "☁ くもり 16℃", J["v3.live"]], [S.noWeather(), "天気情報なし", J["v3.live"]], [S.failedAfterAnswer(), "☁ くもり 16℃", "キャッシュ 12:04"], [S.live(), "☁ くもり 16℃", J["v3.live"]],
-      [S.failedFirst(), "ライブ情報なし", null], [S.live({ weather: { sky: "rain", temp: 9 } }), "☂ 雨 9℃", J["v3.live"]], [S.loading(), J["v3.loadingLive"], null]];
+      [S.failedFirst(), "今日の情報なし", null], [S.live({ weather: { sky: "rain", temp: 9 } }), "☂ 雨 9℃", J["v3.live"]], [S.loading(), J["v3.loadingLive"], null]];
     for (const [st, wxText, tagText] of seq) { w.set(st); expect([st.status, w.read().wx, w.read().tag]).toEqual([st.status, wxText, tagText]); }
     expect(w.q('[data-act="arrivals"]')).toBe(chip); expect(w.q('[data-f="wx"]')).toBe(wx); expect(w.q('[data-f="tag"]')).toBe(tag); expect(w.hud.el.htmlSets).toBe(rendered);
   }));
@@ -137,10 +137,10 @@ describe("the chip says what the weather is, or why it has none", () => {
 });
 
 describe("English", () => {
-  test("the three states read in English too: Weather unavailable; Live data unavailable (and the panel's sentence); Cached 12:04 with the failure named in the header", () => {
-    withWorld(S.noWeather(), (w) => { expect(w.read().wx).toBe("Weather unavailable"); expect(w.read().tag).toBe("Live"); }, { lang: "en" });
-    withWorld(S.failedFirst(), (w) => { expect(w.read()).toMatchObject({ wx: "Live data unavailable", boats: "", tag: null }); expect(w.read().list).toBe(E["v3.arrivals.error"]); }, { lang: "en" });
-    withWorld(S.failedAfterAnswer(), (w) => { expect(w.read()).toMatchObject({ tag: "Cached 12:04", tag2: "Live data unavailable · Cached 12:04", wx: "☁ Cloudy 16℃" }); }, { lang: "en" });
+  test("the three states read in English too: Weather unavailable; Today's data unavailable (and the panel's sentence); Cached 12:04 with the failure named in the header", () => {
+    withWorld(S.noWeather(), (w) => { expect(w.read().wx).toBe("Weather unavailable"); expect(w.read().tag).toBe("Real data"); }, { lang: "en" });
+    withWorld(S.failedFirst(), (w) => { expect(w.read()).toMatchObject({ wx: "Today's data unavailable", boats: "", tag: null }); expect(w.read().list).toBe(E["v3.arrivals.error"]); }, { lang: "en" });
+    withWorld(S.failedAfterAnswer(), (w) => { expect(w.read()).toMatchObject({ tag: "Cached 12:04", tag2: "Today's data unavailable · Cached 12:04", wx: "☁ Cloudy 16℃" }); }, { lang: "en" });
   });
 });
 

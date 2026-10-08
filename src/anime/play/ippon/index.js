@@ -345,6 +345,7 @@ export function mountIppon(ctx) {
   // wipe and title card while its meshes build, as はじめる does; the hub's own start arrives here with them ready.
   function start() {
     const aboard = sail.active && sail.boatId === 'katsuo';
+    if (!aboard && typeof ctx.playerObj?.allowMode === 'function' && !ctx.playerObj.allowMode('ippon', { via: 'hub' })) return false;
     if (!view.ready && !aboard && typeof ui.run === 'function' && kitLive()) {
       ui.run({ id: 'ippon', title: modeSpec.title, hook: modeSpec.hook, prepare: () => view.prepare(), start: () => { startNow(); } });
       return true;
@@ -951,9 +952,12 @@ export function mountIppon(ctx) {
       ring,
     } : null);
     if (!onBoat && dist < 3 && !talking && (session.phase === 'quay' || !sail.active)) {
-      if (!talkOn) {
+      if (!talkOn || talkHandle?.shown === false) {
         talkOn = true;
-        try { talkHandle = ui.prompt(T('play.ippon.talk'), { onPress: () => start() }); } catch { talkOn = false; }
+        try {
+          talkHandle = ui.prompt(T('play.ippon.talk'), { onPress: () => start(), priority: 1 });
+          if (talkHandle?.shown === false) { talkOn = false; talkHandle = null; }
+        } catch { talkOn = false; }
       }
     } else if (talkOn) {
       talkOn = false;

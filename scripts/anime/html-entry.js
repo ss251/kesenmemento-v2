@@ -33,7 +33,8 @@ if (import.meta.main) {
   const { fileURLToPath } = await import("node:url");
   const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const out = process.argv[2];
-  const r = await Bun.build({ entrypoints: [resolve(ROOT, "src/anime/index.html")], outdir: out, target: "browser", splitting: true });
+  const { optionalMemePlugin } = await import("./optional-meme.js");
+  const r = await Bun.build({ entrypoints: [resolve(ROOT, "src/anime/index.html")], outdir: out, target: "browser", splitting: true, plugins: [optionalMemePlugin(ROOT)] });
   if (!r.success) { console.log(JSON.stringify({ ok: false, logs: r.logs.map(String) })); process.exit(1); }
   const fixed = fixHtmlEntry(r.outputs);
   const src = readFileSync(resolve(out, "index.html"), "utf8").match(/<script[^>]*src="\.\/([^"]+)"/)[1];

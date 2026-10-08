@@ -12,11 +12,13 @@ import {
   TALK_R, CPS, medalAtLeast, katsuoCount, emptyProgress, hydrate, serialize, questById, questLog,
   offeredQuest, markerFor, turnInFor, balloonOpacity, balloonMark, bearingDeg, stampGlyph, stampRows,
   nearest, angleDelta, stepMet, acceptQuest, noteIppon, notePhoto, notePerch,
-  noteSwim, noteRace, absorbCourses, advance, onTalk, stepTarget, tracker, fillWorld, forceComplete,
+  noteSwim, noteRace, absorbCourses, advance, onTalk, stepTarget, tracker, trackerAction, fillWorld, forceComplete,
+  activeIds, cycleActive, mapLabel, COURSE_START, FLY_AWAY,
   balloonPx, BALLOON_FLOOR_PX, BALLOON_CAP_PX, BALLOON_NEAR, BALLOON_FAR,
   DIALOGUE_PHONE_PX, DIALOGUE_DESK_PX, handoffOf, countStamps, stampLine, modeIsNew, questMode, markIsBang,
 } from '../src/anime/play/missions/logic.js';
 import { scriptFor, heardAmbient, openLine, stepLine, skipLine, visible, blipFor, voicePitch } from '../src/anime/play/missions/dialogue.js';
+import { welcomePose, FISHER, ARRIVE_M, ARRIVE_S } from '../src/anime/play/missions/arrive.js';
 import { readable, clearStance, sightBlocked, standingClear } from '../src/anime/play/missions/place.js';
 import { idlePose } from '../src/anime/play/npc/figures.js';
 import {
@@ -82,15 +84,20 @@ describe('quest steps', () => {
     expect(at({ type: 'gull', x: 3, z: 4, r: 2 }, { x: 0, z: 0 })).toBe(true);
     expect(at({ type: 'gull', x: 30, z: 30, r: 2 }, { x: 0, z: 0 })).toBe(false);
     noteSwim(s, { x: 5, y: -1, z: 5 });
+    expect(at({ type: 'swim', x: 5, y: -1, z: 5, r: 3 }, { x: 0, z: 0 })).toBe(false);
+    s.diving = true;
     expect(at({ type: 'swim', x: 5, y: -1, z: 5, r: 3 }, { x: 0, z: 0 })).toBe(true);
-    expect(at({ type: 'swim', x: 5, y: -8, z: 5, r: 3 }, { x: 0, z: 0 })).toBe(false);
+    expect(at({ type: 'swim', x: 5, y: -8, z: 5, r: 3 }, { x: 0, z: 0 })).toBe(true);
+    expect(at({ type: 'swim', x: 40, y: -1, z: 5, r: 3 }, { x: 0, z: 0 })).toBe(false);
+    s.diving = false;
     noteRace(s, 400000);
     noteRace(s, 500000);
     expect(s.raceMs).toBe(400000);
     absorbCourses(s, { 'race-minato': { best: 300000, medal: 'gold' } });
-    expect(s.raceMs).toBe(300000);
+    expect(s.races['race-minato']).toBe(300000);
+    expect(s.raceMs).toBe(400000);
     absorbCourses(s, { 'race-minato': { best: 350000 } });
-    expect(s.raceMs).toBe(300000);
+    expect(s.races['race-minato']).toBe(300000);
     const landed = emptyProgress();
     noteIppon(landed, { kind: 'landed', kg: 2.4, count: 3, biggest: 62 });
     expect(landed.ippon.kg).toBe(2.4);
@@ -112,14 +119,14 @@ describe('quest steps', () => {
     expect(s.ippon).toEqual({ kg: 9, count: 4, maxCm: 60 });
   });
 
-  test('angles wrap, and the talk radius is 3 m', () => {
+  test('angles wrap, and the talk radius is 4.5 m', () => {
     expect(angleDelta(0, Math.PI * 2)).toBeLessThan(1e-9);
     expect(angleDelta(Math.PI, -Math.PI)).toBeLessThan(1e-9);
     expect(angleDelta(0, Math.PI)).toBeCloseTo(Math.PI, 6);
     const list = [{ id: 'a', x: 0, z: 0 }, { id: 'b', x: 10, z: 0 }];
-    expect(nearest(list, 3, 0, TALK_R)?.id).toBe('a');
-    expect(nearest(list, 3.05, 0, TALK_R)).toBe(null);
-    expect(TALK_R).toBe(3);
+    expect(nearest(list, 4.4, 0, TALK_R)?.id).toBe('a');
+    expect(nearest(list, 4.55, 0, TALK_R)).toBe(null);
+    expect(TALK_R).toBe(4.5);
     expect(CPS).toBe(40);
   });
 
@@ -195,9 +202,9 @@ describe('quest steps', () => {
         if (step.type === 'medal') courses[step.course] = { medal: 'gold' };
         if (step.type === 'ippon') noteIppon(s, { kind: 'catch', kg: step.kg || 0, cm: step.cm || 0 });
         if (step.type === 'photo') notePhoto(s, { x: step.x, z: step.z, yaw: step.yaw ?? 0 });
-        if (step.type === 'gull') notePerch(s, { x: step.x, z: step.z, id: step.perch || null });
-        if (step.type === 'swim') noteSwim(s, { x: step.x, y: step.y || 0, z: step.z });
-        if (step.type === 'race') noteRace(s, step.ms);
+        if (step.type === 'gull') notePerch(s, { x: step.x, z: step.z, id: step.perch || null, perched: true });
+        if (step.type === 'swim') { noteSwim(s, { x: step.x, y: step.y || 0, z: step.z }); s.diving = true; }
+        if (step.type === 'race') noteRace(s, step.ms, step.course || null);
         const w = world(s, pos, { katsuo, courses });
         if (step.type === 'talk') onTalk(s, quests, step.npc, now);
         else if (step.type === 'deliver') onTalk(s, quests, step.to, now);
@@ -219,8 +226,111 @@ describe('quest steps', () => {
     expect(info.dist).toBeGreaterThan(28);
     const medal = questById(quests, 'port-medal');
     acceptQuest(s, medal, now);
-    expect(stepTarget(medal.steps[0], npcs)).toBe(null);
+    const start = stepTarget(medal.steps[0], npcs);
+    expect(start.x).toBeCloseTo(COURSE_START.minato.x, 2);
+    expect(start.z).toBeCloseTo(COURSE_START.minato.z, 2);
     expect(tracker(s, quests, npcs, w).quest.id).toBe('port-medal');
+    expect(tracker(s, quests, npcs, w).action).toBe(null);
+  });
+
+  test('each step offers its own way of travelling', () => {
+    const far = { pos: { x: 0, z: 0 } };
+    const photo = { type: 'photo', x: 40, z: 70, r: 28 };
+    expect(trackerAction(photo, far)).toBe(null);
+    expect(trackerAction(photo, { pos: { x: 40, z: 70 } })?.id).toBe('photo');
+    expect(trackerAction({ type: 'swim', x: 1, z: 1, r: 14 }, far)?.key).toBe('play.quest.go.dive');
+    expect(trackerAction({ type: 'gull', x: 1, z: 1, r: 10 }, far)?.id).toBe('gull');
+    expect(trackerAction({ type: 'ippon' }, far)?.id).toBe('boat');
+    expect(trackerAction({ type: 'race', course: 'race-minato', ms: 1 }, far)?.id).toBe('race');
+    expect(trackerAction({ type: 'collect', n: 3 }, far)).toBe(null);
+    expect(trackerAction({ type: 'medal', course: 'minato', min: 'bronze' }, far)).toBe(null);
+    expect(trackerAction({ type: 'reach', x: 10, z: 10, r: 8 }, far)).toBe(null);
+    expect(trackerAction({ type: 'reach', x: 400, z: 0, r: 8 }, far)?.id).toBe('fly');
+    expect(FLY_AWAY).toBe(300);
+    const race = stepTarget({ type: 'race', course: 'race-minato' }, npcs);
+    expect(race.x).toBeCloseTo(105.2, 1);
+    expect(race.z).toBeCloseTo(105.7, 1);
+    const boat = stepTarget({ type: 'ippon' }, npcs);
+    expect(boat.x).toBeCloseTo(567, 0);
+    const charms = [{ id: 'a', x: 10, z: 0, mode: 'walk' }, { id: 'b', x: 80, z: 0, mode: 'sail' }];
+    const near = stepTarget({ type: 'collect', n: 3 }, npcs, { charms, found: { a: 1 }, pos: { x: 0, z: 0 } });
+    expect(near.x).toBe(80);
+    expect(near.mode).toBe('sail');
+    const s = emptyProgress();
+    acceptQuest(s, questById(quests, 'golden-three'), now);
+    const info = tracker(s, quests, npcs, world(s, { x: 0, z: 0 }), { charms, found: {} });
+    expect(info.target.x).toBe(10);
+    expect(info.modeKey).toBe('play.quest.mode.walk');
+    expect(info.action).toBe(null);
+  });
+
+  test('◀ ▶ cycles open quests and the map names a giver', () => {
+    const s = emptyProgress();
+    acceptQuest(s, questById(quests, 'quay-photo'), now);
+    acceptQuest(s, questById(quests, 'shrine-visit'), now);
+    expect(activeIds(s, quests)).toEqual(['quay-photo', 'shrine-visit']);
+    expect(s.active).toBe('shrine-visit');
+    cycleActive(s, quests, 1);
+    expect(s.active).toBe('quay-photo');
+    cycleActive(s, quests, -1);
+    expect(s.active).toBe('shrine-visit');
+    const fisher = npcs.find((n) => n.id === 'fisher');
+    expect(mapLabel(fisher, quests, emptyProgress(), '漁師')).toBe('漁師！');
+    expect(mapLabel(fisher, quests, s, '漁師')).toBe(null);
+  });
+});
+
+describe('swim, perch, the race clock and the welcome spot', () => {
+  test('a dive completes on the horizontal radius, and only while it is active', () => {
+    const s = emptyProgress();
+    const step = { type: 'swim', x: 175, y: -1.2, z: -110, r: 14 };
+    noteSwim(s, { x: 175, y: -1.9, z: -110 });
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(false);
+    s.diving = true;
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(true);
+    noteSwim(s, { x: 200, y: -1.2, z: -110 });
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(false);
+  });
+
+  test('a gull step needs a perch inside the radius', () => {
+    const s = emptyProgress();
+    const step = { type: 'gull', x: 352, z: -28, r: 36 };
+    notePerch(s, { x: 352, z: -28, perched: false });
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(false);
+    notePerch(s, { x: 360, z: -20, perched: true });
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(true);
+    notePerch(s, { x: 10, z: 10, perched: true });
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(false);
+  });
+
+  test('岸壁の長さ reads only the night race', () => {
+    const s = emptyProgress();
+    const step = questById(quests, 'quay-run').steps[0];
+    expect(step.course).toBe('race-minato');
+    noteRace(s, 200000, 'minato');
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(false);
+    noteRace(s, 200000);
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(false);
+    noteRace(s, 400000, 'race-minato');
+    expect(stepMet(step, world(s, { x: 0, z: 0 }))).toBe(true);
+    noteRace(s, 500000, 'race-minato');
+    expect(s.races['race-minato']).toBe(400000);
+  });
+
+  test('まちへ出る stands on foot, 6 m from the fisher, facing him', () => {
+    const p = welcomePose();
+    expect(p.fly).toBe(false);
+    expect(p.person).toBe('third');
+    expect(Math.hypot(p.x - FISHER.x, p.z - FISHER.z)).toBeCloseTo(ARRIVE_M, 5);
+    expect(p.dur).toBeGreaterThanOrEqual(1.2);
+    expect(p.dur).toBeLessThanOrEqual(1.8);
+    expect(ARRIVE_S).toBe(p.dur);
+    const yaw = p.yawDeg * Math.PI / 180;
+    const fx = -Math.sin(yaw), fz = -Math.cos(yaw);
+    const dx = FISHER.x - p.x, dz = FISHER.z - p.z;
+    const len = Math.hypot(dx, dz);
+    expect(fx).toBeCloseTo(dx / len, 5);
+    expect(fz).toBeCloseTo(dz / len, 5);
   });
 });
 

@@ -55,39 +55,28 @@ Footsteps go through the kit `sfx.play` (`step-asphalt`, `step-wood`, `step-sand
 
 Prefs live in `localStorage` key `klc.play.avatar.v1`. The kit store drops unknown meta, so they are not stored there.
 
-## ホヤぼーや
+## The character slot
 
-He is the default walker. The model is `src/anime/play/avatar/hoya-model.js`, owned by the model worker and not edited here:
+The default id is `meme` (`src/anime/play/avatar/characters.js`). The registry records メメ at 1.15 m (soles to the tip) and the original figure at 1.62 m. The import is literal. `scripts/anime/optional-meme.js` bundles the file when it is in the tree, and an empty module when it is not, so a missing file is not a browser request and nothing is written to the console. `load` returns null, and the original figure walks. The 姿 picker lists メメ only when that module exports `build`. There is no credit pill.
+
+A model module exports `build`:
 
 ```js
-buildHoya(THREE, { quality, mat, calm, blink }) -> { root, setPose, update, setLift, setCalm, dispose }
+build(THREE, { quality, mat, calm }) → {
+  root,            // Object3D, feet at y = 0, facing −Z. The walker moves and yaws this, and never scales it.
+  mesh,            // the skinned body, or null
+  setPose(name),   // 'auto' | 'idle' | 'walk' | 'run' | 'jump' | 'fall'
+  update(dt, { speed, onGround, vy, cadence, run }),
+  dispose(),
+  setLift(night0to1),
+  setCalm(bool),
+  gait(speed, run) → { travel, stance, run, hz, rate }
+}
 ```
 
-The root faces −Z with its feet at y = 0, so it is placed at the player's yaw and never scaled. A turn rolls that whole root up to 6°, eased over 0.18 s, the same way the original rig leans. A landing moves him down by up to 4 cm and back, over the same 0.2 s, and does not scale him. Neither is 変形: no part moves apart, and the mesh stays at scale 1. `setPose('auto')` lets his animator read speed, ground and vertical speed, including his own landing. Night calls `setLift` with `life.time.night` so he is never a silhouette. Reduced motion holds the root upright and skips the dip.
+The root faces −Z with its feet at y = 0, so it is placed at the player's yaw and never scaled. A turn rolls that whole root up to 6°, eased over 0.18 s (`characterTurnLean`, `LEAN_TAU`). A landing moves it down by up to 4 cm and back, over the same 0.2 s, and does not scale it. `setPose('auto')` lets the animator read speed, ground and vertical speed. Night calls `setLift` with `life.time.night`. Reduced motion holds the root upright and skips the dip.
 
-`setModel('hoya')` refuses, and logs once, unless `data/hoyaboya-approval.json` allows both `3d` and `animation`. The default pref is `hoya`. With the record and the mesh, he is on. `?hoya3d=0` forces the original.
-
-- No file, or a file that does not allow those two: locked. The original walker is shown.
-- `kind: "written"` with a `ref`: the city's 承認書.
-- `kind: "owner-interim"` with `decidedAt`: the owner's 2026-10-07 decision to show him until demo day. It is not a 様式第2号.
-- `?hoya3d=0` forces the original even when the record allows him.
-- `?hoya3d=1` asks for him when the record and the mesh both exist.
-
-The notebook tab 姿 has the three looks and 「ホヤぼーや／オリジナル」. While he is on screen the credit is on screen too, never on him:
-
-気仙沼市観光キャラクター
-「海の子 ホヤぼーや」
-
-The city's rules (取扱要綱 第5条) want it on screen, uncovered, whenever he is shown, and it must not sit on him or on the thumbs:
-- **A desktop (wider than 720 px):** on the right, under the search button (112 px down), as on a landscape phone. Bottom centre it sat on his legs: his soles are 82 % of the way down the picture, so 96 px up cleared them only in windows at least ~843 px tall, and lifted over もぐる (148 px, the chip shows at the start spot by the water) it covered his legs at 1600×900.
-- **A narrow window without the pad:** bottom centre, 96 px up, lifted to 148 px while the もぐる chip shows and to 232 px over it and the kit's prompt together. It eases over 200 ms, and moves at once under reduced motion.
-- **A portrait phone with the pad:** the band the emil-ui lane keeps free for it, 24 px above the safe bottom, between the credits line and the pad's 78 px floor. Nothing is bottom centre there any more, so there is no lift.
-- **A landscape phone:** one line on the right, under the search button (112 px down). He stands mid-screen there, where the centred credit covered him, and the pad's action cluster owns the bottom-right corner (at 844×390 the search ends at 96 px and the cluster starts at 227 px; `tools/anime/feel-stills.mjs` measured five places and this one alone touched nothing).
-- **While the あそぶ hub's sheet covers him,** the credit steps back with him.
-
-`test/feel-credit.test.js` pins the rules; `tools/anime/feel-stills.mjs` checks the rects in Chrome against every HUD piece and his projected box, and `feel-modes.mjs` against the chips and the pad.
-
-The use to ask the city for is in the application text (not included), section 7.
+Third-person speeds for that character are 1.5 m/s walking and 3.0 m/s running (`CHARACTER_SPEED`). The original walker keeps 3.1 / 6.4. `?speed=walk,run` tries others (`?speed=0` gives the walker's speeds). Prefs live in `klc.play.avatar.v1`; an unknown model id, including anything stored before this slot, becomes `meme`.
 
 ## ウミネコ
 
@@ -130,7 +119,7 @@ Measured in the WebKit shot session, timing the step with `performance.now` (the
 
 | | mean | steps |
 |---|---|---|
-| Walker, with ホヤぼーや | 0.011 ms | 435 |
+| Walker, original figure | 0.011 ms | 435 |
 | Gull, flock and feathers | 0.022 ms | 322 |
 
 Draw calls, third person then first person: 1084 and 1081. He is two draws (body and line) plus a shadow the model turns on. The feathers are one instanced mesh, hidden until a flap. The budget is 0.6 ms.

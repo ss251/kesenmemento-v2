@@ -6,10 +6,41 @@ import * as THREE from 'three';
 import STR from '../../../../data/play-i18n.json';
 import { counterText, timerText, splitText, splitFaster, esc } from './format.js';
 import { onPlayTick, playMode } from './runtime.js';
+import { readMode } from './mode.js';
 import { sfx } from './sfx.js';
 import { store } from './store.js';
 import { HUB_CSS, mountHub } from './hub.js';
 import { mountCoach, clearCoachSeen } from './coach.js';
+
+/** A lower priority cannot cover a higher one. Equal priority may replace it. 0 means nothing is up. */
+export function promptReplaces(current, next) {
+  if (current == null || current <= 0) return true;
+  return next >= current;
+}
+
+/** The phone pad beside 話す keeps jump and dash. 飛ぶ sits only on the ordinary walk row. */
+export function promptPadIds(opt) {
+  const ids = ['jump', 'dash'];
+  if (!opt?.talk) ids.push('fly');
+  return ids;
+}
+
+/** Enter always presses the prompt. E does too, and only while walking (fly and the dive use E to rise). */
+export function promptKeyFires(code, walking) {
+  if (code === 'Enter') return true;
+  if (code === 'KeyE') return !!walking;
+  return false;
+}
+
+function promptOnFoot(ctx) {
+  const p = ctx?.playerObj;
+  if (!p || p.fly || p.gull) return false;
+  const s = ctx.services || {};
+  if (s.swim?.active || s.explore?.drive?.active || s.drive?.active) return false;
+  if (s.sail?.active || s.explore?.sail?.active) return false;
+  if (s.play?.gull?.active || s.play?.courses?.active || s.playCar?.race?.phase && s.playCar.race.phase !== 'idle') return false;
+  return true;
+}
 
 const EXTRA_CSS = /* css */`
 /* Results: full screen over the dimmed town. A big medal (a milled rim, the kanji engraved, a shine that sweeps once,
@@ -278,6 +309,11 @@ const CSS = /* css */`
   background: linear-gradient(180deg, #FFE38A 0%, #FFD24A 49%, #F8B500 51%, #EDA600 100%);
   box-shadow: 0 5px 14px rgba(23,24,75,.38), inset 0 0 0 3px #FFFFFF, 0 0 0 1px rgba(23,24,75,.4); }
 #klc-play .prompt::before { content: ""; width: 11px; height: 13px; background: #223A70; clip-path: polygon(0 0, 100% 50%, 0 100%); flex: none; }
+#klc-play .prompt.has-key::before { content: none; }
+#klc-play .prompt kbd { position: static; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 7px; flex: none;
+  font: 800 12px/24px var(--k-round); color: #223A70; background: #FBFAF5; text-align: center; letter-spacing: 0;
+  box-shadow: inset 0 -2px 0 rgba(34,58,112,.22), 0 0 0 1.5px #223A70, 0 3px 6px rgba(23,24,75,.3); }
+@media (pointer: coarse) { #klc-play .prompt kbd { display: none; } }
 #klc-play .prompt:active { transform: translateX(-50%) scale(.94); }
 /* 3 · 2 · 1 · GO!: 120 px numerals, 生成り over a 7 px 紺 outline and a 生成り keyline, a hard 鉄紺 drop;
    each beat scales 1.3 → 1 with a burst of speed lines behind it. GO! is 山吹. */
@@ -354,7 +390,7 @@ const CSS = /* css */`
 }
 @media (max-width: 720px) {
   #klc-play .counters { top: calc(80px + env(safe-area-inset-top, 0px)); left: 12px; }
-  #klc-play .prompt { bottom: auto; top: calc(188px + env(safe-area-inset-top, 0px)); min-width: 168px; }   /* [emil-ui] the context prompts' one place on a phone: the top-centre slot under the HUD's rows (the gull's .prompt.top, the board chip's, もぐる's: ui/ship.js). At 168 px it sat on the stick's top edge; above the thumbs, on ホヤぼーや */
+  #klc-play .prompt { bottom: auto; top: calc(188px + env(safe-area-inset-top, 0px)); min-width: 168px; }   /* [emil-ui] the context prompts' one place on a phone: the top-centre slot under the HUD's rows (the gull's .prompt.top, the board chip's, もぐる's: ui/ship.js). At 168 px it sat on the stick's top edge; above the thumbs, clear of the walker */
   #klc-play .timer { top: calc(132px + env(safe-area-inset-top, 0px)); font-size: 40px; }
   #klc-play .split { top: calc(180px + env(safe-area-inset-top, 0px)); }
   #klc-play .prompt.top { bottom: auto; top: calc(188px + env(safe-area-inset-top, 0px)); }   /* [integration] avatar's top prompt (the gull), under the kit's row (which ends near 172 px on a phone) */
@@ -472,6 +508,8 @@ export function mountUi(ctx) {
   let overlay = false;
   let hubApi = null;
   let hidePrompt = () => {};
+  let promptPri = 0;
+  let promptGen = 0;
   let cardCleanup = () => {};
   let promptPad = false;
   const arrowPos = { x: 0, y: 0, z: 0 };
@@ -585,7 +623,7 @@ export function mountUi(ctx) {
     if (!veil.hidden) cardCleanup();
   });
 
-  function movementButtons() {
+  function movementButtons(opt) {
     const p = ctx.playerObj;
     const drive = ctx.services?.explore?.drive;
     if (drive?.active) return [
@@ -599,13 +637,17 @@ export function mountUi(ctx) {
       { id: 'boost', label: 'touch.btn.boost', icon: 'boost', hold: true },
       { id: 'land', label: 'touch.btn.land', icon: 'walk', onDown: () => { p.fly = false; } },
     ];
-    return [
-      { id: 'jump', label: 'touch.btn.jump', icon: 'jump', onDown: () => p?.jump?.() },
-      { id: 'dash', label: 'touch.btn.dash', icon: 'dash', toggle: true },
-      { id: 'fly', label: 'touch.btn.fly', icon: 'fly', onDown: () => { if (p) { p.fly = true; p.vy = 0; p.onGround = false; } } },
-    ];
+    const byId = {
+      jump: { id: 'jump', label: 'touch.btn.jump', icon: 'jump', onDown: () => p?.jump?.() },
+      dash: { id: 'dash', label: 'touch.btn.dash', icon: 'dash', toggle: true },
+      fly: { id: 'fly', label: 'touch.btn.fly', icon: 'fly', onDown: () => {
+        if (p && typeof p.allowMode === 'function' && !p.allowMode('fly', { via: 'pad' })) return;
+        if (p) { p.fly = true; p.vy = 0; p.onGround = false; }
+      } },
+    };
+    return promptPadIds(opt).map((id) => byId[id]);
   }
-  function syncPad(text, onPress) {
+  function syncPad(text, onPress, opt) {
     const pad = ctx.pad;
     if (!pad || typeof pad.registerMode !== 'function') return;
     const mode = pad.mode;
@@ -615,7 +657,7 @@ export function mountUi(ctx) {
         stick: 'analog',
         buttons: [
           { id: 'play-go', label: { ja: text, en: text }, icon: FISH, onDown: () => onPress?.() },
-          ...movementButtons(),
+          ...movementButtons(opt),
         ],
       });
       pad.setMode('play-prompt');
@@ -704,33 +746,51 @@ export function mountUi(ctx) {
     setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 320); }, life);
   };
   ui.prompt = (text, o = {}) => {
+    const priority = Number.isFinite(+o.priority) ? +o.priority : 1;
+    if (!promptEl.hidden && !promptReplaces(promptPri, priority)) return { hide() {}, shown: false };
     hidePrompt();
+    const gen = ++promptGen;
+    promptPri = priority;
     promptEl.hidden = false;
-    promptEl.textContent = text;
+    promptEl.classList.toggle('has-key', !!o.keycap);
     promptEl.classList.toggle('top', !!o.top);
-    const key = o.key || 'Enter';
+    promptEl.setAttribute('aria-label', text);
+    if (o.keycap) {
+      promptEl.textContent = '';
+      const cap = document.createElement('kbd');
+      cap.textContent = o.keycap;
+      promptEl.appendChild(cap);
+      promptEl.appendChild(document.createTextNode(text));
+    } else promptEl.textContent = text;
     const press = () => { sfx.play('tap'); o.onPress?.(); };
     promptEl.onclick = press;
     const onKey = (e) => {
-      if (overlay || e.repeat || e.code !== key) return;
+      if (gen !== promptGen || overlay || e.repeat) return;
+      if (!promptKeyFires(e.code, promptOnFoot(ctx))) return;
       const tag = e.target && e.target.tagName;
       if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
       if (document.body && !document.body.classList.contains('playing') && !document.body.classList.contains('shot')) return;
+      if (e.code === 'KeyE' && !promptOnFoot(ctx)) return;
       e.preventDefault();
       press();
     };
     document.addEventListener('keydown', onKey);
-    if (o.pad !== false) syncPad(text, press);
+    if (o.pad !== false) syncPad(text, press, o);
+    const handle = { shown: true, hide() { hide(); } };
     const hide = () => {
+      if (gen !== promptGen) { handle.shown = false; return; }
+      handle.shown = false;
+      promptPri = 0;
       promptEl.hidden = true;
-      promptEl.classList.remove('top');
+      promptEl.classList.remove('top', 'has-key');
       promptEl.onclick = null;
+      promptEl.textContent = '';
       document.removeEventListener('keydown', onKey);
       clearPad();
       hidePrompt = () => {};
     };
     hidePrompt = hide;
-    return { hide };
+    return handle;
   };
   ui.countdown = (o = {}) => new Promise((resolve) => {
     const beats = ['3', '2', '1', t('play.kit.go')];
@@ -1127,7 +1187,13 @@ export function mountUi(ctx) {
     stampTimer = setTimeout(() => { floatHanko.hidden = true; floatHanko.classList.remove('in'); }, reduced() ? 400 : 900);
   };
   ui.coach = mountCoach({ root, store, t, reduced });
-  hubApi = mountHub({ root, store, t, lang: () => lang, setOverlay, reduced });
+  hubApi = mountHub({
+    root, store, t, lang: () => lang, setOverlay, reduced,
+    allow: (to, extra) => {
+      const fn = ctx.playerObj?.allowMode;
+      return typeof fn === 'function' ? fn(to, extra) : true;
+    },
+  });
   ui.run = (spec) => hubApi.run(spec);   // [mobile-play] a mode started from the world: the wipe and title card, its world built behind it
   ui.hubStart = () => hubApi.lastStart;
   playBtn.addEventListener('click', () => {
@@ -1141,6 +1207,8 @@ export function mountUi(ctx) {
     // The photo shortcut is on window, registered before the kit. It asks us first.
     live.eatKeyP = (e) => {
       if (!hubApi || e.repeat || e.metaKey || e.ctrlKey || e.altKey || playBtn.hidden) return false;
+      // While walking, P takes the photo. あそぶ stays the pill, and P still opens it in the air or the car.
+      if (readMode(ctx) === 'walk' || live.photoOwnsP) return false;
       e.preventDefault();
       if (hubApi.isOpen()) hubApi.hide();
       else hubApi.show();

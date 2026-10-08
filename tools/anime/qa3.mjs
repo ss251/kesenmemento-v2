@@ -45,7 +45,7 @@ try {
 
   // ---- load
   const t0 = Date.now();
-  await page.goto(`${srv.url}?person=first`);   // [integration] the walk checks are first-person by design (eye height, the spot framing); ホヤぼーや's third person is the players' default and has its own tests
+  await page.goto(`${srv.url}?person=first`);   // [integration] the walk checks are first-person by design (eye height, the spot framing); third person is the players' default and has its own tests
   await page.waitFor("document.body.classList.contains('loaded')", { timeout: 280000 });
   report.timings.loadMs = Date.now() - t0;
   const st = await page.eval('({ modules: window.__stats.modules, batch: window.__stats.batch, errors: window.__errors })');

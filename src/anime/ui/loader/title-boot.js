@@ -34,10 +34,7 @@
     d.documentElement.lang = lang;
     try { localStorage.setItem('klc.lang', lang); } catch (e) { /* private mode */ }
     d.querySelectorAll('.lang button').forEach(function (b) { var on = b.getAttribute('data-lang') === lang; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-    // the map credit and the mascot credit follow the language; the English credit is the manual's own form, unaltered
-    // (docs/loading/HOYABOYA.md), set in two lines after its comma like the Japanese one
     var mc = d.getElementById('ld-map'); if (mc) mc.textContent = lang === 'en' ? 'Map © GSI Japan · OpenStreetMap' : '地図 © 国土地理院・OpenStreetMap';
-    var hc = d.getElementById('ld-hoya-credit'); if (hc) hc.innerHTML = lang === 'en' ? 'Kesennuma City Mascot,<br>Hoya Boya the Ocean Boy' : '気仙沼市観光キャラクター<br>「海の子 ホヤぼーや」';
     paintTip();
     var b = d.getElementById('ld-sound'); if (b) b.setAttribute('aria-label', soundLabel(b.getAttribute('aria-pressed') === 'true'));
   }
@@ -148,15 +145,6 @@
   addEventListener('offline', health); addEventListener('online', health);
   var hb = setInterval(function () { if (d.body.classList.contains('loaded') || d.body.classList.contains('playing')) { clearInterval(hb); return; } health(); }, 2000);
   var retry = d.getElementById('ld-retry'); if (retry) retry.addEventListener('click', function () { location.reload(); });
-
-  try {
-    var host = location.hostname, local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]', tpl = d.getElementById('klc-hoya-dev');
-    if (local && tpl && new URLSearchParams(location.search).get('hoya') === 'run') {
-      var run = d.querySelector('.runner');
-      if (run) run.innerHTML = '<div class="sr" data-character="hoyaboya" data-n="1"><div class="sr-bob"><div class="sr-win"><img class="sr-strip" alt=""></div></div></div>';
-      d.documentElement.classList.add('klc-hoya-dev');
-    }
-  } catch (e) { /* no dev runner */ }
 
   try {
     if (reduced || typeof stage.animate !== 'function') { /* the motion clock fades in place; .ld-fade is the safety net if the clock never starts */ }

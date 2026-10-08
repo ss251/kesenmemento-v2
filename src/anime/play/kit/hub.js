@@ -1,7 +1,7 @@
 // [play] あそぶ. One tap from anywhere, then a title card, then the mode.
 // PLAY-ENTRY §1, §2, §5. Closed, it costs nothing per frame.
 
-import { listModes, onModes } from './modes.js';
+import { listModes, onModes, hubTarget } from './modes.js';
 import { sfx } from './sfx.js';
 
 const STEP_ICONS = [
@@ -198,7 +198,7 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function mountHub({ root, store, t, lang, setOverlay, reduced }) {
+export function mountHub({ root, store, t, lang, setOverlay, reduced, allow }) {
   const hub = document.createElement('div');
   hub.className = 'hub';
   hub.hidden = true;
@@ -527,7 +527,9 @@ export function mountHub({ root, store, t, lang, setOverlay, reduced }) {
   }
 
   async function begin(spec) {
-    if (busy) return;
+    if (busy || !spec) return;
+    const to = hubTarget(spec.id);
+    if (to && typeof allow === 'function' && !allow(to, { via: 'hub' })) return;
     busy = true;
     const t0 = performance.now();
     hideSheet();

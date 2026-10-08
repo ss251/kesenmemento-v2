@@ -27,7 +27,7 @@ Measured in the town by `tools/anime/feel-probe.mjs` (headless Chrome through th
 | the stick | dead zone, curve, run | full walk never reachable (91 %); 2 % speed at 20 % travel | full walk at 80 % travel; 0.25 u + 0.75 u² |
 | 30 vs 60 fps | the same | the same (the fixed step) | the same: starts, stops, turns, slides and the camera match |
 
-Deploy #7 (`e1be2c1`) shipped everything above at the walker's 3.1 / 6.4 m/s and main's stride (the feet still slid then); deploy #8 adds his own speeds, the hoya-accuracy lane's stride and the cadence lock. The boot's slide is measured as the hoya lane does (`test/play-hoya3d.test.js`): its ankle within 1.2 cm of its lowest, the travel along his heading from the frame after touch-down to lift-off. Across his heading over the same frames a planted boot moved 0 cm walking and 0.3–0.4 cm a stance running in the r8 run, before the hoya lane's thigh fix (`bd88b15`; its offline numbers after the fix: 0.15 / 0.55 cm). At 30 fps no walking stance has two sampled frames within 1.2 cm of the lowest, so the per-stance numbers there are the run's (0 cm slide, 0 cm across); the coarser median speed of the lower ankle is the same at 30 and 60 fps (0.44 m/s, most of it the swing).
+Deploy #7 (`e1be2c1`) shipped everything above at the walker's 3.1 / 6.4 m/s. Deploy #8 gives a custom character its own speeds (1.5 / 3.0) and a cadence lock through `gait()`. The original figure keeps 3.1 / 6.4 until that model is in the build.
 
 ## Proof: clips and stills
 
@@ -46,7 +46,7 @@ Deploy #7 (`e1be2c1`) shipped everything above at the walker's 3.1 / 6.4 m/s and
 
 - **The rig by screen shape.** Landscape and desktop keep the 4.5 m boom (1.6 m look height, −8°, 0.35 m shoulder: he is 22 % of the picture). A portrait phone sees 88° tall (`core/fov.js`), where that boom left him at 12 %: it gets a 2.6 m boom looking at his chest (0.9 m), −14°, a 0.15 m shoulder, which frames him at 20 % with his feet two thirds of the way down. Between aspect 1 and 1:2 the rig blends.
 - **The follow.** The boom's origin tracks his feet with their own velocity fed forward (a critically damped spring at 24 /s only on what the velocity does not explain): a steady walk or run has no lag, and a stop leaves the camera still within 0.05–0.10 s with no catch-up and no overshoot. Its height follows on a softer spring (9 /s), so kerbs and stairs never shake the picture. Any tracker without lag must overshoot a stop if its look-ahead moves the camera (measured: 0.23 m), so the look-ahead only turns the view: 0.14 s of his travel, at most ~10° (0.176 × the boom), built at 4 /s and let go at 12 /s.
-- **Walls.** The boom length eases in quickly (20 /s) and out slowly (4 /s) toward the clear distance and is clamped to it the moment a wall comes between: never a view through a wall. Beside a wall the shoulder offset is pulled in toward his column (14 /s, probed 1.5× out so it starts early): it snapped 0.35 m sideways before. A short boom rises (eased) and looks lower, as before (see [AVATAR.md](AVATAR.md)).
+- **Walls.** The boom length eases in quickly (20 /s) and out slowly (4 /s) toward the clear distance, and never shortens or lengthens by more than 0.24 m in one frame (it used to clamp the moment a wall crossed the ray, which dropped the picture). A passer-by, a pole, a sign, a wire, a tree's thin trunk and a car whose roof is under the camera do not shorten it. A ray that already starts inside a building — the phone tier's solid footprint, which covers the stair beside PIER7 — keeps the framing instead of collapsing to his chest. The ground under the camera is the surface just beneath it, not the highest deck in the column (PIER7's upper landing was collapsing the boom). The camera stays at least 0.6 m above that surface, and never below the look point. It does not fall more than 0.24 m behind his feet in one frame. Beside a wall the shoulder offset is pulled in toward his column (14 /s, probed 1.5× out so it starts early): it snapped 0.35 m sideways before. A short boom rises (eased) and looks lower, as before (see [AVATAR.md](AVATAR.md)).
 - **Short booms.** Under the rig's own measure (`liftAt`: 2.4 m on the 4.5 m boom, 1.39 m on the portrait one) a short boom rises 0.45 m for each metre lost, eased, and stops under a ceiling; the look point drops toward his chest.
 - **Dropped frames.** Frames of 16.7 to 50 ms mixed keep the camera within 1 cm of its 60 fps place behind him (`test/feel-camera.test.js`).
 - **Reduced motion** snaps every frame, as before. The gull keeps its own follow (`placeChase`).
@@ -55,29 +55,20 @@ Deploy #7 (`e1be2c1`) shipped everything above at the walker's 3.1 / 6.4 m/s and
 
 Past the 12 % dead zone (6.7 px of the 56 px travel) the push u, reaching 1 at 80 % of the travel, gives `0.25 u + 0.75 u²`: a quarter of linear's slope at the start (a small push is a slow walk you can steer), steepening to full walking speed at 80 %, before RUN at 85 % (with its 5 % hysteresis). The smoothstep before gave 2 % of the speed at 20 % travel and topped out at 91 % of walking speed. The car, the boat, the swim and the gull read the same `pad.move`.
 
-## His speeds and his walk cycle (deploy #8)
+## Speeds and the walk cycle (deploy #8)
 
-**Decided by the conductor (2026-10-08 10:00): ホヤぼーや walks at 1.5 m/s and runs at 3.0 m/s in third person, with his feet planted.** First person and the original walker keep 3.1 / 6.4. The numbers live in one place, `HOYA_SPEED` in `src/anime/play/avatar/index.js`; `?hoyaSpeed=walk,run` tries others (`?hoyaSpeed=0` gives him the walker's).
+**A custom character walks at 1.5 m/s and runs at 3.0 m/s in third person.** First person and the original walker keep 3.1 / 6.4. The numbers live in `CHARACTER_SPEED` (`src/anime/play/avatar/pose.js`, re-exported from `index.js`). `?speed=walk,run` tries others (`?speed=0` gives the walker's speeds). Until `meme-model.js` loads, the original figure is what you see, at the walker's speeds.
 
-Why those two numbers: the manual's legs are 0.114 m long. With the manual's stride (hoya-accuracy: 0.204 m a stance walking at stance 0.56, 0.196 m running at 0.36) and the poses' readable cycle rates (walk ≤ 4.2 Hz, run ≤ 5.5 Hz), the fastest no-slide speeds are 1.5 and 3.0 m/s. The trade-off (the planted foot's slide as a share of his speed):
+The run stays lively: from standing to a run in at most 0.15 s, ダッシュ is the run, and at a run the view widens by 3.5° (90 % in 0.65 s, back within 0.45 s; `RUN_FOV`), measured from the screen's own field of view and given back when the walk ends (none under reduced motion).
 
-| walk / run (m/s) | walk slide | run slide | cycle walk / run |
-|---|---|---|---|
-| 3.1 / 6.4, main's stride (before) | 73–80 % | 84–88 % | 3.2 / 3.6 Hz |
-| 3.1 / 6.4, the new stride, locked | 51 % | 53 % | 4.2 / 5.5 Hz |
-| 2.4 / 4.0 | 36 % | 25 % | 4.2 / 5.5 Hz |
-| 2.0 / 3.0 | 24 % | 0 % | 4.2 / 5.5 Hz |
-| 1.8 / 3.0 | 15 % | 0 % | 4.2 / 5.5 Hz |
-| **1.5 / 3.0 (chosen)** | **0 %** | **0 %** | 4.1 / 5.5 Hz |
+## The walk cycle
 
-The run stays lively: from standing to 3.0 m/s in at most 0.15 s, ダッシュ is the run, and at a run the view widens by 3.5° (90 % in 0.65 s, back within 0.45 s; `RUN_FOV`), measured from the screen's own field of view and given back when the walk ends (none under reduced motion).
+The run stays lively: from standing to 3.0 m/s in at most 0.15 s, ダッシュ is the run, and at a run the view widens by at most 2° (90 % in ~1.3 s, back in about a second; `RUN_FOV`), measured from the screen's own field of view. Walking does not change it. The addition is given back in one frame when the walk ends (`dropRunFov`: a mode that takes the camera keeps that mode's own lens), and there is none under reduced motion.
 
-## His walk cycle
-
-His planted foot slid because his legs are short for his speed: the manual's legs are 0.114 m long, and at 3.1 m/s a cycle that keeps the foot planted would need ~15 Hz with main's stride. The hoya-accuracy lane's model gives the manual's stride (0.204 m a stance walking at stance 0.56, 0.196 m running at 0.36) and `gait(speed, run)`. `play/avatar/index.js` `gaitCadence` drives `update(dt, { …, cadence, run })` with the model's own no-slide `rate` (`speed × stance / travel`, held to the pose's readable ceiling), within 1.6–5.5 Hz; `run` is 0 walking and 1 running (eased over 0.12 s), so the model shows the pose the player chose. The footsteps follow the same cadence and soften as the patter quickens (`footstepGain`). A model without `gait()` keeps its own speed-driven cycle.
+When a model offers `gait(speed, run)`, `play/avatar/index.js` `gaitCadence` drives `update(dt, { …, cadence, run })` with the model's own no-slide `rate` (`speed × stance / travel`, held to 1.6–5.5 Hz). `run` is 0 walking and 1 running. The footsteps follow that cadence and soften as the patter quickens (`footstepGain`). A model without `gait()`, and the original figure, keep their own speed-driven cycle. The slot test is `test/feel-gait.test.js`: a missing module loads as null, quietly.
 
 ## Checking it
 
-- `env -u NODE_OPTIONS bun test ./test/feel-player.test.js ./test/feel-camera.test.js ./test/feel-metrics.test.js ./test/feel-gait.test.js ./test/feel-credit.test.js`: the numbers above through the real `Player` and camera, the probe's metrics against synthetic motion with known answers, his planted feet through the model's gait at his speeds, and the credit's place per screen.
+- `env -u NODE_OPTIONS bun test ./test/feel-player.test.js ./test/feel-camera.test.js ./test/feel-metrics.test.js ./test/feel-gait.test.js ./test/feel-credit.test.js`: the numbers above through the real `Player` and camera, the probe's metrics against synthetic motion with known answers, the slot's quiet fallback, and the absence of a credit pill.
 - `tools/anime/gate.sh chrome --fg env -u NODE_OPTIONS bun tools/anime/feel-probe.mjs --label <name> [--fps 60,30] [--clip] [--throttle 4]`: the town numbers (and clips into `docs/play/shots/feel/`).
 - `tools/anime/gate.sh chrome --fg env -u NODE_OPTIONS bun tools/anime/feel-modes.mjs`: every mode that shares the player (fly, gull, drive, swim, 一本釣り, かつお), each followed by a walk.

@@ -28,7 +28,7 @@ const CLIP = has('clip') || has('clip-only');
 const CLIP_ONLY = has('clip-only');   // only the clip pass (a measurement already saved)
 const THROTTLE = Number(arg('throttle', 0));
 const STEPS_HOLD = Number(arg('stepsHold', 3.5)) * 1000;   // seconds walked along the kerb route and up the stair (a slower walk needs longer)
-const PARAMS = arg('params') ? '&' + String(arg('params')) : '';   // extra URL parameters for the page (e.g. hoyaSpeed=1.8,3.2)   // CDP CPU throttling during the walk (a phone's dropped frames): 0 = off
+const PARAMS = arg('params') ? '&' + String(arg('params')) : '';   // extra URL parameters for the page (e.g. speed=1.8,3.2)   // CDP CPU throttling during the walk (a phone's dropped frames): 0 = off
 const OUT = join(ROOT, 'docs/play/shots/feel');
 const RAW = join(ROOT, 'dist/feel', LABEL);
 mkdirSync(OUT, { recursive: true }); mkdirSync(RAW, { recursive: true });
@@ -44,7 +44,7 @@ const RECORDER = `(() => {
   function find() {
     if (root && root.parent) return;
     root = null; fR = fL = null;
-    ctx.scene.traverse((o) => { if (!root && o.name === 'hoya3d') root = o; });
+    ctx.scene.traverse((o) => { if (!root && typeof o.name === 'string' && o.name.indexOf('chr_play-') === 0) root = o; });
     if (root) { fR = root.getObjectByName('footR'); fL = root.getObjectByName('footL'); }
   }
   const marks = [];
@@ -216,7 +216,7 @@ async function enter(page, dev) {
   if (dev === 'phone') { const f = fingers(page); await waitGo(page); const g = await center(page, '#go'); await f.tap(g.x, g.y); }
   else { await waitGo(page); await page.eval("document.getElementById('go').click()"); };
   await page.waitFor("document.body.classList.contains('playing')", { timeout: 30000 });
-  await page.waitFor(`(() => { let r = null; window.__ctx.scene.traverse((o) => { if (o.name === 'hoya3d') r = o; }); return !!r; })()`, { timeout: 60000 });
+  await page.waitFor(`(() => { let r = null; window.__ctx.scene.traverse((o) => { if (typeof o.name === 'string' && o.name.indexOf('chr_play-') === 0) r = o; }); return !!r; })()`, { timeout: 60000 });
   await page.eval(RECORDER);
 }
 

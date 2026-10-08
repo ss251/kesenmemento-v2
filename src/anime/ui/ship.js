@@ -321,8 +321,8 @@ body:not(.playing):not(.shotui) #klc-board,body.noui #klc-board{display:none!imp
 /* [emil-ui] One context prompt at a time, in one place (above the thumbs on a phone). A game's start (the kit's prompt: 話す, スタート) wins over the boat in front of you
    (乗船する), which wins over the bay (もぐる); the one that gave way comes back when the other goes. */
 body:has(#klc-play .prompt:not([hidden]):not(.top)) #klc-board,body:has(#klc-play .prompt:not([hidden]):not(.top)) .swim-dive,body:has(#klc-board.show) .swim-dive{display:none!important}
-/* [emil-ui] ... and with the pad on, もぐる (play/underwater's chip) takes this chip's place: at 96 px it sat on the stick's edge, under ホヤぼーや's credit. The desktop keeps its own 96 px.
-   On a phone the place is the top-centre slot under the HUD's rows (the gull's prompt's, play/kit/ui.js): above the thumbs they sat on ホヤぼーや himself (no text on him: CRAFT 2).
+/* [emil-ui] ... and with the pad on, もぐる (play/underwater's chip) takes this chip's place: at 96 px it sat on the stick's edge. The desktop keeps its own 96 px.
+   On a phone the place is the top-centre slot under the HUD's rows (the gull's prompt's, play/kit/ui.js): above the thumbs, clear of the walker (CRAFT 2: no text on the walker).
    While the HUD's ☰, a sheet or the credits are open (modal; the pad steps aside too), the prompts step back. */
 body.klc-pad .swim-dive{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 @media (max-width:720px){#klc-board{top:calc(188px + env(safe-area-inset-top,0px));bottom:auto}body.klc-pad .swim-dive{top:calc(188px + env(safe-area-inset-top,0px));bottom:auto}}

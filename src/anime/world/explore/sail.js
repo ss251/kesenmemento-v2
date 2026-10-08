@@ -556,6 +556,11 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   }
 
   function enter(at = null) {
+    const plGate = ctx.playerObj;
+    const placed = !!(at && (at.x != null || at.z != null));
+    const to = (at?.boat || 'shofuku') === 'katsuo' ? 'katsuo' : 'sail';
+    // The prompt is the place check. A special mode still cannot board.
+    if (typeof plGate?.allowMode === 'function' && !plGate.allowMode(to, { via: placed ? 'mission' : 'key', atPlace: true })) return false;
     const prevKind = boatKind;
     const id = applyBoat(at?.boat || 'shofuku');
     const home = homeOf(id);
@@ -624,7 +629,11 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     addEventListener('keydown', (e) => {
       if (ctx.services.swim?.active) return;   // [play:underwater] V / hold R / F leave the water, not the boat
       const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
-      if (state.active && boatKind !== 'katsuo' && !typing && (e.code === 'KeyV' || e.code === 'KeyF' || e.code === 'KeyC' || /^Digit\d$/.test(e.code))) exit();
+      if (state.active && boatKind !== 'katsuo' && !typing && (e.code === 'KeyV' || e.code === 'KeyF' || e.code === 'KeyC' || /^Digit\d$/.test(e.code))) {
+        exit();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
     }, true);
     addEventListener(HELD_R, () => {
       if (ctx.services.swim?.active) return;

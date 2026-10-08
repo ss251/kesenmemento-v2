@@ -7,14 +7,14 @@
 //   css       <style id="klc-loader-css">   src/anime/ui/loader/loader.css
 //   slot      the poster hour, before paint  ui/loader/sky.js posterForQuery, duplicated in slotScript()
 //   logo      the sun title mark             src/anime/assets/loader/title-logo-sun.svg (tools/anime/title-logo.mjs)
-//   runner    the gauge's カツオ              an empty svg; title-boot.js clones the logo's fish into it. The localhost dev flag stays a <template>.
+//   runner    the gauge's カツオ              an empty svg; title-boot.js clones the logo's fish into it.
 //   tips      <script type=application/json id=klc-tips>   ja, en and the phrased source of every tip in data/loading-tips.json
 //   sky       <script>                       the real-time sky: NOAA sun position (src/web/lib/solar.js) + ui/loader/sky.js + the glue that writes the poster slot
 //   boot      <script>                       title-motion.js then title-boot.js, as classic scripts
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runnerHtml, assertRunnerAllowed, aspectOf, assertHoyaAllowed, hoyaRunnerHtml } from '../../src/anime/ui/loader/sprite-runner.js';
+import { assertRunnerAllowed } from '../../src/anime/ui/loader/sprite-runner.js';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const read = (p, enc = 'utf8') => readFileSync(join(ROOT, p), enc);
@@ -79,8 +79,7 @@ export function tipsJson(data) {
   return JSON.stringify(tips).replace(/</g, '\\u003c').split(LS).join('\\u2028').split(PS).join('\\u2029');
 }
 const FALLBACK_TIPS = { tips: [
-  { id: 'hoya-sword', ja: 'ホヤぼーやの剣は、サンマなんだよ。', en: "Hoya Boya's sword is a saury, a fish." },
-  { id: 'hoya-belt', ja: 'ホヤぼーやのベルトは、ホタテの貝がらだよ。', en: "Hoya Boya's belt is a scallop shell." },
+  { id: 'katsuo-modori', ja: '秋に南へもどる、あぶらがのったカツオは「もどりガツオ」とよばれるよ。', en: 'Bonito that return south in autumn are fatty and are known as “modori-gatsuo.”' },
 ] };
 
 /** Strip comments from a piece of plain browser JS (whole-line comments, block comments, and trailing // comments that hold no quote), and turn ES-module exports into plain declarations. */
@@ -146,12 +145,9 @@ export function slotScript() {
 /** Every generated region of index.html, as a map name -> the text that goes between the markers. */
 export function loaderParts() {
   const raw = JSON.parse(read('src/anime/assets/runner/runner.json'));
-  const runner = assertRunnerAllowed(raw), hoya = assertHoyaAllowed(raw.hoya);   // (throws: a Hoya Boya runner without the city's approval record)
-  // the gauge's fish is the logo's own カツオ (cloned at runtime). The region only names the character and, while mode is off, holds the localhost dev flag.
-  const runnerMarkup = (hoya.mode === 'off'
-    ? `<svg class="runner" id="fish" data-character="bonito" viewBox="-66 -32 122 61" aria-hidden="true"></svg>`
-    : hoyaRunnerHtml(hoya, `./assets/hoyaboya/${hoya.src}`))
-    + (hoya.pose ? `<template id="klc-hoya-dev" data-src="/data/hoyaboya-dev/${hoya.src}" data-aspect="${hoya.aspect}"></template>` : '');
+  assertRunnerAllowed(raw);
+  // the gauge's fish is the logo's own カツオ (cloned at runtime). The region only names the character.
+  const runnerMarkup = `<svg class="runner" id="fish" data-character="bonito" viewBox="-66 -32 122 61" aria-hidden="true"></svg>`;
   const tipsFile = join(ROOT, 'data/loading-tips.json');
   const tips = existsSync(tipsFile) ? JSON.parse(readFileSync(tipsFile, 'utf8')) : FALLBACK_TIPS;
   const css = read('src/anime/ui/loader/loader.css').trimEnd();

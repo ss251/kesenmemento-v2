@@ -75,7 +75,7 @@ test('no references to the V3-SPEC section 5 exclusion list', () => {
 });
 
 test('fictional brands only (no real companies, chains or mascots)', () => {
-  const real = /コカ・?コーラ|Coca|ペプシ|ローソン|セブン-?イレブン|ファミリーマート|ファミマ|サントリー|キリン|アサヒ|サッポロ|伊藤園|ヤマト運輸|佐川|東北電力|NTT|ドコモ|docomo|au |ソフトバンク|ホヤぼーや|かもめの玉子|斉吉|角星|男山|アンカーコーヒー|鶴亀食堂|ムカエル|ウマレル|Yamaki|ヤマキ|ENEOS|出光|ゆうちょ|七十七銀行|トヨタ|ホンダ|スズキ|ダイハツ|Toyota|Honda|Suzuki|Daihatsu/;
+  const real = /コカ・?コーラ|Coca|ペプシ|ローソン|セブン-?イレブン|ファミリーマート|ファミマ|サントリー|キリン|アサヒ|サッポロ|伊藤園|ヤマト運輸|佐川|東北電力|NTT|ドコモ|docomo|au |ソフトバンク|かもめの玉子|斉吉|角星|男山|アンカーコーヒー|鶴亀食堂|ムカエル|ウマレル|Yamaki|ヤマキ|ENEOS|出光|ゆうちょ|七十七銀行|トヨタ|ホンダ|スズキ|ダイハツ|Toyota|Honda|Suzuki|Daihatsu/;
   for (const [p, src] of files) expect(real.test(src), p).toBe(false);
 });
 

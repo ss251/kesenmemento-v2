@@ -1,8 +1,8 @@
 // [loader] The real loading screen and title screen without the world: src/anime/index.html built with tools/anime/loader-preview-main.js standing in for main.js, and served on YOUR port.
 //   env -u NODE_OPTIONS bun tools/anime/loader-preview.mjs --port 9435 [--mock-runner path/to/still.png --mock-label]    (Ctrl-C to stop)
 //   http://127.0.0.1:9435/?p=0.55            the loader at 55 %          &state=loaded  the title screen          &state=playing  after the hand-off          &lang=en  &phone=1
-// --mock-runner <png>: the application mock (not included): the ship's sheet is replaced by this still, one frame, in the page's own DOM, and a 「申請用イメージ」 tag is added
-// (the still is the city's official illustration, unmodified; the mock is for the 使用承認申請 only and is never part of the app).
+// --mock-runner <png>: replaces the ship's sheet with one still, in the page's own DOM, and adds a 「申請用イメージ」 tag.
+// That mock is not part of the app.
 import { join, resolve } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { serve, ROOT } from './cdp.mjs';
@@ -15,7 +15,10 @@ const STUB = join(ROOT, 'tools/anime/loader-preview-main.js');
 export async function buildPreview(outdir) {
   const { writeRegistry } = await import(join(ROOT, 'scripts/anime/registry.js')); writeRegistry();
   const res = await Bun.build({ entrypoints: [join(ROOT, 'src/anime/index.html')], outdir, minify: false, target: 'browser', splitting: false,
-    plugins: [{ name: 'loader-preview-stub', setup(b) { b.onResolve({ filter: /(^|[\\/])main\.js$/ }, () => ({ path: STUB })); } }] });
+    plugins: [
+      { name: 'loader-preview-stub', setup(b) { b.onResolve({ filter: /(^|[\\/])main\.js$/ }, () => ({ path: STUB })); } },
+      (await import(join(ROOT, 'scripts/anime/optional-meme.js'))).optionalMemePlugin(ROOT),
+    ] });
   if (!res.success) throw new Error('preview build failed:\n' + res.logs.map((l) => l.message ?? l).join('\n'));
   const { installTitleAssets } = await import(join(ROOT, 'scripts/anime/title-assets.js')); installTitleAssets(outdir, ROOT);
   return res;

@@ -67,7 +67,7 @@ export const CSS = /* css */`
 #klc-pad .chip button:focus-visible, #klc-pad .gear:focus-visible, #klc-pad .sw:focus-visible, #klc-pad .coach .ok:focus-visible { outline: 2px solid var(--ring-ink, #1f3a68); outline-offset: 2px; box-shadow: 0 0 0 5px var(--ring-halo, rgba(255, 255, 255, 0.92)); }
 
 /* ---------- the mode chip and the settings */
-#klc-pad[data-custom="1"] .chip { display: none; }   /* a registered mode (the sail mode) owns the buttons: no 歩く / 飛ぶ / 運転 switch while it runs */
+#klc-pad[data-custom="1"] .chip, #klc-pad[data-special="1"] .chip { display: none; }   /* a registered mode, or a dive, gull, car, boat, race or game, owns the buttons */
 #klc-pad .topbar { position: absolute; display: flex; gap: 8px; align-items: center; }
 #klc-pad .chip { display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--k-glass); pointer-events: auto; -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
   box-shadow: 0 8px 26px rgba(35, 40, 70, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.55); }
@@ -150,7 +150,7 @@ html.klc-pad-root { touch-action: manipulation; }
   body.klc-pad #klc-ui .tools { display: none; position: absolute; top: calc(60px + env(safe-area-inset-top, 0px)); right: 10px; width: min(268px, calc(100vw - 20px)); flex-direction: column; align-items: stretch; gap: 2px; padding: 8px;
     border-radius: 22px; background: var(--k-glass-2); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); box-shadow: 0 16px 44px rgba(35, 40, 70, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.6) inset; z-index: 3; }
   body.klc-pad #klc-ui[data-menu="1"] .tools { display: flex; }
-  body.klc-pad #klc-ui .tools { max-height: calc(100dvh - 72px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow-y: auto; overscroll-behavior: contain; }   /* [emil-ui] 11 rows (名所, 操作設定 joined), 44 px each (the touch minimum; they were 48): at 390 x 844 the menu ends above ホヤぼーや's credit, and on a 667 px phone it scrolls inside itself */
+  body.klc-pad #klc-ui .tools { max-height: calc(100dvh - 72px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow-y: auto; overscroll-behavior: contain; }   /* [emil-ui] 11 rows (名所, 操作設定 joined), 44 px each (the touch minimum; they were 48): at 390 x 844 the menu ends above the bottom band, and on a 667 px phone it scrolls inside itself */
   body.klc-pad #klc-ui[data-menu="1"], body.klc-pad #klc-ui:not([data-sheet=""]) { z-index: 5; }   /* above the minimap while the menu or a sheet is open */
   body.klc-pad #klc-ui .tools .mhead { display: grid; gap: 4px; padding: 6px 10px 10px; border-bottom: 1px solid var(--k-line); margin-bottom: 4px; }
   body.klc-pad #klc-ui .tools .mhead b { font: 900 17px/1.1 var(--k-round); letter-spacing: .05em; color: var(--k-navy); }
@@ -175,7 +175,7 @@ html.klc-pad-root { touch-action: manipulation; }
   body.klc-pad #klc-x .xdrive { top: calc(116px + env(safe-area-inset-top, 0px)); bottom: auto; left: 10px; transform: none; max-width: calc(100vw - 124px); }
   body.klc-pad #klc-x .xdrive .rd { max-width: 92px; }
   /* [emil-ui] No bottom row: the time chip opens the time sheet, the ☰ opens 名所, and the time sheet holds 今日の入船 (hud.js). The bottom of the screen is the thumbs'.
-     The band just above the credit line (24 to 72 px) is ホヤぼーや's credit's (play/avatar/index.js), which nothing may cover while he is shown: the sheets rise above it
+     The band just above the footer credit line (24 to 72 px) stays clear: the sheets rise above it
      (80 px), and the pad steps aside while one is open. */
   body.klc-pad #klc-ui .brand .chip[aria-expanded="true"] { background: var(--k-navy); color: #fff; }
   body.klc-pad #klc-ui .brand .chip[aria-expanded="true"] :is(.clock, .wx) { color: #fff; }

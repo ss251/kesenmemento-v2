@@ -140,7 +140,11 @@ export class Player {
     addEventListener('keydown', (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
       this.keys.add(e.code);
-      if (e.code === 'KeyF') this.fly = !this.fly;
+      if (e.code === 'KeyF') {
+        const next = this.fly ? 'walk' : 'fly';
+        if (typeof this.allowMode === 'function' && !this.allowMode(next, { via: 'key' })) return;
+        this.fly = !this.fly;
+      }
       if (e.code === 'Space' && this.enabled && (this.onGround || this.fly) && !this._landing) { if (!this.fly) this.vy = 4.2; e.preventDefault(); }
     });
     addEventListener('keyup', (e) => this.keys.delete(e.code));

@@ -171,8 +171,9 @@ export function mountRace(ctx, kit, drive) {
   }
 
   function showPrompt() {
-    if (prompt || run.phase !== 'idle' || notebookOpen() || veilOpen()) return;
-    prompt = ui.prompt(ui.t('play.car.start'), { onPress: () => { hidePrompt(); begin(); } });
+    if (prompt?.shown || run.phase !== 'idle' || notebookOpen() || veilOpen()) return;
+    prompt = ui.prompt(ui.t('play.car.start'), { onPress: () => { hidePrompt(); begin(); }, priority: 2 });
+    if (prompt && prompt.shown === false) prompt = null;
   }
 
   function armNight() {
@@ -232,6 +233,7 @@ export function mountRace(ctx, kit, drive) {
 
   let countGen = 0;
   async function begin(at) {
+    if (typeof ctx.playerObj?.allowMode === 'function' && !ctx.playerObj.allowMode('race', { via: 'hub' })) return;
     hidePrompt();
     if (run.phase === 'count' || run.phase === 'run') return;
     const gen = ++countGen;

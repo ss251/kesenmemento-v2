@@ -125,6 +125,10 @@ export function makeDom({ search = '', hostname = 'klc.test' } = {}) {
     get innerHTML() { return this.childNodes.map((c) => serialize(c)).join(''); }
     set innerHTML(html) { this.#clear(); this.htmlSets = (this.htmlSets || 0) + 1; for (const c of parse(String(html))) { c.parentNode = this; this.childNodes.push(c); } wrote(this, 'html'); }
     #clear() { for (const c of this.childNodes) c.parentNode = null; this.childNodes = []; }
+    replaceChildren(...ns) {
+      this.#clear();
+      for (const n of ns) this.appendChild(n && n.nodeType ? n : new Text(n));
+    }
     prepend(...ns) { for (const n of [...ns].reverse()) this.insertBefore(n, this.childNodes[0] ?? null); }
     matches(sel) { return matchesAny(this, sel); }
     closest(sel) { for (let n = this; n && n.nodeType === 1; n = n.parentNode) if (matchesAny(n, sel)) return n; return null; }

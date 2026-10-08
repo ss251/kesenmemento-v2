@@ -55,6 +55,9 @@ export async function build({ entry = join(ROOT, 'src/anime/index.html'), outdir
     const body = 'export const MODULE_LOADERS = {\n' + mods.map(([n, p]) => `  ${JSON.stringify(n)}: () => import(${JSON.stringify(p)}),`).join('\n') + '\n};\n';
     plugins.push({ name: 'klc-registry', setup(b) { b.onLoad({ filter: /[\\/]src[\\/]anime[\\/]world[\\/]registry\.js$/ }, () => ({ contents: body, loader: 'js' })); } });
   }
+  if (entry.startsWith(join(ROOT, 'src/anime'))) {
+    plugins.push((await import(join(ROOT, 'scripts/anime/optional-meme.js'))).optionalMemePlugin(ROOT));
+  }
   const tmp = outdir + '.tmp';
   rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true });
   let res;

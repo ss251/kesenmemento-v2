@@ -1,8 +1,8 @@
 // The walker draws only while he is the body. The dive, the gull, a boat, the car,
 // the race and the ship each put someone else at player.pos (the fish copies its
 // pose there every frame). chaseOwns only knows the drone flag (player.fly): a walk
-// into 「もぐる」 is still third person, so ホヤぼーや was placed on the fish and his
-// walk cycle kept playing. These flags hide him, his shadow and his credit until
+// into 「もぐる」 is still third person, so the walker was placed on the fish and the
+// walk cycle kept playing. These flags hide the walker and its shadow until
 // that body lets go. Leaving a walk puts third person back as it was.
 
 import { chaseOwns } from './camera.js';
@@ -16,7 +16,7 @@ export function otherBody(occupy) {
 }
 
 /**
- * The walker (ホヤぼーや or the original figure) is on screen only in third person
+ * The walker (a custom character, or the original figure) is on screen only in third person
  * on foot, and only while no other body owns the player.
  * `occupy` is the snapshot from bodyOccupy.
  */

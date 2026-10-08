@@ -71,7 +71,7 @@ for (let i = 1; i <= 6; i++) {
     p.keys.add('KeyW');
     for (let k=0;k<4;k++){ p.yaw += 0.1; p.step(1/30); nudge(); }
     bake();
-    const deg = window.__ctx.services.play.avatar.hoyaLean * 180 / Math.PI;
+    const deg = window.__ctx.services.play.avatar.characterLean * 180 / Math.PI;
     return 'lean ' + deg.toFixed(1);
   `, wait: 60, out: join(frames, `l${String(i).padStart(2, '0')}.png`) });
 }

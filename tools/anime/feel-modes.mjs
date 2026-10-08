@@ -31,7 +31,7 @@ try {
     await page.S('Input.dispatchKeyEvent', { type: 'keyUp', code, key: vk[1], windowsVirtualKeyCode: vk[0], nativeVirtualKeyCode: vk[0] });
   };
   const state = () => page.eval(`(() => { const c = window.__ctx, p = c.playerObj, av = c.services.play?.avatar; let vis = false;
-    c.scene.traverse((o) => { if (o.name === 'hoya3d' && o.visible) vis = true; });
+    c.scene.traverse((o) => { if (typeof o.name === 'string' && o.name.indexOf('chr_play-') === 0 && o.visible) vis = true; });
     return { x: p.pos.x, y: p.pos.y, z: p.pos.z, fly: p.fly, enabled: p.enabled, gnd: p.onGround, person: p.person, gull: !!p.gull,
       water: !!c.physics.isWater?.(p.pos.x, p.pos.z) && !c.physics.standable?.(p.pos.x, p.pos.z, p.pos.y), boom: av ? av.boom : null, drawn: vis,
       landing: !!p.landing, finite: [p.pos.x, p.pos.y, p.pos.z, p.vel.x, p.vel.z].every(Number.isFinite) }; })()`);
@@ -126,12 +126,11 @@ try {
     await walkCheck(label + ' → walk', { started, onBoat, afterExit: { fly: after.fly, water: after.water, onGround: after.gnd, finite: after.finite, enabled: after.enabled }, landed });
   }
   if (want('credit')) {
-    // ホヤぼーや's credit (取扱要綱 第5条): never covered by a chip. Show the もぐる chip and the kit prompt (alone and together) and compare
-    // the rects once the credit's 200 ms move is done.
+    // There is no credit pill. Show the もぐる chip and the kit prompt (alone and together) and confirm the pill stays absent.
     await page.eval("window.__camSpec('walk')"); await sleep(900);
     const rects = () => page.eval(`(() => {
       const R = (e) => { if (!e || e.hidden) return null; const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 ? { l: b.left, t: b.top, r: b.right, b: b.bottom } : null; };
-      const credit = R(document.querySelector('#klc-play .hoya-credit'));
+      const credit = R(document.querySelector('#klc-play .avatar-credit'));
       const dive = R(document.querySelector('.swim-dive')), prompt = R(document.querySelector('#klc-play .prompt'));
       const pad = [...document.querySelectorAll('#klc-pad .cluster .btn')].filter((e) => e.dataset.show !== '0').map(R).filter(Boolean);
       const ring = R(document.querySelector('#klc-pad .ghost'));
@@ -150,7 +149,7 @@ try {
     await setChips(false, false);
     await page.eval("document.getElementById('feel-swim-ui')?.remove()");
     // and never on the thumbs' controls: a pad button or the stick's ring (the conductor's #7 report: it covered 乗る and the ring at the quay)
-    const ok = !!rows.none.credit && Object.values(rows).every((r) => r.credit && !r.overDive && !r.overPrompt && !r.overPad && !r.overRing);
+    const ok = Object.values(rows).every((r) => !r.credit);
     const row = { mode: 'credit vs the chips, the pad and the stick', ok, rows };
     out.checks.push(row); log(JSON.stringify({ mode: row.mode, ok, dive: rows.dive.credit, prompt: rows.prompt.credit, both: rows.both.credit, overPad: Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, v.overPad])), overRing: Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, v.overRing])) }));
   }

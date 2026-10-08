@@ -117,16 +117,16 @@ d("row 15: the feed's failure copy (real Chrome)", () => {
     }, 330000);
     afterAll(async () => { await page?.goto("about:blank").catch(() => {}); }, 30000);
 
-    T("a good answer: weather, the count and the green ライブ tag (the baseline); the chip is at least 34 px tall", async () => {
+    T("a good answer: weather, the count and the green 実データ tag (the baseline); the chip is at least 34 px tall", async () => {
       const r = await page.eval(READ); metric("desktop.live", r); await open(true); await shot("live"); await open(false);
-      expect(r).toMatchObject({ status: "ok", wx: A.weatherText, boats: "入船 12隻", tag: "ライブ", tag2: "ライブ", rows: A.rows });
+      expect(r).toMatchObject({ status: "ok", wx: A.weatherText, boats: "入船 12隻", tag: "実データ", tag2: "実データ", rows: A.rows });
       expect(r.tagClass).toContain("live"); expect(r.chipH).toBeGreaterThanOrEqual(34);
     });
 
     T("no weather block (JMA down, the co-op list fine): 天気情報なし beside the count, not 情報を取得中…", async () => {
       expect(await page.eval(SET("noweather"))).toBe("ok");
       const r = await page.eval(READ); metric("desktop.noWeather", r); await open(true); await shot("noweather"); await open(false);
-      expect(r).toMatchObject({ status: "ok", wx: "天気情報なし", boats: "入船 12隻", tag: "ライブ", rows: A.rows });
+      expect(r).toMatchObject({ status: "ok", wx: "天気情報なし", boats: "入船 12隻", tag: "実データ", rows: A.rows });
       expect(r.wx).not.toBe("情報を取得中…"); expect(r.chipH).toBeGreaterThanOrEqual(34);
     });
 
@@ -141,14 +141,14 @@ d("row 15: the feed's failure copy (real Chrome)", () => {
       expect(await page.eval(SET("live"))).toBe("ok");
       expect(await page.eval(SET("error"))).toBe("error");
       const r = await page.eval(READ); metric("desktop.failedRefresh", { ...r, expectedHM: A.updatedHM }); await open(true); await shot("failed-refresh"); await open(false);
-      expect(r).toMatchObject({ status: "error", wx: A.weatherText, boats: "入船 12隻", tag: `キャッシュ ${A.updatedHM}`, tag2: `ライブ情報なし · キャッシュ ${A.updatedHM}`, rows: A.rows });
+      expect(r).toMatchObject({ status: "error", wx: A.weatherText, boats: "入船 12隻", tag: `キャッシュ ${A.updatedHM}`, tag2: `今日の情報なし · キャッシュ ${A.updatedHM}`, rows: A.rows });
       expect(r.tagClass).not.toContain("live"); expect(r.chipH).toBeGreaterThanOrEqual(34);
     });
 
-    T("it recovers: the next good answer is ライブ again", async () => {
+    T("it recovers: the next good answer is 実データ again", async () => {
       expect(await page.eval(SET("live"))).toBe("ok");
       const r = await page.eval(READ); metric("desktop.recovered", r);
-      expect(r).toMatchObject({ status: "ok", wx: A.weatherText, tag: "ライブ", tag2: "ライブ", rows: A.rows }); expect(r.tagClass).toContain("live");
+      expect(r).toMatchObject({ status: "ok", wx: A.weatherText, tag: "実データ", tag2: "実データ", rows: A.rows }); expect(r.tagClass).toContain("live");
     });
 
     T("the chip is the same height in every state (34 px at least): the tag coming and going moves nothing below it", async () => {
@@ -159,14 +159,14 @@ d("row 15: the feed's failure copy (real Chrome)", () => {
       expect(new Set(Object.values(h)).size).toBe(1);
     });
 
-    T("English: Weather unavailable; the failed refresh reads Live data unavailable · Cached HH:MM", async () => {
+    T("English: Weather unavailable; the failed refresh reads Today's data unavailable · Cached HH:MM", async () => {
       await page.eval("document.querySelector('#klc-ui [data-act=lang]').click(); 0"); await sleep(400);
       await page.eval(SET("noweather")); const nw = await page.eval(READ);
       await page.eval(SET("live")); await page.eval(SET("error")); const fr = await page.eval(READ); await open(true); await shot("failed-refresh-en"); await open(false);
       await page.eval(SET("live")); await page.eval("document.querySelector('#klc-ui [data-act=lang]').click(); 0"); await sleep(400);
       metric("desktop.english", { noWeather: nw, failedRefresh: fr });
-      expect(nw.wx).toBe("Weather unavailable"); expect(nw.tag).toBe("Live");
-      expect(fr.tag).toBe(`Cached ${A.updatedHM}`); expect(fr.tag2).toBe(`Live data unavailable · Cached ${A.updatedHM}`);
+      expect(nw.wx).toBe("Weather unavailable"); expect(nw.tag).toBe("Real data");
+      expect(fr.tag).toBe(`Cached ${A.updatedHM}`); expect(fr.tag2).toBe(`Today's data unavailable · Cached ${A.updatedHM}`);
     });
 
     T("no page errors", async () => { expect(page.errors().filter((e) => !/api\/live/.test(e.text))).toEqual([]); });
@@ -190,20 +190,20 @@ d("row 15: the feed's failure copy (real Chrome)", () => {
     }, 330000);
     afterAll(async () => { await f?.release?.().catch(() => {}); }, 30000);
 
-    T("the API and the sample both fail at the first load: the chip says ライブ情報なし, no count, no tag, and the panel says it could not load arrivals; it fits beside the search and ☰ buttons", async () => {
+    T("the API and the sample both fail at the first load: the chip says 今日の情報なし, no count, no tag, and the panel says it could not load arrivals; it fits beside the search and ☰ buttons", async () => {
       const r = await page.eval(READ); metric("phone.neverAnswered", r);
       await chip(); const row = await page.eval(READ); await shot("never-answered"); await chip();
-      expect(r).toMatchObject({ status: "error", wx: "ライブ情報なし", boats: "", tag: null, tag2: null });
+      expect(r).toMatchObject({ status: "error", wx: "今日の情報なし", boats: "", tag: null, tag2: null });
       expect(row.row0).toBe("入船情報を取得できませんでした"); expect(row.rows).toBe(1);
       expect(r.chipH).toBeGreaterThanOrEqual(34); expect(r.chipOverflow).toBe(false);
       if (r.searchL != null) expect(r.chipR).toBeLessThan(r.searchL); if (r.menuL != null) expect(r.chipR).toBeLessThan(r.menuL);
     });
 
-    T("then a good answer (the next poll): weather, count and ライブ; the chip keeps its height and its place", async () => {
+    T("then a good answer (the next poll): weather, count and 実データ; the chip keeps its height and its place", async () => {
       const before = (await page.eval(READ)).chipH;
       expect(await page.eval(SET("live"))).toBe("ok");
       const r = await page.eval(READ); metric("phone.live", r);
-      expect(r).toMatchObject({ status: "ok", wx: A.weatherText, boats: "入船 12隻", tag: "ライブ", rows: A.rows });
+      expect(r).toMatchObject({ status: "ok", wx: A.weatherText, boats: "入船 12隻", tag: "実データ", rows: A.rows });
       expect(r.chipH).toBe(before);   // 34 px with no tag and 34 px with it (it was 27 and 32 on a phone)
       if (r.searchL != null) expect(r.chipR).toBeLessThan(r.searchL); if (r.menuL != null) expect(r.chipR).toBeLessThan(r.menuL);
       expect(r.chipOverflow).toBe(false);
@@ -216,9 +216,9 @@ d("row 15: the feed's failure copy (real Chrome)", () => {
       }
       await page.eval(SET("live")); await page.eval(SET("error")); out.failedRefresh = await page.eval(READ); await view("failed-refresh");
       metric("phone.states", out);
-      expect(out.noWeather).toMatchObject({ wx: "天気情報なし", tag: "ライブ" });
+      expect(out.noWeather).toMatchObject({ wx: "天気情報なし", tag: "実データ" });
       expect(out.cached).toMatchObject({ tag: `キャッシュ ${A.staleHM}` });
-      expect(out.failedRefresh).toMatchObject({ status: "error", tag: `キャッシュ ${A.updatedHM}`, tag2: `ライブ情報なし · キャッシュ ${A.updatedHM}`, rows: A.rows });
+      expect(out.failedRefresh).toMatchObject({ status: "error", tag: `キャッシュ ${A.updatedHM}`, tag2: `今日の情報なし · キャッシュ ${A.updatedHM}`, rows: A.rows });
       for (const [name, r] of Object.entries(out)) {
         expect([name, r.chipH >= 34, r.chipOverflow]).toEqual([name, true, false]);
         if (r.searchL != null) expect([name, r.chipR < r.searchL]).toEqual([name, true]); if (r.menuL != null) expect([name, r.chipR < r.menuL]).toEqual([name, true]);

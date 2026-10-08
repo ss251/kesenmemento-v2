@@ -5,12 +5,12 @@ Remote friends are drawn in two batched meshes: one body, and a flag on a boat. 
 | Mode | What you see | Accent |
 | --- | --- | --- |
 | car | The kei van's vertex-colour body, facing the same way as the van you drive | The friend's colour tints the van |
-| avatar | ホヤぼーや, baked in a walk pose, when the approval record allows him and `?hoya3d` is not `0`. Otherwise the faceless walker | The name-tag dot. He is never recolored. The city credit is on screen while a friend is him |
+| avatar | The faceless stand-in. A custom character is not baked into a friend's body | The name-tag dot. He is never recolored |
 | gull | The ウミネコ from the gull lane (`flockGeo`) | The name-tag dot |
 | fish | The swimming fish geometry, belly and back painted in | The name-tag dot |
 | boat | A low hull at the real length: 第一昭福丸 58.6 m (`vehicle` 0), 第五凪丸 28 m (`vehicle` 1) | A small flag in the friend's colour |
 
-The bodies are baked when you create or join a room, not when the town loads: a visitor who never plays together never pays for the van, the hulls or the 12.7k-vertex ホヤぼーや.
+The bodies are baked when you create or join a room, not when the town loads: a visitor who never plays together never pays for the van or the hulls.
 
 Stand-ins, and only stand-ins, when a bake throws (no town materials, a missing module):
 

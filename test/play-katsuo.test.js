@@ -6,7 +6,7 @@ import { charmGeometry, charmShadowY, charmCentreY, CHARM_GOLD, CHARM_GOLD_HI, C
 import { pickupRadius, nextCombo, comboPitch, comboName, shimmerGain, isMilestone, isFinale, glintMetres, GLINT_PX, GLINT_REST, GLINT_FLASH, COMBO_S, SWIM_R } from '../src/anime/play/katsuo/rules.js';
 
 const test = (name, fn) => bunTest(name, fn, 60_000);
-const SENSITIVE = /\u6d25\u6ce2|\u9707\u707d|被災|復興|tsun[a]mi|earthquake|201[1]|3\.1[1]|慰霊|避難|防潮堤|伝承館|遺構|memorial|disaster|ホヤぼーや/i;
+const SENSITIVE = /\u6d25\u6ce2|\u9707\u707d|被災|復興|tsun[a]mi|earthquake|201[1]|3\.1[1]|慰霊|避難|防潮堤|伝承館|遺構|memorial|disaster/i;
 
 test('pickup, combo and milestones', () => {
   expect(pickupRadius('walk')).toBe(2.5);

@@ -18,7 +18,7 @@ Production does not run from the repository tree but from a **bundle**, a folder
 |---|---|
 | `server.js`, `static.js`, `jpyc.js` | this folder's three files, at the root, so their imports are bundle-relative |
 | `public/` | the build (`dist/`), without source maps, dot files, the per-port test builds (`anime-<port>`), the JPYC e2e screenshots (`jpyc-shots*`), the folders the QA and screenshot tools write (`qa3/`, `*-shots/`) and the dev fixtures |
-| `data/` | what the app fetches at run time: `data/anime`, `data/live`, `data/ship`, `data/shops`, `tour.json`, `landmarks.json`, `i18n.json`, the three `ui-*-i18n.json` files and `buildings/coast.json`; and, when the checkout has them, `data/play` (the card stills of the play hub) and `hoyaboya-approval.json` (the record that the 3D walker reads before it is shown) |
+| `data/` | what the app fetches at run time: `data/anime`, `data/live`, `data/ship`, `data/shops`, `tour.json`, `landmarks.json`, `i18n.json`, the three `ui-*-i18n.json` files and `buildings/coast.json`; and, when the checkout has it, `data/play` (the card stills of the play hub) |
 | `src/`, `scripts/` | the modules behind `/api/live` (`src/server/live.js`, `src/core/geo.js`, `src/web/lib/solar.js`, `scripts/live.js`, `scripts/live/*`; when the checkout has them, the AIS feed `src/server/ais.js` with `src/anime/world/life/ais.js`) and the voucher check (`src/anime/play/missions/voucher.js`) |
 | `*.br`, `*.gz` | brotli 11 and gzip 9 copies of every compressible file under `public/` and `data/` |
 

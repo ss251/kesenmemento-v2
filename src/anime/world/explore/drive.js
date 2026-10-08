@@ -186,6 +186,11 @@ export function createDrive(ctx, { net, carMesh = null }) {   // [smooth] carMes
     return !!n && Math.hypot(n.x - p.x, n.z - p.z) <= r;
   }
   function enter(at = null) {
+    const plGate = ctx.playerObj;
+    const placed = !!(at && (at.x != null || at.z != null));
+    const racing = ctx.services?.playCar?.race?.phase;
+    const raceOwns = racing === 'count' || racing === 'run';
+    if (!raceOwns && typeof plGate?.allowMode === 'function' && !plGate.allowMode('drive', { via: placed ? 'mission' : 'key', atPlace: placed || canEnter() })) return false;
     const p = at || ctx.playerObj?.pos || cam.position;
     const yaw = at?.yaw ?? ctx.playerObj?.yaw ?? 0;
     const sp = net.spawn(p.x, p.z, yaw);
@@ -390,7 +395,11 @@ export function createDrive(ctx, { net, carMesh = null }) {   // [smooth] carMes
     addEventListener('keydown', (e) => {
       const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
       if (e.code === 'KeyC' && !e.repeat && !typing && document.body?.classList?.contains('playing')) { toggle(); return; }
-      if (state.active && (e.code === 'KeyV' || e.code === 'KeyF' || /^Digit\d$/.test(e.code)) && !typing) exit();
+      if (state.active && (e.code === 'KeyV' || e.code === 'KeyF' || /^Digit\d$/.test(e.code)) && !typing) {
+        exit();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
     }, true);
     addEventListener(HELD_R, () => { if (state.active) exit(); });
   }

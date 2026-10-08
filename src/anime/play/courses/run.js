@@ -213,9 +213,10 @@ export function mount(ctx, kit) {
     const wrong = modeNow(ctx, kit) !== c.mode;
     const label = wrong ? text(ctx, 'play.course.switch.' + c.mode) : text(ctx, 'play.course.start');
     if (ui?.prompt) {
-      if (prompt && nearId === c.id && prompt._label === label) return;
+      if (prompt?.shown && nearId === c.id && prompt._label === label) return;
       hidePrompt();
-      prompt = ui.prompt(label, { onPress: () => onPrompt(c) });
+      prompt = ui.prompt(label, { onPress: () => onPrompt(c), priority: 2 });
+      if (prompt && prompt.shown === false) { prompt = null; return; }
       prompt._label = label;
     } else {
       localGo.hidden = false;
@@ -523,8 +524,10 @@ export function mount(ctx, kit) {
     if (phase === 'idle' && playing(ctx)) {
       readPose();
       let best = null, bd = REACH, nearest = Infinity;
+      const claim = ctx.services?.missions?.travelCourse?.() || null;
       for (let i = 0; i < courses.length; i++) {
         const c = courses[i];
+        if (claim && claim !== c.id) continue;
         const dx = c.start.x - pose.x, dy = (c.start.y || 0) - pose.y, dz = c.start.z - pose.z;
         const h = Math.hypot(dx, dz);
         if (h < nearest) nearest = h;
@@ -606,6 +609,8 @@ export function mount(ctx, kit) {
   function start(id, opts = {}) {
     const c = courses.find((x) => x.id === id);
     if (!c) return false;
+    const to = c.mode === 'drive' ? 'drive' : c.mode === 'sail' ? 'sail' : 'fly';
+    if (typeof ctx.playerObj?.allowMode === 'function' && !ctx.playerObj.allowMode(to, { via: 'hub', atPlace: true })) return false;
     if (phase === 'result') closeCard();
     hidePrompt();
     const at = opts && Number.isFinite(Number(opts.at)) ? Number(opts.at) : 0;

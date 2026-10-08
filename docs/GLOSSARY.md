@@ -20,7 +20,7 @@ One Japanese term per concept, the same in the UI (`data/i18n.json`, `data/ui-*-
 | 気仙沼リビングシティ | けせんぬま リビングシティ | Kesennuma Living City | wordmark (☰ menu, brand), share title | ok in the HUD, the menu, the share title, `data/tour.json` and the READMEs. `index.html` `<title>` still has the space: the loading lane owns that file |
 | KesenMemento | ケセンメメント (said once, in the JPYC credit) | KesenMemento | hackathon and public name; written in Latin in running Japanese text | decide: which name faces the public, this or the wordmark above |
 | 第一昭福丸 | だいいちしょうふくまる | Daiichi Shofuku Maru | the ship, everywhere; never 昭福丸 alone | ok. The phone chip is the name 「第一昭福丸」 and the verb 「乗船する」; the desktop title and the search row stay 「第一昭福丸に乗る」 / "Board the Daiichi Shofuku Maru" |
-| ホヤぼーや | — | Hoya Boya | only as the City's design manual allows, with its credit; no text on top of it | ok |
+| メメ | めめ | Meme | the custom walker, when `meme-model.js` is in the build. Until then the original figure walks. No text on top of the walker | slot |
 
 ## The interface
 

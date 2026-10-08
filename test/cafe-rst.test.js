@@ -333,7 +333,7 @@ describe('content hygiene', () => {
     expect(SENSITIVE.test(SRC + read('docs/anime/interiors-cafe-rst.md') + JSON.stringify(PLAN_DOC))).toBe(false);
   });
   test('nothing invented or copied is written on a sign: no cola, no brand, no made-up shop words, nobody\'s character', () => {
-    expect(/coca-?cola|コカ|budweiser|bmw|betty|boop|7-?eleven|セブン|pepsi|hello\s?kitty|ホヤぼーや|fizz|\bcola\b|diner|riders|km 66|arabica|60 kgs/i.test(SRC)).toBe(false);
+    expect(/coca-?cola|コカ|budweiser|bmw|betty|boop|7-?eleven|セブン|pepsi|hello\s?kitty|fizz|\bcola\b|diner|riders|km 66|arabica|60 kgs/i.test(SRC)).toBe(false);
   });
   test('no photograph is committed with the room: the module draws everything, and the plan document holds numbers only', () => {
     expect(/\.(jpg|jpeg|png|heic|webp)['"`]/i.test(SRC)).toBe(false); expect(/data:image/.test(SRC)).toBe(false);

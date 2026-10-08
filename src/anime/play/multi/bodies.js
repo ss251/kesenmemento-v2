@@ -154,7 +154,6 @@ export function mountBodies(ctx, tags) {
     for (let i = 0; i < shown; i++) {
       const it = list[i];
       const key = keyOf(it);
-      if (key === 'avatar' && kind.avatar === 'hoya') sawAvatar = true;
       if (slotMode[i] !== key) {
         if (slotInst[i] >= 0) mesh.deleteInstance(slotInst[i]);
         slotInst[i] = mesh.addInstance(geoId[key]);
@@ -223,7 +222,6 @@ export function mountBodies(ctx, tags) {
     draw,
     aim,
     get frameMs() { return lastMs; },
-    get hoya() { return kind.avatar === 'hoya'; },
     get sawAvatar() { return sawAvatar; },
     get kind() { return kind; },
     mesh,

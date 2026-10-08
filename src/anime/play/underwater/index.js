@@ -165,10 +165,24 @@ async function mountInner(ctx, kit) {
   let baseFov = ctx.camera.fov;
   let acc = 0;
 
+  const swimPos = { x: 0, y: 0, z: 0 };
+  const posFns = [];
+  function publishPos() {
+    if (!state) { swimPos._on = false; return; }
+    if (swimPos._on && swimPos.x === state.x && swimPos.y === state.y && swimPos.z === state.z) return;
+    swimPos.x = state.x; swimPos.y = state.y; swimPos.z = state.z; swimPos._on = true;
+    for (let i = 0; i < posFns.length; i++) { try { posFns[i](swimPos); } catch (e) { /* one listener */ } }
+  }
   const api = {
     get active() { return !!state; },
     get state() { return state; },
+    get pos() { return state ? swimPos : null; },
     get frameMs() { return api._ms || 0; },
+    on(ev, fn) {
+      if (ev !== 'pos' || typeof fn !== 'function') return () => {};
+      posFns.push(fn);
+      return () => { const i = posFns.indexOf(fn); if (i >= 0) posFns.splice(i, 1); };
+    },
     drive: null,
     get drops() { return culture ? culture.drops : null; },
     /** [mobile-play] the dive's world: built, prepared behind a cover, freed (kit/lazy.js) */
@@ -334,6 +348,9 @@ async function mountInner(ctx, kit) {
   function begin(from, pose) {
     const pl = ctx.playerObj;
     if (!pl || state) return;
+    const via = from === 'mission' ? 'mission' : (from === 'menu' || from === 'mode') ? 'hub' : 'chip';
+    const atShore = via === 'chip' && from !== 'sail';
+    if (typeof pl.allowMode === 'function' && !pl.allowMode('dive', { via, atShore })) return;
     built();
     ensurePad();
     const sail = ctx.services.sail;
@@ -421,6 +438,22 @@ async function mountInner(ctx, kit) {
   }
 
   /** keep: the world stays built (a restart from inside the dive builds nothing). */
+  function nearestLand(x, z) {
+    let best = null;
+    for (let r = 0; r <= 48; r += 3) {
+      const n = r === 0 ? 1 : 12;
+      for (let k = 0; k < n; k++) {
+        const a = (k / n) * Math.PI * 2;
+        const qx = x + Math.cos(a) * r;
+        const qz = z + Math.sin(a) * r;
+        const s = env.shore(qx, qz);
+        if (s < -0.3 && s > -4) { best = { x: qx, z: qz }; break; }
+      }
+      if (best) return best;
+    }
+    return null;
+  }
+
   function end(keep = false) {
     if (!state) return;
     state = null;
@@ -446,6 +479,18 @@ async function mountInner(ctx, kit) {
     ctx.camera.fov = typeof ctx.fovFor === 'function' && ctx.camera.aspect > 0 ? ctx.fovFor(ctx.camera.aspect) : baseFov;
     ctx.camera.up.set(0, 1, 0);
     ctx.camera.updateProjectionMatrix();
+    if (saved.from === 'mission' || saved.from === 'menu' || saved.from === 'mode') {
+      const land = nearestLand(pl.pos.x, pl.pos.z);
+      pl.fly = false;
+      pl.enabled = saved.enabled !== false;
+      const yaw = saved.yaw * 180 / Math.PI;
+      if (land) pl.setPose(land.x, land.z, yaw, 0);
+      else pl.setPose(saved.x, saved.z, yaw, saved.pitch * 180 / Math.PI);
+      try { ctx.pad?.setMode(null); } catch { /* */ }
+      saved = null;
+      syncUnder();
+      return;
+    }
     if (saved.from === 'sail') {
       pl.enabled = false;
       pl.fly = true;
@@ -624,6 +669,7 @@ async function mountInner(ctx, kit) {
     if (state && (ctx.services.life?.tour?.flying || ctx.planet?.active)) end();
     if (state) {
       place(dt);
+      publishPos();
       clearHulls(ctx.camera.position, true);
       crops.update(ctx.camera.position);
       api._ms = acc;
@@ -638,6 +684,19 @@ async function mountInner(ctx, kit) {
 
   // [mobile-play] A dive started from the world (the offer at the shore or from the boat, the chip, the notebook) goes in behind
   // the hub's wipe and title card while its world builds, as はじめる does. A world already built and warm goes straight in.
+  function enterAt(pose) {
+    if (!pose || state) return false;
+    const go = () => begin('mission', pose);
+    if (world.ready || typeof kit?.ui?.run !== 'function' || kit.shim) { go(); return true; }
+    kit.ui.run({
+      id: 'underwater', title: label('play.swim.mode.title'), hook: label('play.swim.mode.hook'),
+      prepare: () => world.prepare(),
+      start: go,
+    });
+    return true;
+  }
+  api.enterAt = enterAt;
+
   function enterCovered(from) {
     if (state) return;
     if (world.ready || typeof kit?.ui?.run !== 'function' || kit.shim) { begin(from); return; }

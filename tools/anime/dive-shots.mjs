@@ -57,7 +57,6 @@ export const MEASURE = `(() => {
   add('dive', '.swim-ui .swim-dive');
   add('become', '.swim-ui .swim-become');
   add('board', '#klc-board');
-  add('hoyaCredit', '#klc-play .hoya-credit');
   add('stick', '#klc-pad .ghost');
   document.querySelectorAll('#klc-pad .cluster .btn').forEach((e) => { if (e.dataset.show !== '0' && vis(e)) rects['btn:' + e.dataset.id] = R(e); });
   add('playPill', '#klc-play [data-act="play"]');

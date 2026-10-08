@@ -54,6 +54,7 @@ export function mountGull(ctx) {
   let wind = null;
   let promptKey = '';
   let prompt = null;
+  const perchFns = [];
   let coaching = false;
   let coachPhase = 'done';
   let coachHandle = null;
@@ -110,12 +111,13 @@ export function mountGull(ctx) {
   }
 
   function showPrompt(key, onPress, text) {
-    if (promptKey === key) return;
+    if (promptKey === key && prompt?.shown) return;
     hidePrompt();
     promptKey = key;
     const padOn = !!ctx.pad?.active;
     const line = text || ui.t('play.gull.prompt.' + key);
-    try { prompt = ui.prompt(line, { onPress, pad: false, top: padOn }); } catch (e) { prompt = null; }
+    try { prompt = ui.prompt(line, { onPress, pad: false, top: padOn, priority: 1 }); } catch (e) { prompt = null; }
+    if (prompt && prompt.shown === false) { prompt = null; promptKey = ''; return; }
     if (active && ctx.pad?.mode !== 'gull') { try { ctx.pad.setMode('gull'); } catch (err) { /* */ } }
   }
 
@@ -123,8 +125,12 @@ export function mountGull(ctx) {
     return !!(ctx.services?.explore?.drive?.active || ctx.services?.explore?.sail?.active || ctx.services?.sail?.active || ctx.planet?.active);
   }
 
+  let enterVia = 'free';
   function enter() {
     if (active || blocked()) return false;
+    const via = enterVia;
+    enterVia = 'free';
+    if (typeof player.allowMode === 'function' && !player.allowMode('gull', { via })) return false;
     const tour = ctx.services?.life?.tour;
     if (tour?.playing || tour?.flying) tour.stop();
     ensureMeshes();
@@ -197,7 +203,22 @@ export function mountGull(ctx) {
     actionBar = null;
   }
 
+  function beginNear(spot) {
+    if (!spot) return false;
+    enterVia = 'mission';
+    const x = spot.x;
+    const z = spot.z + 30;
+    const y = floorAt(x, z) + 12;
+    player.pos.set(x, y, z);
+    player.prevPos?.set(x, y, z);
+    player.yaw = Math.atan2(-(spot.x - x), -(spot.z - z));
+    player.fly = true;
+    player.enabled = true;
+    return enter();
+  }
+
   function beginLookout() {
+    enterVia = 'hub';
     if (active) leave('stop', true);
     const spot = lookoutPerch((x, z) => {
       try { return ctx.L.heightAt(x, z); } catch (e) { return 0; }
@@ -304,8 +325,8 @@ export function mountGull(ctx) {
       if (!active) return;
       const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
       if (typing) return;
-      if (e.code === 'KeyF') { e.preventDefault(); e.stopPropagation(); leave('drone'); }
-      else if (/^Digit[1-9]$/.test(e.code)) leave('view');
+      if (e.code === 'KeyF') { e.preventDefault(); e.stopImmediatePropagation(); leave('drone'); }
+      else if (/^Digit[1-9]$/.test(e.code)) { e.preventDefault(); e.stopImmediatePropagation(); leave('view'); }
       else if (e.code === 'Space') e.preventDefault();
     }, true);
     addEventListener(HELD_R, () => { if (active) leave('view'); });
@@ -347,13 +368,7 @@ export function mountGull(ctx) {
     else if (!active && params.get('gull') === '1') { params = new URLSearchParams(); enter(); }
     if (active && (blocked() || ctx.services?.life?.tour?.flying)) { leave('view'); return; }
     if (!active) {
-      const flying = player.fly && player.enabled && !blocked();
-      const touring = !!(ctx.services?.life?.tour?.playing || ctx.services?.life?.tour?.flying);
-      const playing = typeof document === 'undefined' || document.body.classList.contains('playing') || document.body.classList.contains('shot');
-      const mode = ctx.pad?.mode;
-      const padHeld = !!(mode && mode !== 'walk' && mode !== 'fly' && mode !== 'drive');
-      if (flying && playing && !touring && !padHeld) { if (promptKey !== 'become') showPrompt('become', () => { hidePrompt(); enterQuiet(); }); }
-      else if (promptKey === 'become') hidePrompt();
+      if (promptKey === 'become') hidePrompt();
       return;
     }
     const list = ctx.services?.harbor?.perches;
@@ -362,7 +377,13 @@ export function mountGull(ctx) {
     near = !!(perchOut.ok && canPerch(st.speed, perchOut.d, GULL));
     prev.x = st.x; prev.y = st.y; prev.z = st.z;
     readInput();
+    const wasPerched = st.perched;
     gullStep(st, inp, dt, { floor: floorAt, solid, perch: perchOut.ok ? perchOut : null });
+    if (st.perched && !wasPerched) {
+      const ev = { x: st.x, y: st.y, z: st.z, perched: true, id: null };
+      api.perch = ev;
+      for (let i = 0; i < perchFns.length; i++) { try { perchFns[i](ev); } catch (e) { /* one listener */ } }
+    } else if (!st.perched) api.perch = null;
     player.pos.set(st.x, st.y, st.z);
     player.prevPos?.set(prev.x, prev.y, prev.z);
     player.yaw = st.yaw;
@@ -438,12 +459,20 @@ export function mountGull(ctx) {
     get active() { return active; },
     get state() { return st; },
     get coach() { return coachPhase; },
+    perch: null,
     enter, leave,
     start: beginLookout,
+    beginNear,
     world,
+    on(ev, fn) {
+      if (ev !== 'perch' || typeof fn !== 'function') return () => {};
+      perchFns.push(fn);
+      return () => { const i = perchFns.indexOf(fn); if (i >= 0) perchFns.splice(i, 1); };
+    },
     cost: () => (cost.n ? { mean: cost.sum / cost.n, max: cost.max, n: cost.n } : { mean: 0, max: 0, n: 0 }),
   };
   ctx.services.play = Object.assign(ctx.services.play || {}, { gull: api });
+  try { if (typeof window !== 'undefined') window.__gull = api; } catch (e) { /* tests */ }
   const spec = gullModeSpec(beginLookout, storage);
   spec.prepare = () => world.prepare();   // [mobile-play] behind the hub's title card
   const reg = kitApi.registerMode || ctx.services?.play?.registerMode;

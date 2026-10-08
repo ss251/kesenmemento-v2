@@ -4,7 +4,7 @@
 import { test, expect, describe } from 'bun:test';
 import * as THREE from 'three';
 import { Player } from '../src/anime/core/player.js';
-import { createWalkCam, liftBoom, placeWalk, thirdFor, THIRD, THIRD_PORTRAIT, WALK } from '../src/anime/play/avatar/camera.js';
+import { BOOM, createWalkCam, liftBoom, occludesBoom, placeWalk, solveWalkBoom, thirdFor, THIRD, THIRD_PORTRAIT, WALK, walkGround } from '../src/anime/play/avatar/camera.js';
 import { fovFor } from '../src/anime/core/fov.js';
 
 globalThis.addEventListener ??= () => {};
@@ -175,11 +175,11 @@ describe('feel camera: framing by screen shape', () => {
 });
 
 import { gaitCadence, CADENCE } from '../src/anime/play/avatar/index.js';
-import { stepSpacing, hoyaCadence } from '../src/anime/play/avatar/steps.js';
-describe('feel: the walk cycle locked to speed (the hoya model API, when it is there)', () => {
-  test('no gait() on the model: undefined (his own cadence), and the footsteps keep his own spacing', () => {
+import { stepSpacing, characterCadence } from '../src/anime/play/avatar/steps.js';
+describe('feel: the walk cycle locked to speed (the character slot, when a model offers gait)', () => {
+  test('no gait() on the model: undefined (its own cadence), and the footsteps keep that spacing', () => {
     expect(gaitCadence({}, 3)).toBeUndefined(); expect(gaitCadence(null, 3)).toBeUndefined();
-    expect(stepSpacing(3, 'hoya')).toBeCloseTo(3 / (hoyaCadence(3) * 2), 9);
+    expect(stepSpacing(3, 'meme')).toBeCloseTo(3 / (characterCadence(3) * 2), 9);
   });
   test('with gait(): the model\u2019s own rate for the pose (walk or run), passed through gait(speed, run)', () => {
     const seen = [];
@@ -191,28 +191,32 @@ describe('feel: the walk cycle locked to speed (the hoya model API, when it is t
     const m = { gait: () => ({ travel: 0.2, stance: 0.5 }) };
     expect(gaitCadence(m, 1.2)).toBeCloseTo(3, 9);           // 1.2 × 0.5 / 0.2
     expect(gaitCadence(m, 0.2)).toBe(CADENCE.min); expect(gaitCadence(m, 9)).toBe(CADENCE.max);
-    expect(stepSpacing(1.2, 'hoya', undefined, 3)).toBeCloseTo(0.2, 9);   // two footfalls a cycle
+    expect(stepSpacing(1.2, 'meme', undefined, 3)).toBeCloseTo(0.2, 9);   // two footfalls a cycle
   });
 });
 
-import { HOYA_SPEED, hoyaSpeedFrom, RUN_FOV, runFovStep } from '../src/anime/play/avatar/index.js';
-describe('feel: his speeds and the run (deploy #8)', () => {
-  test('HOYA_SPEED is 1.5 / 3.0 (planted feet); ?hoyaSpeed= overrides it for trying, 0 gives him the walker\u2019s', () => {
-    expect(HOYA_SPEED).toEqual({ walk: 1.5, run: 3.0 });
-    expect(hoyaSpeedFrom('')).toEqual({ walk: 1.5, run: 3.0 });
-    expect(hoyaSpeedFrom('?hoyaSpeed=1.8,3.2')).toEqual({ walk: 1.8, run: 3.2 });
-    expect(hoyaSpeedFrom('?hoyaSpeed=2')).toEqual({ walk: 2, run: 4 });
-    expect(hoyaSpeedFrom('?hoyaSpeed=0')).toEqual({ walk: null, run: null });
+import { CHARACTER_SPEED, speedFrom, RUN_FOV, runFovStep } from '../src/anime/play/avatar/index.js';
+describe('feel: a custom character\'s speeds and the run (deploy #8)', () => {
+  test('CHARACTER_SPEED is 1.5 / 3.0 (planted feet); ?speed= overrides it for trying, 0 gives the walker\'s', () => {
+    expect(CHARACTER_SPEED).toEqual({ walk: 1.5, run: 3.0 });
+    expect(speedFrom('')).toEqual({ walk: 1.5, run: 3.0 });
+    expect(speedFrom('?speed=1.8,3.2')).toEqual({ walk: 1.8, run: 3.2 });
+    expect(speedFrom('?speed=2')).toEqual({ walk: 2, run: 4 });
+    expect(speedFrom('?speed=0')).toEqual({ walk: null, run: null });
   });
-  test('the run widens the view by 3.5° in ~0.4 s and gives it back in ~0.3 s, never past either end', () => {
+  test('the run widens the view by at most 2° in ~1.3 s and gives it back in about a second, never past either end', () => {
     const o = { x: 0, v: 0 }; let t90 = null, max = 0;
-    for (let i = 1; i <= 90; i++) { runFovStep(o.x, o.v, 1, 1 / 60, o); max = Math.max(max, o.x); if (t90 === null && o.x >= 0.9) t90 = i / 60; }
-    expect(t90).toBeGreaterThan(0.5); expect(t90).toBeLessThan(0.75);   // ~0.65 s to 90 %: a gentle swell, not a punch
+    for (let i = 1; i <= 120; i++) { runFovStep(o.x, o.v, 1, 1 / 60, o); max = Math.max(max, o.x); if (t90 === null && o.x >= 0.9) t90 = i / 60; }
+    expect(t90).toBeGreaterThan(1.05); expect(t90).toBeLessThan(1.55);   // ~1.3 s to 90 %: a slow swell, not a distort
     expect(max).toBeLessThanOrEqual(1);
-    let t10 = null; for (let i = 1; i <= 90; i++) { runFovStep(o.x, o.v, 0, 1 / 60, o); expect(o.x).toBeGreaterThanOrEqual(0); if (t10 === null && o.x <= 0.1) t10 = i / 60; }
-    expect(t10).toBeLessThan(0.5);
-    expect(RUN_FOV.deg).toBeGreaterThanOrEqual(3); expect(RUN_FOV.deg).toBeLessThanOrEqual(4);
+    expect(RUN_FOV.deg * max).toBeLessThanOrEqual(2);
+    let t10 = null; for (let i = 1; i <= 120; i++) { runFovStep(o.x, o.v, 0, 1 / 60, o); expect(o.x).toBeGreaterThanOrEqual(0); if (t10 === null && o.x <= 0.1) t10 = i / 60; }
+    expect(t10).toBeGreaterThan(0.7); expect(t10).toBeLessThan(1.25);
+    expect(RUN_FOV.deg).toBe(2);
     expect(runFovStep(0.7, 0.2, 0, 0, o).x).toBe(0);   // a still: at once
+    const held = { x: 0, v: 0 };
+    for (let i = 0; i < 30; i++) runFovStep(held.x, held.v, 0, 1 / 60, held);
+    expect(held.x).toBe(0);   // walking (want 0) does not change the lens
   });
 });
 
@@ -238,11 +242,116 @@ describe('feel camera: a passer-by does not collapse the boom', () => {
     const solid = (x, y, z) => P.solidAt(x, z, y), C = thirdFor(390 / 844, {});
     const st = createWalkCam(), f = { x: 0, y: 0, z: 0, vx: 0, vz: 0, dt: 0, landing: false };
     placeWalk(st, f, 0, solid, () => 0, true, C);
-    expect(st.boom).toBeLessThan(1.3);                                   // with him counted, the boom stops at the person (and hides him)
+    expect(st.boom).toBeGreaterThan(C.dist - 0.2);                       // he is thin: the boom stays out even while his box is solid
     withoutMoving(P, () => placeWalk(st, f, 0, solid, () => 0, true, C));
-    expect(st.boom).toBeCloseTo(C.dist, 1);                              // the walker's camera ignores him
+    expect(st.boom).toBeCloseTo(C.dist, 1);                              // and the moving boxes are still restored afterwards
     expect(P.solidAt(0.15, 1.2, 1)).toBe(true);                          // and he is back for the walker's own collisions
     expect(() => withoutMoving(P, () => { throw new Error('x'); })).toThrow();
     expect(P.solidAt(0.15, 1.2, 1)).toBe(true);                          // even after a throw
+  });
+});
+
+describe('walk camera: boom spring, thin occluders, the floor', () => {
+  const pose = { x: 0, y: 0, z: 0, vx: 0, vz: 0, dt: 0, landing: false };
+  const C = () => thirdFor(390 / 844, {});
+
+  test('a pole, a passer-by and a car under the boom do not shorten it; a wall does', () => {
+    const pole = (x, y, z) => Math.hypot(x - 0.15, z - 1.2) < 0.12 && y > 0 && y < 6;
+    const person = (x, y, z) => Math.abs(x - 0.15) < 0.23 && Math.abs(z - 1.2) < 0.23 && y > 0 && y < 1.7;
+    const car = (x, y, z) => Math.abs(x) < 0.8 && z > 0.8 && z < 4.2 && y > 0 && y < 1.6;
+    const wall = (x, y, z) => z > 1.6 && z < 2.1 && Math.abs(x) < 3 && y > 0 && y < 8;
+    for (const solid of [pole, person, car]) {
+      const st = createWalkCam();
+      placeWalk(st, pose, 0, solid, () => 0, true, C());
+      expect(st.boom).toBeGreaterThan(C().dist - 0.15);
+    }
+    expect(occludesBoom(pole, 0.15, 1.2, 1.2, 1, 0, 0, 1, 1.53)).toBe(false);
+    expect(occludesBoom(wall, 0, 1.2, 1.8, 1, 0, 0, 1, 1.53)).toBe(true);
+    const st = createWalkCam();
+    placeWalk(st, pose, 0, wall, () => 0, true, C());
+    expect(st.boom).toBeLessThan(C().dist - 0.4);
+    const solved = {};
+    solveWalkBoom({ x: 0, y: 0.9, z: 0 }, { x: 0, y: 1.53, z: C().dist }, car, solved, C());
+    expect(solved.dist).toBeGreaterThan(C().dist - 0.15);
+  });
+
+  test('a wall that crosses the boom shortens it by at most 0.24 m in one frame, then settles', () => {
+    let on = false;
+    const wall = (x, y, z) => on && z > 1.5 && z < 2.2 && Math.abs(x) < 4 && y < 8;
+    const st = createWalkCam(), rig = C();
+    const f = { ...pose };
+    placeWalk(st, f, 0, wall, () => 0, true, rig);
+    f.dt = 1 / 60;
+    for (let i = 0; i < 8; i++) placeWalk(st, f, 0, wall, () => 0, false, rig);
+    const full = st.boom;
+    on = true;
+    let worst = 0;
+    for (let i = 0; i < 90; i++) {
+      const b = st.boom;
+      placeWalk(st, f, 0, wall, () => 0, false, rig);
+      worst = Math.max(worst, b - st.boom);
+    }
+    expect(worst).toBeLessThanOrEqual(BOOM.maxIn + 1e-6);
+    expect(st.boom).toBeLessThan(full - 0.4);
+    expect(st.z).toBeLessThanOrEqual(1.5 + BOOM.maxIn);
+  });
+
+  test('the camera stays at least 0.6 m above the ground under it and never looks up', () => {
+    const ground = (x, z) => (z > 0.4 ? 2.2 : 0);
+    const st = createWalkCam(), rig = C();
+    placeWalk(st, pose, 0, () => false, ground, true, rig);
+    const g = ground(st.x, st.z);
+    expect(g).toBeGreaterThan(1);
+    expect(st.y).toBeGreaterThanOrEqual(g + BOOM.floor - 1e-6);
+    expect(st.y).toBeGreaterThanOrEqual(st.ty - 1e-6);
+    expect(st.boom).toBeGreaterThan(rig.dist - 0.15);   // the step behind him does not collapse the framing
+    const high = createWalkCam();
+    placeWalk(high, pose, 0, () => false, () => 8, true, rig);
+    expect(high.y).toBeLessThan(3);   // a deck far above the camera is a ceiling, not the floor
+    expect(high.boom).toBeGreaterThan(rig.dist - 0.15);
+  });
+
+  test('a building the ray starts inside does not collapse the boom; letting it out is capped', () => {
+    const rig = C();
+    const building = (x, y, z) => Math.abs(x) < 3 && z > -1 && z < rig.dist + 1 && y > -1 && y < 12;
+    const st = createWalkCam();
+    placeWalk(st, pose, 0, building, () => 0, true, rig);
+    expect(st.boom).toBeGreaterThan(rig.dist - 0.15);
+    st.boom = 0.2; st.boomV = 0;
+    const f = { ...pose, dt: 0.5 };
+    placeWalk(st, f, 0, () => false, () => 0, false, rig);
+    expect(st.boom).toBeLessThanOrEqual(0.2 + BOOM.maxIn + 1e-6);
+    expect(st.boom).toBeGreaterThan(0.2);
+  });
+
+  test('a step up is followed within 0.24 m, and stepping off a high surface drops at most that', () => {
+    const rig = C();
+    let high = true;
+    const ground = (x, z) => (high && z > 0.4 ? 2.2 : 0);
+    const st = createWalkCam();
+    const f = { ...pose, dt: 1 / 30 };
+    placeWalk(st, f, 0, () => false, ground, true, rig);
+    const lifted = st.y;
+    expect(lifted).toBeGreaterThan(2.5);
+    high = false;
+    placeWalk(st, f, 0, () => false, ground, false, rig);
+    expect(lifted - st.y).toBeLessThanOrEqual(BOOM.maxIn + 1e-6);
+    expect(st.y).toBeGreaterThan(lifted - BOOM.maxIn - 1e-6);
+    const y1 = st.y;
+    f.y = 0.8;
+    placeWalk(st, f, 0, () => false, ground, false, rig);
+    expect(st.y).toBeGreaterThanOrEqual(y1 + 0.8 - BOOM.maxIn - 1e-6);
+  });
+
+  test('an upper deck is not the ground under the boom', () => {
+    const P = new Physics(() => 0);
+    P.addWalkBox(0, 1.5, 8, 6, 0, 6);
+    expect(P.groundHeight(0, 1.5, 1e9)).toBeCloseTo(6, 5);
+    expect(walkGround((x, z, y) => P.groundHeight(x, z, y), 0, 0, 1.5)).toBeCloseTo(0, 5);
+    const st = createWalkCam(), rig = C();
+    const ground = (x, z) => walkGround((a, b, y) => P.groundHeight(a, b, y), 0, x, z);
+    placeWalk(st, pose, 0, () => false, ground, true, rig);
+    expect(st.boom).toBeGreaterThan(rig.dist - 0.15);
+    expect(st.y).toBeLessThan(3);
   });
 });

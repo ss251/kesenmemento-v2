@@ -4,11 +4,11 @@ import { THIRD, chaseOwns, createChaseState, damp1, desiredCam, follow, liftBoom
 import { bodyOccupy, walkerShown } from '../src/anime/play/avatar/shown.js';
 import { armHandoff, blendHandoff, createHandoff } from '../src/anime/play/avatar/handoff.js';
 import { nextView, viewId, viewLabelKey, VIEW_CYCLE } from '../src/anime/play/avatar/view.js';
-import { _resetApprovalWarn, hoyaPermitted, resolveModel, setModel } from '../src/anime/play/avatar/approval.js';
+import { DEFAULT_ID, loadCharacter, pickerIds } from '../src/anime/play/avatar/characters.js';
 import { LOOKS, PREF_KEY, readPrefs, writePrefs } from '../src/anime/play/avatar/prefs.js';
 import { boxHit, inAwing, inBody, outsidePhoneKit } from '../src/anime/play/avatar/boxes.js';
-import { clipOf, cycleLength, easeAngle, easeScalar, footAmp, gaitPhase, hoyaPose, hoyaTurnLean, HOYA_BOB, HOYA_LEAN_MAX, landBob, landSquash, placeHoyaRoot, plantMatch, stepPhase, turnLean, wrapPi } from '../src/anime/play/avatar/pose.js';
-import { classifySurface, footstep, hoyaCadence, stepSpacing, stepTick, surfaceKind } from '../src/anime/play/avatar/steps.js';
+import { clipOf, cycleLength, easeAngle, easeScalar, footAmp, gaitPhase, characterPose, characterTurnLean, BODY_BOB, LEAN_MAX, landBob, landSquash, placeCharacterRoot, plantMatch, stepPhase, turnLean, wrapPi } from '../src/anime/play/avatar/pose.js';
+import { classifySurface, footstep, characterCadence, stepSpacing, stepTick, surfaceKind } from '../src/anime/play/avatar/steps.js';
 
 describe('third-person boom', () => {
   test('an open boom stays 4.5 m behind, a shoulder to the right, the look 1.6 m up', () => {
@@ -161,24 +161,22 @@ describe('view cycle', () => {
   });
 });
 
-describe('ホヤぼーや gate', () => {
-  test('an absent record locks, a written approval opens, the interim record opens, ?hoya3d=0 forces the original', () => {
-    _resetApprovalWarn();
-    expect(hoyaPermitted(null).ok).toBe(false);
-    expect(hoyaPermitted({}).why).toBe('scope');
-    const written = { kind: 'written', ref: '様式第2号', allows: ['3d', 'animation'] };
-    expect(hoyaPermitted(written).ok).toBe(true);
-    const interim = { kind: 'owner-interim', decidedAt: '2026-10-07T13:20:00+05:30', allows: ['3d', 'animation'] };
-    expect(hoyaPermitted(interim).ok).toBe(true);
-    expect(resolveModel({ record: null, pref: 'hoya', mesh: true }).model).toBe('original');
-    expect(resolveModel({ record: interim, url: '0', mesh: true, pref: 'hoya' }).why).toBe('url');
-    expect(resolveModel({ record: interim, mesh: false, pref: 'hoya' }).why).toBe('no-mesh');
-    expect(resolveModel({ record: interim, mesh: true, pref: 'hoya' }).model).toBe('hoya');
-    expect(resolveModel({ record: interim, mesh: true, pref: 'original' }).model).toBe('original');
-    expect(setModel('hoya', { record: null, mesh: true }).ok).toBe(false);
-    expect(setModel('hoya', { record: interim, mesh: false }).why).toBe('no-mesh');
-    expect(setModel('hoya', { record: interim, mesh: true }).ok).toBe(true);
-    expect(setModel('original', {}).model).toBe('original');
+describe('character slot', () => {
+  test('meme is the default and loads, the original figure is the quiet fallback, and the picker offers both', async () => {
+    expect(DEFAULT_ID).toBe('meme');
+    const errors = [];
+    const orig = console.error;
+    console.error = (...a) => { errors.push(a); };
+    let meme = null;
+    try {
+      meme = await loadCharacter('meme', THREE, { quality: 'phone' });
+      expect(await loadCharacter('original', THREE, {})).toBeNull();
+      expect(await loadCharacter('no-such-character', THREE, {})).toBeNull();
+      expect(await pickerIds()).toEqual(['meme', 'original']);
+    } finally { console.error = orig; }
+    expect(errors).toEqual([]);
+    expect(meme && meme.root).toBeTruthy();
+    meme.dispose?.();
   });
 });
 
@@ -187,16 +185,17 @@ describe('looks and clips', () => {
     const mem = new Map();
     const storage = { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v) };
     expect(readPrefs(storage).look).toBe('navy');
-    expect(readPrefs(storage).model).toBe('hoya');
+    expect(readPrefs(storage).model).toBe('meme');
     writePrefs(storage, { look: 'asagi', model: 'original' });
     expect(storage.getItem(PREF_KEY)).toContain('asagi');
     expect(readPrefs(storage)).toEqual({ look: 'asagi', model: 'original' });
-    writePrefs(storage, { look: 'nope', model: 'hoya' });
+    writePrefs(storage, { look: 'nope', model: 'gone' });
     expect(readPrefs(storage).look).toBe('navy');
+    expect(readPrefs(storage).model).toBe('meme');
     expect(LOOKS).toEqual(['navy', 'kinari', 'asagi']);
   });
 
-  test('clips: idle, walk, run, jump, fall, land, turn; hoya rests land and turn on idle', () => {
+  test('clips: idle, walk, run, jump, fall, land, turn; a custom character rests land and turn on idle', () => {
     expect(clipOf(0, true, 0, 0, 0)).toBe('idle');
     expect(clipOf(1.2, true, 0, 0, 0)).toBe('walk');
     expect(clipOf(6, true, 0, 0, 0)).toBe('run');
@@ -204,9 +203,9 @@ describe('looks and clips', () => {
     expect(clipOf(0, false, -2, 0, 0)).toBe('fall');
     expect(clipOf(0, true, 0, 0.1, 0)).toBe('land');
     expect(clipOf(0, true, 0, 0, 0.8)).toBe('turn');
-    expect(hoyaPose('land')).toBe('idle');
-    expect(hoyaPose('turn')).toBe('idle');
-    expect(hoyaPose('run')).toBe('run');
+    expect(characterPose('land')).toBe('idle');
+    expect(characterPose('turn')).toBe('idle');
+    expect(characterPose('run')).toBe('run');
     expect(Math.abs(wrapPi(Math.PI * 3))).toBeCloseTo(Math.PI, 5);
     const mid = easeAngle(0, Math.PI / 2, 0.1, 0.1);
     expect(mid).toBeGreaterThan(0.5);
@@ -266,8 +265,8 @@ describe('footsteps', () => {
     expect(st.hit).toBe(true);
     stepTick(st, 3, 0.1, false);
     expect(st.acc).toBe(0);
-    expect(hoyaCadence(1.4)).toBeGreaterThan(2);
-    expect(stepSpacing(1.4, 'hoya')).toBeLessThan(stepSpacing(1.4, 'original'));
+    expect(characterCadence(1.4)).toBeGreaterThan(2);
+    expect(stepSpacing(1.4, 'meme')).toBeLessThan(stepSpacing(1.4, 'original'));
     expect(stepSpacing(0, 'original')).toBe(0);
     const a = footstep(8000, 'asphalt'), w = footstep(8000, 'wood'), s = footstep(8000, 'sand');
     const energy = (b) => b.reduce((n, x) => n + x * x, 0);
@@ -313,29 +312,29 @@ describe('building boxes on the boom', () => {
   });
 });
 
-describe('ホヤぼーや root pose', () => {
+describe('character root pose', () => {
   test('the lean stays inside 6° and the landing is a 4 cm dip', () => {
-    expect(hoyaTurnLean(0)).toBe(0);
-    expect(hoyaTurnLean(8)).toBeCloseTo(-HOYA_LEAN_MAX, 6);
-    expect(Math.abs(hoyaTurnLean(8))).toBeLessThan(0.11);
+    expect(characterTurnLean(0)).toBe(0);
+    expect(characterTurnLean(8)).toBeCloseTo(-LEAN_MAX, 6);
+    expect(Math.abs(characterTurnLean(8))).toBeLessThan(0.11);
     expect(landBob(0, 0.2)).toBe(0);
-    expect(landBob(0.1, 0.2)).toBeCloseTo(-HOYA_BOB, 5);
+    expect(landBob(0.1, 0.2)).toBeCloseTo(-BODY_BOB, 5);
     expect(landBob(0.2, 0.2)).toBeCloseTo(0, 5);
     const root = {
       position: { set(x, y, z) { this.x = x; this.y = y; this.z = z; } },
       rotation: { order: 'XYZ', set(x, y, z) { this.x = x; this.y = y; this.z = z; } },
       scale: { set(x, y, z) { this.x = x; this.y = y; this.z = z; } },
     };
-    placeHoyaRoot(root, 1, 2, 3, 0.4, 1, -1);
+    placeCharacterRoot(root, 1, 2, 3, 0.4, 1, -1);
     expect(root.rotation.order).toBe('YZX');
     expect(root.rotation.y).toBeCloseTo(0.4, 5);
-    expect(root.rotation.z).toBeCloseTo(HOYA_LEAN_MAX, 5);
-    expect(root.position.y).toBeCloseTo(2 - HOYA_BOB, 5);
+    expect(root.rotation.z).toBeCloseTo(LEAN_MAX, 5);
+    expect(root.position.y).toBeCloseTo(2 - BODY_BOB, 5);
     expect(root.scale.x).toBe(1);
     expect(root.scale.y).toBe(1);
-    const eased = easeScalar(0, HOYA_LEAN_MAX, 0.18, 0.18);
-    expect(eased).toBeGreaterThan(HOYA_LEAN_MAX * 0.5);
-    expect(eased).toBeLessThan(HOYA_LEAN_MAX);
+    const eased = easeScalar(0, LEAN_MAX, 0.18, 0.18);
+    expect(eased).toBeGreaterThan(LEAN_MAX * 0.5);
+    expect(eased).toBeLessThan(LEAN_MAX);
     expect(easeScalar(0.02, 0.04, 0, 0.18)).toBe(0.04);
   });
 });
