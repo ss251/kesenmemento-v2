@@ -18,6 +18,28 @@ const T = (name, fn) => test(name, fn, 300000);
 const hit = (a, b) => a.l < b.r - 0.5 && a.r > b.l + 0.5 && a.t < b.b - 0.5 && a.b > b.t + 0.5;
 const COACH_UP = "(() => { const c = document.querySelector('#klc-play .coach'); return !!c && !c.hidden; })()";
 const ACTIVE = '!!(window.__swim && window.__swim.active)';
+/** The third-person walker during a dive: his mesh, his shadow and his credit stay off while the fish is the body.
+ *  A child's own visible flag stays true when its group is hidden, so this walks the parents. */
+const WALKER = `(() => {
+  const ctx = window.__ctx;
+  const root = ctx.dynamicRoot || ctx.scene;
+  const chain = (o) => { for (let p = o; p; p = p.parent) if (!p.visible) return false; return true; };
+  const hoya = root.getObjectByName('hoya3d');
+  const body = hoya && hoya.getObjectByName('hoya3d-body');
+  const drawn = [];
+  root.traverse((o) => {
+    if (!o.name || !chain(o)) return;
+    if (o.name === 'hoya3d' || o.name === 'hoya3d-body' || o.name === 'chr_play-navy' || o.name === 'chr_play-kinari' || o.name === 'chr_play-asagi') drawn.push(o.name);
+  });
+  const creditEl = document.querySelector('#klc-play .hoya-credit');
+  const cs = creditEl ? getComputedStyle(creditEl) : null;
+  const p = ctx.playerObj;
+  return {
+    person: p.person, fly: !!p.fly, swim: !!(window.__swim && window.__swim.active),
+    drawn, shadow: !!(body && body.castShadow && chain(body)),
+    credit: !!(creditEl && !creditEl.hidden && cs.display !== 'none' && cs.visibility !== 'hidden' && +cs.opacity > 0.05),
+  };
+})()`;
 /** The page's own errors. Not counted: the local server has no /api/live, and a headless Chrome on this machine sometimes fails to
  *  fetch the web fonts (net::ERR_CERT_VERIFIER_CHANGED on fonts.gstatic.com): network conditions, not the page's code. */
 const pageErrors = (page) => page.errors().filter((e) => !/api\/live/.test(e.text) && !/Failed to load resource: net::ERR_[A-Z_]+ https:\/\/fonts\.(gstatic|googleapis)\.com\//.test(e.text));
@@ -43,6 +65,11 @@ async function checkEntered(page) {
   // the HUD: only what the dive needs
   const l = await page.eval(LAND);
   expect(l).toMatchObject({ board: false, drive: false, view: false, credit: false, swim: true });
+  const w = await page.eval(WALKER);
+  expect(w.swim).toBe(true);
+  expect(w.drawn).toEqual([]);
+  expect(w.shadow).toBe(false);
+  expect(w.credit).toBe(false);
   // one thing at a time: on a first dive the species chip waits for the coach; otherwise it is off every HUD rect
   if (await page.eval(COACH_UP)) expect(m.rects.chip).toBeUndefined();
   else await checkChip(page);
@@ -240,11 +267,27 @@ d('海の中 on a phone (390x844 @3, touch)', () => {
     expect(await page.eval(COACH_UP)).toBe(false);
     const m = await page.eval(MEASURE);
     expect(m.fish.onScreen).toBe(true);
+    const w = await page.eval(WALKER);
+    expect(w.swim).toBe(true);
+    expect(w.drawn).toEqual([]);
+    expect(w.shadow).toBe(false);
+    expect(w.credit).toBe(false);
     await tap('#klc-pad .btn[data-id="swim-out"]');
     await page.waitFor(`!${ACTIVE}`, { timeout: 8000 });
-    const r = await page.eval("(() => { const p = window.__ctx.playerObj; return { x: p.pos.x, z: p.pos.z, fly: p.fly }; })()");
+    await page.frames(2);
+    const r = await page.eval("(() => { const p = window.__ctx.playerObj; return { x: p.pos.x, z: p.pos.z, fly: p.fly, person: p.person }; })()");
     expect(r.fly).toBe(false);
+    expect(r.person).toBe('third');
     expect(Math.hypot(r.x - spot.x, r.z - spot.z)).toBeLessThan(1);
+    const back = await page.eval(WALKER);
+    expect(back.swim).toBe(false);
+    expect(back.fly).toBe(false);
+    expect(back.person).toBe('third');
+    const boom = await page.eval('window.__ctx.services.play.avatar.boom');
+    if (boom > 0.7) {
+      expect(back.drawn.length).toBeGreaterThan(0);
+      expect(back.credit).toBe(back.drawn.includes('hoya3d'));
+    }
   });
 });
 

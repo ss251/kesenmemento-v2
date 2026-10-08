@@ -15,6 +15,8 @@ import { createFeatherMesh, createPuff, emitPuff, stepPuff, writeFeathers } from
 import { registerGullAudio, windGain } from './voice.js';
 import { footstep } from '../avatar/steps.js';
 import { lazyWorld } from '../kit/lazy.js';
+import { HELD_R } from '../../ui/holdkey.js';   // [r-hold]
+import { mouseLook, lookBlocked } from '../../ui/look-settings.js';
 
 // 3.4 m: at 6.8 m the wings were a speck over the bay. −18° looks down onto the bird and the water.
 const CAM = { dist: 3.4, height: 0.55, pitch: -18 * Math.PI / 180, shoulder: 0.15, tau: 0.16, boomStep: 0.25, boomMin: 0.7, boomRadius: 0.16, hide: 0.35 };
@@ -303,13 +305,14 @@ export function mountGull(ctx) {
       const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
       if (typing) return;
       if (e.code === 'KeyF') { e.preventDefault(); e.stopPropagation(); leave('drone'); }
-      else if (e.code === 'KeyR' || /^Digit[1-9]$/.test(e.code)) leave('view');
+      else if (/^Digit[1-9]$/.test(e.code)) leave('view');
       else if (e.code === 'Space') e.preventDefault();
     }, true);
+    addEventListener(HELD_R, () => { if (active) leave('view'); });
     addEventListener('mousedown', (e) => { if (!active) return; drag = true; lx = e.clientX; ly = e.clientY; });
     addEventListener('mouseup', () => { drag = false; });
     addEventListener('mousemove', (e) => {
-      if (!active) return;
+      if (!active || lookBlocked()) return;
       const locked = typeof document !== 'undefined' && document.pointerLockElement;
       if (locked) { lookPx.dx += e.movementX || 0; lookPx.dy += e.movementY || 0; }
       else if (drag) { lookPx.dx += (e.clientX - lx) * 1.4; lookPx.dy += (e.clientY - ly) * 1.4; lx = e.clientX; ly = e.clientY; }
@@ -330,9 +333,10 @@ export function mountGull(ctx) {
     inp.launch = wantLaunch;
     wantPerch = false;
     wantLaunch = false;
-    const sens = 0.0022;
-    inp.lookYaw = -lookPx.dx * sens - lookRad.dx;
-    inp.lookPitch = -lookPx.dy * sens - lookRad.dy * 0.65;
+    if (lookBlocked()) lookPx.dx = lookPx.dy = 0;
+    const d = mouseLook(lookPx.dx, lookPx.dy);
+    inp.lookYaw = d.yaw - lookRad.dx;
+    inp.lookPitch = d.pitch - lookRad.dy * 0.65;
     lookPx.dx = lookPx.dy = 0;
     lookRad.dx = lookRad.dy = 0;
   }

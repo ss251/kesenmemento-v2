@@ -45,6 +45,8 @@ One Japanese term per concept, the same in the UI (`data/i18n.json`, `data/ui-*-
 | 季節 | きせつ | Season | 春 / 夏 / 秋 / 冬 / 早春 = Spring / Summer / Autumn / Winter / Early spring | align: EN `v3.season.short.autumn` is "Fall"; use "Autumn" |
 | 朝 昼 夕方 夕焼け 夜 | あさ ひる ゆうがた ゆうやけ よる | Morning, Noon, Afternoon, Sunset, Night | the time presets | ok |
 | 歩く / 飛ぶ / 運転 | あるく / とぶ / うんてん | Walk / Fly / Drive | the pad's modes | ok |
+| 視点の速さ | してんのはやさ | Look speed | 操作設定; multiplies mouse and touch look, 0.3× to 2.5× | ok |
+| 上下を反転 | じょうげをはんてん | Invert Y | 操作設定; flips look up / down | ok |
 | ダッシュ / ジャンプ | — | Dash / Jump | pad buttons (walking) | ok |
 | もぐる / あがる | — | Dive / Get out | into the water from the shore / out of it (海の中) | ok |
 | 上へ / 下へ | うえへ / したへ | Up / Down | the dive's pad buttons (rise / sink). Not 上がる / 下がる: 「上がる」 beside 「あがる」 reads the same | ok |

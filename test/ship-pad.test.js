@@ -164,7 +164,7 @@ describe("the sail mode reads the pad: stick, 停止, 4×, and the look in radia
     expect(sail.state.autopilot).toBe(false);          // 停止 keeps it off until the next helm input
     expect(sail.state.eng).toBeLessThan(0.02);
     expect(sail.state.kn).toBeLessThan(kn1);   // coasting down, not driven on
-    expect(sail.state.kn).toBeLessThan(0.6);
+    expect(sail.state.kn).toBeGreaterThan(1);  // no brakes: 3 s of the 12 kn ahead still leaves way on after 20 s (playtests 2026-10-08)
     sail.setAutopilot(true); expect(sail.state.autopilot).toBe(true);
     sail.dispose();
   });

@@ -6,17 +6,18 @@
 
 export const KN = 0.514444;
 
-/** 28 m, 5.8 m beam. Harbour pace 7.5 kn (quicker than the longliner's 6 kn).
+/** 28 m, 5.8 m beam. 14 kn, quicker than the longliner's 12 kn (playtests 2026-10-08: 7.5 kn was too slow for kids).
  *  Camera and engine fields are read by createSail; absent on BOAT, so 第一昭福丸 keeps her chase camera and thump. */
 export const KATSUO = {
   id: 'katsuo',
   L: 28, B: 5.8,
-  vMax: 7.5 * KN,
-  accel: 0.34,
+  vMax: 14 * KN,
+  accel: 3.2,            // m/s^2 from rest: 0 -> 90 % of 14 kn in ~6 s (playtests 2026-10-08)
+  coast: 0.30,           // m/s^2 of drag at vMax: she still coasts with the engine stopped
   astern: 0.38,
   linDrag: 0.02,
   turnDrag: 0.22,
-  engineLag: 1.5,
+  engineLag: 1.0,        // s (playtests 2026-10-08)
   rudderRate: 0.7,
   R0: 58,
   Tn: 2.8,

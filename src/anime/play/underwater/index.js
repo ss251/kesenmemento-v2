@@ -21,6 +21,8 @@ import { createHud, t, label } from './hud.js';
 import { shimKit, shimUnder } from './shim.js';
 import { loadKit } from './kit-link.js';
 import { lazyWorld } from '../kit/lazy.js';
+import { HELD_R } from '../../ui/holdkey.js';   // [r-hold]
+import { mouseLook } from '../../ui/look-settings.js';
 
 const input = { thrust: 0, strafe: 0, lift: 0, dash: false };
 const splashAt = { x: 0, y: 0, z: 0 };
@@ -338,7 +340,7 @@ async function mountInner(ctx, kit) {
     const sailing = from === 'sail' || (from !== 'menu' && from !== 'shot' && from !== 'mode' && sail?.active);
     saved = {
       from: sailing ? 'sail' : from,
-      lookCapture: pl.lookCapture, lookSink: pl.lookSink,
+      lookCapture: pl.lookCapture, lookSink: pl.lookSink, lookWhileDisabled: pl.lookWhileDisabled,
       fly: pl.fly, enabled: pl.enabled,
       x: pl.pos.x, y: pl.pos.y, z: pl.pos.z, yaw: pl.yaw, pitch: pl.pitch,
     };
@@ -369,7 +371,8 @@ async function mountInner(ctx, kit) {
     pl.enabled = false;
     pl.fly = true;
     pl.vel?.set(0, 0, 0);
-    pl.lookCapture = (dx, dy) => { state.yaw -= dx * 0.0022; state.pitch = Math.max(-1.15, Math.min(1.15, state.pitch - dy * 0.0016)); };
+    pl.lookWhileDisabled = true;
+    pl.lookCapture = (dx, dy) => { const d = mouseLook(dx, dy); state.yaw += d.yaw; state.pitch = Math.max(-1.15, Math.min(1.15, state.pitch + d.pitch)); };
     pl.lookSink = (dx, dy) => { state.yaw -= dx; state.pitch = Math.max(-1.15, Math.min(1.15, state.pitch - dy)); };
     ctx.services.life?.tour?.stop?.();
     try { ctx.pad?.setMode('swim'); } catch (e) { /* pad not up yet */ }
@@ -439,6 +442,7 @@ async function mountInner(ctx, kit) {
     if (!pl || !saved) return;
     pl.lookCapture = saved.lookCapture || null;
     pl.lookSink = saved.lookSink || null;
+    pl.lookWhileDisabled = !!saved.lookWhileDisabled;
     ctx.camera.fov = typeof ctx.fovFor === 'function' && ctx.camera.aspect > 0 ? ctx.fovFor(ctx.camera.aspect) : baseFov;
     ctx.camera.up.set(0, 1, 0);
     ctx.camera.updateProjectionMatrix();
@@ -653,13 +657,19 @@ async function mountInner(ctx, kit) {
       if (!state) return;
       const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
       if (typing) return;
-      if (e.code === 'KeyV' || e.code === 'KeyR' || e.code === 'KeyF') {
+      if (e.code === 'KeyV' || e.code === 'KeyF') {
         e.preventDefault(); e.stopImmediatePropagation(); end(); return;
       }
       if (e.code === 'Space' && !e.repeat) airTap(state, TUNE, reduced);
       if (MOVE.has(e.code)) { e.preventDefault(); e.stopImmediatePropagation(); keys.add(e.code); }
     }, true);
     addEventListener('keyup', (e) => { keys.delete(e.code); }, true);
+    // [r-hold] a held R surfaces. It must not also snap to the hero overview (the old keydown stopped that).
+    addEventListener(HELD_R, (e) => {
+      if (!state) return;
+      e.stopImmediatePropagation();
+      end();
+    });
     addEventListener('pointerdown', (e) => {
       if (!state || state.mode !== 'breach') return;
       if (e.target && e.target.closest && e.target.closest('button, a, input, textarea, select')) return;

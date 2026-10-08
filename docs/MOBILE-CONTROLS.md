@@ -144,8 +144,8 @@ The gear next to the mode chip. Stored in `localStorage` key `klc.pad.v1` (insid
 | Setting | Effect |
 |---|---|
 | 左手モード (left-handed) | swaps the sides: stick on the right, look on the left, buttons arc at the bottom left |
-| 視点の上下を反転 (invert Y) | flips the vertical look direction (flight-stick style) |
-| 視点の感度 (sensitivity) | multiplies the look speed, 0.5 to 1.8 |
+| 上下を反転 (invert Y) | flips the vertical look direction (flight-stick style). The same switch the desktop 操作設定 sheet uses |
+| 視点の速さ (look speed) | multiplies mouse and touch look, 0.3 to 2.5, default 1. At 1 a pointer-lock pixel is 0.0022 rad and a touch pixel is 0.008 rad |
 
 ## Details
 
@@ -153,7 +153,7 @@ The gear next to the mode chip. Stored in `localStorage` key `klc.pad.v1` (insid
   the base under it; the knob follows (56 CSS px of travel, scaled to 0.8 to 1.15 by screen size). 12 % dead zone, eased
   (smoothstep) magnitude. Past 85 % of the travel the ring turns coral and the tag says 走る (on foot) or ブースト (in a
   car): that is RUN / BOOST / fast flight. The knob springs home on release.
-- **Right: look.** Drag anywhere that is not a button: 0.008 rad per CSS px (about 85 degrees for a 190 px swipe; times the sensitivity setting, 0.5 to 1.8), light smoothing
+- **Right: look.** Drag anywhere that is not a button: 0.008 rad per CSS px (about 85 degrees for a 190 px swipe; times the look speed, 0.3 to 2.5), light smoothing
   (35 ms), pitch clamped to 85 degrees by the player. The top quarter of the stick's half also looks.
 - **Thumbs on panels.** A touch that lands on the places strip, the time dock, the credit line, the minimap or the mode chip
   is a tap until it moves more than 10 CSS px; then the pad takes it (the stick or the look, by where it landed) and the
@@ -169,7 +169,7 @@ The gear next to the mode chip. Stored in `localStorage` key `klc.pad.v1` (insid
 | drive | ブレーキ (hold, handbrake), ブースト (hold), 降りる |
 
 - **Top left: mode chip** 歩く / 飛ぶ / 運転 (quick switch) and a settings button: 左手モード (swap sides, persisted),
-  視点の上下を反転 (invert Y) and 視点の感度 (look sensitivity). Settings live in `localStorage` key `klc.pad.v1`
+  上下を反転 (invert Y) and 視点の速さ (look speed, 0.3 to 2.5). The desktop toolbar's 操作設定 opens the same two look controls. Settings live in `localStorage` key `klc.pad.v1`
   (inside try/catch: private mode just forgets).
 - **First run:** a coach mark 「左で移動・右で視点」, dismissible, shown once.
 - **A touch ends a flight.** While a flight to a place runs the pad is out of the way, and a touch on the canvas takes the camera back: the flight

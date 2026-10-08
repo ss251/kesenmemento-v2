@@ -2,7 +2,8 @@
 // and ホヤぼーや as the default walker. His mesh is hoya-model.js and is not edited here.
 
 import { sfx, ui } from '../kit/index.js';
-import { chaseOwns, createWalkCam, damp1, placeWalk, thirdFor, THIRD } from './camera.js';
+import { createWalkCam, damp1, placeWalk, thirdFor, THIRD } from './camera.js';
+import { bodyOccupy, walkerShown } from './shown.js';
 import { createBuildingProbe } from './boxes.js';
 import { armHandoff, blendHandoff, createHandoff } from './handoff.js';
 import { hoyaPermitted, resolveModel, setModel } from './approval.js';
@@ -224,18 +225,22 @@ export function mountAvatar(ctx) {
     }
   }
 
+  const occupy = { swim: false, gull: false, drive: false, sail: false, race: false, voyage: false };
   function walkingThird() {
-    return chaseOwns(player) && !player.gull;
+    return walkerShown(player, bodyOccupy(ctx, occupy));
   }
 
   function placeFigure(dt) {
     const model = shownModel();
-    const show = walkingThird() && boomDist > THIRD.hide;
+    const onFoot = walkingThird();
+    const show = onFoot && boomDist > THIRD.hide;
     const playing = typeof document !== 'undefined' && (document.body.classList.contains('playing') || document.body.classList.contains('shot') || document.body.classList.contains('loaded'));
     const fig = figure();
     for (const f of figures.values()) if (f !== fig) f.group.visible = false;
+    // Hidden first, every frame: another body (the fish included) must not leave him or his shadow up.
     if (hoya?.root) hoya.root.visible = false;
-    if (!walkingThird()) dropRunFov(player.camera);   // (a mode that took the camera keeps the screen's own field of view)
+    if (hoya?.mesh) hoya.mesh.castShadow = false;
+    if (!onFoot) dropRunFov(player.camera);   // (a mode that took the camera keeps the screen's own field of view)
     if (!show || !playing) {
       if (fig) fig.group.visible = false;
       if (credit) credit.hidden = true;
@@ -253,6 +258,7 @@ export function mountAvatar(ctx) {
     if (model === 'hoya' && hoya?.root) {
       if (fig) fig.group.visible = false;
       hoya.root.visible = true;
+      if (hoya.mesh) hoya.mesh.castShadow = true;
       // His root faces −Z. A roll of the whole root is a pose (≤ 6°). A landing
       // is a translation (≤ 4 cm). The mesh is never scaled or taken apart.
       try { hoya.setCalm(reducedMotion()); } catch (e) { /* */ }

@@ -184,6 +184,10 @@ html { overscroll-behavior: none; }   /* html is what the viewport reads for rub
 /* [integrate] the phone's ☰ menu button, the menu's head and labels, its 名所 and 操作設定 rows and the time sheet's 今日の入船 exist only for a portrait phone with the pad
    (touchpad-style.js turns them on) */
 #klc-ui .mbtn, #klc-ui .mhead, #klc-ui .tools .lbl, #klc-ui .tools .prow, #klc-ui .tools .pset, #klc-ui .dock .arr { display: none; }
+/* [look] a fine pointer has no ☰: 操作設定 is the same toolbar control, 44 px, and it opens the shared look sheet */
+@media (hover: hover) and (pointer: fine) {
+  #klc-ui .tools .pset { display: grid; width: 44px; height: 44px; }
+}
 /* [emil-ui] The HUD is a game's, not a web page's (lanes/emil-ui.md):
    - no wordmark over the town: the title screen carries the name;
    - one clock on the screen, the chip's: the time dock's copy goes;
@@ -194,6 +198,7 @@ html { overscroll-behavior: none; }   /* html is what the viewport reads for rub
 body:has(#klc-play.timing) #klc-ui :is(.brand, .mbtn, .tools, .dock, .places, .help, .arrivals), body:has(#klc-play.timing) #klc-x .xbar { visibility: hidden; }
 /* [emil-ui] while the ☰, a sheet or the credits are open (modal: the pad steps aside), the world's quest markers step back; they draw above the HUD (#klc-m, z-index 8) and covered the menu's rows */
 body:has(#klc-ui:is([data-menu="1"], [data-sheet="time"], [data-sheet="places"], [data-credits="1"])) #klc-m { visibility: hidden; }
+body.klc-look-open #klc-m { visibility: hidden; }
 body.klc-ui #corner, body.klc-ui #help, body.klc-ui #credit { display: none !important; }
 #klc-ui .tools .cbtn, #klc-ui .credits { display: none; }   /* [integrate:fix] the ⓘ credits item and its sheet: the portrait phone only (touchpad-style.js) */
 #klc-ui-restore { display: none; position: fixed; z-index: 5; top: calc(18px + env(safe-area-inset-top, 0px)); right: 18px; width: 38px; height: 38px; border: 0; border-radius: 50%;

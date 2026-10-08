@@ -57,8 +57,8 @@ const setText = (n, s) => { if (n && n.textContent !== s) n.textContent = s; };
 const setAttr = (n, k, v) => { const s = String(v); if (n && n.getAttribute(k) !== s) n.setAttribute(k, s); };
 const setData = (n, k, v) => { if (n && n.dataset[k] !== v) n.dataset[k] = v; };
 const setHidden = (n, h) => { if (n && n.hidden !== h) n.hidden = h; };
-// [ui-a2] The keys that take the camera back from a flight: the player's movement keys (WASD, QE, the arrows), Space and Escape. The digits and R stay instant picks (they retarget the flight);
-// the other keys (time, season, photo ...) do not interrupt a flight.
+// [ui-a2] The keys that take the camera back from a flight: the player's movement keys (WASD, QE, the arrows), Space and Escape. The digits stay instant picks (they retarget the flight).
+// R is a hold (ui/holdkey.js), so it is not in this set. The other keys (time, season, photo ...) do not interrupt a flight.
 const FLY_BREAK = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Escape']);
 
 export function mountHud(ctx, life, o = {}) {

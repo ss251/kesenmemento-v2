@@ -232,11 +232,11 @@ describe("pad: activation and settings", () => {
     expect(touchEnabled("?foo=1&touch=1", {})).toBe(true);
   });
   test("settings: defaults, persisted JSON, a broken value", () => {
-    expect(loadSettings(null)).toEqual({ leftHanded: false, invertY: false, sens: 1, coach: false });
-    expect(loadSettings(JSON.stringify({ leftHanded: true, invertY: true, sens: 1.3, coach: true }))).toEqual({ leftHanded: true, invertY: true, sens: 1.3, coach: true });
-    expect(loadSettings("{nope")).toEqual({ leftHanded: false, invertY: false, sens: 1, coach: false });
-    expect(loadSettings(JSON.stringify({ sens: 99 })).sens).toBe(1.8);
-    expect(loadSettings(JSON.stringify({ sens: 0.01 })).sens).toBe(0.5);
+    expect(loadSettings(null)).toEqual({ leftHanded: false, invertY: false, sens: 1, speed: 1, coach: false });
+    expect(loadSettings(JSON.stringify({ leftHanded: true, invertY: true, sens: 1.3, coach: true }))).toEqual({ leftHanded: true, invertY: true, sens: 1.3, speed: 1.3, coach: true });
+    expect(loadSettings("{nope")).toEqual({ leftHanded: false, invertY: false, sens: 1, speed: 1, coach: false });
+    expect(loadSettings(JSON.stringify({ sens: 99 })).sens).toBe(2.5);
+    expect(loadSettings(JSON.stringify({ sens: 0.01 })).sens).toBe(0.3);
   });
 });
 
@@ -326,7 +326,7 @@ describe("pad: strings", () => {
     }
     for (const k of ["enter", "leave", "board"]) need.add("touch.btn." + k);
     for (const m of BUILTIN_NAMES) need.add("touch.mode." + m);
-    const src = readFileSync(join(ROOT, "src/anime/ui/touchpad.js"), "utf8");
+    const src = ["src/anime/ui/touchpad.js", "src/anime/ui/look-settings.js"].map((f) => readFileSync(join(ROOT, f), "utf8")).join("\n");
     for (const m of src.matchAll(/(?:data-t="|tr\(')(touch\.[\w.]+)/g)) if (!m[1].endsWith(".")) need.add(m[1]);
     for (const k of need) { expect(DATA.ja[k]).toBeDefined(); expect(DATA.en[k]).toBeDefined(); }
   });

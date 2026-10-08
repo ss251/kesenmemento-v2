@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { STEP_HEIGHT } from './physics.js';
 import { chaseOwns, damp1 } from '../play/avatar/camera.js';
+import { mouseLook, lookBlocked } from '../ui/look-settings.js';
 
 const DEG = Math.PI / 180;
 export const FLY = 25, FLY_RUN = 70;   // [v4:polish3] fly speeds, m/s
@@ -149,13 +150,17 @@ export class Player {
     d.addEventListener('mousedown', (e) => { dragging = true; lx = e.clientX; ly = e.clientY; });
     addEventListener('mouseup', () => { dragging = false; });
     addEventListener('mousemove', (e) => {
-      if (!this.enabled) return;
+      if (lookBlocked()) return;
+      if (!this.enabled && !this.lookWhileDisabled) return;
       if (document.pointerLockElement === d) { this.look.dx += e.movementX; this.look.dy += e.movementY; }
       else if (dragging) { this.look.dx += (e.clientX - lx) * 1.4; this.look.dy += (e.clientY - ly) * 1.4; lx = e.clientX; ly = e.clientY; }
     });
   }
 
-  requestLock() { try { const p = this.dom.requestPointerLock?.(); if (p && p.catch) p.catch(() => {}); } catch (e) { /* drag-look fallback */ } }
+  requestLock() {
+    if (lookBlocked()) return;
+    try { const p = this.dom.requestPointerLock?.(); if (p && p.catch) p.catch(() => {}); } catch (e) { /* drag-look fallback */ }
+  }
 
   /** x,z world; yaw/pitch in degrees (yaw 0 = north). y optional (fly). */
   setPose(x, z, yawDeg = 0, pitchDeg = 0, y = null) {
@@ -188,11 +193,14 @@ export class Player {
 
   /** [smooth] The look (the mouse, the pad's drag): every rendered frame, so a turn of the view is answered in the frame it is made. */
   lookStep(dt) {
-    const sens = 0.0022;
-    // [ship] a mode that owns the camera (the sail chase camera) takes the mouse/legacy look drag instead: this update runs
-    // first in the frame, so consuming it here left nothing for that mode to read (the touch look-around never turned)
-    if (typeof this.lookCapture === 'function') this.lookCapture(this.look.dx, this.look.dy);
-    else { this.yaw -= this.look.dx * sens; this.pitch -= this.look.dy * sens; }
+    // [look] speed and invert Y are the shared setting (ui/look-settings.js). 1× is this walker's old 0.0022 rad/px.
+    // A mode that owns the camera takes the raw pixels (the 1.4 drag gain is already in them) and calls mouseLook itself.
+    if (lookBlocked()) this.look.dx = this.look.dy = 0;
+    else if (typeof this.lookCapture === 'function') this.lookCapture(this.look.dx, this.look.dy);
+    else {
+      const d = mouseLook(this.look.dx, this.look.dy);
+      this.yaw += d.yaw; this.pitch += d.pitch;
+    }
     this.look.dx = this.look.dy = 0;
     if (this.pad) {   // the pad's drag look, already in radians and smoothed; the car's and the ship's chase cameras take it (lookSink)
       const l = this.pad.takeLook(dt);

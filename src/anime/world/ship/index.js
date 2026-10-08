@@ -36,6 +36,13 @@ export const BOARD = { radius: 320, maxAlt: 420 };
 /** Keys the town binds that would fight the voyage for the camera while it runs (blocked while it is active). */
 export const BLOCKED_KEYS = new Set(['KeyC', 'KeyV', 'KeyF', 'KeyR', 'KeyN', 'KeyT', 'Slash', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0']);
 
+/** True when this keydown must not reach the town. On a voyage, R is included. While 一本釣り owns the keys, R is 散水 and is left through. */
+export function townKeyBlocked(code, { voyage = false, fishing = false } = {}) {
+  if (!voyage && !fishing) return false;
+  if (code === 'KeyR' && fishing && !voyage) return false;
+  return BLOCKED_KEYS.has(code);
+}
+
 /** The places-list entry (explore): selecting it boards the ship. */
 export const PLACE = {
   id: 'ship-shofukumaru1', ja: '第一昭福丸に乗る', en: 'Board the Daiichi Shofuku Maru', cat: 'ship', group: 'ship',
@@ -78,6 +85,7 @@ export async function build(ctx) {
 
   // the town's keys (drive C, map N, views 1-9, hero R, ...) stay out of the way while the voyage owns the camera;
   // Esc leaves the voyage. Registered before the sail mode so it runs first in the capture phase.
+  // [r-hold] On a voyage, R is stopped here, so the hold never starts. While 一本釣り owns the keys, R is the spray tap and is not stopped.
   let voyage = null;
   if (typeof addEventListener === 'function') addEventListener('keydown', (e) => {
     const fishing = !!ctx.services.ippon?.ownsInput?.();
@@ -89,7 +97,7 @@ export async function build(ctx) {
       else ctx.services.ippon?.leave?.();
       return;
     }
-    if (BLOCKED_KEYS.has(e.code)) e.stopImmediatePropagation();
+    if (townKeyBlocked(e.code, { voyage: !!voyage?.active, fishing })) e.stopImmediatePropagation();
   }, true);
 
   const ship = buildShofukumaru(ctx, { livery, tier });

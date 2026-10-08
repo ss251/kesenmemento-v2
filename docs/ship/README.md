@@ -205,8 +205,8 @@ homecoming under 大漁旗, 北かつまぐろ屋 海の市店, the first MSC ce
 2020-08-13), IUCN EN → LC in September 2021, and the story pin's site, its age, the tuna bones, fish over 2 m, the stone
 blades, the possible butchering site and the 唐桑町荒谷前 address.
 
-Stylised: 6 kn in the harbour (a harbour pace chosen for the game; no harbour limit for 気仙沼 is sourced, and her
-service speed is 12.3 kn), time compression (4x in the bay, the set in 40 s), the handling constants, the hull lines
+Stylised: 12 kn in the harbour (playtests 2026-10-08: the earlier 6 kn pace was too slow for kids; her service speed is
+12.3 kn, JASNAOE SOY 2020, and no harbour limit for 気仙沼 is sourced), time compression (4x in the bay, the set in 40 s), the handling constants, the hull lines
 between the measured profile and the beam, the crowd size and tape lengths, the order and weights of the fish, the ocean
 palette and the hours (the HUD clock runs 05:30 → 10:00 over the set and on from 10:00 through the soak; the sky sits at
 11:00 for the soak and 16:12 for the haul), the floodlight pools of the night haul, the chain cards as flat illustrations

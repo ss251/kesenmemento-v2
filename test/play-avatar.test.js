@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import * as THREE from 'three';
 import { THIRD, chaseOwns, createChaseState, damp1, desiredCam, follow, liftBoom, pathBlocked, placeChase, solveBoom } from '../src/anime/play/avatar/camera.js';
+import { bodyOccupy, walkerShown } from '../src/anime/play/avatar/shown.js';
 import { armHandoff, blendHandoff, createHandoff } from '../src/anime/play/avatar/handoff.js';
 import { nextView, viewId, viewLabelKey, VIEW_CYCLE } from '../src/anime/play/avatar/view.js';
 import { _resetApprovalWarn, hoyaPermitted, resolveModel, setModel } from '../src/anime/play/avatar/approval.js';
@@ -83,6 +84,65 @@ describe('third-person boom', () => {
     expect(chaseOwns({ fly: false, person: 'first', chase })).toBe(false);
     expect(chaseOwns({ fly: false, person: 'third' })).toBe(false);
     expect(chaseOwns(null)).toBe(false);
+  });
+});
+
+describe('walker visibility', () => {
+  const chase = () => {};
+  const onFoot = { fly: false, person: 'third', chase, gull: false };
+
+  test('third person on foot is shown; the fish, gull, boat, car, race and ship hide him, and leaving brings him back', () => {
+    expect(walkerShown(onFoot, {})).toBe(true);
+    expect(walkerShown(onFoot, { swim: true })).toBe(false);
+    expect(walkerShown(onFoot, { gull: true })).toBe(false);
+    expect(walkerShown(onFoot, { drive: true })).toBe(false);
+    expect(walkerShown(onFoot, { sail: true })).toBe(false);
+    expect(walkerShown(onFoot, { race: true })).toBe(false);
+    expect(walkerShown(onFoot, { voyage: true })).toBe(false);
+    expect(walkerShown({ ...onFoot, gull: true }, {})).toBe(false);
+    expect(walkerShown({ ...onFoot, fly: true }, {})).toBe(false);
+    expect(walkerShown({ ...onFoot, person: 'first' }, {})).toBe(false);
+    expect(walkerShown(onFoot, null)).toBe(true);
+    expect(walkerShown(null, { swim: true })).toBe(false);
+    // a walk into the dive is still third person with fly false: he stays off while the fish is the body
+    expect(walkerShown(onFoot, { swim: true })).toBe(false);
+    expect(walkerShown(onFoot, { swim: false })).toBe(true);
+  });
+
+  test('bodyOccupy reads the dive, the gull, the boat, the car, the race and the ship', () => {
+    const ctx = {
+      services: {
+        swim: { active: true },
+        play: { gull: { active: false } },
+        explore: { drive: { active: false } },
+        sail: { active: false },
+        playCar: { race: { phase: 'idle' } },
+        ship: { voyage: { active: false } },
+      },
+    };
+    expect(bodyOccupy(ctx)).toMatchObject({ swim: true, gull: false, drive: false, sail: false, race: false, voyage: false });
+    expect(walkerShown(onFoot, bodyOccupy(ctx))).toBe(false);
+    ctx.services.swim.active = false;
+    expect(walkerShown(onFoot, bodyOccupy(ctx))).toBe(true);
+    ctx.services.play.gull.active = true;
+    expect(bodyOccupy(ctx).gull).toBe(true);
+    ctx.services.play.gull.active = false;
+    ctx.services.explore.drive.active = true;
+    expect(bodyOccupy(ctx).drive).toBe(true);
+    ctx.services.explore.drive.active = false;
+    ctx.services.sail.active = true;
+    expect(bodyOccupy(ctx).sail).toBe(true);
+    ctx.services.sail.active = false;
+    ctx.services.playCar.race.phase = 'run';
+    expect(bodyOccupy(ctx).race).toBe(true);
+    ctx.services.playCar.race.phase = 'count';
+    expect(bodyOccupy(ctx).race).toBe(true);
+    ctx.services.playCar.race.phase = 'idle';
+    expect(bodyOccupy(ctx).race).toBe(false);
+    ctx.services.ship.voyage.active = true;
+    expect(bodyOccupy(ctx).voyage).toBe(true);
+    ctx.services.ship.voyage.active = false;
+    expect(walkerShown(onFoot, bodyOccupy(ctx))).toBe(true);
   });
 });
 

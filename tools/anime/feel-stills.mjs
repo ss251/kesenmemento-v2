@@ -63,7 +63,7 @@ async function still(page, name, { walk = true, dive = false, dump = false } = {
     let share = null;
     if (root) { const v = new THREE.Vector3(root.position.x, root.position.y, root.position.z).project(cam).y, w = new THREE.Vector3(root.position.x, root.position.y + 1.1, root.position.z).project(cam).y; share = +((w - v) / 2).toFixed(3); }
     return { w: innerWidth, h: innerHeight, share, drawn: !!root, credit: !!credit, creditRect: credit, hits, creditClear: !!credit && hits.length === 0,
-      lang: document.querySelector('[data-act="lang"]')?.textContent.trim() === 'EN' ? 'ja' : 'en'${dump ? ', obs' : ''} };
+      lang: ${LANG_JS}${dump ? ', obs' : ''} };
   })()`);
   const png = join(OUT, name + '.png'), jpg = join(OUT, name + '.jpg');
   await page.shot(png);
@@ -94,9 +94,11 @@ async function spots(page) {
   }
   await page.eval("document.getElementById('feel-spot')?.remove()");
 }
-// the HUD's language: its button offers the other one (EN in Japanese, 日本語 in English); <html lang> does not follow it
+// the HUD's language: its button offers the other one (EN in Japanese, 日本語 in English), in its own text before the .lbl caption
+// (hud.js); <html lang> does not follow it
+const LANG_JS = `(() => { const b = document.querySelector('[data-act="lang"]'); const t = b ? [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim() : ''; return t === 'EN' ? 'ja' : t ? 'en' : null; })()`;
 const lang = (page, to) => page.eval(`(async () => {
-  const cur = () => (document.querySelector('[data-act="lang"]')?.textContent.trim() === 'EN' ? 'ja' : 'en');
+  const cur = () => ${LANG_JS};
   if (cur() !== ${JSON.stringify(to)}) { document.querySelector('[data-act="lang"]')?.click(); await new Promise((r) => setTimeout(r, 400)); }
   return cur();
 })()`);
@@ -127,9 +129,14 @@ try {
   await enter(dk, false);
   await still(dk, 'desktop-ja-day', { dump: true });
   await still(dk, 'desktop-ja-day-moguru', { dive: true });
-  await lang(dk, 'en'); await night(dk, true); await still(dk, 'desktop-en-night'); await night(dk, false); await lang(dk, 'ja');
+  await lang(dk, 'en'); await night(dk, true); await still(dk, 'desktop-en-night'); await lang(dk, 'ja'); await still(dk, 'desktop-ja-night'); await night(dk, false);
   await dk.S('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 2, mobile: false, screenWidth: 1440, screenHeight: 900 }); await sleep(1200);
   await still(dk, 'retina-ja-day');
+  // smaller laptop windows: the HUD's top-right rows and the credit under them
+  for (const [w, h] of [[1280, 720], [1024, 700]]) {
+    await dk.S('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: false, screenWidth: w, screenHeight: h }); await sleep(1200);
+    await still(dk, `desktop-${w}-ja-day`, { dump: true });
+  }
   }
   report.errors = [...(ph ? ph.errors() : []), ...(dk ? dk.errors() : [])].filter((e) => !String(e.text).includes('/api/live')).map((e) => e.text.slice(0, 200));
 } finally {

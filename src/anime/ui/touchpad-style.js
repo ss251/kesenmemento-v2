@@ -84,21 +84,22 @@ export const CSS = /* css */`
    HUD's ☰ (操作設定, hud.js) and keep their place under the top bar, which stays as their anchor. Elsewhere (a landscape phone, a tablet) the gear stays: the
    landscape toolbar has no room for another icon (it would reach the minimap), and landscape gets the ☰ in #9. */
 #klc-pad .topbar .chip { display: none; }
-#klc-pad .settings { z-index: 5; position: absolute; top: calc(100% + 8px); left: 0; width: min(272px, calc(100vw - 28px)); max-height: calc(100dvh - 120px); overflow: auto; padding: 12px 14px 8px; border-radius: 16px; background: var(--k-glass); pointer-events: auto; touch-action: pan-y;
-  -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2); box-shadow: 0 14px 40px rgba(35, 40, 70, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.55); }
+#klc-pad .settings { z-index: 5; position: absolute; top: calc(100% + 8px); left: 0; width: min(320px, calc(100vw - 32px)); max-height: calc(100dvh - 120px); overflow: auto; padding: 16px 16px 8px; border-radius: 16px; background: var(--k-glass); pointer-events: auto; touch-action: pan-y;
+  -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2); box-shadow: 0 16px 40px rgba(35, 40, 70, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.55); }
 #klc-pad .settings[hidden] { display: none; }
-#klc-pad .settings h4 { margin: 0 0 6px; font: 900 13px/1.2 var(--k-round); color: var(--k-navy); letter-spacing: .08em; }
-#klc-pad .settings .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--k-line); }
-#klc-pad .settings .row.col { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; align-content: center; }
-#klc-pad .settings .row b { display: block; font: 700 14px/1.25 var(--k-round); color: var(--k-ink); }
-#klc-pad .settings .row small { display: block; font: 500 11px/1.3 var(--k-sans); color: var(--k-muted); }
-#klc-pad .settings .row.col span { display: flex; justify-content: space-between; align-items: baseline; }
-#klc-pad .settings output { font: 700 12px/1 var(--k-round); color: var(--k-muted); font-variant-numeric: tabular-nums; }
-#klc-pad .sw { position: relative; flex: none; width: 52px; height: 32px; border: 0; border-radius: 999px; background: rgba(45, 51, 80, 0.2); cursor: pointer; transition: background .2s; touch-action: manipulation; }
-#klc-pad .sw i { position: absolute; left: 3px; top: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(35, 40, 70, 0.35); transition: transform .22s var(--pop); }
+#klc-pad .settings h4 { margin: 0 0 8px; font: 700 16px/1.3 var(--k-round); color: var(--k-navy); letter-spacing: 0.04em; }
+#klc-pad .settings .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; padding: 8px 0; border-top: 1px solid var(--k-line); }
+#klc-pad .settings .row.col { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: center; }
+#klc-pad .settings .row b { display: block; font: 700 16px/1.4 var(--k-round); color: var(--k-ink); }
+#klc-pad .settings .row small { display: block; margin-top: 4px; font: 500 13px/1.6 var(--k-sans); color: var(--k-muted); }
+#klc-pad .settings .row.col span { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+#klc-pad .settings output { font: 700 16px/1 var(--k-round); color: var(--k-navy); font-variant-numeric: tabular-nums; }
+#klc-pad .sw { position: relative; flex: none; width: 64px; height: 44px; border: 0; border-radius: 999px; background: rgba(45, 51, 80, 0.2); cursor: pointer; padding: 0; transition: background .2s; touch-action: manipulation; }
+#klc-pad .sw i { position: absolute; left: 4px; top: 4px; width: 36px; height: 36px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(35, 40, 70, 0.35); transition: transform .22s var(--pop); }
 #klc-pad .sw[aria-checked="true"] { background: var(--k-navy); }
 #klc-pad .sw[aria-checked="true"] i { transform: translateX(20px); }
-#klc-pad input[type="range"] { width: 100%; min-width: 0; justify-self: stretch; height: 32px; accent-color: var(--k-navy); touch-action: pan-y; }
+#klc-pad input[type="range"] { width: 100%; min-width: 0; justify-self: stretch; height: 44px; margin: 0; accent-color: var(--k-navy); touch-action: pan-y; cursor: pointer; }
+#klc-pad .settings :focus-visible { outline: 2px solid var(--k-navy); outline-offset: 2px; }
 
 /* ---------- the first-run coach mark (placed by the pad in the free band between the panels and the thumbs) */
 #klc-pad .coach { position: absolute; left: 50%; top: var(--cy, 44%); width: min(300px, calc(100% - 120px)); transform: translate(-50%, -50%) scale(var(--cs, 1)); padding: 12px 12px 12px; border-radius: 22px; text-align: center; pointer-events: auto;

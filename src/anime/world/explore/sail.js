@@ -5,8 +5,9 @@
 //   - a rate-limited rudder, a first-order (Nomoto) yaw response whose rate scales with speed (a ship turns on a circle
 //     of roughly fixed size whatever her speed: tactical diameter ~3.5 LOA), a little sideslip outward in a turn, and
 //     a little speed lost while turning;
-//   - a harbour pace of 6 kn (3.1 m/s), a game setting (no sourced harbour limit for 気仙沼); "boost" is TIME COMPRESSION (x4): the whole model runs four times faster, so she
-//     covers the bay at an apparent 24 kn but turns on the same circle and keeps the same feel;
+//   - 12 kn (6.2 m/s), her service speed rounded from 12.3 kn (JASNAOE SOY 2020). Playtests 2026-10-08: the old 6 kn harbour
+//     pace was too slow for kids. "boost" is TIME COMPRESSION (x4): the whole model runs four times faster, so she
+//     covers the bay at an apparent 48 kn but turns on the same circle and keeps the same feel;
 //   - the shore: L.shoreDist (signed distance to the coastline, + at sea) sampled at the bow, the stern and the beam
 //     corners; she slides along a quay, never through it, and loses speed on contact.
 // Chase camera and the touch stick are copied from explore/drive.js. Autopilot (pure pursuit on OUTBOUND) takes over
@@ -34,18 +35,21 @@ import { damp, lerp, lerpAngle } from '../../core/timestep.js';   // [smooth]
 import { OUTBOUND_PATH, BERTH, KANAE_CROSSING, SHOKO, MIRAI, BAY_MOUTH, makePath, SHIP_DIMS } from '../ship/route.js';
 import { KANAE } from '../harbor/real.js';
 import { KATSUO, KATSUO_SAMPLES } from '../ship/boat-params.js';   // [ippon] the second boat's handling
+import { HELD_R } from '../../ui/holdkey.js';   // [r-hold]
+import { mouseLook, lookBlocked } from '../../ui/look-settings.js';
 
 export const KN = 0.514444;   // m/s per knot
 
 /** Ship handling constants (sources in the comments; the "game" values are tuned to the real ones' proportions). */
 export const BOAT = {
   L: SHIP_DIMS.loa, B: SHIP_DIMS.beam,
-  vMax: 6 * KN,          // 3.09 m/s: a harbour pace chosen for the game (no sourced limit for 気仙沼); service speed is 12.3 kn (JASNAOE SOY 2020)
-  accel: 0.16,           // m/s^2 at full ahead from rest: 0 -> 90 % of harbour speed in ~28 s (a 486 GT hull)
+  vMax: 12 * KN,         // 6.17 m/s. Service speed is 12.3 kn (JASNAOE SOY 2020); 12 kn is the playtest pace (playtests 2026-10-08)
+  accel: 2.15,           // m/s^2 from rest at full ahead: 0 -> 90 % of 12 kn in ~8 s (playtests 2026-10-08)
+  coast: 0.26,           // m/s^2 of drag at vMax. Ahead thrust eases from accel down to this, so she still settles at vMax and coasts with the engine stopped (no brakes)
   astern: 0.3,           // astern thrust / ahead thrust (fixed-pitch propeller going astern)
   linDrag: 0.012,        // 1/s: lets her come to rest instead of coasting forever on the quadratic drag
   turnDrag: 0.25,        // speed lost per rad/s of yaw rate (a ship slows in a turn)
-  engineLag: 3.0,        // s: the engine order takes effect over a few seconds
+  engineLag: 1.2,        // s: the engine order takes effect (playtests 2026-10-08; was 3 s at the 6 kn pace)
   rudderRate: 0.45,      // full rudder (35 deg) from midships in ~2.2 s (game; SOLAS asks 35 -> -30 deg in 28 s)
   R0: 96,                // m: steady turning radius at full rudder; with the yaw lag the tactical diameter is ~3.5 LOA
   Tn: 5.0,               // s: yaw (Nomoto T) time constant for a ~50 m Lpp hull
@@ -85,9 +89,16 @@ export function boatStep(s, input, dt, P = BOAT) {
   const h = dt * tc;   // model time this frame
   const order = clamp(input.throttle || 0, -1, 1);
   const eng = s.eng + (order - s.eng) * ease(h, P.engineLag);
-  const thrust = eng >= 0 ? eng * P.accel : eng * P.accel * P.astern;
-  const kq = (P.accel - P.linDrag * P.vMax) / (P.vMax * P.vMax);   // full ahead settles at exactly vMax
-  let u = s.u + (thrust - kq * s.u * Math.abs(s.u) - P.linDrag * s.u - P.turnDrag * Math.abs(s.r) * s.u) * h;
+  // Ahead thrust is `accel` at rest and eases to `coast` at vMax. Drag ahead matches `coast`, so full ahead settles at
+  // exactly vMax and cutting the engine still coasts. Astern keeps the strong drag (from `accel`) so reverse settles
+  // near sqrt(astern) of vMax, and X plus astern can stop her (playtests 2026-10-08). `coast` defaults to `accel`.
+  const coast = P.coast ?? P.accel;
+  const kq = (s.u >= 0 ? coast : P.accel) - P.linDrag * P.vMax;
+  const kqq = kq / (P.vMax * P.vMax);
+  const fade = P.vMax > 0 ? clamp(s.u / P.vMax, 0, 1) : 1;
+  const ahead = coast + (P.accel - coast) * (1 - fade);
+  const thrust = eng >= 0 ? eng * ahead : eng * P.accel * P.astern;
+  let u = s.u + (thrust - kqq * s.u * Math.abs(s.u) - P.linDrag * s.u - P.turnDrag * Math.abs(s.r) * s.u) * h;
   if (Math.abs(u) < 1e-4 && Math.abs(thrust) < 1e-4) u = 0;
   const want = clamp(input.rudder || 0, -1, 1);
   const rudder = s.rudder + clamp(want - s.rudder, -P.rudderRate * h, P.rudderRate * h);
@@ -149,9 +160,20 @@ export function resolveShore(prev, next, dt, shoreDist = L.shoreDist, P = BOAT, 
   return out;
 }
 
-/** boatStep + resolveShore: the full pure step. `samples` defaults to the longliner's hull. */
+/**
+ * boatStep + resolveShore. A step longer than half the fender margin (full ahead at 12 kn, or x4) is split, so she
+ * cannot jump through a quay. `samples` defaults to the longliner's hull.
+ */
 export function sailStep(s, input, dt, shoreDist = L.shoreDist, P = BOAT, samples) {
-  return resolveShore(s, boatStep(s, input, dt, P), dt, shoreDist, P, samples);
+  const tc = Math.max(s.tc || 1, input?.boost ? P.boostX : 1);
+  const travel = Math.abs(s.u || 0) * dt * tc;
+  const limit = Math.max(0.45, (P.margin || 2) * 0.5);
+  const n = travel > limit ? Math.min(12, Math.ceil(travel / limit)) : 1;
+  if (n <= 1) return resolveShore(s, boatStep(s, input, dt, P), dt, shoreDist, P, samples);
+  const sub = dt / n;
+  let cur = s;
+  for (let i = 0; i < n; i++) cur = resolveShore(cur, boatStep(cur, input, sub, P), sub, shoreDist, P, samples);
+  return cur;
 }
 
 /** Per-boat handling. `shofuku` is BOAT itself (the voyage). `katsuo` is the lighter pole-and-line boat. */
@@ -188,8 +210,10 @@ export const AUTO = {
  */
 export function pursue(path, s, progress = 0, P = BOAT, A = AUTO, rec = null, dt = 0, shoreDist = L.shoreDist, out = null) {
   const q = path.project(s.x, s.z, Math.max(0, progress + A.window[0]), progress + A.window[1]);
-  const vWorld = Math.abs(s.u) * s.tc;
-  const Ld = clamp(70 + vWorld * 7, 70, 200);
+  const vWorld = Math.abs(s.u) * (s.tc || 1);
+  // 70 m + 7 s of way: the 6 kn tune. Its cap was 200 m (16 s at the old x4). At 12 kn the same 7 s of way
+  // is a longer look, and the cap scales so x4 (~25 m/s) is not stuck on an 8 s preview (playtests 2026-10-08).
+  const Ld = clamp(70 + vWorld * 7, 70, 280);
   const [tx, tz] = path.at(q.s + Ld);
   const alpha = wrap(Math.atan2(tx - s.x, tz - s.z) - s.yaw);
   // curvature to reach the look-ahead point; yaw rises with a port turn (rudder < 0): rudder = -kappa * R0
@@ -320,10 +344,16 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     });
     addEventListener('keyup', (e) => keys.delete(e.code));
     addEventListener('blur', () => keys.clear());
+    let dragX = 0, dragY = 0;
+    addEventListener('mousedown', (e) => { dragX = e.clientX; dragY = e.clientY; });
     addEventListener('mousemove', (e) => {
-      if (!state.active) return;
+      if (!state.active || lookBlocked()) return;
       const locked = typeof document !== 'undefined' && document.pointerLockElement === ctx.renderer?.domElement;
-      if (locked || e.buttons) { orbit.yaw -= e.movementX * 0.004; orbit.pitch = clamp(orbit.pitch - e.movementY * 0.003, -0.8, 0.3); orbit.back = 3; }
+      let d = null;
+      if (locked) d = mouseLook(e.movementX || 0, e.movementY || 0);
+      else if (e.buttons) { d = mouseLook(e.clientX - dragX, e.clientY - dragY, { drag: true }); dragX = e.clientX; dragY = e.clientY; }
+      if (!d) return;
+      orbit.yaw += d.yaw; orbit.pitch = clamp(orbit.pitch + d.pitch, -0.8, 0.3); orbit.back = 3;
     });
   }
   /** Stopped in the water with an engine order ahead and next to the shore: the player left her on a bank. */
@@ -454,17 +484,22 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     lookIn.dx = lookIn.dy = 0; if (plk) plk.dx = plk.dy = 0;
     const rdx = lookRad.dx, rdy = lookRad.dy; lookRad.dx = lookRad.dy = 0;
     if (ldx || ldy || rdx || rdy) {
-      orbit.yaw -= ldx * 0.0018 + rdx; orbit.pitch = clamp(orbit.pitch - ldy * 0.0014 - rdy * 0.6, -0.8, 0.3); orbit.back = 3;
+      const d = mouseLook(ldx, ldy);
+      orbit.yaw += d.yaw - rdx; orbit.pitch = clamp(orbit.pitch + d.pitch - rdy * 0.6, -0.8, 0.3); orbit.back = 3;
     }
     // chase camera: behind and above the ship; the mouse orbit eases back behind her
     // [smooth] the easings are exponential in the frame's time (they were per frame: 1.21, 1.01 and 3.08 /s are what they gave at 60 Hz)
     if (dt > 0 && orbit.back > 0) orbit.back -= dt; else if (dt > 0) orbit.yaw *= Math.exp(-1.21 * dt);
-    const cy = byaw + Math.PI + orbit.yaw, dist = (hullP.camBack ?? 92) + Math.abs(boat.u * boat.tc) * (hullP.camSpeed ?? 1.6), hgt = (hullP.camHeight ?? 26) - orbit.pitch * (hullP.camPitch ?? 60);
+    // Follow rate and look-ahead scale with world speed above her own cruise, so x4 at 12 kn does not leave the
+    // camera behind and does not have to catch up in one whip (playtests 2026-10-08). At cruise, pace is 1: the old rates.
+    const vW = Math.abs(boat.u * boat.tc), pace = Math.max(1, Math.min(4, vW / Math.max(0.5, hullP.vMax || BOAT.vMax)));
+    const cy = byaw + Math.PI + orbit.yaw, dist = (hullP.camBack ?? 92) + vW * (hullP.camSpeed ?? 1.6), hgt = (hullP.camHeight ?? 26) - orbit.pitch * (hullP.camPitch ?? 60);
     const tx = bx + Math.sin(cy) * dist, tz = bz + Math.cos(cy) * dist;
     const ty = Math.max(hgt, (LL.heightAt ? LL.heightAt(tx, tz) : 0) + 6);
-    if (!camInit || dt <= 0) { camPos.set(tx, ty, tz); camInit = true; } else camPos.lerp(_ct.set(tx, ty, tz), damp(camEase > 0 ? 1.01 : 3.08, dt));
+    if (!camInit || dt <= 0) { camPos.set(tx, ty, tz); camInit = true; } else camPos.lerp(_ct.set(tx, ty, tz), damp(camEase > 0 ? 1.01 : 3.08 * pace, dt));
     if (camEase > 0) camEase -= dt;
-    camLook.set(bx + Math.sin(byaw) * (hullP.lookAhead ?? 25), hullP.lookY ?? 9, bz + Math.cos(byaw) * (hullP.lookAhead ?? 25));
+    const la = (hullP.lookAhead ?? 25) * pace;
+    camLook.set(bx + Math.sin(byaw) * la, hullP.lookY ?? 9, bz + Math.cos(byaw) * la);
     if (cam) { cam.position.copy(camPos); cam.lookAt(camLook); }
     const pl = ctx.playerObj;
     if (pl?.pos) { pl.pos.set(boat.x, hullP.playerY ?? 6, boat.z); pl.vel?.set(0, 0, 0); pl.yaw = boat.yaw + Math.PI; }
@@ -585,11 +620,17 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   function setPose(x, z, yaw) { boat = boatState(x, z, yaw); sync(); place(0); }
   function emit(ev) { state.events.push(ev); for (const f of listeners) try { f(ev, api); } catch (e) { console.error(e); } }
 
-  if (typeof addEventListener === 'function') addEventListener('keydown', (e) => {
-    if (ctx.services.swim?.active) return;   // [play:underwater] V / R / F leave the water, not the boat
-    const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
-    if (state.active && boatKind !== 'katsuo' && !typing && (e.code === 'KeyV' || e.code === 'KeyR' || e.code === 'KeyF' || e.code === 'KeyC' || /^Digit\d$/.test(e.code))) exit();
-  }, true);
+  if (typeof addEventListener === 'function') {
+    addEventListener('keydown', (e) => {
+      if (ctx.services.swim?.active) return;   // [play:underwater] V / hold R / F leave the water, not the boat
+      const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
+      if (state.active && boatKind !== 'katsuo' && !typing && (e.code === 'KeyV' || e.code === 'KeyF' || e.code === 'KeyC' || /^Digit\d$/.test(e.code))) exit();
+    }, true);
+    addEventListener(HELD_R, () => {
+      if (ctx.services.swim?.active) return;
+      if (state.active && boatKind !== 'katsuo') exit();
+    });
+  }
   // [smooth] the ship model at the fixed rate, the drawing every frame (in shot mode and window.__sim: one after the other, as update() did)
   ctx.onStep((dt) => { step(dt); });
   ctx.onUpdate((dt) => {

@@ -16,6 +16,8 @@ import * as THREE from 'three';
 import { makeKeiCar } from '../town/sakura/vehicles_cars.js';
 import { damp, lerp, lerpAngle } from '../../core/timestep.js';   // [smooth]
 import { carStep, CAR, RACE } from './drive-model.js';
+import { HELD_R } from '../../ui/holdkey.js';   // [r-hold]
+import { mouseLook, lookBlocked } from '../../ui/look-settings.js';
 
 export { carStep, CAR, RACE };
 
@@ -153,10 +155,16 @@ export function createDrive(ctx, { net, carMesh = null }) {   // [smooth] carMes
     addEventListener('keydown', (e) => { if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return; keys.add(e.code); if (state.active && ['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) e.preventDefault(); });
     addEventListener('keyup', (e) => keys.delete(e.code));
     addEventListener('blur', () => keys.clear());
+    let dragX = 0, dragY = 0;
+    addEventListener('mousedown', (e) => { dragX = e.clientX; dragY = e.clientY; });
     addEventListener('mousemove', (e) => {
-      if (!state.active) return;
+      if (!state.active || lookBlocked()) return;
       const locked = document.pointerLockElement === ctx.renderer?.domElement;
-      if (locked || e.buttons) { orbit.yaw -= e.movementX * 0.004; orbit.pitch = Math.max(-0.7, Math.min(0.25, orbit.pitch - e.movementY * 0.003)); orbit.back = 2.5; }
+      let d = null;
+      if (locked) d = mouseLook(e.movementX || 0, e.movementY || 0);
+      else if (e.buttons) { d = mouseLook(e.clientX - dragX, e.clientY - dragY, { drag: true }); dragX = e.clientX; dragY = e.clientY; }
+      if (!d) return;
+      orbit.yaw += d.yaw; orbit.pitch = Math.max(-0.7, Math.min(0.25, orbit.pitch + d.pitch)); orbit.back = 2.5;
     });
   }
 
@@ -376,13 +384,16 @@ export function createDrive(ctx, { net, carMesh = null }) {   // [smooth] carMes
   /** Streaming focus: a little ahead of the car, more at speed. */
   function focus() { const k = 3 + Math.abs(state.speed) * 2.5, s = Math.sign(state.speed || 1); return { x: state.x - Math.sin(state.yaw) * k * s, z: state.z - Math.cos(state.yaw) * k * s }; }
 
-  // the other views take the camera back: leave the car first (V drone / walk, R home, F fly, the number keys)
+  // the other views take the camera back: leave the car first (V drone / walk, hold R home, F fly, the number keys)
   // [v4:polish2] C is handled on keydown (not polled once per frame), so a short press during a frame hitch is never lost
-  if (typeof addEventListener === 'function') addEventListener('keydown', (e) => {
-    const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
-    if (e.code === 'KeyC' && !e.repeat && !typing && document.body?.classList?.contains('playing')) { toggle(); return; }
-    if (state.active && (e.code === 'KeyV' || e.code === 'KeyR' || e.code === 'KeyF' || /^Digit\d$/.test(e.code)) && !typing) exit();
-  }, true);
+  if (typeof addEventListener === 'function') {
+    addEventListener('keydown', (e) => {
+      const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
+      if (e.code === 'KeyC' && !e.repeat && !typing && document.body?.classList?.contains('playing')) { toggle(); return; }
+      if (state.active && (e.code === 'KeyV' || e.code === 'KeyF' || /^Digit\d$/.test(e.code)) && !typing) exit();
+    }, true);
+    addEventListener(HELD_R, () => { if (state.active) exit(); });
+  }
   // [smooth] the physics at the fixed rate, the drawing every frame (in shot mode and window.__sim: one after the other, as update() did)
   ctx.onStep((dt) => { step(dt); });
   ctx.onUpdate((dt) => {

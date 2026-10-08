@@ -18,7 +18,7 @@ The fish is the title mark's カツオ: dark indigo back, silver belly, the tail
 
 | | Value | Why |
 |---|---|---|
-| Hull | 28 m × 5.8 m, 7.5 kn, accel 0.34 | Game model inside the 80–180 t 近海 range. Not a measured hull. |
+| Hull | 28 m × 5.8 m, 14 kn, 0→90 % in about 6 s | Game model inside the 80–180 t 近海 range. Not a measured hull. Playtests 2026-10-08: 7.5 kn was too slow for kids. Quicker than 第一昭福丸 at 12 kn. |
 | In-season school | just outside the bay mouth: the 400 m gate plus 0.9 km, 1.2 km and 1.45 km, on bearings 36°, 48° and 28° (open water east-northeast; the channel's last leg runs into the coast) | Skipjack are fished offshore. The centres stay east of the gate, and a 70–80 m drift does not bring them inside it. |
 | First departure | A horn, then 4.2 s of the real ×4 pull off the quay, then a veil to `groundsPose` (the school, 36 m west and 28 m south, inside the 70 m work ring) | A first fish has to land inside a minute. The outbound path, the school centres and `boostX` are unchanged. The twelve-minute voyage is the open question in the lane file. 「もう一回」 skips the quay and starts at the grounds. |
 | Bait on the way | 「餌の用意」 during the run. The chum goes in on the first moment at the grounds | The harbour does not get a bait pulse. The radar sweeps while she is outbound. |

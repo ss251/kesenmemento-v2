@@ -13,6 +13,7 @@ import {
   routeClearance, makePath, inBerthReserve,
 } from "../src/anime/world/ship/route.js";
 import { KANAE } from "../src/anime/world/harbor/real.js";
+import { KATSUO } from "../src/anime/world/ship/boat-params.js";
 import { kanaeDeckY } from "../src/anime/world/harbor/kanae.js";
 import { yieldHold, YIELD_R, createArrivals } from "../src/anime/world/harbor/arrivals.js";
 import { planMooringRows } from "../src/anime/world/harbor/rows.js";
@@ -39,33 +40,76 @@ const read = (p) => readFileSync(resolve(ROOT, p), "utf8");
 const LOA = SHIP_DIMS.loa;
 const run = (s, input, secs, dt = 0.05) => { for (let t = 0; t < secs; t += dt) s = boatStep(s, input, dt); return s; };
 
+function timeTo(P, frac, throttle = 1) {
+  let s = boatState(0, 0, 0);
+  for (let t = 0; t < 60; t += 0.05) {
+    s = boatStep(s, { throttle }, 0.05, P);
+    if (s.u >= frac * P.vMax) return { t, s };
+  }
+  return { t: null, s };
+}
+/** From a settled full ahead, X is throttle 0 and astern is throttle -1. */
+function stopFromFull(P, throttle) {
+  let s = boatState(0, 0, 0);
+  for (let i = 0; i < 800; i++) s = boatStep(s, { throttle: 1 }, 0.05, P);
+  for (let t = 0; t < 40; t += 0.05) {
+    s = boatStep(s, { throttle }, 0.05, P);
+    if (s.u <= 0) return t;
+  }
+  return null;
+}
+
 describe("boatStep: surge (inertia, no brakes, astern thrust)", () => {
-  test("accelerates slowly to the 6 kn harbour pace (a game setting) and never past it", () => {
-    let s = boatState(0, 0, 0), t = 0, t50 = null, t90 = null, vmax = 0;
-    for (; t < 120; t += 0.05) {
+  test("settles at 12 kn and never past it (playtests 2026-10-08)", () => {
+    let s = boatState(0, 0, 0), t = 0, vmax = 0;
+    for (; t < 40; t += 0.05) {
       s = boatStep(s, { throttle: 1 }, 0.05);
       vmax = Math.max(vmax, s.u);
-      if (t50 == null && s.u >= 0.5 * BOAT.vMax) t50 = t;
-      if (t90 == null && s.u >= 0.9 * BOAT.vMax) t90 = t;
     }
-    expect(BOAT.vMax / KN).toBeCloseTo(6, 5);
+    expect(BOAT.vMax / KN).toBeCloseTo(12, 5);
+    expect(BOAT.astern).toBeCloseTo(0.3, 5);
+    expect(BOAT.engineLag).toBeCloseTo(1.2, 5);
+    expect(BOAT.boostX).toBe(4);
+    expect(BOAT.R0).toBe(96);
     expect(s.u).toBeGreaterThan(0.99 * BOAT.vMax);
     expect(vmax).toBeLessThanOrEqual(BOAT.vMax + 1e-6);
-    expect(t50).toBeGreaterThan(8);            // a 486 GT hull: no car-like launch
-    expect(t50).toBeLessThan(20);
-    expect(t90).toBeGreaterThan(25);
-    expect(t90).toBeLessThan(45);
     expect(s.z).toBeGreaterThan(0);            // yaw 0 = bow due south (+Z)
     expect(Math.abs(s.x)).toBeLessThan(1e-6);
   });
+  test("0 -> 90 % in about 8 s; X plus astern stops her from full ahead in under about 10 s", () => {
+    const up = timeTo(BOAT, 0.9);
+    expect(up.t).toBeGreaterThan(6);
+    expect(up.t).toBeLessThan(9.5);
+    const tStop = stopFromFull(BOAT, -1);
+    expect(tStop).not.toBeNull();
+    expect(tStop).toBeLessThan(10.5);
+    expect(tStop).toBeGreaterThan(4);          // astern is 30 %: not a car brake
+  });
+  test("かつお船: 14 kn, 0 -> 90 % in about 6 s, astern stops her under about 10 s", () => {
+    expect(KATSUO.vMax / KN).toBeCloseTo(14, 5);
+    expect(KATSUO.vMax).toBeGreaterThan(BOAT.vMax);
+    expect(KATSUO.accel).toBeGreaterThan(BOAT.accel);
+    expect(KATSUO.R0).toBe(58);
+    expect(KATSUO.astern).toBeCloseTo(0.38, 5);
+    expect(KATSUO.engineLag).toBeCloseTo(1, 5);
+    const up = timeTo(KATSUO, 0.9);
+    expect(up.t).toBeGreaterThan(4.5);
+    expect(up.t).toBeLessThan(7.5);
+    let ks = boatState(0, 0, 0);
+    for (let i = 0; i < 400; i++) ks = boatStep(ks, { throttle: 1 }, 0.05, KATSUO);
+    expect(ks.u).toBeGreaterThan(0.99 * KATSUO.vMax);
+    expect(ks.u).toBeLessThanOrEqual(KATSUO.vMax + 1e-6);
+    const tStop = stopFromFull(KATSUO, -1);
+    expect(tStop).toBeLessThan(10);
+  });
   test("no brakes: she coasts a long way on the engine stopped; astern thrust stops her sooner", () => {
-    const full = run(boatState(0, 0, 0), { throttle: 1 }, 90);
+    const full = run(boatState(0, 0, 0), { throttle: 1 }, 40);
     const coast = run(full, { throttle: 0 }, 30);
     expect(coast.u).toBeGreaterThan(0.35 * BOAT.vMax);
     let a = full, tStop = null;
-    for (let t = 0; t < 120; t += 0.05) { a = boatStep(a, { throttle: -1 }, 0.05); if (a.u <= 0) { tStop = t; break; } }
+    for (let t = 0; t < 30; t += 0.05) { a = boatStep(a, { throttle: -1 }, 0.05); if (a.u <= 0) { tStop = t; break; } }
     expect(tStop).not.toBeNull();
-    expect(tStop).toBeLessThan(60);
+    expect(tStop).toBeLessThan(10.5);
     let c = full, tCoast = null;
     for (let t = 0; t < 600; t += 0.05) { c = boatStep(c, { throttle: 0 }, 0.05); if (c.u < 0.05) { tCoast = t; break; } }
     expect(tCoast ?? 600).toBeGreaterThan(tStop * 2);
@@ -133,7 +177,7 @@ describe("boatStep: steering", () => {
     const base = run(boatState(0, 0, 0), { throttle: 1 }, 120);
     const n = run(base, { throttle: 1 }, 20), b = run(base, { throttle: 1, boost: true }, 20);
     expect(b.tc).toBeGreaterThan(3.9);
-    expect(b.u).toBeLessThanOrEqual(BOAT.vMax + 1e-6);         // the speed through the water is still 6 kn
+    expect(b.u).toBeLessThanOrEqual(BOAT.vMax + 1e-6);         // the speed through the water is still 12 kn
     expect((b.z - base.z) / (n.z - base.z)).toBeGreaterThan(3.2);
     const fast = turnTest(1, true), plain = turnTest(1, false);
     expect(Math.abs(fast.steady - plain.steady) / plain.steady).toBeLessThan(0.1);
@@ -197,6 +241,30 @@ describe("shore collision", () => {
     expect(along).toBeGreaterThan(10);
     const r = resolveShore(hit, { ...hit, x: hit.x - 30 }, 0.05);   // a pose 30 m into the pier: refused
     expect(hullClearance(r).d).toBeGreaterThanOrEqual(BOAT.margin - 1e-6);
+  });
+  test("full ahead at 12 kn, and at x4, never passes through the コの字岸壁 or the shore under かなえ大橋", () => {
+    const ram = (x, z, yaw, boost) => {
+      let s = { ...boatState(x, z, yaw), u: BOAT.vMax, eng: 1, tc: boost ? BOAT.boostX : 1 };
+      expect(hullClearance(s).d).toBeGreaterThan(BOAT.margin);
+      let minD = Infinity;
+      for (let i = 0; i < 800; i++) {
+        s = sailStep(s, { throttle: 1, rudder: 0, boost }, 0.05);
+        minD = Math.min(minD, hullClearance(s).d);
+      }
+      expect(minD).toBeGreaterThanOrEqual(BOAT.margin - 1e-6);
+      expect(minD).toBeLessThan(BOAT.margin + 0.75);   // she met the fenders, she did not stop short or tunnel
+    };
+    ram(BERTH.x + 40, BERTH.z - 60, BERTH.yaw - 0.45, false);
+    ram(BERTH.x + 40, BERTH.z - 60, BERTH.yaw - 0.45, true);
+    const K = KANAE_CROSSING, e = 4;
+    let gx = L.shoreDist(K.x + e, K.z) - L.shoreDist(K.x - e, K.z);
+    let gz = L.shoreDist(K.x, K.z + e) - L.shoreDist(K.x, K.z - e);
+    const gl = Math.hypot(gx, gz) || 1; gx /= gl; gz /= gl;
+    const yaw = Math.atan2(-gx, -gz);   // bow down the gradient, into the bank
+    let x = K.x + gx * 12, z = K.z + gz * 12;
+    for (let i = 0; i < 30 && hullClearance({ ...boatState(x, z, yaw), u: BOAT.vMax }).d < BOAT.margin + 2; i++) { x += gx * 3; z += gz * 3; }
+    ram(x, z, yaw, false);
+    ram(x, z, yaw, true);
   });
 });
 
@@ -276,10 +344,11 @@ describe("route: the コの字岸壁 berth and OUTBOUND", () => {
 
 describe("autopilot (pure pursuit on OUTBOUND)", () => {
   test("berth to bay mouth: events in order, never near the shore, on the line", () => {
-    let s = boatState(), prog = 0, t = 0, worst = Infinity, xte = 0, maxRudderEarly = 0;
+    let s = boatState(), prog = 0, t = 0, worst = Infinity, xte = 0, maxRudderEarly = 0, rec = null, backed = false;
     const fired = new Set(), evs = [];
     for (let i = 0; i < 20000 && !fired.has("arrived"); i++) {
-      const ap = pursue(OUTBOUND_PATH, s, prog);
+      const ap = pursue(OUTBOUND_PATH, s, prog, BOAT, AUTO, rec, 0.1);
+      rec = ap.rec; backed ||= !!rec?.backing;
       if (prog < AUTO.straightUntil) maxRudderEarly = Math.max(maxRudderEarly, Math.abs(ap.rudder));
       const prev = s;
       s = sailStep(s, ap, 0.1); t += 0.1;
@@ -292,6 +361,8 @@ describe("autopilot (pure pursuit on OUTBOUND)", () => {
     expect(evs[0].between).toBe(true);
     expect(worst).toBeGreaterThanOrEqual(BOAT.margin);
     expect(xte).toBeLessThan(30);
+    expect(xte).toBeLessThan(AUTO.towXte);    // inside the tow threshold the whole way: no tow
+    expect(backed).toBe(false);
     expect(maxRudderEarly).toBe(0);           // straight off the quay first (her stern would swing into it)
     expect(t).toBeLessThan(20 * 60);          // the x4 bay transit: berth to sea in under 20 min
     expect(Math.abs(s.u)).toBeLessThan(BOAT.vMax);
@@ -406,26 +477,29 @@ describe("autopilot near the start: lost off the line (B1), and the tow-assist (
     expect(hullClearance(sail.boat).d).toBeGreaterThan(5);
     sail.dispose();
   });
-  test("B2: in the mid-harbour pocket (x 459, z 155; s 215, xte 107) back-and-fill alone does not free her, the tow-assist does within 60 s", () => {
-    const old = AUTO.towAfter; AUTO.towAfter = 1e9;
+  test("B2: the mid-harbour pocket (x 459, z 155) — at 12 kn she backs clear if the tow is held off, and the tow still picks her up inside a minute", () => {
+    const old = AUTO.towAfter;
+    AUTO.towAfter = 1e9;
     try {
       const ctx = mkCtx(), sail = createSail(ctx, {});
       sail.enter({ x: 459, z: 155, yaw: -50 * Math.PI / 180, autopilot: true });
       for (let i = 0; i < 20 * 120; i++) sail.update(0.05);
-      expect(sail.state.xte).toBeGreaterThan(60);   // the reported failure: still 100 m off the line
       expect(sail.state.towed).toBe(0);
+      expect(Math.abs(sail.state.xte)).toBeLessThan(30);
+      expect(sail.state.s).toBeGreaterThan(400);
       sail.dispose();
     } finally { AUTO.towAfter = old; }
     const ctx = mkCtx(), sail = createSail(ctx, {});
     sail.enter({ x: 459, z: 155, yaw: -50 * Math.PI / 180, autopilot: true });
-    for (let i = 0; i < 20 * 60; i++) sail.update(0.05);
-    expect(sail.state.towed).toBe(1);
+    let towedAt = null;
+    for (let i = 0; i < 20 * 90; i++) {
+      sail.update(0.05);
+      if (towedAt == null && sail.state.towed >= 1) towedAt = i * 0.05;
+    }
+    expect(towedAt).not.toBeNull();
+    expect(towedAt).toBeLessThan(60);
     expect(Math.abs(sail.state.xte)).toBeLessThan(40);
-    expect(sail.state.contact).toBe(0);
-    expect(sail.state.u).toBeGreaterThan(1);
-    for (let i = 0; i < 20 * 120; i++) sail.update(0.05);
-    expect(sail.state.s).toBeGreaterThan(400);    // and she carries on down the route
-    expect(sail.state.towed).toBe(1);
+    expect(sail.state.s).toBeGreaterThan(400);
     sail.dispose();
   });
   test("B2: the tow-assist never fires on a clean run off the quay, or while the helm has her", () => {

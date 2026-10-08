@@ -22,18 +22,19 @@ import DATA from '../../../data/ui-touch-i18n.json';
 import { pickLang } from './i18n.js';
 import { CSS as PAD_CSS } from './touchpad-style.js';
 import { interruptFlight } from './veil.js';   // [ui-a2] a touch while the pad is out of the way for a flight ends the flight (tour.skip), it does not wait it out
+import { clampSpeed, parsePad, setLook, touchLook, setSheetBlocked, lookControlsHTML, fillLookSheet, bindLookKeys, onLookEscape, openDesktopLook, closeDesktopLook, desktopLookOpen } from './look-settings.js';
 
 // ------------------------------------------------------------------ pure parts (bun test: test/mobile-pad.test.js)
 /** The stick: 56 CSS px of travel (scaled on small screens), a 12 % dead zone, full walk at 80 % (`full`), RUN past 85 % of the travel. */
 export const STICK = { travel: 56, deadZone: 0.12, full: 0.8, runAt: 0.85, runHysteresis: 0.05, base: 8, knob: 52 };
-/** Look: radians per CSS px (0.008 = about 85 degrees for a 190 px swipe, the Genshin / PUBG feel; the slider scales it 0.5 to 1.8),
- *  a light smoothing (time constant, s) and the safe pitch limit. */
+/** Look: radians per CSS px (0.008 = about 85 degrees for a 190 px swipe, the Genshin / PUBG feel). The shared look speed
+ *  (ui/look-settings.js, 0.3 to 2.5, default 1) scales it. tau is the smoothing time constant, s; pitchMax is the safe limit. */
 export const LOOK = { sens: 0.008, tau: 0.035, pitchMax: 80 * Math.PI / 180 };
 /** The arc: sizes and gaps in CSS px at scale 1; every button is at least 56 px. */
 export const BTN = { primary: 76, size: 60, min: 56, ring: 92, gap: 12 };
 export const IDLE_MS = 4000, IDLE_OPACITY = 0.35;
 export const STORE_KEY = 'klc.pad.v1';
-export const DEFAULTS = { leftHanded: false, invertY: false, sens: 1, coach: false };
+export const DEFAULTS = { leftHanded: false, invertY: false, sens: 1, speed: 1, coach: false };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 /**
@@ -141,11 +142,7 @@ export function touchEnabled(search = '', { coarse = false, touched = false } = 
   return !!(coarse || touched);
 }
 
-export function loadSettings(raw) {
-  let o = {};
-  try { o = JSON.parse(raw) || {}; } catch { /* first run */ }
-  return { leftHanded: !!o.leftHanded, invertY: !!o.invertY, sens: clamp(Number(o.sens) || 1, 0.5, 1.8), coach: !!o.coach };
-}
+export function loadSettings(raw) { return parsePad(raw); }
 
 // ------------------------------------------------------------------ icons (stroke style of ui/hud.js)
 const svg = (d, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${d}</svg>`;
@@ -216,6 +213,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     set(o) { try { win.localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch { /* private mode */ } },
   };
   pad.settings = loadSettings(store.get());
+  setLook({ speed: pad.settings.speed, invertY: pad.settings.invertY }, { persist: false });
   const held = new Set(), toggled = new Set();
   const suppress = new Set();
   const services = () => ctx?.services || {};
@@ -324,11 +322,8 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
         <div class="topbar ctl">
           <div class="chip" role="group"></div>
           <button class="gear" type="button" data-act="settings">${ICONS.sliders}</button>
-          <section class="settings" hidden>
-            <h4></h4>
-            <div class="row"><span><b data-t="touch.settings.lefty"></b><small data-t="touch.settings.lefty.hint"></small></span><button type="button" role="switch" class="sw" data-set="leftHanded"><i></i></button></div>
-            <div class="row"><span><b data-t="touch.settings.invertY"></b></span><button type="button" role="switch" class="sw" data-set="invertY"><i></i></button></div>
-            <div class="row col"><span><b data-t="touch.settings.sens"></b><output></output></span><input type="range" min="0.5" max="1.8" step="0.05" data-set="sens"></div>
+          <section class="settings" hidden role="dialog" aria-modal="true" aria-labelledby="klc-pad-set-title">
+            ${lookControlsHTML('klc-pad-set-title')}
           </section>
         </div>
         <div class="cluster ctl"></div>
@@ -359,9 +354,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   }
   function syncSettingsUi() {
     if (!root) return;
-    for (const b of root.querySelectorAll('.sw')) b.setAttribute('aria-checked', String(!!pad.settings[b.dataset.set]));
-    const r = root.querySelector('input[data-set="sens"]'); if (r) { r.value = String(pad.settings.sens); r.setAttribute('aria-label', tr('touch.settings.sens')); }
-    const o = root.querySelector('.settings output'); if (o) o.textContent = '×' + pad.settings.sens.toFixed(2);
+    fillLookSheet(settingsEl, tr, pad.settings);
     root.dataset.hand = pad.settings.leftHanded ? 'left' : 'right';
   }
   function currentButtons() { return modes.get(pad.mode)?.buttons || []; }
@@ -567,7 +560,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     const s = touches.get(t.identifier); if (!s) return;
     if (s.role === 'stick') moveStick(t);
     else {
-      const d = lookDelta(t.clientX - s.x, t.clientY - s.y, { mult: pad.settings.sens, invertY: pad.settings.invertY });
+      const d = touchLook(t.clientX - s.x, t.clientY - s.y);
       acc.dx += d.dx; acc.dy += d.dy; s.x = t.clientX; s.y = t.clientY;
     }
   }
@@ -620,10 +613,18 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     if (!settingsEl) return;
     settingsEl.hidden = !open; gearBtn?.setAttribute('aria-expanded', String(!!open));
     doc.body.classList.toggle('klc-pad-set', !!open);
+    try { doc.querySelector('#klc-ui [data-act="padset"]')?.setAttribute('aria-expanded', String(!!open)); } catch { /* no hud */ }
+    setSheetBlocked(!!open, doc);
+    if (open) { syncSettingsUi(); try { settingsEl.querySelector('input[type="range"]')?.focus?.(); } catch { /* */ } }
   }
   function setSetting(k, v) {
-    pad.settings[k] = k === 'sens' ? clamp(Number(v) || 1, 0.5, 1.8) : !!v;
-    store.set(pad.settings); syncSettingsUi(); dirty.layout = true;
+    if (k === 'sens' || k === 'speed') {
+      const speed = clampSpeed(v);
+      pad.settings.speed = speed; pad.settings.sens = speed;
+    } else pad.settings[k] = !!v;
+    store.set(pad.settings);
+    setLook({ speed: pad.settings.speed, invertY: !!pad.settings.invertY }, { persist: false });
+    syncSettingsUi(); dirty.layout = true;
     if (k === 'leftHanded') { endStick(); dirty.buttons = true; }
     emit({ type: 'settings', id: k, mode: pad.mode });
   }
@@ -662,7 +663,9 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       else if (a?.dataset.act === 'coach') dismissCoach();
       const sw = e.target.closest('.sw'); if (sw) setSetting(sw.dataset.set, !pad.settings[sw.dataset.set]);
     });
-    root.querySelector('input[data-set="sens"]').addEventListener('input', (e) => setSetting('sens', e.target.value));
+    root.querySelector('input[data-set="speed"]').addEventListener('input', (e) => setSetting('speed', e.target.value));
+    bindLookKeys(settingsEl, { doc, onClose: () => setSettingsOpen(false), onSpeed: (v) => setSetting('speed', v) });
+    onLookEscape(() => { if (settingsEl && !settingsEl.hidden) setSettingsOpen(false); });
     // [emil-ui] the settings open from the HUD's ☰ (操作設定) on a phone, so they close like any popover: a touch anywhere outside them (the scene, a button)
     doc.addEventListener('pointerdown', (e) => { if (settingsEl && !settingsEl.hidden && !e.target.closest?.('#klc-pad .settings, #klc-pad .gear, #klc-ui [data-act="padset"]')) setSettingsOpen(false); }, true);   // (操作設定 itself toggles them: hud.js)
     // iOS: a touch on a button or the chip never scrolls, zooms or fires a ghost click; the settings keep their native sliders
@@ -701,6 +704,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   let styleEl = null;
   function activate() {
     if (pad.active) return;
+    closeDesktopLook();
     pad.active = true;
     doc.body.classList.add('klc-pad'); doc.documentElement.classList.add('klc-pad-root');
     if (!styleEl) { styleEl = doc.createElement('style'); styleEl.id = 'klc-pad-css'; styleEl.textContent = PAD_CSS; doc.head.appendChild(styleEl); }
@@ -710,6 +714,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   }
   function deactivate() {
     if (!pad.active) return;
+    if (settingsEl && !settingsEl.hidden) setSettingsOpen(false);
     pad.active = false; endStick(); lookId = null; touches.clear(); grabs.clear(); acc.dx = acc.dy = 0;
     doc.body.classList.remove('klc-pad', 'klc-pad-set'); doc.documentElement.classList.remove('klc-pad-root'); root?.remove(); root = null; pad.ready = false;
   }
@@ -762,8 +767,12 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     setToggle(id, on) { id = String(id); if (on === toggled.has(id)) return; if (on) toggled.add(id); else toggled.delete(id); syncButtons(); },
     registerMode, setMode, mount, update, layout: () => { dirty.layout = true; if (root) layout(); }, takeLook, activate, deactivate, setSetting, note, showCoach, dismissCoach,
     /** [emil-ui] The touch settings popover, opened from the HUD's ☰ (操作設定): the gear no longer sits on a phone's screen. */
-    openSettings(on = true) { setSettingsOpen(!!on); },
-    get settingsOpen() { return !!settingsEl && !settingsEl.hidden; },
+    openSettings(on = true) {
+      if (!pad.active) { if (on) openDesktopLook(doc, { get: () => pad.settings, set: (k, v) => setSetting(k, v) }); else closeDesktopLook(); return; }
+      if (desktopLookOpen()) closeDesktopLook();
+      setSettingsOpen(!!on);
+    },
+    get settingsOpen() { return desktopLookOpen() || (!!settingsEl && !settingsEl.hidden); },
     suppress(reason, on = true) { if (on) suppress.add(reason); else suppress.delete(reason); },
     get suppressed() { return [...suppress]; },
     get vertical() { return (held.has('up') ? 1 : 0) - (held.has('down') ? 1 : 0); },

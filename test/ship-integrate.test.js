@@ -8,7 +8,7 @@ import * as THREE from "three";
 import * as L from "../src/anime/world/layout.js";
 import { createContext } from "../src/anime/core/ctx.js";
 import { listModules } from "../scripts/anime/registry.js";
-import { parseShipParams, nearBerth, introDone, ACT_START, PLACE, BOARD, BLOCKED_KEYS, build } from "../src/anime/world/ship/index.js";
+import { parseShipParams, nearBerth, introDone, ACT_START, PLACE, BOARD, BLOCKED_KEYS, townKeyBlocked, build } from "../src/anime/world/ship/index.js";
 import { STATES, ACT_OF } from "../src/anime/world/ship/acts.js";
 import { BERTH, KANAE_CROSSING, SHOKO } from "../src/anime/world/ship/route.js";
 import { createArrivals } from "../src/anime/world/harbor/arrivals.js";
@@ -77,6 +77,13 @@ describe("ship: boarding entry", () => {
     for (const k of ["KeyC", "KeyN", "KeyR", "Digit1", "Digit5"]) expect(BLOCKED_KEYS.has(k)).toBe(true);
     expect(BLOCKED_KEYS.has("Escape")).toBe(false);
     expect(BLOCKED_KEYS.has("KeyW")).toBe(false);   // the helm
+    // [r-hold] a voyage still swallows R (the hold never starts). On the pole boat, R is the spray tap and is left through.
+    expect(townKeyBlocked("KeyR", { voyage: true })).toBe(true);
+    expect(townKeyBlocked("KeyR", { voyage: true, fishing: true })).toBe(true);
+    expect(townKeyBlocked("KeyR", { fishing: true })).toBe(false);
+    expect(townKeyBlocked("KeyC", { fishing: true })).toBe(true);
+    expect(townKeyBlocked("KeyV", { voyage: true })).toBe(true);
+    expect(townKeyBlocked("KeyW", { voyage: true })).toBe(false);
   });
   test("strings: the chip in JA and EN", () => {
     const D = JSON.parse(read("data/ship/i18n.json"));

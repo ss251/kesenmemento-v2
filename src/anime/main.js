@@ -10,6 +10,7 @@ import { createRenderPipeline } from './core/renderer.js';
 import { createSky } from './core/sky.js';
 import { Player } from './core/player.js';
 import { createTouchpad } from './ui/touchpad.js';   // [v7:pad] floating stick, look, context buttons
+import { installHeldR, HELD_R } from './ui/holdkey.js';   // [r-hold] R resets the camera only after a hold
 import { batchStatic } from './core/batch.js';
 import { batchStatic as batchStatic2, ATLAS } from './core/batch2.js';
 import { createAudio } from './core/audio.js';
@@ -787,15 +788,17 @@ if (params.get('cam')) { try { camSpec(params.get('cam')); } catch (e) { console
   const go = $('go'); if (go) { go.disabled = false; if (window.matchMedia?.('(pointer: fine)')?.matches) go.focus({ preventScroll: true }); go.addEventListener('click', () => { if (window.__titleOnGo) window.__titleOnGo(); else start(); }); }
   canvas.addEventListener('click', () => { if (started && !ctx.services.ship?.voyage?.active) player.requestLock(); });   // [ship:integrate] the voyage UI needs the cursor
   document.addEventListener('pointerlockchange', () => { document.body.classList.toggle('locked', document.pointerLockElement === canvas); });
+  installHeldR(window);
   addEventListener('keydown', (e) => {
     if (e.code === 'Enter' && !started) { if (window.__titleOnGo) window.__titleOnGo(); else start(); }
     if (!started) return;
     if (e.code === 'KeyH') document.body.classList.toggle('noui');
     if (e.code === 'KeyM') { audio.muted = !audio.muted; const b = $('mute'); if (b) b.setAttribute('aria-pressed', String(audio.muted)); }
-    if (e.code === 'KeyR') camSpec('hero');
     if (e.code === 'Backquote') { const s = $('stats'); if (s) s.hidden = !s.hidden; }
     const v = VIEWS[e.code]; if (v) { camSpec(v.spec); showToast(v.label); }
   });
+  // [r-hold] a tap of R does nothing. A hold snaps back to the hero overview. 一本釣り owns R for 散水, so it never resets from there.
+  addEventListener(HELD_R, () => { if (!started || ctx.services.ippon?.ownsInput?.()) return; camSpec('hero'); });
   const q = $('quality');
   // [v4:phone] a forced phone keeps only the phone choice (a higher tier is what crashed iOS Safari)
   if (q && TIER.forced) for (const op of [...q.options]) if (op.value !== 'phone') op.remove();
