@@ -10,6 +10,15 @@
 // 'loaded', before the settle wait. Without it the page is measured on the intro card, and anything that waits for
 // body.playing (a URL voyage such as ?ship=1&act=2) has not started yet.
 // Phone = 390x844, DPR 3, mobile, touch (pointer: coarse), like qa3 --phone but at the real DPR.
+// texMB counts every texture reachable from a material in the scene (uploaded or not), 4 B a texel and a third more for
+// the mip chain; the budget is 240 MB (docs/ARCHITECTURE.md, "Phone texture budget"). `atlas` is the static batch's atlas
+// (pages, MB, tiles); `atlases` lists every atlas the page built (static, the walk-in interiors', one per arriving boat).
+// The arriving boats are today's 入船情報 from the live feed (data/cache/live; the saved sample when offline): each of the
+// first PHONE.arrivals boats carries its own small atlas, so texMB moves by a few MB with the day's list (the phone tier's
+// 232 -> 256 MB regression was measured with four boats): `--params fixtures=1` pins them to the saved sample feed (four
+// boats, the same on every run), and `--params atlas=square` measures one build with the old square atlas pages.
+// `--eval tools/anime/atlas-dump.js` writes the atlas inputs that test/v6-phone-budget.test.js pins
+// (test/fixtures/phone-atlas-tiles.json).
 import { join } from 'node:path';
 import { writeFileSync, createWriteStream, mkdirSync } from 'node:fs';
 import { build, serve, launch, ROOT } from './cdp.mjs';
@@ -88,7 +97,9 @@ const info = await p.eval(`(() => {
   ctx.scene.traverse((o) => { const g = o.geometry; if (!g || geos.has(g)) return; geos.add(g); for (const k in g.attributes) acc(g.attributes[k]); acc(g.index); });
   const sun = ctx.sky?.sun || null;
   return { q: ctx.quality.name, tier: ctx.quality.tier || ctx.quality.name, pixelRatio: ctx.quality.pixelRatio, msaa: ctx.quality.msaa, shadowMap: ctx.quality.shadowMap,
-    canvas: [r.domElement.width, r.domElement.height], bench, texMB: Math.round(texBytes / 1e6), bigTex: big.sort((a, b) => b[3] - a[3]).slice(0, 12), geoMB: Math.round(vtx / 1e6), geoCpuMB: Math.round(cpu / 1e6),
+    canvas: [r.domElement.width, r.domElement.height], bench, texMB: Math.round(texBytes / 1e6), texCount: seen.size, atlas: window.__stats?.batch ? { pages: window.__stats.batch.atlasPages, mb: window.__stats.batch.atlasMB, tiles: window.__stats.batch.atlasTextures } : null,   // [v6:phone-budget] the static batch's atlas (core/batch2.js)
+    atlases: (window.__atlas || []).map((a) => ({ root: a.root, tiles: a.tiles.length, pages: a.pages.map((p) => p.join('x')).join(' '), mb: Math.round(a.pages.reduce((s, p) => s + p[0] * p[1] * 4 * 1.33, 0) / 1e5) / 10 })),   // every atlas built: the static one, the interiors', each arriving boat's
+    bigTex: big.sort((a, b) => b[3] - a[3]).slice(0, 12), geoMB: Math.round(vtx / 1e6), geoCpuMB: Math.round(cpu / 1e6),
     modules: window.__stats?.modules, errors: (window.__errors || []).length, lots: window.__L?.LOTS?.length };
 })()`);
 if (arg('eval')) info.eval = await p.eval(await Bun.file(arg('eval')).text());   // extra page JS (diagnostics)

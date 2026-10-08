@@ -7,7 +7,7 @@
   300,
   -200
  ],
- "note": "太田・入沢・陣山・栄町 (north of the inner bay). Roof colours: the median roof colour per lot on Google Earth top views (imagery 2026-03-11) at ~0.32 m/px (raw/ref/earth/c2/sub/<block>/earth_top.png, registered per block and per lot), with the Earth-vs-app grading measured on asphalt removed (linear x 1/0.90, 1/0.82, 1/0.80); applied where it differs from the app by dE2000 >= 10. Everything else is hand-read from the Earth views and cited per entry.",
+ "note": "太田・入沢・陣山・栄町 (north of the inner bay). Roof colours: the median roof colour per lot on Google Earth top views (imagery 2026-03-11) at ~0.32 m/px (raw/ref/earth/c2/sub/<block>/earth_top.png, registered per block and per lot), with NO grading applied (sys:1: the colour is the raw sub-cell Earth median, 'earth' per lot in raw/ref/earth/c2/tools/roofplan.json, as c9 and c10 do; the first pass divided each channel by a per-channel cast (the median Earth/app roof ratio 0.839, 0.598, 0.671, not the asphalt gain 1/0.90, 1/0.82, 1/0.80 this note used to name), which lifted green and blue over red and gave 70 pale mint roofs where Earth shows grey and brown ones); applied where it differs from the app by dE2000 >= 10. Everything else is hand-read from the Earth views and cited per entry.",
  "sources": [
   {
    "id": "earth",
@@ -27,198 +27,192 @@
   {
    "id": "16/58540/25066/10",
    "roof": {
-    "color": "#767482"
+    "color": "#6d5b6c"
    },
-   "src": "earth: roof #767482 on the top view (sub/nw, lot 230); app #a5c7cc"
+   "src": "earth: roof #6d5b6c on the top view (sub/nw, lot 230); app #a5c7cc"
   },
   {
    "id": "16/58540/25066/11",
    "roof": {
-    "color": "#96adab"
+    "color": "#8a898f"
    },
-   "src": "earth: roof #96adab on the top view (sub/nw, lot 231); app #305c39"
+   "src": "earth: roof #8a898f on the top view (sub/nw, lot 231); app #305c39"
   },
   {
    "id": "16/58540/25066/12",
    "roof": {
-    "color": "#d2dcca"
+    "color": "#c2afa9"
    },
-   "src": "earth: roof #d2dcca on the top view (sub/nw, lot 232); app #c7bbb3"
+   "src": "earth: roof #c2afa9 on the top view (sub/nw, lot 232); app #c7bbb3"
   },
   {
    "id": "16/58540/25066/14",
    "roof": {
-    "color": "#dafbef"
+    "color": "#cac8c8"
    },
-   "src": "earth: roof #dafbef on the top view (sub/nw, lot 234); app #acc2bb"
+   "src": "earth: roof #cac8c8 on the top view (sub/nw, lot 234); app #acc2bb"
   },
   {
    "id": "16/58540/25066/15",
    "roof": {
-    "color": "#b99895"
+    "color": "#ab787c"
    },
-   "src": "earth: roof #b99895 on the top view (sub/nw, lot 235); app #f6f4ea"
+   "src": "earth: roof #ab787c on the top view (sub/nw, lot 235); app #f6f4ea"
   },
   {
    "id": "16/58540/25066/16",
    "roof": {
-    "color": "#7c888e"
+    "color": "#726b76"
    },
-   "src": "earth: roof #7c888e on the top view (sub/nw, lot 236); app #405650"
+   "src": "earth: roof #726b76 on the top view (sub/nw, lot 236); app #405650"
   },
   {
    "id": "16/58540/25066/17",
    "roof": {
-    "color": "#d2d4c0"
+    "color": "#c2a8a0"
    },
-   "src": "earth: roof #d2d4c0 on the top view (sub/nw, lot 237); app #c7bbb3"
+   "src": "earth: roof #c2a8a0 on the top view (sub/nw, lot 237); app #c7bbb3"
   },
   {
    "id": "16/58540/25066/3",
-   "roof": {
-    "color": "#647477"
-   },
-   "src": "earth: roof #647477 on the top view (sub/nw, lot 245); app #b1beaf"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (forest), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58540/25066/31",
    "roof": {
-    "color": "#d5eee3"
+    "color": "#c5bdbe"
    },
-   "src": "earth: roof #d5eee3 on the top view (sub/nw, lot 247); app #c3d0da"
+   "src": "earth: roof #c5bdbe on the top view (sub/nw, lot 247); app #c3d0da"
   },
   {
    "id": "16/58540/25066/37",
    "roof": {
-    "color": "#756274"
+    "color": "#6c4c60"
    },
-   "src": "earth: roof #756274 on the top view (sub/nw, lot 252); app #a77a71"
+   "src": "earth: roof #6c4c60 on the top view (sub/nw, lot 252); app #a77a71"
   },
   {
    "id": "16/58540/25066/38",
-   "roof": {
-    "color": "#7d858f"
-   },
-   "src": "earth: roof #7d858f on the top view (sub/nw, lot 253); app #2e4854"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (forest beside a red roof (the red roof is another lot)), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58540/25066/39",
    "roof": {
-    "color": "#d1ddca"
+    "color": "#c1b0a9"
    },
-   "src": "earth: roof #d1ddca on the top view (sub/nw, lot 254); app #b7b3ad"
+   "src": "earth: roof #c1b0a9 on the top view (sub/nw, lot 254); app #b7b3ad"
   },
   {
    "id": "16/58540/25066/6",
    "roof": {
-    "color": "#b09d9d"
+    "color": "#a37c83"
    },
-   "src": "earth: roof #b09d9d on the top view (sub/nw, lot 260); app #60545d"
+   "src": "earth: roof #a37c83 on the top view (sub/nw, lot 260); app #60545d"
   },
   {
    "id": "16/58540/25067/101",
-   "roof": {
-    "color": "#848c88"
-   },
-   "src": "earth: roof #848c88 on the top view (sub/mw, lot 265); app #465d54"
+   "remove": true,
+   "src": "earth top (c2/sub/mw) + GSI photo: scrub/forest, no roof"
   },
   {
    "id": "16/58540/25067/102",
    "roof": {
-    "color": "#7b7a80"
+    "color": "#71606a"
    },
-   "src": "earth: roof #7b7a80 on the top view (sub/mw, lot 266); app #a78f81"
+   "src": "earth: roof #71606a on the top view (sub/mw, lot 266); app #a78f81"
   },
   {
    "id": "16/58540/25067/103",
    "roof": {
-    "color": "#82a2b0"
+    "color": "#788093"
    },
-   "src": "earth: roof #82a2b0 on the top view (sub/nw, lot 267); app #5fc4d3"
+   "src": "earth: roof #788093 on the top view (sub/nw, lot 267); app #5fc4d3"
   },
   {
    "id": "16/58540/25067/104",
    "roof": {
-    "color": "#b8a7a2"
+    "color": "#aa8487"
    },
-   "src": "earth: roof #b8a7a2 on the top view (sub/nw, lot 268); app #f6f4e9"
+   "src": "earth: roof #aa8487 on the top view (sub/nw, lot 268); app #f6f4e9"
   },
   {
    "id": "16/58540/25067/106",
    "roof": {
-    "color": "#ad989b"
+    "color": "#a07881"
    },
-   "src": "earth: roof #ad989b on the top view (sub/nw, lot 270); app #907275"
+   "src": "earth: roof #a07881 on the top view (sub/nw, lot 270); app #907275"
   },
   {
    "id": "16/58540/25067/109",
    "roof": {
-    "color": "#a2c0c5"
+    "color": "#9698a5"
    },
-   "src": "earth: roof #a2c0c5 on the top view (sub/nw, lot 273); app #62999b"
+   "src": "earth: roof #9698a5 on the top view (sub/nw, lot 273); app #62999b | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a small light-grey roof (a porch or shed) beside the white building"
   },
   {
    "id": "16/58540/25067/110",
    "roof": {
-    "color": "#6d7d86"
+    "color": "#64626f"
    },
-   "src": "earth: roof #6d7d86 on the top view (sub/nw, lot 274); app #969b9a"
+   "src": "earth: roof #64626f on the top view (sub/nw, lot 274); app #969b9a"
   },
   {
    "id": "16/58540/25067/111",
    "roof": {
-    "color": "#c8a39d"
+    "color": "#b98183"
    },
-   "src": "earth: roof #c8a39d on the top view (sub/mw, lot 275); app #c07a75"
+   "src": "earth: roof #b98183 on the top view (sub/mw, lot 275); app #c07a75"
   },
   {
    "id": "16/58540/25067/113",
    "roof": {
-    "color": "#a6cad2"
+    "color": "#99a0b0"
    },
-   "src": "earth: roof #a6cad2 on the top view (sub/nw, lot 277); app #666062"
+   "src": "earth: roof #99a0b0 on the top view (sub/nw, lot 277); app #666062"
   },
   {
    "id": "16/58540/25067/116",
    "roof": {
-    "color": "#7f9797"
+    "color": "#75777e"
    },
-   "src": "earth: roof #7f9797 on the top view (sub/nw, lot 279); app #b2b7b9"
+   "src": "earth: roof #75777e on the top view (sub/nw, lot 279); app #b2b7b9"
   },
   {
    "id": "16/58540/25067/117",
    "roof": {
-    "color": "#a6a89a"
+    "color": "#998580"
    },
-   "src": "earth: roof #a6a89a on the top view (sub/mw, lot 280); app #a0c3c8"
+   "src": "earth: roof #998580 on the top view (sub/mw, lot 280); app #a0c3c8"
   },
   {
    "id": "16/58540/25067/118",
    "roof": {
-    "color": "#8f9b96"
+    "color": "#847a7d"
    },
-   "src": "earth: roof #8f9b96 on the top view (sub/mw, lot 281); app #8a6662"
+   "src": "earth: roof #847a7d on the top view (sub/mw, lot 281); app #8a6662"
   },
   {
    "id": "16/58540/25067/119",
    "roof": {
-    "color": "#a1a9a1"
+    "color": "#958686"
    },
-   "src": "earth: roof #a1a9a1 on the top view (sub/mw, lot 282); app #53657e"
+   "src": "earth: roof #958686 on the top view (sub/mw, lot 282); app #53657e"
   },
   {
    "id": "16/58540/25067/120",
    "roof": {
-    "color": "#b2cbc8"
+    "color": "#a4a1a7"
    },
-   "src": "earth: roof #b2cbc8 on the top view (sub/nw, lot 283); app #869797"
+   "src": "earth: roof #a4a1a7 on the top view (sub/nw, lot 283); app #869797"
   },
   {
    "id": "16/58540/25067/122",
    "roof": {
-    "color": "#a99994"
+    "color": "#9c797b"
    },
-   "src": "earth: roof #a99994 on the top view (sub/mw, lot 285); app #7d7f6f"
+   "src": "earth: roof #9c797b on the top view (sub/mw, lot 285); app #7d7f6f"
   },
   {
    "id": "16/58540/25067/125",
@@ -238,16 +232,16 @@
   {
    "id": "16/58540/25067/132",
    "roof": {
-    "color": "#435062"
+    "color": "#3d3e51"
    },
-   "src": "earth: roof #435062 on the top view (sub/mw, lot 292); app #826e66"
+   "src": "earth: roof #3d3e51 on the top view (sub/mw, lot 292); app #826e66"
   },
   {
    "id": "16/58540/25067/133",
    "roof": {
-    "color": "#abb6ad"
+    "color": "#9e9090"
    },
-   "src": "earth: roof #abb6ad on the top view (sub/mw, lot 293); app #f6f4e9"
+   "src": "earth: roof #9e9090 on the top view (sub/mw, lot 293); app #f6f4e9"
   },
   {
    "id": "16/58540/25067/139",
@@ -257,653 +251,655 @@
   {
    "id": "16/58540/25067/143",
    "roof": {
-    "color": "#8a9e9e"
+    "color": "#7f7d84"
    },
-   "src": "earth: roof #8a9e9e on the top view (sub/mw, lot 298); app #b3cdd7"
+   "src": "earth: roof #7f7d84 on the top view (sub/mw, lot 298); app #b3cdd7"
   },
   {
    "id": "16/58540/25067/146",
    "roof": {
-    "color": "#849394"
+    "color": "#7a747b"
    },
-   "src": "earth: roof #849394 on the top view (sub/mw, lot 301); app #3e526c"
+   "src": "earth: roof #7a747b on the top view (sub/mw, lot 301); app #3e526c"
   },
   {
    "id": "16/58540/25067/147",
    "roof": {
-    "color": "#455566"
+    "color": "#3f4254"
    },
-   "src": "earth: roof #455566 on the top view (sub/mw, lot 302); app #c2cfd5"
+   "src": "earth: roof #3f4254 on the top view (sub/mw, lot 302); app #c2cfd5"
   },
   {
    "id": "16/58540/25067/148",
    "roof": {
-    "color": "#626d79"
+    "color": "#5a5564"
    },
-   "src": "earth: roof #626d79 on the top view (sub/mw, lot 303); app #85968e"
+   "src": "earth: roof #5a5564 on the top view (sub/mw, lot 303); app #85968e | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a dark grey roof among its neighbours"
   },
   {
    "id": "16/58540/25067/150",
    "roof": {
-    "color": "#b3bab6"
+    "color": "#a59398"
    },
-   "src": "earth: roof #b3bab6 on the top view (sub/mw, lot 305); app #725749"
+   "src": "earth: roof #a59398 on the top view (sub/mw, lot 305); app #725749"
   },
   {
    "id": "16/58540/25067/152",
    "roof": {
-    "color": "#827272"
+    "color": "#78595e"
    },
-   "src": "earth: roof #827272 on the top view (sub/mw, lot 307); app #6f7065"
+   "src": "earth: roof #78595e on the top view (sub/mw, lot 307); app #6f7065"
   },
   {
    "id": "16/58540/25067/153",
    "roof": {
-    "color": "#61777d"
+    "color": "#595d68"
    },
-   "src": "earth: roof #61777d on the top view (sub/mw, lot 308); app #f6f4e9"
+   "src": "earth: roof #595d68 on the top view (sub/mw, lot 308); app #f6f4e9"
   },
   {
    "id": "16/58540/25067/154",
    "roof": {
-    "color": "#7d8e94"
+    "color": "#73707b"
    },
-   "src": "earth: roof #7d8e94 on the top view (sub/mw, lot 309); app #f6f5ea"
+   "src": "earth: roof #73707b on the top view (sub/mw, lot 309); app #f6f5ea"
   },
   {
    "id": "16/58540/25067/160",
    "roof": {
-    "color": "#defaeb"
+    "color": "#cdc7c5"
    },
-   "src": "earth: roof #defaeb on the top view (sub/mw, lot 315); app #dad7e2"
+   "src": "earth: roof #cdc7c5 on the top view (sub/mw, lot 315); app #dad7e2"
   },
   {
    "id": "16/58540/25067/161",
    "roof": {
-    "color": "#a1b8ba"
+    "color": "#95929b"
    },
-   "src": "earth: roof #a1b8ba on the top view (sub/mw, lot 316); app #4d6b7d"
+   "src": "earth: roof #95929b on the top view (sub/mw, lot 316); app #4d6b7d"
   },
   {
    "id": "16/58540/25067/163",
    "roof": {
-    "color": "#a8ada2"
+    "color": "#9b8987"
    },
-   "src": "earth: roof #a8ada2 on the top view (sub/mw, lot 318); app #a19a99"
+   "src": "earth: roof #9b8987 on the top view (sub/mw, lot 318); app #a19a99"
   },
   {
    "id": "16/58540/25067/165",
    "roof": {
-    "color": "#6f757b"
+    "color": "#665c66"
    },
-   "src": "earth: roof #6f757b on the top view (sub/mw, lot 320); app #415f70"
+   "src": "earth: roof #665c66 on the top view (sub/mw, lot 320); app #415f70"
   },
   {
    "id": "16/58540/25067/167",
    "roof": {
-    "color": "#b29b95"
+    "color": "#a47a7c"
    },
-   "src": "earth: roof #b29b95 on the top view (sub/mw, lot 322); app #3d5767"
+   "src": "earth: roof #a47a7c on the top view (sub/mw, lot 322); app #3d5767"
   },
   {
    "id": "16/58540/25067/168",
    "roof": {
-    "color": "#656d82"
+    "color": "#5d556c"
    },
-   "src": "earth: roof #656d82 on the top view (sub/mw, lot 323); app #a4b6c1"
+   "src": "earth: roof #5d556c on the top view (sub/mw, lot 323); app #a4b6c1"
   },
   {
    "id": "16/58540/25067/169",
    "roof": {
-    "color": "#adc3b4"
+    "color": "#a09b96"
    },
-   "src": "earth: roof #adc3b4 on the top view (sub/mw, lot 324); app #cac4b5"
+   "src": "earth: roof #a09b96 on the top view (sub/mw, lot 324); app #cac4b5"
   },
   {
    "id": "16/58540/25067/170",
    "roof": {
-    "color": "#968f8e"
+    "color": "#8a7176"
    },
-   "src": "earth: roof #968f8e on the top view (sub/mw, lot 325); app #7492a3"
+   "src": "earth: roof #8a7176 on the top view (sub/mw, lot 325); app #7492a3"
   },
   {
    "id": "16/58540/25067/173",
    "roof": {
-    "color": "#37485f"
+    "color": "#32374e"
    },
-   "src": "earth: roof #37485f on the top view (sub/mw, lot 328); app #a7827d"
+   "src": "earth: roof #32374e on the top view (sub/mw, lot 328); app #a7827d"
   },
   {
    "id": "16/58540/25067/175",
    "roof": {
-    "color": "#66757f"
+    "color": "#5e5c69"
    },
-   "src": "earth: roof #66757f on the top view (sub/mw, lot 329); app #7d7374"
+   "src": "earth: roof #5e5c69 on the top view (sub/mw, lot 329); app #7d7374"
   },
   {
    "id": "16/58540/25067/176",
    "roof": {
-    "color": "#9e8e90"
+    "color": "#927078"
    },
-   "src": "earth: roof #9e8e90 on the top view (sub/mw, lot 330); app #6f5d62"
+   "src": "earth: roof #927078 on the top view (sub/mw, lot 330); app #6f5d62"
   },
   {
    "id": "16/58540/25067/179",
    "roof": {
-    "color": "#35414f"
+    "color": "#303241"
    },
-   "src": "earth: roof #35414f on the top view (sub/mw, lot 332); app #cac6bb"
+   "src": "earth: roof #303241 on the top view (sub/mw, lot 332); app #cac6bb"
   },
   {
    "id": "16/58540/25067/180",
    "roof": {
-    "color": "#a2c1c2"
+    "color": "#9699a2"
    },
-   "src": "earth: roof #a2c1c2 on the top view (sub/mw, lot 333); app #608089"
+   "src": "earth: roof #9699a2 on the top view (sub/mw, lot 333); app #608089"
   },
   {
    "id": "16/58540/25067/183",
    "roof": {
-    "color": "#90b1a6"
+    "color": "#858c8a"
    },
-   "src": "earth: roof #90b1a6 on the top view (sub/mw, lot 336); app #96928e"
+   "src": "earth: roof #858c8a on the top view (sub/mw, lot 336); app #96928e"
   },
   {
    "id": "16/58540/25067/184",
    "roof": {
-    "color": "#b4cdc9"
+    "color": "#a6a3a8"
    },
-   "src": "earth: roof #b4cdc9 on the top view (sub/mw, lot 337); app #b3b4b1"
+   "src": "earth: roof #a6a3a8 on the top view (sub/mw, lot 337); app #b3b4b1"
   },
   {
    "id": "16/58540/25067/185",
    "roof": {
-    "color": "#a8c0bd"
+    "color": "#9b989e"
    },
-   "src": "earth: roof #a8c0bd on the top view (sub/mw, lot 338); app #9c969c"
+   "src": "earth: roof #9b989e on the top view (sub/mw, lot 338); app #9c969c"
   },
   {
    "id": "16/58540/25067/186",
    "roof": {
-    "color": "#ddeedf"
+    "color": "#ccbdbb"
    },
-   "src": "earth: roof #ddeedf on the top view (sub/mw, lot 339); app #bad4e2"
+   "src": "earth: roof #ccbdbb on the top view (sub/mw, lot 339); app #bad4e2"
   },
   {
    "id": "16/58540/25067/187",
    "roof": {
-    "color": "#aab1aa"
+    "color": "#9d8c8e"
    },
-   "src": "earth: roof #aab1aa on the top view (sub/mw, lot 340); app #9cd0c9"
+   "src": "earth: roof #9d8c8e on the top view (sub/mw, lot 340); app #9cd0c9"
   },
   {
    "id": "16/58540/25067/189",
    "roof": {
-    "color": "#7c8990"
+    "color": "#726c78"
    },
-   "src": "earth: roof #7c8990 on the top view (sub/mw, lot 342); app #a9bfbc"
+   "src": "earth: roof #726c78 on the top view (sub/mw, lot 342); app #a9bfbc"
   },
   {
    "id": "16/58540/25067/190",
    "roof": {
-    "color": "#7c8e90"
+    "color": "#727078"
    },
-   "src": "earth: roof #7c8e90 on the top view (sub/mw, lot 343); app #cbc3c5"
+   "src": "earth: roof #727078 on the top view (sub/mw, lot 343); app #cbc3c5"
   },
   {
    "id": "16/58540/25067/191",
    "roof": {
-    "color": "#aa9c9d"
+    "color": "#9d7b83"
    },
-   "src": "earth: roof #aa9c9d on the top view (sub/mw, lot 344); app #dce1e4"
+   "src": "earth: roof #9d7b83 on the top view (sub/mw, lot 344); app #dce1e4"
   },
   {
    "id": "16/58540/25067/192",
    "roof": {
-    "color": "#ffffff"
+    "color": "#faf2f0"
    },
-   "src": "earth: roof #ffffff on the top view (sub/mw, lot 345); app #a2b0aa"
+   "src": "earth: roof #faf2f0 on the top view (sub/mw, lot 345); app #a2b0aa"
   },
   {
    "id": "16/58540/25067/195",
    "roof": {
-    "color": "#9ca3a3"
+    "color": "#908188"
    },
-   "src": "earth: roof #9ca3a3 on the top view (sub/mw, lot 348); app #365058"
+   "src": "earth: roof #908188 on the top view (sub/mw, lot 348); app #365058"
   },
   {
    "id": "16/58540/25067/198",
    "roof": {
-    "color": "#62747b"
+    "color": "#5a5b66"
    },
-   "src": "earth: roof #62747b on the top view (sub/mw, lot 351); app #3d525f"
+   "src": "earth: roof #5a5b66 on the top view (sub/mw, lot 351); app #3d525f"
   },
   {
    "id": "16/58540/25067/199",
    "roof": {
-    "color": "#91a8ad"
+    "color": "#868590"
    },
-   "src": "earth: roof #91a8ad on the top view (sub/mw, lot 352); app #57879d"
+   "src": "earth: roof #868590 on the top view (sub/mw, lot 352); app #57879d"
   },
   {
    "id": "16/58540/25067/205",
    "roof": {
-    "color": "#9b858a"
+    "color": "#8f6973"
    },
-   "src": "earth: roof #9b858a on the top view (sub/mw, lot 358); app #b98d7f"
+   "src": "earth: roof #8f6973 on the top view (sub/mw, lot 358); app #b98d7f"
   },
   {
    "id": "16/58540/25067/206",
    "roof": {
-    "color": "#ccbdb5"
+    "color": "#bd9697"
    },
-   "src": "earth: roof #ccbdb5 on the top view (sub/mw, lot 359); app #4a465a"
+   "src": "earth: roof #bd9697 on the top view (sub/mw, lot 359); app #4a465a"
   },
   {
    "id": "16/58540/25067/207",
    "roof": {
-    "color": "#92948c"
+    "color": "#877574"
    },
-   "src": "earth: roof #92948c on the top view (sub/mw, lot 360); app #ede8d8"
+   "src": "earth: roof #877574 on the top view (sub/mw, lot 360); app #ede8d8"
   },
   {
    "id": "16/58540/25067/209",
    "roof": {
-    "color": "#d3b7b1"
+    "color": "#c39194"
    },
-   "src": "earth: roof #d3b7b1 on the top view (sub/sw, lot 362); app #b68988"
+   "src": "earth: roof #c39194 on the top view (sub/sw, lot 362); app #b68988"
   },
   {
    "id": "16/58540/25067/210",
    "roof": {
-    "color": "#a2aeb3"
+    "color": "#968a95"
    },
-   "src": "earth: roof #a2aeb3 on the top view (sub/sw, lot 363); app #71868f"
+   "src": "earth: roof #968a95 on the top view (sub/sw, lot 363); app #71868f"
   },
   {
    "id": "16/58540/25067/211",
    "roof": {
-    "color": "#728387"
+    "color": "#696770"
    },
-   "src": "earth: roof #728387 on the top view (sub/sw, lot 364); app #725849"
+   "src": "earth: roof #696770 on the top view (sub/sw, lot 364); app #725849"
   },
   {
    "id": "16/58540/25067/212",
    "roof": {
-    "color": "#8f9c90"
+    "color": "#847b78"
    },
-   "src": "earth: roof #8f9c90 on the top view (sub/sw, lot 365); app #e3eeec"
+   "src": "earth: roof #847b78 on the top view (sub/sw, lot 365); app #e3eeec"
   },
   {
    "id": "16/58540/25067/214",
    "roof": {
-    "color": "#dcf8ee"
+    "color": "#cbc5c7"
    },
-   "src": "earth: roof #dcf8ee on the top view (sub/mw, lot 366); app #d7dfe4"
+   "src": "earth: roof #cbc5c7 on the top view (sub/mw, lot 366); app #d7dfe4"
   },
   {
    "id": "16/58540/25067/218",
    "roof": {
-    "color": "#9fa796"
+    "color": "#93847d"
    },
-   "src": "earth: roof #9fa796 on the top view (sub/sw, lot 369); app #725749"
+   "src": "earth: roof #93847d on the top view (sub/sw, lot 369); app #725749"
   },
   {
    "id": "16/58540/25067/219",
    "roof": {
-    "color": "#aaaea0"
+    "color": "#9d8a85"
    },
-   "src": "earth: roof #aaaea0 on the top view (sub/sw, lot 370); app #435472"
+   "src": "earth: roof #9d8a85 on the top view (sub/sw, lot 370); app #435472"
   },
   {
    "id": "16/58540/25067/222",
    "roof": {
-    "color": "#42535d"
+    "color": "#3c404d"
    },
-   "src": "earth: roof #42535d on the top view (sub/sw, lot 372); app #849694"
+   "src": "earth: roof #3c404d on the top view (sub/sw, lot 372); app #849694"
   },
   {
    "id": "16/58540/25067/231",
    "roof": {
-    "color": "#738a9a"
+    "color": "#6a6d80"
    },
-   "src": "earth: roof #738a9a on the top view (sub/sw, lot 380); app #70a3ab"
+   "src": "earth: roof #6a6d80 on the top view (sub/sw, lot 380); app #70a3ab"
   },
   {
    "id": "16/58540/25067/232",
    "roof": {
-    "color": "#b9cdcb"
+    "color": "#aba3aa"
    },
-   "src": "earth: roof #b9cdcb on the top view (sub/sw, lot 381); app #bbbfca"
+   "src": "earth: roof #aba3aa on the top view (sub/sw, lot 381); app #bbbfca"
   },
   {
    "id": "16/58540/25067/233",
    "roof": {
-    "color": "#89949e"
+    "color": "#7e7584"
    },
-   "src": "earth: roof #89949e on the top view (sub/sw, lot 382); app #5d7b80"
+   "src": "earth: roof #7e7584 on the top view (sub/sw, lot 382); app #5d7b80"
   },
   {
    "id": "16/58540/25067/234",
    "roof": {
-    "color": "#61646e"
+    "color": "#594e5b"
    },
-   "src": "earth: roof #61646e on the top view (sub/sw, lot 383); app #837879"
+   "src": "earth: roof #594e5b on the top view (sub/sw, lot 383); app #837879"
   },
   {
    "id": "16/58540/25067/236",
    "roof": {
-    "color": "#a6c3ca"
+    "color": "#999ba9"
    },
-   "src": "earth: roof #a6c3ca on the top view (sub/sw, lot 385); app #48bcdc"
+   "src": "earth: roof #999ba9 on the top view (sub/sw, lot 385); app #48bcdc"
   },
   {
    "id": "16/58540/25067/238",
    "roof": {
-    "color": "#50606d"
+    "color": "#494b5a"
    },
-   "src": "earth: roof #50606d on the top view (sub/sw, lot 387); app #443f44"
+   "src": "earth: roof #494b5a on the top view (sub/sw, lot 387); app #443f44"
   },
   {
    "id": "16/58540/25067/240",
    "roof": {
-    "color": "#848387"
+    "color": "#7a6770"
    },
-   "src": "earth: roof #848387 on the top view (sub/sw, lot 389); app #c0d1d7"
+   "src": "earth: roof #7a6770 on the top view (sub/sw, lot 389); app #c0d1d7"
   },
   {
    "id": "16/58540/25067/241",
    "roof": {
-    "color": "#afa8a3"
+    "color": "#a28588"
    },
-   "src": "earth: roof #afa8a3 on the top view (sub/sw, lot 390); app #a77a71"
+   "src": "earth: roof #a28588 on the top view (sub/sw, lot 390); app #a77a71"
   },
   {
    "id": "16/58540/25067/242",
    "roof": {
-    "color": "#8ca1a7"
+    "color": "#817f8b"
    },
-   "src": "earth: roof #8ca1a7 on the top view (sub/sw, lot 391); app #576475"
+   "src": "earth: roof #817f8b on the top view (sub/sw, lot 391); app #576475"
   },
   {
    "id": "16/58540/25067/245",
    "roof": {
-    "color": "#434460"
+    "color": "#3d344f"
    },
-   "src": "earth: roof #434460 on the top view (sub/sw, lot 394); app #394d5d"
+   "src": "earth: roof #3d344f on the top view (sub/sw, lot 394); app #394d5d"
   },
   {
    "id": "16/58540/25067/247",
    "roof": {
-    "color": "#978e8f"
+    "color": "#8b7077",
+    "shape": "gable",
+    "ridge": "x"
    },
-   "src": "earth: roof #978e8f on the top view (sub/sw, lot 396); app #7a6864"
+   "src": "earth: roof #8b7077 on the top view (sub/sw, lot 396); app #7a6864 | [r3] roof shape: earth: top view rectified at 12 px/m (round 3 systemic 6): a gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
   },
   {
    "id": "16/58540/25067/249",
    "roof": {
-    "color": "#d6f6e6"
+    "color": "#c6c4c1"
    },
-   "src": "earth: roof #d6f6e6 on the top view (sub/sw, lot 398); app #b8c9d3"
+   "src": "earth: roof #c6c4c1 on the top view (sub/sw, lot 398); app #b8c9d3"
   },
   {
    "id": "16/58540/25067/250",
    "roof": {
-    "color": "#8b999a"
+    "color": "#807980"
    },
-   "src": "earth: roof #8b999a on the top view (sub/sw, lot 399); app #f5f1ee"
+   "src": "earth: roof #807980 on the top view (sub/sw, lot 399); app #f5f1ee"
   },
   {
    "id": "16/58540/25067/253",
    "roof": {
-    "color": "#8d8e8e"
+    "color": "#827076"
    },
-   "src": "earth: roof #8d8e8e on the top view (sub/sw, lot 402); app #5e7364"
+   "src": "earth: roof #827076 on the top view (sub/sw, lot 402); app #5e7364"
   },
   {
    "id": "16/58540/25067/256",
    "roof": {
-    "color": "#9fa79e"
+    "color": "#938484"
    },
-   "src": "earth: roof #9fa79e on the top view (sub/sw, lot 405); app #d7dfe9"
+   "src": "earth: roof #938484 on the top view (sub/sw, lot 405); app #d7dfe9"
   },
   {
    "id": "16/58540/25067/257",
    "roof": {
-    "color": "#87777f"
+    "color": "#7c5d69"
    },
-   "src": "earth: roof #87777f on the top view (sub/sw, lot 406); app #929b9a"
+   "src": "earth: roof #7c5d69 on the top view (sub/sw, lot 406); app #929b9a"
   },
   {
    "id": "16/58540/25067/258",
    "roof": {
-    "color": "#846a74"
+    "color": "#7a5360"
    },
-   "src": "earth: roof #846a74 on the top view (sub/sw, lot 407); app #b78281"
+   "src": "earth: roof #7a5360 on the top view (sub/sw, lot 407); app #b78281"
   },
   {
    "id": "16/58540/25067/260",
    "roof": {
-    "color": "#aac1ca"
+    "color": "#9d99a9"
    },
-   "src": "earth: roof #aac1ca on the top view (sub/sw, lot 409); app #37c4ef"
+   "src": "earth: roof #9d99a9 on the top view (sub/sw, lot 409); app #37c4ef"
   },
   {
    "id": "16/58540/25067/261",
    "roof": {
-    "color": "#def9e9"
+    "color": "#cdc6c3"
    },
-   "src": "earth: roof #def9e9 on the top view (sub/sw, lot 410); app #bed8e4"
+   "src": "earth: roof #cdc6c3 on the top view (sub/sw, lot 410); app #bed8e4"
   },
   {
    "id": "16/58540/25067/266",
    "roof": {
-    "color": "#c9aca4"
+    "color": "#ba8889"
    },
-   "src": "earth: roof #c9aca4 on the top view (sub/sw, lot 414); app #9f7276"
+   "src": "earth: roof #ba8889 on the top view (sub/sw, lot 414); app #9f7276"
   },
   {
    "id": "16/58540/25067/267",
    "roof": {
-    "color": "#909394"
+    "color": "#85747b"
    },
-   "src": "earth: roof #909394 on the top view (sub/sw, lot 1); app #8a7a7a"
+   "src": "earth: roof #85747b on the top view (sub/sw, lot 1); app #8a7a7a"
   },
   {
    "id": "16/58540/25067/270",
    "roof": {
-    "color": "#4a5e73"
+    "color": "#44495f"
    },
-   "src": "earth: roof #4a5e73 on the top view (sub/sw, lot 3); app #aac8d2"
+   "src": "earth: roof #44495f on the top view (sub/sw, lot 3); app #aac8d2"
   },
   {
    "id": "16/58540/25067/271",
    "roof": {
-    "color": "#bbc8c1"
+    "color": "#ad9fa1"
    },
-   "src": "earth: roof #bbc8c1 on the top view (sub/sw, lot 4); app #f5f3e7"
+   "src": "earth: roof #ad9fa1 on the top view (sub/sw, lot 4); app #f5f3e7"
   },
   {
    "id": "16/58540/25067/275",
    "roof": {
-    "color": "#bcdfdc"
+    "color": "#aeb1b8"
    },
-   "src": "earth: roof #bcdfdc on the top view (sub/mw, lot 416); app #85bfc9"
+   "src": "earth: roof #aeb1b8 on the top view (sub/mw, lot 416); app #85bfc9"
   },
   {
    "id": "16/58540/25067/281",
    "roof": {
-    "color": "#a1aea9"
+    "color": "#958a8d"
    },
-   "src": "earth: roof #a1aea9 on the top view (sub/mw, lot 422); app #f7f5ea"
+   "src": "earth: roof #958a8d on the top view (sub/mw, lot 422); app #f7f5ea"
   },
   {
    "id": "16/58540/25067/282",
    "roof": {
-    "color": "#c9a099"
+    "color": "#ba7e7f"
    },
-   "src": "earth: roof #c9a099 on the top view (sub/mw, lot 423); app #ac7e82"
+   "src": "earth: roof #ba7e7f on the top view (sub/mw, lot 423); app #ac7e82"
   },
   {
    "id": "16/58540/25067/285",
    "roof": {
-    "color": "#b9d0ce"
+    "color": "#aba5ac"
    },
-   "src": "earth: roof #b9d0ce on the top view (sub/mw, lot 426); app #f6f4e9"
+   "src": "earth: roof #aba5ac on the top view (sub/mw, lot 426); app #f6f4e9"
   },
   {
    "id": "16/58540/25067/286",
    "roof": {
-    "color": "#d9e6dd"
+    "color": "#c9b7b9"
    },
-   "src": "earth: roof #d9e6dd on the top view (sub/mw, lot 427); app #aa8286"
+   "src": "earth: roof #c9b7b9 on the top view (sub/mw, lot 427); app #aa8286"
   },
   {
    "id": "16/58540/25067/289",
    "roof": {
-    "color": "#687074"
+    "color": "#605860"
    },
-   "src": "earth: roof #687074 on the top view (sub/sw, lot 429); app #455d54"
+   "src": "earth: roof #605860 on the top view (sub/sw, lot 429); app #455d54"
   },
   {
    "id": "16/58540/25067/290",
    "roof": {
-    "color": "#767980"
+    "color": "#6d5f6a"
    },
-   "src": "earth: roof #767980 on the top view (sub/sw, lot 430); app #8b9d8f"
+   "src": "earth: roof #6d5f6a on the top view (sub/sw, lot 430); app #8b9d8f"
   },
   {
    "id": "16/58540/25067/292",
    "roof": {
-    "color": "#83a0a6"
+    "color": "#797e8a"
    },
-   "src": "earth: roof #83a0a6 on the top view (sub/sw, lot 432); app #8cc4d7"
+   "src": "earth: roof #797e8a on the top view (sub/sw, lot 432); app #8cc4d7"
   },
   {
    "id": "16/58540/25067/293",
    "roof": {
-    "color": "#707381"
+    "color": "#675a6b"
    },
-   "src": "earth: roof #707381 on the top view (sub/sw, lot 433); app #8a9d90"
+   "src": "earth: roof #675a6b on the top view (sub/sw, lot 433); app #8a9d90"
   },
   {
    "id": "16/58540/25067/295",
    "roof": {
-    "color": "#89989a"
+    "color": "#7e7880"
    },
-   "src": "earth: roof #89989a on the top view (sub/mw, lot 435); app #5b7071"
+   "src": "earth: roof #7e7880 on the top view (sub/mw, lot 435); app #5b7071"
   },
   {
    "id": "16/58540/25067/299",
    "roof": {
-    "color": "#314355"
+    "color": "#2d3346"
    },
-   "src": "earth: roof #314355 on the top view (sub/sw, lot 439); app #4b645a"
+   "src": "earth: roof #2d3346 on the top view (sub/sw, lot 439); app #4b645a"
   },
   {
    "id": "16/58540/25067/305",
    "roof": {
-    "color": "#b2cfcb"
+    "color": "#a4a4aa"
    },
-   "src": "earth: roof #b2cfcb on the top view (sub/mw, lot 445); app #c2d3e1"
+   "src": "earth: roof #a4a4aa on the top view (sub/mw, lot 445); app #c2d3e1"
   },
   {
    "id": "16/58540/25067/307",
    "roof": {
-    "color": "#a1ac9b"
+    "color": "#958881"
    },
-   "src": "earth: roof #a1ac9b on the top view (sub/mw, lot 447); app #bb8e89"
+   "src": "earth: roof #958881 on the top view (sub/mw, lot 447); app #bb8e89"
   },
   {
    "id": "16/58540/25067/309",
    "roof": {
-    "color": "#63737b"
+    "color": "#5b5a66"
    },
-   "src": "earth: roof #63737b on the top view (sub/mw, lot 449); app #7b8885"
+   "src": "earth: roof #5b5a66 on the top view (sub/mw, lot 449); app #7b8885"
   },
   {
    "id": "16/58540/25067/310",
    "roof": {
-    "color": "#71888c"
+    "color": "#686b74"
    },
-   "src": "earth: roof #71888c on the top view (sub/mw, lot 450); app #d7dce0"
+   "src": "earth: roof #686b74 on the top view (sub/mw, lot 450); app #d7dce0"
   },
   {
    "id": "16/58540/25067/311",
    "roof": {
-    "color": "#888f8c"
+    "color": "#7d7174"
    },
-   "src": "earth: roof #888f8c on the top view (sub/mw, lot 451); app #c4d1d3"
+   "src": "earth: roof #7d7174 on the top view (sub/mw, lot 451); app #c4d1d3"
   },
   {
    "id": "16/58540/25067/313",
    "roof": {
-    "color": "#b59194"
+    "color": "#a7727b"
    },
-   "src": "earth: roof #b59194 on the top view (sub/mw, lot 452); app #715648"
+   "src": "earth: roof #a7727b on the top view (sub/mw, lot 452); app #715648"
   },
   {
    "id": "16/58540/25067/314",
    "roof": {
-    "color": "#61817a"
+    "color": "#596565"
    },
-   "src": "earth: roof #61817a on the top view (sub/mw, lot 453); app #abc9cb"
+   "src": "earth: roof #596565 on the top view (sub/mw, lot 453); app #abc9cb"
   },
   {
    "id": "16/58540/25067/316",
    "roof": {
-    "color": "#919e96"
+    "color": "#867d7d"
    },
-   "src": "earth: roof #919e96 on the top view (sub/sw, lot 455); app #cbb2a7"
+   "src": "earth: roof #867d7d on the top view (sub/sw, lot 455); app #cbb2a7"
   },
   {
    "id": "16/58540/25067/320",
    "roof": {
-    "color": "#384556"
+    "color": "#333547"
    },
-   "src": "earth: roof #384556 on the top view (sub/sw, lot 459); app #7a6f70"
+   "src": "earth: roof #333547 on the top view (sub/sw, lot 459); app #7a6f70"
   },
   {
    "id": "16/58540/25067/321",
    "roof": {
-    "color": "#b48e8f"
+    "color": "#a67077"
    },
-   "src": "earth: roof #b48e8f on the top view (sub/sw, lot 460); app #465d55"
+   "src": "earth: roof #a67077 on the top view (sub/sw, lot 460); app #465d55"
   },
   {
    "id": "16/58540/25067/322",
    "roof": {
-    "color": "#bda8a1"
+    "color": "#af8586"
    },
-   "src": "earth: roof #bda8a1 on the top view (sub/mw, lot 461); app #b38181"
+   "src": "earth: roof #af8586 on the top view (sub/mw, lot 461); app #b38181"
   },
   {
    "id": "16/58540/25067/323",
    "roof": {
-    "color": "#7e6970"
+    "color": "#74525d"
    },
-   "src": "earth: roof #7e6970 on the top view (sub/mw, lot 462); app #b9b3ab"
+   "src": "earth: roof #74525d on the top view (sub/mw, lot 462); app #b9b3ab"
   },
   {
    "id": "16/58540/25067/324",
    "roof": {
-    "color": "#b49c90"
+    "color": "#a67b78"
    },
-   "src": "earth: roof #b49c90 on the top view (sub/mw, lot 463); app #423d42"
+   "src": "earth: roof #a67b78 on the top view (sub/mw, lot 463); app #423d42"
   },
   {
    "id": "16/58540/25067/325",
    "roof": {
-    "color": "#b9baab"
+    "color": "#ab938f"
    },
-   "src": "earth: roof #b9baab on the top view (sub/sw, lot 464); app #53627f"
+   "src": "earth: roof #ab938f on the top view (sub/sw, lot 464); app #53627f"
   },
   {
    "id": "16/58540/25067/327",
    "roof": {
-    "color": "#816d75"
+    "color": "#775561"
    },
-   "src": "earth: roof #816d75 on the top view (sub/sw, lot 466); app #a69289"
+   "src": "earth: roof #775561 on the top view (sub/sw, lot 466); app #a69289"
   },
   {
    "id": "16/58540/25067/328",
@@ -913,431 +909,424 @@
   {
    "id": "16/58540/25067/333",
    "roof": {
-    "color": "#7c878c"
+    "color": "#726a74"
    },
-   "src": "earth: roof #7c878c on the top view (sub/sw, lot 12); app #4e6079"
+   "src": "earth: roof #726a74 on the top view (sub/sw, lot 12); app #4e6079"
   },
   {
    "id": "16/58540/25067/335",
    "roof": {
-    "color": "#97acab"
+    "color": "#8b888f"
    },
-   "src": "earth: roof #97acab on the top view (sub/sw, lot 14); app #c2d4d9"
+   "src": "earth: roof #8b888f on the top view (sub/sw, lot 14); app #c2d4d9"
   },
   {
    "id": "16/58540/25067/336",
    "roof": {
-    "color": "#839494"
+    "color": "#79757b"
    },
-   "src": "earth: roof #839494 on the top view (sub/sw, lot 15); app #b7c8ca"
+   "src": "earth: roof #79757b on the top view (sub/sw, lot 15); app #b7c8ca"
   },
   {
    "id": "16/58540/25067/338",
    "roof": {
-    "color": "#334458"
+    "color": "#636370"
    },
-   "src": "earth: roof #334458 on the top view (sub/mw, lot 467); app #6f889a"
+   "src": "earth: roof #636370, mid-grey slate (roofs8922/c2_mw; sub/mw, lot 467); the earlier #2e3448 read the cast shadow"
   },
   {
    "id": "16/58540/25067/339",
    "roof": {
-    "color": "#374559"
+    "color": "#323549"
    },
-   "src": "earth: roof #374559 on the top view (sub/mw, lot 468); app #5a7378"
+   "src": "earth: roof #323549 on the top view (sub/mw, lot 468); app #5a7378"
   },
   {
    "id": "16/58540/25067/352",
    "roof": {
-    "color": "#c0d9d4"
+    "color": "#b1acb1"
    },
-   "src": "earth: roof #c0d9d4 on the top view (sub/sw, lot 18); app #5e699a"
+   "src": "earth: roof #b1acb1 on the top view (sub/sw, lot 18); app #5e699a"
+  },
+  {
+   "id": "16/58540/25067/57",
+   "remove": true,
+   "src": "earth 2026-03-11 c2/sub/mw: bare soil, no roof; GSI 2020-22: forest"
   },
   {
    "id": "16/58540/25067/58",
-   "roof": {
-    "color": "#5d7d79"
-   },
-   "src": "earth: roof #5d7d79 on the top view (sub/nw, lot 475); app #435a51"
+   "remove": true,
+   "src": "earth 2026-03-11 c2/sub/mw: bare soil, no roof; GSI 2020-22: forest. (the red roof just east of the outline is a different building)"
+  },
+  {
+   "id": "16/58540/25067/90",
+   "remove": true,
+   "src": "earth 2026-03-11 c2/sub/mw: unbroken forest, no roof; GSI 2020-22: forest"
   },
   {
    "id": "16/58540/25067/60",
    "roof": {
-    "color": "#6c7372"
+    "color": "#635a5e"
    },
-   "src": "earth: roof #6c7372 on the top view (sub/nw, lot 477); app #bdc3d8"
+   "src": "earth: roof #635a5e on the top view (sub/nw, lot 477); app #bdc3d8"
   },
   {
    "id": "16/58540/25067/61",
    "roof": {
-    "color": "#5f7c74"
+    "color": "#576160"
    },
-   "src": "earth: roof #5f7c74 on the top view (sub/nw, lot 478); app #bb8285"
+   "src": "earth: roof #576160 on the top view (sub/nw, lot 478); app #bb8285"
   },
   {
    "id": "16/58540/25067/62",
    "roof": {
-    "color": "#75737b"
+    "color": "#6c5a66"
    },
-   "src": "earth: roof #75737b on the top view (sub/nw, lot 479); app #888a82"
+   "src": "earth: roof #6c5a66 on the top view (sub/nw, lot 479); app #888a82"
   },
   {
    "id": "16/58540/25067/63",
    "roof": {
-    "color": "#98998f"
+    "color": "#8c7977"
    },
-   "src": "earth: roof #98998f on the top view (sub/nw, lot 480); app #465d55"
+   "src": "earth: roof #8c7977 on the top view (sub/nw, lot 480); app #465d55"
   },
   {
    "id": "16/58540/25067/64",
    "roof": {
-    "color": "#d9f9ee"
+    "color": "#c9c6c7"
    },
-   "src": "earth: roof #d9f9ee on the top view (sub/nw, lot 481); app #c3d3dd"
+   "src": "earth: roof #c9c6c7 on the top view (sub/nw, lot 481); app #c3d3dd"
   },
   {
    "id": "16/58540/25067/65",
    "roof": {
-    "color": "#a5a7a1"
+    "color": "#988486"
    },
-   "src": "earth: roof #a5a7a1 on the top view (sub/nw, lot 482); app #96bcbf"
+   "src": "earth: roof #988486 on the top view (sub/nw, lot 482); app #96bcbf"
   },
   {
    "id": "16/58540/25067/70",
    "roof": {
-    "color": "#c8ada9"
+    "color": "#b9898d"
    },
-   "src": "earth: roof #c8ada9 on the top view (sub/nw, lot 486); app #968e7d"
+   "src": "earth: roof #b9898d on the top view (sub/nw, lot 486); app #968e7d"
   },
   {
    "id": "16/58540/25067/73",
    "roof": {
-    "color": "#858881"
+    "color": "#7b6b6b"
    },
-   "src": "earth: roof #858881 on the top view (sub/nw, lot 489); app #a2c9c6"
+   "src": "earth: roof #7b6b6b on the top view (sub/nw, lot 489); app #a2c9c6"
   },
   {
    "id": "16/58540/25067/75",
    "roof": {
-    "color": "#bca4a6"
+    "color": "#ae828a"
    },
-   "src": "earth: roof #bca4a6 on the top view (sub/nw, lot 491); app #a0beb4"
+   "src": "earth: roof #ae828a on the top view (sub/nw, lot 491); app #a0beb4"
   },
   {
    "id": "16/58540/25067/76",
-   "roof": {
-    "color": "#908f89"
-   },
-   "src": "earth: roof #908f89 on the top view (sub/nw, lot 492); app #455c54"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (forest and a dirt track), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58540/25067/77",
    "roof": {
-    "color": "#768a91"
+    "color": "#6d6d79"
    },
-   "src": "earth: roof #768a91 on the top view (sub/nw, lot 493); app #4f6875"
-  },
-  {
-   "id": "16/58540/25067/78",
-   "roof": {
-    "color": "#587773"
-   },
-   "src": "earth: roof #587773 on the top view (sub/nw, lot 494); app #445c53"
+   "src": "earth: roof #6d6d79 on the top view (sub/nw, lot 493); app #4f6875"
   },
   {
    "id": "16/58540/25067/79",
-   "roof": {
-    "color": "#7e7f81"
-   },
-   "src": "earth: roof #7e7f81 on the top view (sub/mw, lot 495); app #4b6373"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (a red-brown dirt track), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58540/25067/80",
    "roof": {
-    "color": "#8d8c8d"
+    "color": "#826e75"
    },
-   "src": "earth: roof #8d8c8d on the top view (sub/mw, lot 496); app #b68d88"
+   "src": "earth: roof #826e75 on the top view (sub/mw, lot 496); app #b68d88"
   },
   {
    "id": "16/58540/25067/81",
    "roof": {
-    "color": "#708183"
+    "color": "#67656d"
    },
-   "src": "earth: roof #708183 on the top view (sub/nw, lot 497); app #433e44"
+   "src": "earth: roof #67656d on the top view (sub/nw, lot 497); app #433e44"
   },
   {
    "id": "16/58540/25067/83",
    "roof": {
-    "color": "#705b6a"
+    "color": "#674758"
    },
-   "src": "earth: roof #705b6a on the top view (sub/nw, lot 499); app #97dceb"
+   "src": "earth: roof #674758 on the top view (sub/nw, lot 499); app #97dceb"
   },
   {
    "id": "16/58540/25067/84",
    "roof": {
-    "color": "#796e7a"
+    "color": "#6f5665"
    },
-   "src": "earth: roof #796e7a on the top view (sub/nw, lot 500); app #b27679"
+   "src": "earth: roof #6f5665 on the top view (sub/nw, lot 500); app #b27679"
   },
   {
    "id": "16/58540/25067/85",
    "roof": {
-    "color": "#2c3a4b"
+    "color": "#282c3d"
    },
-   "src": "earth: roof #2c3a4b on the top view (sub/nw, lot 501); app #accdcb"
+   "src": "earth: roof #282c3d on the top view (sub/nw, lot 501); app #accdcb"
   },
   {
    "id": "16/58540/25067/86",
    "roof": {
-    "color": "#9baeae"
+    "color": "#8f8a91"
    },
-   "src": "earth: roof #9baeae on the top view (sub/nw, lot 502); app #f6f5ea"
+   "src": "earth: roof #8f8a91 on the top view (sub/nw, lot 502); app #f6f5ea"
   },
   {
    "id": "16/58540/25067/87",
    "roof": {
-    "color": "#97928e"
+    "color": "#8b7376"
    },
-   "src": "earth: roof #97928e on the top view (sub/nw, lot 503); app #835959"
+   "src": "earth: roof #8b7376 on the top view (sub/nw, lot 503); app #835959"
   },
   {
    "id": "16/58540/25067/88",
-   "roof": {
-    "color": "#92a49e"
-   },
-   "src": "earth: roof #92a49e on the top view (sub/nw, lot 504); app #455d54"
+   "remove": true,
+   "src": "earth 2026-03-11 c2/sub/nw: bare soil beside the track, no roof; GSI 2020-22: grass and scrub"
   },
   {
    "id": "16/58540/25067/93",
    "roof": {
-    "color": "#b9dce5"
+    "color": "#abafc0"
    },
-   "src": "earth: roof #b9dce5 on the top view (sub/mw, lot 509); app #5fc4ea"
+   "src": "earth: roof #abafc0 on the top view (sub/mw, lot 509); app #5fc4ea"
   },
   {
    "id": "16/58540/25067/98",
    "roof": {
-    "color": "#9ea3a6"
+    "color": "#92818a"
    },
-   "src": "earth: roof #9ea3a6 on the top view (sub/mw, lot 514); app #798283"
+   "src": "earth: roof #92818a on the top view (sub/mw, lot 514); app #798283"
   },
   {
    "id": "16/58540/25067/99",
    "roof": {
-    "color": "#6e7c7c"
+    "color": "#656167"
    },
-   "src": "earth: roof #6e7c7c on the top view (sub/mw, lot 515); app #8d9f91"
+   "src": "earth: roof #656167 on the top view (sub/mw, lot 515); app #8d9f91"
   },
   {
    "id": "16/58540/25068/24",
    "roof": {
-    "color": "#defff3"
+    "color": "#cdcbcc"
    },
-   "src": "earth: roof #defff3 on the top view (sub/sw, lot 520); app #3b4e4a"
+   "src": "earth: roof #cdcbcc on the top view (sub/sw, lot 520); app #3b4e4a"
   },
   {
    "id": "16/58540/25068/247",
    "roof": {
-    "color": "#d5f1e4"
+    "color": "#c5c0bf"
    },
-   "src": "earth: roof #d5f1e4 on the top view (sub/sw, lot 522); app #bad4de"
+   "src": "earth: roof #c5c0bf on the top view (sub/sw, lot 522); app #bad4de"
   },
   {
    "id": "16/58540/25068/258",
    "roof": {
-    "color": "#ccd4c5"
+    "color": "#bda8a5"
    },
-   "src": "earth: roof #ccd4c5 on the top view (sub/sw, lot 21); app #a9adab"
+   "src": "earth: roof #bda8a5 on the top view (sub/sw, lot 21); app #a9adab"
   },
   {
    "id": "16/58540/25068/259",
    "storeys": 2,
-   "src": "earth: a low light-roofed building among 1-2 storey neighbours in every oblique, not 5 storeys (sub/t_t22 strip, sub/sw zoom_22); earth: roof #bedad5 on the top view (sub/sw, lot 22); app #ded8cb",
+   "src": "earth: a low light-roofed building among 1-2 storey neighbours in every oblique, not 5 storeys (sub/t_t22 strip, sub/sw zoom_22); earth: roof #b0adb2 on the top view (sub/sw, lot 22); app #ded8cb",
    "roof": {
-    "color": "#bedad5"
+    "color": "#b0adb2"
    }
   },
   {
    "id": "16/58540/25068/264",
    "roof": {
-    "color": "#b4d0cb"
+    "color": "#a6a5aa"
    },
-   "src": "earth: roof #b4d0cb on the top view (sub/sw, lot 27); app #73594b"
+   "src": "earth: roof #a6a5aa on the top view (sub/sw, lot 27); app #73594b"
   },
   {
    "id": "16/58540/25068/267",
    "roof": {
-    "color": "#c4ddd7"
+    "color": "#b5b0b4"
    },
-   "src": "earth: roof #c4ddd7 on the top view (sub/sw, lot 30); app #f7f5ea"
+   "src": "earth: roof #b5b0b4 on the top view (sub/sw, lot 30); app #f7f5ea"
   },
   {
    "id": "16/58540/25068/29",
    "roof": {
-    "color": "#8d8184"
+    "color": "#82656e"
    },
-   "src": "earth: roof #8d8184 on the top view (sub/sw, lot 41); app #f5f2e7"
+   "src": "earth: roof #82656e on the top view (sub/sw, lot 41); app #f5f2e7"
   },
   {
    "id": "16/58540/25068/299",
    "roof": {
-    "color": "#d2ece1"
+    "color": "#c2bcbc"
    },
-   "src": "earth: roof #d2ece1 on the top view (sub/sw, lot 43); app #d5d6e3"
+   "src": "earth: roof #c2bcbc on the top view (sub/sw, lot 43); app #d5d6e3"
   },
   {
    "id": "16/58540/25068/301",
    "roof": {
-    "color": "#4f5f72"
+    "color": "#484a5e"
    },
-   "src": "earth: roof #4f5f72 on the top view (sub/sw, lot 46); app #69796b"
+   "src": "earth: roof #484a5e on the top view (sub/sw, lot 46); app #69796b"
   },
   {
    "id": "16/58540/25068/302",
    "roof": {
-    "color": "#6c7e87"
+    "color": "#636370"
    },
-   "src": "earth: roof #6c7e87 on the top view (sub/sw, lot 47); app #725749"
+   "src": "earth: roof #636370 on the top view (sub/sw, lot 47); app #725749"
   },
   {
    "id": "16/58541/25066/137",
    "roof": {
-    "color": "#ecffff"
+    "color": "#dadbe1"
    },
-   "src": "earth: roof #ecffff on the top view (sub/ne, lot 531); app #cdd9e7"
+   "src": "earth: roof #dadbe1 on the top view (sub/ne, lot 531); app #cdd9e7"
   },
   {
    "id": "16/58541/25066/141",
    "roof": {
-    "color": "#a0a8a0"
+    "color": "#948585"
    },
-   "src": "earth: roof #a0a8a0 on the top view (sub/ne, lot 535); app #6e7378"
+   "src": "earth: roof #948585 on the top view (sub/ne, lot 535); app #6e7378"
   },
   {
    "id": "16/58541/25066/142",
    "roof": {
-    "color": "#a89296"
+    "color": "#9b737d"
    },
-   "src": "earth: roof #a89296 on the top view (sub/ne, lot 536); app #75666b"
+   "src": "earth: roof #9b737d on the top view (sub/ne, lot 536); app #75666b"
   },
   {
    "id": "16/58541/25066/148",
    "roof": {
-    "color": "#677881"
+    "color": "#5f5e6b"
    },
-   "src": "earth: roof #677881 on the top view (sub/ne, lot 541); app #eaefed"
+   "src": "earth: roof #5f5e6b on the top view (sub/ne, lot 541); app #eaefed"
   },
   {
    "id": "16/58541/25066/151",
    "roof": {
-    "color": "#73707d"
+    "color": "#6a5868"
    },
-   "src": "earth: roof #73707d on the top view (sub/ne, lot 544); app #eeeeeb"
+   "src": "earth: roof #6a5868 on the top view (sub/ne, lot 544); app #eeeeeb"
   },
   {
    "id": "16/58541/25066/37",
    "roof": {
-    "color": "#9a8989"
+    "color": "#8e6c72"
    },
-   "src": "earth: roof #9a8989 on the top view (sub/ne, lot 556); app #756458"
+   "src": "earth: roof #8e6c72 on the top view (sub/ne, lot 556); app #756458"
   },
   {
    "id": "16/58541/25066/38",
    "roof": {
-    "color": "#9fa399"
+    "color": "#93817f"
    },
-   "src": "earth: roof #9fa399 on the top view (sub/ne, lot 557); app #4a7b4a"
+   "src": "earth: roof #93817f on the top view (sub/ne, lot 557); app #4a7b4a"
   },
   {
    "id": "16/58541/25066/39",
    "roof": {
-    "color": "#989e94"
+    "color": "#8c7d7b"
    },
-   "src": "earth: roof #989e94 on the top view (sub/ne, lot 558); app #75868b"
+   "src": "earth: roof #8c7d7b on the top view (sub/ne, lot 558); app #75868b"
   },
   {
    "id": "16/58541/25066/46",
    "roof": {
-    "color": "#e4fbe5"
+    "color": "#d3c8c0"
    },
-   "src": "earth: roof #e4fbe5 on the top view (sub/ne, lot 564); app #ebe7e8"
+   "src": "earth: roof #d3c8c0 on the top view (sub/ne, lot 564); app #ebe7e8"
   },
   {
    "id": "16/58541/25066/47",
    "roof": {
-    "color": "#2f2c42"
+    "color": "#896b78"
    },
-   "src": "earth: roof #2f2c42 on the top view (sub/ne, lot 565); app #716e6a"
+   "src": "earth: roof #896b78 on the mauve roof strips (roofs8922/c2_ne); the earlier #2b2136 read the dark shadow line between the two strips (sub/ne, lot 565)"
   },
   {
    "id": "16/58541/25066/49",
-   "roof": {
-    "color": "#a5b0a8"
-   },
-   "src": "earth: roof #a5b0a8 on the top view (sub/ne, lot 567); app #c0d5df"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (guard-rail asphalt at the edge of a car park), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58541/25066/51",
    "roof": {
-    "color": "#cadcdb"
+    "color": "#bbafb7"
    },
-   "src": "earth: roof #cadcdb on the top view (sub/ne, lot 569); app #a28e92"
+   "src": "earth: roof #bbafb7 on the top view (sub/ne, lot 569); app #a28e92"
   },
   {
    "id": "16/58541/25067/10",
    "roof": {
-    "color": "#a5a79e"
+    "color": "#988484"
    },
-   "src": "earth: roof #a5a79e on the top view (sub/mw, lot 575); app #ae9691"
+   "src": "earth: roof #988484 on the top view (sub/mw, lot 575); app #ae9691"
   },
   {
    "id": "16/58541/25067/100",
    "roof": {
-    "color": "#7a7e80"
+    "color": "#70636a"
    },
-   "src": "earth: roof #7a7e80 on the top view (sub/ne, lot 576); app #55617c"
+   "src": "earth: roof #70636a on the top view (sub/ne, lot 576); app #55617c"
   },
   {
    "id": "16/58541/25067/101",
    "roof": {
-    "color": "#4d6270"
+    "color": "#474c5d"
    },
-   "src": "earth: roof #4d6270 on the top view (sub/ne, lot 577); app #7896a3"
+   "src": "earth: roof #474c5d on the top view (sub/ne, lot 577); app #7896a3"
   },
   {
    "id": "16/58541/25067/102",
    "roof": {
-    "color": "#abc2c0"
+    "color": "#9e9aa0"
    },
-   "src": "earth: roof #abc2c0 on the top view (sub/ne, lot 578); app #69838c"
+   "src": "earth: roof #9e9aa0 on the top view (sub/ne, lot 578); app #69838c"
   },
   {
    "id": "16/58541/25067/105",
    "roof": {
-    "color": "#8a9e9d"
+    "color": "#7f7d83"
    },
-   "src": "earth: roof #8a9e9d on the top view (sub/ne, lot 580); app #b9c6bf"
+   "src": "earth: roof #7f7d83 on the top view (sub/ne, lot 580); app #b9c6bf"
   },
   {
    "id": "16/58541/25067/107",
    "roof": {
-    "color": "#8ea0a3"
+    "color": "#837e88"
    },
-   "src": "earth: roof #8ea0a3 on the top view (sub/ne, lot 582); app #9bc6c8"
+   "src": "earth: roof #837e88 on the top view (sub/ne, lot 582); app #9bc6c8"
   },
   {
    "id": "16/58541/25067/110",
    "storeys": 2,
-   "src": "earth: ケアハウスみなみ is two large two-storey blocks with maroon hip roofs (sub/t_t586 strip); earth: roof #735368 on the top view (sub/ne, lot 584); app #cdcfca",
+   "src": "earth: ケアハウスみなみ is two large two-storey blocks with maroon hip roofs (sub/t_t586 strip); earth: roof #6a4056 on the top view (sub/ne, lot 584); app #cdcfca",
    "roof": {
-    "color": "#735368"
+    "color": "#6a4056"
    }
   },
   {
    "id": "16/58541/25067/111",
    "roof": {
-    "color": "#7e8587"
+    "color": "#746970"
    },
-   "src": "earth: roof #7e8587 on the top view (sub/ne, lot 585); app #5e6a9a"
+   "src": "earth: roof #746970 on the top view (sub/ne, lot 585); app #5e6a9a"
   },
   {
    "id": "16/58541/25067/112",
@@ -1352,16 +1341,16 @@
   {
    "id": "16/58541/25067/113",
    "roof": {
-    "color": "#6f7c83"
+    "color": "#66616d"
    },
-   "src": "earth: roof #6f7c83 on the top view (sub/me, lot 587); app #a8cedc"
+   "src": "earth: roof #66616d on the top view (sub/me, lot 587); app #a8cedc"
   },
   {
    "id": "16/58541/25067/114",
    "roof": {
-    "color": "#687a81"
+    "color": "#60606b"
    },
-   "src": "earth: roof #687a81 on the top view (sub/me, lot 588); app #4b645b"
+   "src": "earth: roof #60606b on the top view (sub/me, lot 588); app #4b645b"
   },
   {
    "id": "16/58541/25067/116",
@@ -1371,94 +1360,92 @@
   {
    "id": "16/58541/25067/117",
    "storeys": 1,
-   "src": "earth: one-storey white shed east of the new car park (sub/t_t699 strip); earth: roof #bbd5cf on the top view (sub/me, lot 590); app #f6f4e9",
+   "src": "earth: one-storey white shed east of the new car park (sub/t_t699 strip); earth: roof #ada9ad on the top view (sub/me, lot 590); app #f6f4e9",
    "roof": {
-    "color": "#bbd5cf"
+    "color": "#ada9ad"
    }
   },
   {
    "id": "16/58541/25067/118",
    "roof": {
-    "color": "#bed7d2"
+    "color": "#b0abb0"
    },
-   "src": "earth: roof #bed7d2 on the top view (sub/me, lot 591); app #e7ebee"
+   "src": "earth: roof #b0abb0 on the top view (sub/me, lot 591); app #e7ebee"
   },
   {
    "id": "16/58541/25067/119",
    "roof": {
-    "color": "#757c75"
+    "color": "#6c6161"
    },
-   "src": "earth: roof #757c75 on the top view (sub/me, lot 592); app #aac8ca"
+   "src": "earth: roof #6c6161 on the top view (sub/me, lot 592); app #aac8ca"
   },
   {
    "id": "16/58541/25067/121",
    "roof": {
-    "color": "#707276"
+    "color": "#675962"
    },
-   "src": "earth: roof #707276 on the top view (sub/me, lot 594); app #8a977d"
+   "src": "earth: roof #675962 on the top view (sub/me, lot 594); app #8a977d"
   },
   {
    "id": "16/58541/25067/126",
    "roof": {
-    "color": "#989c90"
+    "color": "#8c7b78"
    },
-   "src": "earth: roof #989c90 on the top view (sub/me, lot 598); app #577075"
+   "src": "earth: roof #8c7b78 on the top view (sub/me, lot 598); app #577075"
   },
   {
    "id": "16/58541/25067/128",
    "roof": {
-    "color": "#1e2d40"
+    "color": "#1b2234"
    },
-   "src": "earth: roof #1e2d40 on the top view (sub/me, lot 600); app #525c5d"
+   "src": "earth: roof #1b2234 on the top view (sub/me, lot 600); app #525c5d"
   },
   {
    "id": "16/58541/25067/129",
    "roof": {
-    "color": "#2c3f52"
+    "color": "#283043"
    },
-   "src": "earth: roof #2c3f52 on the top view (sub/me, lot 601); app #5b6c69"
+   "src": "earth: roof #283043 on the top view (sub/me, lot 601); app #5b6c69"
   },
   {
    "id": "16/58541/25067/130",
-   "roof": {
-    "color": "#969b8a"
-   },
-   "src": "earth: roof #969b8a on the top view (sub/me, lot 603); app #567378"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (a bare field; the building is the next lot to the north-east), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58541/25067/132",
    "roof": {
-    "color": "#f6ffff"
+    "color": "#e4e2ea"
    },
-   "src": "earth: roof #f6ffff on the top view (sub/mw, lot 605); app #d0c0bd"
+   "src": "earth: roof #e4e2ea on the top view (sub/mw, lot 605); app #d0c0bd"
   },
   {
    "id": "16/58541/25067/136",
    "roof": {
-    "color": "#887a83"
+    "color": "#7d606d"
    },
-   "src": "earth: roof #887a83 on the top view (sub/me, lot 607); app #616e67"
+   "src": "earth: roof #7d606d on the top view (sub/me, lot 607); app #616e67"
   },
   {
    "id": "16/58541/25067/138",
    "roof": {
-    "color": "#bbdad6"
+    "color": "#adadb3"
    },
-   "src": "earth: roof #bbdad6 on the top view (sub/mw, lot 609); app #645f63"
+   "src": "earth: roof #adadb3 on the top view (sub/mw, lot 609); app #645f63"
   },
   {
    "id": "16/58541/25067/14",
    "roof": {
-    "color": "#c3c6b7"
+    "color": "#b49d99"
    },
-   "src": "earth: roof #c3c6b7 on the top view (sub/sw, lot 611); app #aea29c"
+   "src": "earth: roof #b49d99 on the top view (sub/sw, lot 611); app #aea29c"
   },
   {
    "id": "16/58541/25067/143",
    "roof": {
-    "color": "#95b1b3"
+    "color": "#898c95"
    },
-   "src": "earth: roof #95b1b3 on the top view (sub/sw, lot 615); app #a2a1a9"
+   "src": "earth: roof #898c95 on the top view (sub/sw, lot 615); app #a2a1a9"
   },
   {
    "id": "16/58541/25067/144",
@@ -1473,9 +1460,9 @@
   {
    "id": "16/58541/25067/152",
    "roof": {
-    "color": "#8c94a0"
+    "color": "#817585"
    },
-   "src": "earth: roof #8c94a0 on the top view (sub/me, lot 620); app #657677"
+   "src": "earth: roof #817585 on the top view (sub/me, lot 620); app #657677"
   },
   {
    "id": "16/58541/25067/157",
@@ -1490,9 +1477,9 @@
   {
    "id": "16/58541/25067/160",
    "roof": {
-    "color": "#334556"
+    "color": "#2e3547"
    },
-   "src": "earth: roof #334556 on the top view (sub/se, lot 69); app #7b999d"
+   "src": "earth: roof #2e3547 on the top view (sub/se, lot 69); app #7b999d"
   },
   {
    "id": "16/58541/25067/162",
@@ -1502,16 +1489,16 @@
   {
    "id": "16/58541/25067/165",
    "roof": {
-    "color": "#c29c9e"
+    "color": "#b37b84"
    },
-   "src": "earth: roof #c29c9e on the top view (sub/sw, lot 73); app #9f7479"
+   "src": "earth: roof #b37b84 on the top view (sub/sw, lot 73); app #9f7479"
   },
   {
    "id": "16/58541/25067/166",
    "roof": {
-    "color": "#8f969c"
+    "color": "#847682"
    },
-   "src": "earth: roof #8f969c on the top view (sub/sw, lot 74); app #6f7786"
+   "src": "earth: roof #847682 on the top view (sub/sw, lot 74); app #6f7786"
   },
   {
    "id": "16/58541/25067/169",
@@ -1526,170 +1513,170 @@
   {
    "id": "16/58541/25067/170",
    "roof": {
-    "color": "#829396"
+    "color": "#78747d"
    },
-   "src": "earth: roof #829396 on the top view (sub/se, lot 78); app #52636c"
+   "src": "earth: roof #78747d on the top view (sub/se, lot 78); app #52636c"
   },
   {
    "id": "16/58541/25067/171",
    "roof": {
-    "color": "#849396"
+    "color": "#7a747d"
    },
-   "src": "earth: roof #849396 on the top view (sub/se, lot 79); app #567688"
+   "src": "earth: roof #7a747d on the top view (sub/se, lot 79); app #567688"
   },
   {
    "id": "16/58541/25067/172",
    "roof": {
-    "color": "#677c83"
+    "color": "#5f616d"
    },
-   "src": "earth: roof #677c83 on the top view (sub/se, lot 80); app #3a5469"
+   "src": "earth: roof #5f616d on the top view (sub/se, lot 80); app #3a5469"
   },
   {
    "id": "16/58541/25067/174",
    "roof": {
-    "color": "#b3b7b7"
+    "color": "#a59199"
    },
-   "src": "earth: roof #b3b7b7 on the top view (sub/sw, lot 81); app #757781"
+   "src": "earth: roof #a59199 on the top view (sub/sw, lot 81); app #757781"
   },
   {
    "id": "16/58541/25067/175",
    "roof": {
-    "color": "#daf6ec"
+    "color": "#cac4c6"
    },
-   "src": "earth: roof #daf6ec on the top view (sub/sw, lot 82); app #608d9f"
+   "src": "earth: roof #cac4c6 on the top view (sub/sw, lot 82); app #608d9f"
   },
   {
    "id": "16/58541/25067/176",
    "roof": {
-    "color": "#38485d"
+    "color": "#33374d"
    },
-   "src": "earth: roof #38485d on the top view (sub/se, lot 83); app #c0d1de"
+   "src": "earth: roof #33374d on the top view (sub/se, lot 83); app #c0d1de"
   },
   {
    "id": "16/58541/25067/177",
    "roof": {
-    "color": "#aac1bd"
+    "color": "#9d999e"
    },
-   "src": "earth: roof #aac1bd on the top view (sub/sw, lot 84); app #f5f3e8"
+   "src": "earth: roof #9d999e on the top view (sub/sw, lot 84); app #f5f3e8"
   },
   {
    "id": "16/58541/25067/178",
    "roof": {
-    "color": "#9ea0a1"
+    "color": "#927e86"
    },
-   "src": "earth: roof #9ea0a1 on the top view (sub/sw, lot 85); app #42525e"
+   "src": "earth: roof #927e86 on the top view (sub/sw, lot 85); app #42525e"
   },
   {
    "id": "16/58541/25067/179",
    "roof": {
-    "color": "#ab9b9a"
+    "color": "#9e7a80"
    },
-   "src": "earth: roof #ab9b9a on the top view (sub/se, lot 86); app #94585c"
+   "src": "earth: roof #9e7a80 on the top view (sub/se, lot 86); app #94585c"
   },
   {
    "id": "16/58541/25067/181",
    "roof": {
-    "color": "#bd918d"
+    "color": "#af7275"
    },
-   "src": "earth: roof #bd918d on the top view (sub/se, lot 88); app #b66d68"
+   "src": "earth: roof #af7275 on the top view (sub/se, lot 88); app #b66d68"
   },
   {
    "id": "16/58541/25067/182",
    "roof": {
-    "color": "#8f939c"
+    "color": "#847482"
    },
-   "src": "earth: roof #8f939c on the top view (sub/se, lot 89); app #b1b6b4"
+   "src": "earth: roof #847482 on the top view (sub/se, lot 89); app #b1b6b4"
   },
   {
    "id": "16/58541/25067/183",
    "roof": {
-    "color": "#eafffb"
+    "color": "#d8d5d2"
    },
-   "src": "earth: roof #eafffb on the top view (sub/se, lot 90); app #d6dfe8"
+   "src": "earth: roof #d8d5d2 on the top view (sub/se, lot 90); app #d6dfe8"
   },
   {
    "id": "16/58541/25067/188",
    "roof": {
-    "color": "#bed1bb"
+    "color": "#b0a69c"
    },
-   "src": "earth: roof #bed1bb on the top view (sub/se, lot 95); app #725749"
+   "src": "earth: roof #b0a69c on the top view (sub/se, lot 95); app #725749"
   },
   {
    "id": "16/58541/25067/189",
    "roof": {
-    "color": "#47535f"
+    "color": "#41404e"
    },
-   "src": "earth: roof #47535f on the top view (sub/se, lot 96); app #88919a"
+   "src": "earth: roof #41404e on the top view (sub/se, lot 96); app #88919a"
   },
   {
    "id": "16/58541/25067/190",
    "roof": {
-    "color": "#998488"
+    "color": "#8d6871"
    },
-   "src": "earth: roof #998488 on the top view (sub/se, lot 97); app #aeb3b2"
+   "src": "earth: roof #8d6871 on the top view (sub/se, lot 97); app #aeb3b2"
   },
   {
    "id": "16/58541/25067/191",
    "roof": {
-    "color": "#a68d8e"
+    "color": "#996f76"
    },
-   "src": "earth: roof #a68d8e on the top view (sub/se, lot 98); app #f6f4e9"
+   "src": "earth: roof #996f76 on the top view (sub/se, lot 98); app #f6f4e9"
   },
   {
    "id": "16/58541/25067/192",
    "roof": {
-    "color": "#dff5e6"
+    "color": "#cec3c1"
    },
-   "src": "earth: roof #dff5e6 on the top view (sub/se, lot 99); app #b9d3dd"
+   "src": "earth: roof #cec3c1 on the top view (sub/se, lot 99); app #b9d3dd"
   },
   {
    "id": "16/58541/25067/193",
    "roof": {
-    "color": "#b9b7b1"
+    "color": "#ab9194"
    },
-   "src": "earth: roof #b9b7b1 on the top view (sub/se, lot 100); app #645559"
+   "src": "earth: roof #ab9194 on the top view (sub/se, lot 100); app #645559"
   },
   {
    "id": "16/58541/25067/194",
    "roof": {
-    "color": "#3e4f65"
+    "color": "#393d53"
    },
-   "src": "earth: roof #3e4f65 on the top view (sub/se, lot 101); app #6dc0d3"
+   "src": "earth: roof #393d53 on the top view (sub/se, lot 101); app #6dc0d3"
   },
   {
    "id": "16/58541/25067/195",
    "roof": {
-    "color": "#aaa3a0"
+    "color": "#9d8185"
    },
-   "src": "earth: roof #aaa3a0 on the top view (sub/se, lot 102); app #735d5d"
+   "src": "earth: roof #9d8185 on the top view (sub/se, lot 102); app #735d5d"
   },
   {
    "id": "16/58541/25067/196",
    "roof": {
-    "color": "#959ea2"
+    "color": "#897d87"
    },
-   "src": "earth: roof #959ea2 on the top view (sub/se, lot 103); app #8b8892"
+   "src": "earth: roof #897d87 on the top view (sub/se, lot 103); app #8b8892"
   },
   {
    "id": "16/58541/25067/200",
    "roof": {
-    "color": "#88888a"
+    "color": "#7d6b73"
    },
-   "src": "earth: roof #88888a on the top view (sub/se, lot 107); app #aac8ca"
+   "src": "earth: roof #7d6b73 on the top view (sub/se, lot 107); app #aac8ca"
   },
   {
    "id": "16/58541/25067/202",
    "roof": {
-    "color": "#c19b99"
+    "color": "#b27a7f"
    },
-   "src": "earth: roof #c19b99 on the top view (sub/se, lot 623); app #86cbd9"
+   "src": "earth: roof #b27a7f on the top view (sub/se, lot 623); app #86cbd9"
   },
   {
    "id": "16/58541/25067/203",
    "roof": {
-    "color": "#3a4c60"
+    "color": "#353b4f"
    },
-   "src": "earth: roof #3a4c60 on the top view (sub/se, lot 108); app #9d7175"
+   "src": "earth: roof #353b4f on the top view (sub/se, lot 108); app #9d7175"
   },
   {
    "id": "16/58541/25067/204",
@@ -1708,44 +1695,42 @@
   {
    "id": "16/58541/25067/207",
    "roof": {
-    "color": "#68727c"
+    "color": "#605967"
    },
-   "src": "earth: roof #68727c on the top view (sub/me, lot 625); app #bf8984"
+   "src": "earth: roof #605967 on the top view (sub/me, lot 625); app #bf8984"
   },
   {
    "id": "16/58541/25067/208",
    "roof": {
-    "color": "#66747d"
+    "color": "#5e5b68"
    },
-   "src": "earth: roof #66747d on the top view (sub/me, lot 626); app #7b99a2"
+   "src": "earth: roof #5e5b68 on the top view (sub/me, lot 626); app #7b99a2"
   },
   {
    "id": "16/58541/25067/210",
    "roof": {
-    "color": "#738489"
+    "color": "#6a6872"
    },
-   "src": "earth: roof #738489 on the top view (sub/me, lot 628); app #909d94"
+   "src": "earth: roof #6a6872 on the top view (sub/me, lot 628); app #909d94"
   },
   {
    "id": "16/58541/25067/213",
    "roof": {
-    "color": "#abbbbb"
+    "color": "#9e949c"
    },
-   "src": "earth: roof #abbbbb on the top view (sub/me, lot 631); app #84898a"
+   "src": "earth: roof #9e949c on the top view (sub/me, lot 631); app #84898a"
   },
   {
    "id": "16/58541/25067/216",
    "roof": {
-    "color": "#d0f8e5"
+    "color": "#c0c5c0"
    },
-   "src": "earth: roof #d0f8e5 on the top view (sub/se, lot 110); app #536871"
+   "src": "earth: roof #c0c5c0 on the top view (sub/se, lot 110); app #536871"
   },
   {
    "id": "16/58541/25067/217",
-   "roof": {
-    "color": "#abae9c"
-   },
-   "src": "earth: roof #abae9c on the top view (sub/se, lot 111); app #f5f4e9"
+   "remove": true,
+   "src": "earth 2026-03-11: c2/sub/se top+o0+o180 and c2/r1003 show the nursery building demolished, bare dirt (GSI shows the old red roof)"
   },
   {
    "id": "16/58541/25067/218",
@@ -1760,107 +1745,107 @@
   {
    "id": "16/58541/25067/220",
    "roof": {
-    "color": "#959790"
+    "color": "#897778"
    },
-   "src": "earth: roof #959790 on the top view (sub/se, lot 115); app #ebebea"
+   "src": "earth: roof #897778 on the top view (sub/se, lot 115); app #ebebea"
   },
   {
    "id": "16/58541/25067/221",
    "roof": {
-    "color": "#707f84"
+    "color": "#67646e"
    },
-   "src": "earth: roof #707f84 on the top view (sub/se, lot 116); app #9e9fa2"
+   "src": "earth: roof #67646e on the top view (sub/se, lot 116); app #9e9fa2"
   },
   {
    "id": "16/58541/25067/222",
    "roof": {
-    "color": "#8d928d"
+    "color": "#827375"
    },
-   "src": "earth: roof #8d928d on the top view (sub/se, lot 117); app #8bcbda"
+   "src": "earth: roof #827375 on the top view (sub/se, lot 117); app #8bcbda"
   },
   {
    "id": "16/58541/25067/223",
    "roof": {
-    "color": "#e3ffeb"
+    "color": "#d2cbc5"
    },
-   "src": "earth: roof #e3ffeb on the top view (sub/se, lot 118); app #becbcd"
+   "src": "earth: roof #d2cbc5 on the top view (sub/se, lot 118); app #becbcd"
   },
   {
    "id": "16/58541/25067/225",
    "roof": {
-    "color": "#938990"
+    "color": "#886c78"
    },
-   "src": "earth: roof #938990 on the top view (sub/se, lot 119); app #929797"
+   "src": "earth: roof #886c78 on the top view (sub/se, lot 119); app #929797"
   },
   {
    "id": "16/58541/25067/227",
    "roof": {
-    "color": "#c3b3a7"
+    "color": "#b48e8b"
    },
-   "src": "earth: roof #c3b3a7 on the top view (sub/se, lot 121); app #a37e82"
+   "src": "earth: roof #b48e8b on the top view (sub/se, lot 121); app #a37e82"
   },
   {
    "id": "16/58541/25067/228",
    "roof": {
-    "color": "#c6c0b4"
+    "color": "#b79896"
    },
-   "src": "earth: roof #c6c0b4 on the top view (sub/se, lot 122); app #b79f95"
+   "src": "earth: roof #b79896 on the top view (sub/se, lot 122); app #b79f95"
   },
   {
    "id": "16/58541/25067/231",
    "roof": {
-    "color": "#546d70"
+    "color": "#4d555d"
    },
-   "src": "earth: roof #546d70 on the top view (sub/se, lot 125); app #766e73"
+   "src": "earth: roof #4d555d on the top view (sub/se, lot 125); app #766e73"
   },
   {
    "id": "16/58541/25067/232",
    "roof": {
-    "color": "#cedcd1"
+    "color": "#beafaf"
    },
-   "src": "earth: roof #cedcd1 on the top view (sub/se, lot 126); app #bbafad"
+   "src": "earth: roof #beafaf on the top view (sub/se, lot 126); app #bbafad"
   },
   {
    "id": "16/58541/25067/233",
    "roof": {
-    "color": "#cadcd1"
+    "color": "#bbafaf"
    },
-   "src": "earth: roof #cadcd1 on the top view (sub/se, lot 127); app #91a299"
+   "src": "earth: roof #bbafaf on the top view (sub/se, lot 127); app #91a299"
   },
   {
    "id": "16/58541/25067/239",
    "roof": {
-    "color": "#9f8e8c"
+    "color": "#937074"
    },
-   "src": "earth: roof #9f8e8c on the top view (sub/se, lot 131); app #cb7974"
+   "src": "earth: roof #937074 on the top view (sub/se, lot 131); app #cb7974"
   },
   {
    "id": "16/58541/25067/244",
    "roof": {
-    "color": "#5d5a63"
+    "color": "#554652"
    },
-   "src": "earth: roof #5d5a63 on the top view (sub/se, lot 136); app #60696a"
+   "src": "earth: roof #554652 on the top view (sub/se, lot 136); app #60696a"
   },
   {
    "id": "16/58541/25067/245",
    "roof": {
-    "color": "#d4e7de"
+    "color": "#c4b8ba"
    },
-   "src": "earth: roof #d4e7de on the top view (sub/se, lot 137); app #79929b"
+   "src": "earth: roof #c4b8ba on the top view (sub/se, lot 137); app #79929b"
   },
   {
    "id": "16/58541/25067/246",
    "roof": {
-    "color": "#979ba0"
+    "color": "#8b7a85"
    },
-   "src": "earth: roof #979ba0 on the top view (sub/se, lot 138); app #ab7a7a"
+   "src": "earth: roof #8b7a85 on the top view (sub/se, lot 138); app #ab7a7a"
   },
   {
    "id": "16/58541/25067/247",
    "roof": {
-    "color": "#a1777b"
+    "color": "#955d66"
    },
-   "src": "earth: roof #a1777b on the top view (sub/se, lot 139); app #cb7974"
+   "src": "earth: roof #955d66 on the top view (sub/se, lot 139); app #cb7974"
   },
   {
    "id": "16/58541/25067/248",
@@ -1868,347 +1853,345 @@
    "storeys": 2,
    "roof": {
     "shape": "gable",
-    "color": "#859394"
+    "color": "#7b747b"
    },
    "facade": "house",
-   "src": "earth: a two-storey house compound with grey and brown tiled gable roofs, not a 5-storey office (sub/t_t140 strip, sub/se zoom_140; its shadow is about 3 m); earth: roof #859394 on the top view (sub/se, lot 140); app #dbd4c3"
+   "src": "earth: a two-storey house compound with grey and brown tiled gable roofs, not a 5-storey office (sub/t_t140 strip, sub/se zoom_140; its shadow is about 3 m); earth: roof #7b747b on the top view (sub/se, lot 140); app #dbd4c3"
   },
   {
    "id": "16/58541/25067/249",
    "roof": {
-    "color": "#798c7b"
+    "color": "#6f6e66"
    },
-   "src": "earth: roof #798c7b on the top view (sub/se, lot 141); app #9f8682"
+   "src": "earth: roof #6f6e66 on the top view (sub/se, lot 141); app #9f8682"
   },
   {
    "id": "16/58541/25067/25",
    "roof": {
-    "color": "#6f838a"
+    "color": "#666773"
    },
-   "src": "earth: roof #6f838a on the top view (sub/ne, lot 633); app #486071"
+   "src": "earth: roof #666773 on the top view (sub/ne, lot 633); app #486071"
   },
   {
    "id": "16/58541/25067/251",
    "roof": {
-    "color": "#919795"
+    "color": "#86777c"
    },
-   "src": "earth: roof #919795 on the top view (sub/se, lot 143); app #d8dce0"
+   "src": "earth: roof #86777c on the top view (sub/se, lot 143); app #d8dce0"
   },
   {
    "id": "16/58541/25067/253",
    "roof": {
-    "color": "#cff0e6"
+    "color": "#bfbfc1"
    },
-   "src": "earth: roof #cff0e6 on the top view (sub/se, lot 145); app #adcbda"
+   "src": "earth: roof #bfbfc1 on the top view (sub/se, lot 145); app #adcbda"
   },
   {
    "id": "16/58541/25067/257",
    "roof": {
-    "color": "#455a70"
+    "color": "#3f465d"
    },
-   "src": "earth: roof #455a70 on the top view (sub/se, lot 149); app #bdcfd0"
+   "src": "earth: roof #3f465d on the top view (sub/se, lot 149); app #bdcfd0"
   },
   {
    "id": "16/58541/25067/258",
    "roof": {
-    "color": "#303f55"
+    "color": "#b98a90"
    },
-   "src": "earth: roof #303f55 on the top view (sub/se, lot 150); app #aa968d"
+   "src": "earth: roof #b98a90 = the lower bay of the three-bay salmon roof on the lit side (Earth #c79296 lit bay, #b4888c..#bf898d lower bay; core median #9f7d84); the earlier #2c3046 read the cast shadow just south of it (sub/se, lot 150; raw/ref/earth/roofs8922c/evidence/f5_c2_shadow_colours_a.jpg)"
   },
   {
    "id": "16/58541/25067/261",
    "roof": {
-    "color": "#5d6470"
+    "color": "#554e5d"
    },
-   "src": "earth: roof #5d6470 on the top view (sub/ne, lot 634); app #6d8290"
+   "src": "earth: roof #554e5d on the top view (sub/ne, lot 634); app #6d8290"
   },
   {
    "id": "16/58541/25067/262",
    "roof": {
-    "color": "#a8cdd1"
+    "color": "#9ba3af"
    },
-   "src": "earth: roof #a8cdd1 on the top view (sub/ne, lot 635); app #9ca19c"
+   "src": "earth: roof #9ba3af on the top view (sub/ne, lot 635); app #9ca19c"
   },
   {
    "id": "16/58541/25067/265",
    "roof": {
-    "color": "#97a9a6"
+    "color": "#8b868a"
    },
-   "src": "earth: roof #97a9a6 on the top view (sub/ne, lot 638); app #f2ebe9"
+   "src": "earth: roof #8b868a on the top view (sub/ne, lot 638); app #f2ebe9"
   },
   {
    "id": "16/58541/25067/267",
    "roof": {
-    "color": "#567c84"
+    "color": "#4f616e"
    },
-   "src": "earth: roof #567c84 on the top view (sub/ne, lot 640); app #ebeeec"
+   "src": "earth: roof #4f616e on the top view (sub/ne, lot 640); app #ebeeec"
   },
   {
    "id": "16/58541/25067/269",
    "roof": {
-    "color": "#41485d"
+    "color": "#3b374d"
    },
-   "src": "earth: roof #41485d on the top view (sub/ne, lot 642); app #705456"
+   "src": "earth: roof #3b374d on the top view (sub/ne, lot 642); app #705456"
   },
   {
    "id": "16/58541/25067/270",
    "roof": {
-    "color": "#81949a"
+    "color": "#777580"
    },
-   "src": "earth: roof #81949a on the top view (sub/ne, lot 644); app #5b6f74"
+   "src": "earth: roof #777580 on the top view (sub/ne, lot 644); app #5b6f74 | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a small dark roof on the pale concrete yard"
   },
   {
    "id": "16/58541/25067/276",
    "roof": {
-    "color": "#a7918a"
+    "color": "#9a7273"
    },
-   "src": "earth: roof #a7918a on the top view (sub/me, lot 649); app #5a737c"
+   "src": "earth: roof #9a7273 on the top view (sub/me, lot 649); app #5a737c"
   },
   {
    "id": "16/58541/25067/277",
    "roof": {
-    "color": "#2c3b53"
+    "color": "#8a6b66"
    },
-   "src": "earth: roof #2c3b53 on the top view (sub/me, lot 650); app #756e6b"
+   "src": "earth: roof #8a6b66, blend of the dark plum roof (median #6e696c) and the orange-red hip it covers (roofs8922/c2_me; lot 650); the earlier #282d44 read shadow"
   },
   {
    "id": "16/58541/25067/279",
    "roof": {
-    "color": "#7d8a8d"
+    "color": "#736d75"
    },
-   "src": "earth: roof #7d8a8d on the top view (sub/me, lot 652); app #c08a85"
+   "src": "earth: roof #736d75 on the top view (sub/me, lot 652); app #c08a85"
   },
   {
    "id": "16/58541/25067/280",
    "roof": {
-    "color": "#bb9495"
+    "color": "#ad757c"
    },
-   "src": "earth: roof #bb9495 on the top view (sub/me, lot 653); app #8d9b92"
+   "src": "earth: roof #ad757c on the top view (sub/me, lot 653); app #8d9b92"
   },
   {
    "id": "16/58541/25067/295",
    "roof": {
-    "color": "#6d7981"
+    "color": "#645f6b"
    },
-   "src": "earth: roof #6d7981 on the top view (sub/se, lot 153); app #455d54"
+   "src": "earth: roof #645f6b on the top view (sub/se, lot 153); app #455d54 | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a dark roof partly under trees"
   },
   {
    "id": "16/58541/25067/296",
    "roof": {
-    "color": "#93989b"
+    "color": "#887881"
    },
-   "src": "earth: roof #93989b on the top view (sub/se, lot 154); app #9f553e"
+   "src": "earth: roof #887881 on the top view (sub/se, lot 154); app #9f553e"
   },
   {
    "id": "16/58541/25067/297",
    "roof": {
-    "color": "#727a84"
+    "color": "#69606e"
    },
-   "src": "earth: roof #727a84 on the top view (sub/se, lot 155); app #f5f3e9"
+   "src": "earth: roof #69606e on the top view (sub/se, lot 155); app #f5f3e9"
   },
   {
    "id": "16/58541/25067/30",
-   "roof": {
-    "color": "#797e7c"
-   },
-   "src": "earth: roof #797e7c on the top view (sub/ne, lot 660); app #4a6359"
+   "remove": true,
+   "src": "earth top (c2/sub/ne) + GSI photo: scrub/forest, no roof"
   },
   {
    "id": "16/58541/25067/301",
    "roof": {
-    "color": "#667e90"
+    "color": "#5e6378"
    },
-   "src": "earth: roof #667e90 on the top view (sub/se, lot 159); app #4c99bb"
+   "src": "earth: roof #5e6378 on the top view (sub/se, lot 159); app #4c99bb"
   },
   {
    "id": "16/58541/25067/309",
    "roof": {
-    "color": "#839997"
+    "color": "#79797e"
    },
-   "src": "earth: roof #839997 on the top view (sub/se, lot 165); app #c7d0d5"
+   "src": "earth: roof #79797e on the top view (sub/se, lot 165); app #c7d0d5"
   },
   {
    "id": "16/58541/25067/314",
    "roof": {
-    "color": "#c6a8a2"
+    "color": "#b78587"
    },
-   "src": "earth: roof #c6a8a2 on the top view (sub/se, lot 170); app #515c54"
+   "src": "earth: roof #b78587 on the top view (sub/se, lot 170); app #515c54"
   },
   {
    "id": "16/58541/25067/320",
    "roof": {
-    "color": "#637e84"
+    "color": "#5b636e"
    },
-   "src": "earth: roof #637e84 on the top view (sub/se, lot 176); app #445d5d"
+   "src": "earth: roof #5b636e on the top view (sub/se, lot 176); app #445d5d"
   },
   {
    "id": "16/58541/25067/323",
    "roof": {
-    "color": "#bad2c8"
+    "color": "#aca7a7"
    },
-   "src": "earth: roof #bad2c8 on the top view (sub/se, lot 179); app #d7dbe3"
+   "src": "earth: roof #aca7a7 on the top view (sub/se, lot 179); app #d7dbe3"
   },
   {
    "id": "16/58541/25067/367",
    "storeys": 1,
-   "src": "earth: a 12 m2 annex of the サンワイ商事 shed, one storey (sub/se zoom_209); earth: roof #71878e on the top view (sub/se, lot 186); app #435159",
+   "src": "earth: a 12 m2 annex of the サンワイ商事 shed, one storey (sub/se zoom_209); earth: roof #686a76 on the top view (sub/se, lot 186); app #435159",
    "roof": {
-    "color": "#71878e"
+    "color": "#686a76"
    }
   },
   {
    "id": "16/58541/25067/368",
    "roof": {
-    "color": "#859797"
+    "color": "#7b777e"
    },
-   "src": "earth: roof #859797 on the top view (sub/se, lot 187); app #4c686d"
+   "src": "earth: roof #7b777e on the top view (sub/se, lot 187); app #4c686d"
   },
   {
    "id": "16/58541/25067/38",
    "roof": {
-    "color": "#7b8d93"
+    "color": "#716f7a"
    },
-   "src": "earth: roof #7b8d93 on the top view (sub/ne, lot 665); app #516f74"
+   "src": "earth: roof #716f7a on the top view (sub/ne, lot 665); app #516f74 | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a grey flat roof with its shadow"
   },
   {
    "id": "16/58541/25067/39",
    "roof": {
-    "color": "#d3f1e5"
+    "color": "#c3c0c0"
    },
-   "src": "earth: roof #d3f1e5 on the top view (sub/me, lot 666); app #c6dbe3"
+   "src": "earth: roof #c3c0c0 on the top view (sub/me, lot 666); app #c6dbe3"
   },
   {
    "id": "16/58541/25067/41",
    "roof": {
-    "color": "#c3e1db"
+    "color": "#b4b3b7"
    },
-   "src": "earth: roof #c3e1db on the top view (sub/me, lot 668); app #9fc1cb"
+   "src": "earth: roof #b4b3b7 on the top view (sub/me, lot 668); app #9fc1cb"
   },
   {
    "id": "16/58541/25067/42",
    "roof": {
-    "color": "#9aa89b"
+    "color": "#8e8581"
    },
-   "src": "earth: roof #9aa89b on the top view (sub/mw, lot 669); app #5f7a81"
+   "src": "earth: roof #8e8581 on the top view (sub/mw, lot 669); app #5f7a81"
   },
   {
    "id": "16/58541/25067/43",
    "roof": {
-    "color": "#545166"
+    "color": "#4d3f54"
    },
-   "src": "earth: roof #545166 on the top view (sub/me, lot 670); app #826166"
+   "src": "earth: roof #4d3f54 on the top view (sub/me, lot 670); app #826166"
   },
   {
    "id": "16/58541/25067/46",
    "roof": {
-    "color": "#304158"
+    "color": "#2c3248"
    },
-   "src": "earth: roof #304158 on the top view (sub/me, lot 673); app #89c8ce"
+   "src": "earth: roof #2c3248 on the top view (sub/me, lot 673); app #89c8ce"
   },
   {
    "id": "16/58541/25067/49",
    "roof": {
-    "color": "#575b68"
+    "color": "#504756"
    },
-   "src": "earth: roof #575b68 on the top view (sub/me, lot 675); app #797376"
+   "src": "earth: roof #504756 on the top view (sub/me, lot 675); app #797376"
   },
   {
    "id": "16/58541/25067/5",
    "roof": {
-    "color": "#b7cfcd"
+    "color": "#a9a4ab"
    },
-   "src": "earth: roof #b7cfcd on the top view (sub/mw, lot 676); app #f5f4e9"
+   "src": "earth: roof #a9a4ab on the top view (sub/mw, lot 676); app #f5f4e9"
   },
   {
    "id": "16/58541/25067/51",
    "roof": {
-    "color": "#7c8c94"
+    "color": "#726e7b"
    },
-   "src": "earth: roof #7c8c94 on the top view (sub/mw, lot 677); app #495966"
+   "src": "earth: roof #726e7b on the top view (sub/mw, lot 677); app #495966"
   },
   {
    "id": "16/58541/25067/52",
    "roof": {
-    "color": "#cce7e1"
+    "color": "#bdb8bc"
    },
-   "src": "earth: roof #cce7e1 on the top view (sub/me, lot 678); app #a4c7d1"
+   "src": "earth: roof #bdb8bc on the top view (sub/me, lot 678); app #a4c7d1"
   },
   {
    "id": "16/58541/25067/54",
    "roof": {
-    "color": "#71838a"
+    "color": "#686773"
    },
-   "src": "earth: roof #71838a on the top view (sub/me, lot 679); app #7b9e9d"
+   "src": "earth: roof #686773 on the top view (sub/me, lot 679); app #7b9e9d"
   },
   {
    "id": "16/58541/25067/55",
    "roof": {
-    "color": "#707e86"
+    "color": "#67636f"
    },
-   "src": "earth: roof #707e86 on the top view (sub/mw, lot 680); app #505c65"
+   "src": "earth: roof #67636f on the top view (sub/mw, lot 680); app #505c65"
   },
   {
    "id": "16/58541/25067/58",
    "roof": {
-    "color": "#6b6f7c"
+    "color": "#625767"
    },
-   "src": "earth: roof #6b6f7c on the top view (sub/me, lot 683); app #867b7c"
+   "src": "earth: roof #625767 on the top view (sub/me, lot 683); app #867b7c"
   },
   {
    "id": "16/58541/25067/60",
    "roof": {
-    "color": "#7e9ba1"
+    "color": "#747a86"
    },
-   "src": "earth: roof #7e9ba1 on the top view (sub/me, lot 684); app #a1bfc1"
+   "src": "earth: roof #747a86 on the top view (sub/me, lot 684); app #a1bfc1"
   },
   {
    "id": "16/58541/25067/61",
    "roof": {
-    "color": "#738f9b"
+    "color": "#6a7181"
    },
-   "src": "earth: roof #738f9b on the top view (sub/me, lot 685); app #bdd3e1"
+   "src": "earth: roof #6a7181 on the top view (sub/me, lot 685); app #bdd3e1"
   },
   {
    "id": "16/58541/25067/65",
    "roof": {
-    "color": "#576876"
+    "color": "#505162"
    },
-   "src": "earth: roof #576876 on the top view (sub/me, lot 687); app #80969e"
+   "src": "earth: roof #505162 on the top view (sub/me, lot 687); app #80969e"
   },
   {
    "id": "16/58541/25067/67",
    "roof": {
-    "color": "#95b0b1"
+    "color": "#898b94"
    },
-   "src": "earth: roof #95b0b1 on the top view (sub/me, lot 688); app #597a87"
+   "src": "earth: roof #898b94 on the top view (sub/me, lot 688); app #597a87"
   },
   {
    "id": "16/58541/25067/69",
    "roof": {
-    "color": "#828991"
+    "color": "#786c79"
    },
-   "src": "earth: roof #828991 on the top view (sub/me, lot 690); app #636c74"
+   "src": "earth: roof #786c79 on the top view (sub/me, lot 690); app #636c74"
   },
   {
    "id": "16/58541/25067/71",
    "roof": {
-    "color": "#35455b"
+    "color": "#30354b"
    },
-   "src": "earth: roof #35455b on the top view (sub/me, lot 692); app #7896a7"
+   "src": "earth: roof #30354b on the top view (sub/me, lot 692); app #7896a7"
   },
   {
    "id": "16/58541/25067/77",
    "roof": {
-    "color": "#887877"
+    "color": "#7d5e63"
    },
-   "src": "earth: roof #887877 on the top view (sub/me, lot 697); app #ab9b95"
+   "src": "earth: roof #7d5e63 on the top view (sub/me, lot 697); app #ab9b95"
   },
   {
    "id": "16/58541/25067/78",
    "roof": {
-    "color": "#98968d"
+    "color": "#8c7675"
    },
-   "src": "earth: roof #98968d on the top view (sub/me, lot 698); app #b1c2c0"
+   "src": "earth: roof #8c7675 on the top view (sub/me, lot 698); app #b1c2c0"
   },
   {
    "id": "16/58541/25067/79",
@@ -2218,9 +2201,9 @@
   {
    "id": "16/58541/25067/8",
    "roof": {
-    "color": "#9ba3a8"
+    "color": "#8f818c"
    },
-   "src": "earth: roof #9ba3a8 on the top view (sub/mw, lot 700); app #797984"
+   "src": "earth: roof #8f818c on the top view (sub/mw, lot 700); app #797984"
   },
   {
    "id": "16/58541/25067/82",
@@ -2228,80 +2211,80 @@
    "storeys": 1,
    "roof": {
     "shape": "gable",
-    "color": "#c2a399"
+    "color": "#b3817f"
    },
    "facade": "house",
-   "src": "earth: a one-storey building with a red gable roof beside the new car park (sub/t_t699 strip); earth: roof #c2a399 on the top view (sub/me, lot 702); app #b47273"
+   "src": "earth: a one-storey building with a red gable roof beside the new car park (sub/t_t699 strip); earth: roof #b3817f on the top view (sub/me, lot 702); app #b47273"
   },
   {
    "id": "16/58541/25067/84",
    "roof": {
-    "color": "#ccefe5"
+    "color": "#bdbec0"
    },
-   "src": "earth: roof #ccefe5 on the top view (sub/ne, lot 703); app #aeccd6"
+   "src": "earth: roof #bdbec0 on the top view (sub/ne, lot 703); app #aeccd6"
   },
   {
    "id": "16/58541/25067/86",
    "roof": {
-    "color": "#c7c1bc"
+    "color": "#b8999d"
    },
-   "src": "earth: roof #c7c1bc on the top view (sub/ne, lot 705); app #7e7071"
+   "src": "earth: roof #b8999d on the top view (sub/ne, lot 705); app #7e7071"
   },
   {
    "id": "16/58541/25067/88",
    "roof": {
-    "color": "#cfeee5"
+    "color": "#bfbdc0"
    },
-   "src": "earth: roof #cfeee5 on the top view (sub/ne, lot 707); app #ebebee"
+   "src": "earth: roof #bfbdc0 on the top view (sub/ne, lot 707); app #ebebee"
   },
   {
    "id": "16/58541/25067/91",
    "roof": {
-    "color": "#b8b2b4"
+    "color": "#aa8d96"
    },
-   "src": "earth: roof #b8b2b4 on the top view (sub/ne, lot 709); app #99b3be"
+   "src": "earth: roof #aa8d96 on the top view (sub/ne, lot 709); app #99b3be"
   },
   {
    "id": "16/58541/25067/92",
    "roof": {
-    "color": "#455867"
+    "color": "#3f4455"
    },
-   "src": "earth: roof #455867 on the top view (sub/ne, lot 710); app #f6f5ea"
+   "src": "earth: roof #3f4455 on the top view (sub/ne, lot 710); app #f6f5ea"
   },
   {
    "id": "16/58541/25067/94",
    "roof": {
-    "color": "#bdd6d4"
+    "color": "#afaab1"
    },
-   "src": "earth: roof #bdd6d4 on the top view (sub/ne, lot 712); app #9aab9d"
+   "src": "earth: roof #afaab1 on the top view (sub/ne, lot 712); app #9aab9d"
   },
   {
    "id": "16/58541/25067/99",
    "roof": {
-    "color": "#6b7c82"
+    "color": "#62616c"
    },
-   "src": "earth: roof #6b7c82 on the top view (sub/ne, lot 717); app #769699"
+   "src": "earth: roof #62616c on the top view (sub/ne, lot 717); app #769699"
   },
   {
    "id": "16/58541/25068/23",
    "roof": {
-    "color": "#8d9790"
+    "color": "#827778"
    },
-   "src": "earth: roof #8d9790 on the top view (sub/sw, lot 195); app #b7c4ba"
+   "src": "earth: roof #827778 on the top view (sub/sw, lot 195); app #b7c4ba"
   },
   {
    "id": "16/58541/25068/24",
    "roof": {
-    "color": "#90a4a6"
+    "color": "#85828a"
    },
-   "src": "earth: roof #90a4a6 on the top view (sub/se, lot 196); app #6f5546"
+   "src": "earth: roof #85828a on the top view (sub/se, lot 196); app #6f5546"
   },
   {
    "id": "16/58541/25068/28",
    "roof": {
-    "color": "#75888f"
+    "color": "#6c6b77"
    },
-   "src": "earth: roof #75888f on the top view (sub/se, lot 200); app #be7269"
+   "src": "earth: roof #6c6b77 on the top view (sub/se, lot 200); app #be7269"
   },
   {
    "id": "16/58541/25068/37",
@@ -2321,30 +2304,30 @@
   {
    "id": "16/58541/25068/91",
    "roof": {
-    "color": "#b3d0c9"
+    "color": "#a5a5a8"
    },
-   "src": "earth: roof #b3d0c9 on the top view (sub/se, lot 221); app #f5f3e8"
+   "src": "earth: roof #a5a5a8 on the top view (sub/se, lot 221); app #f5f3e8"
   },
   {
    "id": "16/58541/25068/94",
    "roof": {
-    "color": "#d2b6ae"
+    "color": "#c29091"
    },
-   "src": "earth: roof #d2b6ae on the top view (sub/se, lot 224); app #bd888b"
+   "src": "earth: roof #c29091 on the top view (sub/se, lot 224); app #bd888b"
   },
   {
    "id": "16/58541/25068/95",
    "roof": {
-    "color": "#5f727a"
+    "color": "#575965"
    },
-   "src": "earth: roof #5f727a on the top view (sub/se, lot 225); app #495970"
+   "src": "earth: roof #575965 on the top view (sub/se, lot 225); app #495970"
   },
   {
    "id": "ovr:c2:fukko-park-wc",
    "roof": {
-    "color": "#626e75"
+    "color": "#5a5661"
    },
-   "src": "earth: roof #626e75 on the top view (sub/se, lot null); app #a1bc7b"
+   "src": "earth: roof #5a5661 on the top view (sub/se, lot null); app #a1bc7b"
   },
   {
    "id": "16/58540/25068/297",
@@ -2370,6 +2353,56 @@
    "id": "16/58541/25067/158",
    "remove": true,
    "src": "earth: sub/se top + r1003 o0/o90/o180/o270/l45/l225, unbroken cedar canopy, no roof or clearing; the GSI photo also shows woods"
+  },
+  {
+   "id": "16/58540/25066/30",
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (bare ground beside a warehouse; the dark strip is its shadow), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
+  },
+  {
+   "id": "16/58540/25067/303",
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (forest), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
+  },
+  {
+   "id": "16/58540/25067/326",
+   "roof": {
+    "shape": "gable",
+    "ridge": "z"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a double red gable on a 17 x 22 m house, ridges along the long axis; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
+  },
+  {
+   "id": "16/58540/25067/74",
+   "roof": {
+    "shape": "hip",
+    "ridge": "z"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a hipped roof (blue-grey); the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a hip"
+  },
+  {
+   "id": "16/58541/25067/0",
+   "roof": {
+    "shape": "gable",
+    "ridge": "z"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
+  },
+  {
+   "id": "16/58541/25066/174",
+   "roof": {
+    "shape": "gable",
+    "ridge": "x"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
+  },
+  {
+   "id": "16/58540/25066/8",
+   "roof": {
+    "shape": "gable",
+    "ridge": "x"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
   }
  ],
  "newLots": [
@@ -2401,6 +2434,34 @@
    },
    "facade": "public",
    "src": "earth: a small grey-roofed park building (toilets) beside the 復興祈念公園 car park, not in the GSI footprints (sub/se zoom_parkwc.jpg, its shadow ~5 m)"
+  },
+  {
+   "id": "ovr:c2:osm-1242838123",
+   "poly": [
+    [
+     -165.9,
+     -339.7
+    ],
+    [
+     -164,
+     -329.9
+    ],
+    [
+     -156.6,
+     -331.3
+    ],
+    [
+     -158.5,
+     -341.1
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#938d91"
+   },
+   "src": "osm: w1242838123 (75 m2, uncovered by any lot) + earth: 2026-03-11 top, o0 and o180 of the c2 capture (tools/anime/earth-crop.mjs --ring): a dark grey gable roof (the ring is 2 m off the building); roof median #8b8589 + 3 L* (round 3 systemic 1: the OSM gap list is mostly gone buildings, this one stands)"
   }
  ],
  "landuse": [

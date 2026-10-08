@@ -1,0 +1,22 @@
+{
+  "schema": "klc-jpyc-shops/1",
+  "version": 1,
+  "doc": "docs/jpyc/README.md",
+  "note": "THE SWITCH: production shows nothing (no menu item, no sheet, no request to JPYC EC) until an entry here is on. A demo shop is on only with \"enabled\": true; a Kesennuma shop is on when its consent record is filled (and it is not \"enabled\": false). See docs/jpyc/README.md.",
+  "entries": [
+    {
+      "id": "jpyc-demo",
+      "kind": "demo",
+      "enabled": false,
+      "ja": "JPYC EC デモショップ",
+      "en": "JPYC EC demo shop",
+      "x": 5,
+      "z": 40,
+      "shopSlug": "otameshi",
+      "productIds": null,
+      "consent": null,
+      "googleMapsQuery": null,
+      "googleMapsPlaceId": null
+    }
+  ]
+}

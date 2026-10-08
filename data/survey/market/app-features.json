@@ -1,12 +1,237 @@
 {
  "note": "window.__features(area) / __featureDims(area) from the built app (tools/anime/survey-diff.mjs)",
  "area": "market",
- "generated": "2026-10-03T13:22:17.585Z",
+ "generated": "2026-10-03T21:59:26.203Z",
  "features": {
-  "canopy.beam_bottom": [
-   563.771,
-   5.82,
-   663.949
+  "canopy.col#10": [
+   530.976,
+   2.15,
+   614.448
+  ],
+  "canopy.col#9": [
+   539.954,
+   2.15,
+   634.093
+  ],
+  "canopy.col#8": [
+   548.932,
+   2.15,
+   653.739
+  ],
+  "canopy.col#7": [
+   557.911,
+   2.15,
+   673.385
+  ],
+  "canopy.col#6": [
+   566.889,
+   2.15,
+   693.03
+  ],
+  "canopy.col#5": [
+   575.867,
+   2.15,
+   712.676
+  ],
+  "canopy.col#4": [
+   584.845,
+   2.15,
+   732.322
+  ],
+  "canopy.col#3": [
+   593.823,
+   2.15,
+   751.967
+  ],
+  "canopy.col#2": [
+   602.801,
+   2.15,
+   771.613
+  ],
+  "canopy.col#1": [
+   611.78,
+   2.15,
+   791.259
+  ],
+  "canopy.col#0": [
+   620.758,
+   2.15,
+   810.904
+  ],
+  "canopy.col#-1": [
+   629.736,
+   2.15,
+   830.55
+  ],
+  "canopy.col#-2": [
+   638.714,
+   2.15,
+   850.196
+  ],
+  "canopy.col#-3": [
+   647.692,
+   2.15,
+   869.841
+  ],
+  "canopy.col#-4": [
+   656.67,
+   2.15,
+   889.487
+  ],
+  "canopy.col#-5": [
+   665.648,
+   2.15,
+   909.133
+  ],
+  "canopy.col#-6": [
+   674.627,
+   2.15,
+   928.779
+  ],
+  "canopy.curb#1": [
+   576.843,
+   1.84,
+   663.688
+  ],
+  "canopy.curb#2": [
+   579.42,
+   1.84,
+   669.327
+  ],
+  "canopy.curb#3": [
+   581.424,
+   1.84,
+   673.711
+  ],
+  "canopy.bitt#1": [
+   577.974,
+   1.84,
+   666.162
+  ],
+  "canopy.bitt#2": [
+   581.985,
+   1.84,
+   674.939
+  ],
+  "canopy.tub#1": [
+   543.665,
+   2.89,
+   661.82
+  ],
+  "canopy.tub#2": [
+   544.176,
+   2.89,
+   662.938
+  ],
+  "canopy.tub#3": [
+   544.687,
+   2.89,
+   664.057
+  ],
+  "canopy.tub#4": [
+   545.198,
+   2.89,
+   665.176
+  ],
+  "canopy.tub#5": [
+   545.71,
+   2.89,
+   666.295
+  ],
+  "canopy.tub#6": [
+   546.221,
+   2.89,
+   667.413
+  ],
+  "canopy.tub#7": [
+   546.732,
+   2.89,
+   668.532
+  ],
+  "canopy.tub#8": [
+   547.243,
+   2.89,
+   669.651
+  ],
+  "canopy.conveyor.caster#1": [
+   555.118,
+   2.15,
+   667.756
+  ],
+  "canopy.conveyor.caster#2": [
+   554.639,
+   2.15,
+   668.294
+  ],
+  "canopy.conveyor.caster#3": [
+   552.961,
+   2.15,
+   663.036
+  ],
+  "canopy.conveyor.caster#4": [
+   552.182,
+   2.15,
+   663.568
+  ],
+  "canopy.conveyor.caster#5": [
+   553.026,
+   2.15,
+   661.06
+  ],
+  "canopy.conveyor.caster#6": [
+   552.357,
+   2.15,
+   661.497
+  ],
+  "canopy.hopper.leg#1": [
+   554.738,
+   2.15,
+   671.327
+  ],
+  "canopy.hopper.leg#2": [
+   554.9,
+   2.15,
+   672.715
+  ],
+  "canopy.truck.wheel#1": [
+   572.42,
+   1.84,
+   665.775
+  ],
+  "canopy.truck.wheel#2": [
+   573.098,
+   1.84,
+   668.148
+  ],
+  "canopy.tug.ring#1": [
+   580.062,
+   4.505,
+   666.642
+  ],
+  "canopy.tug.ring#2": [
+   581.542,
+   4.41,
+   669.88
+  ],
+  "canopy.tug.mark": [
+   581.38,
+   3.395,
+   670.031
+  ],
+  "canopy.tug.wall_top": [
+   580.448,
+   4.08,
+   667.967
+  ],
+  "canopy.tug.funnel_top": [
+   581.47,
+   7.07,
+   669.242
+  ],
+  "canopy.tug.house_roof": [
+   584.346,
+   4.69,
+   674.332
   ],
   "deck.wall.n_base": [
    666.71,
@@ -84,151 +309,121 @@
    1024.623
   ],
   "deck.window#1": [
-   668.772,
-   17.405,
-   967.545
-  ],
-  "deck.window#2": [
-   670.411,
-   17.405,
-   971.139
-  ],
-  "deck.window#3": [
-   672.051,
-   17.405,
-   974.733
-  ],
-  "deck.window#4": [
    674.897,
    17.405,
    980.974
   ],
-  "deck.window#5": [
+  "deck.window#2": [
    676.52,
    17.405,
    984.532
   ],
-  "deck.window#6": [
+  "deck.window#3": [
    678.367,
    17.405,
    988.581
   ],
-  "deck.window#7": [
+  "deck.window#4": [
    681.126,
    17.405,
    994.631
   ],
-  "deck.window#8": [
+  "deck.window#5": [
    682.683,
    17.405,
    998.043
   ],
-  "deck.window#9": [
+  "deck.window#6": [
    684.259,
    17.405,
    1001.5
   ],
-  "deck.window#10": [
+  "deck.window#7": [
    687.148,
    17.405,
    1007.832
   ],
-  "deck.window#11": [
+  "deck.window#8": [
    688.849,
    17.405,
    1011.563
   ],
-  "deck.window#12": [
+  "deck.window#9": [
    690.472,
    17.405,
    1015.12
   ],
-  "deck.window#13": [
+  "deck.window#10": [
    693.273,
    17.405,
    1021.261
   ],
-  "deck.window#14": [
+  "deck.window#11": [
    694.937,
    17.405,
    1024.91
   ],
-  "deck.window#15": [
+  "deck.window#12": [
    696.576,
    17.405,
    1028.504
   ],
-  "deck.window#16": [
+  "deck.window#13": [
    705.602,
    17.405,
    1048.292
   ],
-  "deck.window#17": [
+  "deck.window#14": [
    707.3,
    17.405,
    1052.013
   ],
-  "deck.window#18": [
+  "deck.window#15": [
    708.997,
    17.405,
    1055.735
   ],
-  "deck.window#19": [
-   711.412,
-   17.405,
-   1061.03
-  ],
-  "deck.window#20": [
-   713.051,
-   17.405,
-   1064.624
-  ],
-  "deck.window#21": [
-   714.69,
-   17.405,
-   1068.217
-  ],
-  "deck.window#22": [
+  "deck.window#16": [
    717.147,
    17.405,
    1073.603
   ],
-  "deck.window#23": [
+  "deck.window#17": [
    718.741,
    17.405,
    1077.097
   ],
-  "deck.window#24": [
+  "deck.window#18": [
    720.318,
    17.405,
    1080.555
   ],
-  "deck.window#25": [
+  "deck.window#19": [
    722.982,
    17.405,
    1086.396
   ],
-  "deck.window#26": [
+  "deck.window#20": [
    724.555,
    17.405,
    1089.844
   ],
-  "deck.window#27": [
+  "deck.window#21": [
    726.053,
    17.405,
    1093.128
   ],
-  "deck.window#28": [
+  "deck.window#22": [
    728.734,
    17.405,
    1099.006
   ],
-  "deck.window#29": [
+  "deck.window#23": [
    730.232,
    17.405,
    1102.29
   ],
-  "deck.window#30": [
+  "deck.window#24": [
    731.775,
    17.405,
    1105.675
@@ -249,9 +444,19 @@
    1036.355
   ],
   "deck.cone#4": [
-   713.056,
+   713.35,
    15.585,
-   1039.145
+   1038.689
+  ],
+  "deck.line.stall#1": [
+   712.59,
+   15.585,
+   1040.599
+  ],
+  "deck.line.stall#2": [
+   714.7,
+   15.585,
+   1039.636
   ],
   "deck.stack#1": [
    687.336,
@@ -289,9 +494,9 @@
    1066.703
   ],
   "deck.stack#8": [
-   742.612,
+   742.197,
    20.6,
-   1092.082
+   1091.172
   ],
   "deck.pavilion#1": [
    685.546,
@@ -329,9 +534,9 @@
    1086.274
   ],
   "deck.pavilion#8": [
-   746.363,
+   745.512,
    15.585,
-   1096.691
+   1094.826
   ],
   "deck.lifeboat.end_n": [
    714.16,
@@ -370,15 +575,21 @@
   ]
  },
  "dims": {
-  "canopy.floor_y": 2.19,
-  "canopy.soffit_y": 5.82,
-  "canopy.open_depth": 39.3,
+  "canopy.tug.hull_plane_d": 1,
+  "canopy.floor_y": 2.15,
+  "canopy.apron_y": 1.84,
+  "canopy.tub_h": 0.74,
+  "canopy.tub_pitch": 1.23,
+  "canopy.truck_wheelbase": 2.468,
+  "canopy.beam_t1.a": 59.7,
+  "canopy.beam_t1.y": 7.76,
+  "canopy.shadow_d": -34.426,
   "deck.y": 15.585,
   "deck.wall_h": 6.645,
   "deck.studio_h": 6.535,
   "deck.wall_len": 159.82,
   "deck.pavilions": 8,
   "deck.stacks": 8,
-  "deck.windows": 30
+  "deck.windows": 24
  }
 }

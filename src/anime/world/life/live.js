@@ -9,6 +9,8 @@
 // Publishes ctx.services.arrivals = { list: [{ vessel, time, h, type, typeEn, catch, catchEn, kg, kind, estimated }], sample,
 //   origin, onChange(fn) } — the harbor package may spawn arriving boats with these real vessel names.
 
+import { mapWeather } from './wxmap.js';
+
 export function normalizeArrivals(port) {
   return (port?.arrivals || []).map((a) => ({
     vessel: a.vessel, time: a.time, h: a.eta?.h ?? null, estimated: !!a.eta?.estimated,
@@ -30,11 +32,9 @@ export function staleness(s, origin, now = Date.now()) {
   if (/^\d{4}-\d{2}-\d{2}$/.test(pd) && pd < jstToday) stale = true;   // the co-op lists tomorrow's 予定 in the evening
   return { stale, at };
 }
-/** The /api/live weather block -> { cover, rain, windMs, windDirDeg, sky, temp }. */
-export function weatherRender(w) {
-  if (!w) return null;
-  const r = w.render || {};
-  return { cover: r.cover ?? 0.4, rain: r.rain ?? 0, windMs: r.windMs ?? w.windMs ?? 3, windDirDeg: r.windDirDeg ?? w.windDirDeg ?? 270, sky: w.sky || 'clear', temp: w.temp ?? null };
+/** The /api/live weather block -> { cover, rain, wet, windMs, windDirDeg, sky, temp }. */
+export function weatherRender(w, prev = null) {
+  return mapWeather(w, prev);
 }
 
 export function createLive(ctx, T, o = {}) {
@@ -56,14 +56,18 @@ export function createLive(ctx, T, o = {}) {
     }
     if (!s) { state.status = 'error'; emit(); return state; }
     state.status = 'ok'; state.origin = origin; state.sample = origin !== 'live' || !!s.sample;
-    state.weather = s.weather ? { ...weatherRender(s.weather), station: s.weather.station, observedAt: s.weather.observedAt, forecast: s.weather.forecast } : null;
+    state.weather = s.weather ? { ...weatherRender(s.weather, state.weather), station: s.weather.station, observedAt: s.weather.observedAt, forecast: s.weather.forecast, source: s.weather.source } : null;
+    state.sun = s.sun || null;
+    state.ais = s.ais || null;
     state.arrivals = normalizeArrivals(s.port);
     state.portDate = s.port?.date || null;
     state.updated = s.updated || null;
     // [v3:fix] a cached copy (network failed) older than 1 h, or a port list dated before today (JST), is not "live"
     { const st = staleness(s, origin); state.stale = st.stale; state.staleAt = st.at; }
-    svc.list = state.arrivals; svc.sample = state.sample; svc.origin = origin;
+    svc.list = state.arrivals; svc.sample = state.sample; svc.origin = origin; svc.date = state.portDate;
     if (o.applyWeather !== false && state.weather) T.setWeather(state.weather);
+    if (state.sun) T.setSun?.(state.sun);
+    ctx.services.ais = state.ais;
     emit();
     return state;
   }

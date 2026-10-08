@@ -46,9 +46,11 @@ export const inCedarCells = (x, z) => CEDAR_CELLS.some(([x0, z0, x1, z1]) => x >
 /** [v5:fix2] A canopy pixel on the cedar hills is cedar when its hue is over 95 or its value under 0.45. */
 export const cedarCanopy = (h, v) => h > 95 || v < 0.45;
 /** [v5:fix2] The core town: the grey-ground-far-from-buildings rule (grass / field) holds only outside it (ground over
- *  8 m, or beyond 1.5 km of (250, 150)); the cleared post-2011 core is grey or tan ground with few buildings, and Earth
+ *  8 m, or beyond 1.5 km of (250, 150)); the cleared core is grey or tan ground with few buildings, and Earth
  *  2026 shows asphalt, gravel or bare ground there, not lawns. */
 export const coreTown = (x, z, h) => h <= 8 && Math.hypot(x - 250, z - 150) <= 1500;
+/** [v6:c4e] sand above this ground height (m), away from buildings, is a bare cut or clear-cut (felled), not a beach. */
+export const SAND_HILL_H = 12;
 /** Pixel -> class index. Exported for tests. */
 export function classify(r, g, b) {
   r = Math.min(255, r * 1.1); b = Math.min(255, b * 1.05);   // the GSI photos carry a green cast: neutralise town grey first
@@ -91,7 +93,7 @@ function fillRing(a, size, x0, z0, px, pz, ring, holes, c, only = null) {
   }
   return set;
 }
-const SURFACE_CLASS = { parking: 6, apron: 6, plaza: 6, gravel: 7, construction: 7, felled: 9, forest: 0, cedar: 1 };
+const SURFACE_CLASS = { parking: 6, apron: 6, plaza: 6, levee: 6, gravel: 7, grave: 7, construction: 7, felled: 9, forest: 0, cedar: 1 };
 /** [v5:fix2] Paint the known surfaces over the photo classes: every lot footprint (OBB) is town ground; every car park,
  *  override apron, plaza, gravel lot and building site is paving or town ground; override forest / cedar / felled are
  *  forest, cedar and bare ground. Woods are not painted over by a lot (a hillside shed in the trees). */
@@ -136,10 +138,10 @@ async function build(name, size) {
   const W = meta.width * meta.dx, H = meta.height * meta.dz, hMin = name === "core" ? 36 : 28;
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
     const k = y * size + x, c = a[k];
-    if (c !== 4 && c !== 6 && c !== 7) continue;
+    if (c !== 4 && c !== 5 && c !== 6 && c !== 7) continue;
     const wx = meta.x0 + (x + 0.5) / size * W, wz = meta.z0 + (y + 0.5) / size * H;
     const h = L.heightAt(wx, wz);
-    if (h > hMin + ((x * 7 + y * 13) % 11)) a[k] = h > 120 && (x + y) % 3 === 0 ? 1 : 0;
+    if (h > hMin + ((x * 7 + y * 13) % 11)) a[k] = c === 5 ? 9 : h > 120 && (x + y) % 3 === 0 ? 1 : 0;   // [v6:c4e] bright tan (sand) on a hill is a bare cut / clear-cut: felled, not cream sand
   }
   // [v5:fix2] the cedar hills of c1, c2 and c5: canopy above 30 m is 杉 when it is blue-green or dark
   let cedarN = 0;
@@ -165,6 +167,17 @@ async function build(name, size) {
     if (coreTown(wx, wz, L.heightAt(wx, wz))) continue;   // [v5:fix2] not in the cleared core town
     a[k] = (k * 2654435761 >>> 0) % 7 === 0 ? 2 : 3;
   }
+  // [v6:c4e] bare-cut sand away from the town. The aerial photo (2020-22) shows the 三陸沿岸道路 works as bare cream cuts and
+  // the hill rule above only reaches ground over 36 m, but the cuts sit at 15-45 m: Earth 2026-03-11 shows the road finished and
+  // the slopes dormant tan-brown grass (L* about 47 = `felled`), nowhere cream. Sand over SAND_HILL_H m (a beach is under 6 m)
+  // with no building within about 50 m is felled ground. Real sand stays: beaches, and any quarry that Earth confirms.
+  let sandN = 0;
+  for (let k = 0; k < n; k++) {
+    if (a[k] !== 5 || bdb[k] >= 0.002 * (W / size) * (W / size) / 4) continue;
+    const x = k % size, y = (k / size) | 0, wx = meta.x0 + (x + 0.5) / size * W, wz = meta.z0 + (y + 0.5) / size * H;
+    if (L.heightAt(wx, wz) > SAND_HILL_H) { a[k] = 9; sandN++; }
+  }
+  if (sandN) console.error(`[landcover ${name}] bare-cut sand over ${SAND_HILL_H} m, away from buildings: ${sandN} px sand -> felled`);
   // [v4:polish3] the working quays: the apron between the harbour road and the berths is concrete and asphalt (aerial z18,
   // 港町 / 魚市場前), but its weedy joints and the photo's green cast read as a lawn strip. Grass / field within 25 m of a
   // quay or seawall on low ground (< 5 m) is paving; the forest of 神明崎 and the hills stays.

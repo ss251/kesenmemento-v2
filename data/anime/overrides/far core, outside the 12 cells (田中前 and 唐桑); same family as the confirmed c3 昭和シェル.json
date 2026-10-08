@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "cell": "far-fuel-brands",
+  "bbox": [
+    -2420,
+    -250,
+    6480,
+    4720
+  ],
+  "note": "far core and outer lots, outside the 12 cells: five petrol stations whose OSM names are retired brands (same family as c3 昭和シェル -> apollostation). The bbox spans the five lots (田中前 -878,1478; 気仙沼バイパス 459,4671; 唐桑 5355,374 and 6432,142; ENEOS -2373,-206); only those five lots are patched. Idemitsu absorbed Showa Shell in 2019 and relabelled every Idemitsu and Shell station apollostation (rollout 2021-04, complete end of 2023). Esso became ENEOS. The OSM POIs that carry the old names are dropped by build-layout extras() because their lot is renamed; the lot name puts the new place in search and labels.",
+  "sources": [
+    {
+      "id": "idemitsu",
+      "what": "map.idemitsu.com/b/a/attr/?citycode=04205 station list and info/<id> pages (apollostation 唐桑半島中央SS, 唐桑SS, 気仙沼バイパスSS)",
+      "date": "2026-10-05"
+    },
+    {
+      "id": "yahoo",
+      "what": "Yahoo Maps place 8tXB7teoXHE and 90uMvXnlLRI; map.yahoo.co.jp/v3/place/TyjXdgdH976 (apollostation 気仙沼西SS, 田中前)",
+      "date": "2026-10-05"
+    },
+    {
+      "id": "kshokai",
+      "what": "k-shokai.co.jp 気仙沼西店 営業終了のお知らせ (notice dated 2026-06-08: the 田中前 station closed end of May 2026)",
+      "date": "2026-06-08"
+    },
+    {
+      "id": "gogo",
+      "what": "gogo.gs/news/contents/1701331715 (さようなら昭和シェル石油 & 出光: 2024 unification under apollostation)",
+      "date": "2024-01-01"
+    },
+    {
+      "id": "okamoto",
+      "what": "okamoto-self.com/20181120-2 and mapion phonebook 20430114138 (ENEOS セルフ気仙沼SS)",
+      "date": "2018-11-20"
+    }
+  ],
+  "lots": [
+    {
+      "id": "16/58539/25071/154",
+      "unname": true,
+      "src": "kshokai: the former 昭和シェル / apollostation 気仙沼西SS at 田中前 closed at the end of May 2026 (営業終了のお知らせ 2026-06-08); the name goes, the footprint and canopy stay until a 2026 photo shows demolition; yahoo TyjXdgdH976 still lists the old apollostation 気仙沼西SS"
+    },
+    {
+      "id": "16/58554/25068/71",
+      "name": "apollostation 唐桑半島中央SS",
+      "nameEn": "apollostation Karakuwa Hanto-Chuo SS",
+      "src": "idemitsu: citycode=04205 lists apollostation 唐桑半島中央SS; gogo: 昭和シェル石油 brand ended in the 2019-2024 unification"
+    },
+    {
+      "id": "16/58552/25069/11",
+      "name": "apollostation 唐桑SS",
+      "nameEn": "apollostation Karakuwa SS",
+      "src": "idemitsu: citycode=04205 lists apollostation 唐桑SS; gogo: 出光 brand ended 2024. The duplicate OSM pin p1at9ia1 (5352,374, n5162503721) on the same lot carries the old name and is dropped with it"
+    },
+    {
+      "id": "16/58541/25078/348",
+      "name": "apollostation 気仙沼バイパスSS",
+      "nameEn": "apollostation Kesennuma Bypass SS",
+      "src": "idemitsu: citycode=04205 lists apollostation 気仙沼バイパスSS; yahoo 90uMvXnlLRI; gogo: 出光 brand ended 2024"
+    },
+    {
+      "id": "16/58535/25068/159",
+      "name": "ENEOS セルフ気仙沼SS",
+      "nameEn": "ENEOS Self Kesennuma SS",
+      "src": "okamoto: ENEOS セルフ気仙沼SS (mapion 20430114138); Esso became ENEOS years ago"
+    }
+  ]
+}

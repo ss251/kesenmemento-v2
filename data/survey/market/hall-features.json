@@ -1,0 +1,471 @@
+{
+ "note": "Quay-hall features (tools/survey/market_hall.py from data/survey/market/hall-picks.json): ENU metres, 1-sigma per axis.",
+ "features": [
+  {
+   "name": "canopy.tub#1",
+   "enu": [
+    543.656,
+    2.89,
+    661.821
+   ],
+   "sigma": [
+    0.156,
+    0.05,
+    0.156
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 21.9,
+   "note": "row 1, near rim corner of tub 1 (the first tub's four rim corners cut to a 1.44 x 1.19 m rectangle)"
+  },
+  {
+   "name": "canopy.tub#2",
+   "enu": [
+    544.153,
+    2.89,
+    662.89
+   ],
+   "sigma": [
+    0.157,
+    0.05,
+    0.157
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 22.6
+  },
+  {
+   "name": "canopy.tub#3",
+   "enu": [
+    544.697,
+    2.89,
+    664.051
+   ],
+   "sigma": [
+    0.157,
+    0.05,
+    0.157
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 23.4
+  },
+  {
+   "name": "canopy.tub#4",
+   "enu": [
+    545.183,
+    2.89,
+    665.125
+   ],
+   "sigma": [
+    0.158,
+    0.05,
+    0.158
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 24.1
+  },
+  {
+   "name": "canopy.tub#5",
+   "enu": [
+    545.781,
+    2.89,
+    666.273
+   ],
+   "sigma": [
+    0.158,
+    0.05,
+    0.158
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 25.0
+  },
+  {
+   "name": "canopy.tub#6",
+   "enu": [
+    546.334,
+    2.89,
+    667.438
+   ],
+   "sigma": [
+    0.159,
+    0.05,
+    0.159
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 25.9
+  },
+  {
+   "name": "canopy.tub#7",
+   "enu": [
+    546.853,
+    2.89,
+    668.588
+   ],
+   "sigma": [
+    0.159,
+    0.05,
+    0.159
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 26.8
+  },
+  {
+   "name": "canopy.tub#8",
+   "enu": [
+    547.351,
+    2.89,
+    669.614
+   ],
+   "sigma": [
+    0.16,
+    0.05,
+    0.16
+   ],
+   "method": "ray x plane tub_rim (T.P. 2.89), IMG_0853",
+   "views": [
+    "IMG_0853"
+   ],
+   "range_m": 27.7
+  },
+  {
+   "name": "canopy.conveyor.caster#1",
+   "enu": [
+    555.121,
+    2.15,
+    667.752
+   ],
+   "sigma": [
+    0.165,
+    0.05,
+    0.165
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 34.3,
+   "note": "belt, right end"
+  },
+  {
+   "name": "canopy.conveyor.caster#2",
+   "enu": [
+    554.638,
+    2.15,
+    668.289
+   ],
+   "sigma": [
+    0.165,
+    0.05,
+    0.165
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 34.0
+  },
+  {
+   "name": "canopy.conveyor.caster#3",
+   "enu": [
+    552.961,
+    2.15,
+    663.035
+   ],
+   "sigma": [
+    0.162,
+    0.05,
+    0.162
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 31.2,
+   "note": "belt, middle"
+  },
+  {
+   "name": "canopy.conveyor.caster#4",
+   "enu": [
+    552.183,
+    2.15,
+    663.571
+   ],
+   "sigma": [
+    0.162,
+    0.05,
+    0.162
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 30.5
+  },
+  {
+   "name": "canopy.conveyor.caster#5",
+   "enu": [
+    553.021,
+    2.15,
+    661.059
+   ],
+   "sigma": [
+    0.162,
+    0.05,
+    0.162
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 31.0,
+   "note": "sorter, left end"
+  },
+  {
+   "name": "canopy.conveyor.caster#6",
+   "enu": [
+    552.36,
+    2.15,
+    661.497
+   ],
+   "sigma": [
+    0.162,
+    0.05,
+    0.162
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 30.4
+  },
+  {
+   "name": "canopy.truck.wheel#1",
+   "enu": [
+    572.42,
+    1.84,
+    665.777
+   ],
+   "sigma": [
+    0.181,
+    0.05,
+    0.181
+   ],
+   "method": "ray x plane apron (T.P. 1.84), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 50.7,
+   "note": "2 t truck, front tyre contact patch (wheelbase 2.5 m is a constraint of the canopy adjustment)"
+  },
+  {
+   "name": "canopy.truck.wheel#2",
+   "enu": [
+    573.1,
+    1.84,
+    668.153
+   ],
+   "sigma": [
+    0.182,
+    0.05,
+    0.182
+   ],
+   "method": "ray x plane apron (T.P. 1.84), IMG_0855",
+   "views": [
+    "IMG_0855"
+   ],
+   "range_m": 51.8,
+   "note": "rear tyre"
+  },
+  {
+   "name": "canopy.hopper.leg#1",
+   "enu": [
+    554.734,
+    2.15,
+    671.325
+   ],
+   "sigma": [
+    0.165,
+    0.05,
+    0.165
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0860",
+   "views": [
+    "IMG_0860"
+   ],
+   "range_m": 33.9,
+   "note": "steel hopper beside column 7, front leg"
+  },
+  {
+   "name": "canopy.hopper.leg#2",
+   "enu": [
+    554.897,
+    2.15,
+    672.716
+   ],
+   "sigma": [
+    0.165,
+    0.05,
+    0.165
+   ],
+   "method": "ray x plane hall_floor (T.P. 2.15), IMG_0860",
+   "views": [
+    "IMG_0860"
+   ],
+   "range_m": 34.5
+  },
+  {
+   "name": "canopy.curb#1",
+   "enu": [
+    576.842,
+    1.833,
+    663.683
+   ],
+   "sigma": [
+    0.25,
+    0.05,
+    0.25
+   ],
+   "method": "survey adjustment (canopy:curb.0853.0)",
+   "views": [
+    "IMG_0853"
+   ]
+  },
+  {
+   "name": "canopy.curb#2",
+   "enu": [
+    579.398,
+    1.809,
+    669.332
+   ],
+   "sigma": [
+    0.25,
+    0.05,
+    0.25
+   ],
+   "method": "survey adjustment (canopy:curb.0853.5)",
+   "views": [
+    "IMG_0853"
+   ]
+  },
+  {
+   "name": "canopy.curb#3",
+   "enu": [
+    581.454,
+    1.862,
+    673.701
+   ],
+   "sigma": [
+    0.25,
+    0.05,
+    0.25
+   ],
+   "method": "survey adjustment (canopy:curb.0853.10)",
+   "views": [
+    "IMG_0853"
+   ]
+  },
+  {
+   "name": "canopy.bitt#1",
+   "enu": [
+    578.006,
+    1.864,
+    666.152
+   ],
+   "sigma": [
+    0.25,
+    0.05,
+    0.25
+   ],
+   "method": "survey adjustment (canopy:bollard.0853.a)",
+   "views": [
+    "IMG_0853"
+   ]
+  },
+  {
+   "name": "canopy.bitt#2",
+   "enu": [
+    581.994,
+    1.841,
+    674.936
+   ],
+   "sigma": [
+    0.25,
+    0.05,
+    0.25
+   ],
+   "method": "survey adjustment (canopy:bollard.0855.a)",
+   "views": [
+    "IMG_0855"
+   ]
+  }
+ ],
+ "dims": [
+  {
+   "name": "canopy.beam_t1.a",
+   "value": 59.69,
+   "sigma": 0.15,
+   "note": "lower edge of the sunlit transverse beam: a line along the quay normal, seen from both camera positions (their baseline is across it); mean residual 2.9 px over 14 edge samples"
+  },
+  {
+   "name": "canopy.beam_t1.y",
+   "value": 7.76,
+   "sigma": 0.1,
+   "note": "T.P. height of the same line"
+  },
+  {
+   "name": "canopy.floor_y",
+   "value": 2.15,
+   "sigma": 0.08,
+   "note": "hall floor T.P.: floor tie points of the five frames (median 2.14-2.16 over 18-24 m; 1.8-1.9 beyond the roof edge, the apron)"
+  },
+  {
+   "name": "canopy.apron_y",
+   "value": 1.84,
+   "sigma": 0.03,
+   "note": "apron / curb top T.P. (adjustment scalar apron_y)"
+  },
+  {
+   "name": "canopy.tub_h",
+   "value": 0.74,
+   "sigma": 0.04,
+   "note": "tub rim above the floor (vertical cut over the foot, IMG_0853); the tub is 1.44 x 1.19 m"
+  },
+  {
+   "name": "canopy.tub_pitch",
+   "value": 1.23,
+   "sigma": 0.05,
+   "note": "tub row 1, junction to junction along the quay (eight tubs)"
+  },
+  {
+   "name": "canopy.truck_wheelbase",
+   "value": 2.47,
+   "sigma": 0.05,
+   "note": "front to rear tyre contact (a constraint of the adjustment, 2.5 m: Dyna / Dutro 2 t standard cab)"
+  },
+  {
+   "name": "canopy.shadow_d",
+   "value": -34.52,
+   "sigma": 0.1,
+   "note": "d of the roof edge's shadow line on the floor (IMG_0853 lower right, a line parallel to the quay)"
+  }
+ ]
+}

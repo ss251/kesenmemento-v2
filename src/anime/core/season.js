@@ -54,16 +54,26 @@ export const SEASON_GLSL = /* glsl */`
     vec3 sum = c * vec3(0.72, 1.06, 0.70);   // [v3:polish] deeper, lusher summer green
     vec3 win = mix(c, vec3(l), 0.55) * vec3(0.97, 0.97, 1.02);
     win = mix(win, mix(c, vec3(l), 0.7) * vec3(1.12, 1.0, 0.8), uSeasonE.y);   // [v5:fix1] early spring: dormant tan turf
+    // [r2:9] and darker: Earth 2026-03-11 shows the hillside grass and field gaps as a dull brown-grey (L* 45-52: grass #746a6f, field #867c7e) where the
+    // dormant tan read #a09f90 / #c7c2a1, the most visible land difference on every hill (dL +19 grass, +25 field; 'paving' +1 and 'cedar' +2 are the
+    // controls). Greenness is read from the ORIGINAL painted colour (the desaturated one has none left), the darkening is in linear space and follows
+    // the early preset only: summer and autumn keep their looks (no October evidence). Dirt (+20) and sand (+12) are not green: a separate follow-up.
+    float gr = smoothstep(0.015, 0.06, c.g - max(c.r, c.b));
+    win *= mix(vec3(1.0), vec3(0.46, 0.40, 0.58), gr * uSeasonE.y);
     return c * uSeasonS.z + spr * uSeasonS.x + sum * uSeasonS.y + win * uSeasonS.w;
   }
   // winter snow: up-facing surfaces, broken into painted drifts; flat dark surfaces (asphalt) stay clear
   vec3 klcSnowMix(vec3 albedo, vec3 nW, vec3 pW){
-    // [v5:fix1] early spring (no snow): flat green surfaces (lawns, verges) turn dormant tan, as in March imagery
+    // [v5:fix1] early spring (no snow): flat green surfaces (lawns, verges) turn dormant tan, as in March imagery.
+    // [r3:7] Not on roofs, facades and building materials (KLC_NO_DORMANT, patchSnow's noDormant): a green-painted roof (lot 16/58541/25069/367 stores
+    // sage #9fb5a2, Earth reads #afb9b0) stays green in the March imagery; the dormant turf is for ground and land cover only.
+    #ifndef KLC_NO_DORMANT
     if (uSeasonE.y > 0.002) {
       float gr = smoothstep(0.015, 0.06, albedo.g - max(albedo.r, albedo.b)) * smoothstep(0.85, 0.97, nW.y);
       float lg = dot(albedo, vec3(0.299, 0.587, 0.114));
       albedo = mix(albedo, vec3(lg) * vec3(1.25, 1.0, 0.68), gr * uSeasonE.y * 0.85);
     }
+    #endif
     float w = uSeasonS.w * uSeasonE.x;
     if (w < 0.002) return albedo;
     float up = smoothstep(0.42, 0.78, nW.y);
@@ -78,11 +88,13 @@ export const SEASON_GLSL = /* glsl */`
 `;
 
 /** onBeforeCompile helper: declare the uniform + helpers and apply snow before the toon lighting.
- *  posExpr: a world-position expression available in the fragment shader (e.g. 'vPWorld'). */
-export function patchSnow(sh, uSeason, posExpr) {
+ *  posExpr: a world-position expression available in the fragment shader (e.g. 'vPWorld'). noDormant: [r3:7] roofs, facades, buildings (see klcSnowMix). */
+export function patchSnow(sh, uSeason, posExpr, noDormant = false) {
   sh.uniforms.uSeasonS = uSeason;
   sh.uniforms.uSeasonE = seasonExtra(uSeason);
-  if (!sh.fragmentShader.includes('uniform vec4 uSeasonS;')) sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + SEASON_GLSL);
+  // [r3:7] noDormant: roof / facade / building materials skip the early-spring dormant-tan conversion (SEASON_GLSL klcSnowMix); the caller's
+  // customProgramCacheKey must differ for them ('-roof'): the define changes the program
+  if (!sh.fragmentShader.includes('uniform vec4 uSeasonS;')) sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + (noDormant ? '#define KLC_NO_DORMANT\n' : '') + SEASON_GLSL);
   const hook = sh.fragmentShader.includes('#include <lights_toon_fragment>') ? '#include <lights_toon_fragment>' : '#include <lights_fragment_begin>';
   sh.fragmentShader = sh.fragmentShader.replace(hook, `{
       vec3 klcNW = normalize((vec4(normal, 0.0) * viewMatrix).xyz);

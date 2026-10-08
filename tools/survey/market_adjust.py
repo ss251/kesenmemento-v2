@@ -224,7 +224,7 @@ class Problem:
                         add((P[ax] - c['enu'][ax]) / sg[ax], ('known', c['p'], 'xyz'[ax]))
             elif kind == 'on_y':
                 for p in c['points']:
-                    add((self.pt(x, p)[1] - self.val(x, c['y'])) / c.get('sigma', 0.05), ('on_y', p, str(c['y'])))
+                    add((self.pt(x, p)[1] - self.val(x, c['y']) - c.get('dy', 0.0)) / c.get('sigma', 0.05), ('on_y', p, str(c['y'])))   # [v6:fix2] dy: a height above the named surface (a licence plate 0.5 m above the deck)
             elif kind == 'on_line':
                 a, b = np.asarray(c['line'][0], float), np.asarray(c['line'][1], float)
                 u = (b - a) / np.linalg.norm(b - a)

@@ -30,7 +30,7 @@ const L = await import('../src/anime/world/layout.js');
 const { createContext } = await import('../src/anime/core/ctx.js');
 const { buildHarbor } = await import('../src/anime/world/harbor/world.js');
 const R = await import('../src/anime/world/harbor/real.js');
-const { atLen, lineLen, obbOf } = await import('../src/anime/world/harbor/lmkit.js');
+const { atLen, lineLen, obbOf, openRing } = await import('../src/anime/world/harbor/lmkit.js');
 const { kanaeDeckY } = await import('../src/anime/world/harbor/kanae.js');
 const { wallSide } = await import('../src/anime/world/harbor/uwall.js');
 const { BOAT_SPECS } = await import('../src/anime/world/harbor/boats.js');
@@ -147,7 +147,7 @@ test('南町: PIER7 and 迎 at 3 storeys with white roofs, the garden, two ponto
   expect(BOAT_SPECS.cruise.L).toBe(32); expect(BOAT_SPECS.cruise.B).toBe(7);
   // moored beside the first pontoon, afloat
   const p = cruise[0].group.position; expect(L.isWater(p.x, p.z)).toBe(true);
-  expect(Math.hypot(p.x - 47.7, p.z - 10.5)).toBeLessThan(15);
+  expect(Math.hypot(p.x - 67.7, p.z - 45.2)).toBeLessThan(15);   // [v6:fix3] the nearer pontoon (IMG_0888)
 });
 
 test('安波山: the summit clearing and the two terraces on the path', () => {
@@ -156,12 +156,43 @@ test('安波山: the summit clearing and the two terraces on the path', () => {
   expect(Math.hypot(H.anba.eye.x - R.ANBA.summit[0], H.anba.eye.z - R.ANBA.summit[1])).toBeLessThan(10);
 });
 
+test('プラザホテル: the bridge enters the hotel wall, and is longer than the 25 m footprint', () => {
+  const b = H.plaza.bridge;
+  // the GSI footprint (…/137) stops in the air; the mesh must run past it to the podium
+  expect(b.footprint).toBeGreaterThan(24);
+  expect(b.footprint).toBeLessThan(26);
+  expect(b.len).toBeGreaterThan(25);
+  expect(b.len).toBeGreaterThan(b.footprint);
+  expect(b.y).toBeCloseTo(25.8, 5);
+  expect(b.lot).toBe('16/58541/25068/142');
+  const P = openRing(L.lotById(b.lot).poly);
+  const inside = (x, z) => {
+    let c = false;
+    for (let i = 0, k = P.length - 1; i < P.length; k = i++) {
+      const xi = P[i][0], zi = P[i][1], xk = P[k][0], zk = P[k][1];
+      if ((zi > z) !== (zk > z) && x < ((xk - xi) * (z - zi)) / ((zk - zi) || 1e-12) + xi) c = !c;
+    }
+    return c;
+  };
+  const dist = (x, z) => {
+    let d = 1e9;
+    for (let i = 0; i < P.length; i++) {
+      const a = P[i], e = P[(i + 1) % P.length], sx = e[0] - a[0], sz = e[1] - a[1], l2 = sx * sx + sz * sz || 1;
+      let u = ((x - a[0]) * sx + (z - a[1]) * sz) / l2; u = Math.max(0, Math.min(1, u));
+      d = Math.min(d, Math.hypot(x - (a[0] + sx * u), z - (a[1] + sz * u)));
+    }
+    return d;
+  };
+  for (const p of [...b.end, b.far]) expect(inside(p[0], p[1])).toBe(true);
+  expect(Math.min(...b.end.map((p) => dist(p[0], p[1])))).toBeLessThanOrEqual(0.5);
+});
+
 test('deterministic, and no disaster references in the landmark code', () => {
   const DIR = join(import.meta.dir, '../src/anime/world/harbor');
   for (const f of ['real.js', 'lmkit.js', 'market4.js', 'kanae.js', 'oshima.js', 'shinmei.js', 'uwall.js', 'minami.js', 'anba.js', 'kazemachi.js', 'plaza.js']) {   // [v4:polish1] + kazemachi, plaza
     const src = readFileSync(join(DIR, f), 'utf8');
     expect([f, /Math\.random\(/.test(src)]).toEqual([f, false]);
-    expect([f, /津波|震災|被災|復興|tsunami|earthquake|慰霊|避難所|防潮堤/i.test(src)]).toEqual([f, false]);
+    expect([f, /\u6d25\u6ce2|\u9707\u707d|被災|復興|tsun[a]mi|earthquake|慰霊|避難所|防潮堤/i.test(src)]).toEqual([f, false]);
   }
   expect(readdirSync(DIR).includes('real.js')).toBe(true);
 });

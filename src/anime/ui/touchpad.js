@@ -21,10 +21,11 @@ import * as THREE from 'three';
 import DATA from '../../../data/ui-touch-i18n.json';
 import { pickLang } from './i18n.js';
 import { CSS as PAD_CSS } from './touchpad-style.js';
+import { interruptFlight } from './veil.js';   // [ui-a2] a touch while the pad is out of the way for a flight ends the flight (tour.skip), it does not wait it out
 
 // ------------------------------------------------------------------ pure parts (bun test: test/mobile-pad.test.js)
-/** The stick: 56 CSS px of travel (scaled on small screens), a 12 % dead zone, RUN past 85 % of the travel. */
-export const STICK = { travel: 56, deadZone: 0.12, runAt: 0.85, runHysteresis: 0.05, base: 8, knob: 52 };
+/** The stick: 56 CSS px of travel (scaled on small screens), a 12 % dead zone, full walk at 80 % (`full`), RUN past 85 % of the travel. */
+export const STICK = { travel: 56, deadZone: 0.12, full: 0.8, runAt: 0.85, runHysteresis: 0.05, base: 8, knob: 52 };
 /** Look: radians per CSS px (0.008 = about 85 degrees for a 190 px swipe, the Genshin / PUBG feel; the slider scales it 0.5 to 1.8),
  *  a light smoothing (time constant, s) and the safe pitch limit. */
 export const LOOK = { sens: 0.008, tau: 0.035, pitchMax: 80 * Math.PI / 180 };
@@ -35,8 +36,14 @@ export const STORE_KEY = 'klc.pad.v1';
 export const DEFAULTS = { leftHanded: false, invertY: false, sens: 1, coach: false };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-/** The smoothstep that eases the stick magnitude (precise at a gentle push, quick at the end). */
-export const easeStick = (m) => { m = clamp(m, 0, 1); return m * m * (3 - 2 * m); };
+/**
+ * [feel] The stick's response curve (the movement-feel lane): fine near the centre, full speed at the rim. Past the dead zone the push u
+ * (0..1, reaching 1 at STICK.full) gives 0.25 u + 0.75 u²: a quarter of linear's slope at the start (a small push is a slow walk you can
+ * steer, never nothing: the smoothstep before gave 2 % of the speed at 20 % travel), steepening to full walk at 80 % of the travel, so
+ * full walking speed is reachable before RUN takes over at 85 % (the smoothstep's top walk was 91 % of it). Measured in
+ * docs/play/FEEL.md (tools/anime/feel-probe.mjs).
+ */
+export const easeStick = (m) => { m = clamp(m, 0, 1); return 0.25 * m + 0.75 * m * m; };
 /** Everything is sized for a 390 px short side; small phones shrink a little, tablets grow a little, and a landscape phone
  *  (a short screen) takes 8 % off so the arc and the stick fit between the top panels and the bottom ones. */
 export const padScale = (vw, vh) => clamp(Math.min(vw, vh) / 390, 0.8, 1.15) * (vw > vh && vh <= 520 ? 0.92 : 1);
@@ -46,13 +53,13 @@ export const padScale = (vw, vh) => clamp(Math.min(vw, vh) / 390, 0.8, 1.15) * (
  * -> { x, y (the eased vector, y down), mag (0..1), raw (travel fraction 0..1), run, knob { x, y } (clamped, px) }
  * `prevRun` gives the run threshold a little hysteresis so the ring does not flicker at 85 %.
  */
-export function stickMath(dx, dy, { scale = 1, travel = STICK.travel, deadZone = STICK.deadZone, runAt = STICK.runAt, prevRun = false } = {}) {
+export function stickMath(dx, dy, { scale = 1, travel = STICK.travel, deadZone = STICK.deadZone, full = STICK.full, runAt = STICK.runAt, prevRun = false } = {}) {
   const T = travel * scale, len = Math.hypot(dx, dy);
   const raw = T > 0 ? Math.min(1, len / T) : 0;
   const k = len > T && len > 0 ? T / len : 1;
   const knob = { x: dx * k, y: dy * k };
   if (!(len > 0) || raw <= deadZone) return { x: 0, y: 0, mag: 0, raw, run: false, knob };
-  const mag = easeStick((raw - deadZone) / (1 - deadZone));
+  const mag = easeStick((raw - deadZone) / (full - deadZone));
   return { x: dx / len * mag, y: dy / len * mag, mag, raw, run: raw >= (prevRun ? runAt - STICK.runHysteresis : runAt), knob };
 }
 
@@ -65,7 +72,7 @@ export function touchZone(x, y, vw, vh, { leftHanded = false, stick = 'analog' }
 /** HUD panels a thumb may land on: a drag that starts on one still drives the pad (the stick or the look); a tap still reaches the panel. */
 export const HUD_GRAB = {
   move: 10,   // CSS px of travel before a touch on a panel becomes a stick / look touch
-  selector: '#klc-places, #klc-ui .places, #klc-ui .dock, #klc-ui .attr, #klc-x .mini, #klc-x .xdrive, #klc-pad .chip, #klc-pad .gear',
+  selector: '#klc-places, #klc-ui .places, #klc-ui .dock, #klc-ui .pbar, #klc-ui .attr, #klc-x .mini, #klc-x .xdrive, #klc-pad .chip, #klc-pad .gear',
   skip: 'input, select, textarea, .xsearch, .arrivals, .xmap, [data-scroll], #klc-pad .settings',   // (these keep their own drags)
 };
 /** What a touch that began on a HUD panel does at its current offset: 'wait' (still a tap), 'promote' (a drag: the pad takes it) or
@@ -364,7 +371,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       return `<button type="button" class="btn${i === 0 ? ' primary' : ''}" data-id="${id}" data-i="${i}" ${tg ? `aria-pressed="${toggled.has(id)}"` : ''} aria-label="${text(b.label)}">
         <span class="ico">${iconOf(b.icon)}</span><span class="lbl">${text(b.label)}</span></button>`;
     }).join('');
-    root.dataset.mode = pad.mode; root.dataset.nostick = modes.get(pad.mode)?.stick === 'none' ? '1' : '0';
+    root.dataset.mode = pad.mode; root.dataset.custom = custom.has(pad.mode) ? '1' : '0'; root.dataset.nostick = modes.get(pad.mode)?.stick === 'none' ? '1' : '0';
     for (const m of chip.querySelectorAll('button[data-mode]')) m.setAttribute('aria-pressed', String(pad.mode === m.dataset.mode));
     syncButtons();
     dirty.buttons = false; dirty.layout = true;
@@ -387,8 +394,11 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   }
 
   // ---- layout (measured against the other panels: nothing of the pad sits on them)
-  const PANELS = ['#klc-ui .dock', '#klc-ui .places', '#klc-ui .attr', '#klc-x .xdrive', '#klc-x .mini', '#klc-x .xbar'];   // (the last two only matter on a desktop with ?touch=1: on a phone they sit up top)
-  const rectOf = (el) => { const r = el.getBoundingClientRect(); return r.width > 1 && r.height > 1 && getComputedStyle(el).visibility !== 'hidden' ? { l: r.left, t: r.top, r: r.right, b: r.bottom } : null; };
+  const PANELS = ['#klc-ui .dock', '#klc-ui .places', '#klc-ui .pbar', '#klc-ui .attr', '#klc-x .xdrive', '#klc-x .mini', '#klc-x .xbar', '#klc-ship .panel', '#klc-ship .card .inner', '#klc-ship .facts'];   // (the last two only matter on a desktop with ?touch=1: on a phone they sit up top)
+  // [ui-b2:7] a panel that is fading out (the HUD's sheets keep their display for 200 ms while they leave: a display transition that ends in none) is already gone for the layout: the pad
+  // comes back in the frame the sheet closes and would lift its buttons clear of a panel that is about to vanish, and drop them again at the next signature check
+  const leaving = (el) => { try { return el.getAnimations().some((a) => a.transitionProperty === 'display' && a.effect.getKeyframes().at(-1).display === 'none'); } catch { return false; } };
+  const rectOf = (el) => { const r = el.getBoundingClientRect(); return r.width > 1 && r.height > 1 && getComputedStyle(el).visibility !== 'hidden' && !leaving(el) ? { l: r.left, t: r.top, r: r.right, b: r.bottom } : null; };
   const panelRects = () => PANELS.flatMap((s) => [...doc.querySelectorAll(s)]).map(rectOf).filter(Boolean);
   /** The coach mark goes in the free band between the top panels and the thumbs' controls (scaled down if the band is short). */
   function placeCoach(sa, vw, vh) {
@@ -429,7 +439,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     const gb = liftClear({ l: gl, w: gs, h: gs }, sa.bottom - M - 6 * sc, panels, 8, floor);
     ghost.style.cssText = `left:${gl.toFixed(1)}px;top:${(gb - gs).toFixed(1)}px;width:${gs}px;height:${gs}px`;   // (the ghost is a child of the root, not of the safe box)
     // the mode chip: top left (as in the mobile games), below the brand and the minimap when they are in that corner
-    const left = [...doc.querySelectorAll('#klc-ui .brand, #klc-x .mini')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 1 && r.left < vw * 0.25 && r.top < vh * 0.5);
+    const left = [...doc.querySelectorAll('#klc-ui .brand, #klc-x .mini, #klc-ship .top')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 1 && r.left < vw * 0.25 && r.top < vh * 0.5);
     const below = left.reduce((m, r) => Math.max(m, r.bottom), sa.top);
     topbar.style.cssText = `top:${(below + 8 - sa.top).toFixed(1)}px;left:${(10 * sc).toFixed(1)}px`;
     // (on a phone in portrait the search / map / drive buttons are a row right of the minimap, and the car's speed chip under it:
@@ -442,7 +452,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     dirty.layout = false;
     layout.sig = signature();
   }
-  function signature() { const p = panelRects(); const sb = safe.getBoundingClientRect(); return [sb.left, sb.top, sb.right, sb.bottom].map(Math.round).join(',') + '|' + win.innerWidth + 'x' + win.innerHeight + ':' + pad.settings.leftHanded + ':' + pad.mode + ':' + currentButtons().length + ':' + p.map((r) => [r.l, r.t, r.r, r.b].map(Math.round).join(',')).join(';') + ':' + [...doc.querySelectorAll('#klc-ui .brand, #klc-x .mini')].map((e) => Math.round(e.getBoundingClientRect().bottom)).join(','); }
+  function signature() { const p = panelRects(); const sb = safe.getBoundingClientRect(); return [sb.left, sb.top, sb.right, sb.bottom].map(Math.round).join(',') + '|' + win.innerWidth + 'x' + win.innerHeight + ':' + pad.settings.leftHanded + ':' + pad.mode + ':' + currentButtons().length + ':' + p.map((r) => [r.l, r.t, r.r, r.b].map(Math.round).join(',')).join(';') + ':' + [...doc.querySelectorAll('#klc-ui .brand, #klc-x .mini, #klc-ship .top')].map((e) => Math.round(e.getBoundingClientRect().bottom)).join(','); }
 
   // ---- touch: stick + look on the canvas, by touch identifier
   const touches = new Map();   // id -> { role, x0, y0, x, y }
@@ -472,7 +482,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     pad.move.set(r.x, r.y); pad.mag = r.mag; pad.running = r.run;
     if (r.run !== lastRun) { lastRun = r.run; if (r.run) vibrate(6); }
     base.dataset.run = r.run ? '1' : '0';
-    tagEl.textContent = r.run ? tr(pad.mode === 'drive' ? 'touch.boost.on' : 'touch.run') : '';
+    tagEl.textContent = r.run ? tr(pad.mode === 'drive' ? 'touch.boost.on' : pad.mode === 'sail' ? 'touch.helm.full' : 'touch.run') : '';
     setKnob(r.knob.x, r.knob.y);
     spring.x = r.knob.x; spring.y = r.knob.y;
   }
@@ -485,7 +495,10 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   function onTouchStart(e) {
     if (!pad.active) { if (touchEnabled(win.location?.search, { touched: true })) activate(); else return; }
     poke();
-    if (pad.hidden) return;
+    // [ui-a2] the pad is out of the way for a flight to a place (update(): tour.flying), and a touch used to do nothing for the 3 to 11 s it lasted. Now it takes the camera back: the flight
+    // is finished with tour.skip() (a quarter-second glide when it is near its destination, the veil's dip when it is far; never tour.stop(), which freezes the camera in mid-air), the pad
+    // comes back as soon as tour.flying is false, and this touch is spent on that (it does not start a stick or a look; the next one does). The auto tour is left alone (interruptFlight).
+    if (pad.hidden) { interruptFlight(tour(), ctx?.veil); return; }
     for (const t of e.changedTouches) {
       if (touches.has(t.identifier)) continue;
       const zone = touchZone(t.clientX, t.clientY, win.innerWidth, win.innerHeight, { leftHanded: pad.settings.leftHanded, stick: modes.get(pad.mode)?.stick });
@@ -597,6 +610,12 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   }
 
   // ---- settings / coach
+  // (body.klc-pad-set: while the popover is open the HUD's dock and places strip fold away, so nothing sits under it; landscape phones)
+  function setSettingsOpen(open) {
+    if (!settingsEl) return;
+    settingsEl.hidden = !open; gearBtn?.setAttribute('aria-expanded', String(!!open));
+    doc.body.classList.toggle('klc-pad-set', !!open);
+  }
   function setSetting(k, v) {
     pad.settings[k] = k === 'sens' ? clamp(Number(v) || 1, 0.5, 1.8) : !!v;
     store.set(pad.settings); syncSettingsUi(); dirty.layout = true;
@@ -634,7 +653,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       const m = e.target.closest('button[data-mode]');
       if (m) { switchTo(m.dataset.mode); return; }
       const a = e.target.closest('[data-act]');
-      if (a?.dataset.act === 'settings') { settingsEl.hidden = !settingsEl.hidden; gearBtn.setAttribute('aria-expanded', String(!settingsEl.hidden)); }
+      if (a?.dataset.act === 'settings') setSettingsOpen(settingsEl.hidden);
       else if (a?.dataset.act === 'coach') dismissCoach();
       const sw = e.target.closest('.sw'); if (sw) setSetting(sw.dataset.set, !pad.settings[sw.dataset.set]);
     });
@@ -660,7 +679,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   function harden() {
     if (hardened) return; hardened = true;
     for (const t of ['gesturestart', 'gesturechange', 'gestureend']) doc.addEventListener(t, (e) => e.preventDefault(), { passive: false });
-    doc.addEventListener('touchmove', (e) => { if (pad.active && !e.target.closest?.('ul, ol, input, select, textarea, .xsearch, .arrivals, [data-scroll]')) e.preventDefault(); }, { passive: false });
+    doc.addEventListener('touchmove', (e) => { if (pad.active && !e.target.closest?.('ul, ol, input, select, textarea, .xsearch, .arrivals, [data-scroll], #klc-ship .inner, #klc-ship .panel, #klc-ship .facts')) e.preventDefault(); }, { passive: false });
     // double-tap zoom: a second tap within 350 ms on anything that is not a text field
     let lastEnd = 0;
     doc.addEventListener('touchend', (e) => { const n = performance.now(); if (pad.active && n - lastEnd < 350 && (e.target === canvas || e.target.closest?.('#klc-pad .cluster'))) e.preventDefault(); lastEnd = n; }, { passive: false });
@@ -685,7 +704,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   function deactivate() {
     if (!pad.active) return;
     pad.active = false; endStick(); lookId = null; touches.clear(); grabs.clear(); acc.dx = acc.dy = 0;
-    doc.body.classList.remove('klc-pad'); doc.documentElement.classList.remove('klc-pad-root'); root?.remove(); root = null; pad.ready = false;
+    doc.body.classList.remove('klc-pad', 'klc-pad-set'); doc.documentElement.classList.remove('klc-pad-root'); root?.remove(); root = null; pad.ready = false;
   }
 
   // ---- per frame
@@ -706,7 +725,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       || !!tour()?.playing || !!tour()?.flying || !!ctx?.planet?.active || suppress.size > 0;
     if (hide !== pad.hidden) {
       pad.hidden = hide; root.dataset.hidden = hide ? '1' : '0';
-      if (hide) { endStick(); lookId = null; grabs.clear(); for (const [k, v] of touches) if (v.role === 'look') touches.delete(k); for (const id of [...held]) releaseId(id, true); settingsEl.hidden = true; }
+      if (hide) { endStick(); lookId = null; grabs.clear(); for (const [k, v] of touches) if (v.role === 'look') touches.delete(k); for (const id of [...held]) releaseId(id, true); setSettingsOpen(false); }
       else { dirty.layout = true; if (mayCoach()) setTimeout(() => { if (!pad.hidden) showCoach(); }, 700); }
     }
     if (dirty.text) { renderText(); dirty.text = false; }
@@ -732,8 +751,11 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   Object.defineProperties(pad, Object.getOwnPropertyDescriptors({
     on(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     isDown: (id) => held.has(id),
+    /** Set a toggle button's pressed state from the game (a toggle that something else can also change, like the autopilot). */
+    setToggle(id, on) { id = String(id); if (on === toggled.has(id)) return; if (on) toggled.add(id); else toggled.delete(id); syncButtons(); },
     registerMode, setMode, mount, update, layout: () => { dirty.layout = true; if (root) layout(); }, takeLook, activate, deactivate, setSetting, note, showCoach, dismissCoach,
     suppress(reason, on = true) { if (on) suppress.add(reason); else suppress.delete(reason); },
+    get suppressed() { return [...suppress]; },
     get vertical() { return (held.has('up') ? 1 : 0) - (held.has('down') ? 1 : 0); },
     get dash() { return toggled.has('dash'); },
     get brake() { return held.has('brake'); },

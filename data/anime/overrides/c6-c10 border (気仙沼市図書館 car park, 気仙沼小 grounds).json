@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "cell": "c6-c10-border",
+  "bbox": [-230, 340, -140, 430],
+  "note": "border of c5 / c6 / c10: the 気仙沼市図書館 car park inside the OSM school ground (way 415669878), between GEONET 気仙沼 and the library",
+  "sources": [
+    { "id": "earth", "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/lm/lm-kesennumae: pair_top, top_annot)", "date": "2026-03-11" }
+  ],
+  "landuse": [
+    {
+      "use": "parking",
+      "ring": [[-216, 368], [-181, 362], [-158, 404], [-208, 407]],
+      "fill": 0.28,
+      "src": "earth 2026-03-11: marked asphalt car park, ~23 cars, between GEONET 気仙沼 and 気仙沼市図書館 (lm-kesennumae top)"
+    }
+  ]
+}

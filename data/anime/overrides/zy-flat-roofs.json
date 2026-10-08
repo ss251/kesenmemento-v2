@@ -1,0 +1,1245 @@
+{
+ "version": 1,
+ "cell": "flat-roofs",
+ "bbox": [
+  -700,
+  -800,
+  1300,
+  1000
+ ],
+ "note": "[r2:3] The flat-roof data fix: flat roofs rendered far brighter (near white, often slightly pink) than the 2026-03-11 Earth top view, where they are mid-grey concrete or membrane. The stored colour of every clean flat lot of the captured cells that sat more than 4 L* (5 L* for a colour that an override had typed in) off its Earth reading is set to that reading (data/anime/earth-roofs.json: the median of the roof polygon's 60 % core on the top view). A flat roof renders as painted since town/flatroof.js takes the renderer's +3.5 L* out, so the stored colour IS the Earth colour. Not touched: lots with solar modules (skip pv in earth-roofs.json), roofs the GSI photo shows as trees (veg), landmark models, the lots of zz-photos.json and the photo-survey south shore (x -80..200, z 0..140). Contaminated readings (shadow, canopy) cannot be told from a dark roof by colour: 16/58541/25069/366 and 16/58542/25066/200 were hand-checked on the top view.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth, imagery dated 2026-03-11, top views (raw/ref/earth/*, tools/anime/earth-ref.mjs); per-lot medians in data/anime/earth-roofs.json (tools/anime/earth-roofs.mjs)",
+   "date": "2026-03-11"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58540/25067/349",
+   "roof": {
+    "color": "#81787f"
+   },
+   "src": "earth: the clean flat roof reads #81787f (L* 51) on the 2026-03-11 top view; the stored #8c9098 (aerial) was +8.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/280",
+   "roof": {
+    "color": "#6b6873"
+   },
+   "src": "earth: the clean flat roof reads #6b6873 (L* 45) on the 2026-03-11 top view; the stored #7c7880 (aerial) was +6.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/287",
+   "roof": {
+    "color": "#9f989a"
+   },
+   "src": "earth: the clean flat roof reads #9f989a (L* 63) on the 2026-03-11 top view; the stored #b0a8ac (aerial) was +6.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/289",
+   "roof": {
+    "color": "#8e888b"
+   },
+   "src": "earth: the clean flat roof reads #8e888b (L* 57) on the 2026-03-11 top view; the stored #a8a4a8 (aerial) was +10.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/292",
+   "roof": {
+    "color": "#c1bcbd"
+   },
+   "src": "earth: the clean flat roof reads #c1bcbd (L* 77) on the 2026-03-11 top view; the stored #b4acac (aerial) was -5.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/310",
+   "roof": {
+    "color": "#afa3a1"
+   },
+   "src": "earth: the clean flat roof reads #afa3a1 (L* 68) on the 2026-03-11 top view; the stored #88848c (aerial) was -12.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/330",
+   "roof": {
+    "color": "#7e6f7c"
+   },
+   "src": "earth: the clean flat roof reads #7e6f7c (L* 49) on the 2026-03-11 top view; the stored #9c9ea0 (override) was +16.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/368",
+   "roof": {
+    "color": "#beb8b9"
+   },
+   "src": "earth: the clean flat roof reads #beb8b9 (L* 75) on the 2026-03-11 top view; the stored #a4a4ac (aerial) was -7.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/371",
+   "roof": {
+    "color": "#616471"
+   },
+   "src": "earth: the clean flat roof reads #616471 (L* 43) on the 2026-03-11 top view; the stored #8e9092 (override) was +17.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/374",
+   "roof": {
+    "color": "#9c9699"
+   },
+   "src": "earth: the clean flat roof reads #9c9699 (L* 63) on the 2026-03-11 top view; the stored #b0a8ac (aerial) was +7.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/387",
+   "roof": {
+    "color": "#9f9696"
+   },
+   "src": "earth: the clean flat roof reads #9f9696 (L* 63) on the 2026-03-11 top view; the stored #b0acac (aerial) was +7.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/390",
+   "roof": {
+    "color": "#7d7481"
+   },
+   "src": "earth: the clean flat roof reads #7d7481 (L* 50) on the 2026-03-11 top view; the stored #9ea09e (override) was +15.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/400",
+   "roof": {
+    "color": "#a4a0a6"
+   },
+   "src": "earth: the clean flat roof reads #a4a0a6 (L* 66) on the 2026-03-11 top view; the stored #949498 (aerial) was -4.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/214",
+   "roof": {
+    "color": "#a5a2a4"
+   },
+   "src": "earth: the clean flat roof reads #a5a2a4 (L* 67) on the 2026-03-11 top view; the stored #84888c (aerial) was -10.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/25",
+   "roof": {
+    "color": "#98908c"
+   },
+   "src": "earth: the clean flat roof reads #98908c (L* 60) on the 2026-03-11 top view; the stored #b0a8a8 (aerial) was +9.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25067/169",
+   "roof": {
+    "color": "#9f9a9f"
+   },
+   "src": "earth: the clean flat roof reads #9f9a9f (L* 64) on the 2026-03-11 top view; the stored #7c8088 (aerial) was -10.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25067/177",
+   "roof": {
+    "color": "#b0abb1"
+   },
+   "src": "earth: the clean flat roof reads #b0abb1 (L* 71) on the 2026-03-11 top view; the stored #9d999e (override) was -6.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25067/188",
+   "roof": {
+    "color": "#bdb4a7"
+   },
+   "src": "earth: the clean flat roof reads #bdb4a7 (L* 74) on the 2026-03-11 top view; the stored #b0a69c (override) was -5.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/138",
+   "roof": {
+    "color": "#a5a6ac"
+   },
+   "src": "earth: the clean flat roof reads #a5a6ac (L* 68) on the 2026-03-11 top view; the stored #bec2c9 (override) was +10.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/139",
+   "roof": {
+    "color": "#9d9da6"
+   },
+   "src": "earth: the clean flat roof reads #9d9da6 (L* 65) on the 2026-03-11 top view; the stored #bec2c9 (override) was +13.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/144",
+   "roof": {
+    "color": "#777a82"
+   },
+   "src": "earth: the clean flat roof reads #777a82 (L* 51) on the 2026-03-11 top view; the stored #8e8e94 (override) was +8.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/145",
+   "roof": {
+    "color": "#b2b1b6"
+   },
+   "src": "earth: the clean flat roof reads #b2b1b6 (L* 72) on the 2026-03-11 top view; the stored #a3a4a8 (override) was -5.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/155",
+   "roof": {
+    "color": "#7b767e"
+   },
+   "src": "earth: the clean flat roof reads #7b767e (L* 50) on the 2026-03-11 top view; the stored #7c5a54 (override) was -8.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/16",
+   "roof": {
+    "color": "#867c81"
+   },
+   "src": "earth: the clean flat roof reads #867c81 (L* 53) on the 2026-03-11 top view; the stored #a89da4 (override) was +12.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/24",
+   "roof": {
+    "color": "#939296"
+   },
+   "src": "earth: the clean flat roof reads #939296 (L* 61) on the 2026-03-11 top view; the stored #85828a (override) was -5.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/27",
+   "roof": {
+    "color": "#595966"
+   },
+   "src": "earth: the clean flat roof reads #595966 (L* 38) on the 2026-03-11 top view; the stored #74707c (aerial) was +9.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/33",
+   "roof": {
+    "color": "#a5a0a6"
+   },
+   "src": "earth: the clean flat roof reads #a5a0a6 (L* 66) on the 2026-03-11 top view; the stored #949498 (aerial) was -5.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/39",
+   "roof": {
+    "color": "#72707f"
+   },
+   "src": "earth: the clean flat roof reads #72707f (L* 48) on the 2026-03-11 top view; the stored #808490 (aerial) was +7.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/48",
+   "roof": {
+    "color": "#727684"
+   },
+   "src": "earth: the clean flat roof reads #727684 (L* 50) on the 2026-03-11 top view; the stored #b8bab8 (override) was +25.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25068/85",
+   "roof": {
+    "color": "#8a8d96"
+   },
+   "src": "earth: the clean flat roof reads #8a8d96 (L* 59) on the 2026-03-11 top view; the stored #9a9ea2 (override) was +6.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/31",
+   "roof": {
+    "color": "#8e8f96"
+   },
+   "src": "earth: the clean flat roof reads #8e8f96 (L* 60) on the 2026-03-11 top view; the stored #a7a7b0 (override) was +9.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c6:uomachi-n1",
+   "roof": {
+    "color": "#7c6e7d"
+   },
+   "src": "earth: the clean flat roof reads #7c6e7d (L* 48) on the 2026-03-11 top view; the stored #7c5a5c (override) was -6.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c6:uomachi-n2",
+   "roof": {
+    "color": "#5f626f"
+   },
+   "src": "earth: the clean flat roof reads #5f626f (L* 42) on the 2026-03-11 top view; the stored #8e9092 (override) was +18.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c6:kashizaki-h1g",
+   "roof": {
+    "color": "#b9b0b1"
+   },
+   "src": "earth: the clean flat roof reads #b9b0b1 (L* 73) on the 2026-03-11 top view; the stored #d8d6d0 (override) was +13.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c6:kyodoka-deck",
+   "roof": {
+    "color": "#dbd3d5"
+   },
+   "src": "earth: the clean flat roof reads #dbd3d5 (L* 85) on the 2026-03-11 top view; the stored #bfb8b4 (override) was -10.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25067/228",
+   "roof": {
+    "color": "#776371"
+   },
+   "src": "earth: the clean flat roof reads #776371 (L* 44) on the 2026-03-11 top view; the stored #908488 (aerial) was +12.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25067/267",
+   "roof": {
+    "color": "#6d5e68"
+   },
+   "src": "earth: the clean flat roof reads #6d5e68 (L* 42) on the 2026-03-11 top view; the stored #84787c (aerial) was +10.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25067/269",
+   "roof": {
+    "color": "#7b6a72"
+   },
+   "src": "earth: the clean flat roof reads #7b6a72 (L* 47) on the 2026-03-11 top view; the stored #787c84 (aerial) was +5.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25067/323",
+   "roof": {
+    "color": "#7a7d7d"
+   },
+   "src": "earth: the clean flat roof reads #7a7d7d (L* 52) on the 2026-03-11 top view; the stored #8c8c90 (aerial) was +6.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/353",
+   "roof": {
+    "color": "#6d6c6c"
+   },
+   "src": "earth: the clean flat roof reads #6d6c6c (L* 46) on the 2026-03-11 top view; the stored #b8bab8 (override) was +29.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/356",
+   "roof": {
+    "color": "#6b6171"
+   },
+   "src": "earth: the clean flat roof reads #6b6171 (L* 43) on the 2026-03-11 top view; the stored #848088 (aerial) was +11.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/407",
+   "roof": {
+    "color": "#897984"
+   },
+   "src": "earth: the clean flat roof reads #897984 (L* 53) on the 2026-03-11 top view; the stored #5e5858 (override) was -14.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/444",
+   "roof": {
+    "color": "#696170"
+   },
+   "src": "earth: the clean flat roof reads #696170 (L* 42) on the 2026-03-11 top view; the stored #5e5456 (override) was -5.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/447",
+   "roof": {
+    "color": "#745e6c"
+   },
+   "src": "earth: the clean flat roof reads #745e6c (L* 42) on the 2026-03-11 top view; the stored #88787c (aerial) was +9.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/453",
+   "roof": {
+    "color": "#867f86"
+   },
+   "src": "earth: the clean flat roof reads #867f86 (L* 54) on the 2026-03-11 top view; the stored #b0a8ac (aerial) was +15.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/478",
+   "roof": {
+    "color": "#b7b6bb"
+   },
+   "src": "earth: the clean flat roof reads #b7b6bb (L* 74) on the 2026-03-11 top view; the stored #b0a8ac (aerial) was -4.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25068/479",
+   "roof": {
+    "color": "#7f7f86"
+   },
+   "src": "earth: the clean flat roof reads #7f7f86 (L* 53) on the 2026-03-11 top view; the stored #a0888c (aerial) was +5.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58539/25069/212",
+   "roof": {
+    "color": "#73717f"
+   },
+   "src": "earth: the clean flat roof reads #73717f (L* 48) on the 2026-03-11 top view; the stored #80818b (override) was +5.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25067/133",
+   "roof": {
+    "color": "#8b787b"
+   },
+   "src": "earth: the clean flat roof reads #8b787b (L* 52) on the 2026-03-11 top view; the stored #9e9090 (override) was +8.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25067/154",
+   "roof": {
+    "color": "#5f5c69"
+   },
+   "src": "earth: the clean flat roof reads #5f5c69 (L* 40) on the 2026-03-11 top view; the stored #73707b (override) was +8.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25067/238",
+   "roof": {
+    "color": "#6b6068"
+   },
+   "src": "earth: the clean flat roof reads #6b6068 (L* 42) on the 2026-03-11 top view; the stored #494b5a (override) was -9.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25067/282",
+   "roof": {
+    "color": "#a3727c"
+   },
+   "src": "earth: the clean flat roof reads #a3727c (L* 53) on the 2026-03-11 top view; the stored #ba7e7f (override) was +5.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25067/323",
+   "roof": {
+    "color": "#898288"
+   },
+   "src": "earth: the clean flat roof reads #898288 (L* 55) on the 2026-03-11 top view; the stored #74525d (override) was -16.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25067/360",
+   "roof": {
+    "color": "#75616c"
+   },
+   "src": "earth: the clean flat roof reads #75616c (L* 43) on the 2026-03-11 top view; the stored #98949c (aerial) was +18.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25067/37",
+   "roof": {
+    "color": "#635d66"
+   },
+   "src": "earth: the clean flat roof reads #635d66 (L* 40) on the 2026-03-11 top view; the stored #786c74 (aerial) was +6.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/115",
+   "roof": {
+    "color": "#797880"
+   },
+   "src": "earth: the clean flat roof reads #797880 (L* 51) on the 2026-03-11 top view; the stored #a8a4a8 (aerial) was +17.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/125",
+   "roof": {
+    "color": "#b6b5ba"
+   },
+   "src": "earth: the clean flat roof reads #b6b5ba (L* 74) on the 2026-03-11 top view; the stored #a0a0a4 (aerial) was -7.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/136",
+   "roof": {
+    "color": "#73707c"
+   },
+   "src": "earth: the clean flat roof reads #73707c (L* 48) on the 2026-03-11 top view; the stored #807c88 (aerial) was +4.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/142",
+   "roof": {
+    "color": "#5a5c64"
+   },
+   "src": "earth: the clean flat roof reads #5a5c64 (L* 39) on the 2026-03-11 top view; the stored #74707c (aerial) was +8.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/159",
+   "roof": {
+    "color": "#886570"
+   },
+   "src": "earth: the clean flat roof reads #886570 (L* 47) on the 2026-03-11 top view; the stored #8c7c84 (aerial) was +7.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/171",
+   "roof": {
+    "color": "#757279"
+   },
+   "src": "earth: the clean flat roof reads #757279 (L* 49) on the 2026-03-11 top view; the stored #949498 (aerial) was +12.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/172",
+   "roof": {
+    "color": "#99929a"
+   },
+   "src": "earth: the clean flat roof reads #99929a (L* 61) on the 2026-03-11 top view; the stored #a8a8ac (aerial) was +7.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/199",
+   "roof": {
+    "color": "#968c8f"
+   },
+   "src": "earth: the clean flat roof reads #968c8f (L* 59) on the 2026-03-11 top view; the stored #a09ca0 (aerial) was +5.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/213",
+   "roof": {
+    "color": "#7a7d8b"
+   },
+   "src": "earth: the clean flat roof reads #7a7d8b (L* 53) on the 2026-03-11 top view; the stored #a4a0a4 (aerial) was +13.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/352",
+   "roof": {
+    "color": "#73737e"
+   },
+   "src": "earth: the clean flat roof reads #73737e (L* 49) on the 2026-03-11 top view; the stored #88848c (aerial) was +6.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/353",
+   "roof": {
+    "color": "#7d777d"
+   },
+   "src": "earth: the clean flat roof reads #7d777d (L* 51) on the 2026-03-11 top view; the stored #989098 (aerial) was +10.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/44",
+   "roof": {
+    "color": "#707179"
+   },
+   "src": "earth: the clean flat roof reads #707179 (L* 48) on the 2026-03-11 top view; the stored #8c9294 (override) was +12.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/45",
+   "roof": {
+    "color": "#625966"
+   },
+   "src": "earth: the clean flat roof reads #625966 (L* 39) on the 2026-03-11 top view; the stored #889094 (aerial) was +20.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/58",
+   "roof": {
+    "color": "#acabb0"
+   },
+   "src": "earth: the clean flat roof reads #acabb0 (L* 70) on the 2026-03-11 top view; the stored #b9bbb9 (override) was +5.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25068/59",
+   "roof": {
+    "color": "#969199"
+   },
+   "src": "earth: the clean flat roof reads #969199 (L* 61) on the 2026-03-11 top view; the stored #a09ca4 (aerial) was +4.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/161",
+   "roof": {
+    "color": "#71646d"
+   },
+   "src": "earth: the clean flat roof reads #71646d (L* 44) on the 2026-03-11 top view; the stored #b0acb0 (aerial) was +26.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/191",
+   "roof": {
+    "color": "#989192"
+   },
+   "src": "earth: the clean flat roof reads #989192 (L* 61) on the 2026-03-11 top view; the stored #b4b2b0 (override) was +11.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/199",
+   "roof": {
+    "color": "#6b5767"
+   },
+   "src": "earth: the clean flat roof reads #6b5767 (L* 39) on the 2026-03-11 top view; the stored #909098 (aerial) was +20.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/219",
+   "roof": {
+    "color": "#5d6060"
+   },
+   "src": "earth: the clean flat roof reads #5d6060 (L* 40) on the 2026-03-11 top view; the stored #847c80 (aerial) was +12.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/234",
+   "roof": {
+    "color": "#80787c"
+   },
+   "src": "earth: the clean flat roof reads #80787c (L* 51) on the 2026-03-11 top view; the stored #908c90 (aerial) was +7.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/34",
+   "roof": {
+    "color": "#b3b0b5"
+   },
+   "src": "earth: the clean flat roof reads #b3b0b5 (L* 72) on the 2026-03-11 top view; the stored #a0a0a8 (aerial) was -6.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/41",
+   "roof": {
+    "color": "#a48584"
+   },
+   "src": "earth: the clean flat roof reads #a48584 (L* 58) on the 2026-03-11 top view; the stored #9c989c (aerial) was +4.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/420",
+   "roof": {
+    "color": "#857b84"
+   },
+   "src": "earth: the clean flat roof reads #857b84 (L* 53) on the 2026-03-11 top view; the stored #a09ca0 (aerial) was +12.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/71",
+   "roof": {
+    "color": "#816574"
+   },
+   "src": "earth: the clean flat roof reads #816574 (L* 46) on the 2026-03-11 top view; the stored #685563 (override) was -7.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/75",
+   "roof": {
+    "color": "#6b6870"
+   },
+   "src": "earth: the clean flat roof reads #6b6870 (L* 45) on the 2026-03-11 top view; the stored #b4acb0 (aerial) was +26.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/85",
+   "roof": {
+    "color": "#9f9aa2"
+   },
+   "src": "earth: the clean flat roof reads #9f9aa2 (L* 64) on the 2026-03-11 top view; the stored #6c6874 (aerial) was -19.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25069/89",
+   "roof": {
+    "color": "#7a767e"
+   },
+   "src": "earth: the clean flat roof reads #7a767e (L* 50) on the 2026-03-11 top view; the stored #989098 (aerial) was +10.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25070/237",
+   "roof": {
+    "color": "#beb9bd"
+   },
+   "src": "earth: the clean flat roof reads #beb9bd (L* 76) on the 2026-03-11 top view; the stored #c9c9c5 (override) was +5.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25070/299",
+   "roof": {
+    "color": "#a29a9b"
+   },
+   "src": "earth: the clean flat roof reads #a29a9b (L* 64) on the 2026-03-11 top view; the stored #beb0b4 (override) was +8.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58540/25070/78",
+   "roof": {
+    "color": "#b2aba6"
+   },
+   "src": "earth: the clean flat roof reads #b2aba6 (L* 70) on the 2026-03-11 top view; the stored #919092 (override) was -10.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25066/159",
+   "roof": {
+    "color": "#6f5964"
+   },
+   "src": "earth: the clean flat roof reads #6f5964 (L* 40) on the 2026-03-11 top view; the stored #807880 (aerial) was +11.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25067/117",
+   "roof": {
+    "color": "#82777e"
+   },
+   "src": "earth: the clean flat roof reads #82777e (L* 51) on the 2026-03-11 top view; the stored #ada9ad (override) was +18.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25067/345",
+   "roof": {
+    "color": "#bcb4b8"
+   },
+   "src": "earth: the clean flat roof reads #bcb4b8 (L* 74) on the 2026-03-11 top view; the stored #aca8ac (aerial) was -4.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25067/72",
+   "roof": {
+    "color": "#c6b9b7"
+   },
+   "src": "earth: the clean flat roof reads #c6b9b7 (L* 76) on the 2026-03-11 top view; the stored #909498 (aerial) was -15.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/105",
+   "roof": {
+    "color": "#97888e"
+   },
+   "src": "earth: the clean flat roof reads #97888e (L* 58) on the 2026-03-11 top view; the stored #a59792 (override) was +5.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/192",
+   "roof": {
+    "color": "#c4bebe"
+   },
+   "src": "earth: the clean flat roof reads #c4bebe (L* 77) on the 2026-03-11 top view; the stored #d0cdc6 (override) was +5.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/227",
+   "roof": {
+    "color": "#c6bfbf"
+   },
+   "src": "earth: the clean flat roof reads #c6bfbf (L* 78) on the 2026-03-11 top view; the stored #d3cfc8 (override) was +5.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/290",
+   "roof": {
+    "color": "#7a7b7f"
+   },
+   "src": "earth: the clean flat roof reads #7a7b7f (L* 52) on the 2026-03-11 top view; the stored #c3a59f (override) was +18.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/350",
+   "roof": {
+    "color": "#997077"
+   },
+   "src": "earth: the clean flat roof reads #997077 (L* 51) on the 2026-03-11 top view; the stored #988084 (aerial) was +4.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/361",
+   "roof": {
+    "color": "#adaaab"
+   },
+   "src": "earth: the clean flat roof reads #adaaab (L* 70) on the 2026-03-11 top view; the stored #94989c (aerial) was -7.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/364",
+   "roof": {
+    "color": "#9b999e"
+   },
+   "src": "earth: the clean flat roof reads #9b999e (L* 64) on the 2026-03-11 top view; the stored #a8a4a8 (aerial) was +4.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/366",
+   "roof": {
+    "color": "#cdc4c4"
+   },
+   "src": "earth: the clean flat roof reads #cdc4c4 (L* 80) on the 2026-03-11 top view; the stored #b4acac (aerial) was -8.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/376",
+   "roof": {
+    "color": "#b2b2b7"
+   },
+   "src": "earth: the clean flat roof reads #b2b2b7 (L* 73) on the 2026-03-11 top view; the stored #9c9ca4 (aerial) was -8.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/379",
+   "roof": {
+    "color": "#7c7c85"
+   },
+   "src": "earth: the clean flat roof reads #7c7c85 (L* 52) on the 2026-03-11 top view; the stored #8c9098 (aerial) was +7.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/383",
+   "roof": {
+    "color": "#a2a1a6"
+   },
+   "src": "earth: the clean flat roof reads #a2a1a6 (L* 66) on the 2026-03-11 top view; the stored #b9bab4 (override) was +8.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/385",
+   "roof": {
+    "color": "#bbb7b9"
+   },
+   "src": "earth: the clean flat roof reads #bbb7b9 (L* 75) on the 2026-03-11 top view; the stored #a9aaa8 (override) was -5.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/386",
+   "roof": {
+    "color": "#a9a5a7"
+   },
+   "src": "earth: the clean flat roof reads #a9a5a7 (L* 68) on the 2026-03-11 top view; the stored #b5b5af (override) was +5.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/389",
+   "roof": {
+    "color": "#b2abb0"
+   },
+   "src": "earth: the clean flat roof reads #b2abb0 (L* 71) on the 2026-03-11 top view; the stored #bdbcb8 (override) was +5.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/391",
+   "roof": {
+    "color": "#98a0ad"
+   },
+   "src": "earth: the clean flat roof reads #98a0ad (L* 66) on the 2026-03-11 top view; the stored #aab0b6 (override) was +5.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25069/397",
+   "roof": {
+    "color": "#adabac"
+   },
+   "src": "earth: the clean flat roof reads #adabac (L* 70) on the 2026-03-11 top view; the stored #c9cac6 (override) was +11.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/106",
+   "roof": {
+    "color": "#8a8589"
+   },
+   "src": "earth: the clean flat roof reads #8a8589 (L* 56) on the 2026-03-11 top view; the stored #949094 (aerial) was +4.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/11",
+   "roof": {
+    "color": "#b0acb0"
+   },
+   "src": "earth: the clean flat roof reads #b0acb0 (L* 71) on the 2026-03-11 top view; the stored #c9cac6 (override) was +10.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/12",
+   "roof": {
+    "color": "#c8c3c7"
+   },
+   "src": "earth: the clean flat roof reads #c8c3c7 (L* 79) on the 2026-03-11 top view; the stored #d8dbd6 (override) was +7.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/121",
+   "roof": {
+    "color": "#b7afb3"
+   },
+   "src": "earth: the clean flat roof reads #b7afb3 (L* 72) on the 2026-03-11 top view; the stored #c9cac6 (override) was +8.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/125",
+   "roof": {
+    "color": "#c7c3c6"
+   },
+   "src": "earth: the clean flat roof reads #c7c3c6 (L* 79) on the 2026-03-11 top view; the stored #d8dbd6 (override) was +7.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/126",
+   "roof": {
+    "color": "#959197"
+   },
+   "src": "earth: the clean flat roof reads #959197 (L* 61) on the 2026-03-11 top view; the stored #a4a0a4 (aerial) was +5.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/143",
+   "roof": {
+    "color": "#c0bebc"
+   },
+   "src": "earth: the clean flat roof reads #c0bebc (L* 77) on the 2026-03-11 top view; the stored #a4a4a8 (aerial) was -9.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/146",
+   "roof": {
+    "color": "#c5c2bb"
+   },
+   "src": "earth: the clean flat roof reads #c5c2bb (L* 78) on the 2026-03-11 top view; the stored #b0a8ac (aerial) was -8.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/147",
+   "roof": {
+    "color": "#b5afae"
+   },
+   "src": "earth: the clean flat roof reads #b5afae (L* 72) on the 2026-03-11 top view; the stored #c9cac6 (override) was +9.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/149",
+   "roof": {
+    "color": "#cbc6c7"
+   },
+   "src": "earth: the clean flat roof reads #cbc6c7 (L* 80) on the 2026-03-11 top view; the stored #b4acb0 (aerial) was -9.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/150",
+   "roof": {
+    "color": "#66616f"
+   },
+   "src": "earth: the clean flat roof reads #66616f (L* 42) on the 2026-03-11 top view; the stored #4a4f58 (override) was -8.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/151",
+   "roof": {
+    "color": "#64606d"
+   },
+   "src": "earth: the clean flat roof reads #64606d (L* 41) on the 2026-03-11 top view; the stored #7c7880 (aerial) was +9.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/152",
+   "roof": {
+    "color": "#bbb9bc"
+   },
+   "src": "earth: the clean flat roof reads #bbb9bc (L* 75) on the 2026-03-11 top view; the stored #d8dbd6 (override) was +11.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/165",
+   "roof": {
+    "color": "#72636d"
+   },
+   "src": "earth: the clean flat roof reads #72636d (L* 44) on the 2026-03-11 top view; the stored #848890 (aerial) was +13.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/167",
+   "roof": {
+    "color": "#a19da2"
+   },
+   "src": "earth: the clean flat roof reads #a19da2 (L* 65) on the 2026-03-11 top view; the stored #a9adb0 (override) was +5.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/175",
+   "roof": {
+    "color": "#919195"
+   },
+   "src": "earth: the clean flat roof reads #919195 (L* 60) on the 2026-03-11 top view; the stored #a8a0a0 (aerial) was +6.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/24",
+   "roof": {
+    "color": "#beb9bd"
+   },
+   "src": "earth: the clean flat roof reads #beb9bd (L* 76) on the 2026-03-11 top view; the stored #c9c9c5 (override) was +5.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/56.1",
+   "roof": {
+    "color": "#636776"
+   },
+   "src": "earth: the clean flat roof reads #636776 (L* 44) on the 2026-03-11 top view; the stored #c1b4b8 (override) was +30.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/57",
+   "roof": {
+    "color": "#75747d"
+   },
+   "src": "earth: the clean flat roof reads #75747d (L* 49) on the 2026-03-11 top view; the stored #a59fa5 (override) was +17.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/85",
+   "roof": {
+    "color": "#7b777e"
+   },
+   "src": "earth: the clean flat roof reads #7b777e (L* 51) on the 2026-03-11 top view; the stored #a6a0a9 (override) was +16.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58541/25070/91",
+   "roof": {
+    "color": "#87818b"
+   },
+   "src": "earth: the clean flat roof reads #87818b (L* 55) on the 2026-03-11 top view; the stored #a9a9aa (override) was +14.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25066/177",
+   "roof": {
+    "color": "#9d9a9f"
+   },
+   "src": "earth: the clean flat roof reads #9d9a9f (L* 64) on the 2026-03-11 top view; the stored #b4acac (aerial) was +7.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25066/179",
+   "roof": {
+    "color": "#a49fa6"
+   },
+   "src": "earth: the clean flat roof reads #a49fa6 (L* 66) on the 2026-03-11 top view; the stored #b8acb0 (aerial) was +5.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25066/181",
+   "roof": {
+    "color": "#c0b7b4"
+   },
+   "src": "earth: the clean flat roof reads #c0b7b4 (L* 75) on the 2026-03-11 top view; the stored #e0ecea (override) was +17.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25066/198",
+   "roof": {
+    "color": "#9e979b"
+   },
+   "src": "earth: the clean flat roof reads #9e979b (L* 63) on the 2026-03-11 top view; the stored #aca4a8 (aerial) was +5.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/15",
+   "roof": {
+    "color": "#8e8080"
+   },
+   "src": "earth: the clean flat roof reads #8e8080 (L* 55) on the 2026-03-11 top view; the stored #c9c0ba (override) was +23.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/42",
+   "roof": {
+    "color": "#aaa9af"
+   },
+   "src": "earth: the clean flat roof reads #aaa9af (L* 69) on the 2026-03-11 top view; the stored #7d8596 (override) was -14.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/45",
+   "roof": {
+    "color": "#c6c3c8"
+   },
+   "src": "earth: the clean flat roof reads #c6c3c8 (L* 79) on the 2026-03-11 top view; the stored #b0acac (aerial) was -8.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/66",
+   "roof": {
+    "color": "#a29da4"
+   },
+   "src": "earth: the clean flat roof reads #a29da4 (L* 65) on the 2026-03-11 top view; the stored #b0a8ac (aerial) was +4.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/70",
+   "roof": {
+    "color": "#a49d9a"
+   },
+   "src": "earth: the clean flat roof reads #a49d9a (L* 65) on the 2026-03-11 top view; the stored #989098 (aerial) was -4.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/73",
+   "roof": {
+    "color": "#bcb4b3"
+   },
+   "src": "earth: the clean flat roof reads #bcb4b3 (L* 74) on the 2026-03-11 top view; the stored #aca8a8 (aerial) was -4.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/74",
+   "roof": {
+    "color": "#bbbabb"
+   },
+   "src": "earth: the clean flat roof reads #bbbabb (L* 76) on the 2026-03-11 top view; the stored #aca8ac (aerial) was -6.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/75",
+   "roof": {
+    "color": "#c4bebf"
+   },
+   "src": "earth: the clean flat roof reads #c4bebf (L* 77) on the 2026-03-11 top view; the stored #b0a4ac (aerial) was -8.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/80",
+   "roof": {
+    "color": "#a59fa6"
+   },
+   "src": "earth: the clean flat roof reads #a59fa6 (L* 66) on the 2026-03-11 top view; the stored #b4acb0 (aerial) was +4.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/81",
+   "roof": {
+    "color": "#bbbbbd"
+   },
+   "src": "earth: the clean flat roof reads #bbbbbd (L* 76) on the 2026-03-11 top view; the stored #b4acb0 (aerial) was -4.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/82",
+   "roof": {
+    "color": "#87848a"
+   },
+   "src": "earth: the clean flat roof reads #87848a (L* 56) on the 2026-03-11 top view; the stored #a09ca4 (aerial) was +9.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25067/90",
+   "roof": {
+    "color": "#929095"
+   },
+   "src": "earth: the clean flat roof reads #929095 (L* 60) on the 2026-03-11 top view; the stored #8c848c (aerial) was -4.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25070/22",
+   "roof": {
+    "color": "#a89994"
+   },
+   "src": "earth: the clean flat roof reads #a89994 (L* 64) on the 2026-03-11 top view; the stored #c9c3b8 (override) was +14.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58542/25070/32",
+   "roof": {
+    "color": "#b5b1b6"
+   },
+   "src": "earth: the clean flat roof reads #b5b1b6 (L* 73) on the 2026-03-11 top view; the stored #c9cac6 (override) was +8.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58543/25068/21",
+   "roof": {
+    "color": "#787f92"
+   },
+   "src": "earth: the clean flat roof reads #787f92 (L* 53) on the 2026-03-11 top view; the stored #948c90 (aerial) was +5.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58543/25068/22",
+   "roof": {
+    "color": "#afadb0"
+   },
+   "src": "earth: the clean flat roof reads #afadb0 (L* 71) on the 2026-03-11 top view; the stored #c4c4c0 (override) was +8.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58543/25068/25",
+   "roof": {
+    "color": "#b9bbc6"
+   },
+   "src": "earth: the clean flat roof reads #b9bbc6 (L* 76) on the 2026-03-11 top view; the stored #98a0a4 (aerial) was -10.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58543/25068/29",
+   "roof": {
+    "color": "#a29d9e"
+   },
+   "src": "earth: the clean flat roof reads #a29d9e (L* 65) on the 2026-03-11 top view; the stored #b4b2b0 (override) was +7.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "16/58543/25069/32",
+   "roof": {
+    "color": "#aa9e98"
+   },
+   "src": "earth: the clean flat roof reads #aa9e98 (L* 66) on the 2026-03-11 top view; the stored #bcb8b4 (override) was +9.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:nakamachi-store",
+   "roof": {
+    "color": "#a9a8ad"
+   },
+   "src": "earth: the clean flat roof reads #a9a8ad (L* 69) on the 2026-03-11 top view; the stored #c4c4c2 (override) was +10.0 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:nakamachi-big",
+   "roof": {
+    "color": "#9699a2"
+   },
+   "src": "earth: the clean flat roof reads #9699a2 (L* 63) on the 2026-03-11 top view; the stored #acaeb1 (override) was +7.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:nakamachi-grey",
+   "roof": {
+    "color": "#a4a3a8"
+   },
+   "src": "earth: the clean flat roof reads #a4a3a8 (L* 67) on the 2026-03-11 top view; the stored #b2b3b5 (override) was +5.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:saiwai-white",
+   "roof": {
+    "color": "#c0bec1"
+   },
+   "src": "earth: the clean flat roof reads #c0bec1 (L* 77) on the 2026-03-11 top view; the stored #d2d2ce (override) was +6.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:youth-kiosk",
+   "roof": {
+    "color": "#bfbabd"
+   },
+   "src": "earth: the clean flat roof reads #bfbabd (L* 76) on the 2026-03-11 top view; the stored #d6d6d2 (override) was +9.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:minamimachi-pale",
+   "roof": {
+    "color": "#646470"
+   },
+   "src": "earth: the clean flat roof reads #646470 (L* 43) on the 2026-03-11 top view; the stored #c8c8c6 (override) was +37.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:saiwai-warehouse",
+   "roof": {
+    "color": "#bcbabf"
+   },
+   "src": "earth: the clean flat roof reads #bcbabf (L* 76) on the 2026-03-11 top view; the stored #d8d9d6 (override) was +10.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:saiwai1-a",
+   "roof": {
+    "color": "#918f9c"
+   },
+   "src": "earth: the clean flat roof reads #918f9c (L* 60) on the 2026-03-11 top view; the stored #b9b2b5 (override) was +13.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:saiwai1-annex",
+   "roof": {
+    "color": "#bebbc0"
+   },
+   "src": "earth: the clean flat roof reads #bebbc0 (L* 76) on the 2026-03-11 top view; the stored #d4d3d6 (override) was +8.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c10:koen-south-flat",
+   "roof": {
+    "color": "#ebdedb"
+   },
+   "src": "earth: the clean flat roof reads #ebdedb (L* 89) on the 2026-03-11 top view; the stored #d8cdc9 (override) was -6.2 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c11:office-uoichibamae",
+   "roof": {
+    "color": "#bdb9ba"
+   },
+   "src": "earth: the clean flat roof reads #bdb9ba (L* 75) on the 2026-03-11 top view; the stored #d8dbd6 (override) was +11.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c11:prefab-yard",
+   "roof": {
+    "color": "#c1bbbc"
+   },
+   "src": "earth: the clean flat roof reads #c1bbbc (L* 76) on the 2026-03-11 top view; the stored #d8dbd6 (override) was +10.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c11:shed-sw",
+   "roof": {
+    "color": "#7a747b"
+   },
+   "src": "earth: the clean flat roof reads #7a747b (L* 50) on the 2026-03-11 top view; the stored #4a4f58 (override) was -16.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c12:shipyard-shed",
+   "roof": {
+    "color": "#bcbabe"
+   },
+   "src": "earth: the clean flat roof reads #bcbabe (L* 76) on the 2026-03-11 top view; the stored #d2cec8 (override) was +7.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c2:fukko-park-wc",
+   "roof": {
+    "color": "#6d6770"
+   },
+   "src": "earth: the clean flat roof reads #6d6770 (L* 44) on the 2026-03-11 top view; the stored #5a5661 (override) was -7.1 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c3:yard-shed-1",
+   "roof": {
+    "color": "#a79d9d"
+   },
+   "src": "earth: the clean flat roof reads #a79d9d (L* 66) on the 2026-03-11 top view; the stored #aeaeb0 (override) was +5.6 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c3:yard-shed-2",
+   "roof": {
+    "color": "#c8c6c8"
+   },
+   "src": "earth: the clean flat roof reads #c8c6c8 (L* 80) on the 2026-03-11 top view; the stored #aeaeb0 (override) was -8.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c3:hamacho-n-new",
+   "roof": {
+    "color": "#645e6d"
+   },
+   "src": "earth: the clean flat roof reads #645e6d (L* 41) on the 2026-03-11 top view; the stored #4f5459 (override) was -5.5 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c3:corner-prefab-2",
+   "roof": {
+    "color": "#949294"
+   },
+   "src": "earth: the clean flat roof reads #949294 (L* 61) on the 2026-03-11 top view; the stored #c8c6cb (override) was +19.4 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c4:yard-hut",
+   "roof": {
+    "color": "#8b8891"
+   },
+   "src": "earth: the clean flat roof reads #8b8891 (L* 57) on the 2026-03-11 top view; the stored #a4a6a8 (override) was +10.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c5:sawada-shed",
+   "roof": {
+    "color": "#84797d"
+   },
+   "src": "earth: the clean flat roof reads #84797d (L* 52) on the 2026-03-11 top view; the stored #e2e2df (override) was +37.9 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c8:namiita-warehouse",
+   "roof": {
+    "color": "#bab5bb"
+   },
+   "src": "earth: the clean flat roof reads #bab5bb (L* 74) on the 2026-03-11 top view; the stored #c8c8c6 (override) was +6.3 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c8:yard-hut",
+   "roof": {
+    "color": "#979a9f"
+   },
+   "src": "earth: the clean flat roof reads #979a9f (L* 64) on the 2026-03-11 top view; the stored #5f8a6a (override) was -9.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c8:tank-small",
+   "roof": {
+    "color": "#4d4c56"
+   },
+   "src": "earth: the clean flat roof reads #4d4c56 (L* 33) on the 2026-03-11 top view; the stored #e4e4e0 (override) was +57.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c9:house-2chome-w",
+   "roof": {
+    "color": "#afadb2"
+   },
+   "src": "earth: the clean flat roof reads #afadb2 (L* 71) on the 2026-03-11 top view; the stored #d4d4d0 (override) was +13.8 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  },
+  {
+   "id": "ovr:c9:outbuilding-sachi-b",
+   "roof": {
+    "color": "#9d8889"
+   },
+   "src": "earth: the clean flat roof reads #9d8889 (L* 59) on the 2026-03-11 top view; the stored #d3c8bf (override) was +22.7 L* off [r2:3: the flat-roof data fix: Earth median, no contamination (not pv, not a tree)]"
+  }
+ ]
+}

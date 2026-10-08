@@ -22,7 +22,7 @@ This supplements the dedicated sheets for 五十鈴神社 (`isuzu-jinja.md`) and
 | 稲荷大明神 | shinto | 38.90857, 141.57182 | (−276, −285) | — | OSM node 7448263222 |
 | 松尾神社 | shinto | 38.90931, 141.56815 | (−595, −367) | 4.9 × 4.6 m | OSM way 917011862 |
 | 北野神社 | shinto | 38.90896, 141.56426 | (−936, −311) | precinct 309 × 86 m (grove) | OSM way 761768594 |
-| (unnamed shinto building in 南町, probably 紫神社, after which the 南町紫神社前商店街 is named) | shinto | 38.90459, 141.57217 | (−246, 157) | small | OSM way 928776176. The name **is not verified** |
+| 紫神社 (Murasaki Shrine; 南町紫神社前商店街 is named after it) | shinto | 38.90459, 141.57217 | (−247, 158) | small | OSM way 928776176 (unnamed in OSM). The name is **verified** by the Google Earth 2026-03-11 紫神社 pin (lm-seigoji top/o180), which unprojects to (−246.5, 156.3), on this hall. Roof red-brown (Earth #7c5f6e, GSI #927e77; app #8e5a55). The long light-grey roof to its west (lot 16/58540/25068/224) is a separate house |
 
 Typical palette:
 

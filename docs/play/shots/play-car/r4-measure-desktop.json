@@ -1,0 +1,552 @@
+{
+  "tag": "desktop",
+  "w": 1440,
+  "h": 900,
+  "dsf": 1,
+  "mode": {
+    "title": {
+      "ja": "ドライブ・レース",
+      "en": "Drive race"
+    },
+    "id": "race",
+    "listed": [
+      "katsuo",
+      "race"
+    ]
+  },
+  "driftDiag": {
+    "body": "shot playing",
+    "sheet": {
+      "hidden": true,
+      "d": "none",
+      "bg": "rgba(23, 24, 75, 0.34)",
+      "op": "1",
+      "bf": "none"
+    },
+    "veil": {
+      "hidden": true,
+      "d": "none",
+      "bg": "rgba(23, 24, 75, 0.28)",
+      "op": "1",
+      "bf": "none"
+    },
+    "hits": [
+      {
+        "u": 0.5,
+        "v": 0.08,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.5,
+        "v": 0.5,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.12,
+        "v": 0.18,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.85,
+        "v": 0.82,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      }
+    ],
+    "grade": {
+      "hours": 12,
+      "preset": "hiru",
+      "night": 0,
+      "lamps": 0,
+      "exp": 1,
+      "bloom": 0.26,
+      "glow": 0.1,
+      "vig": 0.22,
+      "neutral": 0,
+      "hemi": 1.45,
+      "sun": 3.15
+    },
+    "cam": {
+      "x": 66.71,
+      "y": 4.3,
+      "z": 144.79,
+      "fov": 58.12
+    }
+  },
+  "hiddenDiag": {
+    "cam": {
+      "x": 66.71,
+      "y": 4.3,
+      "z": 144.79,
+      "fov": 58.12
+    },
+    "grade": {
+      "hours": 12,
+      "preset": "hiru",
+      "night": 0,
+      "lamps": 0,
+      "exp": 1,
+      "bloom": 0.26,
+      "glow": 0.1,
+      "vig": 0.22,
+      "neutral": 0,
+      "hemi": 1.45,
+      "sun": 3.15
+    },
+    "sheet": {
+      "hidden": true,
+      "d": "none",
+      "bg": "rgba(23, 24, 75, 0.34)",
+      "op": "1",
+      "bf": "none"
+    },
+    "hits": [
+      {
+        "u": 0.5,
+        "v": 0.08,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.5,
+        "v": 0.5,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.12,
+        "v": 0.18,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.85,
+        "v": 0.82,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      }
+    ]
+  },
+  "walkDiag": {
+    "cam": {
+      "x": 66.71,
+      "y": 4.3,
+      "z": 144.79,
+      "fov": 58.12
+    },
+    "grade": {
+      "hours": 12,
+      "preset": "hiru",
+      "night": 0,
+      "lamps": 0,
+      "exp": 1,
+      "bloom": 0.26,
+      "glow": 0.1,
+      "vig": 0.22,
+      "neutral": 0,
+      "hemi": 1.45,
+      "sun": 3.15
+    },
+    "sheet": {
+      "hidden": true,
+      "d": "none",
+      "bg": "rgba(23, 24, 75, 0.34)",
+      "op": "1",
+      "bf": "none"
+    },
+    "body": "shot playing",
+    "hits": [
+      {
+        "u": 0.5,
+        "v": 0.08,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.5,
+        "v": 0.5,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.12,
+        "v": 0.18,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      },
+      {
+        "u": 0.85,
+        "v": 0.82,
+        "els": [
+          {
+            "id": "scene",
+            "cls": "",
+            "bg": "rgba(0, 0, 0, 0)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "shot playing",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          },
+          {
+            "id": "",
+            "cls": "klc-card-ready",
+            "bg": "rgb(207, 220, 236)",
+            "op": "1",
+            "bf": "none",
+            "d": "block"
+          }
+        ]
+      }
+    ]
+  },
+  "drift": {
+    "file": "docs/play/shots/play-car/drift-desktop-ja.jpg",
+    "w": 1440,
+    "h": 900,
+    "full": [
+      125.4,
+      138.1,
+      155.5
+    ],
+    "sky": [
+      164.6,
+      202.3,
+      235.8
+    ],
+    "tl": [
+      133.6,
+      172.7,
+      213.5
+    ]
+  },
+  "carHidden": {
+    "file": "docs/play/shots/play-car/r4-match-car-desktop.png",
+    "w": 1440,
+    "h": 900,
+    "full": [
+      127.2,
+      140.5,
+      158.6
+    ],
+    "sky": [
+      164.6,
+      202.5,
+      235.9
+    ],
+    "tl": [
+      133.2,
+      172.9,
+      213.4
+    ]
+  },
+  "walk": {
+    "file": "docs/play/shots/play-car/r4-match-walk-desktop.png",
+    "w": 1440,
+    "h": 900,
+    "full": [
+      127.1,
+      140.4,
+      158.3
+    ],
+    "sky": [
+      164.6,
+      202.5,
+      235.9
+    ],
+    "tl": [
+      133.2,
+      172.9,
+      213.4
+    ]
+  },
+  "relFull": [
+    0.0008,
+    0.0007,
+    0.0019
+  ],
+  "relSky": [
+    0,
+    0.001,
+    0.0004
+  ],
+  "relSkyHidden": [
+    0,
+    0,
+    0
+  ],
+  "worst": 0.0019
+}

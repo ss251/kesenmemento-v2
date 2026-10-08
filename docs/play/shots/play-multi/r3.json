@@ -1,0 +1,11 @@
+{
+  "code": "4WD9",
+  "peers": 1,
+  "idleMean": 1,
+  "idleMax": 1,
+  "idleN": 3,
+  "frameMean": 1.5,
+  "frameMax": 3,
+  "frameN": 4,
+  "play": "{\"n\":363,\"mean\":0.13223140495865013,\"max\":6}"
+}

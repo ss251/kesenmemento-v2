@@ -5,7 +5,7 @@
 `tools/anime/ship-profile.mjs` checks the side profile against the nendo model photos.
 `test/ship-model.test.js` covers the dimensions, the 舷門, the budgets, the flags and the fallback.
 
-Sources: `docs/ship/shofukumaru-dossier.md` (the captain's dossier) and the reference photos in `raw/ref/shofukumaru/`.
+Sources: the project's sourced notes on the ship (not included) (the project's sourced notes on the ship, not included) and the reference photos in `raw/ref/shofukumaru/`.
 The photos are copyrighted and live only in `raw/`, which is never committed.
 
 ## Frame and API
@@ -40,7 +40,7 @@ If you leave out `livery`, `flags.js` picks it. If you leave out `tier`, `ctx.qu
 
 | Real (sourced or measured) | Stylised |
 |---|---|
-| LOA 58.60, beam 9.2, depth 3.91 and design draft 3.54 come from the registries. The keel sits 4.05 m (forward) to 4.25 m (amidships) under the paint line, as measured on the model photo 02 (34–35 px; the dossier's 32 px under-reads the edge, see the README's Deviations, row b). | The cel materials, ink outlines and studio colours follow the app's look rules. |
+| LOA 58.60, beam 9.2, depth 3.91 and design draft 3.54 come from the registries. The keel sits 4.05 m (forward) to 4.25 m (amidships) under the paint line, as measured on the model photo 02 (34–35 px; the sourced notes's 32 px under-reads the edge, see the README's Deviations, row b). | The cel materials, ink outlines and studio colours follow the app's look rules. |
 | The profile (sheer, raked stem, knuckle-bulb, rounded stern, skeg, rudder and propeller) is measured on `shofukumaru02` at 0.1226 m/px, using the tool's segmentation. | The hull lines between the measured profile and the 9.2 m beam are a fair fishing-hull loft. No lines plan is public. |
 | The 舷門 is on starboard only, at s 22.8–31.3 and h 3.0–4.7, with the line hauler, slow conveyor, branch-line reel and fish boxes in the well. | The well and stern-bay gear is simplified, and the interiors are dark recesses. |
 | The masts are the foremast (s 14.2, top 16.1), the white lattice radar mast (s 42.8, top 20.7) and the aft mast (s 53.7, top 19.1). | The lattice bracing pattern is generic. |
@@ -107,10 +107,10 @@ stern leaves little room, so its aft edge is nearly vertical. `ship-livery-paint
 
 `cleanNendo()` turns each traced fragment into its convex hull. It merges a fragment with a touching fragment of the same colour only while the union stays compact. It then simplifies the shape to the fewest corners that keep 92 % of its area, and snaps corners at the waterline and at the stem. Nothing is snapped to the stern (fix round 2: snapping corners past s 57 to the atlas edge made the stern triangles meet across the transom); the white transom clips them at the quarter knuckle instead. `paintAtlas` order: shapes, circles, `over` shapes, lines, the white transom, text, the gunwale edge, the antifouling.
 
-**Flag** (`flags.js`). Livery permission granted to the captain by 臼福本店 on 2026-10-03; nendo livery is the default in all builds.
+**Flag** (`flags.js`). The livery is 臼福本店's, used with permission in the live demo and not included in this repository; without its data she is painted in a plain livery.
 - `?livery=fallback|nendo` wins.
 - Otherwise a build that defines `KLC_NENDO=0` shows the fallback.
-- Otherwise nendo, on every host, the public Funnel link (`*.ts.net`) and any public deploy included.
+- Otherwise nendo, on every host, the public public mirror and any public deploy included.
 
 With the fallback, the nendo files are never fetched. They are never imported either, so they are never bundled: every deploy serves them under `/data/ship/shofukumaru1/` (`scripts/serve.js`, `scripts/public-mirror.js` and the static-deploy pattern in `docs/ARCHITECTURE.md`).
 

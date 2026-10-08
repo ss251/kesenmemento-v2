@@ -1,0 +1,178 @@
+{
+  "ja-desktop": {
+    "quay": {
+      "phase": "quay",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "talk": {
+      "phase": "run",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "coach-bait": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "actions": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "catch": {
+      "phase": "swing",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "results": {
+      "phase": "done",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    }
+  },
+  "en-desktop": {
+    "quay": {
+      "phase": "quay",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "talk": {
+      "phase": "run",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "coach-bait": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "actions": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "catch": {
+      "phase": "swing",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "results": {
+      "phase": "done",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    }
+  },
+  "ja-phone": {
+    "quay": {
+      "phase": "quay",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "talk": {
+      "phase": "run",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "coach-bait": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "actions": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "catch": {
+      "phase": "swing",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "results": {
+      "phase": "done",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    }
+  },
+  "en-phone": {
+    "quay": {
+      "phase": "quay",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "talk": {
+      "phase": "run",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "coach-bait": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "actions": {
+      "phase": "work",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "catch": {
+      "phase": "swing",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    },
+    "results": {
+      "phase": "done",
+      "play": true,
+      "hud": true,
+      "kit": true,
+      "hits": []
+    }
+  }
+}

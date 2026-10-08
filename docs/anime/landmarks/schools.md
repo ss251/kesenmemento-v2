@@ -21,6 +21,14 @@ Colour notes (ortho and photo):
 - Roofs flat light grey #c9ccc9; gyms blue-grey #6f8698.
 - Yards compacted earth #c9b99a; pools #3d8fc9.
 
+## Which building is the gym [r3:16]
+
+The area / box-ratio rule (550 to 2600 m2, ratio up to 1.9) drew five classroom buildings as 8 m barrel-roofed hangars (気仙沼小 /73, 気仙沼中 /126, 鹿折中 /196 (a U round a garden, fill 0.49), 気仙沼高 /24 (a U round a lawn,
+fill 0.44), 条南中 /168), so `landmarks/sites.js` `SCHOOL_INFO.<ground>.kindOverride` is now the per-lot table: gyms 気仙沼小 /64, 気仙沼中 /100, 気仙沼高 /39 /35, 鹿折中 /195, 条南中 /170, 鹿折小 /69 (pitched roof),
+東陵高 /31 (pitched roof); blocks /73 (2 storeys, flat roof with planters, Commons 2025-09-28), /126, /24, /429, /531, /196, /168; sheds 気仙沼高 /38 (a 570 m2 low annex). The rule stays as the fallback for an unlisted lot, now with
+polygon fill >= 0.85 (`schools.js polyFill`). `buildSchools` first swaps the true footprints of the far school lots in from explore.json (`patchLots`; the landmarks module builds before explore), so /24 and /196 keep their open
+courtyards. 九条小 lies outside the 8192 px core ortho; an Earth 2026-03-11 capture (top, o0) decided it: /307 (678 m2, 33 x 21 m) is the red pitched-roof gym beside the pool (listed as a gym, roof gable by `outside cells (九条小, far zone).json`), /362 the long flat-roofed block. Every school roof in the data is flat, so no roof test can tell blocks from gyms.
+
 ## Sources
 
 - OSM ways 415669878, 415669877, 768699248, 415669879, 765653828, 104964823, 762601688, 415669837 and 768032842

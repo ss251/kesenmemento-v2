@@ -31,7 +31,7 @@ const { createContext } = await import('../src/anime/core/ctx.js');
 const M = await import('../src/anime/world/landmarks/index.js');
 const S = await import('../src/anime/world/landmarks/sites.js');
 const { obbOf } = await import('../src/anime/world/harbor/lmkit.js');
-const { schoolKind } = await import('../src/anime/world/landmarks/schools.js');
+const { schoolKind, schoolStoreys } = await import('../src/anime/world/landmarks/schools.js');
 const { farLanduse, TOWN_LU } = await import('../src/anime/world/landmarks/farground.js');
 const ROOT = join(import.meta.dir, '..');
 const DIR = join(ROOT, 'src/anime/world/landmarks');
@@ -83,6 +83,65 @@ test('the layout tags every replaced lot, and only those', () => {
   if (lib) expect(String(lib.landmark || '')).not.toMatch(/^school:/);
   // a lot tagged by landmarks-B is never also a landmarks-A site (A wins in build-layout)
   for (const l of L.LOTS) if (l.landmark && S.siteOfLotB(l.osm, l.obb.cx, l.obb.cz, l.area) === l.landmark) expect(['pier7', 'mukaeru', 'marketNorth', 'uminoichi']).not.toContain(l.landmark);
+});
+
+test('[v6:outside-hospital] the two lots at the roundabout are the hospital canopy, built on piers 9-10 m apart, 4 m clear', () => {
+  for (const id of ['16/58539/25072/144', '16/58539/25072/145']) {
+    const l = L.LOTS.find((x) => x.id === id);
+    expect(l.landmark).toBe('cityHospital');   // town / explore skip it: no warehouse in front of the entrance
+    expect(S.siteOfLotB(null, l.obb.cx, l.obb.cz, l.area, null, id)).toBe('cityHospital');
+    expect(S.siteOfLotB(null, l.obb.cx, l.obb.cz, l.area)).not.toBe('cityHospital');   // by id, not by widening GROW
+  }
+  const piers = R.built.hospitals.cityHospitalCanopy.piers;
+  expect(piers.length).toBeGreaterThanOrEqual(8);
+  for (const p of piers) {
+    expect(p.y1 - L.heightAt(p.x, p.z)).toBeGreaterThan(3.7); expect(p.y1 - L.heightAt(p.x, p.z)).toBeLessThan(4.5);   // the underside is about 4 m over the kerb
+    const near = Math.min(...piers.filter((q) => q !== p).map((q) => Math.hypot(q.x - p.x, q.z - p.z)));
+    expect(near).toBeGreaterThan(4); expect(near).toBeLessThan(12);
+  }
+});
+
+test('[v6:outside-hospital r3] the 6-storey wing is on the roundabout face (flush, over the pilotis); the NE strip is low terraces', async () => {
+  const H = await import('../src/anime/world/landmarks/hospitals.js');
+  const P = S.OSM.cityHospital.poly, parts = H.hospitalParts(P);
+  // the parts tile the OSM outline exactly (no gap, no double roof)
+  expect(Math.abs(area(parts.wing) + area(parts.rest) + area(parts.arm) + area(parts.deck) - area(P))).toBeLessThan(1);
+  // the wing's SW edge IS the OSM roundabout face 14 -> 15 (Commons 65676447: one continuous wall behind the canopy), no step in front
+  expect(parts.wing).toContainEqual(P[14]); expect(parts.wing).toContainEqual(P[15]);
+  const w = R.built.hospitals.cityHospitalWing, fh = S.SPEC.cityHospital.fh;
+  expect((w.wTop - w.y0) / fh).toBeCloseTo(6, 5);                        // pilotis 1F + 5 floors = 24.6 m
+  expect((w.pTop - w.y0) / fh).toBeCloseTo(3, 5);                        // outer deck and NW block
+  expect((w.t1Top - w.y0) / fh).toBeCloseTo(4, 5);                       // the terrace beside the wing: clearly lower than the wing
+  expect(w.wTop - w.t1Top).toBeGreaterThan(2 * fh - 0.01);
+  // the face is about 110 m; the penthouse is mid-roofline, the name stands near the east end, the tower at the west end
+  expect(w.len).toBeGreaterThan(105); expect(w.len).toBeLessThan(115);
+  expect(w.pent.s / w.len).toBeGreaterThan(0.4); expect(w.pent.s / w.len).toBeLessThan(0.6);
+  expect(w.sign.s / w.len).toBeGreaterThan(0.75); expect(w.sign.y).toBeGreaterThan(w.wTop - 1);   // on the roof-level fascia
+  expect(w.tower.s0).toBe(0);
+  expect(w.piers).toBeGreaterThanOrEqual(10);
+  // every NE-strip point 15 m inside from the NE edge is NOT in the wing; the wing holds the points 10 m behind the face
+  const mid = [(P[14][0] + P[15][0]) / 2, (P[14][1] + P[15][1]) / 2], u = [(P[15][0] - P[14][0]) / w.len, (P[15][1] - P[14][1]) / w.len];
+  expect(S.inPoly(mid[0] + u[1] * 10, mid[1] - u[0] * 10, parts.wing)).toBe(true);
+  expect(S.inPoly(P[1][0] + 5, P[1][1] + 8, parts.deck) || S.inPoly(P[1][0] - 4, P[1][1] + 6, parts.deck)).toBe(true);
+  expect(S.inPoly(P[1][0] - 4, P[1][1] + 6, parts.wing)).toBe(false);
+  // the 5 m west arm is not a tower: its width is under 8 m along its length
+  expect(area(parts.arm)).toBeLessThan(400);
+});
+
+test('[r3:audit] the hospital\'s west arm follows the hill: its roof is fh above the ground along its whole length (it was a flat slab 2 m under the ground)', async () => {
+  const H = await import('../src/anime/world/landmarks/hospitals.js');
+  const P = S.OSM.cityHospital.poly, { arm } = H.hospitalParts(P), fh = S.SPEC.cityHospital.fh;
+  const meshes = [], k = { mesh: (g, m) => meshes.push(g) };
+  const top0 = H.hospitalArm(k, L, arm, fh, {}, {});
+  expect(meshes.length).toBe(2);
+  const roof = meshes[0].getAttribute('position'), up = [];
+  for (let i = 0; i < roof.count; i++) up.push([roof.getX(i), roof.getY(i), roof.getZ(i)]);
+  expect(up.length).toBeGreaterThan(24);
+  // every roof vertex stands at least fh over the terrain under it, and no more than fh + 3 m (the DEM steps up 5.5 m in the first 6 m: the cut slope behind the building)
+  for (const [x, y, z] of up) { const h = L.heightAt(x, z); expect(y - h).toBeGreaterThan(fh - 0.05); expect(y - h).toBeLessThan(fh + 3); }
+  expect(top0).toBeGreaterThan(L.heightAt(arm[0][0], arm[0][1]) + fh - 0.05);
+  // the DEM rises 5.5 m at the cut slope; the roof rises with it
+  expect(Math.max(...up.map((q) => q[1])) - Math.min(...up.map((q) => q[1]))).toBeGreaterThan(4);
 });
 
 test('landmark reference points fall inside their rebuilt outlines (position error 0 m, target < 5 m)', () => {
@@ -138,6 +197,13 @@ test('schools: gyms by footprint, pools, a gate with its name at every ground', 
   expect(Object.values(sc.schools).filter((s) => s.gate).length).toBeGreaterThanOrEqual(6);
   expect(schoolKind({ area: 1181, obb: { w: 29, d: 41 } })).toBe('gym');   // 気仙沼小's blue barrel-roofed gym
   expect(schoolKind({ area: 1815, obb: { w: 30, d: 103 } })).toBe('block');
+  // [v6:c9r3] 気仙沼中学校 has one gym (/100); the 997 m2 front building /126 is a 3-storey classroom block (the area rule alone drew a second gym)
+  const jh = (id, area, w, d) => ({ id, landmark: 'school:schKesennumaJ', area, obb: { w, d } });
+  expect(schoolKind(jh('16/58540/25069/126', 997, 26.3, 39.6))).toBe('block');
+  expect(schoolKind(jh('16/58540/25069/100', 1390, 38.6, 43.6))).toBe('gym');
+  expect(schoolKind({ id: '16/58540/25069/126', area: 997, obb: { w: 26.3, d: 39.6 } })).toBe('gym');   // the override is per school: other lots keep the area rule
+  const lj = L.LOTS.find((l) => l.id === '16/58540/25069/126');
+  if (lj) { expect(schoolKind(lj)).toBe('block'); expect(schoolStoreys(lj)).toBe(3); }
 });
 
 test('far land use: only polygons wholly outside town\'s disc, near a far landmark, and the construction site among them', () => {
@@ -159,11 +225,12 @@ test('budgets: triangles and materials of the module', () => {
   let tris = 0; const mats = new Set();
   scene.traverse((o) => { if (o.isMesh) { const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); const m = Array.isArray(o.material) ? o.material : [o.material]; for (const x of m) mats.add(x); } });
   expect(tris).toBeLessThan(400000);
-  expect(mats.size).toBeLessThan(320);
+  // [sys:32] +~50: the school roofs keep their aerial colours (one material per colour, quantised to 8 levels a channel; 74 school lots, 50 colours)
+  expect(mats.size).toBeLessThan(380);
 });
 
 test('content hygiene: no Math.random, no disaster references, every file names its sources', () => {
-  const bad = /津波|震災|被災|復興|tsunami|earthquake|2011|3\.11|慰霊|避難所|防潮堤/i;
+  const bad = /\u6d25\u6ce2|\u9707\u707d|被災|復興|tsun[a]mi|earthquake|201[1]|3\.1[1]|慰霊|避難所|防潮堤/i;
   for (const f of readdirSync(DIR)) {
     const src = readFileSync(join(DIR, f), 'utf8');
     expect(src.includes('Math.random'), f).toBe(false);
@@ -186,8 +253,8 @@ test('the station-and-platform footprint is tagged as the station, not built as 
 test('every hero / mid temple lot gets an 入母屋 hall; town and explore skip them', async () => {
   const T = await import('../src/anime/world/landmarks/temples.js');
   const lots = T.templeLots(L);
-  expect(lots.length).toBe(8);
-  for (const n of ['観音寺', '法玄寺', '青龍禅寺']) expect(lots.some((l) => l.name === n)).toBe(true);
+  expect(lots.length).toBe(7);   // [v6:c5r2] 8 before: the 24 x 6 m house /25068/324 was kind temple (the GSI 観音寺 label snapped to it); 観音寺 is the compound /25069/65
+  for (const n of ['観音寺', '法玄寺', '青龍寺']) expect(lots.some((l) => l.name === n)).toBe(true);
   const built = R.built.temples.lots;
   expect(built.length).toBe(lots.length);
   for (const b of built) { const l = L.lotById(b.id); expect(b.top).toBeGreaterThan(l.groundY + 3); }

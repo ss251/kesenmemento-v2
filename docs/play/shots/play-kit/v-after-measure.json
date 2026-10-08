@@ -1,0 +1,5017 @@
+{
+ "desktop-ja": {
+  "charm-day": {
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 602,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "book": [
+    {
+     "w": 95.2,
+     "h": 48,
+     "x": 743,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "手帳"
+    }
+   ]
+  },
+  "charm-60": {
+   "glint": [
+    {
+     "w": 56.8,
+     "h": 56.8,
+     "x": 692,
+     "y": 430,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 14,
+     "h": 14,
+     "x": 3891,
+     "y": 310,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    }
+   ]
+  },
+  "hud": {
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 602,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "pillText": [
+    {
+     "w": 49.9,
+     "h": 16,
+     "x": 658,
+     "y": 30,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "book": [
+    {
+     "w": 95.2,
+     "h": 48,
+     "x": 743,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "手帳"
+    }
+   ],
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "chipName": [
+    {
+     "w": 71.4,
+     "h": 16,
+     "x": 58,
+     "y": 120,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ"
+    }
+   ],
+   "chipNum": [
+    {
+     "w": 29.4,
+     "h": 14,
+     "x": 139,
+     "y": 121,
+     "fs": "14px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "countdown": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 720,
+     "y": 378,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ],
+   "num": [
+    {
+     "w": 76,
+     "h": 168.8,
+     "x": 682,
+     "y": 287,
+     "fs": "168px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "go": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 720,
+     "y": 378,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ],
+   "num": [
+    {
+     "w": 284.2,
+     "h": 168.4,
+     "x": 578,
+     "y": 287,
+     "fs": "168px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ]
+  },
+  "timer": {
+   "timer": [
+    {
+     "w": 132.5,
+     "h": 44,
+     "x": 654,
+     "y": 84,
+     "fs": "44px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0:12.36"
+    }
+   ],
+   "split": [
+    {
+     "w": 55.4,
+     "h": 26,
+     "x": 693,
+     "y": 138,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "−1.2"
+    }
+   ]
+  },
+  "actions": {
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 1344,
+     "y": 788,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出すSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1264,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌E"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1188,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "散水R"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1112,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "冷やすC"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1036,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "やめるEsc"
+    }
+   ],
+   "label": [
+    {
+     "w": 79.2,
+     "h": 25,
+     "x": 1341,
+     "y": 866,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出す"
+    },
+    {
+     "w": 57.8,
+     "h": 22,
+     "x": 1263,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌"
+    },
+    {
+     "w": 44.5,
+     "h": 22,
+     "x": 1194,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "散水"
+    },
+    {
+     "w": 57.8,
+     "h": 22,
+     "x": 1111,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "冷やす"
+    },
+    {
+     "w": 57.8,
+     "h": 22,
+     "x": 1035,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "やめる"
+    }
+   ],
+   "key": [
+    {
+     "w": 46.3,
+     "h": 24,
+     "x": 1336,
+     "y": 780,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Space"
+    },
+    {
+     "w": 24,
+     "h": 24,
+     "x": 1256,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "E"
+    },
+    {
+     "w": 24,
+     "h": 24,
+     "x": 1180,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "R"
+    },
+    {
+     "w": 24,
+     "h": 24,
+     "x": 1104,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "C"
+    },
+    {
+     "w": 32.5,
+     "h": 24,
+     "x": 1028,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Esc"
+    }
+   ]
+  },
+  "toast": {
+   "toast": [
+    {
+     "w": 260.3,
+     "h": 46,
+     "x": 590,
+     "y": 160,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "チュートリアルをもう一度"
+    }
+   ],
+   "big": [
+    {
+     "w": 308.3,
+     "h": 80,
+     "x": 566,
+     "y": 72,
+     "fs": "30px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ10匹！"
+    }
+   ]
+  },
+  "ono": {
+   "ono": [
+    {
+     "w": 244.2,
+     "h": 94.5,
+     "x": 598,
+     "y": 60,
+     "fs": "64px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "ザバッ！"
+    }
+   ]
+  },
+  "stamp": {
+   "stamp": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 713,
+     "y": 374,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ]
+  },
+  "results": {
+   "medal": [
+    {
+     "w": 206.6,
+     "h": 206.6,
+     "x": 617,
+     "y": 287,
+     "fs": "96px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 544,
+     "h": 75,
+     "x": 448,
+     "y": 534,
+     "fs": "72px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:23.45"
+    }
+   ],
+   "stamp": [
+    {
+     "w": 234.3,
+     "h": 104,
+     "x": 665,
+     "y": 422,
+     "fs": "30px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "自己ベスト！"
+    }
+   ],
+   "retry": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 490,
+     "y": 631,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "もう一回"
+    }
+   ],
+   "quit": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 726,
+     "y": 631,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "やめる"
+    }
+   ],
+   "title": [
+    {
+     "w": 196.6,
+     "h": 38,
+     "x": 622,
+     "y": 218,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオさがし"
+    }
+   ]
+  },
+  "hub-1": {
+   "sheet": [
+    {
+     "w": 344,
+     "h": 422,
+     "x": 548,
+     "y": 239,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 337,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    }
+   ],
+   "title": [
+    {
+     "w": 244,
+     "h": 26,
+     "x": 598,
+     "y": 527,
+     "fs": "20px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオさがし"
+    }
+   ],
+   "chip": [
+    {
+     "w": 61.3,
+     "h": 26,
+     "x": 598,
+     "y": 589,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "★☆☆"
+    },
+    {
+     "w": 56.3,
+     "h": 26,
+     "x": 665,
+     "y": 589,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1人"
+    },
+    {
+     "w": 46.2,
+     "h": 26,
+     "x": 728,
+     "y": 589,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "hub-card": {
+   "open": [
+    {
+     "w": 282.9,
+     "h": 430.6,
+     "x": 579,
+     "y": 268,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    }
+   ],
+   "go": [
+    {
+     "w": 253.8,
+     "h": 58.2,
+     "x": 593,
+     "y": 571,
+     "fs": "17px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "はじめる"
+    }
+   ],
+   "how": [
+    {
+     "w": 253.8,
+     "h": 45.8,
+     "x": 593,
+     "y": 638,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "やりかた"
+    }
+   ]
+  },
+  "hub-7": {
+   "sheet": [
+    {
+     "w": 916,
+     "h": 780,
+     "x": 262,
+     "y": 60,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWクエストまちの人のおねがい6分"
+    }
+   ],
+   "dots": []
+  },
+  "hub-7-card": {
+   "open": [
+    {
+     "w": 282.9,
+     "h": 430.6,
+     "x": 579,
+     "y": 150,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    }
+   ],
+   "others": [
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 302,
+     "y": 162,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 874,
+     "y": 162,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 302,
+     "y": 590,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 588,
+     "y": 590,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 874,
+     "y": 590,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWクエストまちの人のおねがい6分"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 302,
+     "y": 896,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWみんなでいっしょに港をまわる1"
+    }
+   ]
+  },
+  "title": {
+   "title": [
+    {
+     "w": 757.7,
+     "h": 110,
+     "x": 299,
+     "y": 331,
+     "fs": "96px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオさがし"
+    }
+   ],
+   "seal": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 1067,
+     "y": 326,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ],
+   "sub": [
+    {
+     "w": 321.9,
+     "h": 42,
+     "x": 559,
+     "y": 456,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Fifty hidden in to"
+    }
+   ]
+  },
+  "coach": {
+   "bubble": [
+    {
+     "w": 380,
+     "h": 136,
+     "x": 748,
+     "y": 270,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "キラッと光っている。そばに行くと、ひ"
+    }
+   ],
+   "text": [
+    {
+     "w": 282,
+     "h": 54,
+     "x": 830,
+     "y": 284,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "キラッと光っている。そばに行くと、ひ"
+    }
+   ]
+  },
+  "results-grade": {
+   "stamp": [
+    {
+     "w": 156.6,
+     "h": 156.6,
+     "x": 642,
+     "y": 345,
+     "fs": "84px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "優"
+    }
+   ],
+   "extra": [
+    {
+     "w": 544,
+     "h": 27,
+     "x": 448,
+     "y": 504,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "8本・合計18.6kg・最大74cm"
+    }
+   ]
+  }
+ },
+ "glintRest": {
+  "after": "[\"14.0\",\"14.0\",\"14.0\",\"14.0\"]"
+ },
+ "spark": {
+  "after": {
+   "n": 24,
+   "min": 6.7,
+   "p50": 7.7,
+   "max": 9.2,
+   "visible": true
+  },
+  "after-desktop": {
+   "n": 24,
+   "min": 13.1,
+   "p50": 14,
+   "max": 14,
+   "visible": true
+  },
+  "after-phone": {
+   "n": 24,
+   "min": 6.7,
+   "p50": 7.7,
+   "max": 9.2,
+   "visible": true
+  }
+ },
+ "desktop-en": {
+  "charm-day": {
+   "chip": [
+    {
+     "w": 187.3,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "Golden bonito0/50"
+    }
+   ],
+   "pill": [
+    {
+     "w": 114.9,
+     "h": 56,
+     "x": 591,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Play"
+    }
+   ],
+   "book": [
+    {
+     "w": 133.4,
+     "h": 48,
+     "x": 716,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Notebook"
+    }
+   ]
+  },
+  "charm-60": {
+   "glint": [
+    {
+     "w": 56.8,
+     "h": 56.8,
+     "x": 692,
+     "y": 430,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 14,
+     "h": 14,
+     "x": 3891,
+     "y": 310,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    }
+   ]
+  },
+  "hud": {
+   "pill": [
+    {
+     "w": 114.9,
+     "h": 56,
+     "x": 591,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Play"
+    }
+   ],
+   "pillText": [
+    {
+     "w": 32.9,
+     "h": 16,
+     "x": 647,
+     "y": 30,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Play"
+    }
+   ],
+   "book": [
+    {
+     "w": 133.4,
+     "h": 48,
+     "x": 716,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Notebook"
+    }
+   ],
+   "chip": [
+    {
+     "w": 187.3,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "Golden bonito0/50"
+    }
+   ],
+   "chipName": [
+    {
+     "w": 89.9,
+     "h": 16,
+     "x": 58,
+     "y": 120,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Golden bonito"
+    }
+   ],
+   "chipNum": [
+    {
+     "w": 29.4,
+     "h": 14,
+     "x": 158,
+     "y": 121,
+     "fs": "14px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "countdown": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 720,
+     "y": 378,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ],
+   "num": [
+    {
+     "w": 76,
+     "h": 168.8,
+     "x": 682,
+     "y": 287,
+     "fs": "168px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "go": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 720,
+     "y": 378,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ],
+   "num": [
+    {
+     "w": 284.2,
+     "h": 168.4,
+     "x": 578,
+     "y": 287,
+     "fs": "168px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ]
+  },
+  "timer": {
+   "timer": [
+    {
+     "w": 132.5,
+     "h": 44,
+     "x": 654,
+     "y": 84,
+     "fs": "44px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0:12.36"
+    }
+   ],
+   "split": [
+    {
+     "w": 55.4,
+     "h": 26,
+     "x": 693,
+     "y": 138,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "−1.2"
+    }
+   ]
+  },
+  "actions": {
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 1344,
+     "y": 788,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "CastSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1264,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "ChumE"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1188,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "SprayR"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1112,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "IceC"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1036,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "QuitEsc"
+    }
+   ],
+   "label": [
+    {
+     "w": 50,
+     "h": 25,
+     "x": 1355,
+     "y": 866,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Cast"
+    },
+    {
+     "w": 51.7,
+     "h": 22,
+     "x": 1266,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Chum"
+    },
+    {
+     "w": 52.9,
+     "h": 22,
+     "x": 1190,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Spray"
+    },
+    {
+     "w": 35,
+     "h": 22,
+     "x": 1123,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Ice"
+    },
+    {
+     "w": 43.7,
+     "h": 22,
+     "x": 1042,
+     "y": 866,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Quit"
+    }
+   ],
+   "key": [
+    {
+     "w": 46.3,
+     "h": 24,
+     "x": 1336,
+     "y": 780,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Space"
+    },
+    {
+     "w": 24,
+     "h": 24,
+     "x": 1256,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "E"
+    },
+    {
+     "w": 24,
+     "h": 24,
+     "x": 1180,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "R"
+    },
+    {
+     "w": 24,
+     "h": 24,
+     "x": 1104,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "C"
+    },
+    {
+     "w": 32.5,
+     "h": 24,
+     "x": 1028,
+     "y": 796,
+     "fs": "12px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Esc"
+    }
+   ]
+  },
+  "toast": {
+   "toast": [
+    {
+     "w": 233.8,
+     "h": 46,
+     "x": 603,
+     "y": 160,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Show the tutorial "
+    }
+   ],
+   "big": [
+    {
+     "w": 306.9,
+     "h": 80,
+     "x": 567,
+     "y": 72,
+     "fs": "30px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "10 golden bonito!"
+    }
+   ]
+  },
+  "ono": {
+   "ono": [
+    {
+     "w": 315.8,
+     "h": 102,
+     "x": 562,
+     "y": 56,
+     "fs": "64px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "SPLASH!"
+    }
+   ]
+  },
+  "stamp": {
+   "stamp": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 713,
+     "y": 374,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ]
+  },
+  "results": {
+   "medal": [
+    {
+     "w": 206.6,
+     "h": 206.6,
+     "x": 617,
+     "y": 287,
+     "fs": "96px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 544,
+     "h": 75,
+     "x": 448,
+     "y": 534,
+     "fs": "72px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:23.45"
+    }
+   ],
+   "stamp": [
+    {
+     "w": 212.6,
+     "h": 99.4,
+     "x": 687,
+     "y": 425,
+     "fs": "30px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "New best!"
+    }
+   ],
+   "retry": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 490,
+     "y": 631,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Again"
+    }
+   ],
+   "quit": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 726,
+     "y": 631,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Quit"
+    }
+   ],
+   "title": [
+    {
+     "w": 247.6,
+     "h": 38,
+     "x": 596,
+     "y": 218,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Find the golden bo"
+    }
+   ]
+  },
+  "hub-1": {
+   "sheet": [
+    {
+     "w": 344,
+     "h": 422,
+     "x": 548,
+     "y": 239,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "PlayWhat shall we "
+    }
+   ],
+   "card": [
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 337,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    }
+   ],
+   "title": [
+    {
+     "w": 244,
+     "h": 26,
+     "x": 598,
+     "y": 527,
+     "fs": "20px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Find the golden bo"
+    }
+   ],
+   "chip": [
+    {
+     "w": 61.3,
+     "h": 26,
+     "x": 598,
+     "y": 589,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "★☆☆"
+    },
+    {
+     "w": 63.1,
+     "h": 26,
+     "x": 665,
+     "y": 589,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Solo"
+    },
+    {
+     "w": 46.2,
+     "h": 26,
+     "x": 734,
+     "y": 589,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "hub-card": {
+   "open": [
+    {
+     "w": 282.9,
+     "h": 430.6,
+     "x": 579,
+     "y": 268,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    }
+   ],
+   "go": [
+    {
+     "w": 253.8,
+     "h": 58.2,
+     "x": 593,
+     "y": 571,
+     "fs": "17px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Start"
+    }
+   ],
+   "how": [
+    {
+     "w": 253.8,
+     "h": 45.8,
+     "x": 593,
+     "y": 638,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "How to play"
+    }
+   ]
+  },
+  "hub-7": {
+   "sheet": [
+    {
+     "w": 916,
+     "h": 780,
+     "x": 262,
+     "y": 60,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "PlayWhat shall we "
+    }
+   ],
+   "card": [
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "SuggestedNEWPole-a"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWBe a gullLook d"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWUnder the seaSw"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWDrive raceOnce "
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWQuestsHelp the "
+    }
+   ],
+   "dots": []
+  },
+  "hub-7-card": {
+   "open": [
+    {
+     "w": 282.9,
+     "h": 430.6,
+     "x": 579,
+     "y": 150,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    }
+   ],
+   "others": [
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 302,
+     "y": 162,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "SuggestedNEWPole-a"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 874,
+     "y": 162,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWBe a gullLook d"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 302,
+     "y": 590,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWUnder the seaSw"
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 588,
+     "y": 590,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWDrive raceOnce "
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 874,
+     "y": 590,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWQuestsHelp the "
+    },
+    {
+     "w": 263.8,
+     "h": 283.2,
+     "x": 302,
+     "y": 896,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWTogetherExplore"
+    }
+   ]
+  },
+  "title": {
+   "title": [
+    {
+     "w": 1186.6,
+     "h": 110,
+     "x": 85,
+     "y": 331,
+     "fs": "96px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "Find the golden bo"
+    }
+   ],
+   "seal": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 1282,
+     "y": 326,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ],
+   "sub": [
+    {
+     "w": 283.7,
+     "h": 42,
+     "x": 578,
+     "y": 456,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "まちに隠れた50匹"
+    }
+   ]
+  },
+  "coach": {
+   "bubble": [
+    {
+     "w": 380,
+     "h": 109.2,
+     "x": 748,
+     "y": 270,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "It glints. Walk up"
+    }
+   ],
+   "text": [
+    {
+     "w": 282,
+     "h": 27.2,
+     "x": 830,
+     "y": 284,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "It glints. Walk up"
+    }
+   ]
+  },
+  "results-grade": {
+   "stamp": [
+    {
+     "w": 156.6,
+     "h": 156.6,
+     "x": 642,
+     "y": 345,
+     "fs": "84px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "優"
+    }
+   ],
+   "extra": [
+    {
+     "w": 544,
+     "h": 27,
+     "x": 448,
+     "y": 504,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "8 fish · 18.6 kg i"
+    }
+   ]
+  }
+ },
+ "phone-ja": {
+  "charm-day": {
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 12,
+     "y": 80,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 78,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "book": [
+    {
+     "w": 95.2,
+     "h": 48,
+     "x": 220,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "手帳"
+    }
+   ]
+  },
+  "charm-60": {
+   "glint": [
+    {
+     "w": 56.8,
+     "h": 56.8,
+     "x": 168,
+     "y": 402,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 14,
+     "h": 14,
+     "x": 1811,
+     "y": 351,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    }
+   ]
+  },
+  "hud": {
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 78,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "pillText": [
+    {
+     "w": 49.9,
+     "h": 16,
+     "x": 134,
+     "y": 30,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "book": [
+    {
+     "w": 95.2,
+     "h": 48,
+     "x": 220,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "手帳"
+    }
+   ],
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 12,
+     "y": 80,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "chipName": [
+    {
+     "w": 71.4,
+     "h": 16,
+     "x": 54,
+     "y": 92,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ"
+    }
+   ],
+   "chipNum": [
+    {
+     "w": 29.4,
+     "h": 14,
+     "x": 135,
+     "y": 93,
+     "fs": "14px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "countdown": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 197,
+     "y": 358,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ],
+   "num": [
+    {
+     "w": 60.4,
+     "h": 133.6,
+     "x": 166,
+     "y": 286,
+     "fs": "133.619995px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "go": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 197,
+     "y": 358,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ],
+   "num": [
+    {
+     "w": 226,
+     "h": 133.3,
+     "x": 83,
+     "y": 286,
+     "fs": "133.619995px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ]
+  },
+  "timer": {
+   "timer": [
+    {
+     "w": 120.4,
+     "h": 40,
+     "x": 136,
+     "y": 132,
+     "fs": "40px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0:12.36"
+    }
+   ],
+   "split": [
+    {
+     "w": 55.4,
+     "h": 26,
+     "x": 169,
+     "y": 180,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "−1.2"
+    }
+   ]
+  },
+  "actions": {
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 305,
+     "y": 740,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出すSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 201,
+     "y": 748,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌E"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 234,
+     "y": 669,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "散水R"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 313,
+     "y": 632,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "冷やすC"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 191,
+     "y": 592,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "やめるEsc"
+    }
+   ],
+   "label": [
+    {
+     "w": 79.2,
+     "h": 25,
+     "x": 301,
+     "y": 818,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出す"
+    },
+    {
+     "w": 57.8,
+     "h": 22,
+     "x": 200,
+     "y": 810,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌"
+    },
+    {
+     "w": 44.5,
+     "h": 22,
+     "x": 239,
+     "y": 731,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "散水"
+    },
+    {
+     "w": 57.8,
+     "h": 22,
+     "x": 312,
+     "y": 694,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "冷やす"
+    },
+    {
+     "w": 57.8,
+     "h": 22,
+     "x": 190,
+     "y": 654,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "やめる"
+    }
+   ],
+   "key": []
+  },
+  "toast": {
+   "toast": [
+    {
+     "w": 260.3,
+     "h": 46,
+     "x": 66,
+     "y": 160,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "チュートリアルをもう一度"
+    }
+   ],
+   "big": [
+    {
+     "w": 308.3,
+     "h": 80,
+     "x": 42,
+     "y": 72,
+     "fs": "30px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ10匹！"
+    }
+   ]
+  },
+  "ono": {
+   "ono": [
+    {
+     "w": 188.1,
+     "h": 70.9,
+     "x": 102,
+     "y": 63,
+     "fs": "48px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "ザバッ！"
+    }
+   ]
+  },
+  "stamp": {
+   "stamp": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 189,
+     "y": 354,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ]
+  },
+  "results": {
+   "medal": [
+    {
+     "w": 175.8,
+     "h": 175.8,
+     "x": 109,
+     "y": 283,
+     "fs": "82px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 345,
+     "h": 54,
+     "x": 24,
+     "y": 508,
+     "fs": "52px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:23.45"
+    }
+   ],
+   "stamp": [
+    {
+     "w": 170.2,
+     "h": 74.5,
+     "x": 159,
+     "y": 416,
+     "fs": "22px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "自己ベスト！"
+    }
+   ],
+   "retry": [
+    {
+     "w": 166.5,
+     "h": 56,
+     "x": 24,
+     "y": 584,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "もう一回"
+    }
+   ],
+   "quit": [
+    {
+     "w": 166.5,
+     "h": 56,
+     "x": 203,
+     "y": 584,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "やめる"
+    }
+   ],
+   "title": [
+    {
+     "w": 196.6,
+     "h": 38,
+     "x": 98,
+     "y": 216,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオさがし"
+    }
+   ]
+  },
+  "hub-1": {
+   "sheet": [
+    {
+     "w": 369,
+     "h": 450.6,
+     "x": 12,
+     "y": 389,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 30,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    }
+   ],
+   "title": [
+    {
+     "w": 245,
+     "h": 26,
+     "x": 44,
+     "y": 672,
+     "fs": "20px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオさがし"
+    }
+   ],
+   "chip": [
+    {
+     "w": 61.3,
+     "h": 26,
+     "x": 44,
+     "y": 734,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "★☆☆"
+    },
+    {
+     "w": 56.3,
+     "h": 26,
+     "x": 111,
+     "y": 734,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1人"
+    },
+    {
+     "w": 46.2,
+     "h": 26,
+     "x": 174,
+     "y": 734,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "hub-card": {
+   "open": [
+    {
+     "w": 284,
+     "h": 431.2,
+     "x": 25,
+     "y": 351,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    }
+   ],
+   "go": [
+    {
+     "w": 254.8,
+     "h": 58.2,
+     "x": 39,
+     "y": 655,
+     "fs": "17px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "はじめる"
+    }
+   ],
+   "how": [
+    {
+     "w": 254.8,
+     "h": 45.8,
+     "x": 39,
+     "y": 722,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "やりかた"
+    }
+   ]
+  },
+  "hub-7": {
+   "sheet": [
+    {
+     "w": 369,
+     "h": 450.6,
+     "x": 12,
+     "y": 389,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 30,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 317,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 604,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 891,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 1178,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 1465,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWクエストまちの人のおねがい6分"
+    }
+   ],
+   "dots": [
+    {
+     "w": 44,
+     "h": 44,
+     "x": 43,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 87,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 131,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 175,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 219,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 263,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    }
+   ]
+  },
+  "hub-7-card": {
+   "open": [
+    {
+     "w": 284,
+     "h": 431.2,
+     "x": 55,
+     "y": 351,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    }
+   ],
+   "others": [
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": -223,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 351,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 638,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 925,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 1212,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWクエストまちの人のおねがい6分"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 1499,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWみんなでいっしょに港をまわる1"
+    }
+   ]
+  },
+  "title": {
+   "title": [
+    {
+     "w": 339.4,
+     "h": 49,
+     "x": 27,
+     "y": 276,
+     "fs": "43px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオさがし"
+    }
+   ],
+   "seal": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 156,
+     "y": 331,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ],
+   "sub": [
+    {
+     "w": 321.9,
+     "h": 42,
+     "x": 36,
+     "y": 462,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Fifty hidden in to"
+    }
+   ]
+  },
+  "coach": {
+   "bubble": [
+    {
+     "w": 353.7,
+     "h": 136,
+     "x": 12,
+     "y": 281,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "キラッと光っている。そばに行くと、ひ"
+    }
+   ],
+   "text": [
+    {
+     "w": 255.7,
+     "h": 54,
+     "x": 94,
+     "y": 295,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "キラッと光っている。そばに行くと、ひ"
+    }
+   ]
+  },
+  "results-grade": {
+   "stamp": [
+    {
+     "w": 156.6,
+     "h": 156.6,
+     "x": 118,
+     "y": 321,
+     "fs": "84px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "優"
+    }
+   ],
+   "extra": [
+    {
+     "w": 345,
+     "h": 27,
+     "x": 24,
+     "y": 480,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "8本・合計18.6kg・最大74cm"
+    }
+   ]
+  }
+ },
+ "phone-en": {
+  "charm-day": {
+   "chip": [
+    {
+     "w": 187.3,
+     "h": 40,
+     "x": 12,
+     "y": 80,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "Golden bonito0/50"
+    }
+   ],
+   "pill": [
+    {
+     "w": 114.9,
+     "h": 56,
+     "x": 67,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Play"
+    }
+   ],
+   "book": [
+    {
+     "w": 133.4,
+     "h": 48,
+     "x": 192,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Notebook"
+    }
+   ]
+  },
+  "charm-60": {
+   "glint": [
+    {
+     "w": 56.8,
+     "h": 56.8,
+     "x": 168,
+     "y": 402,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 14,
+     "h": 14,
+     "x": 1811,
+     "y": 351,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    }
+   ]
+  },
+  "hud": {
+   "pill": [
+    {
+     "w": 114.9,
+     "h": 56,
+     "x": 67,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Play"
+    }
+   ],
+   "pillText": [
+    {
+     "w": 32.9,
+     "h": 16,
+     "x": 123,
+     "y": 30,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Play"
+    }
+   ],
+   "book": [
+    {
+     "w": 133.4,
+     "h": 48,
+     "x": 192,
+     "y": 14,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Notebook"
+    }
+   ],
+   "chip": [
+    {
+     "w": 187.3,
+     "h": 40,
+     "x": 12,
+     "y": 80,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "Golden bonito0/50"
+    }
+   ],
+   "chipName": [
+    {
+     "w": 89.9,
+     "h": 16,
+     "x": 54,
+     "y": 92,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Golden bonito"
+    }
+   ],
+   "chipNum": [
+    {
+     "w": 29.4,
+     "h": 14,
+     "x": 154,
+     "y": 93,
+     "fs": "14px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "countdown": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 197,
+     "y": 358,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ],
+   "num": [
+    {
+     "w": 60.4,
+     "h": 133.6,
+     "x": 166,
+     "y": 286,
+     "fs": "133.619995px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "go": {
+   "count": [
+    {
+     "w": 0,
+     "h": 0,
+     "x": 197,
+     "y": 358,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ],
+   "num": [
+    {
+     "w": 226,
+     "h": 133.3,
+     "x": 83,
+     "y": 286,
+     "fs": "133.619995px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "GO!"
+    }
+   ]
+  },
+  "timer": {
+   "timer": [
+    {
+     "w": 120.4,
+     "h": 40,
+     "x": 136,
+     "y": 132,
+     "fs": "40px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0:12.36"
+    }
+   ],
+   "split": [
+    {
+     "w": 55.4,
+     "h": 26,
+     "x": 169,
+     "y": 180,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "−1.2"
+    }
+   ]
+  },
+  "actions": {
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 305,
+     "y": 740,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "CastSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 201,
+     "y": 748,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "ChumE"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 234,
+     "y": 669,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "SprayR"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 313,
+     "y": 632,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "IceC"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 191,
+     "y": 592,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "QuitEsc"
+    }
+   ],
+   "label": [
+    {
+     "w": 50,
+     "h": 25,
+     "x": 316,
+     "y": 818,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Cast"
+    },
+    {
+     "w": 51.7,
+     "h": 22,
+     "x": 203,
+     "y": 810,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Chum"
+    },
+    {
+     "w": 52.9,
+     "h": 22,
+     "x": 235,
+     "y": 731,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Spray"
+    },
+    {
+     "w": 35,
+     "h": 22,
+     "x": 324,
+     "y": 694,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Ice"
+    },
+    {
+     "w": 43.7,
+     "h": 22,
+     "x": 197,
+     "y": 654,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Quit"
+    }
+   ],
+   "key": []
+  },
+  "toast": {
+   "toast": [
+    {
+     "w": 233.8,
+     "h": 46,
+     "x": 80,
+     "y": 160,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Show the tutorial "
+    }
+   ],
+   "big": [
+    {
+     "w": 306.9,
+     "h": 80,
+     "x": 43,
+     "y": 72,
+     "fs": "30px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "10 golden bonito!"
+    }
+   ]
+  },
+  "ono": {
+   "ono": [
+    {
+     "w": 241.8,
+     "h": 76.6,
+     "x": 76,
+     "y": 60,
+     "fs": "48px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "SPLASH!"
+    }
+   ]
+  },
+  "stamp": {
+   "stamp": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 189,
+     "y": 354,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ]
+  },
+  "results": {
+   "medal": [
+    {
+     "w": 175.8,
+     "h": 175.8,
+     "x": 109,
+     "y": 283,
+     "fs": "82px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 345,
+     "h": 54,
+     "x": 24,
+     "y": 508,
+     "fs": "52px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:23.45"
+    }
+   ],
+   "stamp": [
+    {
+     "w": 154.3,
+     "h": 71.1,
+     "x": 175,
+     "y": 418,
+     "fs": "22px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "New best!"
+    }
+   ],
+   "retry": [
+    {
+     "w": 166.5,
+     "h": 56,
+     "x": 24,
+     "y": 584,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Again"
+    }
+   ],
+   "quit": [
+    {
+     "w": 166.5,
+     "h": 56,
+     "x": 203,
+     "y": 584,
+     "fs": "15px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Quit"
+    }
+   ],
+   "title": [
+    {
+     "w": 247.6,
+     "h": 38,
+     "x": 73,
+     "y": 216,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Find the golden bo"
+    }
+   ]
+  },
+  "hub-1": {
+   "sheet": [
+    {
+     "w": 369,
+     "h": 450.6,
+     "x": 12,
+     "y": 389,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "PlayWhat shall we "
+    }
+   ],
+   "card": [
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 30,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    }
+   ],
+   "title": [
+    {
+     "w": 245,
+     "h": 26,
+     "x": 44,
+     "y": 672,
+     "fs": "20px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Find the golden bo"
+    }
+   ],
+   "chip": [
+    {
+     "w": 61.3,
+     "h": 26,
+     "x": 44,
+     "y": 734,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "★☆☆"
+    },
+    {
+     "w": 63.1,
+     "h": 26,
+     "x": 111,
+     "y": 734,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Solo"
+    },
+    {
+     "w": 46.2,
+     "h": 26,
+     "x": 180,
+     "y": 734,
+     "fs": "13px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "0/50"
+    }
+   ]
+  },
+  "hub-card": {
+   "open": [
+    {
+     "w": 284,
+     "h": 431.2,
+     "x": 25,
+     "y": 351,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    }
+   ],
+   "go": [
+    {
+     "w": 254.8,
+     "h": 58.2,
+     "x": 39,
+     "y": 655,
+     "fs": "17px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "Start"
+    }
+   ],
+   "how": [
+    {
+     "w": 254.8,
+     "h": 45.8,
+     "x": 39,
+     "y": 722,
+     "fs": "14px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "How to play"
+    }
+   ]
+  },
+  "hub-7": {
+   "sheet": [
+    {
+     "w": 369,
+     "h": 450.6,
+     "x": 12,
+     "y": 389,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "PlayWhat shall we "
+    }
+   ],
+   "card": [
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 30,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "SuggestedNEWPole-a"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 317,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 604,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWBe a gullLook d"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 891,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWUnder the seaSw"
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 1178,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWDrive raceOnce "
+    },
+    {
+     "w": 273,
+     "h": 292.6,
+     "x": 1465,
+     "y": 481,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWQuestsHelp the "
+    }
+   ],
+   "dots": [
+    {
+     "w": 44,
+     "h": 44,
+     "x": 43,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 87,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 131,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 175,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 219,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    },
+    {
+     "w": 44,
+     "h": 44,
+     "x": 263,
+     "y": 786,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": ""
+    }
+   ]
+  },
+  "hub-7-card": {
+   "open": [
+    {
+     "w": 284,
+     "h": 431.2,
+     "x": 55,
+     "y": 351,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWFind the golden"
+    }
+   ],
+   "others": [
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": -223,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "SuggestedNEWPole-a"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 351,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWBe a gullLook d"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 638,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWUnder the seaSw"
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 925,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWDrive raceOnce "
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 1212,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWQuestsHelp the "
+    },
+    {
+     "w": 264.9,
+     "h": 283.9,
+     "x": 1499,
+     "y": 364,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "0.45",
+     "filter": "saturate(0.7)",
+     "text": "NEWTogetherExplore"
+    }
+   ]
+  },
+  "title": {
+   "title": [
+    {
+     "w": 345,
+     "h": 68,
+     "x": 24,
+     "y": 267,
+     "fs": "30px",
+     "fw": "900",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "Find the golden bo"
+    }
+   ],
+   "seal": [
+    {
+     "w": 81,
+     "h": 120.3,
+     "x": 156,
+     "y": 341,
+     "fs": "26px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "気仙沼"
+    }
+   ],
+   "sub": [
+    {
+     "w": 283.7,
+     "h": 42,
+     "x": 55,
+     "y": 471,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "まちに隠れた50匹"
+    }
+   ]
+  },
+  "coach": {
+   "bubble": [
+    {
+     "w": 353.7,
+     "h": 109.2,
+     "x": 12,
+     "y": 281,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "It glints. Walk up"
+    }
+   ],
+   "text": [
+    {
+     "w": 255.7,
+     "h": 27.2,
+     "x": 94,
+     "y": 295,
+     "fs": "16px",
+     "fw": "700",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "It glints. Walk up"
+    }
+   ]
+  },
+  "results-grade": {
+   "stamp": [
+    {
+     "w": 156.6,
+     "h": 156.6,
+     "x": 118,
+     "y": 321,
+     "fs": "84px",
+     "fw": "400",
+     "ff": "Yuji Syuku",
+     "op": "1",
+     "filter": "",
+     "text": "優"
+    }
+   ],
+   "extra": [
+    {
+     "w": 345,
+     "h": 27,
+     "x": 24,
+     "y": 480,
+     "fs": "18px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "8 fish · 18.6 kg i"
+    }
+   ]
+  }
+ },
+ "fw": {
+  "after-desktop": {
+   "t": 20.8,
+   "n": 607,
+   "launches": [
+    0.6,
+    4.8,
+    9.2,
+    13.6,
+    20,
+    20.4,
+    20.8
+   ],
+   "still": 21.3
+  },
+  "after-phone": {
+   "t": 20.8,
+   "n": 607,
+   "launches": [
+    0.6,
+    4.8,
+    9.2,
+    13.6,
+    20,
+    20.4,
+    20.8
+   ],
+   "still": 21.3
+  }
+ },
+ "perf": {
+  "after": {
+   "cost": {
+    "n": 137,
+    "mean": 0.08759124087593896,
+    "max": 1.000000000001819
+   },
+   "cpuP50": 6,
+   "cpuP95": 12,
+   "cpuP99": 13,
+   "hitch": 0,
+   "calls": 659,
+   "frames": 120
+  }
+ },
+ "errors": {
+  "after-perf-ja": [],
+  "after-land-ja": [],
+  "after-wide-ja": [],
+  "after-retina-ja": [],
+  "after-reduce-ja": [],
+  "after-desktop-ja": [],
+  "after-desktop-en": [],
+  "after-phone-ja": [],
+  "after-phone-en": [],
+  "after-card-ja": []
+ },
+ "land-ja": {
+  "check-hud": {
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 308,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 756,
+     "y": 281,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出すSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 676,
+     "y": 297,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌E"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 600,
+     "y": 297,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "散水R"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 524,
+     "y": 297,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "やめるEsc"
+    }
+   ],
+   "num": [
+    {
+     "w": 54,
+     "h": 120,
+     "x": 399,
+     "y": 100,
+     "fs": "120px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "check-results": {
+   "medal": [
+    {
+     "w": 153.9,
+     "h": 153.9,
+     "x": 77,
+     "y": 148,
+     "fs": "72px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 516,
+     "h": 63,
+     "x": 302,
+     "y": 157,
+     "fs": "60px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:15.22"
+    }
+   ],
+   "retry": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 302,
+     "y": 236,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "もう一回"
+    }
+   ]
+  },
+  "check-hub": {
+   "sheet": [
+    {
+     "w": 828,
+     "h": 345.8,
+     "x": 12,
+     "y": 24,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 242.7,
+     "h": 273.7,
+     "x": 48,
+     "y": 122,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 242.7,
+     "h": 273.7,
+     "x": 305,
+     "y": 122,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    },
+    {
+     "w": 242.7,
+     "h": 273.7,
+     "x": 561,
+     "y": 122,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 242.7,
+     "h": 273.7,
+     "x": 48,
+     "y": 409,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 242.7,
+     "h": 273.7,
+     "x": 305,
+     "y": 409,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 242.7,
+     "h": 273.7,
+     "x": 561,
+     "y": 409,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWクエストまちの人のおねがい6分"
+    }
+   ]
+  }
+ },
+ "wide-ja": {
+  "check-hud": {
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 682,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 1504,
+     "y": 788,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出すSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1424,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌E"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1348,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "散水R"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1272,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "やめるEsc"
+    }
+   ],
+   "num": [
+    {
+     "w": 75.6,
+     "h": 168,
+     "x": 762,
+     "y": 287,
+     "fs": "168px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "check-results": {
+   "medal": [
+    {
+     "w": 206.6,
+     "h": 206.6,
+     "x": 697,
+     "y": 287,
+     "fs": "96px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 544,
+     "h": 75,
+     "x": 528,
+     "y": 534,
+     "fs": "72px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:22.35"
+    }
+   ],
+   "retry": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 570,
+     "y": 631,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "もう一回"
+    }
+   ]
+  },
+  "check-hub": {
+   "sheet": [
+    {
+     "w": 916,
+     "h": 780,
+     "x": 342,
+     "y": 60,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 272,
+     "h": 292,
+     "x": 378,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 664,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 950,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 378,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 664,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 950,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWクエストまちの人のおねがい6分"
+    }
+   ]
+  }
+ },
+ "retina-ja": {
+  "check-hud": {
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 602,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 1344,
+     "y": 788,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出すSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1264,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌E"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1188,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "散水R"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1112,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "やめるEsc"
+    }
+   ],
+   "num": [
+    {
+     "w": 75.6,
+     "h": 168,
+     "x": 682,
+     "y": 287,
+     "fs": "168px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "check-results": {
+   "medal": [
+    {
+     "w": 206.6,
+     "h": 206.6,
+     "x": 617,
+     "y": 287,
+     "fs": "96px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 544,
+     "h": 75,
+     "x": 448,
+     "y": 534,
+     "fs": "72px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:21.98"
+    }
+   ],
+   "retry": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 490,
+     "y": 631,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "もう一回"
+    }
+   ]
+  },
+  "check-hub": {
+   "sheet": [
+    {
+     "w": 916,
+     "h": 780,
+     "x": 262,
+     "y": 60,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWクエストまちの人のおねがい6分"
+    }
+   ]
+  }
+ },
+ "reduce-ja": {
+  "check-hud": {
+   "pill": [
+    {
+     "w": 131.9,
+     "h": 56,
+     "x": 602,
+     "y": 10,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ"
+    }
+   ],
+   "chip": [
+    {
+     "w": 168.8,
+     "h": 40,
+     "x": 16,
+     "y": 108,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "金のカツオ0/50"
+    }
+   ],
+   "act": [
+    {
+     "w": 72,
+     "h": 72,
+     "x": 1344,
+     "y": 788,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "竿を出すSpace"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1264,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "撒き餌E"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1188,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "散水R"
+    },
+    {
+     "w": 56,
+     "h": 56,
+     "x": 1112,
+     "y": 804,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "やめるEsc"
+    }
+   ],
+   "num": [
+    {
+     "w": 75.6,
+     "h": 168,
+     "x": 682,
+     "y": 287,
+     "fs": "168px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "2"
+    }
+   ]
+  },
+  "check-results": {
+   "medal": [
+    {
+     "w": 206.6,
+     "h": 206.6,
+     "x": 617,
+     "y": 287,
+     "fs": "96px",
+     "fw": "700",
+     "ff": "Noto Serif JP",
+     "op": "1",
+     "filter": "",
+     "text": "金"
+    }
+   ],
+   "time": [
+    {
+     "w": 544,
+     "h": 75,
+     "x": 448,
+     "y": 534,
+     "fs": "72px",
+     "fw": "900",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "1:23.45"
+    }
+   ],
+   "retry": [
+    {
+     "w": 224,
+     "h": 56,
+     "x": 490,
+     "y": 631,
+     "fs": "16px",
+     "fw": "800",
+     "ff": "Zen Maru Gothic",
+     "op": "1",
+     "filter": "",
+     "text": "もう一回"
+    }
+   ]
+  },
+  "check-hub": {
+   "sheet": [
+    {
+     "w": 916,
+     "h": 780,
+     "x": 262,
+     "y": 60,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "あそぶ気仙沼でなにする？×\n    "
+    }
+   ],
+   "card": [
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "おすすめNEW一本釣りカツオを一本釣"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW金のカツオさがしまちに隠れた5"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 158,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWウミネコになる空から港を見下ろ"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 298,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEW海の中筏の下をのぞいてみる4分"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 584,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWドライブ・レース港町ぐるっと一"
+    },
+    {
+     "w": 272,
+     "h": 292,
+     "x": 870,
+     "y": 464,
+     "fs": "16px",
+     "fw": "400",
+     "ff": "Noto Sans JP",
+     "op": "1",
+     "filter": "",
+     "text": "NEWクエストまちの人のおねがい6分"
+    }
+   ]
+  }
+ }
+}

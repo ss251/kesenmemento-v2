@@ -10,7 +10,7 @@ import { patchSnow, seasonUniform } from '../../core/season.js';   // [v3:integr
 import * as THREE from 'three';
 import { windowGlow } from '../life/lights.js';
 
-export const STYLE = { house: 0, apartment: 1, office: 2, shop: 3, warehouse: 4, plain: 5, public: 6 };
+export const STYLE = { house: 0, apartment: 1, office: 2, shop: 3, warehouse: 4, plain: 5, public: 6, ribbon: 7 };   // [v6:c5r3] ribbon: a metal-panel block with one narrow ribbon of windows per upper floor (気仙沼信用金庫 本店, Commons 2017-09)
 
 const FACADE_GLSL = /* glsl */`
   float fa_hash(vec2 p){ p = fract(p * vec2(0.1031, 0.1030)); p += dot(p, p.yx + 33.33); return fract((p.x + p.y) * p.x); }
@@ -39,10 +39,17 @@ const FACADE_GLSL = /* glsl */`
       float win = fa_band(cu, 0.1, 0.9, fw / cw) * fa_band(fv, 0.3, 0.84, fw / FH) * top;
       m.x = win; m.y = fa_band(fv, 0.0, 0.1, fw / FH) * top;        // slab edge band
       outCell = vec3(ci, fl, seed * 97.0); litFrac = 0.66;
-    } else if (style < 2.5 || style > 5.5) { // office / public
+    } else if (style > 6.5) {              // [v6:c5r3] ribbon: plain ground floor, then one continuous narrow window band (0.95 m, mullion every 1.2 m) per upper floor, the lot's own panel colour between
+      float cw = 1.2, cu = fract(u / cw);
+      float up = step(0.5, fl) * top;
+      float win = fa_band(fv, 0.46, 0.79, fw / FH) * (1.0 - fa_band(cu, 0.0, 0.035, fw / cw)) * up;
+      m.x = win; m.y = fa_band(fv, 0.42, 0.83, fw / FH) * up - win;
+      outCell = vec3(floor(u / 2.4), fl, seed * 97.0); litFrac = 0.45;
+    } else if (style < 2.5 || (style > 5.5 && style < 6.5)) { // office / public
       // [v3:fix] three layouts by seed (the single ribbon read as v1 striped boxes): ribbon windows with a coloured
       // spandrel, punched windows in pairs, or a grid with a plain stair-core strip; plus a coping band at the roof line
       float var_ = fract(seed * 5.13);
+      var_ = mix(var_, 0.5, step(var_, 0.34) * step(hgt, 16.0));   // [r2:6] under 16 m the continuous-ribbon variant is the punched-pairs one: the 2026 photo of 港町 / 南町 shows no ribbon facade
       if (var_ < 0.34) {
         float cw = 1.8, ci = floor(u / cw), cu = fract(u / cw);
         float win = fa_band(fv, 0.32, 0.84, fw / FH) * (1.0 - fa_band(cu, 0.0, 0.05, fw / cw)) * top;
@@ -154,7 +161,7 @@ export function facadeMaterial(ctx, { instanced = false } = {}) {
           if (vFac.x > 1.5 && vFac.x < 2.5 || vFac.x > 5.5) accent = mix(vec3(0.36, 0.42, 0.52), vec3(0.62, 0.5, 0.42), step(0.55, accent.z)) * mix(0.9, 1.1, accent.y);
           if (vFac.x > 3.5 && vFac.x < 4.5) accent = accent.z < 0.4 ? vec3(0.2, 0.36, 0.6) : accent.z < 0.7 ? vec3(0.2, 0.46, 0.36) : vec3(0.5, 0.2, 0.2);
           // [v3:fix] pastel variation on big plain bodies (office / public / warehouse): tint the wall by seed
-          if (vFac.x > 1.5 && vFac.x < 2.5 || vFac.x > 3.5) {
+          if (vFac.x > 1.5 && vFac.x < 2.5 || vFac.x > 3.5 && vFac.x < 6.5) {
             vec3 tints[5]; tints[0] = vec3(0.96, 0.9, 0.8); tints[1] = vec3(0.84, 0.89, 0.93); tints[2] = vec3(0.86, 0.91, 0.84); tints[3] = vec3(0.94, 0.86, 0.82); tints[4] = vec3(0.89, 0.87, 0.93);
             int ti = int(floor(fa_hash(vec2(vFac.y, 19.0)) * 4.999));
             base = mix(base, base * tints[ti] * 1.04, 0.7);
@@ -168,7 +175,7 @@ export function facadeMaterial(ctx, { instanced = false } = {}) {
           klcGlow += klcWindowGlow(cell + 3.0, 0.85) * fm.z * 0.5;
         }`)
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance += klcGlow;');
-    patchSnow(sh, seasonUniform(ctx.shared), 'vFacW');   // [v3:integrate] winter snow on mid / far roofs
+    patchSnow(sh, seasonUniform(ctx.shared), 'vFacW', true);   // [v3:integrate] winter snow on mid / far roofs; [r3:7] true: no dormant tan on roofs / facades
   };
   m.customProgramCacheKey = () => key;
   m.name = key;

@@ -1,0 +1,20 @@
+{
+ "version": 1,
+ "cell": "c5-west-edge",
+ "bbox": [-860, -60, -700, 100],
+ "note": "c5 west edge, 三日町 (x -860..-700, z -60..100), round 3. セブン-イレブン 気仙沼三日町店 is closed (yahoo-maps: 閉店 2025-02-21). The place p7gaiqd (osm n5164583236 at (-765.2, 12.9)) was a mapper's snap onto the NW vertex (38.9058837, 141.5661789) of the care-home way 761402304 and hung the 7-Eleven pill and the コンビニ / 7-Eleven search hits on lot 16/58539/25068/310 (特別養護老人ホーム キングス・タウン, 8F public, 1,389 m2). No shop building stands for it and none is added. The place is dropped by PLACE_FIX p7gaiqd in src/anime/world/lotfix.js (the override schema has no places section); lot /310 stays the care home (places p1fntvx5 and p7toz7h). Nothing in this file patches a lot: the care home's kind public, 8 storeys, 28 m (OSM w761402304) is right. What stands north of the care home (car park or vacant lot) is not read: the only Earth capture that covers it, raw/ref/earth/c5/r1003 top, is 0.8 m per pixel and cannot tell, so no land use is written there.",
+ "sources": [
+  {
+   "id": "yahoo-maps",
+   "what": "Yahoo! Maps listing of セブン-イレブン 気仙沼三日町店: 閉店 (closed) 2025-02-21 (as supplied with the confirmed finding)",
+   "date": "2025-02-21"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap, raw/osm/overpass.json (OSM base 2026-05-06): node 5164583236 and way 761402304 (amenity=social_facility), © OpenStreetMap contributors (ODbL)",
+   "date": "2026-05-06"
+  }
+ ],
+ "lots": [],
+ "landuse": []
+}

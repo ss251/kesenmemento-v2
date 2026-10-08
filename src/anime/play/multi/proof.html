@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>みんなであそぶ</title>
+<script type="importmap">
+{ "imports": { "three": "/node_modules/three/build/three.module.js" } }
+</script>
+<style>
+  html, body { margin: 0; height: 100%; background: #9ec8e6; overflow: hidden; }
+  #view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+</style>
+</head>
+<body class="playing">
+<canvas id="view"></canvas>
+<script>
+window.__errors = [];
+window.onerror = (m, s, l) => { window.__errors.push(String(m) + ' @' + s + ':' + l); };
+addEventListener('unhandledrejection', (e) => { window.__errors.push(String(e.reason && e.reason.stack || e.reason)); });
+</script>
+<script type="module" src="./proof.js"></script>
+</body>
+</html>

@@ -64,6 +64,8 @@ describe("hard shores", () => {
       const t = s.len / 2, x = s.ax + s.ux * t + s.nx * 1.5, z = s.az + s.uz * t + s.nz * 1.5;
       n++; if (H.clampY(x, z, 1.2) <= (L.SEA.level - 2)) front++;
       const bx = s.ax + s.ux * t - s.nx * 12, bz = s.az + s.uz * t - s.nz * 12;
+      // [sys:19] a strip of land narrower than that between two walls (the 鹿折川 mouth's levee) is in front of the other wall: skipped
+      if (L.shoreDist(bx, bz) > -4) continue;
       if (!H.inApron(bx, bz, 0) && H.clampY(bx, bz, 3.3) !== 3.3) throw new Error(`land 12 m behind a face was clamped at ${bx},${bz}`);
     }
     expect(front / n).toBeGreaterThan(0.95);
@@ -119,7 +121,9 @@ describe("machine rules, scripts and shipped text", () => {
     const g = read("tools/anime/gate.sh");
     expect(g).toMatch(/echo \$\$ > "\$LOCK\/pid"/);
     expect(g).toMatch(/export KLC_GATE=1/);
-    expect(g).toMatch(/l>18/);
+    expect(g).toMatch(/STOPLOAD=\$\{KLC_GATE_STOP:-18\}/);   // the watchdog's cap: 18 unless a step raises it
+    expect(g).toMatch(/MAXLOAD=\$\{KLC_GATE_LOAD:-14\}/);
+    expect(g).toMatch(/l>m/);
     expect(read("tools/anime/cdp.mjs")).toMatch(/process\.env\.KLC_GATE !== '1'/);
   });
   test("every npm script points at a file that exists", () => {

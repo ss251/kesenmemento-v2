@@ -1,0 +1,197 @@
+{
+ "version": 1,
+ "cell": "rooftop-plant",
+ "bbox": [
+  -700,
+  -800,
+  1300,
+  1000
+ ],
+ "note": "[r2:5] Rooftop plant of the large flat roofs, read from the 2026-03-11 Earth top views (a rectified crop of each lot in its own frame with a 5 m grid; positions +-1.5 m): roof.plant = [{ x, z, w, d, h, kind }] in lot-local metres (x along the frontage, z toward the street, the origin at the lot's oriented-box centre, h above the roof deck). town/mid.js, blocks.js, industrial.js and hero.js draw the rects exactly and skip the random roof boxes of these lots (docs/anime/OVERRIDES.md). The enrichment's `equip` count is not used: it counts clutter on the 2020-22 photo (null for 37 and 59). Cells c3, c4, c5 and c10.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth, imagery dated 2026-03-11, top views captured with tools/anime/earth-ref.mjs (raw/ref/earth/c10r2/A, c10/meta8928a/c10B, heights8921/b06, c3/c7c3r2fix8942/c3n2, c5 meta8928/c5b, heights8921/yuubin)",
+   "date": "2026-03-11"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58540/25069/320",
+   "roof": {
+    "plant": [
+     {
+      "x": -5,
+      "z": -9,
+      "w": 10,
+      "d": 15,
+      "h": 3.4,
+      "kind": "penthouse"
+     },
+     {
+      "x": 16,
+      "z": 4,
+      "w": 18,
+      "d": 14,
+      "h": 1.4,
+      "kind": "duct"
+     },
+     {
+      "x": 14,
+      "z": -11,
+      "w": 4,
+      "d": 4,
+      "h": 2.2,
+      "kind": "penthouse"
+     },
+     {
+      "x": -6.5,
+      "z": 5.8,
+      "w": 7,
+      "d": 1.6,
+      "h": 1.1,
+      "kind": "condenser-row"
+     }
+    ]
+   },
+   "src": "earth: c10r2/A top 2026-03-11, rectified into the lot frame (5 m grid, +-1.5 m): a central stair / lift penthouse about 10 x 15 m with its light well and a long shadow, an east field of ducting and pipe racks (about 18 x 14 m, a third of the 1 608 m2 roof), a round tank top 4 m across and a short row of condensers"
+  },
+  {
+   "id": "16/58541/25069/227",
+   "roof": {
+    "plant": [
+     {
+      "x": 3.2,
+      "z": -6,
+      "w": 5.6,
+      "d": 28.5,
+      "h": 2.4,
+      "kind": "penthouse"
+     },
+     {
+      "x": -8,
+      "z": -4,
+      "w": 1.1,
+      "d": 26,
+      "h": 1.1,
+      "kind": "condenser-row"
+     }
+    ]
+   },
+   "src": "earth: c10 B top 2026-03-11, rectified into the lot frame (+-1.5 m): the stepped higher section along the east half of the roof (its 0.8 m shadow on the lower roof gives about 2.4 m) and a row of units along the whole west long side"
+  },
+  {
+   "id": "16/58542/25067/5",
+   "roof": {
+    "plant": [
+     {
+      "x": 9,
+      "z": -19,
+      "w": 12,
+      "d": 6.5,
+      "h": 3,
+      "kind": "penthouse"
+     },
+     {
+      "x": 18.5,
+      "z": 2,
+      "w": 24,
+      "d": 35.4,
+      "h": 3,
+      "kind": "penthouse"
+     }
+    ]
+   },
+   "src": "earth: heights8921/b06 top 2026-03-11, rectified into the lot frame (+-1.5 m): the north-east plant block (12 x 6.5 m) and the higher east section of the roof, its 3.5 m shadow strip on the lower roof beside it; no solar modules show on this top view, so no pv is set"
+  },
+  {
+   "id": "16/58542/25066/200",
+   "roof": {
+    "plant": [
+     {
+      "x": 2.7,
+      "z": -10.7,
+      "w": 9.2,
+      "d": 4.6,
+      "h": 1.6,
+      "kind": "condenser-row"
+     },
+     {
+      "x": 0.4,
+      "z": -2,
+      "w": 9.6,
+      "d": 2.2,
+      "h": 1.1,
+      "kind": "condenser-row"
+     },
+     {
+      "x": -4.3,
+      "z": -10.8,
+      "w": 1.8,
+      "d": 3.6,
+      "h": 2,
+      "kind": "penthouse"
+     }
+    ]
+   },
+   "src": "earth: c3 n2 top 2026-03-11, rectified into the lot frame (+-1.5 m): the cooling-unit block and a second row of units on the tan roof deck, a small plant box at the west end"
+  },
+  {
+   "id": "16/58540/25068/37",
+   "roof": {
+    "plant": [
+     {
+      "x": 5.5,
+      "z": -8,
+      "w": 3.5,
+      "d": 17,
+      "h": 1.3,
+      "kind": "duct"
+     },
+     {
+      "x": -0.6,
+      "z": 5.2,
+      "w": 22,
+      "d": 0.9,
+      "h": 1.3,
+      "kind": "duct"
+     },
+     {
+      "x": 2.3,
+      "z": 11.7,
+      "w": 7.1,
+      "d": 4.4,
+      "h": 1.4,
+      "kind": "condenser-row"
+     }
+    ]
+   },
+   "src": "earth: c5 b top 2026-03-11, rectified into the lot frame (+-1.5 m): gridded plant frames at two levels (two long runs north-south on the east half, one cross bar along the step) and a unit cluster on the south wing (c5.json only recoloured it)"
+  },
+  {
+   "id": "16/58540/25068/59",
+   "roof": {
+    "plant": [
+     {
+      "x": -1,
+      "z": -1.9,
+      "w": 5.5,
+      "d": 0.9,
+      "h": 1.4,
+      "kind": "duct"
+     },
+     {
+      "x": 0,
+      "z": -8.3,
+      "w": 5,
+      "d": 10,
+      "h": 1.8,
+      "kind": "penthouse"
+     }
+    ],
+    "shape": "flat"
+   },
+   "src": "earth: heights8921/yuubin top 2026-03-11, rectified into the lot frame (+-1.5 m): a plant frame across the roof and the raised darker north half (equip is null for this lot: measured from Earth, not from enrich) | [r3] roof shape: flat (the plant frame and the raised north half sit on a flat slab); the OSM refresh of 2026-10-04 changed this lot's derived kind from office to shop, and derive.js resolves a low house / shop 'flat' to gable or hip 60 % of the time, so the flat shape is pinned here"
+  }
+ ]
+}

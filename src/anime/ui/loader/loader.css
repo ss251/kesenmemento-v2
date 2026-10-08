@@ -1,0 +1,340 @@
+/* KesenMemento title (v4): the loading screen and the title screen over the town (docs/loading/README.md).
+   THIS FILE is the source of <style id="klc-loader-css"> in index.html: scripts/anime/loader-inline.js copies it in byte for byte, so the title
+   paints with the first bytes of the page and waits for no stylesheet of the app.
+   House rules (docs/CRAFT.md): traditional colours only (和色大辞典; each is named below); only transform and opacity animate; a 4 px grid.
+   v4: the town is the hero. The UI sits on it with a vignette and two scrims (鉄紺 behind the corner controls, 紺→鉄紺 under the bottom third);
+   one material (生成り glass at 92 %, a 紺 hairline, one soft shadow) and one radius (22 px, inner radii concentric) for the corner controls,
+   the tip bar and the notice. The start prompt has no box: one line of display type between two 山吹 ◆, the Japanese line under it.
+   The ホヤぼーや still (.hoya) has NO animation, NO transition and NO animated ancestor while he is visible: he is cut with display:none at the
+   hand-off (docs/loading/HOYABOYA.md). He stands whole beside the tip bar (official pose NO.1-9), never behind or under a panel. */
+#intro {
+  --ai: #165E83;       /* 藍色 ai: the sea, the tip label */
+  --kon: #223A70;      /* 紺色 kon: night, lettering */
+  --tekkon: #17184B;   /* 鉄紺 tetsukon: the darkest sky, the scrims */
+  --tetsu: #17184B;
+  --asagi: #00A3AF;    /* 浅葱色 asagi: the water's crest line */
+  --wasure: #89C3EB;   /* 勿忘草色 wasurenagusa: the day sky */
+  --shino: #F19072;    /* 東雲色 shinonome: dawn */
+  --yama: #F8B500;     /* 山吹色 yamabuki: gold, the gauge, the ◆ */
+  --yamabuki: #F8B500;
+  --akane: #B7282E;    /* 茜色 akane: the retry */
+  --kinari: #FBFAF5;   /* 生成り色 kinari: paper, light text */
+  --sumi: #595857;     /* 墨 sumi: secondary lettering */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --hz: 72%;
+  --font: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  --dela: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+  --gothic: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;   /* 中ゴシック: the credit, the source, the footer */
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  /* one material, one radius */
+  --r: 22px;
+  --glass: rgba(251, 250, 245, .92);                     /* 生成り glass */
+  --hair: rgba(34, 58, 112, .12);                         /* a 1 px 紺 hairline */
+  --lift: 0 12px 32px -10px rgba(23, 24, 75, .55), 0 2px 6px rgba(23, 24, 75, .16);
+  --mat: inset 0 1px 0 rgba(255, 255, 255, .7), inset 0 0 0 1px var(--hair), var(--lift);   /* the material: a lit top edge, the hairline, the lift */
+  --ink-shadow: 0 1px 2px rgba(23, 24, 75, .75), 0 0 12px rgba(23, 24, 75, .45);   /* white type over the town */
+  /* the grid: margins and the logo per layout (phone portrait first) */
+  --m: 16px;
+  --edge: 8px;
+  --logo-w: min(84vw, 380px, 42vh);
+  --hoya-h: 84px;
+  position: fixed; inset: 0; z-index: 5; height: 100%; overflow: hidden; color: var(--kon);
+  font-family: var(--font); line-break: strict; background: transparent; pointer-events: none;
+}
+@supports (height: 100dvh) { #intro { height: 100dvh; } }
+html[data-chrome] #intro { --sat: 59px; --sab: 34px; }   /* the iPhone's insets, for comp shots only (?chrome=1) */
+@media (orientation: landscape) { html[data-chrome] #intro { --sat: 0px; --sab: 21px; --safe-l: 59px; --safe-r: 59px; } }
+#intro .bg, #intro .scrim, #intro header, #intro .logo, #intro .bottom, #intro footer, #intro .prompt, #intro .btn, #intro .pager button { pointer-events: auto; }
+#intro .scrim, #intro .bg { pointer-events: none; }
+
+@font-face { font-family: "Zen Maru Gothic"; font-weight: 700; font-style: normal; font-display: swap; src: url("./assets/loader/zen-maru-700.woff2") format("woff2"); unicode-range: U+0020-U+007E, U+00A9, U+00B7, U+2019, U+201C-U+201D, U+2026, U+3001-U+3002, U+300C-U+300D, U+301C, U+3042, U+3044, U+3046, U+3048, U+304A-U+304D, U+304F-U+3055, U+3057-U+3059, U+305B-U+305D, U+305F-U+3061, U+3063-U+306B, U+306D-U+3070, U+3073, U+3076, U+3078-U+3079, U+307B-U+3082, U+3084-U+3085, U+3088-U+308D, U+308F, U+3092-U+3093, U+30A2-U+30A4, U+30A8, U+30AA-U+30AD, U+30AF, U+30B1, U+30B3-U+30B6, U+30B8-U+30B9, U+30BB, U+30BF, U+30C3-U+30C4, U+30C6-U+30CB, U+30CD, U+30CF, U+30D1-U+30D3, U+30D5, U+30D7, U+30D9, U+30DB, U+30DE, U+30E1-U+30E5, U+30E9-U+30EC, U+30F3, U+30F6, U+30FB-U+30FC, U+4E00, U+4E07, U+4E0A, U+4E2D, U+4E57, U+4E80, U+4E95, U+4EBA, U+4ECB, U+4ED9, U+4EE5, U+4EF2, U+4F1D, U+4F7F, U+4FE1, U+5104, U+5149, U+5165, U+516B, U+5178, U+5185, U+51FA, U+5206-U+5207, U+524D, U+5263, U+529B, U+52DD, U+5316, U+5341, U+5343, U+5357, U+53F2, U+540D, U+5473, U+54C1, U+5510, U+56F3, U+56FD, U+571F, U+5730, U+57CE, U+5802, U+5831, U+5834, U+5927, U+5929, U+597D, U+5B50, U+5B66, U+5B88-U+5B89, U+5B9A, U+5BAE, U+5C71, U+5CA9, U+5CB8, U+5CF6, U+5D0E, U+5DDD, U+5E02, U+5E2B, U+5E74, U+5E95, U+5EA6, U+5F01, U+5F62, U+5F79, U+5FB9, U+5FF5, U+60C5, U+611B, U+6240, U+6280, U+6307, U+63A2, U+63DA, U+6563, U+6587, U+65AD, U+65BD, U+65D7, U+65E5, U+65E8, U+65EC, U+6614, U+6642, U+6708, U+672C-U+672D, U+6765, U+6797, U+6804, U+6839, U+6848, U+6851, U+68EE, U+6975, U+697D, U+6A2A, U+6A4B, U+6B96, U+6C17, U+6C34, U+6CBC, U+6CE2, U+6CF3, U+6D41, U+6D5C, U+6D66, U+6D6E, U+6D77, U+6E7E, U+6F01, U+706F, U+7136, U+7269, U+7279, U+738B, U+73E0, U+7406, U+7523, U+767A, U+76AE, U+76F4, U+7701, U+770C, U+771F, U+77E5, U+77F3, U+7802, U+79CB, U+79F0, U+7B49, U+7B56, U+7D04, U+7D39, U+7D71, U+8089, U+80B2, U+80CC, U+8239, U+8272, U+8449, U+84B8, U+898B, U+89B3, U+8A00, U+8A18, U+8A2A, U+8A2D, U+8A66, U+8A87, U+8A9E, U+8AAD, U+8B58, U+8C9D, U+8CA1, U+8DE1, U+8DEF, U+8FB2, U+8FBC, U+8FD4, U+9001, U+9032, U+9053, U+9078, U+90E8, U+91DD, U+9451, U+9589, U+958B, U+9593, U+9662, U+96C6, U+96FB, U+9762, U+9769, U+97F3, U+98DF, U+990A, U+9AD8, U+9B45, U+9B5A, U+9BAE, U+9CF4, U+9DB4, U+9F0E, U+FF01, U+FF08-U+FF09, U+FF1A, U+FF1F, U+FF5C; }
+@font-face { font-family: "Zen Maru Gothic"; font-weight: 900; font-style: normal; font-display: swap; src: url("./assets/loader/zen-maru-900.woff2") format("woff2"); unicode-range: U+0020, U+0041, U+0049, U+0052, U+0054, U+0056, U+0061, U+0069, U+0072, U+0076, U+307E, U+3081, U+77E5, U+8B58; }
+@font-face { font-family: "Dela Gothic One"; font-weight: 400; font-style: normal; font-display: swap; src: url("./assets/loader/dela-gothic-one.woff2") format("woff2"); unicode-range: U+0020, U+0025, U+0030-U+0039, U+0041-U+005A; }
+
+#intro .bg { position: absolute; inset: 0; background: #17184B var(--lqip, none) center top / cover no-repeat; transform-origin: 50% 62%; will-change: opacity, transform; transition: opacity 600ms linear; }
+#intro .bg2 { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+body.klc-live #intro .bg { opacity: 0; }
+html[data-t="asa"] #intro .bg { background-image: url("./assets/loader/poster-phone-asa.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-asa.avif") type("image/avif"), url("./assets/loader/poster-phone-asa.webp") type("image/webp")), var(--lqip, none); }
+html[data-t="hiru"] #intro .bg { background-image: url("./assets/loader/poster-phone-hiru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-hiru.avif") type("image/avif"), url("./assets/loader/poster-phone-hiru.webp") type("image/webp")), var(--lqip, none); }
+html[data-t="yugata"] #intro .bg { background-image: url("./assets/loader/poster-phone-yugata.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-yugata.avif") type("image/avif"), url("./assets/loader/poster-phone-yugata.webp") type("image/webp")), var(--lqip, none); }
+html[data-t="yoru"] #intro .bg { background-image: url("./assets/loader/poster-phone-yoru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-yoru.avif") type("image/avif"), url("./assets/loader/poster-phone-yoru.webp") type("image/webp")), var(--lqip, none); }
+/* the vignette and the scrims: the sky stays clear; the corners and the bottom third darken so the UI reads on any hour */
+#intro .scrim { position: absolute; inset: 0; background:
+  radial-gradient(140% 105% at 50% 36%, rgba(23, 24, 75, 0) 52%, rgba(23, 24, 75, .2) 78%, rgba(23, 24, 75, .42) 100%),
+  linear-gradient(rgba(23, 24, 75, .38), rgba(23, 24, 75, .15) 64px, rgba(23, 24, 75, 0) 140px),
+  linear-gradient(to top, rgba(23, 24, 75, .7), rgba(23, 24, 75, .58) 9%, rgba(28, 43, 94, .4) 19%, rgba(34, 58, 112, .2) 29%, rgba(34, 58, 112, .06) 38%, rgba(34, 58, 112, 0) 46%); }
+
+#intro .vh { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+html[lang="en"] #intro .l-ja, html:not([lang="en"]) #intro .l-en { display: none; }
+/* say what the input is: a coarse pointer taps, a fine pointer clicks (html[data-input] is set before the first paint) */
+html[data-input="mouse"] #intro .k-tap, html:not([data-input="mouse"]) #intro .k-click { display: none; }
+
+/* the corner controls: one material, one height (44 px), one shadow */
+#intro header { position: absolute; top: calc(var(--sat) + var(--edge)); left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); display: flex; justify-content: space-between; align-items: center; }
+#intro .btn { box-sizing: border-box; height: 44px; min-width: 44px; padding: 0; border: 0; border-radius: var(--r); background: var(--glass); box-shadow: var(--mat); display: grid; place-items: center; color: var(--kon); cursor: pointer; font: 700 13px/1 var(--font); -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-user-select: none; user-select: none; transition: transform 140ms var(--ease-out); }
+#intro #ld-sound { width: 44px; }
+#intro #ld-sound:active { transform: scale(.97); }
+#intro .btn svg { width: 20px; height: 20px; }
+#intro #ld-sound[aria-pressed="true"] .ic-off, #intro #ld-sound[aria-pressed="false"] .ic-on { display: none; }
+#intro .lang { display: flex; padding: 4px; gap: 2px; }
+#intro .lang button { box-sizing: border-box; height: 36px; min-width: 44px; padding: 0 12px; border: 0; border-radius: calc(var(--r) - 4px); background: transparent; color: var(--sumi); font: 700 13px/1 var(--font); letter-spacing: .04em; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+#intro .lang button.on { background: var(--kon); color: var(--kinari); }
+#intro .btn:focus-visible, #intro .lang button:focus-visible, #intro .pager button:focus-visible { outline: 2px solid var(--kon); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { #intro .lang button:not(.on):hover { color: var(--kon); } }
+
+/* the mark: smaller and higher than v3, its optical centre at 28-30 % (desktop); a soft 鉄紺 halo lifts it off the town */
+#intro .logo { position: absolute; left: 50%; top: calc(var(--sat) + 64px); width: var(--logo-w); transform: translateX(-50%); }
+#intro .logo::before { content: ""; position: absolute; inset: -22% -16% -26%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(23, 24, 75, .5), rgba(23, 24, 75, .3) 45%, rgba(23, 24, 75, .1) 75%, rgba(23, 24, 75, 0)); }
+#intro .logo svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+/* the bottom: the tip bar with ホヤぼーや, then the gauge or the prompt, then the footer */
+#intro .bottom { position: absolute; left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 54px); display: grid; gap: 14px; }   /* (a phone sets the footer in two lines) */
+#intro .tiprow { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: end; min-width: 0; }   /* (above the prompt's wide target, so the pager always gets its taps) */
+
+/* ホヤぼーや, whole: the city's still at its own proportions, the manual's credit centred under him (13Q : 16Q, p.4), never boxed */
+#intro .hoya { display: grid; justify-items: center; align-self: end; justify-self: start; }
+#intro .hoya img { width: auto; height: var(--hoya-h); display: block; }
+#intro .credit { margin-top: 4px; font: 500 12px/1.35 var(--gothic); color: var(--kinari); text-align: center; white-space: nowrap; letter-spacing: 0; text-shadow: var(--ink-shadow); }
+html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
+html[lang="en"] #intro .credit { font-size: 10.5px; }
+
+/* the tip bar: as tall as what it says */
+#intro .tip { position: relative; min-width: 0; box-sizing: border-box; padding: 10px 12px 12px 16px; border-radius: var(--r); background: var(--glass); box-shadow: var(--mat); }
+#intro .tip-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 28px; margin: 0 -2px 2px 0; }
+#intro .tip .tab { display: inline-flex; align-items: center; gap: 8px; font: 900 12px/1 var(--font); letter-spacing: .12em; color: var(--ai); white-space: nowrap; }
+html[lang="en"] #intro .tip .tab { text-transform: uppercase; letter-spacing: .14em; }
+#intro .tip .tab::before { content: ""; width: 7px; height: 7px; border-radius: 1px; background: var(--yamabuki); transform: rotate(45deg); }
+#intro .tip p { margin: 0; font: 700 15px/1.6 var(--font); color: var(--kon); word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+html[lang="en"] #intro .tip p { line-height: 1.5; }
+@media (min-width: 600px) { html[lang="en"] #intro .tip p { text-wrap: pretty; } }   /* (a wide English bar fills its width and avoids a lone last word; a phone and Japanese, set by phrases, balance their lines) */
+#intro .tip .src { margin-top: 4px; font: 500 11px/1.45 var(--gothic); color: var(--sumi); word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+#intro .pager { display: flex; align-items: center; gap: 4px; font: 700 12px/1 var(--font); color: var(--sumi); font-variant-numeric: tabular-nums; }
+#intro .pager .n { display: inline-flex; align-items: baseline; gap: 4px; min-width: 52px; justify-content: center; letter-spacing: .02em; }
+#intro .pager .n i { font-style: normal; opacity: .6; }
+#intro .pager b { color: var(--kon); font-weight: 700; }
+#intro .pager button { position: relative; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 14px; background: rgba(34, 58, 112, .07); color: var(--kon); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: transform 140ms var(--ease-out); }
+#intro .pager button::before { content: ""; position: absolute; inset: -8px; }   /* a 44 px target */
+#intro .pager button:active { transform: scale(.94); }
+#intro .pager svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { #intro .pager button:hover { background: rgba(34, 58, 112, .14); } }
+
+/* the gauge: thin and rounded, a 山吹 fill, the カツオ running at its head */
+#intro .cta { display: grid; align-items: end; justify-items: center; min-height: 64px; }
+#intro .cta > * { grid-area: 1 / 1; }
+#intro .gauge { display: grid; gap: 14px; width: min(100%, 400px); justify-self: center; align-self: end; margin-bottom: 8px; }
+#intro .gauge .row { display: flex; justify-content: space-between; align-items: baseline; color: var(--kinari); font: 700 12px/1 var(--font); letter-spacing: .08em; text-shadow: var(--ink-shadow); }
+html[lang="en"] #intro .gauge .row { letter-spacing: .02em; }
+#intro .gauge .pct { font: 400 13px/1 var(--dela); font-variant-numeric: tabular-nums; letter-spacing: .04em; min-width: 44px; text-align: right; }
+#intro .gauge .pct small { font-size: 10px; margin-left: 1px; }
+#intro .bar { position: relative; height: 6px; border-radius: 3px; background: rgba(251, 250, 245, .3); box-shadow: 0 1px 2px rgba(23, 24, 75, .3); }
+#intro .bar > i, #intro #ld-fill-in, #intro #ld-work-in { background: var(--yamabuki); }
+#intro .bar > i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 3px; }
+html:not([data-capture]) #intro .bar > i { display: none; }
+/* the solid fill is the completed mark, exactly what the number says; the runner rides its edge. Neither ever moves past the mark (core/loadbar.js) */
+#intro #ld-fill { position: absolute; inset: 0; overflow: hidden; border-radius: 3px; transform: translateX(-100%); will-change: transform; }
+#intro #ld-fill-in { position: absolute; inset: 0; transform: translateX(100%); will-change: transform; }
+html[data-capture] #intro #ld-fill { display: none; }
+/* the working layer: the same bar, built the same way, behind the fill, 山吹 at 38 %. From the mark it creeps toward the end of the stage on the compositor, so a long step still shows life
+   (a buffered bar). It is a forecast: it carries no number, the fill never follows it, and under reduced motion it stays at the mark, behind the fill, unseen. */
+#intro #ld-work { position: absolute; inset: 0; overflow: hidden; border-radius: 3px; opacity: .38; transform: translateX(-100%); will-change: transform; }
+#intro #ld-work-in { position: absolute; inset: 0; transform: translateX(100%); will-change: transform; }
+html[data-capture] #intro #ld-work { display: none; }
+#intro #ld-ride { position: absolute; left: 0; width: 100%; top: 50%; height: 0; transform: translateX(0%); will-change: transform; }
+html[data-capture] #intro #ld-ride { transform: none !important; }
+#intro .runner { position: absolute; top: 0; left: 0; width: 46px; height: 23px; transform: translate(-72%, -52%); overflow: visible; }
+/* the runner swims in place: a bob and a wag about the tail, a transform animation on its own box, so the compositor keeps it going through a long step. Every keyframe repeats the lean
+   (translate(-72%, -52%)): an animated transform replaces the one above. Slower while the stage runs long (.ld-idle); still under reduced motion and in a capture. */
+#intro .runner { transform-origin: 30% 55%; animation: klc-swim 1.1s ease-in-out infinite; will-change: transform; }
+@keyframes klc-swim {
+  0%, 100% { transform: translate(-72%, -52%) translateY(0) rotate(-2.5deg); }
+  50% { transform: translate(-72%, -52%) translateY(-2px) rotate(2.5deg); }
+}
+#intro.ld-idle .runner { animation-duration: 2.4s; }
+html[data-capture] #intro .runner { animation: none !important; }
+/* the standing mascot, on the localhost-only ?hoya=run preview (docs/loading/RUNNER.md): only his POSITION may move, never a turn or a squash (the city's manual): two steps up and down */
+html.klc-hoya-dev #intro .runner { animation: klc-bob2 500ms steps(1, end) infinite; }
+@keyframes klc-bob2 {
+  0% { transform: translate(-72%, -52%) translateY(0); }
+  50% { transform: translate(-72%, -52%) translateY(-3px); }
+}
+html.klc-hoya-dev #intro.ld-idle .runner { animation-duration: 1.2s; }
+
+/* the start prompt: no box. White display type with a soft 紺 shadow, two 山吹 ◆, the Japanese line under it; the whole band around it is the target */
+#intro .prompt, #intro .ld-cta { display: none; justify-items: center; }
+#intro .ld-cta { visibility: hidden; }
+body.loaded #intro .ld-cta { visibility: visible; }
+#intro #go { position: relative; -webkit-appearance: none; appearance: none; box-sizing: border-box; min-height: 44px; margin: 0; padding: 8px 20px 10px; border: 0; border-radius: var(--r); background: transparent; color: var(--kinari); cursor: pointer; gap: 8px; outline: none; box-shadow: none; font-feature-settings: "palt"; -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-user-select: none; user-select: none; transition: transform 140ms var(--ease-out); }
+#intro #go::before { content: ""; position: absolute; inset: -14px -24px -12px; }
+#intro #go:disabled { cursor: default; }
+#intro #go .go-line { display: flex; align-items: center; gap: 14px; }
+#intro #go b { font: 400 21px/1 var(--dela); letter-spacing: .16em; margin-right: -.16em; color: #FFFFFF; text-shadow: 0 2px 14px rgba(23, 24, 75, .7), 0 1px 2px rgba(23, 24, 75, .6); white-space: nowrap; }
+#intro #go .dia { display: block; width: var(--dia, 7px); height: var(--dia, 7px); border-radius: 1px; background: var(--yamabuki); transform: rotate(45deg); box-shadow: 0 1px 3px rgba(23, 24, 75, .55); transition: transform 140ms var(--ease-out); }
+/* a mouse over the prompt: the two ◆ close in on the words, the way a menu cursor marks the choice */
+@media (hover: hover) and (pointer: fine) {
+  #intro #go:enabled:hover .dia:first-child { transform: translateX(3px) rotate(45deg); }
+  #intro #go:enabled:hover .dia:last-child { transform: translateX(-3px) rotate(45deg); }
+}
+#intro #go small { display: block; font: 700 13px/1 var(--font); letter-spacing: .12em; margin-right: -.12em; color: var(--kinari); text-shadow: var(--ink-shadow); white-space: nowrap; }
+#intro #go:enabled:active { transform: scale(.97); }
+/* keyboard focus is visible; a pointer user (and the programmatic focus at load) gets no ring (html[data-kbd] follows the last input) */
+#intro #go:focus-visible { outline: none; box-shadow: none; }
+html[data-kbd] #intro #go:focus-visible { outline: 2px solid var(--kinari); outline-offset: 2px; }
+@media (hover: none) and (pointer: coarse) { #intro #go:focus-visible { outline: none; } }
+
+#intro footer { position: absolute; left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 10px); text-align: center; font: 500 11px/1.4 var(--gothic); color: rgba(251, 250, 245, .78); letter-spacing: .02em; text-shadow: 0 1px 2px rgba(23, 24, 75, .7); text-wrap: balance; }
+#intro footer span { white-space: nowrap; }
+#intro footer span + span::before { content: "·"; margin: 0 .55em; }
+@media (max-width: 599px) and (orientation: portrait) { #intro footer #ld-map { display: block; } #intro footer #ld-map::before { content: none; } }
+
+/* a load that cannot go on: the same material, in the tip bar's place */
+#intro .ld-err { display: none; position: relative; box-sizing: border-box; padding: 16px; border-radius: var(--r); color: var(--tekkon); text-align: center; background: var(--glass); box-shadow: var(--mat); }
+#intro .ld-errmsg { margin: 0; font: 700 14px/24px var(--font); text-wrap: pretty; word-break: keep-all; overflow-wrap: anywhere; }   /* (keep-all only with the <wbr> hand-set at each phrase: docs/CRAFT.md section 2) */
+#intro .ld-err { width: min(100%, 460px); }
+#intro .ld-errmsg .m { display: none; }
+#intro .ld-errmsg[data-kind="slow"] .m-slow, #intro .ld-errmsg[data-kind="offline"] .m-offline, #intro .ld-errmsg[data-kind="failed"] .m-failed { display: inline; }
+html[lang="en"] #intro .ld-errmsg .m-ja, html:not([lang="en"]) #intro .ld-errmsg .m-en { display: none !important; }
+#intro #ld-retry { -webkit-appearance: none; appearance: none; margin-top: 12px; min-height: 44px; padding: 8px 24px; border: 0; border-radius: var(--r); background: var(--akane); color: var(--kinari); font: 700 15px/24px var(--font); cursor: pointer; touch-action: manipulation; transition: transform 140ms var(--ease-out); }
+#intro #ld-retry:active { transform: scale(.97); }
+#intro #ld-retry:focus-visible { outline: 3px solid var(--tekkon); outline-offset: 3px; }
+#intro.ld-failed .ld-card, #intro.ld-failed .gauge, #intro.ld-failed .hoya { display: none; }   /* (the notice takes the tip bar's place; ホヤぼーや steps out with his credit, never under or over a panel) */
+#intro.ld-failed .ld-err { display: block; }
+
+body.playing #intro .hoya img, body.playing #intro .credit { display: none; }
+/* once the town is playing the title layer is gone for good: faded to opacity 0 it would still catch taps meant for the HUD
+   under it (the ☰ under the language toggle); the exit animation and the camera flight are over by the time `playing` is set */
+body.playing #intro { display: none !important; }
+body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s forwards; }
+@keyframes klc-gone { to { opacity: 0; } }
+#intro.ld-fade { opacity: 0; visibility: hidden; transition: opacity 160ms linear, visibility 0s linear 160ms; }
+
+/* the desktop and landscape posters (the bay stays in frame) */
+@media (min-width: 900px) {
+  #intro .bg { background-position: center 40%; }
+  html[data-t="asa"] #intro .bg { background-image: url("./assets/loader/poster-desktop-asa.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-asa.avif") type("image/avif"), url("./assets/loader/poster-desktop-asa.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="hiru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-hiru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-hiru.avif") type("image/avif"), url("./assets/loader/poster-desktop-hiru.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yugata"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yugata.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yugata.avif") type("image/avif"), url("./assets/loader/poster-desktop-yugata.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yoru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yoru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yoru.avif") type("image/avif"), url("./assets/loader/poster-desktop-yoru.webp") type("image/webp")), var(--lqip, none); }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  #intro .bg { background-position: center 42%; }
+  html[data-t="asa"] #intro .bg { background-image: url("./assets/loader/poster-desktop-asa.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-asa.avif") type("image/avif"), url("./assets/loader/poster-desktop-asa.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="hiru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-hiru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-hiru.avif") type("image/avif"), url("./assets/loader/poster-desktop-hiru.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yugata"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yugata.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yugata.avif") type("image/avif"), url("./assets/loader/poster-desktop-yugata.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yoru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yoru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yoru.avif") type("image/avif"), url("./assets/loader/poster-desktop-yoru.webp") type("image/webp")), var(--lqip, none); }
+}
+
+/* ---- layouts ---- */
+@media (orientation: portrait) and (max-width: 599px) {
+  #intro .scrim { background:
+    radial-gradient(140% 105% at 50% 36%, rgba(23, 24, 75, 0) 52%, rgba(23, 24, 75, .2) 78%, rgba(23, 24, 75, .42) 100%),
+    linear-gradient(rgba(23, 24, 75, .38), rgba(23, 24, 75, .15) 64px, rgba(23, 24, 75, 0) 140px),
+    linear-gradient(to top, rgba(23, 24, 75, .7), rgba(23, 24, 75, .58) 12%, rgba(28, 43, 94, .42) 26%, rgba(34, 58, 112, .2) 40%, rgba(34, 58, 112, .06) 50%, rgba(34, 58, 112, 0) 58%); }
+}
+/* a wide portrait screen (iPad, a narrow window): ホヤぼーや stands beside the tip bar; the stack is centred */
+@media (min-width: 600px) {
+  #intro { --m: 32px; --edge: 16px; --logo-w: min(64vw, 520px); --hoya-h: 112px; }
+  #intro .logo { top: calc(var(--sat) + 96px); }
+  #intro .bottom { bottom: calc(var(--sab) + 44px); justify-items: center; gap: 18px; }
+  #intro .tiprow { grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; width: min(100%, 640px); }
+  #intro .hoya { justify-self: center; }
+  #intro .credit { font-size: 12px; }
+  html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
+  html[lang="en"] #intro .credit { font-size: 11px; }
+  #intro .tip { padding: 12px 14px 14px 18px; }
+  #intro .gauge { width: min(100%, 420px); }
+  #intro #go b { font-size: 24px; }
+  #intro #go small { font-size: 14px; }
+  #intro #go { --dia: 8px; }
+}
+/* a landscape tablet or a small desktop window (≥ 900 px, wider than tall): the mark sits as on a desktop, its optical centre at 29 %;
+   the bottom stays the centred stack until there is room for three columns */
+@media (min-width: 900px) and (min-aspect-ratio: 1/1) and (min-height: 561px) {
+  #intro { --edge: 24px; --logo-w: min(32vw, 600px, 58vh); --hoya-h: 120px; }
+  #intro .logo { top: calc(29% - var(--logo-w) * .2983); }
+}
+/* a desktop (≥ 1400 px): the mark top-centre, the prompt bottom-centre, the tip bar and ホヤぼーや bottom-left, all on one baseline */
+@media (min-width: 1400px) and (min-height: 561px) {
+  #intro { --m: 32px; --edge: 24px; --logo-w: min(32vw, 600px, 58vh); --hoya-h: 128px; }
+  #intro .logo { top: calc(29% - var(--logo-w) * .2983); }
+  #intro .bottom { bottom: calc(var(--sab) + 44px); grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 24px; align-items: end; justify-items: stretch; }
+  #intro .tiprow { grid-column: 1; grid-row: 1; justify-self: start; width: auto; max-width: 600px; }
+  #intro .ld-err { grid-column: 1; grid-row: 1; justify-self: start; width: min(100%, 460px); }
+  #intro .cta { grid-column: 2; grid-row: 1; width: auto; min-width: 360px; }
+  #intro .tip { width: min(460px, 100%); }
+  #intro .tip p { font-size: 14px; }
+  #intro .gauge { width: 340px; margin-bottom: 14px; }
+  #intro #go b { font-size: 22px; }
+  #intro #go { --dia: 9px; }
+}
+@media (min-width: 1600px) and (min-height: 861px) {
+  #intro { --hoya-h: 140px; }
+  #intro .tip p { font-size: 15px; }
+  #intro #go b { font-size: 26px; }
+}
+/* a big desktop (2000×1195 at DPR 1): the bottom UI grows with the screen, the corner controls keep their 44 px */
+@media (min-width: 1800px) and (min-height: 1000px) {
+  #intro { --hoya-h: 160px; }
+  #intro .tip { width: min(520px, 100%); padding: 14px 16px 16px 20px; }
+  #intro .tip .tab { font-size: 13px; }
+  #intro .tip p { font-size: 17px; }
+  #intro .tip .src { font-size: 12px; }
+  #intro .credit { font-size: 13px; }
+  html:not([lang="en"]) #intro .credit::first-line { font-size: 11px; }
+  html[lang="en"] #intro .credit { font-size: 12px; }
+  #intro .cta { min-width: 420px; }
+  #intro .gauge { width: 400px; }
+  #intro .gauge .row { font-size: 13px; }
+  #intro #go b { font-size: 30px; }
+  #intro #go small { font-size: 15px; }
+  #intro #go { --dia: 10px; }
+  #intro #go .go-line { gap: 18px; }
+  #intro footer { font-size: 12px; }
+}
+/* a short landscape phone (852×393, and the shorter windows ui-b row 8 measures): one row along the bottom (ホヤぼーや, the tip bar,
+   the prompt) under a smaller mark. The landscape poster keeps the bay in frame. */
+@media (orientation: landscape) and (max-height: 520px) {
+  #intro { --hz: 66%; --m: 16px; --edge: 8px; --logo-w: min(32vw, 54vh, 300px); --hoya-h: min(64px, 17vh); }
+  #intro header { top: calc(var(--sat) + var(--edge)); }
+  #intro .logo { top: calc(var(--sat) + 10px); }
+  #intro .bottom { left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 30px); grid-template-columns: minmax(0, 1fr) auto; gap: 0 16px; align-items: end; justify-items: stretch; }
+  #intro .tiprow { grid-column: 1; grid-row: 1; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; width: auto; max-width: 560px; justify-self: start; }
+  #intro .ld-err { grid-column: 1; grid-row: 1; padding: 10px; }
+  #intro .cta { grid-column: 2; grid-row: 1; align-self: end; width: auto; min-width: 200px; min-height: 56px; }
+  #intro .credit { font-size: 12px; }
+  html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
+  html[lang="en"] #intro .credit { font-size: 10.5px; }
+  #intro .tip { padding: 6px 10px 9px 14px; }
+  #intro .tip-head { height: 24px; margin-bottom: 0; }
+  #intro .tip p { font-size: 13px; line-height: 1.5; }
+  #intro .tip .src { font-size: 10px; margin-top: 2px; }
+  #intro .gauge { width: min(260px, 32vw); margin-bottom: 6px; }
+  #intro #go { padding: 6px 12px 8px; }
+  #intro #go b { font-size: 17px; }
+  #intro #go small { font-size: 12px; }
+  #intro footer { bottom: calc(var(--sab) + 6px); }
+}
+/* too narrow (under 740 px) or too short (300 px) for a whole figure beside the tip and the prompt: he steps out with his credit, the tip keeps its room */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 739px) {
+  #intro .hoya { display: none; }
+}
+@media (orientation: landscape) and (max-height: 300px) {
+  #intro .hoya { display: none; }
+  #intro .tip .src { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #intro .bg, #intro .ld-card, #intro #ld-retry, #intro #go, #intro #go .dia, #intro .btn, #intro .pager button { transition: none !important; animation: none !important; }
+  #intro.ld-fade { transition: opacity 160ms linear, visibility 0s linear 160ms; }
+  #intro .ld-wv, #intro .sr-strip, #intro .sr-bob, #intro .runner { animation: none !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  #intro { --glass: #FBFAF5; }
+}
+@media (prefers-contrast: more) {
+  #intro { --glass: #FBFAF5; --hair: rgba(34, 58, 112, .5); }
+}

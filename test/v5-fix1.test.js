@@ -65,7 +65,7 @@ describe("S2 arrival, surfaces and search", () => {
   test("神明崎's north base is gravel and a park, no car park", () => {
     const at = (x, z) => L.LANDUSE.filter((l) => l.src === "override" && inPoly(x, z, l.ring)).map((l) => l.cls);
     for (const p of [[285, -170], [320, -130]]) { expect(at(...p)).toContain("gravel"); expect(at(...p)).not.toContain("parking"); }
-    expect(at(312, -90)).toContain("plaza");   // the west walkway, not a sand beach
+    expect(at(312, -90)).toContain("apron");   // the west walkway, not a sand beach ([v6:c7r2] grey asphalt / concrete, Earth #86848a: 'apron', no longer the cream 'plaza')
   });
   test("浮見海道 is pale concrete with the 朱 rails, the 魚町 seawall strip grey pavers, 海の市's deck grey-brown", () => {
     expect(read("src/anime/world/harbor/shinmei.js")).toContain("walkDeck: '#b9b6ad'");

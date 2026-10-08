@@ -173,6 +173,10 @@ export function buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts, bikeSp
       for (let k = 0; k < 3; k++) F.boxB(H.M.plain, '#9a7350', 1.7, 0.035, 0.12, 0, 0.42, -0.14 + k * 0.14);
       for (let k = 0; k < 2; k++) F.boxB(H.M.plain, '#9a7350', 1.7, 0.1, 0.03, 0, 0.58 + k * 0.14, -0.22);
       ctx.physics.addBox(p.x, p.z, 1.7, 0.5, p.rotY, y, y + 0.8);
+    } else if (p.type === 'busStop') {   // [sys:17] a placed bus stop (face = the compass bearing the plate looks to)
+      buildBusStop(H, H.Frame.at(H.gb, p.x, y, p.z, p.rotY), {}); ctx.physics.addCylinder(p.x, p.z, 0.12, y, y + 2.4);
+    } else if (p.type === 'brtStop') {
+      buildBrtStop(ctx, H, root, { x: p.x, z: p.z, rotY: p.rotY, id: 'ovr' + i }, y); ctx.physics.addCylinder(p.x, p.z, 0.3, y, y + 2.6);
     } else if (p.type === 'bollard') {
       const F = H.Frame.at(H.gb, p.x, y, p.z, 0);
       F.cyl(H.M.plain, '#8f949a', 0.09, 0.8, 0, 0.4, 0, { seg: 8 });
@@ -181,8 +185,74 @@ export function buildProps(ctx, H, { lotIdx, roadIdx, street, shopFronts, bikeSp
     }
     stats.overrides++;
   }
+  // ------------------------------------------------------------------ [sys:17] bus stops and BRT stations
+  // L.BUS_STOPS: every OSM bus stop on the left kerb of the road a bus uses (scripts/anime/busstops.js)
+  stats.busStops = 0; stats.brtStops = 0;
+  for (const b of L.BUS_STOPS || []) {
+    if (L.shoreDist(b.x, b.z) > -0.3 || Math.hypot(b.x - L.ZONES.mid.cx, b.z - L.ZONES.mid.cz) > L.ZONES.mid.r + 150) continue;
+    const y = L.heightAt(b.x, b.z);
+    if (b.kind === 'brt') { buildBrtStop(ctx, H, root, b, y); stats.brtStops++; ctx.physics.addCylinder(b.x, b.z, 0.3, y, y + 2.6); }
+    else { buildBusStop(H, H.Frame.at(H.gb, b.x, y, b.z, b.rotY), b); stats.busStops++; ctx.physics.addCylinder(b.x, b.z, 0.12, y, y + 2.4); }
+  }
   ctx.addStatic(root);
   return stats;
+}
+
+/**
+ * [sys:17] A city bus stop (ミヤコーバス, 岩手県交通): a grey steel pole 2.3 m tall with a round sign plate on top (white face, dark ring)
+ * and a timetable box under it, the plate facing the oncoming bus (local +z). A shelter (roofed bench bay) only where OSM says
+ * shelter=yes. F: a Frame at the foot of the pole.
+ */
+export function buildBusStop(H, F, o) {
+  const M = H.M;
+  F.cyl(M.plain, '#9ea4a9', 0.035, 2.3, 0, 1.15, 0, { seg: 6 });
+  F.boxB(M.concrete, '#b9b7b0', 0.5, 0.12, 0.5, 0, 0, 0, { uv: { world: 2 } });                   // the foot (a small concrete base)
+  F.cyl(M.plain, '#2f4d78', 0.255, 0.03, 0, 2.0, 0.04, { rx: Math.PI / 2, seg: 16 });                 // the ring
+  F.cyl(M.plain, '#f4f4ef', 0.215, 0.034, 0, 2.0, 0.045, { rx: Math.PI / 2, seg: 16 });               // the white face
+  F.boxB(M.plain, '#d9dde0', 0.34, 0.46, 0.05, 0, 1.12, 0.05);                                       // the timetable box
+  F.boxB(M.plain, '#f4f4ef', 0.28, 0.36, 0.01, 0, 1.17, 0.08);
+  if (o.shelter === 'yes') {
+    // a roofed bay beside the pole: back panel, a slatted bench, and a flat roof on two posts (1.6 m wide)
+    const sx = 1.3;
+    for (const u of [sx - 0.8, sx + 0.8]) F.boxB(M.plain, '#6d747c', 0.06, 2.3, 0.06, u, 0, -0.5);
+    F.boxB(M.plain, '#8e949b', 1.8, 0.07, 1.2, sx, 2.3, -0.2);
+    F.boxB(M.glass ?? M.plain, '#bcd2dc', 1.5, 1.6, 0.03, sx, 0.4, -0.52);
+    F.boxB(M.plain, '#9a7350', 1.2, 0.04, 0.35, sx, 0.45, -0.38);
+  }
+}
+/**
+ * [sys:17] A BRT station (大船渡線 / 気仙沼線 BRT, JR 東日本), after the Commons photos of 内湾入口 (2022, 2024): a slim red panel totem about
+ * 2.5 m tall carrying the station name, with a solar-panel cap and timetable and map panels; a bench beside it; a kerbed concrete
+ * platform strip 6 m long and 1.6 m wide along the busway. o: { x, z, rotY (the panel faces the oncoming bus), name, nameEn }.
+ */
+export function buildBrtStop(ctx, H, root, o, y) {
+  const F = H.Frame.at(H.gb, o.x, y, o.z, o.rotY), M = H.M;
+  // kerbed platform strip along the busway (the road is on local +z)
+  F.boxB(M.concrete, '#bdbcb5', 6.0, 0.16, 1.6, 0, -0.02, 0, { uv: { world: 2 } });
+  F.boxB(M.concrete, '#a9a8a1', 6.0, 0.05, 0.14, 0, 0.14, -0.73, { uv: { world: 2 } });                // the back kerb
+  // totem: red slim box (JR 東日本 red), white name board, solar cap
+  F.boxB(M.plain, '#c4262e', 0.5, 2.4, 0.12, 0, 0.14, 0);
+  F.boxB(M.plain, '#e9ecee', 0.44, 0.7, 0.02, 0, 1.55, 0.07);                                          // the name board
+  F.boxB(M.plain, '#e9ecee', 0.34, 0.42, 0.02, 0, 0.95, 0.07);                                         // the timetable panel
+  F.boxB(M.plain, '#dfe3e6', 0.34, 0.3, 0.02, 0, 0.58, 0.07);                                          // the area map
+  F.box(M.plain, '#23304a', 0.62, 0.05, 0.4, 0, 2.58, 0, { rx: -0.2 });                                // the solar panel cap, tilted to the sun
+  // a bench beside the totem (slatted, back toward the road's far side)
+  for (const u of [1.6, 2.8]) F.boxB(M.plain, '#4a4d55', 0.05, 0.42, 0.42, u, 0.14, 0);
+  F.boxB(M.plain, '#9a7350', 1.4, 0.04, 0.4, 2.2, 0.56, 0);
+  F.boxB(M.plain, '#9a7350', 1.4, 0.3, 0.03, 2.2, 0.62, -0.2);
+  // the station name on the board: one small canvas texture per stop (the BRT has a handful)
+  if (o.name && ctx.tex?.draw) {
+    const tex = ctx.tex.draw(256, 128, (g, w, h) => {
+      g.fillStyle = '#f4f4ef'; g.fillRect(0, 0, w, h); g.fillStyle = '#c4262e'; g.fillRect(0, 0, w, 14);
+      g.fillStyle = '#1f2630'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      ctx.tex.fitText(g, o.name, w / 2, 62, w - 20, 44, ctx.tex.FONTS.sans, 800);
+      if (o.nameEn) ctx.tex.fitText(g, o.nameEn, w / 2, 106, w - 20, 16, ctx.tex.FONTS.en || ctx.tex.FONTS.sans, 500);
+    }, { key: 'town-brt-' + o.id });
+    const geo = new THREE.PlaneGeometry(0.44, 0.7);
+    const mesh = new THREE.Mesh(geo, ctx.mat.toon('#ffffff', { map: tex, paint: 0.0 }));
+    const p = F.w(0, 1.55, 0.085); mesh.position.copy(p); mesh.rotation.y = o.rotY; mesh.name = 'brt-name'; root.add(mesh);
+    ctx.noOutline?.(mesh);
+  }
 }
 
 /** ケヤキ-like avenue tree: a stout trunk forking into limbs and a broad vase of soft leaf lobes (a few autumn-tinted). */

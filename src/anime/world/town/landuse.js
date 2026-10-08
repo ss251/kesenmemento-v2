@@ -13,16 +13,53 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { carColor } from './carcolors.js';   // [v5:fix2] the Japanese car-colour mix
 
 export const LOOK = {
-  parking: { col: '#8e9197', lift: 0.05 }, school: { col: '#d4c29c', lift: 0.03 }, sport: { col: '#cdb68c', lift: 0.045 },
-  construction: { col: '#c9b690', lift: 0.035 }, cemetery: { col: '#97938b', lift: 0.035 },   // [v5:fix1] cemetery gravel #d3cec2 -> #97938b: the hillside 墓地 read as white patches (Earth 2026 grey, lum ~100-130)
+  parking: { col: '#797577', lift: 0.05 },   // [r2:10] #8e9197 -> #797577: Earth 2026-03-11 median over 60 rings (128, 124, 130), the render gain is about 1.06 / 1.06 / 1.09 (the old blue-grey #969aa4 was dL +12, worst c10 #1402 +22)
+  school: { col: '#c6bba8', lift: 0.03 }, sport: { col: '#c2bbac', lift: 0.045 },   // [sys:25] Earth 2026-03-11 shows the school yards as a desaturated grey-beige (#b4a69b / #988b83 / #958a86), not saturated sand (#d4c29c / #cdb68c)
+  construction: { col: '#c9b690', lift: 0.035 }, cemetery: { col: '#45434b', lift: 0.035 },   // [v5:fix1] cemetery gravel #d3cec2 -> #97938b: the hillside 墓地 read as white patches (Earth 2026 grey, lum ~100-130); [v6:c5r3] #97938b -> #45434b: Earth 2026-03-11 mean L* 36-38 inside the 沢田 and 本町 cemetery rings (woods, terraces and stones together) against the render's 47-56
   // [v5:fix3] lawns as Google Earth 2026-03-11 shows them (dried, muted turf: 迎 / PIER7 seawall park, the town's parks);
   // #9cc07a / #a3c47f rendered as saturated lime under the toon light
+  // [r2:10] the early-spring park colour is DRY.park (a dormant grey-brown, Earth #918482 (measured: the render of the first guess #827777 was #8a7e83, dL -3.5) against the khaki #a39b7e): LOOK.park keeps the summer / autumn lawn
   park: { col: '#8f9a6a', lift: 0.03 },
   grass: { col: '#949e6e', lift: 0.03 }, religious: { col: '#dad4c6', lift: 0.035 },
-  gravel: { col: '#a09a90', lift: 0.03 }, weeds: { col: '#7d8556', lift: 0.03 },   // [v4:polish2] bare gravel lots traced on the aerial photo (world/landuse_aerial.js); [v5:fix1] gravel #b3ada1 -> #a09a90, the mid grey of Earth 2026
+  // [r2:10] gravel #a09a90 -> #837b7a: Earth median over the 39 override gravel rings (139, 131, 132) (#a8a39a rendered, dL +11); #8a8082 would still render about 3 L* too bright
+  // [v6:c5r3] grave: the hillside grave terraces read dark brown-tan on Earth 2026-03-11 (mean L* 36-50 inside the 沢田 and 本町 terraces; the generic gravel rendered L* 58-62)
+  grave: { col: '#57535a', lift: 0.045 },   // lift above every cemetery polygon (0.035 + 0.0004 x its index): a terrace inside an OSM cemetery ring must paint over it
+  gravel: { col: '#837b7a', lift: 0.03 }, weeds: { col: '#7d8556', lift: 0.03 },   // [v4:polish2] bare gravel lots traced on the aerial photo (world/landuse_aerial.js); [v5:fix1] gravel #b3ada1 -> #a09a90, the mid grey of Earth 2026
   plaza: { col: '#c9c3b8', lift: 0.04 },   // [v4:overrides] a paved square (data/anime/overrides landuse use 'plaza')
-  apron: { col: '#909197', lift: 0.045 },   // [v5] plain asphalt: a quay apron or a yard (override use 'apron'; no stall lines, no cars)
+  apron: { col: '#7c7a82', lift: 0.045 },   // [v5] plain asphalt: a quay apron or a yard (override use 'apron'; no stall lines, no cars); [v6:c12r2] #909197 -> #7c7a82: Earth 2026-03-11 medians inside the 大浦 / 神明崎 / 南町 apron rings are #6b6c77..#868186 (the old colour rendered +10..12 dL too bright)
+  levee: { col: '#928c8d', lift: 0.04 },   // [v6:c4r2] a grey concrete levee slope or revetment (override use 'levee'): Earth 2026-03-11 median over the 鹿折川 levee slopes #9b9494 / #9e9899
 };
+/** [r2:8] [r2:10] The dormant colours of the early-spring look (?season=early: the 2026-03-11 imagery) for the classes whose Earth colour is a grey-brown that the
+ *  generic dormant-turf rule (season.js klcSnowMix, which only half-converts a dark green) does not reach:
+ *    weeds  the 20 'weeds' override polygons (about 42 700 m2): Earth median #857679 (L* about 51, r > g; per polygon #75656f..#908788) against the saturated olive
+ *           #878c62 that LOOK.weeds #7d8556 (g > r) rendered;
+ *    park   the OSM parks and school lawns (13 rings, 37 000 m2): Earth #918482 (measured: the render of the first guess #827777 was #8a7e83, dL -3.5) against the khaki #a39b7e / #a49c7e. An override lawn (lu.ovr: the 迎 / PIER7
+ *           seawall park) keeps its own colour.
+ *  The mix is driven by the season preset (uSeasonE.y: 1 in ?season=early, 0 in summer and autumn, which keep LOOK's colours: they are unmeasured).
+ *  `col` is the albedo the shader mixes toward (sRGB hex, converted to linear by THREE.Color); `render` is what it renders as (the toon light and the grade
+ *  add about 7 %): col = render / 1.072, the ratio measured on the weeds (#7c6e71 -> #857679). */
+export const DRY = { weeds: { col: '#7c6e71', render: '#857679' }, park: { col: '#8a7f7f', render: '#918482' } };
+export const DRY_WEEDS = DRY.weeds.col, DRY_WEEDS_RENDER = DRY.weeds.render;
+const dryCache = new WeakMap();
+export function dryMaterial(ctx, cls = 'weeds') {
+  const m = ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.05, polygonOffset: -0.6, name: 'landuse-dry-' + cls });
+  if (m.userData.dry) return m;
+  m.userData.dry = cls;
+  const base = m.onBeforeCompile, ck = m.customProgramCacheKey, uDry = { value: new THREE.Color(DRY[cls].col) };
+  m.onBeforeCompile = (sh, r) => {
+    base(sh, r);
+    if (!sh.fragmentShader.includes('uniform vec2 uSeasonE;')) return;   // no season uniform on this material: nothing to drive the mix
+    const hook = sh.fragmentShader.includes('#include <lights_toon_fragment>') ? '#include <lights_toon_fragment>' : '#include <lights_fragment_begin>';
+    sh.uniforms.uDryCol = uDry;
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 uDryCol;').replace(hook, `diffuseColor.rgb = mix(diffuseColor.rgb, uDryCol, clamp(uSeasonE.y, 0.0, 1.0));\n${hook}`);
+  };
+  m.customProgramCacheKey = () => ck.call(m) + '|dry-' + cls;
+  m.defines = { ...(m.defines || {}), USE_CUSTOM: '' };
+  return m;
+}
+export const dryWeedsMaterial = (ctx) => dryMaterial(ctx, 'weeds');
+/** which dry mesh a land-use polygon is painted into: vacant weeds, and an OSM / GSI park (not an override lawn), or null (the shared surface mesh) */
+export const dryClassOf = (lu) => (lu.cls === 'weeds' ? 'weeds' : lu.cls === 'park' && !lu.ovr ? 'park' : null);
 /** [v5:fix2] Parked-car fill of a car park (share of the painted stalls with a car). Google Earth 2026-03-11 shows the
  *  town's car parks at a fifth or less (they were drawn at 0.45, packed); an override parking surface may carry its own
  *  `fill` counted on Earth, and EARTH_FILL holds the counted OSM car parks (centroid within 6 m). */
@@ -37,7 +74,7 @@ export function parkFill(lu) {
   const e = EARTH_FILL.find((q) => Math.hypot(q.at[0] - cx, q.at[1] - cz) < 6);
   return e ? e.fill : PARK_FILL;
 }
-const ORDER = ['school', 'park', 'grass', 'weeds', 'gravel', 'religious', 'construction', 'cemetery', 'sport', 'plaza', 'apron', 'parking'];
+const ORDER = ['school', 'park', 'grass', 'weeds', 'gravel', 'religious', 'construction', 'cemetery', 'grave', 'sport', 'plaza', 'levee', 'apron', 'parking'];
 
 /** Triangulate a ring (+ holes) and split every triangle until its longest edge is <= maxE. -> flat [x, z, ...] tris */
 export function drapeTriangles(ring, holes = [], maxE = 6) {
@@ -72,16 +109,18 @@ export function ringFrame(ring) {
 }
 
 /** Land-use polygons of the detail area, in paint order. */
+/** [sys:25] paint rank: an override lawn (a worn-turf patch inside an OSM pitch) paints above the pitch */
+export const rankOf = (lu) => ((lu.ovr && lu.cls === 'park') ? ORDER.indexOf('sport') + 0.5 : ORDER.indexOf(lu.cls));
 export function landuseIn(L, inside) {
   return (L.LANDUSE || []).filter((l) => LOOK[l.cls] && l.ring?.length > 2 && l.ring.some(([x, z]) => inside(x, z)))
-    .sort((a, b) => ORDER.indexOf(a.cls) - ORDER.indexOf(b.cls));
+    .sort((a, b) => rankOf(a) - rankOf(b));
 }
 
 export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false, trees = null }) {
   const L = ctx.L;
   const polys = landuseIn(L, inside);
   const root = new THREE.Group(); root.name = 'town-landuse';
-  const S = { p: [], n: [], c: [], i: [] }, F = { p: [], n: [], c: [], i: [] }, WHITE = { r: 0.93, g: 0.93, b: 0.9 };
+  const S = { p: [], n: [], c: [], i: [] }, DB = { weeds: { p: [], n: [], c: [], i: [] }, park: { p: [], n: [], c: [], i: [] } }, F = { p: [], n: [], c: [], i: [] }, WHITE = { r: 0.93, g: 0.93, b: 0.9 };
   const col = new THREE.Color();
   const put = (B, x, y, z, n, c) => { B.p.push(x, y, z); B.n.push(n[0], n[1], n[2]); if (B.c) B.c.push(c.r, c.g, c.b); return B.p.length / 3 - 1; };
   /** a triangle wound to face up (+y) */
@@ -95,21 +134,22 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
   polys.forEach((lu, k) => {
     const look = LOOK[lu.cls];
     stats[lu.cls] = (stats[lu.cls] || 0) + 1;
-    const lift = look.lift + k * 0.0004;   // later polygons (smaller classes) sit a hair higher
+    const lift = ((lu.ovr && lu.cls === 'park') ? LOOK.sport.lift + 0.02 : look.lift) + k * 0.0004;   // [sys:25] an override lawn rides above the pitch   // later polygons (smaller classes) sit a hair higher
     const tris = drapeTriangles(lu.ring, lu.holes || [], heroIn(lu.ring[0][0], lu.ring[0][1]) ? 5 : 8);
     // [v5] seeded by the polygon's own id and first corner, not its list index: a polygon added by an override no
     // longer reshuffles the parked cars of every later car park
     const r = ctx.rng('lu-' + (lu.ovr || lu.osm || '') + '-' + Math.round(lu.ring[0][0]) + ',' + Math.round(lu.ring[0][1]));
-    const base = col.set(look.col);
+    const base = col.set(lu.col || look.col);   // [v6:c5r3] a polygon may carry its own swatch (override `color`)
+    const SB = DB[dryClassOf(lu)] || S;   // [r2:8] [r2:10] weeds and OSM parks are their own meshes and materials: the dormant-colour mix of the early preset
     for (let t = 0; t < tris.length; t += 3) {
       if (lu.cls === 'cemetery' && nearTree((tris[t][0] + tris[t + 1][0] + tris[t + 2][0]) / 3, (tris[t][1] + tris[t + 1][1] + tris[t + 2][1]) / 3, 4.5)) continue;
       const ids = [];
       for (let q = 0; q < 3; q++) {
         const [x, z] = tris[t + q];
         const n = 0.96 + 0.08 * (Math.sin(x * 0.37 + z * 0.21) * 0.5 + 0.5);   // a painterly tone drift
-        ids.push(put(S, x, L.heightAt(x, z) + lift, z, [0, 1, 0], { r: base.r * n, g: base.g * n, b: base.b * n }));
+        ids.push(put(SB, x, L.heightAt(x, z) + lift, z, [0, 1, 0], { r: base.r * n, g: base.g * n, b: base.b * n }));
       }
-      up(S, ids[0], ids[1], ids[2]);
+      up(SB, ids[0], ids[1], ids[2]);
     }
     const fr = ringFrame(lu.ring);
     const W = (u, v) => [fr.cx + fr.ux * u + fr.vx * v, fr.cz + fr.uz * u + fr.vz * v];
@@ -153,7 +193,7 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
           F.i.push(v[0], v[1], v[2], v[0], v[2], v[3], v[4], v[5], v[6], v[4], v[6], v[7]);
         }
       }
-    } else if (lu.cls === 'cemetery') {
+    } else if (lu.cls === 'cemetery' || lu.cls === 'grave') {   // [v6:c5r3] grave: an override grave terrace (cleared ground, so no woods to stand round)
       // rows of grave stones (1 m plots, 1.9 m row pitch), each on its own little kerbed plot
       for (let v = fr.v0 + 1.2; v <= fr.v1 - 1.2; v += 2.2) for (let u = fr.u0 + 1.0; u <= fr.u1 - 1.0; u += 1.5) {
         const p = W(u, v); if (!inPoly(p[0], p[1], lu.ring, lu.holes || []) || nearTree(p[0], p[1], 4) || lotIdx?.at(p[0], p[1], 0.2)) continue;   // (cheap tests first)
@@ -172,6 +212,7 @@ export function buildLanduse(ctx, { inside, heroIn, lotIdx, roadIdx, low = false
   };
   const surfMat = ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.05, polygonOffset: -0.6 });
   mk(S, surfMat, 'landuse-surfaces');
+  for (const k of Object.keys(DB)) mk(DB[k], dryMaterial(ctx, k), 'landuse-' + k + '-dry');   // [r2:8] [r2:10]
   mk(F, ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.03, side: 'double' }), 'construction-hoarding', { cast: true });
   ctx.addStatic(root);
   // instanced: grave stones and parked cars (mid-zone car parks)
@@ -204,5 +245,5 @@ function ringIndex(L, classes) {
 }
 export function parkingIndex(L) { return ringIndex(L, new Set(['parking'])); }
 /** [v5:fix3] paved or bare ground (car parks, aprons, squares, gravel, building sites): no vacant-lot grass on it */
-export const PAVED = new Set(['parking', 'apron', 'plaza', 'gravel', 'construction']);
+export const PAVED = new Set(['parking', 'apron', 'plaza', 'levee', 'gravel', 'grave', 'construction']);
 export function pavedIndex(L) { return ringIndex(L, PAVED); }

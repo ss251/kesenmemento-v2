@@ -1,0 +1,37 @@
+{
+ "note": "Quay-hall picks (IMG_0853-0861, dawn, 77/78 mm, full-resolution upright JPEG pixels), read off pixel-gridded crops of raw/survey/market/images/t77. tools/survey/market_hall.py cuts each on its surveyed plane with the solved cameras (data/survey/market/cameras.json) and writes hall-features.json. The quay frame: a along the layout quay line from (543.9, 590.4) toward (647.0, 816.0), d out from it toward the sea (negative = inland).",
+ "quay": { "p0": [543.9, 590.4], "p1": [647.0, 816.0] },
+ "planes": { "hall_floor": 2.15, "apron": 1.84, "tub_rim": 2.89 },
+ "floor": [
+  { "name": "canopy.tub#1", "img": "IMG_0853", "uv": [602, 3131], "plane": "tub_rim", "note": "row 1, near rim corner of tub 1 (the first tub's four rim corners cut to a 1.44 x 1.19 m rectangle)" },
+  { "name": "canopy.tub#2", "img": "IMG_0853", "uv": [1000, 3074], "plane": "tub_rim" },
+  { "name": "canopy.tub#3", "img": "IMG_0853", "uv": [1403, 3016], "plane": "tub_rim" },
+  { "name": "canopy.tub#4", "img": "IMG_0853", "uv": [1753, 2967], "plane": "tub_rim" },
+  { "name": "canopy.tub#5", "img": "IMG_0853", "uv": [2095, 2913], "plane": "tub_rim" },
+  { "name": "canopy.tub#6", "img": "IMG_0853", "uv": [2425, 2865], "plane": "tub_rim" },
+  { "name": "canopy.tub#7", "img": "IMG_0853", "uv": [2734, 2822], "plane": "tub_rim" },
+  { "name": "canopy.tub#8", "img": "IMG_0853", "uv": [2990, 2784], "plane": "tub_rim" },
+  { "name": "canopy.conveyor.caster#1", "img": "IMG_0855", "uv": [2347, 2897], "plane": "hall_floor", "note": "belt, right end" },
+  { "name": "canopy.conveyor.caster#2", "img": "IMG_0855", "uv": [2521, 2911], "plane": "hall_floor" },
+  { "name": "canopy.conveyor.caster#3", "img": "IMG_0855", "uv": [1198, 3030], "plane": "hall_floor", "note": "belt, middle" },
+  { "name": "canopy.conveyor.caster#4", "img": "IMG_0855", "uv": [1389, 3061], "plane": "hall_floor" },
+  { "name": "canopy.conveyor.caster#5", "img": "IMG_0855", "uv": [624, 3047], "plane": "hall_floor", "note": "sorter, left end" },
+  { "name": "canopy.conveyor.caster#6", "img": "IMG_0855", "uv": [771, 3074], "plane": "hall_floor" },
+  { "name": "canopy.truck.wheel#1", "img": "IMG_0855", "uv": [1172, 2522], "plane": "apron", "note": "2 t truck, front tyre contact patch (wheelbase 2.5 m is a constraint of the canopy adjustment)" },
+  { "name": "canopy.truck.wheel#2", "img": "IMG_0855", "uv": [1563, 2500], "plane": "apron", "note": "rear tyre" },
+  { "name": "canopy.hopper.leg#1", "img": "IMG_0860", "uv": [2409, 2656], "plane": "hall_floor", "note": "steel hopper beside column 7, front leg" },
+  { "name": "canopy.hopper.leg#2", "img": "IMG_0860", "uv": [2740, 2640], "plane": "hall_floor" }
+ ],
+ "adjust_points": { "canopy.curb#1": "curb.0853.0", "canopy.curb#2": "curb.0853.5", "canopy.curb#3": "curb.0853.10", "canopy.bitt#1": "bollard.0853.a", "canopy.bitt#2": "bollard.0855.a" },
+ "lines": [
+  { "name": "canopy.beam_t1", "dir": "N", "img": [["IMG_0853", [[1300, 833.4], [1400, 828.8], [1500, 825.2], [1600, 821.6], [1700, 815.0], [1800, 811.4], [1900, 806.8]]], ["IMG_0860", [[1350, 640.0], [1500, 642.0], [1650, 635.0], [1800, 625.0], [1950, 616.0], [2100, 604.0], [2250, 606.0]]]], "note": "lower edge of the sunlit transverse beam: a line along the quay normal, seen from both camera positions (their baseline is across it)" }
+ ],
+ "dims": [
+  { "name": "canopy.floor_y", "value": 2.15, "sigma": 0.08, "note": "hall floor T.P.: floor tie points of the five frames (median 2.14-2.16 over 18-24 m; 1.8-1.9 beyond the roof edge, the apron)" },
+  { "name": "canopy.apron_y", "value": 1.84, "sigma": 0.03, "note": "apron / curb top T.P. (adjustment scalar apron_y)" },
+  { "name": "canopy.tub_h", "value": 0.74, "sigma": 0.04, "note": "tub rim above the floor (vertical cut over the foot, IMG_0853); the tub is 1.44 x 1.19 m" },
+  { "name": "canopy.tub_pitch", "value": 1.23, "sigma": 0.05, "note": "tub row 1, junction to junction along the quay (eight tubs)" },
+  { "name": "canopy.truck_wheelbase", "value": 2.47, "sigma": 0.05, "note": "front to rear tyre contact (a constraint of the adjustment, 2.5 m: Dyna / Dutro 2 t standard cab)" },
+  { "name": "canopy.shadow_d", "value": -34.52, "sigma": 0.1, "note": "d of the roof edge's shadow line on the floor (IMG_0853 lower right, a line parallel to the quay)" }
+ ]
+}

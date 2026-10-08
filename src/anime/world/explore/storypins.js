@@ -1,5 +1,5 @@
 // [ship:story] Living City story pins: short sourced stories tied to a real place, listed in the places list (their own
-// group, 「まちの物語」) and found by search. Selecting one flies the drone there, pins its label and opens a story card.
+// group, 「町の物語」) and found by search. Selecting one flies the drone there, pins its label and opens a story card.
 // A small wooden 説明板 marks the spot in the world. It is a stylised marker of the pin: no source shows a real signboard
 // at the site (a housing-relocation dig), and its roof and lettering are invented.
 //
@@ -8,7 +8,7 @@
 // card says so (edgeNote).
 //
 // The first pin is 波怒棄館遺跡 (唐桑町荒谷前): an early Jōmon shell midden of about 5,500 years ago with more than 140 kg of
-// tuna bones, some from fish over 2 m, stone blades still stuck in some, perhaps a butchering site (Usui's public talk (2026-10-03)
+// tuna bones, some from fish over 2 m, stone blades still stuck in some, perhaps a butchering site (the 臼福本店 public talk (2026-10-03)
 // item 5; the location from the prefecture's 2013 dig list and GSI, see the JSON's sources).
 //
 //   storyPlaces(L)                      -> places-list entries { id, ja, en, cat, at, group, groupLabel, story }
@@ -98,10 +98,11 @@ export function cardHTML(pin, lang = 'ja', edge = false) {
 }
 
 const CSS = /* css */`
-#klc-story{position:fixed;left:16px;top:124px;z-index:38;width:min(400px,calc(100% - 32px));max-height:calc(100vh - 290px);overflow:auto;padding:14px 16px 12px;font-family:"Zen Maru Gothic","Noto Sans JP",system-ui,sans-serif;color:#2b2a3a;background:rgba(255,253,248,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.7);border-radius:16px;box-shadow:0 6px 24px rgba(40,40,70,.18);transition:opacity .35s,transform .35s;opacity:0;transform:translateY(8px);pointer-events:none}
+#klc-story,#klc-story *{box-sizing:border-box}
+#klc-story{position:fixed;left:16px;top:calc(124px + env(safe-area-inset-top,0px));z-index:38;width:min(400px,calc(100% - 32px));max-height:calc(100vh - 290px);max-height:calc(100dvh - 290px);overflow:auto;overscroll-behavior:contain;padding:14px 16px 12px;font-family:"Zen Maru Gothic","Noto Sans JP",system-ui,sans-serif;color:#2b2a3a;background:rgba(255,253,248,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.7);border-radius:16px;box-shadow:0 6px 24px rgba(40,40,70,.18);transition:opacity .35s,transform .35s;opacity:0;transform:translateY(8px);pointer-events:none}
 #klc-story.show{opacity:1;transform:none;pointer-events:auto}
 #klc-story .kick{display:block;font-size:12px;color:#8a5a3c;font-weight:700;letter-spacing:.04em}
-#klc-story h3{margin:2px 28px 8px 0;font-size:18px;line-height:1.35}
+#klc-story h3{margin:2px 28px 8px 0;font-size:18px;line-height:1.35;text-wrap:balance;word-break:auto-phrase}
 #klc-story p{margin:6px 0;font-size:14px;line-height:1.65}
 #klc-story p.edge{font-size:12px;opacity:.75}
 #klc-story details{margin-top:8px;font-size:12px;opacity:.85}
@@ -109,9 +110,17 @@ const CSS = /* css */`
 #klc-story ul{margin:4px 0 0;padding-left:18px}
 #klc-story li{margin:2px 0;line-height:1.45}
 #klc-story a{color:#2f64b5}
-#klc-story .x{position:absolute;right:8px;top:8px;width:36px;height:36px;border:0;border-radius:999px;background:#fff;font:inherit;font-size:20px;line-height:36px;cursor:pointer;box-shadow:0 2px 8px rgba(40,40,70,.15)}
+#klc-story .x{position:absolute;right:8px;top:8px;width:36px;height:36px;border:0;border-radius:999px;background:#fff;font:inherit;font-size:20px;line-height:36px;cursor:pointer;box-shadow:0 2px 8px rgba(40,40,70,.15);transition:transform var(--dur-press) var(--ease-out),background-color var(--dur-fast) ease}
+#klc-story .x:active{transform:scale(.97)}   /* [ui-b2:6] the press layer (ui/style.js) */
+#klc-story .x:focus-visible,#klc-story summary:focus-visible,#klc-story a:focus-visible{outline:2px solid var(--ring-ink, #1f3a68);outline-offset:2px;box-shadow:0 0 0 5px var(--ring-halo, rgba(255, 255, 255, 0.92))}   /* two tones: legible on the card and on the scene behind it */
 body.shot #klc-story,body.shotui #klc-story{transition:none}
-@media (max-width:520px){#klc-story{top:112px;max-height:calc(100vh - 300px)}#klc-story p{font-size:13px}}
+@media (max-width:520px){#klc-story{top:calc(112px + env(safe-area-inset-top,0px));max-height:calc(100vh - 300px);max-height:calc(100dvh - 300px)}#klc-story p{font-size:13px}}
+@media (pointer:coarse){#klc-story .x{width:44px;height:44px;line-height:44px;font-size:22px}#klc-story h3{margin-right:40px}}
+/* [ui-b:13] a phone on its side (844 x 390, 844 x 340): the card was 126 / 76 px tall, below the HUD's top rows and cut mid-line. It takes the left 46 % of the screen
+   from the top (inside the notch's insets) and scrolls by touch (data-scroll, see mountStoryCard). [ui-b2] It stops above the time dock instead of running to the bottom of the screen:
+   the dock (centred, 26 px above the inset, about 56 px tall) sits under the card's x range, and a 289 px card at 844 x 390 overlapped its top 16 px (it is above the HUD, z-index 38).
+   The reserve is the dock's 26 + 56 and 10 px of air. */
+@media (max-height:520px) and (orientation:landscape){#klc-story{top:calc(12px + env(safe-area-inset-top,0px));left:calc(12px + env(safe-area-inset-left,0px));width:min(380px,46vw);max-height:calc(100vh - 104px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 104px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}}
 `;
 
 /** The story card (DOM): open(pin, lang, edge), close(). Null without a document (tests). */
@@ -120,7 +129,8 @@ export function mountStoryCard(doc = typeof document !== 'undefined' ? document 
   if (typeof doc?.createElement !== 'function' || typeof doc.getElementById !== 'function' || !doc.head?.appendChild || !doc.body?.appendChild) return null;
   if (!doc.getElementById('klc-story-css')) { const st = doc.createElement('style'); st.id = 'klc-story-css'; st.textContent = CSS; doc.head.appendChild(st); }
   const el = doc.createElement('aside');
-  el.id = 'klc-story'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-live', 'polite'); el.hidden = true;
+  // data-scroll: the touch pad vetoes every touchmove outside the elements it lists, [data-scroll] among them (ui/touchpad.js harden()); without it the card cannot be scrolled by touch
+  el.id = 'klc-story'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-live', 'polite'); el.setAttribute('data-scroll', ''); el.hidden = true;
   doc.body.appendChild(el);
   const card = {
     el, current: null,

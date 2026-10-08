@@ -7,11 +7,11 @@
   800,
   -200
  ],
- "note": "c3: 魚浜町 / 浜町 / 本浜町 / 新浜町 / 栄町 edge, the post-2011 raised fish-processing district. Read from Google Earth 3D (imagery 2026-03-11) in raw/ref/earth/c3 (the whole cell plus five 250 m sub-cells n1 n2 m1 m2 s1 with top and four 60-degree obliques each), checked against the GSI photo. Main fixes: the fish plants were 5-8 storey offices (up to 26 m) and are 1-3 storey plants (8-12 m) with solar roofs; the empty raised blocks are bare earth and dry weeds, not lawn; two demolished buildings; new builds.",
+ "note": "c3: 魚浜町 / 浜町 / 本浜町 / 新浜町 / 栄町 edge, the raised fish-processing district. Read from Google Earth 3D (imagery 2026-03-11) in raw/ref/earth/c3 (the whole cell plus five 250 m sub-cells n1 n2 m1 m2 s1 with top and four 60-degree obliques each), checked against the GSI photo. Main fixes: the fish plants were 5-8 storey offices (up to 26 m) and are 1-3 storey plants (8-12 m) with solar roofs; the empty raised blocks are bare earth and dry weeds, not lawn; two demolished buildings; new builds. Round 2: flat-roof colours of the plants and sheds re-read from the Earth top pixels (they were 14-24 L* lighter than Earth).",
  "sources": [
   {
    "id": "earth",
-   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured with tools/anime/earth-ref.mjs into raw/ref/earth/c3 (cell) and raw/ref/earth/c3/{n1,n2,m1,m2,s1} (sub-cells)",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured into a local reference folder (c3) (cell) and raw/ref/earth/c3/{n1,n2,m1,m2,s1} (sub-cells)",
    "date": "2026-03-11"
   },
   {
@@ -57,30 +57,31 @@
    "height": 5.0,
    "roof": {
     "shape": "flat",
-    "color": "#dedfe2"
+    "color": "#a6a0a6"
    },
-   "src": "earth: n1 top + o0, the gas station's long single-storey service building, light grey roof (the app drew 3 storeys and a brown roof)"
+   "src": "earth: n1 top + o0, the gas station's long single-storey service building, light grey roof (the app drew 3 storeys and a brown roof) [r2: roof colour #dedfe2 -> #a6a0a6, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58541/25066/168",
    "height": 4.5,
    "roof": {
     "shape": "flat",
-    "color": "#dedfe2"
+    "color": "#9d9ba2"
    },
-   "src": "earth: n1 top + o0, the station's single-storey sales building, light grey roof; idemitsu: apollostation カーランド鹿折SS (株)気仙沼商会, 新浜町2-2-10",
+   "src": "earth: n1 top + o0, the station's single-storey sales building, light grey roof; idemitsu: apollostation カーランド鹿折SS (株)気仙沼商会, 新浜町2-2-10 [r2: roof colour #dedfe2 -> #9d9ba2, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]",
    "name": "apollostation カーランド鹿折SS",
-   "nameEn": "apollostation Carland Shishiori"
+   "nameEn": "apollostation Carland Shishiori",
+   "storeys": 1
   },
   {
    "id": "16/58541/25067/287",
-   "storeys": 2,
-   "height": 7.5,
+   "storeys": 3,
+   "height": 11.5,
    "roof": {
     "shape": "flat",
-    "color": "#eeeef0"
+    "color": "#bdb8bc"
    },
-   "src": "earth: n1 top + m1 o0, a two-storey box with a flat white roof (was 3 storeys, hip)"
+   "src": "earth: n1 top shadow about 12 m along bearing 340 (sun el about 45 deg), 3 window bands on the east wall [r2: roof colour #eeeef0 -> #bdb8bc, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25066/110",
@@ -103,17 +104,17 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#dedfe2"
+    "color": "#a8a7ac"
    },
-   "src": "earth: n2 o0 / o180, a two-storey warehouse with a light grey roof (was a 6-storey office, 19.8 m)"
+   "src": "earth: n2 o0 / o180, a two-storey warehouse with a light grey roof (was a 6-storey office, 19.8 m) [r2: roof colour #dedfe2 -> #a8a7ac, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25066/118",
    "roof": {
     "shape": "flat",
-    "color": "#dedfe2"
+    "color": "#a8a7ac"
    },
-   "src": "earth: n2 top, the low wing of the same warehouse, light grey roof"
+   "src": "earth: n2 top, the low wing of the same warehouse, light grey roof [r2: roof colour #dedfe2 -> #a8a7ac, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25066/119",
@@ -136,9 +137,9 @@
    "height": 6.0,
    "roof": {
     "shape": "flat",
-    "color": "#c9c8ca"
+    "color": "#a69f9e"
    },
-   "src": "earth: n2 top + o0 / o90 / o180, the low service wing of the 気仙沼ほてい plant, a flat roof with tanks and plant (was a 6-storey apartment block, 17.4 m)"
+   "src": "earth: n2 top + o0 / o90 / o180, the low service wing of the 気仙沼ほてい plant, a flat roof with tanks and plant (was a 6-storey apartment block, 17.4 m) [r2: roof colour #c9c8ca -> #a69f9e, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25066/201",
@@ -147,9 +148,9 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#dcdcde"
+    "color": "#b5b5b7"
    },
-   "src": "earth: n2 o0 / o180, a two-storey depot with a ribbed light grey metal roof (was a 6-storey office, 19.8 m)"
+   "src": "earth: n2 o0 / o180, a two-storey depot with a ribbed light grey metal roof (was a 6-storey office, 19.8 m) [r2: roof colour #dcdcde -> #b5b5b7, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/37",
@@ -158,9 +159,9 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#dcdcde"
+    "color": "#b5b5b7"
    },
-   "src": "earth: n2 top, the south bay of the same depot under one roof (was a gabled house)"
+   "src": "earth: n2 top, the south bay of the same depot under one roof (was a gabled house) [r2: roof colour #dcdcde -> #b5b5b7, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/27",
@@ -169,9 +170,9 @@
    "height": 8.0,
    "roof": {
     "shape": "flat",
-    "color": "#eeeef0"
+    "color": "#bab6ba"
    },
-   "src": "earth: n2 o0, part of the 気仙沼ほてい plant (was a 3-storey shop)"
+   "src": "earth: n2 o0, part of the 気仙沼ほてい plant (was a 3-storey shop) [r2: roof colour #eeeef0 -> #bab6ba, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/31",
@@ -180,10 +181,14 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#a9adb8"
+    "color": "#a9adb8",
+    "pv": {
+     "share": 0.5,
+     "side": "s"
+    }
    },
    "facade": "warehouse",
-   "src": "earth: n2 top + o0 / o90, a two-storey plant with solar panels on the south half of its roof (was a 6-storey apartment block)"
+   "src": "earth: n2 top + o0 / o90, a two-storey plant with solar panels on the south half of its roof (was a 6-storey apartment block) ; pv: modules on the south half of the roof (n2 top)"
   },
   {
    "id": "16/58542/25067/33",
@@ -192,18 +197,22 @@
    "height": 11.0,
    "roof": {
     "shape": "flat",
-    "color": "#7d8596"
+    "color": "#7d8596",
+    "pv": {
+     "share": 0.5,
+     "side": "e"
+    }
    },
-   "src": "earth: n2 top + o0 / o90 / o180, 気仙沼ほてい's main plant, about 11 m, the roof covered in solar panels (was an 8-storey office, 26.4 m)"
+   "src": "earth: n2 top + o0 / o90 / o180, 気仙沼ほてい's main plant, about 11 m, the roof covered in solar panels (was an 8-storey office, 26.4 m) ; pv: the east block of the roof carries the module grid, about half of it (n2 top, PV-blue pixel share 31 % of the whole footprint)"
   },
   {
    "id": "16/58542/25067/35",
    "height": 7.0,
    "roof": {
     "shape": "flat",
-    "color": "#c6c5c9"
+    "color": "#989499"
    },
-   "src": "earth: n2 o0 / o180, a low plant (was 9.3 m)"
+   "src": "earth: n2 o0 / o180, a low plant (was 9.3 m) [r2: roof colour #c6c5c9 -> #989499, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/36",
@@ -212,9 +221,9 @@
    "height": 8.0,
    "roof": {
     "shape": "flat",
-    "color": "#dedfe2"
+    "color": "#a8a4a7"
    },
-   "src": "earth: n2 o0 / o180, 村東商店's two-storey plant (was a 4-storey office)"
+   "src": "earth: n2 o0 / o180, 村東商店's two-storey plant (was a 4-storey office) [r2: roof colour #dedfe2 -> #a8a4a7, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/38",
@@ -254,34 +263,28 @@
    "height": 11.0,
    "roof": {
     "shape": "flat",
-    "color": "#dedcdc"
+    "color": "#c3bdbf"
    },
-   "src": "earth: n2 o90 / o180, 加和喜フーズ's plant, about 11 m, pale roof (was a 6-storey office, 19.8 m)"
+   "src": "earth: n2 o90 / o180, 加和喜フーズ's plant, about 11 m, pale roof (was a 6-storey office, 19.8 m) [r2: roof colour #dedcdc -> #c3bdbf, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/65",
    "height": 10.0,
    "roof": {
     "shape": "flat",
-    "color": "#dedfe2"
+    "color": "#a6a1a8"
    },
-   "src": "earth: n2 o90, about 10 m (was 14.7 m)"
+   "src": "earth: n2 o90, about 10 m (was 14.7 m) [r2: roof colour #dedfe2 -> #a6a1a8, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58541/25067/289",
-   "roof": {
-    "shape": "hip",
-    "color": "#7c7c84"
-   },
-   "src": "earth: m1 top, a dark grey roof now (GSI white)"
+   "remove": true,
+   "src": "earth: c3/m1 + r1003 top and o0/o180: bare asphalt pad since 2020-22; GSI white prefab boxes demolished"
   },
   {
    "id": "16/58541/25067/290",
-   "roof": {
-    "shape": "gable",
-    "color": "#7c7c84"
-   },
-   "src": "earth: m1 top, a dark grey roof now (GSI white)"
+   "remove": true,
+   "src": "earth: c3/m1 + r1003 top and o0/o180: bare asphalt pad since 2020-22; GSI white prefab boxes demolished"
   },
   {
    "id": "16/58541/25067/291",
@@ -296,9 +299,9 @@
    "height": 8.0,
    "roof": {
     "shape": "flat",
-    "color": "#d8d8dc"
+    "color": "#a7a2a6"
    },
-   "src": "earth: m1 o270 + s1 o0, 福寿水産's long two-storey plant (was a 5-storey office, 16.5 m)"
+   "src": "earth: m1 o270 + s1 o0, 福寿水産's long two-storey plant (was a 5-storey office, 16.5 m) [r2: roof colour #d8d8dc -> #a7a2a6, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/1",
@@ -307,18 +310,37 @@
    "height": 12.0,
    "roof": {
     "shape": "flat",
-    "color": "#9da3b0"
+    "color": "#9da3b0",
+    "pv": 0.7
    },
-   "src": "earth: m1 o0 / o90 / o180 / o270, 気仙沼ほてい 魚浜工場, a white plant about 12 m with solar panels over most of the roof (was a 7-storey office, 23.1 m)"
+   "src": "earth: m1 o0 / o90 / o180 / o270, 気仙沼ほてい 魚浜工場, a white plant about 12 m with solar panels over most of the roof (was a 7-storey office, 23.1 m) ; pv: solar modules over most of the roof, about 70 % (m1 top)"
   },
   {
    "id": "16/58542/25067/52",
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#9da3b0"
+    "color": "#9da3b0",
+    "plant": [
+     {
+      "x": 4.9,
+      "z": -10.7,
+      "w": 3.3,
+      "d": 6.4,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -0.5,
+      "z": -5.3,
+      "w": 5,
+      "d": 17.1,
+      "h": 0.5,
+      "kind": "pv"
+     }
+    ]
    },
-   "src": "earth: m1 o0 / o270, the plant's lower north block, solar panels on the roof"
+   "src": "earth: m1 o0 / o270, the plant's lower north block, solar panels on the roof | r3: earth r3 2026-03-11 top (raw/ref/earth/roofs8922/c3_m1/earth_top.png): two module strips on the north block (about 25 % of the 357 m2 roof), lot-local rects +-1.5 m. The polygon is about 3 m off its roof: not moved in this change"
   },
   {
    "id": "16/58542/25067/18",
@@ -327,9 +349,9 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#c8c6ca"
+    "color": "#9e99a0"
    },
-   "src": "earth: m2 top + o0, 勝漁水産's plant, flat grey roof about 9 m (was a 4-storey office with a hip roof)"
+   "src": "earth: m2 top + o0, 勝漁水産's plant, flat grey roof about 9 m (was a 4-storey office with a hip roof) [r2: roof colour #c8c6ca -> #9e99a0, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/42",
@@ -348,9 +370,10 @@
    "height": 10.0,
    "roof": {
     "shape": "flat",
-    "color": "#7d8596"
+    "color": "#7d8596",
+    "pv": 0.9
    },
-   "src": "earth: m2 top + o0, (株)ムラタ's plant, about 10 m, the whole roof under solar panels (was an 8-storey office, 26.4 m)"
+   "src": "earth: m2 top + o0, (株)ムラタ's plant, about 10 m, the whole roof under solar panels (was an 8-storey office, 26.4 m) ; pv: the whole roof under modules, about 90 % (m2 top)"
   },
   {
    "id": "16/58542/25067/45",
@@ -364,9 +387,9 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#d6d6d8"
+    "color": "#adabb0"
    },
-   "src": "fukuju: 福寿水産 本浜工場, 本浜町1-62-1; earth: m2 top + o0, 福寿水産's plant, about 9 m (was a 5-storey office)",
+   "src": "fukuju: 福寿水産 本浜工場, 本浜町1-62-1; earth: m2 top + o0, 福寿水産's plant, about 9 m (was a 5-storey office) [r2: roof colour #d6d6d8 -> #adabb0, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]",
    "name": "福寿水産 本浜工場",
    "nameEn": "Fukuju Suisan Honhama plant"
   },
@@ -377,9 +400,9 @@
    "height": 10.0,
    "roof": {
     "shape": "flat",
-    "color": "#cfd3d3"
+    "color": "#b3b2b7"
    },
-   "src": "earth: m2 top + o0, (株)一番's plant, about 10 m, pale grey roof with a green-painted bay (was a 5-storey office)"
+   "src": "earth: m2 top + o0, (株)一番's plant, about 10 m, pale grey roof with a green-painted bay (was a 5-storey office) [r2: roof colour #cfd3d3 -> #b3b2b7, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/48",
@@ -388,9 +411,9 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#cfd0d4"
+    "color": "#a4a0a6"
    },
-   "src": "earth: m2 top + o0, あかふさ食品's plant, grey roof now (GSI pale blue), about 9 m (was a 5-storey office)"
+   "src": "earth: m2 top + o0, あかふさ食品's plant, grey roof now (GSI pale blue), about 9 m (was a 5-storey office) [r2: roof colour #cfd0d4 -> #a4a0a6, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58542/25067/59",
@@ -399,9 +422,10 @@
    "height": 10.0,
    "roof": {
     "shape": "flat",
-    "color": "#8a92a2"
+    "color": "#8a92a2",
+    "pv": 0.7
    },
-   "src": "earth: m2 top + o0, マルトヨ食品's plant, about 10 m, solar panels over most of a flat roof (was an 8-storey office with a saw roof, 26.4 m)"
+   "src": "earth: m2 top + o0, マルトヨ食品's plant, about 10 m, solar panels over most of a flat roof (was an 8-storey office with a saw roof, 26.4 m) ; pv: modules over most of the flat roof, about 70 % (m2 top)"
   },
   {
    "id": "16/58542/25067/78",
@@ -421,9 +445,9 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#dadada"
+    "color": "#b5b1b2"
    },
-   "src": "earth: m2 top + o0, 新和エンジンサービス's works, a two-storey shed about 9 m (was a 6-storey office, 19.8 m)"
+   "src": "earth: m2 top + o0, 新和エンジンサービス's works, a two-storey shed about 9 m (was a 6-storey office, 19.8 m) [r2: roof colour #dadada -> #b5b1b2, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "16/58541/25067/332",
@@ -434,7 +458,10 @@
    "id": "16/58541/25068/16",
    "storeys": 3,
    "height": 10.0,
-   "src": "earth: s1 o0 / o180, the hotel's upper wing is no taller than the terraces (was 6 storeys, 17.4 m)"
+   "src": "earth: s1 o0 / o180, the hotel's upper wing is no taller than the terraces (was 6 storeys, 17.4 m) [r2: roof colour #a89da4, the Earth top-view reading of the weathered grey concrete roof; the derived aerial colour #807878 was 15 L* darker]",
+   "roof": {
+    "color": "#a89da4"
+   }
   },
   {
    "id": "16/58541/25067/381",
@@ -463,9 +490,10 @@
    "height": 7.5,
    "roof": {
     "shape": "flat",
-    "color": "#7a8490"
+    "color": "#7a8490",
+    "pv": 0.6
    },
-   "src": "earth: s1 top + o180, a two-storey row with blue-grey roofs (was 4 storeys, 13.2 m)"
+   "src": "earth: s1 top + o180, a two-storey row with blue-grey roofs (was 4 storeys, 13.2 m) ; pv: dark PV module grid over about 60 % of the flat roof (n/m top view, PV-blue pixel share 43 %)"
   },
   {
    "id": "16/58541/25067/363",
@@ -474,9 +502,27 @@
    "height": 9.0,
    "roof": {
     "shape": "flat",
-    "color": "#8a92a2"
+    "color": "#8a92a2",
+    "plant": [
+     {
+      "x": 4.8,
+      "z": -9,
+      "w": 20.7,
+      "d": 11.3,
+      "h": 0.5,
+      "kind": "pv"
+     }
+    ]
    },
-   "src": "earth: s1 top + m1 o180, the plant by the quay has solar panels over its roof, about 9 m"
+   "src": "earth: s1 top + m1 o180, the plant by the quay has solar panels over its roof, about 9 m | r3: earth r3 2026-03-11 top (raw/ref/earth/roofs8922/c3_s1/earth_top.png): only the north rect sits on 5-6 module strips; the two south rects measured earlier ({2.8,11.6,13.2,6} uniformly dark-blue shade with no module pattern, {-0.3,2.8,19.3,3.6} thin louvre or duct slits) are NOT solar and are dropped. The polygon is about 3 m off its roof: not moved in this change"
+  },
+  {
+   "id": "16/58542/25067/15",
+   "roof": {
+    "shape": "flat",
+    "color": "#c9c0ba"
+   },
+   "src": "earth: c3_m2 top, flat cream deck with white parapet and rooftop rooms (was a pitched gable)"
   }
  ],
  "newLots": [
@@ -484,30 +530,29 @@
    "id": "ovr:c3:sakae-house-a",
    "poly": [
     [
-     321,
-     -697
+     332.6,
+     -697.2
     ],
     [
-     337,
-     -697
+     330.1,
+     -686.2
     ],
     [
-     337,
-     -683
+     314.6,
+     -689.7
     ],
     [
-     321,
-     -683
+     317.1,
+     -700.7
     ]
    ],
    "kind": "house",
    "storeys": 2,
    "roof": {
     "shape": "hip",
-    "color": "#6e6c72",
-    "ridge": "x"
+    "color": "#6e6c72"
    },
-   "src": "earth: n1 top + o0, a new two-storey house with a grey hip roof on what GSI shows as an empty plot"
+   "src": "osm: w1286457725 ring + earth: n1/r1003 top, the dark hip-roofed house is this rotated rectangle (about 15 x 12 m, about 15 deg); ridge along the long side"
   },
   {
    "id": "ovr:c3:sakae-house-b",
@@ -563,9 +608,9 @@
    "height": 4.5,
    "roof": {
     "shape": "flat",
-    "color": "#d0d0d2"
+    "color": "#b4b1b6"
    },
-   "src": "earth: n1 top + m1 o0, a new single-storey shop with a light grey roof and marked parking in front, on a plot GSI shows as weeds"
+   "src": "earth: n1 top + m1 o0, a new single-storey shop with a light grey roof and marked parking in front, on a plot GSI shows as weeds [r2: roof colour #d0d0d2 -> #b4b1b6, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:yard-shed-1",
@@ -591,9 +636,9 @@
    "height": 2.6,
    "roof": {
     "shape": "flat",
-    "color": "#cfd0d2"
+    "color": "#aeaeb0"
    },
-   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard"
+   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard [r2: roof colour #cfd0d2 -> #aeaeb0, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:yard-shed-2",
@@ -619,9 +664,9 @@
    "height": 2.6,
    "roof": {
     "shape": "flat",
-    "color": "#cfd0d2"
+    "color": "#aeaeb0"
    },
-   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard"
+   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard [r2: roof colour #cfd0d2 -> #aeaeb0, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:yard-shed-3",
@@ -647,9 +692,9 @@
    "height": 2.6,
    "roof": {
     "shape": "flat",
-    "color": "#cfd0d2"
+    "color": "#aeaeb0"
    },
-   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard"
+   "src": "earth: n1 top, a prefab shed at the edge of the gravel yard [r2: roof colour #cfd0d2 -> #aeaeb0, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:hamacho-plant-n",
@@ -676,9 +721,9 @@
    "height": 8.0,
    "roof": {
     "shape": "flat",
-    "color": "#c4c4c8"
+    "color": "#b6b4b7"
    },
-   "src": "earth: m2 top + o0, a new two-storey plant east of あかふさ食品, on what GSI shows as a truck yard"
+   "src": "earth: m2 top + o0, a new two-storey plant east of あかふさ食品, on what GSI shows as a truck yard [r2: roof colour #c4c4c8 -> #b6b4b7, the Earth top-view reading of the visible roof]"
   },
   {
    "id": "ovr:c3:hamacho-plant-s",
@@ -705,9 +750,9 @@
    "height": 7.0,
    "roof": {
     "shape": "flat",
-    "color": "#c9c6bc"
+    "color": "#bbb6b0"
    },
-   "src": "earth: m2 top + o0, a new low plant by the quay road (a tan and a grey roof bay), on what GSI shows as open paving"
+   "src": "earth: m2 top + o0, a new low plant by the quay road (a tan and a grey roof bay), on what GSI shows as open paving [r2: roof colour #c9c6bc -> #bbb6b0, the Earth top-view reading of the visible roof]"
   },
   {
    "id": "ovr:c3:hamacho-n-new",
@@ -761,10 +806,10 @@
    "height": 2.6,
    "roof": {
     "shape": "flat",
-    "color": "#e4e6e4"
+    "color": "#c8c6cb"
    },
    "wall": "#2f6a6a",
-   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one)"
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one) [r2: roof colour #e4e6e4 -> #c8c6cb, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:corner-prefab-2",
@@ -790,10 +835,10 @@
    "height": 2.6,
    "roof": {
     "shape": "flat",
-    "color": "#e4e6e4"
+    "color": "#c8c6cb"
    },
    "wall": "#2f6a6a",
-   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one); the north-east corner clipped at road r9781's south kerb (the unit sits along the road)"
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one); the north-east corner clipped at road r9781's south kerb (the unit sits along the road) [r2: roof colour #e4e6e4 -> #c8c6cb, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:corner-prefab-3",
@@ -819,10 +864,10 @@
    "height": 2.6,
    "roof": {
     "shape": "flat",
-    "color": "#e4e6e4"
+    "color": "#c8c6cb"
    },
    "wall": "#2f6a6a",
-   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one)"
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one) [r2: roof colour #e4e6e4 -> #c8c6cb, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:corner-prefab-4",
@@ -848,10 +893,10 @@
    "height": 2.6,
    "roof": {
     "shape": "flat",
-    "color": "#e4e6e4"
+    "color": "#c8c6cb"
    },
    "wall": "#2f6a6a",
-   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one)"
+   "src": "earth: n1 top + o0/o90/o180/o270, four prefab units on the corner gravel (GSI: one) [r2: roof colour #e4e6e4 -> #c8c6cb, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:yard-shed-s",
@@ -880,6 +925,7 @@
     "color": "#9a7f78",
     "ridge": "x"
    },
+   "wall": "#3e4350",
    "src": "earth: m2 top + o0/o90/o180, a shed on the yard's south edge along the road, two-tone mauve/tan roof (GSI: vacant)"
   },
   {
@@ -910,9 +956,9 @@
    "height": 4.5,
    "roof": {
     "shape": "flat",
-    "color": "#d6d7d4"
+    "color": "#aaa5a7"
    },
-   "src": "earth: m2 top + o0/o90/o180/o270, low white plant blocks south-west of マルトヨ食品 (GSI shows them; no GSI footprint)"
+   "src": "earth: m2 top + o0/o90/o180/o270, low white plant blocks south-west of マルトヨ食品 (GSI shows them; no GSI footprint) [r2: roof colour #d6d7d4 -> #aaa5a7, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:marutoyo-annex-e",
@@ -938,9 +984,9 @@
    "height": 4.5,
    "roof": {
     "shape": "flat",
-    "color": "#d6d7d4"
+    "color": "#aea8a9"
    },
-   "src": "earth: m2 top + o0/o90/o180/o270, low white plant blocks south-west of マルトヨ食品 (GSI shows them; no GSI footprint)"
+   "src": "earth: m2 top + o0/o90/o180/o270, low white plant blocks south-west of マルトヨ食品 (GSI shows them; no GSI footprint) [r2: roof colour #d6d7d4 -> #aea8a9, the Earth top-view reading of the visible roof (the pale default sat 14-24 L* above it)]"
   },
   {
    "id": "ovr:c3:boyo-hall",
@@ -1080,11 +1126,11 @@
    "height": 17,
    "roof": {
     "shape": "flat",
-    "color": "#b0aeb2"
+    "color": "#928a8d"
    },
    "name": "旧ホテル望洋館",
    "nameEn": "former Hotel Boyo",
-   "src": "osm: way 781684041 building:levels 6; web: 5階建て per burankoutyu.com/?p=450; earth: t-boyo top + o0/o90, terraced flat roofs (2D drape, no height)"
+   "src": "osm: way 781684041 building:levels 6; web: 5階建て per burankoutyu.com/?p=450; earth: t-boyo top + o0/o90, terraced flat roofs (2D drape, no height) [r2: roof colour #b0aeb2 -> #928a8d, the Earth top-view reading of the visible roof]"
   }
  ],
  "landuse": [
@@ -1675,6 +1721,410 @@
     ]
    ],
    "src": "earth 2026-03-11 c3/r1003 top + pair_o0: closed broadleaf woods on the east and south-east slopes of 陣山 between the terraces and the 3丁目 back lots; GSI photo agrees"
+  },
+  {
+   "use": "apron",
+   "ring": [
+    [
+     462.5,
+     -620
+    ],
+    [
+     470,
+     -628.5
+    ],
+    [
+     509.5,
+     -628.5
+    ],
+    [
+     509.5,
+     -574
+    ],
+    [
+     462.5,
+     -574
+    ]
+   ],
+   "src": "earth: c3/m1 + r1003 top (corners read on a 5 m ENU grid projected through the capture camera), one smooth dark-grey asphalt pad between the two roads next to 新浜町公園, no bays, no cars; GSI prefab boxes demolished"
+  },
+  {
+   "use": "park",
+   "replace": true,
+   "name": "新浜町公園",
+   "ring": [
+    [
+     461.7,
+     -571.9
+    ],
+    [
+     507.7,
+     -574
+    ],
+    [
+     510.9,
+     -525.4
+    ],
+    [
+     508.5,
+     -522.4
+    ],
+    [
+     464.1,
+     -542.4
+    ]
+   ],
+   "holes": [
+    [
+     [
+      502.5,
+      -554.3
+     ],
+     [
+      502.0,
+      -550.9
+     ],
+     [
+      500.7,
+      -547.6
+     ],
+     [
+      498.6,
+      -544.9
+     ],
+     [
+      495.8,
+      -542.8
+     ],
+     [
+      492.6,
+      -541.5
+     ],
+     [
+      489.2,
+      -541.0
+     ],
+     [
+      485.8,
+      -541.5
+     ],
+     [
+      482.6,
+      -542.8
+     ],
+     [
+      479.8,
+      -544.9
+     ],
+     [
+      477.7,
+      -547.6
+     ],
+     [
+      476.4,
+      -550.9
+     ],
+     [
+      475.9,
+      -554.3
+     ],
+     [
+      476.4,
+      -557.7
+     ],
+     [
+      477.7,
+      -560.9
+     ],
+     [
+      479.8,
+      -563.7
+     ],
+     [
+      482.5,
+      -565.8
+     ],
+     [
+      485.8,
+      -567.1
+     ],
+     [
+      489.2,
+      -567.6
+     ],
+     [
+      492.6,
+      -567.1
+     ],
+     [
+      495.8,
+      -565.8
+     ],
+     [
+      498.6,
+      -563.7
+     ],
+     [
+      500.7,
+      -560.9
+     ],
+     [
+      502.0,
+      -557.7
+     ]
+    ]
+   ],
+   "src": "earth: pk-c-r2 top: the dormant lawn round the amphitheatre; the park stays a lawn (the OSM ring), re-laid as an override park with the amphitheatre bowl as a hole, because a levee bowl laid over the OSM lawn z-fights with it on the 8 m drape triangles (ragged edge); the override lawn rides above the paving class lifts"
+  },
+  {
+   "use": "levee",
+   "name": "新浜町公園 amphitheatre",
+   "ring": [
+    [
+     502.5,
+     -554.3
+    ],
+    [
+     502.0,
+     -550.9
+    ],
+    [
+     500.7,
+     -547.6
+    ],
+    [
+     498.6,
+     -544.9
+    ],
+    [
+     495.8,
+     -542.8
+    ],
+    [
+     492.6,
+     -541.5
+    ],
+    [
+     489.2,
+     -541.0
+    ],
+    [
+     485.8,
+     -541.5
+    ],
+    [
+     482.6,
+     -542.8
+    ],
+    [
+     479.8,
+     -544.9
+    ],
+    [
+     477.7,
+     -547.6
+    ],
+    [
+     476.4,
+     -550.9
+    ],
+    [
+     475.9,
+     -554.3
+    ],
+    [
+     476.4,
+     -557.7
+    ],
+    [
+     477.7,
+     -560.9
+    ],
+    [
+     479.8,
+     -563.7
+    ],
+    [
+     482.5,
+     -565.8
+    ],
+    [
+     485.8,
+     -567.1
+    ],
+    [
+     489.2,
+     -567.6
+    ],
+    [
+     492.6,
+     -567.1
+    ],
+    [
+     495.8,
+     -565.8
+    ],
+    [
+     498.6,
+     -563.7
+    ],
+    [
+     500.7,
+     -560.9
+    ],
+    [
+     502.0,
+     -557.7
+    ]
+   ],
+   "holes": [
+    [
+     [
+      489.7,
+      -553.6
+     ],
+     [
+      498.4,
+      -554.5
+     ],
+     [
+      498.2,
+      -550
+     ],
+     [
+      494.4,
+      -545.9
+     ],
+     [
+      489.0,
+      -550.1
+     ]
+    ]
+   ],
+   "src": "earth: c3 land2 round 2 (raw/ref/earth/c3/pk-c-r2 top, 20 px/m): the circular terraced amphitheatre (ring path, terrace band and floor), about 26.6 m across, centred (489.2, -554.3) in dormant brown grass; Earth median #948882 (ring #988a85, floor #90867f); the app lawn is +7 dL and dE2000 13.6 off, levee (render about #9b9496) 5.9; the park polygon stays; a cream plaza disc of r 12.5 (the first-pass value) renders at dL +20, dE2000 20.6, so the pale pad is cut out and drawn alone"
+  },
+  {
+   "use": "plaza",
+   "name": "新浜町公園 pad",
+   "ring": [
+    [
+     489.7,
+     -553.6
+    ],
+    [
+     498.4,
+     -554.5
+    ],
+    [
+     498.2,
+     -550
+    ],
+    [
+     494.4,
+     -545.9
+    ],
+    [
+     489.0,
+     -550.1
+    ]
+   ],
+   "src": "earth: pk-c-r2 top, the pale paved pad of the amphitheatre (a wedge about 9 x 8 m, x 489..498, z -554.5..-546), Earth median #beb5b2, plaza render #d6d0c5 (dE2000 8.1)"
+  },
+  {
+   "use": "vacant",
+   "replace": true,
+   "name": "4号公園",
+   "ring": [
+    [
+     373,
+     -770.2
+    ],
+    [
+     373.2,
+     -782.9
+    ],
+    [
+     369.9,
+     -822.6
+    ],
+    [
+     372.5,
+     -824.2
+    ],
+    [
+     404.1,
+     -811.7
+    ],
+    [
+     405.5,
+     -808.9
+    ],
+    [
+     402.3,
+     -770
+    ]
+   ],
+   "src": "earth: c3 land2 round 2 (raw/ref/earth/c3/pk-d-r2 top, 14 px/m): 4号公園 (Earth label 栄町公園) is a bare graded tan plot, Earth median #968782, no lawn; ring = the OSM polygon, replace drops the OSM park; gravel like the 374..402 plot south of it, so the two read as one levelled plot"
+  }
+ ],
+ "arrows": [
+  {
+   "road": "r11277",
+   "node": [
+    455.2,
+    -636.1
+   ],
+   "lanes": [
+    "S",
+    "S"
+   ],
+   "src": "earth: n1 top view (2026-03-11): straight-ahead arrows in both inbound lanes of the 4-lane 気仙沼唐桑線 (north arm) at the 鹿折 junction"
+  },
+  {
+   "road": "r11280",
+   "node": [
+    455.2,
+    -636.1
+   ],
+   "lanes": [
+    "S",
+    "S"
+   ],
+   "src": "earth: n1 top view (2026-03-11): straight-ahead arrows in both inbound lanes of the 4-lane 気仙沼唐桑線 (south arm), with the crossing-ahead ◇ about 30 m before the zebra"
+  }
+ ],
+ "crossings": [
+  {
+   "at": [
+    455.6,
+    -645
+   ],
+   "road": "r11277",
+   "src": "earth: n1 top (2026-03-11): the 鹿折 junction of the 4-lane 気仙沼唐桑線 with the E-W road has a zebra on all four arms"
+  },
+  {
+   "at": [
+    464.2,
+    -636.3
+   ],
+   "road": "r11278",
+   "src": "earth: n1 top (2026-03-11): the 鹿折 junction of the 4-lane 気仙沼唐桑線 with the E-W road has a zebra on all four arms"
+  },
+  {
+   "at": [
+    446.2,
+    -636.4
+   ],
+   "road": "r11279",
+   "src": "earth: n1 top (2026-03-11): the 鹿折 junction of the 4-lane 気仙沼唐桑線 with the E-W road has a zebra on all four arms"
+  },
+  {
+   "at": [
+    454.8,
+    -627.1
+   ],
+   "road": "r11280",
+   "src": "earth: n1 top (2026-03-11): the 鹿折 junction of the 4-lane 気仙沼唐桑線 with the E-W road has a zebra on all four arms"
   }
  ]
 }

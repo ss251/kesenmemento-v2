@@ -42,6 +42,8 @@
 //   * Voice caps per category; finished voices are stopped and disconnected.
 //   * Runtime variation uses a seeded PRNG (never Math.random()).
 
+import { createAudioSession } from './audio-session.js';   // [ui-c] iPhone: the silent switch and a call must not leave the town mute (core/audio-session.js)
+
 const TAU = Math.PI * 2;
 const LA = 0.25;                       // scheduler look-ahead (s)
 const CTL = 0.024;                     // control-rate period (s, audio clock)
@@ -406,9 +408,11 @@ export function createAudio(options = {}) {
   const R = prng(Number(O.seed) >>> 0);
   R.pick = (a) => a[Math.floor(R() * a.length)];
   let ac = null, N = null, SR = 48000, offline = false, failed = false, lastCtl = -1, hooked = false;
+  let session = null;   // [ui-c] the iPhone audio session + resume-on-touch (only for a context this engine creates itself)
   let masterVol = clamp(Number(O.master) || 0, 0, 2), muted = !!O.muted, srcLive = 0, hrtfLive = 0, suspendTimer = null, jaVoice = null, meterBuf = null;
+  let underOn = false;   // [play:underwater] remembered if setUnderwater runs before start()
   const LS = { x: 0, y: 1.6, z: 0, fx: 0, fy: 0, fz: -1, ux: 0, uy: 1, uz: 0 }, LA_ = { x: NaN };
-  const handles = new Set(), voices = [], disposals = [], cache = new Map(), warm = [], warned = new Set();
+  const handles = new Set(), voices = [], disposals = [], cache = new Map(), extraBuf = new Map(), warm = [], warned = new Set();
   const CAP = { sfx: 16, bird: 5, town: 3 };
   const HRTF_VOICES = 8;                                   // one-shots using HRTF at once (the rest: equal-power)
   const SILENT = new Set(['footstep', 'footsteps', 'step']); // removed on purpose: accepted and ignored
@@ -447,8 +451,13 @@ export function createAudio(options = {}) {
   }
   function buf(key) {
     let b = cache.get(key); if (b) return b;
-    const data = synthKey(key, SR), ch = Array.isArray(data) ? data : [data];
-    b = ac.createBuffer(ch.length, ch[0].length, SR);
+    const extra = extraBuf.get(key);
+    // [mobile-perf] O.noteRate (the phone: 32 kHz): the music's notes are synthesised at that rate (WebAudio resamples them on playback): the
+    // note buffers were ~32 MB of the phone's heap at 48 kHz. Partials above 0.46 x the rate are left out (addDamped), here everything above
+    // ~14.7 kHz, which a phone speaker barely plays; the noise loops, effects and the reverb keep the context's rate.
+    const sr = !extra && O.noteRate > 0 && key.startsWith('n:') ? Math.min(SR, O.noteRate) : SR;
+    const data = extra ? extra(SR) : synthKey(key, sr), ch = Array.isArray(data) ? data : [data];
+    b = ac.createBuffer(ch.length, ch[0].length, sr);
     ch.forEach((d, i) => b.getChannelData(i).set(d));
     cache.set(key, b); return b;
   }
@@ -575,8 +584,11 @@ export function createAudio(options = {}) {
       const v = voice('sfx', { pos, dist, gain: vol * def.gain * fade, ref: def.ref, roll: def.roll || 1, wet: pos && def.wet ? (def.wet === 'hi' ? N.wetHi : N.wetLo) : null, pa: def.pa, pan: Number(o.pan) || 0, hq: true });
       if (!v) return null;
       v.name = name; v.base = vol * def.gain * fade; v.pos = pos ? { x: pos.x, y: pos.y, z: pos.z } : null;
-      if (def.buf) vSrc(v, R.pick(def.buf), t0, 1, 1 + (R() * 2 - 1) * (def.jitter || 0));
-      if (def.notes) for (const [t, inst, midi, vel] of def.notes()) vSrc(v, `n:${inst}:${midi}`, t0 + t, vel, 1);
+      const semi = Number(o.pitch);
+      const pr = Number.isFinite(semi) && semi !== 0 ? Math.pow(2, clamp(semi, -24, 24) / 12) : 1;
+      const jr = pr * (1 + (R() * 2 - 1) * (def.jitter || 0));
+      if (def.buf) vSrc(v, R.pick(def.buf), t0, 1, jr);
+      if (def.notes) for (const [t, inst, midi, vel] of def.notes()) vSrc(v, `n:${inst}:${midi}`, t0 + t, vel, pr);
       if (def.speech && o.text) speakLater(String(o.text), pos, vol, def.speech + (t0 - now));
       return { stop: () => { try { killVoice(v); } catch (e) { /* */ } } };
     } catch (e) { warnOnce('play:' + name, 'play failed', name, e); return null; }
@@ -678,7 +690,7 @@ export function createAudio(options = {}) {
       I.nodes.push(I.fg, I.air, I.panner);
       placeLoop(I, now, true);
     }
-    try { def.build(I, now); } catch (e) { disposeLoop(I); throw e; }
+    try { def.build(I, now, { ac, playSrc, G, OSC, BQ, NOISE }); } catch (e) { disposeLoop(I); throw e; }
     if (h.stopped) { disposeLoop(I); return; }
     h.impl = I;
   }
@@ -702,6 +714,7 @@ export function createAudio(options = {}) {
     try { if (on) I.in.connect(I.vg); else I.in.disconnect(); } catch (e) { /* */ }
   }
   function disposeLoop(I) {
+    try { if (typeof I.stop === 'function') I.stop(); } catch (e) { /* a play loop's interval */ }
     I.tick = null; I.setParam = null;
     for (const s of I.srcs) { try { s.stop(); } catch (e) { /* */ } try { s.disconnect(); } catch (e) { /* */ } }
     for (const n of I.nodes) { try { n.disconnect(); } catch (e) { /* */ } }
@@ -970,7 +983,9 @@ export function createAudio(options = {}) {
     N.comp.threshold.value = -10; N.comp.knee.value = 8; N.comp.ratio.value = 4; N.comp.attack.value = 0.002; N.comp.release.value = 0.25;
     N.pre = G(0.25); N.clip = ac.createWaveShaper(); N.clip.curve = clipCurve(); N.clip.oversample = 'none';   // hard ceiling 0.97
     N.mute = G(muted ? 0 : 1);
-    N.bus.connect(N.master); N.master.connect(N.comp); N.comp.connect(N.pre); N.pre.connect(N.clip); N.clip.connect(N.mute); N.mute.connect(ac.destination);
+    N.under = ac.createBiquadFilter();   // [play:underwater] the town goes muffled under the surface; the leap opens it again
+    N.under.type = 'lowpass'; N.under.frequency.value = underOn ? 680 : 19000; N.under.Q.value = 0.7;
+    N.bus.connect(N.under); N.under.connect(N.master); N.master.connect(N.comp); N.comp.connect(N.pre); N.pre.connect(N.clip); N.clip.connect(N.mute); N.mute.connect(ac.destination);
     N.meter = ac.createAnalyser(); N.meter.fftSize = 2048; N.mute.connect(N.meter);
   }
   function hookPage() {
@@ -983,6 +998,54 @@ export function createAudio(options = {}) {
       } catch (e) { /* */ }
     });
   }
+  function hearWanted() {
+    try { return typeof location !== 'undefined' && /(^|[?&])hear=1(&|$)/.test(location.search || ''); } catch (e) { return false; }
+  }
+  // [play] ?hear=1 taps the live master after start(). The shot tool records this graph.
+  // It is not an OfflineAudioContext render of a voice.
+  function installHear() {
+    try {
+      if (typeof ac.createScriptProcessor !== 'function') return;
+      const sp = ac.createScriptProcessor(4096, 1, 1);
+      const chunks = [];
+      let n = 0;
+      let on = true;
+      sp.onaudioprocess = (e) => {
+        if (!on) return;
+        const c = e.inputBuffer.getChannelData(0);
+        const copy = new Float32Array(c.length);
+        copy.set(c);
+        chunks.push(copy);
+        n += c.length;
+      };
+      N.mute.connect(sp);
+      const z = G(0);
+      sp.connect(z);
+      z.connect(ac.destination);
+      const api = {
+        get samples() { return n; },
+        get rate() { return ac.sampleRate; },
+        stop() { on = false; },
+        pcm() {
+          const out = new Int16Array(n);
+          let w = 0;
+          for (let i = 0; i < chunks.length; i++) {
+            const c = chunks[i];
+            for (let k = 0; k < c.length; k++) {
+              const s = c[k] < -1 ? -1 : c[k] > 1 ? 1 : c[k];
+              out[w++] = s < 0 ? s * 0x8000 : s * 0x7fff;
+            }
+          }
+          const bytes = new Uint8Array(out.buffer);
+          let bin = '';
+          const step = 8192;
+          for (let i = 0; i < bytes.length; i += step) bin += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(bytes.length, i + step)));
+          return btoa(bin);
+        },
+      };
+      try { globalThis.__hear = api; } catch (e) { /* */ }
+    } catch (e) { warnOnce('hear', 'capture tap failed', e); }
+  }
   function start() {
     try {
       if (failed) return;
@@ -991,6 +1054,10 @@ export function createAudio(options = {}) {
       else {
         const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
         if (!AC) { failed = true; return; }
+        // [ui-c] iPhone: the audio session becomes 'playback' (the ring/silent switch no longer mutes the town) before the context exists, and any
+        // touch resumes a context a call, Siri or the lock screen interrupted (start() runs inside the 「まちへ出る」 gesture)
+        session = createAudioSession({ getContext: () => ac, isMuted: () => muted, isHidden: hidden });
+        session.apply(); session.arm();
         try { ac = new AC({ latencyHint: 'balanced' }); } catch (e) { ac = new AC(); }
       }
       offline = typeof OfflineAudioContext !== 'undefined' && ac instanceof OfflineAudioContext;
@@ -999,7 +1066,9 @@ export function createAudio(options = {}) {
       buildGraph();
       applyListener(true);
       warm.push(...PREWARM);
-      if (O.ambience) for (const n of ['wind', 'birds', 'town']) loop(n, { volume: 1 });
+      const hear = hearWanted();
+      if (hear && !offline) installHear();
+      if (O.ambience && !hear) for (const n of ['wind', 'birds', 'town']) loop(n, { volume: 1 });
       for (const h of handles) if (!h.impl && !h.stopped) { try { bind(h); } catch (e) { warnOnce('bind:' + h.name, 'loop failed', h.name, e); } }
       if (!offline) { if (ac.state !== 'running' && !muted) ac.resume().catch(() => {}); hookPage(); if (muted) applyMute(); }
       initSpeech();
@@ -1073,18 +1142,54 @@ export function createAudio(options = {}) {
         if (!offline && ac.state !== 'running' && !hidden()) ac.resume().catch(() => {});
         ramp(N.mute.gain, 1, 0.35);
       }
+      session?.sync();   // [ui-c] the older-iOS silent element follows the mute
     } catch (e) { warnOnce('mute', 'mute failed', e); }
+  }
+
+  function captureStream() {
+    try {
+      if (!ac || !N?.mute) return null;
+      if (!N.cap) {
+        N.cap = ac.createMediaStreamDestination();
+        N.mute.connect(N.cap);
+      }
+      return N.cap.stream;
+    } catch (e) { return null; }
+  }
+
+  function setUnderwater(on) {
+    underOn = !!on;
+    if (!ac || !N?.under) return;
+    const target = underOn ? 680 : 19000;
+    try { glide(N.under.frequency, target, 0.08); } catch (e) { try { N.under.frequency.value = target; } catch (e2) { /* */ } }
   }
 
   const api = {
     get ready() { return !!ac && !!N && !failed; },
     get context() { return ac; },
+    /** The master gain, before mute. A capture can tap it without changing what the town hears. */
+    get output() { return N ? N.master : null; },
+    get session() { return session ? session.stats : null; },   // [ui-c] { type, supported, fallback, resumes, armed, error } (the ?dbg=1 strip prints it)
     get muted() { return muted; },
     set muted(v) { muted = !!v; applyMute(); },
     get master() { return masterVol; },
     setMaster(v) { try { masterVol = clamp(Number(v) || 0, 0, 2); if (ac && N) glide(N.master.gain, masterVol, 0.05); } catch (e) { /* */ } },
-    start, update, loop, play,
-    names: { loops: Object.keys(LOOPS), oneShots: Object.keys(SFX) },
+    start, update, loop, play, setUnderwater, captureStream,
+    get names() { return { loops: Object.keys(LOOPS), oneShots: Object.keys(SFX) }; },
+    // [play] features register voices here instead of opening a second AudioContext. Buffers render on first play, after start().
+    registerBuffer(key, fn) {
+      if (typeof key !== 'string' || typeof fn !== 'function') return false;
+      extraBuf.set(key, fn); cache.delete(key); return true;
+    },
+    registerSfx(name, def) {
+      if (typeof name !== 'string' || !def || typeof def !== 'object' || hasOwn(SFX, name)) return false;
+      SFX[name] = def; return true;
+    },
+    register(name, def) { return api.registerSfx(name, def); },
+    registerLoop(name, def) {
+      if (typeof name !== 'string' || !def || typeof def.build !== 'function' || hasOwn(LOOPS, name)) return false;
+      LOOPS[name] = def; return true;
+    },
     meter() {
       try {
         if (!N || !N.meter) return { rms: 0, peak: 0 };

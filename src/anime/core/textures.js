@@ -43,6 +43,17 @@ export function capCanvas(c, max) {
   return d;
 }
 
+/** [mobile-perf] A DataTexture built once and never written again: drop its CPU array after the upload (three keeps `image.data` for a
+ *  re-upload that never comes; a lost WebGL context reloads the page, core/survive.js). The size stays in userData.freed. -> the texture */
+export function freeDataOnUpload(t) {
+  t.onUpdate = () => {
+    t.onUpdate = null;
+    const im = t.image;
+    if (im && im.data) { t.userData.freed = [im.width, im.height]; im.data = null; }
+  };
+  return t;
+}
+
 export function createTextures({ maxSide = 0 } = {}) {   // [v4:phone] maxSide: downscale finished canvases to this many px
   const cache = new Map();
   let pixelBudget = 0;

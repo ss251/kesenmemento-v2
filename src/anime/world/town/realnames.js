@@ -11,8 +11,14 @@ import * as THREE from 'three';
 const CELL_W = 256, CELL_H = 44, TEX = 1024, COLS = Math.floor(TEX / CELL_W), ROWS = Math.floor(TEX / CELL_H);
 const PER_TEX = COLS * ROWS;
 /** Board colours by use: public buildings white on navy / green, shops cream on their trade colour. */
+export const CHARCOAL = '#2f3133';
+/** [v6:c5] a shop an override names carries a charcoal fascia with white lettering (島田呉服店, Commons 2026-09-24) */
+export const isCharcoal = (lot) => lot?.kind === 'shop' && lot.src?.name === 'override';
+/** [v6:c5] a vertical (縦書き) board on the street corner, by lot id: 島田呉服店's tall 「しまだ」 sign */
+export const CORNER_VBOARD = { '16/58540/25068/58': 'しまだ' };
 function coloursOf(lot, k) {
   const u = lot.use || '', f = lot.facility || '';
+  if (isCharcoal(lot)) return [CHARCOAL, '#ffffff'];
   if (/school|kindergarten|college/.test(u + f)) return ['#f4f1e8', '#1f3f6e'];
   if (/hospital|clinic|doctors|pharmacy/.test(u + f)) return ['#ffffff', '#2f7a58'];
   if (/post/.test(u + f)) return ['#d8352f', '#ffffff'];
@@ -38,6 +44,9 @@ export function signName(name) {
  *  restaurants, inns and banks that OSM names. Company offices and apartment names stay off (canvas budget). */
 export function wantsSign(lot) {
   if (!signName(lot.name) || lot.landmark) return false;
+  // [r3:15] a school has one name plate, at the gate or on the main block (landmarks/schools.js): every OSM school polygon gives its full name to every shed, bike store and stair core in the yard
+  // (15 boards of 気仙沼市立気仙沼小学校 / 中学校 on 7-32 m2 lots, each at least 1.6 m wide on a 3 m shed). A GSI-facility lot stays signed; `undefined < 150` is false, so a lot with no area stays signed too.
+  if (lot.kind === 'school' && !lot.facility && lot.area < 150) return false;
   if (lot.facility || lot.kind === 'public' || lot.kind === 'school') return true;
   return /^(shop:|amenity:|tourism:|leisure:|office:government)/.test(lot.use || '');
 }
@@ -66,12 +75,28 @@ export function makeRealNames(ctx, lots, { key = 'town-realnames-' } = {}) {   /
     texs.push(tex);
     mats.push(ctx.mat.toon('#ffffff', { map: tex, paint: 0.01 }));
   }
+  // [v6:c5] the tall corner board of a lot in CORNER_VBOARD: one small canvas per text, shared by the mid boards and the kit shop
+  const vcache = new Map();
+  const vboardOf = (lot) => {
+    const text = CORNER_VBOARD[lot?.id]; if (!text) return null;
+    let v = vcache.get(text);
+    if (!v) {
+      const tex = ctx.tex.draw(64, 256, (g, W, H) => {
+        g.fillStyle = CHARCOAL; g.fillRect(0, 0, W, H); g.fillStyle = '#ffffff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        const chars = [...text], sz = Math.min(W * 0.78, H / chars.length * 0.86); g.font = `900 ${sz}px ${F.sans}`;
+        chars.forEach((c, i) => g.fillText(c, W / 2, H / chars.length * (i + 0.5)));
+      }, { key: key + 'vboard-' + text });
+      v = { mat: ctx.mat.toon('#ffffff', { map: tex, paint: 0.01 }), rect: [0, 0, 1, 1], text };
+      vcache.set(text, v);
+    }
+    return v;
+  };
   const rectOf = (k) => { const kk = k % PER_TEX, TH = heights[Math.floor(k / PER_TEX)], x = (kk % COLS) * CELL_W, y = Math.floor(kk / COLS) * CELL_H; return [x / TEX, 1 - (y + CELL_H) / TH, (x + CELL_W) / TEX, 1 - y / TH]; };
   const get = (lot) => {
     const t = signName(lot?.name);
     if (!t || !idx.has(t) || !wantsSign(lot)) return null;
     const k = idx.get(t);
-    return { mat: mats[Math.floor(k / PER_TEX)], rect: rectOf(k), colors: coloursOf(lot, k), aspect: CELL_W / CELL_H, name: t };
+    return { mat: mats[Math.floor(k / PER_TEX)], rect: rectOf(k), colors: coloursOf(lot, k), aspect: CELL_W / CELL_H, name: t, charcoal: isCharcoal(lot), vboard: vboardOf(lot) };
   };
 
   /** Boards on the simplified buildings: one quad per name facing the street, on a thin backing slab. */
@@ -79,7 +104,7 @@ export function makeRealNames(ctx, lots, { key = 'town-realnames-' } = {}) {   /
     const per = mats.map(() => ({ p: [], n: [], u: [], i: [] }));
     const back = { p: [], n: [], c: [], i: [] };
     const col = new THREE.Color();
-    let count = 0;
+    let count = 0; const vItems = [];
     for (const it of items) {
       const R = get(it.lot); if (!R) continue;
       const k = idx.get(R.name), B = per[Math.floor(k / PER_TEX)];
@@ -104,8 +129,21 @@ export function makeRealNames(ctx, lots, { key = 'town-realnames-' } = {}) {   /
       // front ring (behind the text) + top + sides
       back.i.push(b0, b0 + 1, b0 + 2, b0, b0 + 2, b0 + 3, b0 + 3, b0 + 2, b0 + 6, b0 + 3, b0 + 6, b0 + 7, b0 + 1, b0 + 5, b0 + 6, b0 + 1, b0 + 6, b0 + 2, b0 + 4, b0, b0 + 3, b0 + 4, b0 + 3, b0 + 7);
       count++;
+      const vb = CORNER_VBOARD[it.lot.id];
+      if (vb) vItems.push({ it, text: vb, bw, y, z });
     }
     const group = new THREE.Group(); group.name = 'town-realnames';
+    for (const { it, text, bw, y, z } of vItems) {
+      // a tall board (0.5 x 2.4 m) standing proud of the wall at the +x corner, white on the charcoal of the fascia
+      const vw = 0.5, vh = 2.4, vx = Math.min(it.w / 2 - 0.5, bw / 2 + 0.9), vy = y - 0.3;
+      const vm = vboardOf(it.lot).mat;
+      const P = [[vx - vw / 2, vy, z + 0.12], [vx + vw / 2, vy, z + 0.12], [vx + vw / 2, vy + vh, z + 0.12], [vx - vw / 2, vy + vh, z + 0.12]].map(([x, yy, zz]) => it.F.p(x, yy, zz));
+      const N = it.F.n(0, 0, 1), g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(P.flat(), 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute([...N, ...N, ...N, ...N], 3));
+      g.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2)); g.setIndex([0, 1, 2, 0, 2, 3]); g.computeBoundingSphere();
+      const m = new THREE.Mesh(g, vm); m.receiveShadow = true; group.add(m);
+    }
+
     per.forEach((B, t) => {
       if (!B.i.length) return;
       const g = new THREE.BufferGeometry();

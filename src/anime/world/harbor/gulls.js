@@ -86,7 +86,7 @@ export function buildGulls(ctx, opts = {}) {
   ctx.add(grp);
 
   const M = new THREE.Matrix4(), Wm = new THREE.Matrix4(), H = new THREE.Matrix4(), Rz = new THREE.Matrix4();
-  const e = new THREE.Euler(0, 0, 0, 'YXZ'), qt = new THREE.Quaternion(), pos = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1);
+  const e = new THREE.Euler(0, 0, 0, 'YXZ'), qt = new THREE.Quaternion(), pos = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), sc = new THREE.Vector3(1, 1, 1);
   const pose = (b, t) => {
     if (b.kind === 'sit') {
       const bob = Math.sin(t * 1.3 + b.ph) > 0.93 ? 0.03 : 0;
@@ -95,10 +95,18 @@ export function buildGulls(ctx, opts = {}) {
       // folded wings: small, tucked along the body
       return { flap: -1.45, fold: true };
     }
+    const spread = b.spread || 1;
     const a = b.ph + b.dir * (b.v / b.R) * t;
-    const x = b.c[0] + Math.cos(a) * b.R + Math.sin(t * 0.05 + b.ph) * b.R * b.drift;
-    const z = b.c[2] + Math.sin(a) * b.R;
-    const y = b.c[1] + b.h + Math.sin(a * 2 + b.ph) * 2.2;
+    const x = b.c[0] + Math.cos(a) * b.R * spread + Math.sin(t * 0.05 + b.ph) * b.R * b.drift * spread;
+    const z = b.c[2] + Math.sin(a) * b.R * spread;
+    let y = b.c[1] + b.h + Math.sin(a * 2 + b.ph) * 2.2;
+    if (b._ippon && b.dive > 0.4) {
+      const s = Math.sin(t * 2.6 + b.ph);
+      if (s > -0.25) {
+        const k = Math.min(1, b.dive) * Math.min(1, (s + 0.25) * 0.85);
+        y = y * (1 - k) + (0.28 + (b.ph % 1) * 0.55) * k;
+      }
+    } else if (b.dive > 0.4 && Math.sin(t * 2.1 + b.ph) > 0.45) y -= (6 + b.h) * Math.min(1, b.dive);
     pos.set(x, y, z);
     // heading = tangent of the circle
     const tx = -Math.sin(a) * b.dir, tz = Math.cos(a) * b.dir;
@@ -111,7 +119,9 @@ export function buildGulls(ctx, opts = {}) {
     for (let i = 0; i < N; i++) {
       const b = birds[i];
       const { flap, fold } = pose(b, t);
-      qt.setFromEuler(e); M.compose(pos, qt, one);
+      const s = b.s > 0 ? b.s : 1;
+      if (s !== 1) sc.set(s, s, s);
+      qt.setFromEuler(e); M.compose(pos, qt, s === 1 ? one : sc);
       body.setMatrixAt(i, M);
       for (const [mesh, s] of [[wl, 1], [wr, -1]]) {
         if (fold) {

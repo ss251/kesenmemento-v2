@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "cell": "kameyama-summit",
+  "bbox": [
+    3700,
+    3600,
+    3870,
+    3665
+  ],
+  "note": "outside the 12 cells: the summit promenade of 亀山テラス360° (山頂駅 east along the ridge to ほしのてらす). The surface itself (terracotta ribbon, grey gravel edging, black railings) and the monorail cars and track are drawn in src/anime/world/landmarks/oshima.js (PROMENADE, buildOshima); this file clears the trees and the grown-over ground from a 12 m wide corridor round that line. APPROXIMATE route: traced from the pre-opening Earth strip of 2026-03-11; re-trace it from a post-July 2026 capture and add any spur from the station to terrace 1.",
+  "sources": [
+    {
+      "id": "commons",
+      "what": "Wikimedia Commons 196994329 'Kameyama Terrace 360°' (2026-08-05, raw/ref/commons, reference only): a red-surfaced path with grey edging along an open grass ridge, a few trees on the knoll",
+      "date": "2026-08-05"
+    },
+    {
+      "id": "earth",
+      "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/lm/lm-kameyama: earth_top, top_annot): the path strip east of the 山頂駅 before the 2026-07-19 opening",
+      "date": "2026-03-11"
+    }
+  ],
+  "landuse": [
+    {
+      "use": "vacant",
+      "surface": "weeds",
+      "name": "亀山テラス 山頂遊歩道の回廊",
+      "ring": [
+        [
+          3729.9,
+          3645.9
+        ],
+        [
+          3739.1,
+          3644.5
+        ],
+        [
+          3746.9,
+          3643.3
+        ],
+        [
+          3755.3,
+          3642.3
+        ],
+        [
+          3764.2,
+          3641.9
+        ],
+        [
+          3772.4,
+          3642.0
+        ],
+        [
+          3781.3,
+          3642.3
+        ],
+        [
+          3790.5,
+          3642.7
+        ],
+        [
+          3799.8,
+          3643.0
+        ],
+        [
+          3809.3,
+          3643.2
+        ],
+        [
+          3817.9,
+          3643.4
+        ],
+        [
+          3826.4,
+          3643.6
+        ],
+        [
+          3835.4,
+          3643.8
+        ],
+        [
+          3842.9,
+          3644.0
+        ],
+        [
+          3843.1,
+          3632.0
+        ],
+        [
+          3835.7,
+          3631.8
+        ],
+        [
+          3826.6,
+          3631.6
+        ],
+        [
+          3818.2,
+          3631.4
+        ],
+        [
+          3809.6,
+          3631.2
+        ],
+        [
+          3800.2,
+          3631.0
+        ],
+        [
+          3791.0,
+          3630.7
+        ],
+        [
+          3781.8,
+          3630.3
+        ],
+        [
+          3772.7,
+          3630.0
+        ],
+        [
+          3763.9,
+          3629.9
+        ],
+        [
+          3754.3,
+          3630.4
+        ],
+        [
+          3745.4,
+          3631.4
+        ],
+        [
+          3737.2,
+          3632.6
+        ],
+        [
+          3728.1,
+          3634.1
+        ]
+      ],
+      "src": "commons: the ridge beside the path is open short grass with only a few trees clear of it; earth: the strip runs (3729,3640) to (3843,3638). The corridor keeps the planted trees off the path (build-trees plants none on a vacant surface)."
+    }
+  ]
+}

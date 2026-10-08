@@ -63,14 +63,45 @@ export const POOLS_HELI = {
 };
 
 export const SCHOOL_INFO = {
-  schKesennumaE: { ja: '気仙沼市立気仙沼小学校', en: 'Kesennuma Elementary School', sign: '気仙沼小学校', stairTower: [-323, 348], stairR: 2.6 },   // Commons 2025-09: the grey concrete stair cylinder on the yard side, where the west wing meets the long bar
-  schKesennumaJ: { ja: '気仙沼市立気仙沼中学校', en: 'Kesennuma Junior High School', sign: '気仙沼中学校' },
-  schKesennumaH: { ja: '宮城県気仙沼高等学校', en: 'Kesennuma High School', sign: '宮城県気仙沼高等学校' },
-  schKujoE: { ja: '気仙沼市立九条小学校', en: 'Kujo Elementary School', sign: '九条小学校' },
-  schShishioriJ: { ja: '気仙沼市立鹿折中学校', en: 'Shishiori Junior High School', sign: '鹿折中学校' },
-  schShishioriE: { ja: '気仙沼市立鹿折小学校', en: 'Shishiori Elementary School', sign: '鹿折小学校' },
-  schJonanJ: { ja: '気仙沼市立条南中学校', en: 'Jonan Junior High School', sign: '条南中学校' },
-  schToryoH: { ja: '東陵高等学校', en: 'Toryo High School', sign: '東陵高等学校' },
+  // [r3:16] kindOverride is the per-lot table of schoolKind(): the area / box-ratio rule stays only as the fallback for lots no table lists. Listed lots were checked on the GSI aerial (data/ortho/core.jpg)
+  // and the Commons photos; Earth 2026 (c5/sub-f) shows /73 as a flat roof with planters and gravel. Round 3 found five classroom buildings the rule drew as 8 m barrel-roofed hangars (/73, /126, 鹿折中 /196,
+  // 気仙沼高 /24, 条南中 /168), and the 570 m2 low annex 気仙沼高 /38 drawn as a gym.
+  //   schKesennumaE: /64 is the barrel-roofed gym (Commons 2025-09-28 176190355, arched blue roof left of the stair cylinder); /73 (the west classroom wing, polygon fill 0.72 of its 48 x 35 m box) is a 2-storey
+  //   grey-concrete bar with a flat roof, roof terrace fence and arcade ground floor, about 7.5 m: storeysOverride 2 (the layout record says 5F 13.5 m, derived).
+  schKesennumaE: { ja: '気仙沼市立気仙沼小学校', en: 'Kesennuma Elementary School', sign: '気仙沼小学校', stairTower: [-323, 348], stairR: 2.6,   // Commons 2025-09: the grey concrete stair cylinder on the yard side, where the west wing meets the long bar
+    kindOverride: { '16/58540/25069/64': 'gym', '16/58540/25069/73': 'block' }, storeysOverride: { '16/58540/25069/73': 2 } },
+  // [v6:c9r3] kindOverride: a per-lot kind for schoolKind() where the area / box-ratio rule is wrong. Lot /126 (997 m2, 40 x 26 m) is the 3-storey classroom block (Earth 2026-03-11 c9/A: flat roof, the
+  // school's pin, next to the long bar /162), not a second gym: the school's one gym is /100 (twin-gable roof). Every school roof is 'flat' in layout.json, so no roof-shape test can tell them apart.
+  schKesennumaJ: { ja: '気仙沼市立気仙沼中学校', en: 'Kesennuma Junior High School', sign: '気仙沼中学校', kindOverride: { '16/58540/25069/126': 'block', '16/58540/25069/100': 'gym' } },
+  //   schKesennumaH [r3:16]: /39 and /35 are the gyms (GSI aerial: barrel / pitched roofs), /24 is the U-shaped classroom complex round a green courtyard (OBB 64 x 76 m, fill 0.44: its real U polygon comes from
+  //   explore.json, buildSchools patches the far lots first), /429 and /531 are classroom blocks, /38 a 570 m2 low annex (a shed, not a 3-storey block).
+  schKesennumaH: { ja: '宮城県気仙沼高等学校', en: 'Kesennuma High School', sign: '宮城県気仙沼高等学校',
+    kindOverride: { '16/58538/25071/39': 'gym', '16/58538/25071/35': 'gym', '16/58537/25071/24': 'block', '16/58537/25071/429': 'block', '16/58537/25070/531': 'block', '16/58538/25071/38': 'shed' } },
+  // [r3:16] 九条小 lies outside the core ortho: decided on Earth 2026-03-11 (raw/ref/earth/kujo): /307 is the red pitched-roof gym beside the pool, /362 the flat-roofed classroom block north of the yard
+  schKujoE: { ja: '気仙沼市立九条小学校', en: 'Kujo Elementary School', sign: '九条小学校', kindOverride: { '16/58536/25071/307': 'gym', '16/58536/25071/362': 'block' } },
+  // [v6:schools-r3] look: a per-ground facade palette for the three grounds Commons 2024-05 photos sample (schools.js paints sash windows with plain wall between, not a glazed ribbon). Every other ground
+  // (気仙沼中, 気仙沼高, 九条小, 東陵高) keeps the cool grey-white default, because no recent photo of it is on file, and 気仙沼小 keeps its own concrete variant.
+  //   schShishioriJ: Commons 163963448 (2024-05): the 3-storey classroom block is warm cream (#e0dbc8) with concrete-grey balcony slabs. Lot /196 is the block (the GSI hull of the block, its two wings and the
+  //   courtyard between them, area 1838 m2): the area / box-ratio rule drew it as a barrel-roofed gym 14 m high, so kindOverride makes it the 3-storey block the photo shows (the real plan is a hollow コ, the
+  //   footprint is still the GSI hull).
+  schShishioriJ: { ja: '気仙沼市立鹿折中学校', en: 'Shishiori Junior High School', sign: '鹿折中学校',
+    kindOverride: { '16/58543/25065/195': 'gym', '16/58543/25065/196': 'block' },   // [r3:16] /195 (41 x 39 m, striped barrel / gable roof on the aerial) is the one gym
+    look: { style: 'shishioriJ', wall: '#e0dbc8', slab: '#b4b3ad' } },
+  //   schShishioriE: Commons 150521570 (2024-05): cream piers (#ece3c8, about 1.0 m wide at the bay joints) between white infill walls (#e8e6e1) with light-grey balcony rails, under a dark slate hipped metal
+  //   roof (#4a4d55; the aerial lot.roof is wrong here); the gym is white with teal stripes (#3f9a8a) at the eave and under the window band.
+  schShishioriE: { ja: '気仙沼市立鹿折小学校', en: 'Shishiori Elementary School', sign: '鹿折小学校',
+    kindOverride: { '16/58542/25064/69': 'gym' },   // [r3:16] the gym with the pitched roof (47 x 31 m)
+    look: { style: 'shishioriE', pier: '#ece3c8', pierW: 1.0, wall: '#e8e6e1', rail: '#c9cdd0', roof: '#4a4d55', teal: '#3f9a8a' } },
+  // [v6:jonan-r3] Commons 153670155 (2024-05-03): the main bar /175 is 4 storeys (4 window rows, 14.4 m, yellow roof-edge band, cream walls), the flat-roofed wing /168 west of it 3 storeys (10.8 m; the ortho shows a flat roof, the gym is the rust barrel roof
+  // to the NE), and the stair tower /169 (3.6 x 15 m, between the wing and the bar) stands about 3 m above the bar's roof (17.4 m). The area rule drew the bar 3 storeys, the wing a barrel-roofed gym and the tower a 1-storey shed.
+  schJonanJ: { ja: '気仙沼市立条南中学校', en: 'Jonan Junior High School', sign: '条南中学校',
+    kindOverride: { '16/58538/25072/170': 'gym', '16/58538/25072/175': 'block', '16/58538/25072/168': 'block', '16/58538/25072/169': 'block' },   // [r3:16] /170 is the rust barrel-roofed gym NE of the wing
+    storeysOverride: { '16/58538/25072/175': 4, '16/58538/25072/168': 3, '16/58538/25072/169': 4 },
+    topExtra: { '16/58538/25072/169': 3 },
+    // [v6:schools-r3] Commons 153670155 (2024-05-03): the walls are a mild warm cream (#e4dfca), 4 rows of separate 4-sash windows with narrow wall between (about a 5.2 m pitch), a bright yellow roof-edge
+    // band (#e3bf3a, 0.9 m) on the main bar /175 and the low wing /168, no roof railings, and a stair tower /169 with small square windows. The other blocks of the ground (/105, /182) get the cream, no band.
+    look: { style: 'jonan', wall: '#e4dfca', band: '#e3bf3a', bandLots: ['16/58538/25072/175', '16/58538/25072/168'], tower: ['16/58538/25072/169'] } },
+  schToryoH: { ja: '東陵高等学校', en: 'Toryo High School', sign: '東陵高等学校', kindOverride: { '16/58544/25064/31': 'gym' } },   // [r3:16] the large pitched-roof gym (39 x 57 m)
 };
 
 /**
@@ -85,7 +116,7 @@ export const SPEC = {
   cityHall3: { storeys: 2, fh: 3.4, wall: '#d4d0c6', roof: '#51575f', src: 'OSM start_date 1974; [v5] Earth 2026-03-11 (raw/ref/earth/c1/B): a dark grey roof' },
   cityHallE: { storeys: 2, fh: 3.3, wall: '#d8d2c4', roof: '#ad6f6c', src: 'OSM start_date 1960; [v5] Earth 2026-03-11 (raw/ref/earth/c1/B): a red hipped roof' },
   cityHallE2: { storeys: 2, fh: 3.3, wall: '#d8d2c4', roof: '#c9ccc9', src: 'OSM start_date 1960; ortho' },
-  oneTen: { storeys: 4, fh: 3.2, base: '#b8959c', band: '#3f8f94', deck: '#bdbdb8', src: 'OSM building:levels=4, start_date 1999; photo: mauve base, teal band, parking deck, One-Ten logo tower' },
+  oneTen: { storeys: 4, fh: 3.2, base: '#b39ca2', band: '#3f8f94', deck: '#a8a69e', src: 'OSM building:levels=4, start_date 1999; Commons 2026-03-29 (sunlit mauve stone panels #b09da3, raw grey concrete decks and tower #a6a6a0, teal fascia and cornice)' },
   // JR/BRT 気仙沼駅 (kesennuma-station.md; Commons "JR East Kesennuma Station building"): one storey, 5-arch arcade in
   // off-white stone tile, dark standing-seam roof with the swordfish mural on the square-side slope, centre gable
   station: { h: 4.6, wall: '#e2ddd3', trim: '#cfc9bd', roof: '#4f5763', src: 'OSM building=train_station; ja.wikipedia 気仙沼駅; photo' },
@@ -93,8 +124,8 @@ export const SPEC = {
   // リアス・アーク美術館 (rias-ark.md; Commons "Riasu ark museum.jpg"): ribbed aluminium panels, pink pods on stilts
   riasArk: { h: 13.5, alu: '#b9bdc2', pink: '#e3a7a3', pinkDark: '#b98580', render: '#c9a4a2', roof: '#cfd2d2', src: '石山修武 1994, 3 levels + roof garden, 4,601 m²' },
   // 気仙沼市立病院 (hospitals.md): SRC, seismic isolation, 7F legal / 6 storeys built + B1, 8,174 m² footprint, heliport
-  cityHospital: { podium: 3, wards: 6, fh: 4.1, wall: '#eeefec', band: '#9fb3c4', roof: '#c7c9c6', src: 'kesennuma-hospital.jp summary; OSM way 761241989; ortho (ward bar on the NE side)' },
-  otomo: { storeys: 5, fh: 3.3, wall: '#ece9e1', roof: '#8fc4b0', wing: '#8a5a4c', src: 'OSM building:levels=5; ortho mint-green flat roofs + red-brown pitched wing' },
+  cityHospital: { podium: 3, wards: 6, fh: 4.1, wall: '#eeefec', band: '#9fb3c4', roof: '#bdbdb8', wardRoof: '#9c9d9a', src: 'kesennuma-hospital.jp summary; OSM way 761241989; ortho (the tall wing is on the SW / roundabout side, the NE strip is low terraces; [v6:outside-hospital r3] Commons 65676447 + GSI ortho, see landmarks/hospitals.js hospitalParts); [v6:outside-hospital r1] roofs: Earth 2026-03-11 top (raw/ref/earth/lm/lm-hospital/earth_top.png, top_annot.jpg) with ortho core.jpg: the ward-bar terraces are medium grey (about 1.05x the app asphalt, L 165-170), the SW / central podium roofs light grey (about 1.3x asphalt), so wardRoof #9c9d9a and podium roof #bdbdb8 (was #c7c9c6 on both, which rendered near-white, top median #d5d7d5)' },
+  otomo: { storeys: 5, fh: 3.3, wall: '#ece9e1', roof: '#7f9f93', wing: '#8a5a4c', src: 'OSM building:levels=5; red-brown pitched wing; roof #7f9f93 = muted grey-green read off Earth 2026 top (#789c8e) and oblique (#87ac9f), GSI pixel #7f988b (the old #8fc4b0 was read off the cyan-cast photo)' },
   // shrines, temples, church (shrines-temples.md)
   // [v4:polish3] h = the nave ridge (5.4 m eaves + the 0.85-pitch gable over the 11 m nave, landmarks/temples.js); the
   // belfry's cross stands at 14.7 m. No published height (orthodoxjapan.jp: rebuilt 1933); the lot's 3.3 m (one storey,
@@ -126,10 +157,14 @@ export const NEW_CITY_HALL = {
  */
 export const KAMEYAMA = {
   summit: [3735.4, 3625.3], ele: 235,
-  rail: [[3974, 3925], [3853, 3798], [3743, 3651]],   // the 概要図's dashed line: 駐車場駅 (px 300,378), bend (195,262), 山頂駅 (100,135) at 1.155 m/px
-  lowerStation: { at: [3976, 3930], len: 16, wid: 9 },
-  upperStation: { at: [3736, 3642], len: 13, wid: 8 },
-  parking: { poly: [[3952, 3842], [4018, 3842], [4018, 3912], [3990, 3912], [3952, 3896]] },   // the ortho's paved lot + the 2025 extension (駐車場拡張) toward the station
+  // [v6:outside-kameyama] traced on Google Earth 2026-03-11 (raw/ref/earth/lm/lm-kameyama/earth_top.png, top_annot.jpg) at app terrain height:
+  // from the 駐車場駅 NE-up the slope, straight until about (3780, 3770), then curving north in the upper third (Commons 2026-08
+  // 'Kameyama Monorail Between Stations' shows the curve). The old 概要図 line [[3974,3925],[3853,3798],[3743,3651]] ran 32-44 m east of it mid-way.
+  rail: [[3962, 3908], [3900, 3850], [3844, 3800], [3815, 3788], [3795, 3778], [3780, 3770], [3771, 3758], [3766, 3746], [3759, 3732], [3750, 3714], [3741, 3697], [3735, 3684], [3732, 3672], [3729, 3652]],
+  lowerStation: { at: [3967, 3912], len: 16, wid: 9 },   // only clears trees; the mesh stands on the rail's first point
+  upperStation: { at: [3727, 3647], len: 13, wid: 8 },
+  // the real lot is a NE-SW strip (Earth 2026-03-11 top_annot): SW end (3974,3883)-(3986,3915), NE end (4027,3821)-(4033,3860)
+  parking: { poly: [[3974, 3883], [4013, 3838], [4027, 3821], [4033, 3860], [3986, 3915]] },
   terraces: [
     { id: 't1', at: [3721, 3619], w: 24, d: 16, steps: 3, face: [-0.72, -0.69], sofas: 49 },
     { id: 't2', at: [3700, 3624], w: 9, d: 7, steps: 1, face: [-0.9, 0.4], sofas: 2 },
@@ -156,6 +191,14 @@ export const URANOHAMA = {
 /** All building sites that replace GSI lots (the order decides overlaps: the first match wins). */
 const LOT_SITES = ['cityHall', 'cityHall2', 'cityHall3', 'cityHallE', 'cityHallE2', 'oneTen', 'station', 'stationRoof2', 'brtCanopy', 'stationPlaza', 'riasArk', 'cityHospital', 'otomo', 'church', 'shorinji', 'seigoji', 'minamiShrine', 'matsuo', 'ikkeijima'];
 const GROW = { riasArk: 4, station: 1.5, cityHospital: 2 };
+/**
+ * [v6:outside-hospital] GSI lots that are parts of 気仙沼市立病院 the OSM outline (way 761241989) leaves out: lot 144 is
+ * the west front wing (51 x 17 m, saw-roof in GSI) and lot 145 the curved entrance canopy along the roundabout (30 x 9 m).
+ * Google Earth 2026-03-11 (raw/ref/earth/lm/lm-hospital/top_annot.jpg #22, #23): both sit on the hospital's own grey roof
+ * terraces and canopy, no separate shed; the 2017 Commons photo shows the continuous front with a long canopy. Checked by
+ * id, before the OSM outline test; raising GROW instead would capture neighbouring lots.
+ */
+const HOSPITAL_FRONT_LOTS = new Set(['16/58539/25072/144', '16/58539/25072/145']);
 /** OSM buildings inside a school ground that are not school buildings (気仙沼市図書館, OSM 768699248). */
 const NOT_SCHOOL = new Set([768699248]);
 
@@ -195,7 +238,8 @@ function nearPoly(x, z, poly, g) {
  * The landmarks-B site a GSI lot belongs to, or null: by its OSM match (lot.osm), else its centroid (area in m²).
  * Returns ids like 'cityHall', 'school:schKesennumaE', 'newCityHallSite', 'oshimaTerminal', 'kameyama'.
  */
-export function siteOfLotB(osm, cx, cz, area = 100, poly = null) {
+export function siteOfLotB(osm, cx, cz, area = 100, poly = null, lotId = null) {
+  if (lotId && HOSPITAL_FRONT_LOTS.has(lotId)) return 'cityHospital';   // [v6:outside-hospital] before the OSM outline test
   const id = osm ? Number(String(osm).replace(/^w/, '')) : null;
   for (const s of LOT_SITES) if (id && OSM[s].osm === id) return s;
   for (const s of LOT_SITES) if (nearPoly(cx, cz, OSM[s].poly, GROW[s] || 0)) return s;
@@ -236,6 +280,8 @@ export const PLACES_B = [
   { id: 'church', ja: '気仙沼ハリストス正教会', en: 'Kesennuma Orthodox Church', at: [-487, -32] },
   { id: 'shorinji', ja: '少林寺', en: 'Shorin-ji Temple', at: [-610, 66] },
   { id: 'seigoji', ja: '清護寺', en: 'Seigo-ji Temple', at: [-303, 146] },
+  // [v6:c5] OSM way 928776176 has no name; the Google Earth 2026-03-11 紫神社 pin (lm-seigoji top/o180) is on this small hall; the shopping street beside it is 南町紫神社前商店街
+  { id: 'murasaki', ja: '紫神社', en: 'Murasaki Shrine', at: [-247, 158] },
   { id: 'ikkeijima', ja: '一景島神社', en: 'Ikkeijima Shrine', at: [560, 1095] },
   { id: 'schKesennumaE', ja: '気仙沼小学校', en: 'Kesennuma Elementary School', at: [-300, 360] },
   { id: 'schKesennumaJ', ja: '気仙沼中学校', en: 'Kesennuma Junior High School', at: [-300, 560] },

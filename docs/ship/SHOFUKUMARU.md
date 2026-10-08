@@ -41,15 +41,23 @@ A URL voyage waits until you leave the intro card (「まちへ出る」), so th
 
 The sail mode (`explore/sail.js`) takes her out on autopilot. Use the controls below to take the helm.
 
-| Action | Keys | Touch (phone) |
+| Action | Keys | Touch (phone: the pad's `sail` mode, [../MOBILE-CONTROLS.md](../MOBILE-CONTROLS.md)) |
 |---|---|---|
-| Engine telegraph ahead / astern (it stays where you leave it) | W / S or ↑ / ↓ | Left half of the screen: the stick, up / down |
+| Engine telegraph ahead / astern (it stays where you leave it) | W / S or ↑ / ↓ | The pad's stick, up / down |
 | Rudder to port / starboard (back to midships when released) | A / D or ← / → | The stick, left / right |
-| Stop the engine | X | Stick back to the centre line |
-| Hold 4x time compression | Shift | — |
-| Autopilot on / off | P | The autopilot takes over again after 8 s idle |
-| Look around | — | Right half of the screen: drag |
-| Leave the voyage | Esc or 町へ戻る | 町へ戻る |
+| Stop the engine | X | 停止 (the big button; the autopilot stays off until the next helm input) |
+| Hold 4x time compression | Shift | 4× (hold). Time compression is not a helm input: with the autopilot on it keeps the helm and runs 4x; only the stick or the telegraph keys take it |
+| Autopilot on / off | P | 自動操船 (a toggle that shows the autopilot's state; it also takes over again after 8 s idle) |
+| Look around | — (mouse drag) | A drag on the right half of the screen (the pad's look, through `player.lookSink`) |
+| Leave the voyage | Esc or 町へ戻る | 町へ戻る (a pad button; the voyage UI has one too). You land on the quay on foot or flying as you boarded, at the hour you boarded |
+
+On a phone the pad is shown only at the helm (this transit under かなえ大橋). In every other beat (the berth, the send-off,
+the ocean, the haul with キープ / 放流, the chain cards, the final card) the voyage UI owns the bottom of the screen and the
+pad is hidden. The touch controls do not live in `sail.js` any more: it reads the pad's stick and look, and the buttons are the pad's
+`sail` mode (`world/ship/padmode.js`); the stick's full-ahead tag reads 全速 at the helm. The chain cards scroll by touch and keep 次へ / もう一度出船 /
+町へ戻る pinned at their bottom edge; the boarding chip is the short 昭福丸 and steps aside for the places sheet and the full map. Screenshots:
+`docs/shots/integrate/` (`sail_*`, `haul_*`, `card_*`, `final_*`, and `fix1_*` / `fix2_*` for the two phone review rounds, portrait and landscape);
+the integration record is the integration record (not included).
 
 After 8 s with no input, the autopilot takes over again. That happens when she is under way, when she is against a
 bank, or when a bank has stopped her. If she is left bow-on to a bank, the autopilot backs her off astern before it

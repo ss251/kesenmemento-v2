@@ -1,0 +1,22 @@
+{
+  "ja": {
+    "capturing": "撮影中…",
+    "ready": "写真ができました",
+    "failed": "撮影できませんでした。もう一度お試しください",
+    "save": "保存・共有",
+    "saveOnly": "保存",
+    "close": "閉じる",
+    "alt": "撮影した写真",
+    "saveFailed": "保存できませんでした。写真を長押しして保存してください。"
+  },
+  "en": {
+    "capturing": "Capturing…",
+    "ready": "Your photo is ready",
+    "failed": "Could not take the photo. Please try again",
+    "save": "Save or share",
+    "saveOnly": "Save",
+    "close": "Close",
+    "alt": "The photo you took",
+    "saveFailed": "Could not save. Press and hold the picture to save it."
+  }
+}

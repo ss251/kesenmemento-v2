@@ -1,0 +1,121 @@
+{
+ "note": "tools/survey/tug_spec.py: the berthed tug, rectangles read off IMG_0861 and cut onto the plane of their face",
+ "features": [
+  {
+   "name": "canopy.tug.ring#1",
+   "enu": [
+    579.88,
+    4.505,
+    666.725
+   ],
+   "sigma": [
+    0.8,
+    0.15,
+    0.8
+   ],
+   "method": "ray x plane d = 1.0 (IMG_0861)",
+   "views": [
+    "IMG_0861"
+   ],
+   "note": "life ring centre (0.76 m ring, its picked bbox)"
+  },
+  {
+   "name": "canopy.tug.ring#2",
+   "enu": [
+    581.36,
+    4.41,
+    669.963
+   ],
+   "sigma": [
+    0.8,
+    0.15,
+    0.8
+   ],
+   "method": "ray x plane d = 1.0 (IMG_0861)",
+   "views": [
+    "IMG_0861"
+   ],
+   "note": "life ring centre (0.76 m ring, its picked bbox)"
+  },
+  {
+   "name": "canopy.tug.mark",
+   "enu": [
+    581.389,
+    3.395,
+    670.027
+   ],
+   "sigma": [
+    0.8,
+    0.15,
+    0.8
+   ],
+   "method": "ray x plane d = 1.0 (IMG_0861)",
+   "views": [
+    "IMG_0861"
+   ],
+   "note": "hull marking KO1-875, centre of the lettering"
+  },
+  {
+   "name": "canopy.tug.wall_top",
+   "enu": [
+    580.448,
+    4.08,
+    667.967
+   ],
+   "sigma": [
+    0.8,
+    0.15,
+    0.8
+   ],
+   "method": "ray x plane d = 1.0 (IMG_0861)",
+   "views": [
+    "IMG_0861"
+   ],
+   "note": "top edge of the tall hull side (the quarter-deck wall)"
+  },
+  {
+   "name": "canopy.tug.funnel_top",
+   "enu": [
+    581.47,
+    7.07,
+    669.242
+   ],
+   "sigma": [
+    0.8,
+    0.15,
+    0.8
+   ],
+   "method": "ray x plane d = 1.4 (IMG_0861)",
+   "views": [
+    "IMG_0861"
+   ],
+   "note": "top of the funnel casing (face)"
+  },
+  {
+   "name": "canopy.tug.house_roof",
+   "enu": [
+    584.346,
+    4.69,
+    674.332
+   ],
+   "sigma": [
+    0.8,
+    0.15,
+    0.8
+   ],
+   "method": "ray x plane d = 1.9 (IMG_0861)",
+   "views": [
+    "IMG_0861"
+   ],
+   "note": "roof edge of the forward house (face)"
+  }
+ ],
+ "dims": [
+  {
+   "name": "canopy.tug.hull_plane_d",
+   "value": 1.0,
+   "sigma": 0.8,
+   "note": "hull side plane (d out to sea): life ring size 0.76 m at 59 m range, hull foot at the curb top T.P. 1.84"
+  }
+ ]
+}

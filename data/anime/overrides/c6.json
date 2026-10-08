@@ -24,8 +24,8 @@
    "date": "2026-05-06"
   },
   {
-   "id": "sailesh",
-   "what": "author photo raw/photos-sailesh/drive-1003/IMG_0822.HEIC (2026-10-01 17:20, from (-5, 66), heading 295)",
+   "id": "photos",
+   "what": "author photo raw/author-photos/drive-1003/IMG_0822.HEIC (2026-10-01 17:20, from (-5, 66), heading 295)",
    "date": "2026-10-01"
   },
   {
@@ -39,15 +39,21 @@
   {
    "id": "koyo",
    "what": "koyo-gakuen.ac.jp/rias (school name 気仙沼リアス調理製菓専門学校, 南町2-2-12)"
+  },
+  {
+   "id": "commons",
+   "what": "Wikimedia Commons 2026-03-29 lookout photo raw/ref/commons/187673969_Cityscape_of_Kessennuma_City_2026.jpg (not committed); camera calibrated on lots 350, 374, 388/387/25",
+   "date": "2026-03-29"
   }
  ],
  "lots": [
   {
    "id": "16/58540/25068/305",
    "roof": {
-    "shape": "hip"
+    "shape": "hip",
+    "color": "#c0947e"
    },
-   "src": "earth: 森産婦人科医院 has an orange-brown hipped roof with clear ridges, not a flat deck (sub-a top p_-116_-200; GSI agrees)"
+   "src": "earth: 森産婦人科医院 has an orange-brown hipped roof with clear ridges, not a flat deck (sub-a top p_-116_-200; GSI agrees) | [r3] roof colour: Earth 2026-03-11 top (c6_sub-a) reads #b88c76 with golden-orange facets (the GSI photo #b68c68), plus 3 L*; the stored #98706c was mauve (dE2000 14.1)"
   },
   {
    "id": "16/58540/25068/330",
@@ -94,18 +100,17 @@
     "shape": "flat",
     "color": "#4c505a"
    },
-   "facade": "office",
-   "src": "earth: a 2-storey flat-roofed block with a dark roof and a pale low annex, not a 7 m green gabled warehouse (sub-b top t9; o180 t10)"
+   "src": "earth: a 2-storey flat-roofed block with a dark roof and a pale low annex, not a 7 m green gabled warehouse (sub-b top t9; o180 t10) [r2:6: facade 'office' dropped; an Earth top view carries no facade evidence (Earth is 2.5D here), so the office default (punched windows, no ground photo of a glass ribbon) applies]"
   },
   {
    "id": "16/58541/25068/48",
-   "storeys": 2,
-   "height": 7,
+   "storeys": 4,
+   "height": 12.5,
    "roof": {
     "shape": "flat",
     "color": "#b8bab8"
    },
-   "src": "earth: a low 2-storey flat-roofed building; no 5-storey office stands here (sub-b o180 t11, sub-a o0 t12)"
+   "src": "earth: c6 sub-b top, a dark shadow patch 11-15 m long along 340 across the road to its north gives h about 11-14 m, and its east wall has a column of window slots: 3-4 storeys, taken as 4 (round 2; round 1 had set 2)"
   },
   {
    "id": "16/58541/25068/20",
@@ -147,7 +152,10 @@
    "roof": {
     "color": "#8e9092"
    },
-   "src": "earth: 南町1丁目共同化建物 has a mid-grey ribbed roof, not pale blue (sub-c top p_-200_70)"
+   "src": "earth: 南町1丁目共同化建物 has a mid-grey ribbed roof, not pale blue (sub-c top p_-200_70); commons: 2026-03-29 lookout photo, a 5-storey RC block about 15 m high (a wire box at 15.5 m meets the roof front edge), dark charcoal / slate cladding about 50 % darker than the neighbouring cream 5F blocks, wall shade-relative estimate (round 2)",
+   "storeys": 5,
+   "height": 15.5,
+   "wall": "#4d555c"
   },
   {
    "id": "16/58540/25068/345",
@@ -301,7 +309,7 @@
    "roof": {
     "color": "#8a6a62"
    },
-   "src": "earth: brown roof, not green (sub-f top, rs_ae)"
+   "src": "earth: brown roof, not green (sub-f top, rs_ae) | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a red roof on the lower half of the outline (the outline sits about 3 m off)"
   },
   {
    "id": "16/58541/25069/162",
@@ -319,10 +327,8 @@
   },
   {
    "id": "16/58541/25069/332",
-   "roof": {
-    "color": "#b4b4b0"
-   },
-   "src": "earth: light grey roof, not dark blue (sub-f top, rs_ae)"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (the edge of a green sports court and a bare strip), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58541/25069/68",
@@ -347,12 +353,8 @@
   },
   {
    "id": "16/58540/25068/350",
-   "roof": {
-    "shape": "saw",
-    "color": "#e8e8e6",
-    "ridge": "z"
-   },
-   "src": "earth: c6 sub-c top + l45, white folded-plate roof, folds front to back"
+   "remove": true,
+   "src": "earth: c6 sub-c top + l45, replaced by the pleated white roof drawn as ovr:c6:kyodoka-bay1..6 + deck + PV block (hero.js:98 turns a saw roof into one gable slab)"
   },
   {
    "id": "16/58541/25068/49",
@@ -367,7 +369,7 @@
    "facade": "public",
    "storeys": 3,
    "name": "晃陽学園 気仙沼リアス調理製菓専門学校",
-   "src": "sailesh: IMG_0822 2026-10-01, white block with punched windows + navy-clad set-back top with the school sign (name as on the sign and koyo-gakuen.ac.jp/rias)"
+   "src": "photos: IMG_0822 2026-10-01, white block with punched windows + navy-clad set-back top with the school sign (name as on the sign and koyo-gakuen.ac.jp/rias)"
   },
   {
    "id": "16/58540/25068/295",
@@ -385,6 +387,52 @@
    "name": "鼎・斉吉",
    "nameEn": "Kanae Saikichi",
    "src": "kesennuma-kanko + saikichi-pro: 柏崎1-13 (GSI geocode 232.6,240.8; crewship pin 239,230); earth sub-f top: blue-grey-roofed building with an 8-stall car park on the bluff"
+  },
+  {
+   "id": "16/58540/25068/291",
+   "remove": true,
+   "src": "earth: c6 sub-a top + GSI, the real building is a 12.3 x 24.6 m flat-roofed block, not the 10.3 x 24 m hip house; replaced by ovr:c6:minami-flat (round 2)"
+  },
+  {
+   "id": "16/58540/25069/227",
+   "storeys": 5,
+   "height": 15.5,
+   "facade": "plain",
+   "wall": "#d4d2cb",
+   "src": "commons: 2026-03-29 lookout photo, a 5-storey reinforced-concrete block about 15 m high, light grey wall, 5 rows of small punched windows, flat roof with a stair box; a 16 m wire box overshoots the parapet slightly, so 15.5 m"
+  },
+  {
+   "id": "16/58540/25068/349",
+   "remove": true,
+   "src": "earth: c6 sub-c top + l45, one of the GSI footprints of the 南町二丁目共同化商店街 (OSM names it too) that sits inside the pleated white roof drawn as ovr:c6:kyodoka-bay1..6 (round 2)"
+  },
+  {
+   "id": "16/58540/25068/351",
+   "remove": true,
+   "src": "earth: c6 sub-c top + l45, one of the GSI footprints of the 南町二丁目共同化商店街 (OSM names it too) that sits inside the pleated white roof drawn as ovr:c6:kyodoka-bay1..6 (round 2)"
+  },
+  {
+   "id": "16/58541/25069/83",
+   "roof": {
+    "shape": "flat",
+    "color": "#f1eee8"
+   },
+   "src": "earth: round 3 c6 sub-f top (raw/ref/earth/roofs8922/c6_sub-f/earth_top.png, lean-compensated, 12 px/m): the roof of 魚町/南町 east edge is one uniform white flat deck about 18 x 8 m with a single dark spot and no ridge or slope split (readings #f7f3ee at (139,360), #fcfdf8 at (136,362), L* about 97), not a grey #a69fa6 gable; the colour is the Earth reading because flatPaint removes the 3.5 L* lift; footprint left alone (the deck runs about 4 m east of the lot polygon, which may be registration: no ground check, so no widened newLot) (evidence raw/ref/earth/roofs8922c/evidence/f1_c6_25069_83_earth_vs_app.jpg)"
+  },
+  {
+   "id": "16/58541/25069/116",
+   "roof": {
+    "shape": "flat",
+    "color": "#f1eee8"
+   },
+   "src": "earth: round 3 c6 sub-f top: the 9 m2 annex at (131.2,367.6) is a small bright flat annex on the same white deck as /83, not a grey shed; kept rather than removed (raw/ref/earth/roofs8922c/evidence/f1_c6_25069_83_lotframe.jpg)"
+  },
+  {
+   "id": "16/58540/25069/213",
+   "roof": {
+    "color": "#c8a889"
+   },
+   "src": "earth: lit orange-tan plane of the gable roof #c2a283 on the 2026-03-11 top (c6_sub-e), plus 3 L*; the stored #8c6868 mauve-brown (derive.js snapRoof) is a dE2000 27 miss"
   }
  ],
  "newLots": [
@@ -445,8 +493,7 @@
     "shape": "flat",
     "color": "#a4a6a4"
    },
-   "facade": "office",
-   "src": "earth: new 2-storey building with a white rooftop box, north end of the block (sub-a top, t4; o0, o180)"
+   "src": "earth: new 2-storey building with a white rooftop box, north end of the block (sub-a top, t4; o0, o180) [r2:6: facade 'office' dropped; an Earth top view carries no facade evidence (Earth is 2.5D here), so the office default (punched windows, no ground photo of a glass ribbon) applies]"
   },
   {
    "id": "ovr:c6:uomachi-e1",
@@ -498,15 +545,16 @@
      -73.5
     ]
    ],
-   "kind": "shop",
-   "storeys": 1,
-   "height": 4.8,
+   "kind": "office",
+   "storeys": 3,
+   "height": 9.5,
    "roof": {
     "shape": "flat",
-    "color": "#4c505a"
+    "color": "#b4b6b6"
    },
-   "facade": "plain",
-   "src": "earth: dark-roofed single-storey annex north of it (sub-a top, t7; o0 t8)"
+   "facade": "public",
+   "src": "commons: 2026-03-29 lookout photo, a 3-storey grey concrete building about 9-9.5 m (a 9 m wire box sits on the roof line), plain grey side walls, a diagrid screen on the face beside the road, flat pale roof deck with a dark parapet and a stair core; earth sub-a top reads the roof navy there (unresolved, the photo is newer)",
+   "wall": "#9a9ea2"
   },
   {
    "id": "ovr:c6:uomachi-n0",
@@ -595,27 +643,26 @@
     "shape": "flat",
     "color": "#8e9092"
    },
-   "facade": "office",
-   "src": "earth: 2-storey grey flat-roofed block with a white parapet, east of 18:20 (sub-b top t9; o180 t10)"
+   "src": "earth: 2-storey grey flat-roofed block with a white parapet, east of 18:20 (sub-b top t9; o180 t10) [r2:6: facade 'office' dropped; an Earth top view carries no facade evidence (Earth is 2.5D here), so the office default (punched windows, no ground photo of a glass ribbon) applies]"
   },
   {
    "id": "ovr:c6:uomachi-b5",
    "poly": [
     [
-     171,
-     -180.5
+     173.5,
+     -168.8
     ],
     [
-     190,
-     -180.5
+     179.1,
+     -160.7
     ],
     [
-     190,
-     -159.5
+     191.6,
+     -169.2
     ],
     [
-     171,
-     -159.5
+     186.1,
+     -177.3
     ]
    ],
    "kind": "house",
@@ -626,7 +673,7 @@
     "color": "#3e4452"
    },
    "facade": "house",
-   "src": "earth: dark slate hipped house, also on the GSI photo but missing from the footprints (sub-b top p_134_-200; o180 t11)"
+   "src": "earth: c6 sub-b-after top, the dark slate hip roof fits the rotated OSM w966913922 ring (about 15 x 10 m, 149 m2), ridge along its long side; the lot was 19 x 21 m and ran over asphalt and parking (round 2)"
   },
   {
    "id": "ovr:c6:uomachi-b4",
@@ -806,6 +853,321 @@
     "ridge": "z"
    },
    "src": "earth: c6 sub-b top + o180, two parallel north-south gables on the east part"
+  },
+  {
+   "id": "ovr:c6:minami-flat",
+   "poly": [
+    [
+     -150.7,
+     -61.7
+    ],
+    [
+     -138.4,
+     -65.1
+    ],
+    [
+     -132.0,
+     -41.5
+    ],
+    [
+     -144.2,
+     -38.1
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 2,
+   "height": 9,
+   "roof": {
+    "shape": "flat",
+    "color": "#a6a7ab"
+   },
+   "facade": "warehouse",
+   "src": "earth: c6 sub-a top + GSI, one light-grey flat roof 12.3 x 24.6 m with a parapet at the head of a car park; its shadow (about 10 m along 340 onto the gravel to the north) gives h about 9 m; footprint = the measured roof outline shifted by the lean (+3.5, -1.9) m (round 2); roof colour from the Earth top sample (#a4a1a8), the app lights it about +12 brighter than the stored value"
+  },
+  {
+   "id": "ovr:c6:kyodoka-bay1",
+   "poly": [
+    [
+     -128.9,
+     87.8
+    ],
+    [
+     -123.6,
+     94.0
+    ],
+    [
+     -110.8,
+     83.1
+    ],
+    [
+     -116.2,
+     76.9
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 3,
+   "height": 9,
+   "roof": {
+    "shape": "gable",
+    "color": "#e6e1de",
+    "ridge": "z"
+   },
+   "wall": "#9ca3ab",
+   "src": "earth: c6 sub-c top + l45 + lookout photo: pleated white roof, gable fronts facing 南町魚市場線, ridge front to back (rotated frame 49.6 deg, s along the facade); bay 1, 8.2 x 16.8 m"
+  },
+  {
+   "id": "ovr:c6:kyodoka-bay2",
+   "poly": [
+    [
+     -117.5,
+     88.8
+    ],
+    [
+     -112.1,
+     95.2
+    ],
+    [
+     -105.4,
+     89.5
+    ],
+    [
+     -110.8,
+     83.1
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 3,
+   "height": 9,
+   "roof": {
+    "shape": "gable",
+    "color": "#e6e1de",
+    "ridge": "z"
+   },
+   "wall": "#9ca3ab",
+   "src": "earth: c6 sub-c top + l45 + lookout photo: pleated white roof, gable fronts facing 南町魚市場線, ridge front to back (rotated frame 49.6 deg, s along the facade); bay 2, 8.4 x 8.8 m"
+  },
+  {
+   "id": "ovr:c6:kyodoka-bay3",
+   "poly": [
+    [
+     -112.1,
+     95.2
+    ],
+    [
+     -106.4,
+     101.9
+    ],
+    [
+     -99.7,
+     96.2
+    ],
+    [
+     -105.4,
+     89.5
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 3,
+   "height": 9,
+   "roof": {
+    "shape": "gable",
+    "color": "#e6e1de",
+    "ridge": "z"
+   },
+   "wall": "#9ca3ab",
+   "src": "earth: c6 sub-c top + l45 + lookout photo: pleated white roof, gable fronts facing 南町魚市場線, ridge front to back (rotated frame 49.6 deg, s along the facade); bay 3, 8.8 x 8.8 m",
+   "name": "南町二丁目共同化商店街",
+   "nameEn": "Minamimachi 2-chome Kyodoka Shopping Arcade"
+  },
+  {
+   "id": "ovr:c6:kyodoka-bay4",
+   "poly": [
+    [
+     -112.5,
+     107.1
+    ],
+    [
+     -106.3,
+     114.4
+    ],
+    [
+     -93.5,
+     103.5
+    ],
+    [
+     -99.7,
+     96.2
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 3,
+   "height": 9,
+   "roof": {
+    "shape": "gable",
+    "color": "#e6e1de",
+    "ridge": "z"
+   },
+   "wall": "#9ca3ab",
+   "src": "earth: c6 sub-c top + l45 + lookout photo: pleated white roof, gable fronts facing 南町魚市場線, ridge front to back (rotated frame 49.6 deg, s along the facade); bay 4, 9.6 x 16.8 m"
+  },
+  {
+   "id": "ovr:c6:kyodoka-bay5",
+   "poly": [
+    [
+     -105.5,
+     113.8
+    ],
+    [
+     -99.9,
+     120.3
+    ],
+    [
+     -87.9,
+     110.1
+    ],
+    [
+     -93.5,
+     103.5
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 3,
+   "height": 9,
+   "roof": {
+    "shape": "gable",
+    "color": "#e6e1de",
+    "ridge": "z"
+   },
+   "wall": "#9ca3ab",
+   "src": "earth: c6 sub-c top + l45 + lookout photo: pleated white roof, gable fronts facing 南町魚市場線, ridge front to back (rotated frame 49.6 deg, s along the facade); bay 5, 8.6 x 15.8 m"
+  },
+  {
+   "id": "ovr:c6:kyodoka-bay6",
+   "poly": [
+    [
+     -94.6,
+     115.8
+    ],
+    [
+     -91.0,
+     120.0
+    ],
+    [
+     -84.3,
+     114.3
+    ],
+    [
+     -87.9,
+     110.1
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 3,
+   "height": 9,
+   "roof": {
+    "shape": "gable",
+    "color": "#e6e1de",
+    "ridge": "z"
+   },
+   "wall": "#9ca3ab",
+   "src": "earth: c6 sub-c top + l45 + lookout photo: pleated white roof, gable fronts facing 南町魚市場線, ridge front to back (rotated frame 49.6 deg, s along the facade); bay 6, 5.5 x 8.8 m"
+  },
+  {
+   "id": "ovr:c6:kyodoka-deck",
+   "poly": [
+    [
+     -121.4,
+     92.1
+    ],
+    [
+     -110.2,
+     105.2
+    ],
+    [
+     -106.4,
+     101.9
+    ],
+    [
+     -117.5,
+     88.8
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#bfb8b4"
+   },
+   "facade": "plain",
+   "src": "earth: c6 sub-c top, a tan flat deck with a rooftop box between the white bays and the dark block"
+  },
+  {
+   "id": "ovr:c6:kyodoka-block",
+   "poly": [
+    [
+     -126.2,
+     100.7
+    ],
+    [
+     -110.5,
+     119.2
+    ],
+    [
+     -105.7,
+     115.1
+    ],
+    [
+     -112.5,
+     107.1
+    ],
+    [
+     -110.2,
+     105.2
+    ],
+    [
+     -119.1,
+     94.7
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 3,
+   "height": 9,
+   "roof": {
+    "shape": "flat",
+    "color": "#7c828c",
+    "pv": 0.75
+   },
+   "facade": "plain",
+   "src": "earth: c6 sub-c top, the larger dark flat block behind the white bays: a flat roof covered with dark PV module rows"
+  },
+  {
+   "id": "ovr:c6:osm-966913923",
+   "poly": [
+    [
+     103.8,
+     -117.9
+    ],
+    [
+     109.2,
+     -109.4
+    ],
+    [
+     118.6,
+     -115.3
+    ],
+    [
+     113.2,
+     -123.8
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#96888b"
+   },
+   "src": "osm: w966913923 (112 m2, uncovered by any lot) + earth: 2026-03-11 top, o0 and o180 of the c6 capture (tools/anime/earth-crop.mjs --ring): a flat grey roof like its neighbours; roof median #96888b (round 3 systemic 1: the OSM gap list is mostly gone buildings, this one stands)"
   }
  ],
  "landuse": [
@@ -1267,6 +1629,262 @@
     ]
    ],
    "src": "earth: pier7 top + o180, the strip between the 迎 lawn and the quay edge, north of the stepped garden, is dark asphalt (Earth #817b82)"
+  },
+  {
+   "use": "levee",
+   "replace": true,
+   "name": "三号街区公園",
+   "ring": [
+    [
+     -46.4,
+     6.2
+    ],
+    [
+     -55.2,
+     -9.5
+    ],
+    [
+     -44,
+     -30.4
+    ],
+    [
+     -25.4,
+     -35
+    ],
+    [
+     -24.7,
+     -32.2
+    ],
+    [
+     -34.9,
+     -11.1
+    ],
+    [
+     -31,
+     -2.8
+    ]
+   ],
+   "src": "earth: c6 land2 round 2 (raw/ref/earth/c6/pk-a-r2 top, 16 px/m): 三号街区公園 (Earth label 南町海岸公園) is tan paving and gravel with a few bare planters between the road and the seawall, no lawn; ring = the OSM polygon, replace drops the OSM park.  Surface chosen by measurement, not by the class name: Earth median #a19595 / #a79793 inside the ring, and the app renders plaza (#c9c3b8) at #d6d0c5 (dE2000 17, dL +20) against levee (#928c8d, the documented grey-paving class) at about #9b9496 (dE2000 2.4 / 4.8)."
+  },
+  {
+   "use": "levee",
+   "replace": true,
+   "name": "西風釜公園",
+   "ring": [
+    [
+     -54.4,
+     195.4
+    ],
+    [
+     -35.8,
+     183
+    ],
+    [
+     -13.8,
+     216
+    ],
+    [
+     -16.9,
+     219
+    ]
+   ],
+   "src": "earth: c6 land2 round 2 (raw/ref/earth/c6/pk-b-r2 top, 16 px/m): 西風釜公園 (Earth label Seifukama Park) is sandy grey-pink paving round a dark-grey basin, no lawn; ring = the OSM polygon, replace drops the OSM park.  Surface chosen by measurement, not by the class name: Earth median #a19595 / #a79793 inside the ring, and the app renders plaza (#c9c3b8) at #d6d0c5 (dE2000 17, dL +20) against levee (#928c8d, the documented grey-paving class) at about #9b9496 (dE2000 2.4 / 4.8).; the basin and the bay are holes in this surface, because an apron laid over a levee 5 mm higher z-fights on the 8 m drape triangles (the oval rendered ragged)",
+   "holes": [
+    [
+     [
+      -25.7,
+      198.1
+     ],
+     [
+      -25.8,
+      200.7
+     ],
+     [
+      -27.3,
+      203
+     ],
+     [
+      -29.6,
+      204.3
+     ],
+     [
+      -32.2,
+      203.7
+     ],
+     [
+      -34.1,
+      202.7
+     ],
+     [
+      -36.4,
+      202.2
+     ],
+     [
+      -38,
+      200.5
+     ],
+     [
+      -39.5,
+      198.1
+     ],
+     [
+      -39.6,
+      195
+     ],
+     [
+      -37.9,
+      192.3
+     ],
+     [
+      -35.1,
+      191.1
+     ],
+     [
+      -32.2,
+      191.8
+     ],
+     [
+      -30,
+      192.8
+     ],
+     [
+      -28.4,
+      194.2
+     ],
+     [
+      -27.3,
+      196
+     ]
+    ],
+    [
+     [
+      -50.4,
+      193.2
+     ],
+     [
+      -44.3,
+      189.0
+     ],
+     [
+      -42.6,
+      188.6
+     ],
+     [
+      -41.5,
+      190.6
+     ],
+     [
+      -46.1,
+      196.7
+     ],
+     [
+      -49.0,
+      195.4
+     ]
+    ]
+   ]
+  },
+  {
+   "use": "apron",
+   "name": "西風釜公園 basin",
+   "ring": [
+    [
+     -25.7,
+     198.1
+    ],
+    [
+     -25.8,
+     200.7
+    ],
+    [
+     -27.3,
+     203
+    ],
+    [
+     -29.6,
+     204.3
+    ],
+    [
+     -32.2,
+     203.7
+    ],
+    [
+     -34.1,
+     202.7
+    ],
+    [
+     -36.4,
+     202.2
+    ],
+    [
+     -38,
+     200.5
+    ],
+    [
+     -39.5,
+     198.1
+    ],
+    [
+     -39.6,
+     195
+    ],
+    [
+     -37.9,
+     192.3
+    ],
+    [
+     -35.1,
+     191.1
+    ],
+    [
+     -32.2,
+     191.8
+    ],
+    [
+     -30,
+     192.8
+    ],
+    [
+     -28.4,
+     194.2
+    ],
+    [
+     -27.3,
+     196
+    ]
+   ],
+   "src": "earth: pk-b-r2 top, the dark-grey oval basin (#6e717d) traced by flood fill on the Earth top view, 14 x 13 m, centre (-32.5, 198); apron (dark asphalt, render #82808e, dE2000 7), not vacant (pale gravel)"
+  },
+  {
+   "use": "apron",
+   "name": "西風釜公園 bay",
+   "ring": [
+    [
+     -50.4,
+     193.2
+    ],
+    [
+     -44.3,
+     189.0
+    ],
+    [
+     -42.6,
+     188.6
+    ],
+    [
+     -41.5,
+     190.6
+    ],
+    [
+     -46.1,
+     196.7
+    ],
+    [
+     -49.0,
+     195.4
+    ]
+   ],
+   "src": "earth: pk-b-r2 top, the dark-grey paved bay with white stall lines in the north-west corner of the park, #75757a, about 6 x 9 m"
   }
  ],
  "roads": [
@@ -1314,6 +1932,248 @@
    "id": "r13970",
    "remove": true,
    "src": "earth: exact duplicate of r14055 (same GSI centreline stacked twice)"
+  },
+  {
+   "id": "r12632",
+   "pts": [
+    [
+     -68.7,
+     123.4
+    ],
+    [
+     -90.3,
+     93.1
+    ]
+   ],
+   "src": "earth: c6 sub-c top + pair_top, a hatched 導流帯 (white chevron stripes, centred on the 4-lane carriageway) runs from about (-111,61) to (-88,87) on 南町魚市場線; r12632 is split at the two ends of the paint (same width 16 and kind, same end points and junction nodes, no new degree-3 node), the middle road carries markings. The app centreline sits about 2.4 m SW of the real median here (strip check) [part 1 of 3: south-east end]"
+  },
+  {
+   "id": "ovr:c6:minami-hatch",
+   "pts": [
+    [
+     -90.3,
+     93.1
+    ],
+    [
+     -97.5,
+     83.0
+    ],
+    [
+     -120.4,
+     55.2
+    ]
+   ],
+   "width": 16,
+   "kind": "city",
+   "name": "南町魚市場線",
+   "markings": {
+    "centre": "hatched-median",
+    "medianWidth": 3,
+    "lanes": [
+     2,
+     2
+    ]
+   },
+   "src": "earth: c6 sub-c top + pair_top, a hatched 導流帯 (white chevron stripes, centred on the 4-lane carriageway) runs from about (-111,61) to (-88,87) on 南町魚市場線; r12632 is split at the two ends of the paint (same width 16 and kind, same end points and junction nodes, no new degree-3 node), the middle road carries markings. The app centreline sits about 2.4 m SW of the real median here (strip check) [part 2 of 3: 48 m long so that the 33 m hatch (s 44.7..78.1 from the south-east end) remains after streets.js cuts markings within 7.5 m of a neighbouring road's end]"
+  },
+  {
+   "id": "ovr:c6:minami-sw",
+   "pts": [
+    [
+     -120.4,
+     55.2
+    ],
+    [
+     -150.0,
+     19.4
+    ]
+   ],
+   "width": 16,
+   "kind": "city",
+   "name": "南町魚市場線",
+   "src": "earth: c6 sub-c top + pair_top, a hatched 導流帯 (white chevron stripes, centred on the 4-lane carriageway) runs from about (-111,61) to (-88,87) on 南町魚市場線; r12632 is split at the two ends of the paint (same width 16 and kind, same end points and junction nodes, no new degree-3 node), the middle road carries markings. The app centreline sits about 2.4 m SW of the real median here (strip check) [part 3 of 3: north-west end]"
+  },
+  {
+   "id": "r12692",
+   "markings": {
+    "centre": "white-dashed",
+    "lanes": [
+     2,
+     2
+    ]
+   },
+   "src": "earth: 2026-03-11 top, streets8924r3 lane-line peaks (round 3 systemic 11): r12692 at (111,-158): lines at -6.5, -4.2, 0.4, 2.3, 3.6, 5.5 m (a 2 + 2 lane carriageway with a turn pocket)"
+  },
+  {
+   "id": "r12683",
+   "markings": {
+    "centre": "white-dashed",
+    "lanes": [
+     2,
+     2
+    ]
+   },
+   "src": "earth: 2026-03-11 top, streets8924r3 lane-line peaks (round 3 systemic 11): r12683 at (38,-126): lines at -6.6, -3.8, -2.4, -0.9, 0.6, 2.1, 5.3 m (2 + 2 lanes; the 1.5 m-pitch cluster near the junction is turn-pocket paint and is not modelled)"
+  },
+  {
+   "id": "r12665",
+   "markings": {
+    "centre": "white-dashed",
+    "lanes": [
+     2,
+     2
+    ]
+   },
+   "src": "earth: 2026-03-11 top, streets8924r3 lane-line peaks (round 3 systemic 11): r12665, the same 2 + 2 lane carriageway as r12683 (it continues r12683 to the junction at (14,-118))"
+  },
+  {
+   "id": "r12619",
+   "markings": {
+    "centre": "white-dashed",
+    "lanes": [
+     2,
+     2
+    ]
+   },
+   "src": "earth: 2026-03-11 top, streets8924r3 lane-line peaks (round 3 systemic 11): r12619 at (-48,-104): peaks at -4.2, 0.5, 2.4 to 3.2 m show a 2 + 2 carriageway"
+  },
+  {
+   "id": "r12602",
+   "markings": {
+    "centre": "white-dashed",
+    "lanes": [
+     2,
+     1
+    ]
+   },
+   "src": "earth: 2026-03-11 top, streets8924r3 lane-line peaks (round 3 systemic 11): r12602 at (-171,-89): lines at -5.4, -2, 4, 6.6 m; the + side (right of the first point to the last) has 2 lanes"
+  }
+ ],
+ "crossings": [
+  {
+   "at": [
+    188.2,
+    -152.3
+   ],
+   "road": "r12695",
+   "remove": true,
+   "src": "earth: c6_kou (2026-03-11): the 魚町 bay road has no zebra here; the real crossings are at the side-street junctions to the north"
+  },
+  {
+   "at": [
+    242.8,
+    -173.7
+   ],
+   "road": "r12695",
+   "remove": true,
+   "src": "earth: c6_kou (2026-03-11): the 魚町 bay road has no zebra here; the real crossings are at the side-street junctions to the north"
+  },
+  {
+   "at": [
+    -40.8,
+    -105.4
+   ],
+   "road": "r12619",
+   "remove": true,
+   "src": "earth: c6 sub-a/sub-b top + streets2 junction sheets, no zebra on this west arm (lane arrows and diamonds only)"
+  },
+  {
+   "at": [
+    -16.5,
+    -110.0
+   ],
+   "road": "r12620",
+   "remove": true,
+   "src": "earth: c6 sub-a/sub-b top + streets2 junction sheets, no zebra on this east arm (lane arrows and diamonds only)"
+  },
+  {
+   "at": [
+    25.4,
+    -122.1
+   ],
+   "road": "r12665",
+   "remove": true,
+   "src": "earth: c6 sub-a/sub-b top + streets2 junction sheets, no zebra on this arm at node (14,-118) (lane arrows and diamonds only)"
+  },
+  {
+   "at": [
+    112.3,
+    -102.3
+   ],
+   "road": "r12689",
+   "remove": true,
+   "src": "earth: c6 sub-a/sub-b top + streets2 junction sheets, no zebra on this arm at node (106,-98) (lane arrows and diamonds only)"
+  },
+  {
+   "at": [
+    169.2,
+    -139.7
+   ],
+   "road": "r12689",
+   "remove": true,
+   "src": "earth: c6 sub-a/sub-b top + streets2 junction sheets, no zebra on this arm at node (178,-146) (lane arrows and diamonds only)"
+  },
+  {
+   "at": [
+    163.7,
+    -192.2
+   ],
+   "road": "r12691",
+   "remove": true,
+   "src": "earth: c6 sub-a/sub-b top + streets2 junction sheets, no zebra on this arm at node (154,-185) (lane arrows and diamonds only)"
+  },
+  {
+   "at": [
+    -31.9,
+    -117.6
+   ],
+   "road": "r12611",
+   "src": "earth: c6 sub-a top (node (-28,-107)): the narrow N side street has a zebra at about (-28,-118); the app's r12611 centreline runs about 3.5 m west of the real street there, so the zebra is placed on the app road's nearest point (finding named r12604, which is elsewhere)"
+  },
+  {
+   "at": [
+    143.3,
+    -178.1
+   ],
+   "road": "r12692",
+   "remove": true,
+   "src": "earth: c6 sub-b top (node (154,-185)): no zebra across the south-west arm of the main road; the real zebras are on the two side streets (NW street and SE street)"
+  },
+  {
+   "at": [
+    12,
+    243
+   ],
+   "road": "r13899",
+   "remove": true,
+   "src": "earth: round 3 streets8924r3 c6_minami top (0.15 m/px) + zb_all.jpg crop at (12,243): the 南町 boulevard shows lane lines and a centre line only, no zebra anywhere between z 232 and 296; the planned zebra is an artefact of a hero junction made by the boulevard joining 2-4 m footpaths and stubs (nodes (20,257) deg 5, (26,278) deg 4). The real crossing near (8.6,229) is already matched by the zebra at (7,233) on r12656 (raw/ref/streets8924r3/ov/zb_all.jpg)"
+  },
+  {
+   "at": [
+    25,
+    272
+   ],
+   "road": "r14055",
+   "remove": true,
+   "src": "earth: round 3 streets8924r3 c6_minami top (0.15 m/px) + zb_all.jpg crop at (25,272): the 南町 boulevard shows lane lines and a centre line only, no zebra anywhere between z 232 and 296; the planned zebra is an artefact of a hero junction made by the boulevard joining 2-4 m footpaths and stubs (nodes (20,257) deg 5, (26,278) deg 4). The real crossing near (8.6,229) is already matched by the zebra at (7,233) on r12656 (raw/ref/streets8924r3/ov/zb_all.jpg)"
+  },
+  {
+   "at": [
+    22,
+    263
+   ],
+   "road": "r14055",
+   "remove": true,
+   "src": "earth: round 3 streets8924r3 c6_minami top (0.15 m/px) + zb_all.jpg crop at (22,263): the 南町 boulevard shows lane lines and a centre line only, no zebra anywhere between z 232 and 296; the planned zebra is an artefact of a hero junction made by the boulevard joining 2-4 m footpaths and stubs (nodes (20,257) deg 5, (26,278) deg 4). The real crossing near (8.6,229) is already matched by the zebra at (7,233) on r12656 (raw/ref/streets8924r3/ov/zb_all.jpg)"
+  },
+  {
+   "at": [
+    24,
+    293
+   ],
+   "road": "r14057",
+   "remove": true,
+   "src": "earth: round 3 streets8924r3 c6_minami top (0.15 m/px) + zb_all.jpg crop at (24,293): the 南町 boulevard shows lane lines and a centre line only, no zebra anywhere between z 232 and 296; the planned zebra is an artefact of a hero junction made by the boulevard joining 2-4 m footpaths and stubs (nodes (20,257) deg 5, (26,278) deg 4). The real crossing near (8.6,229) is already matched by the zebra at (7,233) on r12656 (raw/ref/streets8924r3/ov/zb_all.jpg)"
   }
  ]
 }

@@ -1,0 +1,43 @@
+{
+ "version": 1,
+ "cell": "outside-riasark",
+ "bbox": [
+  -2300,
+  2680,
+  -2100,
+  2860
+ ],
+ "note": "outside the 12 cells: the paved lot between the two buildings and the north wall of リアス・アーク美術館 (far core), joined to r20349's end at (-2206, 2752). Earth 2026-03-11 shows the museum inside a paved loop road with a car park north of the building; the second, striped lot S/SW of the museum next to the 野外彫刻 (x about -2215..-2200, z >= 2800, running out of frame) still has to be measured on earth_top_full.png or the GSI ortho before it is added.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth (the 2026-03-11 aerial image draped on the terrain; no 3D buildings), imagery dated 2026-03-11 (raw/ref/earth/lm/lm-riasark: top_annot.jpg, a 6.5 px/m grid)",
+   "date": "2026-03-11"
+  }
+ ],
+ "landuse": [
+  {
+   "use": "parking",
+   "ring": [
+    [
+     -2214,
+     2737
+    ],
+    [
+     -2168,
+     2735
+    ],
+    [
+     -2160,
+     2762
+    ],
+    [
+     -2210,
+     2772
+    ]
+   ],
+   "fill": 0.2,
+   "src": "earth: top_annot.jpg (6.5 px/m): the paved lot with parked cars between the two buildings and the museum's north wall, x about -2214..-2166, z about 2735..2770, joined to r20349's end at (-2206, 2752)"
+  }
+ ]
+}

@@ -28,6 +28,8 @@ export function createContext({ scene, camera, renderer = null, audio, quality, 
   const shared = {
     uTime: { value: 0 },
     uWind: { value: new THREE.Vector2(0.9, 0.35) },   // wind direction * strength (m/s-ish), blows roughly +X
+    uRipple: { value: 1 },                             // [live] water ripple speed, 1 at a light breeze; time.setWeather scales it with wind m/s
+    uRain: { value: 0 }, uWet: { value: 0 },           // [live r2] life eases these; water and the wet-street sheen read them
     uSunDir: { value: sunDir.clone() },
     uGust: { value: 0.5 },                               // 0..1 slowly varying gust strength (core animates it)
   };
@@ -56,6 +58,12 @@ export function createContext({ scene, camera, renderer = null, audio, quality, 
     add(obj) { obj.traverse((o) => { o.userData.dynamic = true; }); dynamicRoot.add(obj); return obj; },
     /** Register fn(dt, t) called every frame (t = seconds since start, deterministic in shot mode). */
     onUpdate(fn) { updates.push(fn); },
+    /** [smooth] Register fn(dt, t) called once per fixed simulation step (dt = 1/60 s, core/timestep.js) for state that integrates motion
+     *  (the car, the ship at the helm). Draw it from an onUpdate, blended between the last two steps by ctx.alpha (0 = the step before,
+     *  1 = the newest). In shot mode and window.__sim it runs with the other updates, in registration order. */
+    onStep(fn) { fn.__step = true; updates.push(fn); },
+    /** [smooth] where this frame lies between the last two simulation steps (main.js sets it every frame) */
+    alpha: 1,
     /** Exclude from the outline pass (alpha cut-outs, particles, shader-animated meshes). */
     noOutline(obj) { obj.traverse((o) => o.layers.set(LAYER_NO_OUTLINE)); return obj; },
     /** Exclude from static merging (keep separate). */

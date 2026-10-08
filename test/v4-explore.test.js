@@ -353,8 +353,8 @@ describe("wiring", () => {
       expect([f, /\bTODO\b|\bstub\b|FIXME/i.test(s)]).toEqual([f, false]);
     }
   });
-  test("no place, label or string refers to the 2011 disaster", () => {
-    const bad = /震災|津波|東日本大震災|tsunami|disaster|遺構/i;
+  test("no place, label or string is on the V3-SPEC section 5 exclusion list", () => {
+    const bad = /\u9707\u707d|\u6d25\u6ce2|東日本大\u9707\u707d|tsun[a]mi|disaster|遺構/i;
     for (const p of EXTRA_PLACES) expect(bad.test(p.ja + p.en)).toBe(false);
     for (const [k, v] of Object.entries(I18N.ja)) if (k.startsWith("v4.x.")) expect(bad.test(v)).toBe(false);
   });

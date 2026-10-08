@@ -1,5 +1,5 @@
 // [v5:photos] The 内湾 / 南町 waterfront and the fish market's C棟 roof deck rebuilt against the author's photos
-// (raw/photos-sailesh, 2026-10-01): the override file, the photo-matched geometry and the pair tool.
+// (raw/author-photos, 2026-10-01): the override file, the photo-matched geometry and the pair tool.
 import { test, expect, describe } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -19,8 +19,8 @@ describe("zz-photos.json", () => {
   test("applies last and names the author's photos as its source", () => {
     const ov = JSON.parse(read("data/anime/layout.json")).overrides;
     expect(ov[ov.length - 1].file).toBe("zz-photos.json");
-    expect(doc.sources[0].id).toBe("sailesh");
-    for (const sec of ["lots", "landuse", "roads"]) for (const o of doc[sec]) expect(o.src.startsWith("sailesh")).toBe(true);
+    expect(doc.sources[0].id).toBe("photos");
+    for (const sec of ["lots", "landuse", "roads"]) for (const o of doc[sec]) expect(o.src.startsWith("photos")).toBe(true);
   });
   test("the plaza is a flat quay-level plaza, the slow street a pedestrian plaza, the store shed gone from the lots", () => {
     const plazas = L.LANDUSE.filter((l) => l.cls === "plaza" && l.src === "override");
@@ -46,7 +46,7 @@ describe("photo-matched geometry", () => {
     for (const p of mid) { expect(pr(p)).toBeGreaterThan(-2.6); expect(pr(p)).toBeLessThan(40.7); }
   });
   test("C棟's roof deck: penthouse, pavilions and lifeboat inside the hall's outline", () => {
-    const pts = [deckEnu(DECK.wall.s[0], 0), deckEnu(DECK.wall.s[1], -5), deckEnu(DECK.lifeboat.stern, DECK.lifeboat.off), ...DECK.pavilions.list.flatMap((p) => [deckEnu(p.s[0], p.o[0]), deckEnu(p.s[1], p.o[1])])];
+    const pts = [deckEnu(DECK.wall.s[0], 0), deckEnu(DECK.wall.s[1], -5), deckEnu(DECK.lifeboat.bow + DECK.lifeboat.L, DECK.lifeboat.off), ...DECK.pavilions.list.flatMap((p) => [deckEnu(p.s[0], p.o[0]), deckEnu(p.s[1], p.o[1])])];
     for (const p of pts) expect(inPoly(p[0], p[1], SITES.marketC.poly)).toBe(true);
     expect(read("src/anime/world/harbor/market4.js")).toContain("buildCRoofPhotos(ctx, k, { cars });");
   });

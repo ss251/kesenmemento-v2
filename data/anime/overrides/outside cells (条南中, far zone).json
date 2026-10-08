@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "cell": "outside-jonan",
+  "bbox": [-1250, 1660, -1050, 1900],
+  "note": "outside the 12 cells: 条南中学校 (far zone, x -1250..-1050 z 1660..1900). The three lots are drawn by the school landmark model (schools.js), which now reads a per-lot kind / storeys from SCHOOL_INFO.schJonanJ (sites.js, [v6:jonan-r3]); the values here keep the layout in step with the render (the derived layout carried 5 and 4 storeys for the bar and the wing, and 1 for the tower). Main bar /175 4 storeys 14.4 m (4 window rows, yellow roof-edge band, cream walls); wing /168 3 storeys 10.8 m, flat roof; stair tower /169 4 storeys + about 3 m = 17.4 m, standing about 3 m above the bar's roof at its west end.",
+  "sources": [
+    { "id": "commons", "what": "Wikimedia Commons 153670155 Kesennuma city Jonan junior high school 202405 (raw/ref/commons, reference only): the bar has 4 window rows with a yellow roof-edge band, a stair tower about 3 m above the roof at its west end, and a 3-storey wing to its west", "date": "2024-05-03" },
+    { "id": "ortho", "what": "GSI aerial photo data/ortho/core.jpg (about 2020-22), crop x -1250..-1050 z 1660..1900: /168 is a flat-roofed square wing, the rust barrel roof to the NE is the gym; /169 is the narrow 3.6 x 15 m link between the wing and the bar's west end", "date": "2021-01-01" }
+  ],
+  "lots": [
+    { "id": "16/58538/25072/175", "storeys": 4, "height": 14.4, "roof": { "shape": "flat" }, "src": "commons: main classroom bar, 4 window rows (4 x 3.6 m = 14.4 m)" },
+    { "id": "16/58538/25072/168", "storeys": 3, "height": 10.8, "roof": { "shape": "flat" }, "src": "commons: 3-storey wing west of the stair tower; ortho: flat-roofed square wing, not the gym" },
+    { "id": "16/58538/25072/169", "storeys": 4, "height": 17.4, "roof": { "shape": "flat" }, "src": "commons: stair tower about 3 m above the 14.4 m bar roof (4 storeys + 3 m); lot 169 polygon is the tower footprint (3.6 x 15 m)" }
+  ]
+}

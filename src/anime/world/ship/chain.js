@@ -2,12 +2,12 @@
 //
 // She does NOT sail home with the fish. The frozen catch moves at Las Palmas (her overseas base) into reefer containers
 // (or reefer carriers) and lands mostly at Shimizu, a bonded port. The landing inspection there is a vignette, in order
-// (SHIMIZU_STEPS; Usui's talk 2026-10-03, Usui's public talk at Hackatsuon, 2026-10-03): about 3 Fisheries Agency inspectors
+// (SHIMIZU_STEPS; the 臼福本店 talk 2026-10-03, the 臼福本店 public talk at Hackatsuon, 2026-10-03): about 3 Fisheries Agency inspectors
 // check by eye and scan each fish's chip with a reader gun, a sticker with the same number goes on the fish's cheek, and
 // the trucks are weighed on truck scales; 1 kg over the quota costs the licences of all 6 ships, plus fines or prison.
 // The ship and crew come home to Kesennuma under 大漁旗 for refit and crew change. The player's tagged fish then becomes
 // a card: 「まぐろの日は北かつまぐろ屋へ」 (北かつまぐろ屋 海の市店, 魚市場前7-13), with no discount promise, closing on
-// Usui's call to the hackers (Usui's public talk, 2026-10-03).
+// the 臼福本店 president's call to the hackers (the 臼福本店 public talk, 2026-10-03).
 //
 //   CHAIN                 the steps in order, with their i18n keys (tested: exactly the acts.js CHAIN_ORDER)
 //   SHIMIZU_STEPS         (acts.js) the inspection substeps; chainCards puts them on the Shimizu card as `steps`
@@ -25,7 +25,7 @@ export const CHAIN = [
   { state: 'CARD', title: 'ship.card.title', body: 'ship.card.body', fact: 'ship.card.fact', carrier: null, withCatch: false },
 ];
 
-/** The final card's last line: Usui's call to the hackers, attributed (Usui's public talk, 2026-10-03). */
+/** The final card's last line: the 臼福本店 president's call to the hackers, attributed (the 臼福本店 public talk, 2026-10-03). */
 export const CLOSING = { line: 'ship.card.closing', by: 'ship.card.closingBy' };
 
 /** 北かつまぐろ屋 海の市店 (OSM node n7181952808, layout place p1m5usud, inside the 海の市 lot 16/58541/25069/401). */

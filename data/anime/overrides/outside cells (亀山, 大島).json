@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "cell": "kameyama",
+  "bbox": [
+    3640,
+    3560,
+    4060,
+    3960
+  ],
+  "note": "outside the 12 cells: 亀山 (Oshima side). The monorail, stations and car park are in src/anime/world/landmarks/sites.js (KAMEYAMA); this file adds the clear-cut swath along the track, which the aerial photo shows as forest.",
+  "sources": [
+    {
+      "id": "earth",
+      "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/lm/lm-kameyama: top_annot, earth_top, pair_o0)",
+      "date": "2026-03-11"
+    },
+    {
+      "id": "commons",
+      "what": "Wikimedia Commons 196954946 Kameyama Monorail Between Stations (2026-08, raw/ref/commons, reference only): the strip along the track is green grass"
+    }
+  ],
+  "landuse": [
+    {
+      "use": "felled",
+      "ring": [
+        [
+          3745,
+          3699
+        ],
+        [
+          3755,
+          3699
+        ],
+        [
+          3761,
+          3709
+        ],
+        [
+          3772,
+          3741
+        ],
+        [
+          3785,
+          3759
+        ],
+        [
+          3803,
+          3770
+        ],
+        [
+          3821,
+          3774
+        ],
+        [
+          3853,
+          3794
+        ],
+        [
+          3874,
+          3816
+        ],
+        [
+          3906,
+          3846
+        ],
+        [
+          3939,
+          3879
+        ],
+        [
+          3957,
+          3893
+        ],
+        [
+          3960,
+          3929
+        ],
+        [
+          3952,
+          3933
+        ],
+        [
+          3919,
+          3909
+        ],
+        [
+          3897,
+          3889
+        ],
+        [
+          3881,
+          3861
+        ],
+        [
+          3854,
+          3852
+        ],
+        [
+          3837,
+          3846
+        ],
+        [
+          3825,
+          3826
+        ],
+        [
+          3813,
+          3806
+        ],
+        [
+          3799,
+          3790
+        ],
+        [
+          3779,
+          3774
+        ],
+        [
+          3768,
+          3766
+        ],
+        [
+          3754,
+          3751
+        ],
+        [
+          3744,
+          3735
+        ],
+        [
+          3734,
+          3719
+        ],
+        [
+          3737,
+          3708
+        ]
+      ],
+      "src": "earth 2026-03-11: bare/grassed swath along the monorail (top_annot, earth_top); the ring follows the tan strip incl. the grass between the track and road r23811 and the bulge SW of the track, and leaves out the scrub NE of the road. commons 2026-08 shows it green-grassed, so felled brown is an approximation"
+    }
+  ]
+}

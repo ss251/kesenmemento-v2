@@ -6,6 +6,7 @@
 // soffits, gutters and downpipes, plus wall-mounted utilities (AC units, meters, water heater, vents)
 // and roof antennas. Everything is appended to the module's GeoBatch through a Frame.
 import { slab, poly } from './gb.js';
+import { PVF, isFlushPv, pvRectToRoof, flushPvBlocks } from '../pv.js';   // [r3:5]
 
 export const WALLS = { plaster: ['plaster', 3], paint: ['plaster', 3], siding: ['siding', 1.2], tile: ['tile', 0.96], wood: ['wood', 1.2] };
 const INTERIORS = ['int_lace', 'int_lace', 'int_curtain_pink', 'int_curtain_green', 'int_curtain_blue', 'int_blind', 'int_blind', 'int_dark', 'int_room', 'int_room'];
@@ -381,11 +382,14 @@ function roofMats(H, R) {
 }
 
 /** Main roof over a volume. Returns ridge y. */
+/** [r2:12] the highest a pitched kit roof may rise: a mono-pitch over its whole depth, a gable / hip from the eave to the ridge (m) */
+export const MAX_SHED_RISE = 3.2, MAX_RIDGE_RISE = 4.5;
 function buildRoof(H, F, v, R, S, out, isMain) {
   const { M } = H;
   const top = v.top;
   const rm = roofMats(H, R);
-  const tv = rm.t, p = R.pitch, o = R.over;
+  const tv = rm.t, o = R.over;
+  let p = R.pitch;   // [r2:12] capped below once the roof depth is known
   const col = R.color, ridgeCol = R.ridgeColor || R.color;
   const type = R.type;
   const lod = S.lod ?? 2;
@@ -396,6 +400,11 @@ function buildRoof(H, F, v, R, S, out, isMain) {
   if (alongZ) { const t = W; W = D; D = t; }
   const og = type === 'gable' ? Math.min(o, 0.42) : o;
   const hx = W / 2 + og, hz = D / 2 + o;
+  // [r2:12] a roof rises by pitch x its depth: on a 72 x 149 m mall (AEON) a shed rose 38 m above the 6 m walls (a house-style mono-pitch on a 149 m deep lot) and a gable
+  // 7-10 m over any deep kit-built lot. Real roofs stop: a mono-pitch at 3.2 m of rise over its depth, a gable or hip at 4.5 m from eave to ridge. The gable ends, the
+  // shed's side and back walls and the solar-panel code all read p, so they follow; a house-sized roof (depth under about 11 m) is not touched.
+  if (type === 'shed') p = Math.min(p, MAX_SHED_RISE / (2 * hz));
+  else if (type === 'gable' || type === 'hip') p = Math.min(p, MAX_RIDGE_RISE / hz);
   const yE = top + tv - o * p;
   const uvf = (e, s) => (q) => [q[0] / 1.2 * rm.topS, (s * q[2] - hz) / -1.0 * rm.topS + q[1] * 0.0];
   let ridgeY = top;
@@ -490,6 +499,17 @@ function buildRoof(H, F, v, R, S, out, isMain) {
     // [v5] the roof colour (hero.js: flatRoofOf, the measured / override colour); it was S.trim (random white / brown / black)
     RF.boxB(M.plain, col || S.trim, W + 0.1, 0.12, D + 0.1, 0, top + 0.9, 0);
     ridgeY = top + 1.0;
+  }
+  // [r3:5] measured solar blocks (lot.roof.pv = { flush, rects, ridgeAt }) lying in the plane of the facets they cover: a thin frame slab and one dark slab per module 0.04-0.07 m above the roof, clipped to the facet
+  if (S.pvFlush && (type === 'hip' || type === 'gable') && lod >= 1) {
+    const spec = S.pvFlush, at = { x: spec.off.x + cx, z: spec.off.z + cz }, rlP = type === 'hip' ? Math.max(0, hx - hz) : hx;
+    const blocks = flushPvBlocks(spec.rects.map((q) => pvRectToRoof(q, at, !alongZ, spec.ridgeAt ?? null)), { Lh: hx, Dh: hz, rl: rlP, pitch: p });
+    const yRp = yE + hz * p, sl = Math.sqrt(1 + p * p), tilt = Math.atan(p);
+    for (const bk of blocks) {
+      const tc = (bk.t0 + bk.t1) / 2, ac = (bk.a0 + bk.a1) / 2, yc = yRp - tc * p, s = bk.s;
+      RF.box(M.plain, PVF.frame, bk.a1 - bk.a0 + 2 * PVF.edge, 0.04, (bk.t1 - bk.t0 + 2 * PVF.edge) * sl, ac, yc + PVF.lift * 0.5, s * tc, { rx: s * tilt });
+      for (const cl of bk.cells) RF.box(M.plain, PVF.dark, cl.a1 - cl.a0, 0.03, (cl.t1 - cl.t0) * sl, (cl.a0 + cl.a1) / 2, yRp - ((cl.t0 + cl.t1) / 2) * p + PVF.lift, s * (cl.t0 + cl.t1) / 2, { rx: s * tilt });
+    }
   }
   // solar panels on the sunny (front/back) plane
   if (S.solar && (type === 'hip' || type === 'gable') && lod >= 1) {

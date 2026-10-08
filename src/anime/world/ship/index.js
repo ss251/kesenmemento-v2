@@ -17,7 +17,7 @@
 //   ?ship=1&auto=1         the hands-free demo (about 5 minutes from the quay to the card)
 // With ?shot=1&t=S the beat is entered on the first simulation step, then the scene runs S seconds (main.js __sim).
 //
-// Publishes ctx.services.ship = { ship, sail, voyage, flags, place, board(state?), parseShipParams } and, for the shot
+// Publishes ctx.services.ship = { ship, sail, voyage, flags, place, board(state?), parseShipParams, padSync } and, for the shot
 // tools, window.__ship / __voyage / __sail / __voyageShot / __voyageCam / __voyageKanae / __voyageInit.
 import * as ROUTE from './route.js';
 import { buildShofukumaru } from './shofukumaru1.js';
@@ -26,6 +26,8 @@ import { createSail } from '../explore/sail.js';
 import { createVoyage } from './voyage.js';
 import { STATES } from './acts.js';
 import { mountBoardChip } from '../../ui/ship.js';
+import { mountSailPad } from './padmode.js';
+import { mount as mountIpponPlay } from '../../play/ippon/index.js';   // [integration] static: Bun's splitter cannot resolve a module that is both imported and import()ed
 
 /** The first beat of each act (?act=). */
 export const ACT_START = { 1: 'DOCKED', 2: 'OCEAN_SET', 3: 'TRANSSHIP_LAS_PALMAS' };
@@ -36,7 +38,7 @@ export const BLOCKED_KEYS = new Set(['KeyC', 'KeyV', 'KeyF', 'KeyR', 'KeyN', 'Ke
 
 /** The places-list entry (explore): selecting it boards the ship. */
 export const PLACE = {
-  id: 'ship-shofukumaru1', ja: '第一昭福丸に乗る', en: 'Board the 第一昭福丸', cat: 'ship', group: 'ship',
+  id: 'ship-shofukumaru1', ja: '第一昭福丸に乗る', en: 'Board the Daiichi Shofuku Maru', cat: 'ship', group: 'ship',
   groupLabel: { ja: '船に乗る', en: 'Go to sea' },
   at: [ROUTE.BERTH.x, ROUTE.BERTH.z],
 };
@@ -78,9 +80,15 @@ export async function build(ctx) {
   // Esc leaves the voyage. Registered before the sail mode so it runs first in the capture phase.
   let voyage = null;
   if (typeof addEventListener === 'function') addEventListener('keydown', (e) => {
-    if (!voyage?.active) return;
+    const fishing = !!ctx.services.ippon?.ownsInput?.();
+    if (!voyage?.active && !fishing) return;
     if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
-    if (e.code === 'Escape') { e.stopImmediatePropagation(); voyage.exit(); return; }
+    if (e.code === 'Escape') {
+      e.stopImmediatePropagation();
+      if (voyage?.active) voyage.exit();
+      else ctx.services.ippon?.leave?.();
+      return;
+    }
     if (BLOCKED_KEYS.has(e.code)) e.stopImmediatePropagation();
   }, true);
 
@@ -88,6 +96,9 @@ export async function build(ctx) {
   ctx.onUpdate((dt, t) => ship.update(dt, t));
   const sail = createSail(ctx, { ship });   // she lies at ROUTE.BERTH until a voyage moves her
   voyage = createVoyage(ctx, { ship, sail, route: ROUTE, livery, auto: want.auto, gate: () => SHOT || introDone() });
+
+  // [ship:pad] the touch pad's 'sail' mode: the stick is the helm; 停止 / 自動操船 / 4× / 町へ戻る (padmode.js)
+  const padSync = mountSailPad(ctx, { sail, voyage });
 
   // the voyage UI needs the cursor: a pointer lock that lands while it runs (main.js start() asks for one as the intro
   // closes, the same frame a URL voyage boards) is released at once
@@ -115,7 +126,8 @@ export async function build(ctx) {
     chipAcc += dt; if (chipAcc < 0.25) return; chipAcc = 0;
     const c = ctx.camera.position, drive = ctx.services.explore?.drive;
     const p = drive?.active ? drive.state : c;
-    const on = !voyage.active && !sail.active && !ctx.planet?.active && nearBerth(p.x, p.z, c.y);
+    const on = !voyage.active && !sail.active && !ctx.planet?.active && nearBerth(p.x, p.z, c.y)
+      && !document.querySelector('#klc-x .xsearch:not([hidden]), #klc-x .xmap:not([hidden])') && !(ctx.pad?.suppressed?.length);   // (never above the places sheet, the full map or a pad-suppressing sheet)
     chip.update({ visible: on, lang: ctx.services.life?.hud?.i18n?.lang });
   });
 
@@ -159,7 +171,12 @@ export async function build(ctx) {
     });
   }
 
-  const api = { ship, sail, voyage, flags, livery, tier, place, board, parseShipParams, chip };
+  const api = { ship, sail, voyage, flags, livery, tier, place, board, parseShipParams, chip, padSync };
   ctx.services.ship = api;
+  if (params.get('play') !== '0') {
+    try {
+      await mountIpponPlay(ctx);
+    } catch (e) { console.error('[ippon]', e); }
+  }
   return { ms: Math.round(performance.now() - t0), livery, tier, triangles: ship.triangles, board: want.board ? want.state : null };
 }

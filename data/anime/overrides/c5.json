@@ -25,13 +25,30 @@
   },
   {
    "id": "commons",
-   "what": "Wikimedia Commons ground photos, raw/ref/commons (窓あかりー気仙沼1, File:窓あかりー気仙沼1.jpg)",
+   "what": "Wikimedia Commons ground photos, raw/ref/commons (窓あかりー気仙沼1, File:窓あかりー気仙沼1.jpg; File:Kesennuma Shinkin.jpg 2017-09; File:Sanjido Sasaki,Kesennuma.jpg 2018-11-11, CC BY-SA 4.0)",
    "date": "2026-09-24"
   },
   {
    "id": "zengin",
    "what": "zengin.ajtw.net branch list of 七十七銀行 (0125): 501 気仙沼支店 at 南町3-1-1, 502 内脇支店 at 田中前",
    "ref": "https://zengin.ajtw.net/linkmeisai.php?abg=0125"
+  },
+  {
+   "id": "sotozen-navi",
+   "what": "曹洞宗 sotozen-navi 青龍寺, 気仙沼市八日町2-2-24",
+   "ref": "https://sotozen-navi.com/detail/index_40410.html"
+  },
+  {
+   "id": "nikkin",
+   "what": "Nikkin Online 2017-03-21: the new 5-storey 気仙沼信用金庫 本店 opened on the old site",
+   "ref": "https://www.nikkinonline.com/article/206960",
+   "date": "2017-03-21"
+  },
+  {
+   "id": "kesennuma-city",
+   "what": "気仙沼市 list of registered tangible cultural properties: 三事堂ささ木店舗及び住宅 and 三事堂ささ木土蔵, 八日町二丁目, registered 2006-03-02",
+   "ref": "https://www.kesennuma.miyagi.jp/edu/s166/010/010/010/030/1173419591523.html",
+   "date": "2006-03-02"
   }
  ],
  "lots": [
@@ -53,12 +70,11 @@
   {
    "id": "16/58539/25068/353",
    "kind": "office",
-   "facade": "office",
    "roof": {
     "shape": "flat",
     "color": "#b8bab8"
    },
-   "src": "earth: a flat-roofed pale 2-storey block about 7 m high, not a gabled shop (sub-a top, sheets/a1 #33; GSI flat light roof). zengin: no bank branch here; the OSM bank tag is stale",
+   "src": "earth: a flat-roofed pale 2-storey block about 7 m high, not a gabled shop (sub-a top, sheets/a1 #33; GSI flat light roof). zengin: no bank branch here; the OSM bank tag is stale [r2:6: facade 'office' dropped; an Earth top view carries no facade evidence (Earth is 2.5D here), so the office default (punched windows, no ground photo of a glass ribbon) applies]",
    "storeys": 2,
    "height": 7
   },
@@ -214,7 +230,7 @@
     "shape": "gable",
     "color": "#6a6264"
    },
-   "src": "earth: dark grey-brown pitched roof with a ridge, not a flat white deck (sub-a top, sheets/a9)"
+   "src": "earth: dark grey-brown pitched roof with a ridge, not a flat white deck (sub-a top, sheets/a9) | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a grey roof in the dense block"
   },
   {
    "id": "16/58539/25068/396",
@@ -258,9 +274,41 @@
   {
    "id": "16/58540/25068/129",
    "roof": {
-    "shape": "gable"
+    "shape": "gable",
+    "ridge": "x",
+    "color": "#a68086",
+    "pv": {
+     "flush": true,
+     "ridgeAt": 2.5,
+     "rects": [
+      {
+       "x": -4.4,
+       "z": -3.55,
+       "w": 3.0,
+       "d": 10.3
+      },
+      {
+       "x": 0.15,
+       "z": -3.55,
+       "w": 4.5,
+       "d": 10.3
+      },
+      {
+       "x": -5.5,
+       "z": 6.8,
+       "w": 3.6,
+       "d": 5.6
+      },
+      {
+       "x": 0.45,
+       "z": 6.8,
+       "w": 6.7,
+       "d": 5.6
+      }
+     ]
+    }
    },
-   "src": "earth: 萬屋呉服部: pitched roof with a solar array, not a flat deck (sub-b top, sheets/b3); 2 storeys like the street (z_a_street.jpg)",
+   "src": "earth: 萬屋呉服部: pitched roof with a solar array, not a flat deck (sub-b top, sheets/b3); 2 storeys like the street (z_a_street.jpg) | [r3] 5: Earth 2026-03-11 (c5/sub-b top rectified into the lot frame, tools/anime/earth-crop.mjs --local): a rose gable roof, the ridge along the frontage 2.5 m behind the box centre, with four gridded PV blocks lying in the roof plane (3 x 10, 4.5 x 10 m on the back facet; 3.6 x 5.6, 6.7 x 5.6 m on the front facet, about 116 m2 of modules); roof colour '#a68086' = the stored scale of its rose neighbours /134 '#a88488' and /128 '#a48084' (not the raw Earth reading '#ac757a')",
    "storeys": 2
   },
   {
@@ -290,14 +338,16 @@
   {
    "id": "16/58540/25068/172",
    "kind": "office",
-   "facade": "office",
-   "src": "earth + OSM: 気仙沼信用金庫 本店 is the bank head office (a pale flat-roofed office block), not a shop (sub-b top, sheets/b6)"
+   "src": "commons: File:Kesennuma Shinkin.jpg (2017-09, the 気仙沼信用金庫 pole sign with P / ATM in frame, raw/ref/commons/orig/Kesennuma_Shinkin.jpg): a modern 5-storey block clad in pale blue-grey metal panels, panel faces #adb9c4 (crops #adb9c7 and #acb9c1), one narrow horizontal window band per upper floor, a plain white ground floor with a recessed entrance and a row of small square vents, no awnings and no timber; + nikkin: opened 2017-03-21 on the old site. The kit drew it as a timber-sided shop with an awning because the bank use made it a shop (hero.js classifyHero) [r3: wall, facade 'ribbon'; 5 storeys / 15.3 m kept]",
+   "wall": "#adb9c4",
+   "facade": "ribbon"
   },
   {
    "id": "16/58540/25068/168",
    "kind": "office",
-   "facade": "office",
-   "src": "earth + OSM: part of the 気仙沼信用金庫 本店 office block (sub-b top, sheets/b6)"
+   "src": "commons: File:Kesennuma Shinkin.jpg (2017-09, the 気仙沼信用金庫 pole sign with P / ATM in frame, raw/ref/commons/orig/Kesennuma_Shinkin.jpg): a modern 5-storey block clad in pale blue-grey metal panels, panel faces #adb9c4 (crops #adb9c7 and #acb9c1), one narrow horizontal window band per upper floor, a plain white ground floor with a recessed entrance and a row of small square vents, no awnings and no timber; + nikkin: opened 2017-03-21 on the old site. The kit drew it as a timber-sided shop with an awning because the bank use made it a shop (hero.js classifyHero) (the 38 m2 east-corner piece; the stepped balcony notch is not drawn on it) [r3: wall, facade 'ribbon'; 5 storeys / 15.3 m kept]",
+   "wall": "#adb9c4",
+   "facade": "ribbon"
   },
   {
    "id": "16/58540/25068/162",
@@ -595,7 +645,7 @@
     "shape": "gable",
     "color": "#4a5054"
    },
-   "src": "earth: dark small roof under trees, not a white flat deck (sub-c top, sheets/c3)"
+   "src": "earth: dark small roof under trees, not a white flat deck (sub-c top, sheets/c3) | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a dark roof strip between two buildings"
   },
   {
    "id": "16/58539/25068/520",
@@ -697,13 +747,11 @@
   },
   {
    "id": "16/58540/25068/224",
-   "kind": "shrine",
-   "name": "紫神社",
-   "nameEn": "Murasaki Shrine",
+   "kind": "house",
    "roof": {
-    "color": "#4a4c50"
+    "color": "#999a9f"
    },
-   "src": "earth: the hall under the 紫神社 label with its torii, a dark grey roof (sub-d top, o180, sheets/d4)"
+   "src": "earth: long light-grey roof just west of the 紫神社 hall (lm-seigoji top/o180, Earth #94949b; GSI #c7dce0); the 紫神社 pin is on the small red-brown hall east of it, OSM w928776176"
   },
   {
    "id": "16/58540/25068/194",
@@ -750,6 +798,169 @@
    "facade": "shop",
    "name": "島田呉服店",
    "src": "commons 窓あかりー気仙沼1 2026-09-24: white RC block ≥3 levels, charcoal fascia with the name, vertical しまだ sign; the shop storey reads ~4.4 m to the fascia top (scaled on the parked car), so 3 levels ≈ 10.5 m"
+  },
+  {
+   "id": "16/58540/25068/141",
+   "name": "青龍寺",
+   "nameEn": "Seiryū-ji",
+   "src": "sotozen-navi 青龍寺 八日町2-2-24; earth label 青龍寺 (c5/sub-b)"
+  },
+  {
+   "id": "16/58540/25069/64",
+   "roof": {
+    "color": "#80b0c8"
+   },
+   "src": "commons 2025-09-28 photo (Kesennuma city Kesennuma elementary school 202509.jpg): light sky-blue barrel roof (sampled #74a6c3-#89b6d1; crown #aecada, flank #80b4d2); GSI aerial graded #78b0bc; Earth 2026-03 top view pale #9693a9. Was the palette-derived slate #56677a (sys:32: landmark lots without a tag colour now take the aerial colour; this pins the gym)"
+  },
+  {
+   "id": "16/58540/25069/55",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 55 (24 m2, centre -377,351): the Earth shadow is dark only 3.0-4.5 m); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58540/25069/58",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 58 (16 m2, centre -354,327)); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58540/25069/59",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 59 (12 m2, centre -358,335)); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58540/25069/75",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 75 (9 m2, centre -371,370)); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58540/25069/85",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 85 (15 m2, centre -292,286)); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58540/25069/86",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 86 (24 m2, centre -291,289): shadow 2.5-4.5 m); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58540/25069/87",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 87 (7 m2, centre -287,286)); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58540/25069/89",
+   "storeys": 1,
+   "height": 3,
+   "roof": {
+    "shape": "flat"
+   },
+   "src": "earth: c5/sub-f top, the footprint centre lies on paving, steps or the road edge of the 気仙沼小学校 grounds and the Earth shadow profile ends at 2-4.5 m (lot 89 (12 m2, centre -282,282): shadow about 2.5 m); a 3 m gate post, stair, bike shed or kerb, not a 10.8-14.4 m school tower (the 2025-09-28 commons ground photo shows every classroom block 3 storeys, nothing taller). Derived school storeys were 3-4 whatever the area"
+  },
+  {
+   "id": "16/58539/25068/469",
+   "roof": {
+    "shape": "flat",
+    "color": "#857f85"
+   },
+   "src": "earth: sub-a top, flat deck with parapet, condenser rows on the NE edge, penthouse at the S end; roof median #857f85 (c5_sub-a, GSI 2020-22 shows the same flat deck, no ridge line)"
+  },
+  {
+   "id": "16/58540/25068/211",
+   "roof": {
+    "shape": "flat",
+    "color": "#808896"
+   },
+   "src": "earth: c5_sub-d top, slate roof planes and flat decks with rooftop units, median #808896; the GSI cyan roof was a photo cast"
+  },
+  {
+   "id": "16/58540/25068/96",
+   "storeys": 2,
+   "height": 7.4,
+   "wall": "#f4f4f0",
+   "roof": {
+    "shape": "gable",
+    "color": "#909298",
+    "ridge": "x"
+   },
+   "src": "commons: File:Sanjido Sasaki,Kesennuma.jpg (2018-11-11, CC BY-SA 4.0, raw/ref/commons/orig/Sanjido_SasakiKesennuma.jpg): 三事堂ささ木, a registered tangible cultural property (kesennuma-city: 店舗及び住宅 and 土蔵, 八日町二丁目, 2006-03-02), is a white-plaster (漆喰) 2-storey 蔵造り shop under a grey tiled roof whose ridge runs along the frontage, a tiled eave band over the ground floor and a grey diamond-tile skirt; earth: the roof reads #9e9fa2 (sub-b top, land3/c5 top; the app renders a pitched roof lighter, so #909298). Footprint, /97 and /139 (花いかだ) unchanged: Earth top shows no kura wing outline on /139 (a dark hipped roof of its own) and no lattice namako wall is visible from above"
+  },
+  {
+   "id": "16/58539/25068/342",
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (bare soil patch), and the stored colour is a dark green derived default: a ghost lot (round 3 systemic 2)"
+  },
+  {
+   "id": "16/58539/25068/364",
+   "roof": {
+    "shape": "gable",
+    "ridge": "z"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a narrow red gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
+  },
+  {
+   "id": "16/58539/25068/424",
+   "roof": {
+    "shape": "gable",
+    "ridge": "z"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a narrow red gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
+  },
+  {
+   "id": "16/58539/25068/463",
+   "roof": {
+    "shape": "hip",
+    "ridge": "x"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a red hip; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a hip"
+  },
+  {
+   "id": "16/58540/25069/44",
+   "roof": {
+    "shape": "hip",
+    "ridge": "z"
+   },
+   "src": "earth: top view rectified at 12 px/m (round 3 systemic 6): a hip; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a hip"
+  },
+  {
+   "id": "16/58540/25069/73",
+   "storeys": 2,
+   "height": 7.5,
+   "src": "commons: 2025-09-28 (Kesennuma city Kesennuma elementary school 202509.jpg, 176190355): the wing left of the stair cylinder is a 2-storey grey-concrete classroom bar with a flat roof, a roof-terrace fence and an arcade ground floor, about 7-8 m; Earth 2026-03-11 (c5/sub-f) shows lot /73 as a flat roof with planters and gravel. The layout's 5F 13.5 m was derived (round 3 systemic 3)"
+  },
+  {
+   "id": "16/58539/25068/470",
+   "roof": {
+    "color": "#cdb68a"
+   },
+   "src": "earth: サンモリ yellow hip roof, 2026-03-11 top, c5_sub-a (#c7b085, plus 3 L* for the renderer's pitched-roof shade; the stored #886c68 mauve-brown came from derive.js snapRoof sending hue 22-75 to brown)"
   }
  ],
  "newLots": [
@@ -780,6 +991,34 @@
     "color": "#e2e2df"
    },
    "src": "earth 2026 sub-f/presence zoom 183: single-storey white-roofed shed on the east edge of the lane, on the GSI footprint /183 (Earth is offset ~5 m east here)"
+  },
+  {
+   "id": "ovr:c5:osm-928776174",
+   "poly": [
+    [
+     -283.1,
+     127.2
+    ],
+    [
+     -276.1,
+     136.4
+    ],
+    [
+     -268.3,
+     128.9
+    ],
+    [
+     -271.8,
+     124.5
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#525864"
+   },
+   "src": "osm: w928776174 (92 m2, uncovered by any lot) + earth: 2026-03-11 top, o0 and o180 of the c5 capture (tools/anime/earth-crop.mjs --ring): a flat dark grey roof in the block; roof median #525864 (round 3 systemic 1: the OSM gap list is mostly gone buildings, this one stands)"
   }
  ],
  "landuse": [
@@ -807,7 +1046,7 @@
    "src": "earth: bare earth lot (no lawn) east of the paved square, where OSM maps 2号公園 as a park (sub-d top, z_plaza_top.jpg, z_plaza_o0.jpg)"
   },
   {
-   "use": "plaza",
+   "use": "apron",
    "ring": [
     [
      -242.9,
@@ -826,7 +1065,7 @@
      30
     ]
    ],
-   "src": "earth: a paved square with a bean-shaped dark feature, lined with lamps, between the vacant lot and the 南町 back row (sub-d top, z_plaza_top.jpg)"
+   "src": "earth: a paved square with a bean-shaped dark feature, lined with lamps, between the vacant lot and the 南町 back row (sub-d top, z_plaza_top.jpg) [r2] use plaza -> apron: Earth median #70717c inside the ring, grey asphalt, not cream"
   },
   {
    "use": "felled",
@@ -853,8 +1092,595 @@
     ]
    ],
    "src": "earth 2026-03-11 c5/r1003 top: cleared bare slope with a track; GSI photo shows woods"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -646,
+     230
+    ],
+    [
+     -611,
+     214
+    ],
+    [
+     -597,
+     222
+    ],
+    [
+     -570,
+     262
+    ],
+    [
+     -576,
+     285
+    ],
+    [
+     -610,
+     309
+    ],
+    [
+     -645,
+     309
+    ]
+   ],
+   "src": "earth: c5/land2 top: the open light-grey grave field (沢田 west terrace, ENU x -645..-570, z 214..309), rows of white and grey stones, no trees; OSM maps it as the cemetery, whose woods the tree builder kept planting over it (build-trees.js OPEN has no cemetery) [r3: surface 'grave', swatch measured: Earth mean L* inside the ring vs the app render]",
+   "surface": "grave",
+   "color": "#746c70"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -614,
+     176
+    ],
+    [
+     -599,
+     172
+    ],
+    [
+     -586,
+     195
+    ],
+    [
+     -585,
+     227
+    ],
+    [
+     -594,
+     230
+    ],
+    [
+     -607,
+     222
+    ],
+    [
+     -616,
+     201
+    ]
+   ],
+   "src": "earth: c5/land2 top: the second open grave field of 沢田 (x -616..-585, z 172..230), light-grey stones in open ground, no trees [r3: surface 'grave', swatch measured: Earth mean L* inside the ring vs the app render]",
+   "surface": "grave",
+   "color": "#9d8d8d"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -384.3,
+     46
+    ],
+    [
+     -393.1,
+     37.5
+    ],
+    [
+     -403.4,
+     16.9
+    ],
+    [
+     -411.3,
+     7.1
+    ],
+    [
+     -405.7,
+     0.2
+    ],
+    [
+     -404.8,
+     -13.3
+    ],
+    [
+     -398,
+     -13.5
+    ],
+    [
+     -394.8,
+     -39.9
+    ],
+    [
+     -388.5,
+     -51.3
+    ],
+    [
+     -387.8,
+     -56.8
+    ],
+    [
+     -368.5,
+     -58.4
+    ],
+    [
+     -357.1,
+     -76.3
+    ],
+    [
+     -362.2,
+     -86.5
+    ],
+    [
+     -373.1,
+     -81.9
+    ],
+    [
+     -386.9,
+     -78.8
+    ],
+    [
+     -420.6,
+     -74.7
+    ],
+    [
+     -441.8,
+     -51.7
+    ],
+    [
+     -443.9,
+     -22.1
+    ],
+    [
+     -436.4,
+     11.8
+    ],
+    [
+     -418.5,
+     46
+    ]
+   ],
+   "src": "earth: c5/land2 top: the open grave field of the north lobe of the 本町 cemetery (OSM ring clipped to z < 46); stones in open ground, graves only on its west side [r3: surface 'grave', swatch measured: Earth mean L* inside the ring vs the app render]",
+   "surface": "grave",
+   "color": "#60585f"
+  },
+  {
+   "use": "vacant",
+   "ring": [
+    [
+     -393,
+     90
+    ],
+    [
+     -364,
+     90
+    ],
+    [
+     -363,
+     100
+    ],
+    [
+     -363,
+     112
+    ],
+    [
+     -362,
+     126
+    ],
+    [
+     -359,
+     140
+    ],
+    [
+     -358,
+     152
+    ],
+    [
+     -357,
+     165
+    ],
+    [
+     -355,
+     178
+    ],
+    [
+     -351,
+     190
+    ],
+    [
+     -347,
+     200
+    ],
+    [
+     -358,
+     204
+    ],
+    [
+     -366,
+     192
+    ],
+    [
+     -372,
+     178
+    ],
+    [
+     -377,
+     164
+    ],
+    [
+     -383,
+     150
+    ],
+    [
+     -391,
+     136
+    ],
+    [
+     -394,
+     120
+    ],
+    [
+     -394,
+     104
+    ]
+   ],
+   "src": "earth: c5/land2 top: the open grave field of the south lobe of the 本町 cemetery (OSM ring clipped to z > 86); stones in open ground [r3: narrowed to the strip Earth shows: a warm brown grave strip about 20-30 m wide and 110 m long (x -394..-347, z 90..204) with woods on both sides, traced on land3/c5 top at 6 px/m, not the 69 x 110 m OSM-clipped patch; surface 'grave']",
+   "surface": "grave",
+   "color": "#807273"
+  },
+  {
+   "use": "cedar",
+   "ring": [
+    [
+     -347.2,
+     86
+    ],
+    [
+     -348.5,
+     84
+    ],
+    [
+     -360.1,
+     78.3
+    ],
+    [
+     -370.8,
+     59
+    ],
+    [
+     -384.3,
+     46
+    ],
+    [
+     -418.5,
+     46
+    ],
+    [
+     -416.2,
+     50.5
+    ],
+    [
+     -395.7,
+     61.6
+    ],
+    [
+     -382.9,
+     77.8
+    ],
+    [
+     -384.5,
+     86
+    ]
+   ],
+   "src": "earth: c5/land2 top: dense conifer on the neck between the two lobes of the 本町 cemetery (OSM ring clipped to 46 < z < 86, overlapping neither lobe); the app painted it as grey cemetery gravel"
+  },
+  {
+   "use": "vacant",
+   "surface": "weeds",
+   "ring": [
+    [
+     -460.5,
+     329.5
+    ],
+    [
+     -453,
+     322.5
+    ],
+    [
+     -444,
+     320.5
+    ],
+    [
+     -436,
+     321.5
+    ],
+    [
+     -431,
+     327
+    ],
+    [
+     -430,
+     337
+    ],
+    [
+     -431,
+     347
+    ],
+    [
+     -433,
+     354
+    ],
+    [
+     -430.5,
+     358
+    ],
+    [
+     -441.2,
+     347.5
+    ],
+    [
+     -451,
+     338.6
+    ]
+   ],
+   "src": "earth: land3/c5 top (2026-03-11): a bare brown vacant lot (Earth mean #857071, L* 49) between the new two-lane road and the 気仙沼小学校 buildings (x -461..-430, z 320..358); no trees on it"
   }
  ],
- "roads": [],
- "props": []
+ "roads": [
+  {
+   "id": "r12559",
+   "pts": [
+    [
+     -252.4,
+     -195.8
+    ],
+    [
+     -237.7,
+     -165.7
+    ],
+    [
+     -219.4,
+     -118.9
+    ]
+   ],
+   "markings": {
+    "centre": "hatched-median",
+    "medianWidth": 3,
+    "lanes": [
+     1,
+     1
+    ]
+   },
+   "src": "earth: streets2/c5-b top and c5/sub-b top (2026-03-11): a painted chevron median (導流帯, V marks about 3 m wide, apex toward the north junction) runs down the centre of 気仙沼街道 from about z -188 to z -132, not a plain dashed line; pts reversed so the road starts at the (-252, -196) junction and the apexes point at it (same layout line, same width and carriage)"
+  },
+  {
+   "id": "r12556",
+   "markings": {
+    "centre": "hatched-median",
+    "medianWidth": 3,
+    "lanes": [
+     1,
+     1
+    ]
+   },
+   "src": "earth: c5/sub-b top and streets2/c1-C top (2026-03-11): the same chevron median (apex east, toward the (-252, -196) junction) runs the whole way along the west arm of 気仙沼街道 from the junction to the zebra at its west end; pts unchanged, first point at the junction"
+  },
+  {
+   "id": "r13873",
+   "pts": [
+    [
+     -579.7,
+     297.1
+    ],
+    [
+     -555.2,
+     276.1
+    ],
+    [
+     -529,
+     263.5
+    ]
+   ],
+   "src": "earth: land3/c5 top and road_a zoom (2026-03-11): the end of the 気仙沼小 road is on the carriageway at (-529, 263.5); the layout node (-528.5, 254.9) was 9 m north of it, on the bare lot beside the road. Same line, only the last point moved so that r13874 and r13876 meet it on the road"
+  },
+  {
+   "id": "r13874",
+   "pts": [
+    [
+     -529,
+     263.5
+    ],
+    [
+     -538.1,
+     243
+    ]
+   ],
+   "src": "earth: land3/c5 top (2026-03-11): joins the carriageway at (-529, 263.5), where r13873 ends (see r13873)"
+  },
+  {
+   "id": "r13876",
+   "pts": [
+    [
+     -529,
+     263.5
+    ],
+    [
+     -522,
+     268
+    ],
+    [
+     -516,
+     277
+    ],
+    [
+     -511,
+     288
+    ],
+    [
+     -504,
+     299
+    ],
+    [
+     -495,
+     309
+    ],
+    [
+     -485,
+     316
+    ],
+    [
+     -473.5,
+     326
+    ]
+   ],
+   "width": 11,
+   "carriage": 7,
+   "kind": "city",
+   "src": "earth: land3/c5 top at 10 px/m (2026-03-11): a two-lane road with white edge lines and sidewalks, about 7 m of asphalt in an 11 m reserve, cut diagonally through the woods west of 気仙沼小; the centre line is traced from the asphalt, 5 to 10 m from the finding's rounded polyline (-526,257) (-493,289) (-467,319) (-441,345) (-425,373) at the north-west end and 3 to 13 m on its south-east half, which lay on the north-east verge; the OSM 2.6 m alley r13876 followed the first stretch and then bent south"
+  },
+  {
+   "id": "ovr:c5:trunk-se",
+   "pts": [
+    [
+     -473.5,
+     326
+    ],
+    [
+     -471,
+     328
+    ],
+    [
+     -464.5,
+     333.5
+    ],
+    [
+     -458,
+     339.5
+    ],
+    [
+     -451.5,
+     345.5
+    ],
+    [
+     -445,
+     351.5
+    ],
+    [
+     -439,
+     357.5
+    ],
+    [
+     -434.5,
+     362
+    ],
+    [
+     -430.5,
+     367
+    ],
+    [
+     -426.6,
+     373.3
+    ]
+   ],
+   "width": 11,
+   "carriage": 7,
+   "kind": "city",
+   "src": "earth: land3/c5 top at 9 px/m (2026-03-11): the south-east half of the same road, from the lanes' junction at (-473.5, 326) to the junction at (-426.6, 373.3) where r13907, r13908 and r13909 meet; it was missing from the layout (EVIDENCE.md change #1, GAP): r13887 turned south at x -465 instead"
+  },
+  {
+   "id": "r13887",
+   "pts": [
+    [
+     -473.5,
+     326
+    ],
+    [
+     -466,
+     330
+    ],
+    [
+     -465,
+     334.6
+    ],
+    [
+     -464.1,
+     349.7
+    ],
+    [
+     -463.3,
+     353.2
+    ],
+    [
+     -460.6,
+     360.6
+    ],
+    [
+     -457.9,
+     365.2
+    ],
+    [
+     -454.7,
+     369.1
+    ],
+    [
+     -450.8,
+     371.2
+    ],
+    [
+     -449,
+     371.5
+    ],
+    [
+     -439.7,
+     371.7
+    ]
+   ],
+   "src": "earth: land3/c5 top (2026-03-11): the loop lane that leaves the road at (-473.5, 326) and curves south and then east to r13908; same line, its first leg (which ran inside the new carriageway) replaced by the junction on the road centre"
+  }
+ ],
+ "props": [],
+ "crossings": [
+  {
+   "at": [
+    -635,
+    -70
+   ],
+   "road": "r12499",
+   "diamonds": true,
+   "src": "earth: c1 / c5 top view (2026-03-11): a mid-block zebra on 気仙沼街道 at about (-635, -70) +-4 m with paired ◇ crossing-ahead marks before it, white edge lines and sidewalks (the layout road under it is r12499, the 気仙沼街道 piece east of the (-644, -63) node; r12500 ends 11 m west of it)"
+  },
+  {
+   "at": [
+    -426.2,
+    -144.4
+   ],
+   "road": "r12532",
+   "src": "earth: c5 sub-b top (2026-03-11): the 市役所前 junction has a zebra with a stop line on each of its three arms"
+  },
+  {
+   "at": [
+    -419.7,
+    -154.1
+   ],
+   "road": "r12544",
+   "src": "earth: c5 sub-b top (2026-03-11): the 市役所前 junction has a zebra with a stop line on each of its three arms"
+  },
+  {
+   "at": [
+    -408.4,
+    -150.9
+   ],
+   "road": "r12545",
+   "src": "earth: c5 sub-b top (2026-03-11): the 市役所前 junction has a zebra with a stop line on each of its three arms"
+  }
+ ]
 }

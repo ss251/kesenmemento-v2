@@ -1,0 +1,17 @@
+{
+ "version": 1,
+ "cell": "all-c5-far",
+ "bbox": [290, 530, 360, 595],
+ "note": "cell 'all (shown at c5 and far)', round 3. Only the Lawson 港町 lot is patched: OSM way 761729107 carries name ローソン 気仙沼港町店 but branch 気仙沼みなと町店 (branch:ja_kana けせんぬまみなとまちてん, addr 港町508-3), and nameEn came from the raw romaji tag branch:en 'kesennumaminatomachi' (no spaces, no capitals). The store's own name is ローソン 気仙沼みなと町店. build-layout extras() drops the OSM place that carried the old name (renamed lot) and the lot name puts the new one in search and labels.",
+ "sources": [
+  { "id": "osm", "what": "OpenStreetMap way 761729107 (raw/osm/overpass.json): name ローソン 気仙沼港町店, branch 気仙沼みなと町店, branch:en kesennumaminatomachi, branch:ja_kana けせんぬまみなとまちてん, addr:housenumber 港町508-3" }
+ ],
+ "lots": [
+  {
+   "id": "16/58541/25069/383",
+   "name": "ローソン 気仙沼みなと町店",
+   "nameEn": "Lawson Kesennuma Minatomachi",
+   "src": "osm: way 761729107 branch 気仙沼みなと町店 (branch:ja_kana けせんぬまみなとまちてん); the 港町店 in the name tag is the town name, not the branch; nameEn splits the romaji branch:en 'kesennumaminatomachi' into Kesennuma Minatomachi"
+  }
+ ]
+}

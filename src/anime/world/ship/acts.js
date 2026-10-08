@@ -10,7 +10,7 @@
 // The catch does NOT sail home: it is transshipped at Las Palmas into reefer containers, landed at the bonded port of
 // Shimizu for the landing inspection (about 3 Fisheries Agency inspectors, a reader gun on each fish's chip, a
 // same-number sticker on its cheek, the trucks on truck scales; 1 kg over the quota costs the licences of all 6 ships:
-// Usui's public talk at Hackatsuon, 2026-10-03), while the ship and crew come home to Kesennuma under 大漁旗.
+// the 臼福本店 public talk at Hackatsuon, 2026-10-03), while the ship and crew come home to Kesennuma under 大漁旗.
 //
 //   const acts = createActs({ seed, date })     acts.state / acts.data / acts.act
 //   acts.can(ev, payload) -> { ok, reason? }    acts.send(ev, payload) -> { ok, state, reason?, auto? }
@@ -30,7 +30,7 @@ export const ACT_OF = {
 /** Act 3 runs in exactly this order (the true chain). */
 export const CHAIN_ORDER = ['TRANSSHIP_LAS_PALMAS', 'REEFER', 'SHIMIZU_WEIGH', 'HOMECOMING', 'CARD'];
 /**
- * The Shimizu landing inspection, in order (Usui's talk, 2026-10-03; Usui's public talk at Hackatsuon, 2026-10-03): about 3
+ * The Shimizu landing inspection, in order (the 臼福本店 talk, 2026-10-03; the 臼福本店 public talk at Hackatsuon, 2026-10-03): about 3
  * Fisheries Agency inspectors check by eye, scan each fish's chip with a reader gun, put a sticker with the same number
  * on its cheek, and the trucks are weighed on truck scales; the last caption is the rule.
  */
@@ -40,24 +40,24 @@ export const SHIMIZU_STEPS = ['inspectors', 'chip', 'sticker', 'truck', 'rule'];
 export const RULES = {
   minKg: 30,              // ICCAT Rec. 22-08 (= 18-02): Atlantic bluefin under 30 kg (or 115 cm fork length) is released
   minFL: 115,             // cm, the other half of the same minimum
-  lineKm: 150,            // 幹縄 about 150 km, Kesennuma to Sendai (北かつ; Usui's slide)
+  lineKm: 150,            // 幹縄 about 150 km, Kesennuma to Sendai (北かつ; a slide of the talk)
   hooks: 3000,            // about 3,000 hooks
   floatEveryM: 300,       // floats 300 m apart (one 'basket' between floats)
   branchPerBasket: [10, 15],
   waitH: 2,               // 縄待ち 2-3 h; the haul may start after 2 h
   waitMaxH: 3,
-  setH: [4, 5],           // setting from the stern 4-5 h (Usui's slide: 7-8 h)
+  setH: [4, 5],           // setting from the stern 4-5 h (a slide of the talk: 7-8 h)
   haulH: [10, 12],        // hauling 10-12 h (slide: 11-12 h)
   freezeC: -60,           // the hold and the blast freezers at -60 °C
   coreH: 36,              // about 36 h to freeze the core
-  japanT: 3779,           // Japan's 2025/26 E. Atlantic bluefin quota (Usui's slide)
+  japanT: 3779,           // Japan's 2025/26 E. Atlantic bluefin quota (a slide of the talk)
   tacT: 43296,            // the E. Atlantic + Mediterranean TAC (slide)
   japanBoats: 100,        // about 100 registered boats share Japan's quota, 48 of them fish Atlantic bluefin
-  japanBluefinBoats: 48,  // (Usui's talk, 2026-10-03; Usui's public talk, 2026-10-03)
-  inspectors: 3,          // about 3 Fisheries Agency inspectors at the Shimizu landing (Usui's public talk, 2026-10-03)
+  japanBluefinBoats: 48,  // (the 臼福本店 talk, 2026-10-03; the 臼福本店 public talk, 2026-10-03)
+  inspectors: 3,          // about 3 Fisheries Agency inspectors at the Shimizu landing (the 臼福本店 public talk, 2026-10-03)
   fleetShips: 6,          // 1 kg over the quota costs the licences of all 6 of the company's ships (item 3)
-  // The quota bar is the ship's share (source notes §5): the minister's allocation to this one ship is about 80 t, as Usui
-  // said in his public talk on 2026-10-03 (Usui's public talk at Hackatsuon, 2026-10-03, marked ⚠, so it is shown as 'about';
+  // The quota bar is the ship's share (source notes §5): the minister's allocation to this one ship is about 80 t, as the 臼福本店 president
+  // said in a public talk on 2026-10-03 (the talk notes, marked ⚠, so it is shown as 'about';
   // it fits the 76.3 t MSC catch of 2024). This set's catch is a slice of it.
   shipShareKg: 80000,
   allowanceKg: 80000,
@@ -226,7 +226,7 @@ export function weighIn(d) {
   const declared = r1(rows.reduce((s, x) => s + x.declared, 0)), weighed = r1(rows.reduce((s, x) => s + x.weighed, 0));
   return { rows, declared, weighed, overKg: r1(Math.max(0, weighed - declared)) };
 }
-/** 1 kg over the declared catch loses the licence (Usui's slide 79). */
+/** 1 kg over the declared catch loses the licence (a slide of the talk (no. 79)). */
 export const weighInOk = (d) => weighIn(d).overKg < 1;
 
 function onEnter(M, state) {

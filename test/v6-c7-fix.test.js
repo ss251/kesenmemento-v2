@@ -75,7 +75,7 @@ describe("headless: the Plaza Hotel and the お魚いちば signs", async () => 
   });
   test("the 2026 colours and the sign text are in the model", () => {
     const src = read("src/anime/world/harbor/plaza.js");
-    for (const c of ["'#c2d4c9'", "'#d3b6a8'", "'#cdb0a3'", "'#e3dbcf'", "'#cfcac0'", "'港ふれあい'", "'#d6b9ab'"]) expect(src).toContain(c);
+    for (const c of ["'#a2aca1'", "'#d3b6a8'", "'#cdb0a3'", "'#e3dbcf'", "'#cfcac0'", "'港ふれあい'", "'#d6b9ab'"]) expect(src).toContain(c);
     expect(src).not.toContain("海とふれあい'");
   });
 });

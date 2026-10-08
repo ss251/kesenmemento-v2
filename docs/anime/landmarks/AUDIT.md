@@ -103,12 +103,14 @@ outline.
 
 ## v5 accuracy sweep (2026-10-01)
 
-Twelve 500 × 600 m cells were checked against Google Earth 3D, which has imagery dated 2026-03-11 and was used for
-reference only. The fixes went into `data/anime/overrides/c1.json` to `c12.json`. Before and after images and the
+Twelve 500 × 600 m cells were checked against Google Earth, whose imagery is dated 2026-03-11 and which was used for
+reference only. [sys:5] Earth is the 2026-03-11 aerial image draped on the terrain (Kesennuma has no 3D buildings in Earth), so
+the obliques carry no building height: every height or storey count in these cells that cites an Earth oblique is to be re-derived from shadows,
+ground photos, GSI footprints or OSM levels (`tools/anime/flag-oblique-heights.mjs`). The fixes went into `data/anime/overrides/c1.json` to `c12.json`. Before and after images and the
 metrics are in [../../shots/v5_cells/README.md](../../shots/v5_cells/README.md).
 
-- **Landmarks:** 15 of 15 are within 5 m, before and after (`dist/qa5/v5/accuracy_core_after.json`,
-  `lm_core_after_*.jpg`).
+- **Landmarks:** the "15 of 15 within 5 m" of the audit was lot containment on layout data (0 m by construction, see section 7), not a
+  measurement of the render; the render is now scored separately (`landmarks.buildings` in `tools/anime/accuracy.mjs`).
 - **PIER7 / 南町** (`pier7.md`):
   - The terraced garden between 迎 and PIER7 is now pale grey concrete paving, with three white ring planters
     holding low planting. It was a brown timber deck with three tall trees, and both Earth and the GSI ortho show

@@ -326,11 +326,11 @@ describe("ship: sendoff and ocean (pure parts)", () => {
     const scale = new Set([0, 2, 4, 7, 9]);   // a major pentatonic on the tonic
     for (const [semi] of MELODY) if (semi !== null) expect(scale.has(((semi % 12) + 12) % 12)).toBe(true);
   });
-  test("the captain's local music file is looked for only on local hosts, never in public, shots or automation", () => {
+  test("the optional local music file is looked for only on local hosts, never in public, shots or automation", () => {
     expect(musicProbeAllowed({ host: "localhost" })).toBe(true);
     expect(musicProbeAllowed({ host: "127.0.0.1" })).toBe(true);
-    expect(musicProbeAllowed({ host: "example.tail1234.ts.net" })).toBe(false);   // the public Funnel link is a ts.net host
-    expect(musicProbeAllowed({ host: "example.tail1234.ts.net", search: "?music=local" })).toBe(true);
+    expect(musicProbeAllowed({ host: "host.example.net" })).toBe(false);   // the public public mirror is a ts.net host
+    expect(musicProbeAllowed({ host: "host.example.net", search: "?music=local" })).toBe(true);
     expect(musicProbeAllowed({ host: "kesennuma.example.org" })).toBe(false);
     expect(musicProbeAllowed({ host: "localhost", search: "?shot=1" })).toBe(false);
     expect(musicProbeAllowed({ host: "localhost", webdriver: true })).toBe(false);
@@ -383,11 +383,11 @@ describe("ship: fix round 2 (the source notes' processing, clock and quota bar)"
     expect(STAGE_HOURS.haul).toBeGreaterThanOrEqual(setEnd + RULES.waitH + 0.5);     // the haul starts about 12:30-13:00 or later
     expect(STAGE_HOURS.set).toBeLessThan(STAGE_HOURS.wait); expect(STAGE_HOURS.wait).toBeLessThan(STAGE_HOURS.haul); expect(STAGE_HOURS.haul).toBeLessThan(STAGE_HOURS.stow);
   });
-  test("the quota bar is the ship's share, about 80 t (Usui, 2026-10-03); this set's catch is a slice of it", () => {
+  test("the quota bar is the ship's share, about 80 t (臼福本店 talk, 2026-10-03); this set's catch is a slice of it", () => {
     expect(RULES.shipShareKg).toBe(80000);
     expect(RULES.allowanceKg).toBe(RULES.shipShareKg);
-    expect(I18N.ja["ship.haul.quotaBar"]).toContain("この船1隻への配分 約80t（臼井社長, 2026-10-03）");
-    expect(I18N.en["ship.haul.quotaBar"]).toContain("about 80 t (Usui, 2026-10-03)");
+    expect(I18N.ja["ship.haul.quotaBar"]).toContain("この船1隻への配分 約80t（臼福本店の講演, 2026-10-03）");
+    expect(I18N.en["ship.haul.quotaBar"]).toContain("about 80 t (臼福本店 talk, 2026-10-03)");
     const M = driveTo("STOW");
     expect(M.data.landedKg).toBeGreaterThan(0); expect(M.data.landedKg / M.data.allowanceKg).toBeLessThan(0.1);
     expect(M.data.haulEnd).toBe("line_in");                                            // one set never fills the ship's share
@@ -396,8 +396,8 @@ describe("ship: fix round 2 (the source notes' processing, clock and quota bar)"
   });
 });
 
-// ---------------------------------------------------------------------------------------------------------- Usui's talk
-// docs/ship/Usui's public talk (2026-10-03) (the captain's product-safe notes of 臼井壯太朗's talk at Hackatsuon, 2026-10-03):
+// ---------------------------------------------------------------------------------------------------------- the 臼福本店 talk
+// The 臼福本店 talk at Hackatsuon, 2026-10-03 (the project's product-safe notes of it, not included):
 // items 1, 2, 3, 4, 6 and 7. The UI is rendered for real through mountShipUI on a minimal DOM stub.
 function withStubDOM(fn) {
   const mk = () => ({ id: "", hidden: false, innerHTML: "", textContent: "", style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(type, fn) { this.on = fn; }, querySelectorAll() { return []; }, querySelector() { return null; }, appendChild() {}, classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } } });
@@ -418,7 +418,7 @@ async function renderView(view, data, lang, { facts = false, today = null } = {}
 }
 const textOf = (html) => html.replace(/<[^>]+>/g, "\n").replace(/&quot;/g, '"').replace(/&amp;/g, "&").split("\n").map((x) => x.trim()).filter(Boolean);
 
-describe("ship: Usui's talk, 2026-10-03 (Usui's public talk, 2026-10-03)", () => {
+describe("ship: the 臼福本店 talk, 2026-10-03", () => {
   const D = JSON.parse(readFileSync(ROOT + "data/ship/i18n.json", "utf8"));
   const NEW_KEYS = [
     "ship.facts.fleet", "ship.facts.voyage", "ship.facts.aroma", "ship.facts.trivia",
@@ -512,7 +512,7 @@ describe("ship: Usui's talk, 2026-10-03 (Usui's public talk, 2026-10-03)", () =>
   }, 30000);   // reads every file under src/ and data/ship: it timed out at the 5 s default under machine load
   test("the facts panel's source line names every body its numbers come from, including MSC (the 2020 certification) and IUCN (EN to LC)", () => {
     for (const k of ["ICCAT", "IUCN", "MSC", "WCPFC", "JASNAOE"]) expect(D.en["ship.facts.src"]).toContain(k);
-    for (const k of ["ICCAT", "IUCN", "MSC", "WCPFC", "臼福本店", "臼井壯太朗"]) expect(D.ja["ship.facts.src"]).toContain(k);
+    for (const k of ["ICCAT", "IUCN", "MSC", "WCPFC", "臼福本店"]) expect(D.ja["ship.facts.src"]).toContain(k);
   });
   test("Act 3 art: the frozen tuna are dressed (gills, guts and tail off): no tail fin, the body ends in one straight cut, the tag on the stub", () => {
     const calls = [], line = [], ell = [], rects = [];
@@ -557,17 +557,17 @@ describe("ship: Usui's talk, 2026-10-03 (Usui's public talk, 2026-10-03)", () =>
       expect(off).toContain(D[lang]["ship.ocean.nopos.off"]); expect(off).not.toContain(D[lang]["ship.ocean.nopos"]);
     }
   });
-  test("round 3 copy: the set clock cites Usui's own 4-8 h, and no 'at sea' is added to the tag chain (source notes: weighed and measured, then tagged)", () => {
+  test("round 3 copy: the set clock cites the talk's own 4-8 h, and no 'at sea' is added to the tag chain (source notes: weighed and measured, then tagged)", () => {
     expect(D.ja["ship.set.time"]).toContain("4〜8時間"); expect(D.en["ship.set.time"]).toContain("4–8 hours");
     expect(D.en["ship.chain.shimizu.body"]).toBe("Every fish was weighed, measured and tagged. At the Shimizu landing, each one is checked again.");
     expect(D.en["ship.card.body"]).toContain("Each one is weighed and tagged, so the Shimizu inspection");
     expect(D.en["ship.chain.shimizu.body"] + D.en["ship.card.body"]).not.toMatch(/at sea/);
   });
-  test("item 7: the final card ends on Usui's line, attributed to 臼井壯太朗 (臼福本店) at Hackatsuon on 2026-10-03", async () => {
+  test("item 7: the final card ends on the talk's closing line, attributed to the president of 臼福本店 at Hackatsuon on 2026-10-03", async () => {
     expect(CLOSING).toEqual({ line: "ship.card.closing", by: "ship.card.closingBy" });
     expect(D.ja["ship.card.closing"]).toBe("「気仙沼の食を、世界中で楽しんでもらい、輸出していこう。」");
     expect(D.en["ship.card.closing"]).toBe("\"Help Kesennuma's food be enjoyed, and exported, all over the world.\"");
-    for (const l of ["ja", "en"]) for (const s of ["臼井壯太朗", "臼福本店", "Hackatsuon"]) expect(D[l]["ship.card.closingBy"]).toContain(s);
+    for (const l of ["ja", "en"]) for (const s of ["臼福本店", "Hackatsuon"]) expect(D[l]["ship.card.closingBy"]).toContain(s);
     expect(D.ja["ship.card.closingBy"]).toContain("2026年10月3日"); expect(D.en["ship.card.closingBy"]).toContain("2026-10-03");
     const M = driveTo("CARD");
     for (const lang of ["ja", "en"]) {

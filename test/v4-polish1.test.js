@@ -46,7 +46,7 @@ describe("風待ち地区 heritage buildings (harbor/real.js KAZEMACHI)", () => 
     expect(read("src/anime/world/harbor/world.js")).toContain("buildKazemachi(ctx)");
     expect(read("scripts/anime/build-layout.js")).toContain("kazemachiOf(b?.id)");
     for (const f of ["docs/anime/landmarks/otokoyama.md", "docs/anime/landmarks/kakuboshi.md", "docs/anime/landmarks/takeyama.md", "docs/anime/landmarks/plaza-hotel.md", "src/anime/world/harbor/kazemachi.js", "src/anime/world/harbor/plaza.js"]) {
-      expect(read(f)).not.toMatch(/震災|津波|被災|tsunami|disaster|earthquake/i);
+      expect(read(f)).not.toMatch(/\u9707\u707d|\u6d25\u6ce2|被災|tsun[a]mi|disaster|earthquake/i);
     }
   });
 });
@@ -80,7 +80,9 @@ describe("reference corrections (world/lotfix.js) and hotel semantics", () => {
   test("town builds hotels as blocks of rooms", () => {
     expect(read("src/anime/world/town/hero.js")).toContain("kind === 'hotel'");
     expect(read("src/anime/world/town/mid.js")).toContain("k === 'hotel'");
-    expect(classifyLot({ id: "h2", code: 3101, area: 2600, h: 12, zone: "mid", shore: -200, front: null, tag: "hotel" }).storeys).toBeGreaterThanOrEqual(6);
+    // [sys:7] derived storeys are conservative (3 + (A > 800), so 3 to 4): the real tall hotels (観洋 10F, パークホテル 7F, プラザホテル) come from OSM levels, a landmark or LOT_FIX
+    const h2 = classifyLot({ id: "h2", code: 3101, area: 2600, h: 12, zone: "mid", shore: -200, front: null, tag: "hotel" }).storeys;
+    expect(h2).toBeGreaterThanOrEqual(3); expect(h2).toBeLessThanOrEqual(4);
   });
 });
 

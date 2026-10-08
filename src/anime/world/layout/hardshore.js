@@ -18,6 +18,9 @@ export const APRON = { quay: 4, seawall: 3.2, promenade: 7 };
  *  app drew a white sand beach with turquoise shallows). Box = [x0, z0, x1, z1] (ENU m). */
 export const REVETMENTS = [
   { id: 'shinmei-west', box: [292, -152, 362, -24], src: 'earth 2026-03-11 c7n top + o270; GSI ortho' },
+  // [sys:19] 浪板's west face has 消波ブロック at its foot (Google Earth 2026-03-11 c8/h-namiita): the armour-stone toe (build-layout.js TOE_BOX,
+  // `rocks` pieces 3 m seaward of the wall) is a hard water edge: no shoal, no surf
+  { id: 'namiita-toe', box: [957, -208, 1004, -62], src: 'earth 2026-03-11 c8/h-namiita + c4/h-mouth' },
 ];
 const inRevetment = (x, z) => REVETMENTS.some(({ box: [x0, z0, x1, z1] }) => x >= x0 && x <= x1 && z >= z0 && z <= z1);
 

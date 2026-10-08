@@ -7,7 +7,7 @@
   800,
   1000
  ],
- "note": "港町 (the quay block south of the 港町 boat berths), 海の市 and the fish market's north block, 魚市場前 (the post-2011 blocks with vacant lots) and the landward side of the market's north facility. Read block by block from Earth top views of the cell and five sub-cells (raw/ref/earth/c11/{full,A,B,C,D,E}; zooms z_*.jpg) against the GSI photo and footprints. Earth here is draped 2D imagery (no 3D meshes), so heights come from shadow lengths (sun about 40 deg high, from 146 deg: 177 and the hotel); the landmark lots (market, 海の市) keep their harbour models.",
+ "note": "港町 (the quay block south of the 港町 boat berths), 海の市 and the fish market's north block, 魚市場前 (the rebuilt blocks with vacant lots) and the landward side of the market's north facility. Read block by block from Earth top views of the cell and five sub-cells (raw/ref/earth/c11/{full,A,B,C,D,E}; zooms z_*.jpg) against the GSI photo and footprints. Earth here is draped 2D imagery (no 3D meshes), so heights come from shadow lengths (sun about 40 deg high, from 146 deg: 177 and the hotel); the landmark lots (market, 海の市) keep their harbour models.",
  "sources": [
   {
    "id": "earth",
@@ -49,6 +49,18 @@
     "color": "#9fb5a2"
    },
    "src": "earth: A top (z_A1), the pale green roof of the 日新興業 block (Earth #aeb8af)"
+  },
+  {
+   "id": "16/58541/25069/380",
+   "kind": "office",
+   "storeys": 3,
+   "height": 9.9,
+   "roof": {
+    "shape": "flat",
+    "color": "#9fb5a2"
+   },
+   "wall": "#f2f0e8",
+   "src": "earth: A top 2026-03-11 (raw/ref/earth/roofs8922c/evidence/f2_c11_25069_380_367_earth_overlay.jpg), one pale sage-green flat roof about 21 x 12 m (#aab9ae..#afbab1, L* 72, one white skylight) spans lots /380 and /367, no gable; the rectified plane at 9.9 m is one continuous surface across the boundary, so /380 takes /367's kind, storeys, height, roof shape, stored roof colour (#9fb5a2: flatPaint lowers L* by about 3.5 on both, so the shades match) and wall"
   },
   {
    "id": "16/58541/25069/372",
@@ -206,22 +218,23 @@
   {
    "id": "16/58541/25070/177",
    "kind": "apartment",
-   "storeys": 6,
-   "height": 18.5,
+   "storeys": 7,
+   "height": 22,
    "roof": {
     "shape": "flat",
     "color": "#9a9a98"
    },
-   "src": "earth: C top (z_C4), a tall block: its shadow runs about 23 m north-west (sun about 40 deg high), so about 6 storeys, not a 2-storey house"
+   "src": "earth: C top (z_C4), a tall block: its shadow runs about 23 m along bearing 340 (the 2026-03-11 scene, tools/anime/earth-ref.mjs EARTH_SCENE: sun 44 deg, so h ~ 0.97 L), about 22 m, i.e. 7 storeys, not a 2-storey house (re-measured with --heights / top_heights.jpg; was 6 storeys, 18.5 m from 'sun about 40 deg, north-west')"
   },
   {
    "id": "16/58542/25070/14",
-   "storeys": 2,
+   "storeys": 4,
+   "height": 12,
    "roof": {
     "shape": "flat",
     "color": "#d8dbd6"
    },
-   "src": "earth: E top, a white flat-roofed two-storey building next to the old post office"
+   "src": "earth: C top (raw/ref/earth/c11/C/earth_top.png), a white flat-roofed box with a 4-row window wall next to the old post office; its shadow along 340 is 11-15 m (profile 10.9 m, visual about 15 m), so h about 12 m, 4 storeys (the first pass read E top and a 6 m 2-storey building, which casts half that shadow)"
   },
   {
    "id": "16/58542/25070/17",
@@ -242,8 +255,8 @@
   {
    "id": "16/58542/25070/20",
    "storeys": 7,
-   "height": 22,
-   "src": "earth: E top (z_E2), 気仙沼パークホテル: its shadow runs about 28 m north-west (sun about 40 deg high), and the aerial shows its balconied facade, so about 7 storeys, not 4"
+   "height": 23,
+   "src": "earth: E top (z_E2), 気仙沼パークホテル: re-measured with top_heights.jpg in the 2026-03-11 scene: the predicted shadow of a 22-23 m prism (bearing 340, sun 44 deg) covers the observed dark shadow; the stated 28 m shadow was read from a footprint registered too far west (the visible roof and east facade sit east of the lot polygon), so it is not used. 7 storeys (Commons cityscape 2026-03-29: パークホテル 7F), not 4"
   },
   {
    "id": "16/58542/25070/22",
@@ -257,17 +270,62 @@
   },
   {
    "id": "16/58542/25070/32",
+   "storeys": 4,
+   "height": 12.5,
    "roof": {
     "shape": "flat",
     "color": "#c9cac6"
    },
-   "src": "earth: E top (z_E2, sheet4), （有）まるきた商店 has a pale flat roof with solar panels (the GSI photo agrees), not a gable"
+   "src": "earth: C top (raw/ref/earth/c11/C/earth_top.png, contrast 106, clean edge), （有）まるきた商店 has a pale flat roof with solar panels (the GSI photo agrees), not a gable; the shadow from its north wall along 340 is 11-15 m (profile median 11.7 m, visual 14-15 m) and the east wall shows 4 window rows, so h about 12.5 m, 4 storeys"
   },
   {
    "id": "16/58541/25070/106",
    "name": "気仙沼市魚市場前庁舎",
    "nameEn": "Kesennuma City Uoichibamae Office (former Kahoku Bldg)",
-   "src": "gsi: lot in 魚市場前; city page sec/s234/010/020/20210812202208.html (updated 2026-05-20): 教育サポートセンター at 魚市場前1-1 魚市場前庁舎3階（旧河北ビル）; earth 2026-03-11 c11/B top labels 青少年育成支援センター; 中央公民館 moved to 内の脇1-16-6 in 2021-12"
+   "src": "gsi: lot in 魚市場前; city page sec/s234/010/020/20210812202208.html (updated 2026-05-20): 教育サポートセンター at 魚市場前1-1 魚市場前庁舎3階（旧河北ビル）; earth 2026-03-11 c11/B top labels 青少年育成支援センター; 中央公民館 moved to 内の脇1-16-6 in 2021-12 + earth/commons: Cityscape of Kessennuma City 2026 (Commons, Nikon Z50II, 2026-03-29; raw/ref/commons/orig/cityscape_full.jpg, raw/ref/facade3/p_arcade.jpg, cmp_hall.jpg): a long grey concrete building (face in shade, reads #6d7a87, so albedo mid-grey #a2a4a2), flat parapet at about 8.2 m, a set-back rooftop block over the west 45% of the length (about 22 m, to 10.5 m) and a smaller box at its east end, and NO punched-window grid (facade plain). The 9-bay round-arched arcade (4.5 m x 7 m bays, wider entrance arch 2/3 along from the east end) has no facade style in town/facade.js and cannot be drawn from an override file. Plant rects are lot-local (x toward WNW, z toward the 魚市場前 road, obb 49.2 x 24.3): placement from the photo to about 1 bay, the set-back depth is not measured",
+   "kind": "public",
+   "storeys": 3,
+   "height": 8.2,
+   "facade": "plain",
+   "wall": "#a2a4a2",
+   "roof": {
+    "shape": "flat",
+    "color": "#8a8589",
+    "plant": [
+     {
+      "x": 13.5,
+      "z": -2,
+      "w": 22,
+      "d": 12,
+      "h": 2.3,
+      "kind": "penthouse"
+     },
+     {
+      "x": 0.75,
+      "z": -2,
+      "w": 3.5,
+      "d": 5,
+      "h": 1.8,
+      "kind": "penthouse"
+     }
+    ]
+   }
+  },
+  {
+   "id": "16/58541/25069/379",
+   "roof": {
+    "plant": [
+     {
+      "x": -2.5,
+      "z": 0.8,
+      "w": 20.7,
+      "d": 9.2,
+      "h": 0.5,
+      "kind": "pv"
+     }
+    ]
+   },
+   "src": "earth: earth r3 2026-03-11 top (raw/ref/earth/roofs8922c/evidence/f4_pv_flat_roofs_a.jpg): 石川電装 roof has one module field, 44 % of the 325 m2 roof, a 20.7 x 9.2 m rect (lot-local, +-1.5 m)"
   }
  ],
  "newLots": [
@@ -297,8 +355,7 @@
     "shape": "flat",
     "color": "#d8dbd6"
    },
-   "facade": "office",
-   "src": "earth: B top (z_B1), a new white flat-roofed three-storey building east of 山代水産; the GSI photo shows brush on the lot"
+   "src": "earth: B top (z_B1), a new white flat-roofed three-storey building east of 山代水産; the GSI photo shows brush on the lot [r2:6: facade 'office' dropped; an Earth top view carries no facade evidence (Earth is 2.5D here), so the office default (punched windows, no ground photo of a glass ribbon) applies]"
   },
   {
    "id": "ovr:c11:prefab-yard",

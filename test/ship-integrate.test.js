@@ -66,7 +66,7 @@ describe("ship: URL parameters (?ship=1&act=1|2|3, &beat=, &auto=1)", () => {
 describe("ship: boarding entry", () => {
   test("the places entry and the chip sit at the コの字岸壁 berth", () => {
     expect(PLACE.ja).toBe("第一昭福丸に乗る");
-    expect(PLACE.en).toBe("Board the 第一昭福丸");
+    expect(PLACE.en).toBe("Board the Daiichi Shofuku Maru");
     expect(PLACE.at).toEqual([BERTH.x, BERTH.z]);
     expect(nearBerth(BERTH.x, BERTH.z, 5)).toBe(true);
     expect(nearBerth(BERTH.quay[0], BERTH.quay[1], 1.7)).toBe(true);
@@ -247,8 +247,11 @@ describe("ship: the bundle still starts the app (Bun HTML entry guard)", () => {
   test("a real build of src/anime/index.html: after the guard, the page's script is main.js's chunk", () => {
     // in its own process: Bun.build inside the test runner can trip over other tests' module mocks
     const dir = mkdtempSync(resolve(tmpdir(), "klc-bundle-"));
-    const p = Bun.spawnSync([process.execPath, resolve(ROOT, "scripts/anime/html-entry.js"), dir], { cwd: ROOT, env: { ...process.env, NODE_OPTIONS: "" } });
-    const out = JSON.parse(String(p.stdout).trim().split("\n").pop());
+    // the answer goes through a file: inside `bun test` (Bun 1.3.14) a piped child's stdout can come back empty
+    const answer = resolve(tmpdir(), `klc-bundle-${process.pid}-${Date.now()}.json`);
+    Bun.spawnSync([process.execPath, resolve(ROOT, "scripts/anime/html-entry.js"), dir], { cwd: ROOT, env: { ...process.env, NODE_OPTIONS: "" }, stdout: Bun.file(answer) });
+    const out = JSON.parse(readFileSync(answer, "utf8").trim().split("\n").pop());
+    rmSync(answer, { force: true });
     expect(out.ok).toBe(true);
     expect(out.main).toBe(true);   // main.js's module labels are in the page's script chunk
     rmSync(dir, { recursive: true, force: true });

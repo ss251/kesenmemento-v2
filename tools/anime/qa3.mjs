@@ -6,7 +6,7 @@
 // (1920x1080: the machine caps forbid 4K until 2026-10-01 00:00Z; scale 1 = 3840x2160 is the same path); hide UI (H).
 // --phone 1 also runs the 390x844 touch layout. --bench 1 measures GPU ms/frame per quality tier on the wow cameras.
 // [v4:explore] then the explorable core: streaming in the far core, search (JA / EN), the full map, the car on the real
-// roads, the fish market and 男山本店 interiors, POI labels (--noexplore skips it; --dist <dir> builds privately).
+// roads, the fish market, 男山本店 and café RST interiors, POI labels (--noexplore skips it; --dist <dir> builds privately).
 // Prints a JSON report and exits 1 on any page error or failed check. Never leaves Chrome or the server running.
 import { join, resolve, relative } from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -45,7 +45,7 @@ try {
 
   // ---- load
   const t0 = Date.now();
-  await page.goto(`${srv.url}`);
+  await page.goto(`${srv.url}?person=first`);   // [integration] the walk checks are first-person by design (eye height, the spot framing); ホヤぼーや's third person is the players' default and has its own tests
   await page.waitFor("document.body.classList.contains('loaded')", { timeout: 280000 });
   report.timings.loadMs = Date.now() - t0;
   const st = await page.eval('({ modules: window.__stats.modules, batch: window.__stats.batch, errors: window.__errors })');
@@ -57,8 +57,10 @@ try {
 
   // ---- enter
   await click('#go');
-  await page.frames(20);
-  check('entered the town (body.playing)', await page.eval("document.body.classList.contains('playing')"));
+  // [title] the mark leaves, then the camera flies into the town (about 2 s, 8 s safety) before body.playing. Twenty frames was the old instant start.
+  let entered = false;
+  try { await page.waitFor("document.body.classList.contains('playing')", { timeout: 12000 }); entered = true; } catch { /* the check below records it */ }
+  check('entered the town (body.playing)', entered);
   check('HUD visible', await page.eval("!!document.getElementById('klc-ui') && !document.getElementById('klc-ui').hidden"));
   await page.eval('window.__life.live.ready');
   await page.frames(10);
@@ -121,6 +123,8 @@ try {
   // ---- drone / walk
   await click('#klc-ui [data-act="stop"][data-id="hero"]'); await page.eval('new Promise((r) => setTimeout(r, 9000))');
   await click('#klc-ui [data-act="view"]'); await page.frames(20);
+  // [integration] the view button cycles 3rd-person walk -> 1st-person walk -> drone; these checks are first person
+  if (await page.eval('window.__ctx.playerObj.person') === 'third') { await click('#klc-ui [data-act="view"]'); await page.frames(20); }
   // ground = the physics floor under the eye (terrain, or the walk boxes of decks / quays / the promenade)
   const w = await page.eval('(() => { const p = window.__ctx.playerObj, c = window.__ctx.camera.position; return { fly: p.fly, y: +c.y.toFixed(2), ground: +window.__ctx.physics.groundHeight(c.x, c.z, c.y).toFixed(2) }; })()');
   check('walk mode: eye height above the ground', !w.fly && w.y - w.ground > 1.2 && w.y - w.ground < 2.2, w);
@@ -379,7 +383,7 @@ try {
     await hold('KeyC', 'c', 67, 150); await page.frames(4);
     const out = await page.eval('({ on: window.__explore.drive.active, fly: window.__ctx.playerObj.fly })');
     check('explore: C leaves the car on foot', !out.on && !out.fly, out);
-    // interiors: the fish market C hall (2F gallery over the landing floor) and 男山本店 (walk in through the door)
+    // interiors: the fish market C hall (2F gallery over the landing floor), 男山本店 and café RST (walk in through the door)
     const ints = await page.eval('(window.__explore.interiors?.list || []).map((i) => ({ id: i.id, entrance: i.entrance, inside: i.inside }))');
     const mk = ints.find((i) => i.id === 'marketC'), ok2 = ints.find((i) => i.id === 'otokoyama');
     if (mk) {
@@ -401,6 +405,18 @@ try {
       await shot('18_otokoyama_inside');
       check('explore: 男山本店: walk in through the shop door', Math.abs(inShop.lx) < inShop.w / 2 && Math.abs(inShop.lz) < inShop.d / 2, inShop);
     } else check('explore: 男山本店 interior built', false, ints);
+    // [cafe-rst] café RST (迎 1F): walk in from the sidewalk through the street door (W held until the camera is inside), then its first view; the credit and consent ride in the record
+    const cr = ints.find((i) => i.id === 'cafeRst');
+    if (cr) {
+      await page.eval(`(() => { const p = window.__ctx.playerObj; p.fly = false; p.setPose(${cr.entrance.x}, ${cr.entrance.z}, ${cr.entrance.yaw}, 0); return 1; })()`);
+      await holdUntil('KeyW', 'w', 87, "(() => { const c = window.__ctx.camera.position; return window.__explore.interiors.at(c.x, c.y, c.z) === 'cafeRst'; })()", 9000); await page.frames(3);
+      const inCafe = await page.eval("(() => { const c = window.__ctx.camera.position, p = window.__ctx.playerObj.pos, r = window.__explore.interiors.cafeRst; return { at: window.__explore.interiors.at(c.x, c.y, c.z), feet: +p.y.toFixed(2), floor: r.inside.y, credit: r.credit?.ja, owner: r.consent?.owner }; })()");
+      await shot('17b_cafe_walkin');
+      await page.eval(`(() => { const p = window.__ctx.playerObj; p.setPose(${cr.inside.x}, ${cr.inside.z}, ${cr.inside.yaw}, ${cr.inside.pitch}); return 1; })()`); await page.frames(8);
+      await shot('18c_cafe_inside');
+      check('explore: café RST: in through the street door on foot, standing on its floor, credited 協力：café RST', inCafe.at === 'cafeRst' && Math.abs(inCafe.feet - inCafe.floor) < 0.1 && inCafe.credit === '協力：café RST' && inCafe.owner === 'café RST', inCafe);
+    } else check('explore: café RST interior built', false, ints);
+    check('explore: four interiors listed (the fish market C hall, 男山本店, café RST, the station hall)', ['marketC', 'otokoyama', 'cafeRst', 'station'].every((id) => ints.some((i) => i.id === id)), ints.map((i) => i.id));
     const stn = ints.find((i) => i.id === 'station');
     if (stn?.inside) {
       await page.eval(`(() => { const p = window.__ctx.playerObj; p.fly = false; p.setPose(${stn.inside.x}, ${stn.inside.z}, ${stn.inside.yaw}, 0); return 1; })()`); await page.frames(10);
@@ -424,12 +440,12 @@ try {
     await ph2.S('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true, screenWidth: 390, screenHeight: 844 });
     await ph2.S('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 }).catch(() => {});
     const tp = Date.now();
-    await ph2.goto(`${srv.url}`);
+    await ph2.goto(`${srv.url}?person=first`);
     await ph2.waitFor("document.body.classList.contains('loaded')", { timeout: 280000 });
     report.timings.phoneLoadMs = Date.now() - tp;
     await ph2.shot(`${out}_09_phone_intro.png`);
     await ph2.eval("document.getElementById('go').click()");
-    await ph2.frames(30);
+    try { await ph2.waitFor("document.body.classList.contains('playing')", { timeout: 12000 }); } catch { /* the explore-UI check records a sheet that never appeared */ }
     await ph2.eval('window.__life.live.ready');
     await ph2.frames(10);
     const q = await ph2.eval('({ q: window.__ctx.quality.name, tier: window.__ctx.quality.tier, phone: !!window.__ctx.quality.phone, heroR: window.__ctx.quality.heroR, overflow: document.documentElement.scrollWidth > innerWidth })');

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "cell": "c4e",
+  "bbox": [
+    1300,
+    -900,
+    1520,
+    -300
+  ],
+  "note": "c4 east edge and beyond (x > 1300, outside the 12 cells): the 三陸沿岸道路 cuttings. The GSI photo (about 2020-22) shows the road works as bare cream cuts, which build-landcover.js classified as sand (#e2d4ae, L* 91 in the app). Earth 2026-03-11 shows the expressway finished (dark asphalt, planted grass slopes of dormant tan-brown, L* median 47). The generic fix is in build-landcover.js (bare-cut sand over 12 m away from buildings, and sand over the hill line, become `felled`: #7f6b57, L* 47); this file only carries the ring that the generic rule leaves (a 12 m high embankment wedge at the road, x 1424-1432, z -326..-315).",
+  "sources": [
+    {
+      "id": "earth",
+      "what": "Google Earth, imagery dated 2026-03-11 (raw/ref/earth/c4e-r3: earth_top, pair_top; before the fix raw/ref/earth/c4e-r3-before). Reference only, never committed.",
+      "date": "2026-03-11"
+    },
+    {
+      "id": "gsi",
+      "what": "GSI seamless aerial photo data/ortho/core.jpg (z18, about 2020-2022): the bare cuts of the unfinished expressway",
+      "date": "2021-01-01"
+    }
+  ],
+  "landuse": [
+    {
+      "use": "felled",
+      "name": "三陸沿岸道路 切土法面 (x 1424-1432)",
+      "ring": [
+        [
+          1421,
+          -330
+        ],
+        [
+          1436,
+          -330
+        ],
+        [
+          1437,
+          -312
+        ],
+        [
+          1421,
+          -312
+        ]
+      ],
+      "src": "earth: the road embankment at z -326..-315 is tan-brown graded slope in 2026 (earth_top, L* about 47), the app's cream sand wedge (226,212,174 on 11-12 m ground, just under the generic 12 m rule) is wrong; felled = #7f6b57"
+    }
+  ]
+}

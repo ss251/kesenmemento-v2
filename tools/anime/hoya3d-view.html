@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ホヤぼーや 3D viewer</title>
+<style>
+  :root { --paper: #FBFAF5; --ink: #595857; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.6 "Hiragino Sans", "Hiragino Kaku Gothic ProN", system-ui, sans-serif; }
+  #view { display: block; }
+  #credit { position: fixed; left: 0; right: 0; bottom: 12px; text-align: center; font-size: 12px; letter-spacing: 0.02em; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<!-- the manual's credit (p.4), shown with him in every view; it never sits on top of him -->
+<div id="credit">気仙沼市観光キャラクター「海の子 ホヤぼーや」</div>
+<script type="module" src="./hoya3d-view.js"></script>
+</body>
+</html>

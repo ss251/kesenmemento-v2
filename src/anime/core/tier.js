@@ -2,9 +2,11 @@
 //
 // iOS Safari reloads a tab ("A problem repeatedly occurred") when the page's JS heap, canvases and GPU buffers together
 // pass about 1-1.5 GB, and less on older phones. The phone tier builds a smaller world (hero radius, far town, trees,
-// boats, poles), caps canvas textures at 512 px, keeps atlas pages at 2048 px, and frees the CPU copy of the static
-// batches once they are on the GPU. A device that looks like a phone or a tablet always gets it: the stored quality
-// setting and `?q=` cannot raise it (only `?unsafe=1`, for testing), and nothing upgrades it automatically.
+// boats, poles), caps canvas textures at 512 px, keeps atlas pages at 2048 px at most (each trimmed to its
+// content), and frees the CPU copy of the static batches once they are on the GPU. Its texture budget is 240 MB
+// (tools/anime/phonemem.mjs; docs/ARCHITECTURE.md "Phone texture budget"). A device that looks like a phone or a tablet
+// always gets it: the stored quality setting and `?q=` cannot raise it (only `?unsafe=1`, for testing), and nothing
+// upgrades it automatically.
 //
 // Evaluated once at import (layout.js reads it before main.js runs). Outside a browser (bun tests, tools) it is 'high'.
 
@@ -27,9 +29,19 @@ export function qualityPreset(tier, { dpr = 1, touch = false } = {}) {
 
 /** The phone tier's build limits (metres unless noted). Tested against the budgets in test/v4-phone.test.js. */
 export const PHONE = {
-  pixelRatio: 1.25,        // CSS px -> device px (a DPR-3 phone renders 488 x 1055 for a 390 x 844 screen)
+  pixelRatio: 1.5,         // CSS px -> device px: [mobile-perf] the quality floor, 1.5 (a DPR-3 phone renders 585 x 1266 for a 390 x 844 screen; it was 1.25,
+                           // and dynamic resolution could take it to 0.75: the owner's "looks so bad", 2026-10-08)
+  drMin: 1.0,              // [mobile-perf] the soft floor: the 60 Hz controller holds 1.5x down to 30 fps (core/dynres.js softMin) ...
+  drFloor: 0.85,           // ... and only a sustained slow stretch (a 2 s median frame over 38 ms) takes it lower, one step at a time, to 1.275x at most
+                           // (a whole number of steps under drMin: no last 1 % resize; and over 1.25x, the conductor's floor)
+  drMax: 1.3,              // ... and climbs to 1.3 x (about 2 device px per CSS px, the canvas's own: main.js) when the GPU holds it ...
+  drStep: 0.05,            // ... in steps of 0.05 (a 3-4 % resize, not a visible jump)
   canvasMax: 512,          // every canvas texture (signs, facades, labels) at most 512 px on a side
-  atlasPage: 2048,         // static-batch atlas pages
+  atlasPage: 2048,         // static-batch atlas pages (the largest side)
+  atlasTrim: true,         // [v6:phone-budget] ... each page canvas cut down to its content (not a mostly empty 2048² last page)
+  atlasQuantum: 64,        // ... in steps of this many px (core/atlaspack.js); a boat's name plates ~1 MB instead of 5.6 MB
+  atlasDensity: 320,       // [mobile-perf] ... and each tile at most this many px per metre of what wears it (core/batch2.js; ?density=0: off): a sign
+                           // 2.7 m away still has a texel per pixel at the 2x scene (it was 200, matched to the old 1.25x)
   heroR: 0.45,             // x the hero zone radius (380 m): Sakura-kit lots, lamps, cast paths
   farDist: 2200,           // far-town instances within this distance of the hero zone
   farSmall: 1000,          // ... and buildings under 70 m² only within this distance (high: 2000)
@@ -54,7 +66,8 @@ export const PHONE = {
   shadowEvery: 3,          // shadow map re-rendered every n-th frame, and at once when the camera moves 3 m or the sun turns
   shadowMax: 280,          // the shadow box stops growing with altitude here (m; others: 700): 0.27 m texels on 1024²
 };
-const PHONE_BASE = { name: 'low', phone: true, msaa: 0, shadowMap: 1024, shadowSize: 40, shadowMax: PHONE.shadowMax, petals: 0.25, heroR: PHONE.heroR };
+// [mobile-perf] shadows at 2048 (were 1024: half-metre texels from the drone's 280 m shadow box); a lite boot keeps 1024, then 512
+const PHONE_BASE = { name: 'low', phone: true, msaa: 0, shadowMap: 2048, shadowSize: 40, shadowMax: PHONE.shadowMax, petals: 0.25, heroR: PHONE.heroR };
 
 /**
  * Does this device look like a phone or a tablet? Touch as the primary pointer on a small screen, an iPad in desktop

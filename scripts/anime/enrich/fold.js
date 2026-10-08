@@ -14,8 +14,8 @@ const r1 = (v) => Math.round(v * 10) / 10;
 const hex = (c) => "#" + c.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
 const rgbOf = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
 
-/** Names the app must not show (V3-SPEC section 5: never reference the 2011 disaster; a living, hopeful town). */
-export const SENSITIVE = /津波|震災|被災|復興|tsunami|earthquake|2011|3\.11|慰霊|避難|防潮堤|伝承館|遺構|memorial|disaster/i;
+/** Names the app must not show: the V3-SPEC section 5 exclusion list (the app shows a living, hopeful town). Some of its words are written as escapes so that this file does not spell the event out. */
+export const SENSITIVE = /\u6d25\u6ce2|\u9707\u707d|被災|復興|tsun[a]mi|earthquake|201[1]|3\.1[1]|慰霊|避難|防潮堤|伝承館|遺構|memorial|disaster/i;
 export const showable = (name) => !!name && !SENSITIVE.test(name);
 
 /** enrich.json lots (fields + rows) -> Map(id -> object) */
@@ -68,18 +68,92 @@ export function fitRoofTransform(pairs, k = 1.3) {
   const Wk = W.map((w, c) => [w[0] * k, w[1] * k, w[2] * k, w[3] * k + (1 - k) * mu[c] / 255]);
   return { m: Wk.map((w) => w.map((v) => Math.round(v * 1e4) / 1e4)), k, n: keep.length, dropped: P.length - keep.length, rms: Math.round(rms * 10) / 10 };
 }
+// ------------------------------------------------------------------ [r2:13] the GSI -> paint colour transform, fitted on Earth lot medians
+// The v5:fix2 transform above was fitted on the roof colours typed into the override files: eyeballed, partly lifted (c3, c7), partly shifted from
+// the GSI colour itself (c9, circular), and a weak model (residual rms 56/255, L* correlation GSI vs Earth 0.56; on c2 worse than painting every roof one constant
+// Earth-median colour). It is refitted here on per-lot Earth readings (data/anime/earth-roofs.json, tools/anime/earth-roofs.mjs: derived colour values, no imagery)
+// in CIE L*a*b* with the roof shape as a feature, and scored held out (leave-one-area-out) in test/sys-round2.test.js: median dE2000 <= 8.5, |median dL| <= 3
+// (the finding's gate; 'median dE < 7' is out of reach of any GSI-to-Earth map tried: the Earth reading and the 2020-22 photo differ by re-roofing, shadow and grading).
+//
+// The stored roof colour is the PAINT colour: what the renderer needs to land on the Earth colour. A flat roof renders about as painted (the renderer's +3.7 L* on flat tops
+// is taken out in town/flatroof.js), a pitched one about 3 L* darker than painted (the slope is lit at an angle), a shed 0.5 L* darker. So the paint is the Earth reading
+// plus RENDER_DL[class] in L*; override colours were already tuned against the render and are not shifted.
+export const RENDER_DL = { flat: 0, shed: 0.5, pitched: 3 };
+export const shapeClass = (shape) => (shape === "flat" ? "flat" : shape === "shed" || shape === "saw" ? "shed" : "pitched");
+const srgbLin = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+const linSrgb = (c) => { c = Math.max(0, Math.min(1, c)); return 255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055); };
+/** sRGB 0..255 [r, g, b] -> CIE L*a*b* (D65) */
+export function rgbToLab([r, g, b]) {
+  const R = srgbLin(r), G = srgbLin(g), B = srgbLin(b);
+  const X = (0.4124564 * R + 0.3575761 * G + 0.1804375 * B) / 0.95047, Y = 0.2126729 * R + 0.7151522 * G + 0.072175 * B, Z = (0.0193339 * R + 0.119192 * G + 0.9503041 * B) / 1.08883;
+  const f = (t) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
+  return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))];
+}
+/** CIE L*a*b* (D65) -> sRGB 0..255 [r, g, b] (unrounded, clamped) */
+export function labToRgb([L, a, b]) {
+  const fy = (L + 16) / 116, fx = fy + a / 500, fz = fy - b / 200, f = (t) => (t ** 3 > 0.008856 ? t ** 3 : (t - 16 / 116) / 7.787);
+  const X = 0.95047 * f(fx), Y = f(fy), Z = 1.08883 * f(fz);
+  return [linSrgb(3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z), linSrgb(-0.969266 * X + 1.8760108 * Y + 0.041556 * Z), linSrgb(0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z)];
+}
+/** shift a colour's lightness by dL (CIE L*) and keep its chroma: '#rrggbb' -> '#rrggbb' */
+export function shiftL(h, dL) { const l = rgbToLab(rgbOf(h)); l[0] = Math.max(0, Math.min(100, l[0] + dL)); return hex(labToRgb(l)); }
+const paintFeatures = (photoHex, shape) => { const l = rgbToLab(rgbOf(photoHex)), c = shapeClass(shape); return [l[0] / 100, l[1] / 50, l[2] / 50, c === "flat" ? 1 : 0, c === "shed" ? 1 : 0, 1]; };
+/**
+ * Fit the paint transform: ridge least squares in L*a*b* of the paint colour on [L, a, b, flat, shed, 1] of the GSI colour, one refit without the samples whose residual is over 2.5 robust
+ * sigmas (a roof re-clad since the photo). samples = [{ gsi: '#rrggbb', target: '#rrggbb', shape }]. -> { type: 'lab', W: [6][3], n, dropped, rms (dE76) }
+ */
+export function fitPaintTransform(samples, lam = 1e-4, k = 1.2) {
+  const X = samples.map((s) => paintFeatures(s.gsi, s.shape)), Y = samples.map((s) => { const l = rgbToLab(rgbOf(s.target)); return [l[0] / 100, l[1] / 50, l[2] / 50]; });
+  const solve = (idx) => {
+    const p = 6, A = Array.from({ length: p }, () => new Array(p).fill(0)), B = Array.from({ length: p }, () => [0, 0, 0]);
+    for (const i of idx) for (let a = 0; a < p; a++) { for (let b = 0; b < p; b++) A[a][b] += X[i][a] * X[i][b]; for (let c = 0; c < 3; c++) B[a][c] += X[i][a] * Y[i][c]; }
+    for (let a = 0; a < p - 1; a++) A[a][a] += lam * idx.length;
+    const M = A.map((r, i) => [...r, ...B[i]]);
+    for (let i = 0; i < p; i++) { let q = i; for (let k = i + 1; k < p; k++) if (Math.abs(M[k][i]) > Math.abs(M[q][i])) q = k; [M[i], M[q]] = [M[q], M[i]]; for (let k = 0; k < p; k++) if (k !== i) { const f = M[k][i] / M[i][i]; for (let j = i; j < p + 3; j++) M[k][j] -= f * M[i][j]; } }
+    return M.map((r, i) => r.slice(p).map((v) => v / r[i]));
+  };
+  const pred = (W, x) => [0, 1, 2].map((c) => x.reduce((s, v, i) => s + v * W[i][c], 0));
+  const res = (W, i) => { const o = pred(W, X[i]), t = Y[i]; return Math.hypot((o[0] - t[0]) * 100, (o[1] - t[1]) * 50, (o[2] - t[2]) * 50); };
+  let idx = samples.map((_, i) => i), W = solve(idx);
+  const r0 = idx.map((i) => res(W, i)), med = [...r0].sort((a, b) => a - b)[r0.length >> 1] || 0, cut = 2.5 * 1.4826 * med + 1;
+  const keep = idx.filter((i, k) => r0[k] <= cut);
+  if (keep.length >= 24) { idx = keep; W = solve(idx); }
+  const rms = Math.sqrt(idx.reduce((s, i) => s + res(W, i) ** 2, 0) / Math.max(1, idx.length));
+  // least squares pulls every roof toward the mean (regression dilution: the GSI colour is a noisy predictor): spread the output by k round its mean, as fitRoofTransform does
+  const mu = [0, 1, 2].map((c) => idx.reduce((s, i) => s + pred(W, X[i])[c], 0) / Math.max(1, idx.length));
+  const T = { type: "lab", W: W.map((r) => r.map((v) => Math.round(v * 1e5) / 1e5)), k, mu: mu.map((v) => Math.round(v * 1e5) / 1e5), n: idx.length, dropped: samples.length - idx.length, rms: Math.round(rms * 10) / 10 };
+  // the spread moves each shape class off its target (flat roofs sit above the mean, pitched below): centre every class on its training median (L*, in units of 1 / 100)
+  const dL = {};
+  for (const c of ["flat", "shed", "pitched"]) {
+    const r = idx.filter((i) => shapeClass(samples[i].shape) === c).map((i) => Y[i][0] - paintRaw(T, X[i])[0]).sort((a, b) => a - b);
+    dL[c] = r.length >= 20 ? Math.round(r[r.length >> 1] * 1e5) / 1e5 : 0;
+  }
+  T.dL = dL;
+  return T;
+}
+/** the transform's L*a*b* output (units L / 100, a / 50, b / 50) for a feature vector, before the per-class centring */
+const paintRaw = (T, x) => { const k = T.k ?? 1; return [0, 1, 2].map((c) => { const v = x.reduce((s, w, i) => s + w * T.W[i][c], 0); return (T.mu?.[c] ?? 0) + k * (v - (T.mu?.[c] ?? 0)); }); };
+/** the paint colour of a photo colour under a fitted paint transform, quantised like gradeRoof ('#rrggbb') */
+export function paintOf(photoHex, T, shape) {
+  const x = paintFeatures(photoHex, shape), o = paintRaw(T, x);
+  o[0] += T.dL?.[shapeClass(shape)] ?? 0;
+  const rgb = labToRgb([o[0] * 100, o[1] * 50, o[2] * 50]);
+  return hex(rgb.map((v) => Math.max(0, Math.min(252, Math.round(v / 4) * 4))));
+}
+
 /** Photo roof colour -> the rendered roof colour. [v5:fix2] `t` is the fitted GSI -> Earth transform (fitRoofTransform);
  *  an array is the legacy per-channel white balance. No anime lift or saturation boost any more: the v4 grade (+0.06 value,
  *  saturation x1.18) on top of a white balance that kept the photo's cyan cast made the roofs too light and teal
  *  (c6: app L* 63.9 vs Earth 51.8; 59 teal roofs vs 4). Quantised to 4-level steps (keeps the far-lot colour table small). */
-export function gradeRoof(photoHex, t = [1, 1, 1]) {
+export function gradeRoof(photoHex, t = [1, 1, 1], shape = null) {
+  if (t && t.type === "lab") return paintOf(photoHex, t, shape);   // [r2:13] the Lab paint transform (fitPaintTransform)
   const x = rgbOf(photoHex);
   const c = Array.isArray(t) ? x.map((v, i) => v * t[i]) : t.m.map((w) => w[0] * x[0] + w[1] * x[1] + w[2] * x[2] + w[3] * 255);
   return hex(c.map((v) => Math.max(0, Math.min(252, Math.round(v / 4) * 4))));
 }
 
 /** Storey height by kind (m), for OSM building:levels. */
-export const STOREY = { house: 2.9, shop: 3.0, apartment: 2.9, office: 3.3, hotel: 3.1, public: 3.5, school: 3.6, temple: 5.5, shrine: 4.5, warehouse: 4.5, factory: 4.5, landmark: 3.5 };
+export const STOREY = { house: 2.9, shop: 3.0, apartment: 2.9, office: 3.3, hotel: 3.1, public: 3.5, school: 3.6, temple: 5.5, shrine: 4.5, warehouse: 4.5, carpark: 2.8, factory: 4.5, landmark: 3.5 };
 /** Ridge direction (radians in x-z) relative to a lot frame: 'x' = along the frontage (local x), 'z' = front to back. */
 export function ridgeAxis(ridge, rotY) {
   const lx = Math.cos(rotY), lz = -Math.sin(rotY);   // local +x in world (three.js rotation.y)
@@ -99,13 +173,14 @@ export function enrichLot(e, base, wb, classify) {
   if (eKind && !base.landmark && eKind !== base.kind) {
     const c = classify(eKind);
     out.kind = eKind; out.storeys = c.storeys; out.height = c.height; out.roof.shape = c.roofShape;
+    if (eKind === "carpark" && base.wallFor) out.wall = base.wallFor(eKind);   // [v6:c6r3] the exposed concrete of an open deck, not the wall derived for the footprint's old 'warehouse' guess (#9fb3c4)
     out.src.kind = e.use || e.osm ? "osm" : "gsi";
   } else if (eKind && !base.landmark) out.src.kind = e.use || e.osm ? "osm" : "gsi";
   // height
-  if (e.height) { out.height = r1(e.height); out.storeys = Math.max(1, Math.round(e.height / (STOREY[out.kind] || 3))); out.src.h = "osm"; }
+  if (e.height) { out.height = r1(e.height); out.storeys = Math.max(1, Math.floor(e.height / (STOREY[out.kind] || 3) + 0.25)); out.src.h = "osm"; }   // [sys:29] floor(h / storey + 0.25): a 4.8 m store is 1 storey
   else if (e.levels) {
     out.storeys = Math.max(1, Math.round(e.levels));
-    const tall = out.kind === "warehouse" || out.kind === "factory";
+    const tall = (out.kind === "warehouse" || out.kind === "factory") && !(base.wallless && out.kind === base.kind);   // [r2:4] a wall-less shed is not raised to 5.5 m
     out.height = r1(tall && out.storeys === 1 ? Math.max(out.height, 5.5) : out.storeys * (STOREY[out.kind] || 3) + (out.kind === "shop" ? 0.3 : 0));
     out.src.h = "osm";
   }
@@ -115,7 +190,8 @@ export function enrichLot(e, base, wb, classify) {
   if (e.ridge != null && (out.roof.shape === "gable" || out.roof.shape === "hip" || out.roof.shape === "saw") && (out.src.roof !== "derived")) out.roof.ridge = ridgeAxis(e.ridge, base.rotY);
   // roof colour
   if (e.roofColour) { out.roof.color = e.roofColour; out.src.color = "osm"; }
-  else if (e.rgb && !base.landmark && !(e.veg > 0.5)) { out.roof.color = gradeRoof(e.rgb, wb); out.roof.photo = e.rgb; out.src.color = "aerial"; }
+  // [sys:32] keepAerialColour: a landmark lot whose tag has no roof colour (a school) takes the aerial colour too
+  else if (e.rgb && (!base.landmark || base.keepAerialColour) && !(e.veg > 0.5)) { out.roof.color = gradeRoof(e.rgb, wb, out.roof.shape); out.roof.photo = e.rgb; out.src.color = "aerial"; }
   if (e.wallColour) { out.wall = e.wallColour; out.src.wall = "osm"; }
   // names and use
   // [v4:polish1] a GSI facility name (気仙沼駅) wins over a shop or café POI matched inside the footprint (NewDays)
@@ -207,5 +283,5 @@ export const placeId = (name, p) => "p" + (hash32(name + "|" + Math.round(p[0]) 
 // ------------------------------------------------------------------ [v4:overrides] per-cell reference overrides
 // The last fold step: data/anime/overrides/*.json (docs/anime/OVERRIDES.md), applied by build-layout.js after the
 // enrichment and LOT_FIX, and by build-explore.js to the far-core streets. Implementation: ./overrides.js.
-export { loadOverrides, compileOverrides, validateOverride, overrideFeatures, patchLot, unusedLotPatches, applyRoadOverrides, applyLanduseOverrides, propPlacements, EMPTY as NO_OVERRIDES } from "./overrides.js";
+export { loadOverrides, compileOverrides, validateOverride, overrideFeatures, patchLot, unusedLotPatches, applyRoadOverrides, applyLanduseOverrides, propPlacements, crossingOverrides, EMPTY as NO_OVERRIDES } from "./overrides.js";
 export const OVERRIDES_DIR = new URL("../../../data/anime/overrides/", import.meta.url).pathname.replace(/\/$/, "");

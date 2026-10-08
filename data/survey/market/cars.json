@@ -1,0 +1,405 @@
+{
+ "note": "[v6:fix2] The cars parked on C\u68df's roof deck as photographed (IMG_0792-0798, 2026-10-01 17:07), in the penthouse-wall frame of model.json (s along the east wall, off out of it; `face` = degrees from facing the wall toward +s). Types are lofts (src/anime/world/harbor/deckcars6.js); the dimensions are the makes' published sizes.",
+ "types": {
+  "stepwgn": {
+   "L": 4.69,
+   "W": 1.695,
+   "H": 1.84,
+   "belt": 1.02,
+   "tailFrac": 0.98,
+   "rearT": 0.04,
+   "frontT": 0.6,
+   "cowlT": 0.76,
+   "hood": 0.98,
+   "nose": 0.8,
+   "wheelbase": 2.85,
+   "rearOver": 0.9,
+   "rw": 0.82
+  },
+  "cactus": {
+   "L": 4.16,
+   "W": 1.73,
+   "H": 1.52,
+   "belt": 0.98,
+   "tailFrac": 0.6,
+   "rearT": 0.06,
+   "frontT": 0.56,
+   "cowlT": 0.7,
+   "hood": 1.0,
+   "nose": 0.8,
+   "wheelbase": 2.6,
+   "rearOver": 0.76,
+   "rw": 0.82
+  },
+  "crown": {
+   "L": 4.72,
+   "W": 1.89,
+   "H": 1.55,
+   "belt": 1.0,
+   "tailFrac": 0.45,
+   "rearT": 0.16,
+   "frontT": 0.52,
+   "cowlT": 0.66,
+   "hood": 0.94,
+   "nose": 0.72,
+   "wheelbase": 2.85,
+   "rearOver": 0.95,
+   "tyre": 0.36,
+   "rw": 0.78
+  },
+  "mazda3": {
+   "L": 4.46,
+   "W": 1.76,
+   "H": 1.47,
+   "belt": 0.95,
+   "tailFrac": 0.5,
+   "rearT": 0.1,
+   "frontT": 0.5,
+   "cowlT": 0.64,
+   "hood": 0.9,
+   "nose": 0.72,
+   "wheelbase": 2.64,
+   "rearOver": 0.9,
+   "rw": 0.8
+  },
+  "swift": {
+   "L": 3.89,
+   "W": 1.74,
+   "H": 1.5,
+   "belt": 0.93,
+   "tailFrac": 0.65,
+   "rearT": 0.05,
+   "frontT": 0.5,
+   "cowlT": 0.66,
+   "hood": 0.88,
+   "nose": 0.7,
+   "wheelbase": 2.45,
+   "rearOver": 0.72,
+   "rw": 0.82
+  },
+  "spacia": {
+   "L": 3.4,
+   "W": 1.475,
+   "H": 1.78,
+   "belt": 0.92,
+   "tailFrac": 0.98,
+   "rearT": 0.03,
+   "frontT": 0.6,
+   "cowlT": 0.77,
+   "hood": 0.95,
+   "nose": 0.8,
+   "wheelbase": 2.45,
+   "rearOver": 0.55,
+   "tyre": 0.28,
+   "rw": 0.86
+  },
+  "van": {
+   "L": 3.4,
+   "W": 1.475,
+   "H": 1.89,
+   "belt": 0.95,
+   "tailFrac": 1,
+   "rearT": 0.02,
+   "frontT": 0.62,
+   "cowlT": 0.8,
+   "hood": 1.0,
+   "nose": 0.85,
+   "wheelbase": 2.45,
+   "rearOver": 0.55,
+   "tyre": 0.28,
+   "rw": 0.9
+  },
+  "kei": {
+   "L": 3.4,
+   "W": 1.475,
+   "H": 1.5,
+   "belt": 0.88,
+   "tailFrac": 0.6,
+   "rearT": 0.05,
+   "frontT": 0.52,
+   "cowlT": 0.68,
+   "hood": 0.85,
+   "nose": 0.66,
+   "wheelbase": 2.45,
+   "rearOver": 0.5,
+   "tyre": 0.28,
+   "rw": 0.84
+  },
+  "rav4": {
+   "L": 4.6,
+   "W": 1.855,
+   "H": 1.69,
+   "belt": 1.07,
+   "tailFrac": 0.8,
+   "rearT": 0.08,
+   "frontT": 0.55,
+   "cowlT": 0.68,
+   "hood": 1.0,
+   "nose": 0.85,
+   "wheelbase": 2.69,
+   "rearOver": 0.9,
+   "tyre": 0.36,
+   "rw": 0.8
+  },
+  "aqua": {
+   "L": 4.0,
+   "W": 1.69,
+   "H": 1.48,
+   "belt": 0.92,
+   "tailFrac": 0.55,
+   "rearT": 0.12,
+   "frontT": 0.48,
+   "cowlT": 0.66,
+   "hood": 0.88,
+   "nose": 0.68,
+   "wheelbase": 2.55,
+   "rearOver": 0.7,
+   "rw": 0.8
+  },
+  "hatch": {
+   "L": 4.1,
+   "W": 1.7,
+   "H": 1.5,
+   "belt": 0.93,
+   "tailFrac": 0.6,
+   "rearT": 0.08,
+   "frontT": 0.5,
+   "cowlT": 0.66,
+   "hood": 0.88,
+   "nose": 0.7,
+   "wheelbase": 2.55,
+   "rearOver": 0.75,
+   "rw": 0.8
+  },
+  "probox": {
+   "L": 4.2,
+   "W": 1.69,
+   "H": 1.9,
+   "belt": 0.98,
+   "tailFrac": 1,
+   "rearT": 0.03,
+   "frontT": 0.66,
+   "cowlT": 0.8,
+   "hood": 0.95,
+   "nose": 0.8,
+   "wheelbase": 2.55,
+   "rearOver": 0.8,
+   "rw": 0.9
+  },
+  "truck2t": {
+   "L": 5.6,
+   "W": 1.7,
+   "H": 2.2,
+   "wheelbase": 2.8,
+   "rearOver": 1.2,
+   "tyre": 0.36,
+   "lampY": 0.8,
+   "mirrorY": 1.4,
+   "mirrorZ": 0.38,
+   "st": [
+    [
+     0,
+     0.5,
+     0.95,
+     0.95,
+     0.98,
+     1
+    ],
+    [
+     0.6,
+     0.5,
+     0.95,
+     0.95,
+     0.98,
+     1
+    ],
+    [
+     0.605,
+     0.4,
+     1.0,
+     2.05,
+     1,
+     0.94
+    ],
+    [
+     0.97,
+     0.4,
+     1.0,
+     2.05,
+     1,
+     0.94
+    ],
+    [
+     0.985,
+     0.35,
+     1.0,
+     1.0,
+     0.96,
+     1
+    ],
+    [
+     1,
+     0.4,
+     0.9,
+     0.9,
+     0.94,
+     1
+    ]
+   ]
+  }
+ },
+ "cars": [
+  {
+   "name": "silver kei",
+   "type": "kei",
+   "color": "#b9bcbf",
+   "nose": [
+    93.45,
+    9.6
+   ],
+   "face": 0
+  },
+  {
+   "name": "cactus",
+   "type": "cactus",
+   "color": "#2b8ea0",
+   "nose": [
+    95.37,
+    8.49
+   ],
+   "face": -11.5
+  },
+  {
+   "name": "crown",
+   "type": "crown",
+   "color": "#eceeea",
+   "nose": [
+    97.5,
+    8.48
+   ],
+   "face": 9.8
+  },
+  {
+   "name": "mazda",
+   "type": "mazda3",
+   "color": "#f2f2ee",
+   "nose": [
+    99.72,
+    7.79
+   ],
+   "face": 0.8
+  },
+  {
+   "name": "swift",
+   "type": "swift",
+   "color": "#f0f0ec",
+   "nose": [
+    102.57,
+    8.56
+   ],
+   "face": 0.3
+  },
+  {
+   "name": "spacia",
+   "type": "spacia",
+   "color": "#ecebe5",
+   "nose": [
+    104.65,
+    8.62
+   ],
+   "face": -8.1
+  },
+  {
+   "name": "suv",
+   "type": "rav4",
+   "color": "#3b3e42",
+   "nose": [
+    109.61,
+    9.58
+   ],
+   "face": 6.5
+  },
+  {
+   "name": "aqua",
+   "type": "aqua",
+   "color": "#b9bcbc",
+   "nose": [
+    112.97,
+    9.34
+   ],
+   "face": -3.5
+  },
+  {
+   "name": "probox",
+   "type": "probox",
+   "color": "#efefec",
+   "nose": [
+    115.67,
+    9.13
+   ],
+   "face": 0.1
+  },
+  {
+   "name": "blue hatch",
+   "type": "aqua",
+   "color": "#2f62ae",
+   "nose": [
+    118.24,
+    8.84
+   ],
+   "face": -4.2
+  },
+  {
+   "name": "white suv",
+   "type": "rav4",
+   "color": "#eeeeea",
+   "nose": [
+    120.85,
+    8.68
+   ],
+   "face": -4.5
+  },
+  {
+   "name": "white hatch",
+   "type": "hatch",
+   "color": "#e8e9e6",
+   "nose": [
+    123.31,
+    8.69
+   ],
+   "face": -4.4
+  },
+  {
+   "name": "stepwgn",
+   "type": "stepwgn",
+   "color": "#f1f1ee",
+   "s": 72.48,
+   "off": 11.52,
+   "face": -15.2
+  },
+  {
+   "name": "white hatch N",
+   "type": "hatch",
+   "color": "#e9eae7",
+   "s": 70.08,
+   "off": 11.43,
+   "face": -17.4
+  },
+  {
+   "name": "black hatch N",
+   "type": "hatch",
+   "color": "#2d3033",
+   "s": 68.18,
+   "off": 11.24,
+   "face": -12.1
+  },
+  {
+   "name": "white truck N",
+   "type": "truck2t",
+   "color": "#eeeeec",
+   "s": 63.9,
+   "off": 12.2,
+   "face": -5
+  }
+ ]
+}

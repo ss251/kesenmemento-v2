@@ -13,7 +13,7 @@ import { OSM, SPEC } from './sites.js';
 import { group, obbOf, obbPt, groundSpan, wallGeo, facadeMat, paintWindow, pitchedRoof, flatRoof, flipFaces, colliders, wallCollider, sign, capGeo, prismWalls, mapMat, textTex, FONT, nightMat, openRing, offsetRing } from './kit.js';
 
 // [v4:polish2] roof #434a55 read black from the air; the ortho samples #7d8488 and the sheet #4f5763 -> #5d6672
-const C = { wall: '#e2ddd3', trim: '#cfc9bd', reveal: '#bdb6a8', roof: '#5d6672', roofEdge: '#555d68', white: '#f0efea', jr: '#2e8b57', blue: '#1f5fae', platform: '#b9b7b0', edge: '#e8d44a', canopy: '#5f9fc0', steel: '#6b7280', ballast: '#8d8a84', rail: '#7b7f86', floor: '#cfc8bb', bench: '#8a6a4e' };
+const C = { wall: '#e2ddd3', trim: '#cfc9bd', reveal: '#bdb6a8', roof: '#5d6672', roofEdge: '#555d68', white: '#f0efea', jr: '#2e8b57', blue: '#1f5fae', platform: '#b9b7b0', edge: '#e8d44a', canopyIsland: '#a09eb3', canopyBrt: '#c3c1c5', jrSteel: '#2f6fb8', offSteel: '#e4e2da', soffit: '#eeeeea', steel: '#6b7280', ballast: '#8d8a84', rail: '#7b7f86', floor: '#cfc8bb', bench: '#8a6a4e' };
 
 /** The painted roof mural: swordfish (メカジキ) and fishermen on a dark slate ground, read at roof scale. */
 function muralTex(ctx) {
@@ -67,7 +67,8 @@ export function buildStation(ctx) {
     wall: t(C.wall, { paint: 0.04 }), trim: t(C.trim, { paint: 0.03 }), reveal: t(C.reveal, { paint: 0.03 }), roof: t(C.roof, { paint: 0.05 }), roofEdge: t(C.roofEdge, { paint: 0.02 }),
     white: t(C.white, { paint: 0.02 }), steel: t(C.steel, { paint: 0 }), floor: t(C.floor, { paint: 0.04 }), dark: t('#3d4350', { paint: 0 }), bench: t(C.bench, { paint: 0.03 }),
     glass: nightMat(ctx, '#9db4c6', '#ffe2b8', 1.25), glassDark: nightMat(ctx, '#6c8298', '#ffdcaa', 1.3), lamp: nightMat(ctx, '#f1efe6', '#fff2d6', 2.2),
-    blue: t(C.blue, { paint: 0 }), jr: t(C.jr, { paint: 0 }), plat: t(C.platform, { paint: 0.05 }), edge: t(C.edge, { paint: 0 }), canopy: t(C.canopy, { paint: 0.03 }),
+    blue: t(C.blue, { paint: 0 }), jr: t(C.jr, { paint: 0 }), plat: t(C.platform, { paint: 0.05 }), edge: t(C.edge, { paint: 0 }), canopyIsland: t(C.canopyIsland, { paint: 0.03 }), canopyBrt: t(C.canopyBrt, { paint: 0.03 }),
+    jrSteel: t(C.jrSteel, { paint: 0 }), offSteel: t(C.offSteel, { paint: 0.02 }), soffit: t(C.soffit, { paint: 0 }),
   };
   // stone-tile arcade texture: off-white tiles 0.6 × 0.3 m with darker joints
   const tileTex = ctx.tex.draw(128, 64, (c, W, H) => { c.fillStyle = C.wall; c.fillRect(0, 0, W, H); c.fillStyle = '#cbc5b8'; for (let y = 0; y < H; y += 16) { c.fillRect(0, y, W, 1.5); for (let x = ((y / 16) % 2) * 16; x < W; x += 32) c.fillRect(x, y, 1.5, 16); } }, { key: 'lmB-station-tile', repeat: [1, 1] });
@@ -216,11 +217,16 @@ export function buildStation(ctx) {
     const B = k.group([bo.cx, by, bo.cz], bo.rotY), kb = ctx.kit(B);
     kb.box(bo.w + 0.4, 0.2, bo.d, M.plat, [0, 0.1, 0]);
     kb.box(0.3, 0.02, bo.d, M.edge, [bo.w / 2, 0.21, 0]);
-    for (let z = -bo.d / 2 + 1; z <= bo.d / 2 - 1; z += 6.2) kb.box(0.16, 3.1, 0.16, M.steel, [-bo.w / 2 + 0.3, 1.65, z]);
-    kb.box(bo.w + 1.6, 0.16, bo.d + 0.4, M.canopy, [0.2, 3.25, 0]);
+    // [v6:station-canopy] Platform 1/2 photo (Commons 142840918): blue painted steel posts and fascia under a light grey
+    // corrugated roof with a white soffit; Earth 2026-03-11 top view: the BRT roof is pale grey (#c3c1c5)
+    for (let z = -bo.d / 2 + 1; z <= bo.d / 2 - 1; z += 6.2) kb.box(0.16, 3.1, 0.16, M.jrSteel, [-bo.w / 2 + 0.3, 1.65, z]);
+    kb.box(bo.w + 1.6, 0.16, bo.d + 0.4, M.canopyBrt, [0.2, 3.25, 0]);
+    kb.box(bo.w + 1.5, 0.02, bo.d + 0.3, M.soffit, [0.2, 3.15, 0]);                       // white soffit under the slab
+    for (const sx of [-1, 1]) kb.box(0.1, 0.3, bo.d + 0.4, M.jrSteel, [0.2 + sx * (bo.w + 1.6) / 2, 3.18, 0]);   // blue fascia, long edges
+    for (const sz of [-1, 1]) kb.box(bo.w + 1.7, 0.3, 0.1, M.jrSteel, [0.2, 3.18, sz * (bo.d + 0.4) / 2]);       // and the two ends
     kb.plane(2.2, 0.55, mapMat(ctx, 'toon', '#ffffff', textTex(ctx, 'BRT のりば  1', { w: 512, h: 128, color: '#ffffff', bg: '#d2462f', font: FONT.sans }), { paint: 0 }), [bo.w / 2 + 0.2, 2.8, 4], [0, Math.PI / 2, 0]);
   }
-  // ---- the island platform (OSM 267557941, 1 face 2 tracks) and its canopy (OSM 761402299, light blue on the ortho)
+  // ---- the island platform (OSM 267557941, 1 face 2 tracks) and its canopy (OSM 761402299, grey-lilac roof #a09eb3 on Earth 2026-03-11, the ortho's light blue is out of date)
   {
     const ip = OSM.islandPlatform.poly, py = L.heightAt(-1420, -470) + 0.95;
     k.mesh(prismWalls(ip, py - 1.2, py, { tile: 2 }), M.plat);
@@ -228,9 +234,16 @@ export function buildStation(ctx) {
     k.mesh(prismWalls(offsetRing(ip, -0.05), py + 0.005, py + 0.012, { tile: 2 }), M.edge);
     const co = obbOf(OSM.platformCanopy.poly);
     const P = k.group([co.cx, py, co.cz], co.rotY), kp = ctx.kit(P);
-    for (let z = -co.d / 2 + 2; z <= co.d / 2 - 2; z += 7.5) { kp.box(0.2, 3.3, 0.2, M.steel, [0, 1.65, z]); kp.box(co.w * 0.9, 0.18, 0.3, M.steel, [0, 3.25, z]); }
-    kp.box(co.w * 0.95, 0.14, co.d, M.canopy, [0, 3.45, 0]);
-    kp.box(co.w * 0.95 + 0.1, 0.3, 0.1, M.canopy, [0, 3.35, co.d / 2]);
+    // [v6:station-canopy] Platform 3/4 photo (Commons 142840920): off-white steel posts and beams, the first two bays at the
+    // north end painted JR blue; roof = pale grey-lilac sheet (Earth 2026-03-11 #a09eb3) over a white soffit
+    const nz = Math.cos(co.rotY) < 0 ? 1 : -1;   // sign of local z that points north (world -z)
+    for (let z = -co.d / 2 + 2; z <= co.d / 2 - 2; z += 7.5) {
+      const mp = (z * nz > co.d / 2 - 2 - 7.5 * 1.5) ? M.jrSteel : M.offSteel;
+      kp.box(0.2, 3.3, 0.2, mp, [0, 1.65, z]); kp.box(co.w * 0.9, 0.18, 0.3, mp, [0, 3.25, z]);
+    }
+    kp.box(co.w * 0.95, 0.14, co.d, M.canopyIsland, [0, 3.45, 0]);
+    kp.box(co.w * 0.95 - 0.1, 0.02, co.d - 0.1, M.soffit, [0, 3.37, 0]);
+    kp.box(co.w * 0.95 + 0.1, 0.3, 0.1, M.offSteel, [0, 3.35, co.d / 2]);
     for (let z = -co.d / 2 + 6; z < co.d / 2; z += 18) kp.box(1.2, 0.45, 0.12, M.bench, [0.9, 0.23, z]);
     kp.plane(1.6, 0.4, mapMat(ctx, 'toon', '#ffffff', textTex(ctx, 'けせんぬま', { w: 512, h: 128, color: '#1d2a3a', bg: '#f5f5f0', font: FONT.sans }), { paint: 0 }), [0, 2.6, 8], [0, 0, 0]);
   }

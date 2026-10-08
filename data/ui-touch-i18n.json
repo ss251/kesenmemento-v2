@@ -14,10 +14,11 @@
     "touch.btn.down": "下降",
     "touch.btn.boost": "加速",
     "touch.btn.land": "歩く",
-    "touch.btn.brake": "ブレーキ",
+    "touch.btn.brake": "ドリフト",
     "touch.btn.nitro": "ブースト",
     "touch.btn.getout": "降りる",
     "touch.run": "走る",
+    "touch.helm.full": "全速",
     "touch.boost.on": "ブースト",
     "touch.coach.title": "左で移動・右で視点",
     "touch.coach.ok": "はじめる",
@@ -27,7 +28,11 @@
     "touch.settings.lefty.hint": "移動と視点を入れ替える",
     "touch.settings.invertY": "視点の上下を反転",
     "touch.settings.sens": "視点の感度",
-    "touch.note.noRoad": "近くに乗れる道がありません"
+    "touch.note.noRoad": "近くに乗れる道がありません",
+    "touch.hud.menu": "メニュー",
+    "touch.hud.credits": "クレジット・ライセンス",
+    "touch.hud.labels": "地名ラベル",
+    "touch.hud.close": "閉じる"
   },
   "en": {
     "touch.mode.walk": "Walk",
@@ -44,10 +49,11 @@
     "touch.btn.down": "Dive",
     "touch.btn.boost": "Boost",
     "touch.btn.land": "Walk",
-    "touch.btn.brake": "Brake",
+    "touch.btn.brake": "Drift",
     "touch.btn.nitro": "Boost",
     "touch.btn.getout": "Get out",
     "touch.run": "Run",
+    "touch.helm.full": "Full",
     "touch.boost.on": "Boost",
     "touch.coach.title": "Left: move · Right: look",
     "touch.coach.ok": "Got it",
@@ -57,6 +63,10 @@
     "touch.settings.lefty.hint": "Swap move and look sides",
     "touch.settings.invertY": "Invert look up / down",
     "touch.settings.sens": "Look sensitivity",
-    "touch.note.noRoad": "No road to drive on nearby"
+    "touch.note.noRoad": "No road to drive on nearby",
+    "touch.hud.menu": "Menu",
+    "touch.hud.credits": "Credits and licence",
+    "touch.hud.labels": "Place labels",
+    "touch.hud.close": "Close"
   }
 }

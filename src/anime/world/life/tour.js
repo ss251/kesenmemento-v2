@@ -1,8 +1,13 @@
 // [v3:life] Tour camera: smooth drone flights between the tour stops (L.TOUR, L.HERO) and walk spots.
 //
 //   const tour = createTour(ctx)
-//   tour.flyTo(id | { pos, look }, { duration? })   drone flight from the current camera: a lifted Catmull-Rom arc,
-//                                                     eased, the look target blended along it
+//   tour.flyTo(id | { pos, look }, { duration?, cinematic? })   drone flight from the current camera: a lifted Catmull-Rom arc flown by arc
+//                                                     length with a Hermite ease that starts moving at once (easeFly), the view panned and
+//                                                     tilted (never a look point lerped through the town), the speed kept when a flight is
+//                                                     retargeted. A pick takes flightSeconds(d): 1.8 s for a hop, 4.5 s across the town.
+//                                                     { cinematic: true } is the auto tour's own length and soft start (flightSecondsCinematic)
+//   tour.skip(cut?) -> bool                           finish the flight in progress (a key, a press or a touch): far from the destination
+//                                                     cut(fn) hides the jump (a veil dip), near it a 0.25 s glide; false when idle or on tour
 //   tour.walkTo(id)                                  drop to the stop's walk spot (street level, walk mode)
 //   tour.play() / tour.stop() / tour.playing         auto tour: fly stop to stop, dwell with a slow orbit drift
 //   tour.filmPose(t, out) -> { pos:[x,y,z], look:[x,y,z] }   pure function of t along FILM_PATH (deterministic film)
@@ -10,7 +15,22 @@
 import * as THREE from 'three';
 
 const DEG = 180 / Math.PI;
-const ease = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+/** [ui-c] Hermite ease of a flight: e(0) = 0, e(1) = 1, e'(0) = s0, e'(1) = 0 (monotone for 0 <= s0 <= 3). s0 = 1.2 starts at 1.2x the mean speed: the first 1 % of the path
+ *  takes 0.8 % of the time (the old in-out cubic spent 13.6 % of it, so a place pick showed nothing for about a second); s0 = 0 is a smoothstep (the auto tour's soft start). */
+export const easeFly = (u, s0 = 1.2) => { const u2 = u * u, u3 = u2 * u; return s0 * (u3 - 2 * u2 + u) + 3 * u2 - 2 * u3; };
+/** A flight the visitor asked for (a place pick, the 歩く / ドローン toggle): 1.8 s for a short hop, 4.5 s across the town. */
+export const flightSeconds = (dist) => clamp(1.4 + 0.08 * Math.sqrt(dist), 1.8, 4.5);
+/** The auto tour's own length (the formula flights always had): 3.2 s to 11 s. Unchanged. */
+export const flightSecondsCinematic = (dist) => clamp(2.2 + Math.sqrt(dist) * 0.16, 3.2, 11);
+/** How far the view tips down toward the town at mid-flight (radians); 0 is a pure turn. Tune by eye: 18 degrees keeps the horizon in view, 50 to 60 degrees brings back the
+ *  old top-down moment (steepest pitch -63 to -73 degrees) without its spin. */
+const FLY_DIP = 30 * Math.PI / 180;
+const PITCH_MAX = 85 * Math.PI / 180;   // the player's own pitch clamp
+/** Yaw (0 looks along -z, turning toward -x: the derivation setCam uses) and pitch (up is positive) of a direction. The view is turned by this pair, so it never rolls. */
+const yawPitch = (v) => [Math.atan2(-v.x, -v.z), Math.asin(Math.max(-1, Math.min(1, v.y)))];
+/** A settle or a skip is a short straight glide: no lifted arc (a 30 m hump in a quarter of a second reads as a bounce). */
+const SETTLE = { duration: 0.25, s0: 2.4, straight: true };
 
 // Beauty framings for the real tour stops (L.TOUR from data/landmarks.json), chosen by screenshot at 1600x900 over every
 // time preset: the drone views keep a landmark, water and a skyline in frame; the walk spots stand on real quays and
@@ -66,7 +86,9 @@ export function createTour(ctx) {
   const byId = new Map(stops.map((s) => [s.id, s]));
   const listeners = new Set();
   const cam = ctx.camera;
-  const state = { flight: null, playing: false, current: 'hero', dwell: 0, orbit: null };
+  // vel / velN / n / last / lastOk: the camera's own velocity during a flight, so a retarget carries it (see flyTo)
+  const state = { flight: null, playing: false, current: 'hero', dwell: 0, orbit: null, vel: new THREE.Vector3(), velN: -99, n: 0, last: new THREE.Vector3(), lastOk: false };
+  const _v = new THREE.Vector3(), _t = new THREE.Vector3();
   const emit = () => { for (const f of listeners) try { f(api); } catch (e) { console.error(e); } };
 
   function player() { return ctx.playerObj; }
@@ -84,47 +106,89 @@ export function createTour(ctx) {
 
   function flyTo(target, o = {}) {
     const s = typeof target === 'string' ? byId.get(target) : null;
-    const to = s ? s.drone : target;
-    if (!to) return;
+    const to = s ? s.drone : typeof target === 'string' ? null : target;   // [ui-c] an unknown id is no flight (it used to throw on to.pos)
+    if (!to || !to.pos || !to.look) return;
     const from = { pos: [cam.position.x, cam.position.y, cam.position.z], look: currentLook(Math.max(60, Math.hypot(to.pos[0] - cam.position.x, to.pos[2] - cam.position.z) * 0.3)) };
     const dist = Math.hypot(to.pos[0] - from.pos[0], to.pos[1] - from.pos[1], to.pos[2] - from.pos[2]);
-    // lifted mid-point: long hops rise over the town so the whole bay reads on the way
+    // lifted mid-point: long hops rise over the town so the whole bay reads on the way (a straight glide has none)
     const lift = Math.min(420, 30 + dist * 0.28);
-    const mid = [(from.pos[0] + to.pos[0]) / 2, Math.max(from.pos[1], to.pos[1]) + lift, (from.pos[2] + to.pos[2]) / 2];
+    const mid = o.straight ? [(from.pos[0] + to.pos[0]) / 2, (from.pos[1] + to.pos[1]) / 2, (from.pos[2] + to.pos[2]) / 2]
+      : [(from.pos[0] + to.pos[0]) / 2, Math.max(from.pos[1], to.pos[1]) + lift, (from.pos[2] + to.pos[2]) / 2];
     const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(...from.pos), new THREE.Vector3(...mid), new THREE.Vector3(...to.pos)], false, 'centripetal');
-    const dur = o.duration ?? Math.min(11, Math.max(3.2, 2.2 + Math.sqrt(dist) * 0.16));
-    state.flight = { curve, from, to, t: 0, dur, id: s?.id || null };
+    const len = curve.getLength();
+    const dur = o.duration ?? (o.cinematic ? flightSecondsCinematic(dist) : flightSeconds(dist));
+    const s0 = o.s0 ?? (o.cinematic ? 0 : 1.2);
+    // a camera that is already moving keeps its velocity: the gap between that velocity and the new path's own start velocity is added as a bump
+    // t * (1 - t / T)^2, which is 0 at both ends, so the speed is continuous and the arrival stays exact (the callers retarget with stop() then
+    // flyTo(), and stop() keeps state.vel on purpose: a retarget used to collapse 124 m/s to 0 in one frame)
+    let dv = null;
+    const T = Math.min(0.6, dur * 0.4);
+    if (state.vel.lengthSq() > 4 && state.n - state.velN <= 2) {   // the last flight frame was at most two updates ago
+      curve.getTangentAt(0, _t);
+      dv = state.vel.clone().sub(_t.multiplyScalar(s0 * len / dur));
+    }
+    // the view pans and tilts from where the camera looks now to the framing's own direction, the way round that is at most half a turn. (A world-space
+    // lerp of the look POINT whipped the camera round where the lifted path passed near it: measured 22 deg of yaw in one frame and 320 deg in all for a
+    // net turn of 39.5. Yaw and pitch have no degenerate case: a slerp between two exactly opposite directions picks an arbitrary plane and flips 180 deg in one frame.)
+    const [y0, p0] = yawPitch(new THREE.Vector3(from.look[0] - from.pos[0], from.look[1] - from.pos[1], from.look[2] - from.pos[2]).normalize());
+    const [y1, p1] = yawPitch(new THREE.Vector3(to.look[0] - to.pos[0], to.look[1] - to.pos[1], to.look[2] - to.pos[2]).normalize());
+    const dyaw = Math.atan2(Math.sin(y1 - y0), Math.cos(y1 - y0));
+    state.flight = { curve, from, to, t: 0, dur, s0, dv, T, y0, p0, dyaw, dp: p1 - p0, id: s?.id || null };
     if (s) state.current = s.id;
     state.orbit = null;
     emit();
   }
+  /**
+   * Finish the flight in progress (any key, press or touch while flying). Far from the destination the caller's `cut(fn)` (a veil dip) hides the jump. Otherwise a
+   * straight glide settles the camera: a quarter of a second when it is near and the view already points at the framing, longer (at most 1.2 s) when the remaining
+   * distance (no veil to hide a cut) or the remaining turn of the view needs it, so a view that points the wrong way never whips round. Never while the auto tour
+   * plays (it has its own pause). -> whether a flight was finished.
+   */
+  function skip(cut = null) {
+    const f = state.flight;
+    if (!f || state.playing) return false;
+    const rest = Math.hypot(f.to.pos[0] - cam.position.x, f.to.pos[1] - cam.position.y, f.to.pos[2] - cam.position.z);
+    // (the cut may run after a veil dip: only if this flight is still the one running, never over a place picked in the meantime)
+    if (rest > 150 && cut) { cut(() => { if (state.flight !== f) return; state.flight = null; state.velN = -99; setCam(f.to.pos, f.to.look); emit(); }); return true; }
+    cam.getWorldDirection(_t);
+    _v.set(f.to.look[0] - f.to.pos[0], f.to.look[1] - f.to.pos[1], f.to.look[2] - f.to.pos[2]).normalize();
+    const turn = Math.acos(clamp(_t.dot(_v), -1, 1));   // radians the view still has to turn
+    flyTo(f.to, { ...SETTLE, duration: clamp(Math.max(0.25 + (rest > 150 ? rest / 1500 : 0), turn / (150 / DEG)), 0.25, 1.2) });
+    return true;
+  }
   /** Cut straight to a stop's drone framing (stills, film, the shot tools). */
   function jumpTo(id) {
     const s = byId.get(id); if (!s) return false;
-    state.flight = null; state.orbit = null; state.current = id;
+    state.flight = null; state.orbit = null; state.current = id; state.velN = -99;   // [ui-c] a cut carries no velocity into the next flight
     const p = player(); if (p) p.fly = true;
     setCam(s.drone.pos, s.drone.look); emit(); return true;
   }
   function walkTo(id) {
     const s = byId.get(id); if (!s?.walk) return false;
-    state.flight = null; state.playing = false; state.orbit = null;
+    state.flight = null; state.playing = false; state.orbit = null; state.velN = -99;
     const p = player();
     if (p) { p.fly = false; p.setPose(s.walk.x, s.walk.z, s.walk.yaw, s.walk.pitch); }
     state.current = id; emit(); return true;
   }
   const _p = new THREE.Vector3();
   function update(dt) {
+    state.n++;
     const f = state.flight;
     if (f && dt > 0) {
       f.t += dt;
-      const u = Math.min(1, f.t / f.dur), e = ease(u);
-      f.curve.getPoint(e, _p);
-      const k = ease(Math.min(1, u * 1.25));
-      const look = [f.from.look[0] + (f.to.look[0] - f.from.look[0]) * k, f.from.look[1] + (f.to.look[1] - f.from.look[1]) * k, f.from.look[2] + (f.to.look[2] - f.from.look[2]) * k];
+      const u = Math.min(1, f.t / f.dur), e = easeFly(u, f.s0);
+      f.curve.getPointAt(e, _p);                       // arc length, so the ease maps to distance and not to the spline parameter (which jumped 3x in speed at the mid-knot)
+      if (f.dv && f.t < f.T) { const k = f.t * (1 - f.t / f.T) ** 2; _p.x += f.dv.x * k; _p.y += f.dv.y * k; _p.z += f.dv.z * k; }
+      const k = easeFly(Math.min(1, u * 1.25), 1.2);   // the view finishes turning at 80 % of the flight
+      const yaw = f.y0 + f.dyaw * k, pitch = Math.max(-PITCH_MAX, Math.min(PITCH_MAX, f.p0 + f.dp * k - FLY_DIP * Math.sin(Math.PI * k))), c = Math.cos(pitch);   // the dip is a nod toward the town mid-flight
+      const look = [_p.x - Math.sin(yaw) * c * 100, _p.y + Math.sin(pitch) * 100, _p.z - Math.cos(yaw) * c * 100];
+      if (state.lastOk) { _v.copy(_p).sub(state.last).divideScalar(dt); state.vel.lerp(_v, 0.6); state.velN = state.n; }
+      state.last.copy(_p); state.lastOk = true;
       setCam([_p.x, _p.y, _p.z], look);
       if (u >= 1) { state.flight = null; state.dwell = 0; if (state.playing) state.orbit = { pos: f.to.pos.slice(), look: f.to.look.slice(), a: 0 }; emit(); }
       return;
     }
+    state.lastOk = false;
     if (state.playing && dt > 0) {
       state.dwell += dt;
       const o = state.orbit;
@@ -133,10 +197,10 @@ export function createTour(ctx) {
         const dx = o.pos[0] - o.look[0], dz = o.pos[2] - o.look[2], c = Math.cos(o.a), s = Math.sin(o.a);
         setCam([o.look[0] + dx * c - dz * s, o.pos[1], o.look[2] + dx * s + dz * c], o.look);
       }
-      if (state.dwell > 7.5) { const i = stops.findIndex((s) => s.id === state.current); flyTo(stops[(i + 1) % stops.length].id); }
+      if (state.dwell > 7.5) { const i = stops.findIndex((s) => s.id === state.current); flyTo(stops[(i + 1) % stops.length].id, { cinematic: true }); }
     }
   }
-  function play() { state.playing = true; const i = stops.findIndex((s) => s.id === state.current); flyTo(stops[(i + 1) % stops.length].id); emit(); }
+  function play() { state.playing = true; const i = stops.findIndex((s) => s.id === state.current); flyTo(stops[(i + 1) % stops.length].id, { cinematic: true }); emit(); }
   // [v5] stop() ends a flight in progress too: a pose set right after it (explore's walk-to-place, the far-core walk)
   // was overwritten by the rest of the flight
   function stop() { state.playing = false; state.orbit = null; state.flight = null; emit(); }
@@ -173,7 +237,7 @@ export function createTour(ctx) {
     return n;
   }
   const api = {
-    stops, flyTo, jumpTo, walkTo, play, stop, update, filmPose, applyFilm, add,
+    stops, flyTo, skip, jumpTo, walkTo, play, stop, update, filmPose, applyFilm, add,
     get playing() { return state.playing; }, get flying() { return !!state.flight; }, get current() { return state.current; },
     onChange: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
   };

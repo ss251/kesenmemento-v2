@@ -33,6 +33,18 @@ export function catGroup(cat) {
 /** Which OSM / GSI place kinds get a street label (prio 1). */
 export const LABEL_KINDS = /^(station|school|kindergarten|hospital|clinic|townhall|city_hall|government|courthouse|police|fire_station|post_office|library|museum|community_centre|hall|temple|shrine|place_of_worship|park|bank|hotel|guest_house|cafe|restaurant|seafood|alcohol|tea|confectionery|bakery|supermarket|convenience|marketplace|mall|pharmacy|bridge)$/;
 
+/**
+ * [mobile] Ambient place labels: on for desktop, OFF on phones by default (they cluttered the small screen; a place you search or pick still
+ * shows its pinned label). ?labels=1|0 overrides and is remembered (persist), then a remembered choice ('1' | '0'), then the device default.
+ * -> { on, persist } — pure: no DOM, no storage.
+ */
+export function labelsDefault({ mobile = false, search = '', stored = null } = {}) {
+  const q = new URLSearchParams(search || '').get('labels');
+  if (q === '1' || q === '0') return { on: q === '1', persist: q };
+  if (stored === '1' || stored === '0') return { on: stored === '1', persist: null };
+  return { on: !mobile, persist: null };
+}
+
 const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 
 export function createLabels(ctx, { items, max = 26, maxNow = null, lotAt = null }) {

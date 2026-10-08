@@ -11,15 +11,19 @@ export function fold(t) {
     .replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 }
 
-/** Kind words (JA and EN) -> a test on the OSM / GSI category. */
+/**
+ * Kind words (JA and EN) -> a test on the OSM / GSI category. [r3:14] An entry may carry a third item, a NAME test that applies to place_of_worship places only: OSM maps churches, shrines and temples all as
+ * amenity=place_of_worship, so the category alone listed 青龍寺 and 愛宕神社 under 教会 and the other way round; the name tells them apart. 教会 has no category test at all (/^$/): a church is a
+ * place_of_worship named 教会 / ハリストス / ホープセンター (気仙沼 ホープセンター is a church that is not called one).
+ */
 export const KINDS = [
   [['駅', 'えき', 'station', 'train', 'brt', 'バス停', 'bus'], /station|bus_stop|platform|stop_position/],
   [['病院', 'びょういん', 'hospital', '医院', 'clinic', 'doctor'], /hospital|clinic|doctors/],
   [['歯科', 'dentist'], /dentist/],
   [['学校', 'がっこう', 'school', '小学校', '中学校', '高校'], /school/],
-  [['神社', 'じんじゃ', 'shrine'], /shrine|place_of_worship/],
-  [['寺', 'てら', 'temple'], /temple|place_of_worship/],
-  [['教会', 'church'], /place_of_worship/],
+  [['神社', 'じんじゃ', 'shrine'], /shrine/, /神社|大明神|稲荷|宮$|社$/],
+  [['寺', 'てら', 'temple'], /temple/, /寺|院$|堂$/],
+  [['教会', 'church'], /^$/, /教会|ハリストス|ホープセンター/],
   [['郵便局', 'ゆうびんきょく', 'post', 'postoffice'], /post_office/],
   [['銀行', 'bank', 'atm'], /bank/],
   [['公園', 'こうえん', 'park'], /park|playground|garden/],
@@ -39,7 +43,14 @@ export const KINDS = [
   [['役所', '市役所', 'cityhall', 'townhall'], /townhall|city_hall|government/],
   [['展望', 'viewpoint', 'view'], /viewpoint/],
   [['橋', 'bridge'], /bridge/],
+  // [r3:14] baths, petrol stations and toilets had no kind word: 温泉 / 風呂 / 銭湯 / ガソリン / 給油 / トイレ returned nothing (the one 風呂 hit was a company, 斎藤風呂店). A word must be listed in full for a query that
+  // is longer than the word to reach it (the matcher tests fold(word).startsWith(query)): ガソリンスタンド and お風呂 are words of their own.
+  [['温泉', '風呂', 'お風呂', '銭湯', '湯', 'bath', 'onsen'], /public_bath|sauna|shower|spa/],
+  [['ガソリン', 'ガソリンスタンド', '給油', 'スタンド', 'fuel', 'gas', 'petrol'], /fuel/],
+  [['トイレ', '便所', 'toilet'], /toilets/],
 ];
+/** [r3:14] the one-character kind words (寺, 湯, 酒, 駅, 橋, 宿): a bare 寺 also substring-matches the surname 小野寺 (小野寺自動車整備工場, 小野寺五典 事務所, 小野寺製材所) */
+const KIND_WORD_1 = new Set(KINDS.flatMap(([words]) => words.map(fold).filter((w) => [...w].length === 1)));
 
 /** [v5:fix1] Area categories (町名 / 丁目 / 地区) and an area name without its 丁目 or （二） suffix: 八日町一丁目 -> 八日町. */
 const AREA_CATS = /^(district|neighbourhood|quarter|suburb|locality)$/;
@@ -72,15 +83,17 @@ export function createSearch(L, { featured = [], near = () => [0, 0] } = {}) {
       const hits = [];
       for (const e of index) {
         let s = e.a === f || e.b === f ? 0 : e.a.startsWith(f) || (e.b && e.b.startsWith(f)) ? 1 : e.a.includes(f) || (e.b && e.b.includes(f)) ? 2 : -1;
+        // [r3:14] a one-character kind word (寺): the name-substring hits (小野寺...) come AFTER the kind hits (score 3), not before them; nothing is dropped (長命寺, 地福寺 are still found)
+        if (s === 2 && [...f].length === 1 && KIND_WORD_1.has(f)) s = 3.5;
         // [v5:fix1] a bare 町名 (八日町) names the district: its 丁目 / （二） areas rank above the shops that carry the name
         if (s < 0) continue;
         if (e.area && e.area === f) s = -0.6;
         hits.push([s - (e.it.group !== 'search' ? 0.5 : 0), d(e.it), e.it]);
       }
       // kind words: the nearest places of that kind (after the name matches)
-      for (const [words, re] of KINDS) {
+      for (const [words, re, nameRe] of KINDS) {
         if (!words.some((w) => fold(w) === f || (f.length >= 3 && fold(w).startsWith(f)))) continue;
-        for (const it of all) if (re.test(it.cat)) hits.push([3, d(it), it]);
+        for (const it of all) if (re.test(it.cat) || (nameRe && it.cat === 'place_of_worship' && nameRe.test(it.ja))) hits.push([3, d(it), it]);
       }
       hits.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
       const out = [], ids = new Set();
@@ -93,8 +106,11 @@ export function createSearch(L, { featured = [], near = () => [0, 0] } = {}) {
       }
       return out;
     },
-    /** The neighbourhood (町名) at (x, z): the nearest 丁目 / 地区 label within 350 m. */
+    /** The neighbourhood (町名) at (x, z): [sys:21] the census small area (e-Stat polygon, L.areaPolyAt) that contains it; only outside every
+     *  polygon (over the sea) the nearest 丁目 / 地区 label within 350 m (a Voronoi guess: wrong at a third of the land). */
     areaAt(x, z) {
+      const poly = L.areaPolyAt?.(x, z);
+      if (poly) return { ja: poly.ja, en: poly.en || null };
       let best = null;
       for (const a of areas) { const dd = Math.hypot(a.x - x, a.z - z) + a.w; if (dd < 350 && (!best || dd < best.d)) best = { d: dd, a }; }
       return best ? { ja: best.a.ja, en: best.a.en } : null;

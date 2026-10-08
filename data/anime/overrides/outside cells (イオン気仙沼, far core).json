@@ -1,0 +1,35 @@
+{
+ "version": 1,
+ "cell": "aeon-kesennuma",
+ "bbox": [
+  -260,
+  1800,
+  -70,
+  1990
+ ],
+ "note": "outside the 12 cells: イオン気仙沼 (OSM supermarket 'イオン', lot 16/58540/25072/110, 72 x 149 m, 10 407 m2). The derived 2 storeys / 6.1 m / mono-pitch roof drew a 46 m wedge (town/kit/house.js had no cap on the pitch). Commons 'AEON Kesennuma 202509a.jpg' (2025-09-19) shows a flat-roofed 2-storey mall: pale pink-beige horizontally banded walls, a roof deck with green railings, the main body about 11-12 m. The height, storeys and roof shape are also in world/lotfix.js (LOT_FIX); the sign tower is town/signtower.js (LOT_TOWER). LOT_FIX cannot set colours, so the wall and roof colours are here.",
+ "sources": [
+  {
+   "id": "commons",
+   "what": "Wikimedia Commons 'AEON Kesennuma 202509a.jpg' (2025-09-19), raw/ref/commons/175309468_AEON_Kesennuma_202509a.jpg; reference only, never committed",
+   "date": "2025-09-19"
+  },
+  {
+   "id": "osm",
+   "what": "OpenStreetMap supermarket 'イオン' (place p1r3swti), as already in the layout"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58540/25072/110",
+   "storeys": 2,
+   "height": 11.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#bfb8b2"
+   },
+   "wall": "#e6d6cf",
+   "src": "commons: AEON Kesennuma 202509a (2025-09-19): pale pink-beige banded walls (#e6d6cf), a grey roof deck (#bfb8b2) with green railings, a 2-storey body of about 11-12 m (storey bands, cars for scale)"
+  }
+ ]
+}

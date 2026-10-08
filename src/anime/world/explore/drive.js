@@ -4,69 +4,147 @@
 // it rides over the river bridges' decks. A light lane assist keeps it on the left lane (Japan drives on the left)
 // when you are not steering. Chase camera behind the car; the mouse (or a drag) orbits it.
 //
-// Keys: C enter / leave the car. W / S or the arrows: accelerate, brake and reverse; A / D steer; Space handbrake;
-// Shift: faster (60 km/h instead of 40). Touch (ui/touchpad.js): the stick steers and throttles (past 85 % = boost),
-// ブレーキ holds the handbrake, ブースト boosts, 降りる gets out, and a drag on the right orbits the chase camera.
+// Keys: C enter / leave the car. W / S or the arrows: accelerate, brake and reverse; A / D steer; Space handbrake
+// (the drift: rear grip falls to 35%); Shift: faster (60 km/h instead of 40; 110 km/h in a race). Touch: the stick
+// steers and throttles, ドリフト holds the handbrake, ブースト boosts, 降りる gets out. A drag on the right orbits the camera.
+// Counter-steer assist is on until the garage turns it off. The step is the slip model in drive-model.js.
 //
 //   const drive = createDrive(ctx, { net })   drive.enter() / drive.exit() / drive.toggle() / drive.active
 //   drive.state -> { x, z, y, yaw, speed (m/s), kmh, road }   drive.focus() -> streaming focus ahead of the car
 //   drive.canEnter(r = 14) -> is there a road within r metres of the player (the touch pad's 乗る button)
 import * as THREE from 'three';
 import { makeKeiCar } from '../town/sakura/vehicles_cars.js';
+import { damp, lerp, lerpAngle } from '../../core/timestep.js';   // [smooth]
+import { carStep, CAR, RACE } from './drive-model.js';
 
-export const CAR = { wheelbase: 2.46, halfW: 0.74, radius: 1.15, vMax: 11.1, vBoost: 16.7, vRev: 3.5, acc: 3.2, brake: 7.5, drag: 0.9, steerMax: 0.62 };
+export { carStep, CAR, RACE };
 
-/** One step of the kinematic bicycle model (pure: tested). input { throttle -1..1, steer -1..1, brake bool, boost }. */
-export function carStep(s, input, dt, C = CAR) {
-  const vTop = input.boost ? C.vBoost : C.vMax;
-  let v = s.speed;
-  const th = input.throttle || 0;
-  if (input.brake) v -= Math.sign(v) * Math.min(Math.abs(v), C.brake * 1.3 * dt);
-  else if (th > 0) v = v < -0.05 ? Math.min(0, v + C.brake * dt) : Math.min(vTop, v + C.acc * th * (1 - Math.max(0, v) / (vTop * 1.15)) * dt + 0.0);
-  else if (th < 0) v = v > 0.05 ? Math.max(0, v - C.brake * dt) : Math.max(-C.vRev, v + C.acc * 0.7 * th * dt);
-  else v -= Math.sign(v) * Math.min(Math.abs(v), (C.drag + Math.abs(v) * 0.04) * dt);
-  // steering: full lock at walking pace, about a third of it at speed
-  const lock = C.steerMax * (1 - 0.62 * Math.min(1, Math.abs(v) / C.vBoost));
-  const target = (input.steer || 0) * lock;
-  const steer = s.steer + (target - s.steer) * Math.min(1, dt * 6);
-  // yaw rate from the bicycle model, capped by the grip (lateral acceleration at most ~6 m/s^2)
-  const cap = 6 / Math.max(0.5, Math.abs(v));
-  const yawRate = Math.max(-cap, Math.min(cap, (v / C.wheelbase) * Math.tan(steer)));
-  const yaw = s.yaw - yawRate * dt;   // yaw 0 = north (-Z); a right turn (steer > 0) turns clockwise seen from above
-  const x = s.x - Math.sin(yaw) * v * dt, z = s.z - Math.cos(yaw) * v * dt;
-  return { ...s, x, z, yaw, speed: v, steer };
+// Two headlight cones, cheap cards on the road. Colour stays at or below 1
+// so the bloom pass does not turn them into balls. Local +Z is the nose.
+const CONE_VERT = /* glsl */`
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }`;
+const CONE_FRAG = /* glsl */`
+  varying vec2 vUv;
+  void main() {
+    float across = abs(vUv.x * 2.0 - 1.0);
+    float edge = smoothstep(1.0, 0.08, across);
+    float along = smoothstep(0.0, 0.08, vUv.y) * (1.0 - smoothstep(0.62, 1.0, vUv.y));
+    float a = edge * along * edge * 0.42;
+    if (a < 0.02) discard;
+    vec3 col = mix(vec3(1.0, 0.93, 0.72), vec3(0.96, 0.74, 0.38), smoothstep(0.05, 0.8, vUv.y));
+    gl_FragColor = vec4(col, a);
+  }`;
+
+function headlightCone() {
+  // Flat on the asphalt, starting just past the bumper so the card never
+  // cuts through the body. The chase camera sees this stretch of road.
+  const y = 0.05, z0 = 2.2, z1 = 13;
+  const pos = new Float32Array(24);
+  const uv = new Float32Array(16);
+  const idx = new Uint16Array(12);
+  let v = 0, t = 0, ii = 0;
+  for (const s of [1, -1]) {
+    const x = 0.50 * s;
+    const quad = [
+      x - s * 0.12, y, z0,
+      x + s * 0.28, y, z0,
+      x + s * 1.7, y, z1,
+      x - s * 0.85, y, z1,
+    ];
+    const base = v / 3;
+    for (let k = 0; k < 12; k++) pos[v++] = quad[k];
+    uv[t++] = 0; uv[t++] = 0; uv[t++] = 1; uv[t++] = 0; uv[t++] = 1; uv[t++] = 1; uv[t++] = 0; uv[t++] = 1;
+    if (s > 0) {
+      idx[ii++] = base; idx[ii++] = base + 1; idx[ii++] = base + 2;
+      idx[ii++] = base; idx[ii++] = base + 2; idx[ii++] = base + 3;
+    } else {
+      idx[ii++] = base; idx[ii++] = base + 2; idx[ii++] = base + 1;
+      idx[ii++] = base; idx[ii++] = base + 3; idx[ii++] = base + 2;
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  geo.setIndex(new THREE.BufferAttribute(idx, 1));
+  const mat = new THREE.ShaderMaterial({
+    vertexShader: CONE_VERT,
+    fragmentShader: CONE_FRAG,
+    transparent: true,
+    depthWrite: false,
+    toneMapped: false,
+    fog: false,
+    side: THREE.DoubleSide,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.name = 'explore-headlight';
+  mesh.renderOrder = 3;
+  mesh.frustumCulled = false;
+  return mesh;
 }
 
-export function createDrive(ctx, { net }) {
+export function createDrive(ctx, { net, carMesh = null }) {   // [smooth] carMesh(): the car's group instead of the kei kit's (unit tests have no canvas)
   const L = ctx.L, cam = ctx.camera;
-  const state = { active: false, x: 0, z: 0, y: 0, yaw: 0, speed: 0, steer: 0, pitch: 0, roll: 0, road: null, scrape: 0, km: 0 };
+  const state = {
+    active: false, x: 0, z: 0, y: 0, yaw: 0, speed: 0, steer: 0, pitch: 0, roll: 0, road: null, scrape: 0, km: 0,
+    u: 0, vLat: 0, yawRate: 0, slipF: 0, slipR: 0, gear: 1, rpm: 850, skid: 0, driftStep: 0, shift: 0,
+    race: false, locked: false,
+  };
+  const look = { color: '#F8B500' };
+  let assistOn = true, dress = null, dressTick = null, fovBase = 0, chaseLag = 0;
+  const onShift = new Set();
+  let motionQ = null;
+  const reducedMotion = () => {
+    if (motionQ === null && typeof matchMedia === 'function') motionQ = matchMedia('(prefers-reduced-motion: reduce)');
+    return !!motionQ?.matches;
+  };
   const listeners = new Set();
   let car = null, lamps = null, glow = null;
   const orbit = { yaw: 0, pitch: -0.18, back: 0 };   // camera orbit offsets (radians) around the chase position
-  const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
+  const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), _ct = new THREE.Vector3();
   let camInit = false;
+  // [smooth] the car one simulation step ago: present() draws it between that and the newest step (ctx.alpha)
+  const prev = { x: 0, z: 0, y: 0, yaw: 0, pitch: 0, roll: 0 };
+  const keep = () => { prev.x = state.x; prev.z = state.z; prev.y = state.y; prev.yaw = state.yaw; prev.pitch = state.pitch; prev.roll = state.roll; };
 
   function makeCar() {
     const g = new THREE.Group(); g.name = 'explore-car';
-    const body = makeKeiCar(ctx, { color: '#f2c14e' });   // a mustard kei with a cream roof (fictional, Sakura's kit)
+    const body = makeKeiCar(ctx, { color: look.color });   // 山吹色 by default; the garage repaints it
+    body.name = 'kei-body';
     g.add(body);
-    // head and tail lamps that light up at dusk: small emissive discs over the kit's lamps, and a soft pool ahead
-    const head = ctx.mat.emissive ? ctx.mat.emissive('#fff4d8', 1.6) : new THREE.MeshBasicMaterial({ color: '#fff4d8' });
-    const tail = ctx.mat.emissive ? ctx.mat.emissive('#ff5a4a', 1.4) : new THREE.MeshBasicMaterial({ color: '#ff5a4a' });
+    // Headlamps, and tail lamps in 茜 #B7282E. Intensity 1.8 puts the lens just
+    // over the bloom threshold (1.05) so it glows, and stays a lamp rather than a ball.
+    const head = ctx.mat.emissive ? ctx.mat.emissive('#fff4d8', 2.2) : new THREE.MeshBasicMaterial({ color: '#fff4d8' });
+    const tail = ctx.mat.emissive ? ctx.mat.emissive('#B7282E', 2.6) : new THREE.MeshBasicMaterial({ color: '#B7282E' });
+    tail.polygonOffset = true; tail.polygonOffsetFactor = -2; tail.polygonOffsetUnits = -2;
     lamps = new THREE.Group();
-    const disc = new THREE.CircleGeometry(0.085, 14);
+    const disc = new THREE.CircleGeometry(0.09, 14);
     for (const sd of [-1, 1]) {
-      const h = new THREE.Mesh(disc, head); h.position.set(sd * 0.50, 0.66, 1.775); h.rotation.x = -0.35; lamps.add(h);
-      const t = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.16), tail); t.position.set(sd * 0.60, 0.82, -1.72); t.rotation.y = Math.PI; lamps.add(t);
+      const h = new THREE.Mesh(disc, head); h.position.set(sd * 0.50, 0.66, 1.78); h.rotation.x = -0.35; lamps.add(h);
+      const t = new THREE.Mesh(new THREE.PlaneGeometry(0.14, 0.09), tail); t.position.set(sd * 0.52, 0.7, -1.74); t.rotation.y = Math.PI; lamps.add(t);
     }
     lamps.visible = false; g.add(lamps);
-    const pm = new THREE.MeshBasicMaterial({ color: '#ffe7b0', transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending });
-    glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 7.5), pm); glow.rotation.x = -Math.PI / 2; glow.position.set(0, 0.08, 5.6); glow.visible = false; g.add(glow);
+    glow = headlightCone();
+    glow.visible = false;
+    g.add(glow);
     g.traverse((o) => { o.userData.noBatch = true; o.userData.dynamic = true; });
     ctx.noOutline(lamps); ctx.noOutline(glow);
+    if (dress) dress(g, look);
     ctx.add(g);
     g.visible = false;
     return g;
+  }
+  function dropCar() {
+    if (!car) return;
+    car.traverse((o) => { if (o.geometry?.type === 'ExtrudeGeometry') o.geometry.dispose(); });
+    car.parent?.remove(car);
+    car = null; lamps = null; glow = null;
   }
 
   const input = { throttle: 0, steer: 0, brake: false, boost: false };
@@ -104,10 +182,14 @@ export function createDrive(ctx, { net }) {
     const yaw = at?.yaw ?? ctx.playerObj?.yaw ?? 0;
     const sp = net.spawn(p.x, p.z, yaw);
     if (!sp) return false;
-    if (!car) car = makeCar();
-    Object.assign(state, { active: true, x: sp.x, z: sp.z, yaw: sp.yaw, speed: 0, steer: 0, road: sp.road });
+    if (!car) car = carMesh ? carMesh() : makeCar();
+    Object.assign(state, {
+      active: true, x: sp.x, z: sp.z, yaw: sp.yaw, speed: 0, steer: 0, road: sp.road,
+      u: 0, vLat: 0, yawRate: 0, slipF: 0, slipR: 0, gear: 1, rpm: 850, skid: 0,
+    });
     state.y = groundY(sp.x, sp.z, 1e9);
-    orbit.yaw = 0; orbit.pitch = -0.18; camInit = false;
+    orbit.yaw = 0; orbit.pitch = -0.18; camInit = false; chaseLag = 0;
+    fovBase = cam.fov || fovBase;
     car.visible = true;
     const pl = ctx.playerObj;
     if (pl) { pl.enabled = false; pl.fly = true; pl.lookSink = padLook; }   // touch look orbits the chase camera
@@ -119,6 +201,8 @@ export function createDrive(ctx, { net }) {
   function exit() {
     if (!state.active) return;
     state.active = false;
+    state.locked = false;
+    if (fovBase && cam) { cam.fov = fovBase; cam.updateProjectionMatrix?.(); }
     if (car) car.visible = false;
     const pl = ctx.playerObj;
     if (pl) pl.lookSink = null;
@@ -145,8 +229,10 @@ export function createDrive(ctx, { net }) {
     input.brake = k.has('Space') || !!pad?.brake;
     // boost: Shift, the ブースト button, or the stick pushed forward past 85 %
     input.boost = k.has('ShiftLeft') || k.has('ShiftRight') || !!pad?.boost || (!!pad?.running && t.y < -0.3);
-    // lane assist: no steering input and moving: ease the heading onto the road ahead
-    input.assist = Math.abs(st) < 0.05 && Math.abs(state.speed) > 1.2;
+    input.counterSteer = assistOn;
+    // lane assist: no steering input and moving: ease the heading onto the road ahead. A drift turns it off.
+    input.assist = Math.abs(st) < 0.05 && Math.abs(state.speed) > 1.2 && !input.brake && !state.skid;
+    if (state.locked) { input.throttle = 0; input.steer = 0; input.brake = false; input.boost = false; input.counterSteer = false; input.assist = false; }
   }
 
   // engine: a soft two-oscillator hum through a low-pass, pitch and level following speed and throttle
@@ -159,45 +245,89 @@ export function createDrive(ctx, { net }) {
       eng.o1 = ac.createOscillator(); eng.o1.type = 'sawtooth'; eng.o2 = ac.createOscillator(); eng.o2.type = 'triangle';
       eng.o1.connect(eng.lp); eng.o2.connect(eng.lp); eng.lp.connect(eng.g); eng.g.connect(ac.destination); eng.o1.start(); eng.o2.start(); eng.on = true;
     }
-    const v = Math.abs(state.speed), f = 38 + v * 5.2 + Math.max(0, input.throttle) * 14;
-    const level = !state.active || A.muted ? 0 : 0.018 + Math.min(1, v / 14) * 0.02 + Math.max(0, input.throttle) * 0.012;
+    const rpm = state.rpm || 850;
+    let f = 32 + (rpm / 6500) * 128 + Math.max(0, input.throttle) * 18;
+    if (state.shift) eng.blip = 0.18;
+    if (eng.blip > 0) { f += 84 * (eng.blip / 0.18); eng.blip = Math.max(0, eng.blip - dt); }
+    const v = Math.abs(state.speed);
+    const slip = Math.abs(state.slipR || 0);
+    const level = !state.active || A.muted ? 0 : 0.016 + Math.min(1, v / 22) * 0.028 + Math.max(0, input.throttle) * 0.014 + (state.skid ? 0.01 : 0);
     const t = ac.currentTime;
-    eng.o1.frequency.setTargetAtTime(f, t, 0.08); eng.o2.frequency.setTargetAtTime(f * 2.02, t, 0.08); eng.g.gain.setTargetAtTime(level, t, 0.12);
+    eng.o1.frequency.setTargetAtTime(f, t, 0.05); eng.o2.frequency.setTargetAtTime(f * 2.02, t, 0.05); eng.g.gain.setTargetAtTime(level, t, 0.08);
+    if (!eng.noise) {
+      const len = ac.sampleRate;
+      const buf = ac.createBuffer(1, len, ac.sampleRate);
+      const data = buf.getChannelData(0);
+      let s = 1;
+      for (let i = 0; i < len; i++) { s = (s * 16807) % 2147483647; data[i] = s / 1073741823.5 - 1; }
+      eng.noise = ac.createBufferSource();
+      eng.noise.buffer = buf;
+      eng.noise.loop = true;
+      eng.bp = ac.createBiquadFilter();
+      eng.bp.type = 'bandpass';
+      eng.bp.frequency.value = 880;
+      eng.bp.Q.value = 0.7;
+      eng.ng = ac.createGain();
+      eng.ng.gain.value = 0;
+      eng.noise.connect(eng.bp);
+      eng.bp.connect(eng.ng);
+      eng.ng.connect(ac.destination);
+      eng.noise.start();
+    }
+    const scrub = state.active && state.skid && !A.muted ? Math.min(0.07, 0.012 + slip * 0.14) : 0;
+    eng.ng.gain.setTargetAtTime(scrub, t, 0.05);
+    eng.bp.frequency.setTargetAtTime(640 + slip * 2200, t, 0.06);
     void dt;
   }
 
   const P = { x: 0, z: 0 };
-  function update(dt) {
-    if (!state.active || dt <= 0) return;
+  const solidAtHit = (x, z) => !!ctx.physics?.solidAt?.(x, z, state.y + 0.7);
+  /** One frame without the fixed clock (tests, tools): a step, then the car and the camera at the newest state. */
+  function update(dt) { if (step(dt)) present(dt, 1); }
+  /** [smooth] One simulation step (main.js: a fixed 1/60 s): input, the slip model, the kerbs, the walls, the ride height. */
+  function step(dt) {
+    if (!state.active || dt <= 0) return false;
+    keep();
     dt = Math.min(dt, 0.05);
     readInput();
-    let next = carStep(state, input, dt);
+    const ox = state.x, oz = state.z;
+    const C = state.race ? RACE : CAR;
+    // at race speed a single push-out can skip a thin collider; the sweep stops the body on the near side
+    const sweep = state.race && Math.abs(state.speed) > 18 && ctx.physics?.solidAt ? solidAtHit : null;
+    carStep(state, input, dt, C, state, sweep);
+    if (state.shift) for (const f of onShift) try { f(); } catch (e) { console.error(e); }
     if (input.assist) {
-      const a = net.ahead(next.x, next.z, next.yaw, 6 + Math.abs(next.speed) * 0.8);
+      const a = net.ahead(state.x, state.z, state.yaw, 6 + Math.abs(state.speed) * 0.8);
       if (a) {
-        const want = Math.atan2(-a.dx * Math.sign(next.speed || 1), -a.dz * Math.sign(next.speed || 1));
-        const d = Math.atan2(Math.sin(want - next.yaw), Math.cos(want - next.yaw));
-        if (Math.abs(d) < 0.6) next.yaw += d * Math.min(1, dt * 1.6);
+        const want = Math.atan2(-a.dx * Math.sign(state.speed || 1), -a.dz * Math.sign(state.speed || 1));
+        const d = Math.atan2(Math.sin(want - state.yaw), Math.cos(want - state.yaw));
+        if (Math.abs(d) < 0.6) state.yaw += d * Math.min(1, dt * 1.6);
       }
     }
-    // stay on the carriageway: slide along the kerb, lose some speed
-    const c = net.clampToRoad(next.x, next.z, CAR.halfW * 0.8);
-    if (c.off > 0 && Number.isFinite(c.off)) { next.x = c.x; next.z = c.z; next.speed *= Math.max(0.2, 1 - dt * 3); state.scrape = 0.4; }
-    else if (!Number.isFinite(c.off)) { next.x = state.x; next.z = state.z; next.speed = 0; }
-    // buildings and walls (the town's colliders), then the sea
-    P.x = next.x; P.z = next.z;
+    const sliding = !!state.skid || !!input.brake;
+    const c = net.clampToRoad(state.x, state.z, CAR.halfW * 0.8);
+    if (c.off > 0 && Number.isFinite(c.off)) {
+      state.x = c.x; state.z = c.z;
+      const bite = Math.min(1, c.off / 1.4);
+      state.speed *= Math.max(0.45, 1 - dt * (sliding ? 1.4 : 3.2) * bite);
+      state.u = state.speed;
+      state.scrape = 0.4;
+    } else if (!Number.isFinite(c.off)) { state.x = ox; state.z = oz; state.speed = 0; state.u = 0; }
+    P.x = state.x; P.z = state.z;
     const ph = ctx.physics;
     if (ph?.resolve) ph.resolve(P, CAR.radius, state.y + 0.2, 1.4);
-    if (Math.hypot(P.x - next.x, P.z - next.z) > 0.02) { next.speed *= Math.max(0.1, 1 - dt * 6); state.scrape = 0.4; }
-    next.x = P.x; next.z = P.z;
-    if (ph?.standable && !ph.standable(next.x, next.z, state.y)) { next.x = state.x; next.z = state.z; next.speed = 0; }
-    const b = L.WORLD?.play; if (b) { next.x = Math.max(b.x0, Math.min(b.x1, next.x)); next.z = Math.max(b.z0, Math.min(b.z1, next.z)); }
-    state.km += Math.hypot(next.x - state.x, next.z - state.z) / 1000;
-    Object.assign(state, { x: next.x, z: next.z, yaw: next.yaw, speed: next.speed, steer: next.steer });
+    if (Math.hypot(P.x - state.x, P.z - state.z) > 0.02) { state.speed *= Math.max(0.1, 1 - dt * 6); state.u = state.speed; state.scrape = 0.4; }
+    state.x = P.x; state.z = P.z;
+    if (ph?.standable && !ph.standable(state.x, state.z, state.y)) { state.x = ox; state.z = oz; state.speed = 0; state.u = 0; }
+    const b = L.WORLD?.play; if (b) { state.x = Math.max(b.x0, Math.min(b.x1, state.x)); state.z = Math.max(b.z0, Math.min(b.z1, state.z)); }
+    state.km += Math.hypot(state.x - ox, state.z - oz) / 1000;
     state.scrape = Math.max(0, state.scrape - dt);
-    place(dt);
+    ride(dt);
+    return true;
   }
-  function place(dt) {
+  /** Put the car and the camera where the car is now (entering, the screenshot tools): no blend from an older step. */
+  function place(dt) { ride(dt); keep(); present(dt, 1); }
+  function ride(dt) {
     // ride height from the ground at the four wheels (terrain, street, bridge decks): pitch and roll follow the road
     const fx = -Math.sin(state.yaw), fz = -Math.cos(state.yaw), rx = Math.cos(state.yaw), rz = -Math.sin(state.yaw);
     const hw = CAR.wheelbase / 2, ht = 0.62;
@@ -207,26 +337,41 @@ export function createDrive(ctx, { net }) {
     state.y = dt > 0 ? state.y + (yT - state.y) * Math.min(1, dt * 12) : yT;
     const pitch = Math.atan2(yF - yB, CAR.wheelbase), roll = Math.atan2(yR - yL, ht * 2);
     state.pitch += (pitch - state.pitch) * Math.min(1, (dt || 1) * 10); state.roll += (roll - state.roll) * Math.min(1, (dt || 1) * 10);
+    const pl = ctx.playerObj;
+    if (pl) { pl.pos.set(state.x, state.y, state.z); pl.vel.set(0, 0, 0); pl.yaw = state.yaw; }
+  }
+  /** [smooth] Draw the car and its chase camera at this frame: alpha of the way from the step before to the newest (ctx.alpha), the
+   *  camera's easing in the frame's own time (dt), so the same at 60 and 120 Hz. */
+  function present(dt, alpha = 1) {
+    const a = alpha >= 1 ? 1 : Math.max(0, alpha);
+    const x = lerp(prev.x, state.x, a), z = lerp(prev.z, state.z, a), y = lerp(prev.y, state.y, a), yaw = lerpAngle(prev.yaw, state.yaw, a);
     if (car) {
-      car.position.set(state.x, state.y, state.z);
+      car.position.set(x, y, z);
       car.rotation.set(0, 0, 0, 'YXZ');
-      car.rotation.y = state.yaw + Math.PI;
-      car.rotation.x = state.pitch; car.rotation.z = -state.roll;
+      car.rotation.y = yaw + Math.PI;
+      car.rotation.x = lerp(prev.pitch, state.pitch, a); car.rotation.z = -lerp(prev.roll, state.roll, a);
       const night = ctx.shared.uNight?.value ?? 0, lampsOn = (ctx.shared.uLamps?.value ?? night) > 0.3 || night > 0.3;
       if (lamps) lamps.visible = lampsOn; if (glow) glow.visible = lampsOn;
     }
     // chase camera: behind and above, orbit offsets from the mouse ease back behind the car after a while
-    if (dt > 0 && orbit.back > 0) orbit.back -= dt; else if (dt > 0) { orbit.yaw *= 1 - Math.min(1, dt * 1.5); }
-    const cy = state.yaw + orbit.yaw, dist = 6.8 + Math.abs(state.speed) * 0.12, h = 2.3 - orbit.pitch * 5;
-    const tx = state.x + Math.sin(cy) * dist, tz = state.z + Math.cos(cy) * dist;
-    let ty = state.y + h;
+    // [smooth] the easings are exponential in the frame's time (they were per frame: 1.52 /s and 5.22 /s are what they gave at 60 Hz)
+    if (dt > 0 && orbit.back > 0) orbit.back -= dt; else if (dt > 0) { orbit.yaw *= Math.exp(-1.52 * dt); }
+    const lagTarget = reducedMotion() ? 0 : Math.max(-0.32, Math.min(0.32, -(state.yawRate || 0) * 0.55));
+    if (dt > 0) chaseLag += (lagTarget - chaseLag) * damp(2.6, dt);
+    const cy = yaw + orbit.yaw + chaseLag, dist = 6.8 + Math.abs(state.speed) * 0.12, h = 2.3 - orbit.pitch * 5;
+    if (fovBase > 0 && cam.fov != null && !reducedMotion()) {
+      const top = state.race ? RACE.vMax : CAR.vBoost;
+      const want = fovBase + 8 * Math.min(1, Math.abs(state.speed) / top);
+      if (Math.abs(cam.fov - want) > 0.04) { cam.fov += (want - cam.fov) * damp(3.2, dt || 0.016); cam.updateProjectionMatrix(); }
+    }
+    if (dressTick && car) dressTick(car, state, dt);
+    const tx = x + Math.sin(cy) * dist, tz = z + Math.cos(cy) * dist;
+    let ty = y + h;
     ty = Math.max(ty, L.heightAt(tx, tz) + 1.2);
     if (!camInit || dt <= 0) { camPos.set(tx, ty, tz); camInit = true; }
-    else camPos.lerp(new THREE.Vector3(tx, ty, tz), Math.min(1, dt * 5));
-    camLook.set(state.x - Math.sin(state.yaw) * 3, state.y + 1.2, state.z - Math.cos(state.yaw) * 3);
+    else camPos.lerp(_ct.set(tx, ty, tz), damp(5.22, dt));
+    camLook.set(x - Math.sin(yaw) * 3, y + 1.2, z - Math.cos(yaw) * 3);
     cam.position.copy(camPos); cam.lookAt(camLook);
-    const pl = ctx.playerObj;
-    if (pl) { pl.pos.set(state.x, state.y, state.z); pl.vel.set(0, 0, 0); pl.yaw = state.yaw; }
   }
   /** Streaming focus: a little ahead of the car, more at speed. */
   function focus() { const k = 3 + Math.abs(state.speed) * 2.5, s = Math.sign(state.speed || 1); return { x: state.x - Math.sin(state.yaw) * k * s, z: state.z - Math.cos(state.yaw) * k * s }; }
@@ -238,17 +383,42 @@ export function createDrive(ctx, { net }) {
     if (e.code === 'KeyC' && !e.repeat && !typing && document.body?.classList?.contains('playing')) { toggle(); return; }
     if (state.active && (e.code === 'KeyV' || e.code === 'KeyR' || e.code === 'KeyF' || /^Digit\d$/.test(e.code)) && !typing) exit();
   }, true);
+  // [smooth] the physics at the fixed rate, the drawing every frame (in shot mode and window.__sim: one after the other, as update() did)
+  ctx.onStep((dt) => { step(dt); });
   ctx.onUpdate((dt) => {
     if (state.active && (ctx.services.life?.tour?.flying || ctx.planet?.active)) exit();
     if (state.active || eng.on) try { engine(dt); } catch (e) { /* no audio: silent car */ }
-    update(dt);
+    if (state.active && dt > 0) present(dt, ctx.alpha ?? 1);
   });
 
+  // [smooth] the car is built now, hidden, so the loading card's warm-up frame (main.js) compiles its programs: built on the first 乗る, its
+  // lamps and glow cost a shader compile in the middle of play
+  if (!carMesh && typeof document !== 'undefined') { try { car = makeCar(); } catch (e) { console.warn('[explore:drive] car', e); } }
+
+  function setLook(next) {
+    const paint = next?.color && next.color !== look.color;
+    if (next) Object.assign(look, next);
+    if (paint && car && !carMesh) { dropCar(); car = makeCar(); car.visible = state.active; }
+    else if (dress && car) dress(car, look);
+  }
   const api = {
-    enter, exit, toggle, update, focus, place, canEnter,
-    get active() { return state.active; }, state,
+    enter, exit, toggle, update, step, present, focus, place, canEnter,
+    setAssist(on) { assistOn = !!on; },
+    setRace(on) { state.race = !!on; },
+    setLocked(on) { state.locked = !!on; },
+    setLook,
+    /** Hold a chase-camera orbit (radians) for `hold` seconds. The garage shots use it; play eases back on its own. */
+    lookOrbit(yaw, pitch, hold = 4) {
+      orbit.yaw = yaw;
+      orbit.pitch = Math.max(-0.7, Math.min(0.25, pitch));
+      orbit.back = hold;
+    },
+    setDress(fn, tick) { dress = fn; dressTick = tick || null; if (dress && car) dress(car, look); },
+    onShift(fn) { onShift.add(fn); return () => onShift.delete(fn); },
+    get active() { return state.active; }, state, look,
     get kmh() { return Math.abs(state.speed) * 3.6; },
     get car() { return car; },
+    get assist() { return assistOn; },
     onChange: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
   };
   return api;

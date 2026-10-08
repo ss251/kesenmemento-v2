@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "cell": "outside-station",
+  "bbox": [-1520, -540, -1330, -400],
+  "note": "outside the 12 cells: 気仙沼駅 (x -1400 z -420). The two platform canopies (OSM 761402299 island, OSM 267557944 BRT) are landmark models, so no lot data is patched here; the model is fixed in src/anime/world/landmarks/station.js [v6:station-canopy]: roofs pale grey-lilac #a09eb3 (island) and pale grey #c3c1c5 (BRT) with a white soffit, blue JR steel (#2f6fb8) BRT posts and fascia, off-white island steel (#e4e2da) with the two north bays blue. The ortho's light blue roof is out of date.",
+  "sources": [
+    { "id": "earth", "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/lm/lm-station: pair_top, pair_o45)", "date": "2026-03-11" },
+    { "id": "commons", "what": "Wikimedia Commons 142840918 JR East Kesennuma Station Platform 1/2 and 142840920 Platform 3/4 (raw/ref/commons/untagged, reference only, 2023)", "date": "2023-01-01" }
+  ]
+}

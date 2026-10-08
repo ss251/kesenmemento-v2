@@ -5,6 +5,9 @@ import * as THREE from 'three';
 
 const CELL = 8;
 export const STEP_HEIGHT = 0.45;
+// [smooth] grid keys are numbers (a cell's x and z packed), not "x,z" strings: a query made a string per cell and a Set per call, the walker,
+// the car and the labels' occlusion test ran thousands of them a second (megabytes of garbage a second, collected in GC pauses)
+const OFF = 32768, cellKey = (ix, iz) => (ix + OFF) * 65536 + (iz + OFF);
 
 export class Physics {
   constructor(heightAt, isWater = null) {
@@ -18,10 +21,13 @@ export class Physics {
     // every one of them out again when the tile unloads (explore/stream.js)
     this.tag = null;
     this._tagged = new Map();
+    // [smooth] _query() results: reused arrays (a stack of them, so a query made while another's result is being read gets its own) and
+    // a stamp per item instead of a Set for the de-duplication; _local() writes into _lv
+    this._qPool = []; this._qDepth = 0; this._qStamp = 0; this._lv = [0, 0];
   }
   _cells(minx, minz, maxx, maxz, fn) {
     const x0 = Math.floor(minx / CELL), x1 = Math.floor(maxx / CELL), z0 = Math.floor(minz / CELL), z1 = Math.floor(maxz / CELL);
-    for (let ix = x0; ix <= x1; ix++) for (let iz = z0; iz <= z1; iz++) fn(ix + ',' + iz);
+    for (let ix = x0; ix <= x1; ix++) for (let iz = z0; iz <= z1; iz++) fn(cellKey(ix, iz));
   }
   _insert(it) {
     const r = it.type === 'cyl' ? it.r : Math.hypot(it.hw, it.hd);
@@ -88,24 +94,48 @@ export class Physics {
   /** Moving colliders: fn() returns an array of {cx,cz,w,d,rotY,y0,y1} each frame. */
   addDynamic(fn) { this.dynamic.push(fn); }
 
-  _local(it, x, z) { const dx = x - it.cx, dz = z - it.cz; return [dx * it.c - dz * it.s, dx * it.s + dz * it.c]; }
+  /** The point (x, z) in the item's frame: [lx, lz] in a reused array (read it before the next call). */
+  _local(it, x, z) { const dx = x - it.cx, dz = z - it.cz, v = this._lv; v[0] = dx * it.c - dz * it.s; v[1] = dx * it.s + dz * it.c; return v; }
+  /** Every item whose cells meet the square of half-size r round (x, z), each once, in the order a Set gave them (cell by cell, x then
+   *  z, then the moving ones). [smooth] The array is reused: iterate it with queryEnd() after, or not at all past the next query. */
   _query(x, z, r) {
-    const out = new Set();
-    this._cells(x - r, z - r, x + r, z + r, (k) => { const a = this.grid.get(k); if (a) for (const it of a) out.add(it); });
-    for (const it of this._dynItems) out.add(it);
+    const out = this._qPool[this._qDepth] || (this._qPool[this._qDepth] = []);
+    out.length = 0;
+    const stamp = ++this._qStamp;
+    const x0 = Math.floor((x - r) / CELL), x1 = Math.floor((x + r) / CELL), z0 = Math.floor((z - r) / CELL), z1 = Math.floor((z + r) / CELL);
+    for (let ix = x0; ix <= x1; ix++) for (let iz = z0; iz <= z1; iz++) {
+      const a = this.grid.get(cellKey(ix, iz)); if (!a) continue;
+      for (let i = 0; i < a.length; i++) { const it = a[i]; if (it._qs !== stamp) { it._qs = stamp; out.push(it); } }
+    }
+    const d = this._dynItems;
+    for (let i = 0; i < d.length; i++) { const it = d[i]; if (it._qs !== stamp) { it._qs = stamp; out.push(it); } }
     return out;
   }
   refreshDynamic() {
-    this._dynItems.length = 0;
-    for (const fn of this.dynamic) { const arr = fn() || []; for (const b of arr) this._dynItems.push(this._obb('box', b.cx, b.cz, b.w, b.d, b.rotY || 0, { y0: b.y0 ?? -50, y1: b.y1 ?? 200 })); }
+    // [smooth] the moving colliders' boxes are reused, not made again every frame
+    const pool = this._dynPool || (this._dynPool = []);
+    let n = 0;
+    for (const fn of this.dynamic) {
+      const arr = fn() || [];
+      for (let i = 0; i < arr.length; i++) {
+        const b = arr[i], rotY = b.rotY || 0;
+        const it = pool[n] || (pool[n] = { type: 'box', cx: 0, cz: 0, hw: 0, hd: 0, c: 1, s: 0, rotY: 0, y0: 0, y1: 0, _qs: 0 });
+        it.cx = b.cx; it.cz = b.cz; it.hw = b.w / 2; it.hd = b.d / 2; it.c = Math.cos(rotY); it.s = Math.sin(rotY); it.rotY = rotY; it.y0 = b.y0 ?? -50; it.y1 = b.y1 ?? 200;
+        n++;
+      }
+    }
+    const d = this._dynItems; d.length = n;
+    for (let i = 0; i < n; i++) d[i] = pool[i];
   }
 
   /** Surface height under (x,z) for feet at feetY (highest walkable top not above feet+STEP). */
   groundHeight(x, z, feetY = 1e9) {
     let g = this.heightAt(x, z);
-    for (const it of this._query(x, z, 0.01)) {
+    const Q = this._query(x, z, 0.01);
+    for (let qi = 0; qi < Q.length; qi++) {
+      const it = Q[qi];
       if (it.type !== 'walk' && it.type !== 'ramp') continue;
-      const [lx, lz] = this._local(it, x, z);
+      const lv = this._local(it, x, z), lx = lv[0], lz = lv[1];
       if (Math.abs(lx) > it.hw || Math.abs(lz) > it.hd) continue;
       const top = it.type === 'walk' ? it.top : it.yA + (it.yB - it.yA) * (lz / (2 * it.hd) + 0.5);
       if (top <= feetY + STEP_HEIGHT && top > g) g = top;
@@ -115,10 +145,12 @@ export class Physics {
 
   /** [v4:integrate] Is (x, y, z) inside a solid (box or cylinder collider)? Walk boxes and ramps are floors, not solids. */
   solidAt(x, z, y) {
-    for (const it of this._query(x, z, 0.01)) {
+    const Q = this._query(x, z, 0.01);
+    for (let qi = 0; qi < Q.length; qi++) {
+      const it = Q[qi];
       if (it.type === 'cyl') { if (y > it.y0 && y < it.y1 && Math.hypot(x - it.cx, z - it.cz) < it.r) return true; continue; }
       if (it.type !== 'box' || y <= it.y0 || y >= it.y1) continue;
-      const [lx, lz] = this._local(it, x, z);
+      const lv = this._local(it, x, z), lx = lv[0], lz = lv[1];
       if (Math.abs(lx) <= it.hw && Math.abs(lz) <= it.hd) return true;
     }
     return false;
@@ -134,14 +166,16 @@ export class Physics {
   resolve(p, r, feetY, height) {
     for (let iter = 0; iter < 3; iter++) {
       let moved = false;
-      for (const it of this._query(p.x, p.z, r + 0.5)) {
+      const Q = this._query(p.x, p.z, r + 0.5);
+      for (let qi = 0; qi < Q.length; qi++) {
+        const it = Q[qi];
         let y0, y1;
         if (it.type === 'box') { y0 = it.y0; y1 = it.y1; if (feetY + STEP_HEIGHT >= y1 || feetY + height <= y0) continue; }
         else if (it.type === 'cyl') { if (feetY + STEP_HEIGHT >= it.y1 || feetY + height <= it.y0) continue; }
         else if (it.type === 'walk') { if (it.top <= feetY + STEP_HEIGHT || feetY + height <= it.y0) continue; }
         else if (it.type === 'ramp') {
           // blocks only where the ramp surface is far above feet
-          const [lx, lz] = this._local(it, p.x, p.z);
+          const lv = this._local(it, p.x, p.z), lx = lv[0], lz = lv[1];
           const lzC = Math.max(-it.hd, Math.min(it.hd, lz));
           const top = it.yA + (it.yB - it.yA) * (lzC / (2 * it.hd) + 0.5);
           if (top <= feetY + STEP_HEIGHT) continue;
@@ -151,7 +185,7 @@ export class Physics {
           if (d < m) { const k = d > 1e-6 ? (m - d) / d : 0; p.x += dx * k; p.z += dz * k; if (d <= 1e-6) p.x += m; moved = true; }
           continue;
         }
-        const [lx, lz] = this._local(it, p.x, p.z);
+        const lv = this._local(it, p.x, p.z), lx = lv[0], lz = lv[1];
         const qx = Math.max(-it.hw, Math.min(it.hw, lx)), qz = Math.max(-it.hd, Math.min(it.hd, lz));
         let dx = lx - qx, dz = lz - qz, d = Math.hypot(dx, dz);
         let nx, nz, pen;

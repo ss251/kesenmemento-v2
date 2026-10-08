@@ -16,7 +16,28 @@ function fsTriangle() {
   return g;
 }
 
-export function createRenderPipeline(renderer, quality) {
+// [mobile-perf] The outline (inverse-depth laplacian + normal discontinuity) from the pre-pass around vUv: the composite's own, or the edge pass's
+// (edgeTex). Needs px, c0, d0 and nd(); leaves `edge`.
+const EDGE_BODY = /* glsl */`        vec4 cl = nd(vUv - vec2(px.x,0.0)), cr = nd(vUv + vec2(px.x,0.0)), cu = nd(vUv + vec2(0.0,px.y)), cd = nd(vUv - vec2(0.0,px.y));
+        float i0 = 1.0/max(d0,0.05);
+        float il = 1.0/max(cl.a*uFar,0.05), ir = 1.0/max(cr.a*uFar,0.05), iu = 1.0/max(cu.a*uFar,0.05), idn = 1.0/max(cd.a*uFar,0.05);
+        float lapX = abs(il + ir - 2.0*i0) / i0, lapY = abs(iu + idn - 2.0*i0) / i0;
+        float dEdge = smoothstep(0.06, 0.18, max(lapX, lapY));
+        // silhouette against much farther stuff (one-sided)
+        float dmin = min(min(cl.a,cr.a),min(cu.a,cd.a))*uFar;
+        dEdge = max(dEdge, smoothstep(0.10, 0.25, (d0 - dmin)/max(dmin,0.05)) );
+        vec3 n0 = c0.rgb*2.0-1.0;
+        float nEdge = 0.0;
+        nEdge = max(nEdge, 1.0 - dot(n0, cl.rgb*2.0-1.0));
+        nEdge = max(nEdge, 1.0 - dot(n0, cr.rgb*2.0-1.0));
+        nEdge = max(nEdge, 1.0 - dot(n0, cu.rgb*2.0-1.0));
+        nEdge = max(nEdge, 1.0 - dot(n0, cd.rgb*2.0-1.0));
+        nEdge = smoothstep(0.30, 0.65, nEdge);
+        float dNear = min(d0, dmin);
+        float fade = 1.0 - smoothstep(uLineRange.x, uLineRange.y, dNear);
+        float edge = max(dEdge, nEdge * 0.85) * fade * uOutline;`;
+
+export function createRenderPipeline(renderer, quality, { edgeTex = false, fxaa = false } = {}) {   // [mobile-perf] edgeTex: the outlines in their own pass (see below); fxaa: the scene colour anti-aliased in the composite
   const size = new THREE.Vector2();
   const HF = THREE.HalfFloatType;
   const rtColor = new THREE.WebGLRenderTarget(4, 4, { type: HF, samples: quality.msaa ?? 4 });
@@ -25,6 +46,11 @@ export function createRenderPipeline(renderer, quality) {
   const rtB2 = new THREE.WebGLRenderTarget(4, 4, { type: HF });
   const rtB3 = new THREE.WebGLRenderTarget(4, 4, { type: HF });
   const rtB4 = new THREE.WebGLRenderTarget(4, 4, { type: HF });
+  // [mobile-perf] On a phone the canvas is finer than the scene's targets (main.js: a 2x canvas over a 1.25x scene), and outlines worked out
+  // per output pixel from the nearest pre-pass texel came out as stair-steps 1.6 output pixels tall. With edgeTex the outline is worked out
+  // once per scene texel into its own one-byte target and the composite reads it filtered: the same lines, smooth when scaled up, and four
+  // fewer pre-pass reads per output pixel.
+  const rtEdge = edgeTex ? new THREE.WebGLRenderTarget(4, 4, { type: THREE.UnsignedByteType, format: THREE.RedFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false }) : null;
 
   // normal + linear depth override material (handles instancing & skinning through chunks)
   // [v4:explore] and batching: the streamed core tiles are THREE.BatchedMesh pools (explore/sbatch.js)
@@ -35,6 +61,9 @@ export function createRenderPipeline(renderer, quality) {
       #include <batching_pars_vertex>
       #include <skinning_pars_vertex>
       varying vec3 vN; varying float vD;
+      #ifdef USE_BATCHING_COLOR
+        varying float vFade;   // [mobile-perf] a stream slot mid-fade (world/explore/sbatch.js): its outlines switch at the fade's midpoint
+      #endif
       void main(){
         #include <batching_vertex>
         #include <beginnormal_vertex>
@@ -45,10 +74,24 @@ export function createRenderPipeline(renderer, quality) {
         #include <skinning_vertex>
         #include <project_vertex>
         vN = normalize(transformedNormal); vD = -mvPosition.z;
+        #ifdef USE_BATCHING_COLOR
+          vFade = getBatchingColor( getIndirectIndex( gl_DrawID ) ).a;
+        #endif
       }`,
     fragmentShader: /* glsl */`
       uniform float uFar; varying vec3 vN; varying float vD;
-      void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; gl_FragColor = vec4(n*0.5+0.5, vD/uFar); }`,
+      #ifdef USE_BATCHING_COLOR
+        varying float vFade;
+      #endif
+      void main(){
+        #ifdef USE_BATCHING_COLOR
+          // [mobile-perf] not dithered like the colour: a screen door in the normals and depths puts an outline on nearly every pixel of a
+          // pole or a sign standing in front of farther things (each kept pixel against a dropped one), a dark grain over the 0.35 s. The
+          // outlines go over from the old geometry to the new at half way instead, when the colour is half dissolved.
+          if ( vFade < 0.5 ) discard;
+        #endif
+        vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; gl_FragColor = vec4(n*0.5+0.5, vD/uFar);
+      }`,
     side: THREE.DoubleSide,
   });
 
@@ -89,7 +132,7 @@ export function createRenderPipeline(renderer, quality) {
 
   const compMat = new THREE.ShaderMaterial({
     uniforms: {
-      tColor: { value: rtColor.texture }, tND: { value: rtND.texture }, tBloom: { value: rtB2.texture }, tBloom2: { value: rtB4.texture },
+      tColor: { value: rtColor.texture }, tND: { value: rtND.texture }, tBloom: { value: rtB2.texture }, tBloom2: { value: rtB4.texture }, tEdge: { value: rtEdge ? rtEdge.texture : null },
       uRes: { value: new THREE.Vector2(1, 1) }, uFar: { value: 2000 }, uPx: { value: 1.0 },
       uOutline: { value: 1.0 }, uLine: { value: new THREE.Color('#2e2740') },
       uBloom: { value: 0.32 }, uGlow: { value: 0.14 }, uExposure: { value: 1.0 }, uNeutral: { value: 0 },
@@ -98,7 +141,8 @@ export function createRenderPipeline(renderer, quality) {
       uLineRange: { value: new THREE.Vector2(35, 190) }, uLeakK: { value: 1.0 }, uNight: { value: 0.0 },
       // [v3:polish3] low-lying mist (the 06:30 morning): a height fog hugging the bay and the valley floors; sky.js drives
       // uMist / uMistCol, render() fills the camera terms
-      uMist: { value: 0.0 }, uMistCol: { value: new THREE.Color('#e8d8dc') }, uMistH: { value: 26.0 }, uCamY: { value: 0 },
+      uMist: { value: 0.0 }, uMistCol: { value: new THREE.Color('#d7e5f2') }, uMistH: { value: 26.0 }, uCamY: { value: 0 },
+      uWet: { value: 0.0 },   // [live r2] wet asphalt: upward, low-saturation surfaces
       // [v4:polish1] 1 at street level (camera below 40 m above the ground), 0 from 70 m up: less shadow cooling, more
       // saturation on the ground (street frames measured 0.14 mean saturation against the style sheet's 0.21)
       uStreet: { value: 0.0 },
@@ -106,38 +150,48 @@ export function createRenderPipeline(renderer, quality) {
     },
     vertexShader: FS_VERT,
     fragmentShader: /* glsl */`
-      uniform sampler2D tColor, tND, tBloom, tBloom2; uniform vec2 uRes; uniform float uFar, uPx, uOutline, uBloom, uGlow, uExposure, uLeak, uTime, uVignette, uLeakK, uNight, uNeutral; uniform vec2 uLineRange;
+      uniform sampler2D tColor, tND, tBloom, tBloom2, tEdge; uniform vec2 uRes; uniform float uFar, uPx, uOutline, uBloom, uGlow, uExposure, uLeak, uTime, uVignette, uLeakK, uNight, uNeutral; uniform vec2 uLineRange;
       uniform vec3 uLine; uniform vec3 uSunScreen; varying vec2 vUv;
-      uniform float uMist, uMistH, uCamY; uniform vec3 uMistCol; uniform mat4 uInvProj; uniform mat3 uCamRot; uniform float uStreet;
+      uniform float uMist, uMistH, uCamY, uWet; uniform vec3 uMistCol; uniform mat4 uInvProj; uniform mat3 uCamRot; uniform float uStreet;
       vec4 nd(vec2 uv){ return texture2D(tND, uv); }
       float lum(vec3 c){ return dot(c, vec3(0.2126,0.7152,0.0722)); }
       vec3 softClip(vec3 c){ vec3 k = vec3(0.78); vec3 over = max(c - k, 0.0); return min(c, k) + (1.0-k) * (1.0 - exp(-over/(1.0-k))); }
       float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
       vec3 toSRGB(vec3 c){ c = max(c, 0.0); return mix(c*12.92, 1.055*pow(c, vec3(1.0/2.4)) - 0.055, step(0.0031308, c)); }
+#ifdef FXAA
+      // [mobile-perf] FXAA (Lottes' console variant, 9 taps) on the scene colour, at the scene's texels: the phone has no MSAA, and its colour edges
+      // (cel bands, roofs against the sky) stair-stepped once scaled up to the canvas. Luma on a perceptual proxy of the linear HDR colour.
+      float fxL(vec3 c){ return sqrt(max(dot(c, vec3(0.299, 0.587, 0.114)), 0.0)); }
+      vec3 fxaaColor(vec2 uv, vec2 r){
+        vec3 nw = texture2D(tColor, uv + vec2(-1.0, -1.0) * r).rgb, ne = texture2D(tColor, uv + vec2(1.0, -1.0) * r).rgb;
+        vec3 sw = texture2D(tColor, uv + vec2(-1.0, 1.0) * r).rgb, se = texture2D(tColor, uv + vec2(1.0, 1.0) * r).rgb, m = texture2D(tColor, uv).rgb;
+        float lNW = fxL(nw), lNE = fxL(ne), lSW = fxL(sw), lSE = fxL(se), lM = fxL(m);
+        float lMin = min(lM, min(min(lNW, lNE), min(lSW, lSE))), lMax = max(lM, max(max(lNW, lNE), max(lSW, lSE)));
+        if (lMax - lMin < max(0.0312, lMax * 0.125)) return m;   // no edge here: the texel as it is
+        vec2 dir = vec2(-((lNW + lNE) - (lSW + lSE)), (lNW + lSW) - (lNE + lSE));
+        float red = max((lNW + lNE + lSW + lSE) * 0.03125, 0.0078125);
+        dir = clamp(dir / (min(abs(dir.x), abs(dir.y)) + red), vec2(-8.0), vec2(8.0)) * r;
+        vec3 a = 0.5 * (texture2D(tColor, uv + dir * (1.0 / 3.0 - 0.5)).rgb + texture2D(tColor, uv + dir * (2.0 / 3.0 - 0.5)).rgb);
+        vec3 b = a * 0.5 + 0.25 * (texture2D(tColor, uv - dir * 0.5).rgb + texture2D(tColor, uv + dir * 0.5).rgb);
+        float lB = fxL(b);
+        return (lB < lMin || lB > lMax) ? a : b;
+      }
+#endif
       void main(){
         vec2 px = uPx / uRes;
+#ifdef FXAA
+        vec3 col = fxaaColor(vUv, 1.0 / uRes);
+#else
         vec3 col = texture2D(tColor, vUv).rgb;
+#endif
         // ---------- outlines (inverse-depth laplacian + normal discontinuity)
         vec4 c0 = nd(vUv);
         float d0 = c0.a * uFar;
-        vec4 cl = nd(vUv - vec2(px.x,0.0)), cr = nd(vUv + vec2(px.x,0.0)), cu = nd(vUv + vec2(0.0,px.y)), cd = nd(vUv - vec2(0.0,px.y));
-        float i0 = 1.0/max(d0,0.05);
-        float il = 1.0/max(cl.a*uFar,0.05), ir = 1.0/max(cr.a*uFar,0.05), iu = 1.0/max(cu.a*uFar,0.05), idn = 1.0/max(cd.a*uFar,0.05);
-        float lapX = abs(il + ir - 2.0*i0) / i0, lapY = abs(iu + idn - 2.0*i0) / i0;
-        float dEdge = smoothstep(0.06, 0.18, max(lapX, lapY));
-        // silhouette against much farther stuff (one-sided)
-        float dmin = min(min(cl.a,cr.a),min(cu.a,cd.a))*uFar;
-        dEdge = max(dEdge, smoothstep(0.10, 0.25, (d0 - dmin)/max(dmin,0.05)) );
-        vec3 n0 = c0.rgb*2.0-1.0;
-        float nEdge = 0.0;
-        nEdge = max(nEdge, 1.0 - dot(n0, cl.rgb*2.0-1.0));
-        nEdge = max(nEdge, 1.0 - dot(n0, cr.rgb*2.0-1.0));
-        nEdge = max(nEdge, 1.0 - dot(n0, cu.rgb*2.0-1.0));
-        nEdge = max(nEdge, 1.0 - dot(n0, cd.rgb*2.0-1.0));
-        nEdge = smoothstep(0.30, 0.65, nEdge);
-        float dNear = min(d0, dmin);
-        float fade = 1.0 - smoothstep(uLineRange.x, uLineRange.y, dNear);
-        float edge = max(dEdge, nEdge * 0.85) * fade * uOutline;
+#ifdef EDGE_TEX
+        float edge = texture2D(tEdge, vUv).r;   // [mobile-perf] worked out per scene texel in the edge pass, read filtered
+#else
+${EDGE_BODY}
+#endif
         // colour-aware line: darken & cool the underlying colour rather than paint black
         vec3 lineCol = mix(col * vec3(0.42, 0.38, 0.5), uLine, 0.35);
         col = mix(col, lineCol, edge * 0.82);
@@ -152,9 +206,10 @@ export function createRenderPipeline(renderer, quality) {
           vec3 pv = vd * (dz / max(-vd.z, 1e-4));
           float wy = uCamY + (uCamRot * pv).y, dist = length(pv);
           float lowK = 1.0 - smoothstep(-2.0, uMistH, wy);
-          float mist = uMist * lowK * (1.0 - exp(-dist / 520.0));
+          float far = smoothstep(900.0, 2000.0, dist);   // [live r2] far hills only, never a veil over the town
+          float mist = uMist * lowK * far * (1.0 - exp(-dist / 1400.0));
           float band = 0.5 + 0.5 * sin(wy * 0.35 + (uCamRot * pv).x * 0.004 + uTime * 0.05);   // soft painted strata
-          col = mix(col, uMistCol, clamp(mist * (0.85 + 0.15 * band), 0.0, 0.85));
+          col = mix(col, uMistCol, clamp(mist * (0.85 + 0.15 * band), 0.0, 0.28));
         }
         // ---------- exposure / tone
         col *= uExposure;
@@ -174,6 +229,27 @@ export function createRenderPipeline(renderer, quality) {
         // surfaces (asphalt, pastel render) gain colour, the already saturated ones barely move
         float mxc = max(col.r, max(col.g, col.b)), satp = mxc > 1e-4 ? (mxc - min(col.r, min(col.g, col.b))) / mxc : 0.0;
         col = mix(vec3(lum(col)), col, mix(mix(1.07, 1.15, uStreet) + uStreet * 0.5 * (1.0 - satp) * (1.0 - satp), 1.0, uNeutral));
+        // [live r2] wet streets: soaked concrete is darker and cooler, with a sky streak down the quay.
+        // Flat and grey only, between the waterline and the first roofs, so the bay and the hills stay as painted.
+        if (uWet > 0.01) {
+          vec4 ndw = nd(vUv);
+          float dw = ndw.a * uFar;
+          if (dw < 70.0) {
+            vec3 vn = ndw.rgb * 2.0 - 1.0;
+            vec3 nW = normalize(uCamRot * vn);
+            vec4 wr = uInvProj * vec4(vUv * 2.0 - 1.0, 1.0, 1.0); vec3 wd = wr.xyz / wr.w;
+            vec3 wpv = wd * (dw / max(-wd.z, 1e-4));
+            float wy = uCamY + (uCamRot * wpv).y;
+            float street = smoothstep(0.2, 0.8, wy) * (1.0 - smoothstep(8.0, 16.0, wy));
+            float flatK = smoothstep(0.62, 0.88, nW.y);
+            float greyK = 1.0 - smoothstep(0.1, 0.26, satp);
+            float wk = uWet * street * flatK * greyK;
+            float nearK = 1.0 - smoothstep(12.0, 40.0, dw);
+            col = mix(col, col * vec3(0.52, 0.58, 0.64), wk * mix(0.28, 0.78, nearK));
+            float streak = exp(-pow((vUv.x - 0.5) * 2.6, 2.0)) * smoothstep(2.2, 8.0, dw) * (1.0 - smoothstep(14.0, 28.0, dw));
+            col += vec3(0.68, 0.76, 0.84) * wk * streak * 0.62;
+          }
+        }
         // ---------- light leak from the sun side
         vec2 asp = vec2(uRes.x/uRes.y, 1.0);
         vec2 sp = uSunScreen.xy;
@@ -188,12 +264,31 @@ export function createRenderPipeline(renderer, quality) {
         gl_FragColor = vec4(outc, 1.0);
       }`,
     depthTest: false, depthWrite: false,
+    defines: { ...(edgeTex ? { EDGE_TEX: '' } : {}), ...(fxaa ? { FXAA: '' } : {}) },
   });
+  // [mobile-perf] the edge pass (edgeTex): the composite's outline, once per scene texel, into rtEdge; it shares the composite's uniforms
+  const CU = compMat.uniforms;
+  const edgeMat = edgeTex ? new THREE.ShaderMaterial({
+    uniforms: { tND: CU.tND, uRes: CU.uRes, uFar: CU.uFar, uPx: CU.uPx, uOutline: CU.uOutline, uLineRange: CU.uLineRange },
+    vertexShader: FS_VERT,
+    fragmentShader: /* glsl */`
+      uniform sampler2D tND; uniform vec2 uRes; uniform float uFar, uPx, uOutline; uniform vec2 uLineRange; varying vec2 vUv;
+      vec4 nd(vec2 uv){ return texture2D(tND, uv); }
+      void main(){
+        vec2 px = uPx / uRes;
+        vec4 c0 = nd(vUv);
+        float d0 = c0.a * uFar;
+${EDGE_BODY}
+        gl_FragColor = vec4(edge, 0.0, 0.0, 1.0);
+      }`,
+    depthTest: false, depthWrite: false,
+  }) : null;
 
   function setSize(w, h, pr) {
     const W = Math.max(4, Math.floor(w * pr)), H = Math.max(4, Math.floor(h * pr));
     size.set(W, H);
     rtColor.setSize(W, H); rtND.setSize(W, H);
+    rtEdge?.setSize(W, H);   // [mobile-perf]
     const bw = Math.max(4, W >> 2), bh = Math.max(4, H >> 2);
     rtB1.setSize(bw, bh); rtB2.setSize(bw, bh);
     rtB3.setSize(Math.max(4, W >> 4), Math.max(4, H >> 4)); rtB4.setSize(Math.max(4, W >> 4), Math.max(4, H >> 4));
@@ -218,8 +313,11 @@ export function createRenderPipeline(renderer, quality) {
   // program parameters + cache key whenever consecutive objects differ in instancing / skinning / vertex colours /
   // alpha colours (tens of µs each). Sorting the pre-pass by that variant first (then front-to-back) keeps runs of
   // identical variants together: measured 7.3 -> ~3 ms per frame at 1080p on the hero drone view.
-  const variant = (o, g) => (o.isInstancedMesh ? 1 : 0) | (o.isSkinnedMesh ? 2 : 0) | (g && g.attributes.color ? (g.attributes.color.itemSize === 4 ? 8 : 4) : 0) | (o.isInstancedMesh && o.instanceColor ? 16 : 0) | (g && g.morphAttributes && g.morphAttributes.position ? 32 : 0);
-  const ndSort = (a, b) => (a.groupOrder - b.groupOrder) || (a.renderOrder - b.renderOrder) || (variant(a.object, a.geometry) - variant(b.object, b.geometry)) || (a.z - b.z) || (a.id - b.id);
+  // [smooth] variant first (and batched meshes are a variant: the streamed tiles' pools): the draw order inside the pre-pass changes nothing
+  // drawn but which of two exactly coplanar surfaces writes its normal (pixel A/B in tools/perf/abdiff.mjs: within the frame-to-frame noise),
+  // and the switches went from 25 a frame to a handful, each one a program-parameter rebuild in three.js (garbage every frame)
+  const variant = (o, g) => (o.isInstancedMesh ? 1 : 0) | (o.isSkinnedMesh ? 2 : 0) | (g && g.attributes.color ? (g.attributes.color.itemSize === 4 ? 8 : 4) : 0) | (o.isInstancedMesh && o.instanceColor ? 16 : 0) | (g && g.morphAttributes && g.morphAttributes.position ? 32 : 0) | (o.isBatchedMesh ? 64 : 0);
+  const ndSort = (a, b) => (variant(a.object, a.geometry) - variant(b.object, b.geometry)) || (a.groupOrder - b.groupOrder) || (a.renderOrder - b.renderOrder) || (a.z - b.z) || (a.id - b.id);
   // [v3:fix] distance culling of the static batches (the renderer is draw-call bound): the outline pre-pass skips cells
   // beyond the outline range (lines fade out there anyway), the colour pass skips cells the fog has swallowed
   // (exp2 fog < 1 % visible) and, on the low / medium tiers, cells beyond 3.5 / 6 km. Visibility is restored each frame.
@@ -260,6 +358,9 @@ export function createRenderPipeline(renderer, quality) {
     return due;
   }
   const tierMax = quality?.phone ? PHONE.drawMax : { low: 3500, medium: 6000 }[quality?.name] ?? Infinity;
+  // [play:underwater] under the surface nothing past ~25 m shows through the water: the dive caps the colour pass's cull distance
+  let viewMax = Infinity;
+  function setViewMax(d) { viewMax = d > 0 ? d : Infinity; }
   function cullTo(camera, maxD) { _cp.setFromMatrixPosition(camera.matrixWorld); for (const it of cullList) it.o.visible = it.v && it.c.distanceTo(_cp) - it.r < maxD; }
   function render(scene, camera, sunDir, t, out = null) {   // [v3:integrate] out: composite into a render target (tiny planet faces)
     cullSetup(scene);
@@ -286,7 +387,7 @@ export function createRenderPipeline(renderer, quality) {
     renderer.setOpaqueSort(null);
     scene.overrideMaterial = null; scene.background = bg; scene.fog = fog;
     // 2. colour pass — all layers
-    cullTo(camera, Math.min(fogMax, tierMax));
+    cullTo(camera, Math.min(fogMax, tierMax, viewMax));
     camera.layers.enableAll();
     renderer.shadowMap.needsUpdate = shadowDue(camera, sunDir, out);
     renderer.setRenderTarget(rtColor);
@@ -304,6 +405,8 @@ export function createRenderPipeline(renderer, quality) {
     blurMat.uniforms.tSrc.value = rtB3.texture; blurMat.uniforms.uDir.value.set(0, 1 / rtB3.height); pass(blurMat, rtB4);
     blurMat.uniforms.tSrc.value = rtB4.texture; blurMat.uniforms.uDir.value.set(1.6 / rtB3.width, 0); pass(blurMat, rtB3);
     blurMat.uniforms.tSrc.value = rtB3.texture; blurMat.uniforms.uDir.value.set(0, 1.6 / rtB3.height); pass(blurMat, rtB4);
+    // [mobile-perf] the outlines at the scene's resolution, read filtered by the composite (edgeTex)
+    if (edgeMat) pass(edgeMat, rtEdge);
     // 4. composite
     _v.copy(sunDir).multiplyScalar(1000).add(camera.position).project(camera);
     const inFront = _v.z < 1 ? 1 : 0;
@@ -313,7 +416,7 @@ export function createRenderPipeline(renderer, quality) {
     compMat.uniforms.uSunScreen.value.set(inFront ? THREE.MathUtils.clamp(sx, -0.3, 1.3) : (sx < 0.5 ? 1.4 : -0.4), inFront ? THREE.MathUtils.clamp(sy, -0.2, 1.3) : 1.2, onScreen);
     compMat.uniforms.uLeak.value = inFront ? 1.0 : 0.25;
     compMat.uniforms.uTime.value = t;
-    if (compMat.uniforms.uMist.value > 0.001) { compMat.uniforms.uInvProj.value.copy(camera.projectionMatrixInverse); compMat.uniforms.uCamRot.value.setFromMatrix4(camera.matrixWorld); compMat.uniforms.uCamY.value = _cp.setFromMatrixPosition(camera.matrixWorld).y; }
+    if (compMat.uniforms.uMist.value > 0.001 || compMat.uniforms.uWet.value > 0.01) { compMat.uniforms.uInvProj.value.copy(camera.projectionMatrixInverse); compMat.uniforms.uCamRot.value.setFromMatrix4(camera.matrixWorld); compMat.uniforms.uCamY.value = _cp.setFromMatrixPosition(camera.matrixWorld).y; }
     compMat.uniforms.tBloom.value = rtB2.texture; compMat.uniforms.tBloom2.value = rtB4.texture;
     pass(compMat, out);
   }
@@ -353,5 +456,5 @@ export function createRenderPipeline(renderer, quality) {
     return d * camera.far * Math.sqrt(1 + x * x + y * y);
   }
 
-  return { render, setSize, setView, setProxies, compMat, ndMat, targets: { rtColor, rtND }, size, nearShare, depthAt };
+  return { render, setSize, setView, setViewMax, setProxies, compMat, ndMat, targets: { rtColor, rtND }, size, nearShare, depthAt };
 }

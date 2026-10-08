@@ -11,7 +11,7 @@
  "sources": [
   {
    "id": "earth",
-   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured with tools/anime/earth-ref.mjs into raw/ref/earth/c12 (full, N, M, S; ortho crops and sheets in the same folder)",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured into a local reference folder (c12) (full, N, M, S; ortho crops and sheets in the same folder)",
    "date": "2026-03-11"
   },
   {
@@ -27,39 +27,18 @@
  "lots": [
   {
    "id": "16/58543/25069/24",
-   "kind": "warehouse",
-   "storeys": 1,
-   "height": 4.2,
-   "roof": {
-    "shape": "shed",
-    "color": "#5d636c"
-   },
-   "facade": "warehouse",
-   "src": "earth: N top (sheets_before s_0/s_1) + o90, the three narrow sheds at the road edge are one low dark-roofed shed now (Earth roof #706877), not pale"
+   "remove": true,
+   "src": "earth: N top + c12/full top (2026-03-11), the three narrow GSI sheds at the road edge (5 x 11 m, 1 to 2 m gaps) are gone: one solid low-roofed shed stands on the same ground, added as ovr:c12:shipyard-roadshed (OSM w1242845982)"
   },
   {
    "id": "16/58543/25069/25",
-   "kind": "warehouse",
-   "storeys": 1,
-   "height": 4.2,
-   "roof": {
-    "shape": "shed",
-    "color": "#5d636c"
-   },
-   "facade": "warehouse",
-   "src": "earth: N top (sheets_before s_0/s_1) + o90, the three narrow sheds at the road edge are one low dark-roofed shed now (Earth roof #706877), not pale"
+   "remove": true,
+   "src": "earth: N top + c12/full top (2026-03-11), the three narrow GSI sheds at the road edge (5 x 11 m, 1 to 2 m gaps) are gone: one solid low-roofed shed stands on the same ground, added as ovr:c12:shipyard-roadshed (OSM w1242845982)"
   },
   {
    "id": "16/58543/25069/26",
-   "kind": "warehouse",
-   "storeys": 1,
-   "height": 4.5,
-   "roof": {
-    "shape": "shed",
-    "color": "#5d636c"
-   },
-   "facade": "warehouse",
-   "src": "earth: N top (s_1) + o90 (oc_ship_o90.jpg), a low dark-roofed shed at the road edge (Earth roof #6f6676), not a 3-storey pale-blue shop"
+   "remove": true,
+   "src": "earth: N top + c12/full top (2026-03-11), the three narrow GSI sheds at the road edge (5 x 11 m, 1 to 2 m gaps) are gone: one solid low-roofed shed stands on the same ground, added as ovr:c12:shipyard-roadshed (OSM w1242845982)"
   },
   {
    "id": "16/58543/25069/22",
@@ -341,7 +320,7 @@
      743.8
     ]
    ],
-   "kind": "public",
+   "kind": "shrine",
    "storeys": 1,
    "height": 2.8,
    "roof": {
@@ -412,11 +391,101 @@
    },
    "facade": "warehouse",
    "src": "earth: S top (z_n.jpg), a small single-storey shed with a pale grey roof next to it"
+  },
+  {
+   "id": "ovr:c12:shipyard-roadshed",
+   "poly": [
+    [
+     1187.1,
+     480.6
+    ],
+    [
+     1184.8,
+     491.1
+    ],
+    [
+     1199.8,
+     495.1
+    ],
+    [
+     1201.9,
+     484.4
+    ]
+   ],
+   "kind": "warehouse",
+   "storeys": 1,
+   "height": 5.5,
+   "roof": {
+    "shape": "shed",
+    "color": "#706877"
+   },
+   "facade": "warehouse",
+   "src": "osm: w1242845982 (167 m2 ring) + earth: N top + c12/full top (2026-03-11), one solid brown-mauve low-pitched roof about 17 x 14 m turned about 15 degrees, shadow on its north side (about 5 to 6 m high), replacing the three GSI sheds 16/58543/25069/24-26. Earth roof #706877. The ridge direction is not visible on Earth, so a plain shed roof is used"
+  },
+  {
+   "id": "ovr:c12:osm-1242845988",
+   "poly": [
+    [
+     1171.3,
+     562.9
+    ],
+    [
+     1180.8,
+     570.1
+    ],
+    [
+     1173.3,
+     579.4
+    ],
+    [
+     1170.8,
+     577.5
+    ],
+    [
+     1163.4,
+     573.1
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "hip",
+    "color": "#b08c8f"
+   },
+   "src": "osm: w1242845988 (145 m2, uncovered by any lot) + earth: 2026-03-11 top, o0 and o180 of the c12 capture (tools/anime/earth-crop.mjs --ring): a red-orange hip roof; roof median #a88487 + 3 L* (round 3 systemic 1: the OSM gap list is mostly gone buildings, this one stands)"
+  },
+  {
+   "id": "ovr:c12:osm-1242845996",
+   "poly": [
+    [
+     1189.2,
+     662.8
+    ],
+    [
+     1190,
+     671.4
+    ],
+    [
+     1194.9,
+     671.5
+    ],
+    [
+     1194.6,
+     662.4
+    ]
+   ],
+   "kind": "house",
+   "storeys": 1,
+   "roof": {
+    "shape": "flat",
+    "color": "#847d86"
+   },
+   "src": "osm: w1242845996 (46 m2, uncovered by any lot) + earth: 2026-03-11 top, o0 and o180 of the c12 capture (tools/anime/earth-crop.mjs --ring): a small pale-roofed hut; roof median #847d86 (round 3 systemic 1: the OSM gap list is mostly gone buildings, this one stands)"
   }
  ],
  "landuse": [
   {
-   "use": "plaza",
+   "use": "apron",
    "ring": [
     [
      1152,
@@ -463,10 +532,10 @@
      830
     ]
    ],
-   "src": "earth: S top (e_a.jpg, e_c.jpg, z_n.jpg) + o90 (pair_o90.jpg), the 大浦 fishing port: the paved yard in front of the port sheds and the concrete quay where the boats moor, not lawn and sand (the GSI photo agrees)"
+   "src": "earth: S top (e_a.jpg, e_c.jpg, z_n.jpg) + o90 (pair_o90.jpg), the 大浦 fishing port: the paved yard in front of the port sheds and the concrete quay where the boats moor, not lawn and sand (the GSI photo agrees) [r2] use plaza -> apron: Earth median #868186 inside the ring (land2 lustats_top), grey asphalt / concrete, not cream"
   },
   {
-   "use": "plaza",
+   "use": "apron",
    "ring": [
     [
      1146,
@@ -501,7 +570,7 @@
      418
     ]
    ],
-   "src": "earth: N top + o0 (e_plat.jpg), the reclaimed apron north of the shipyard is two big concrete-paved squares behind a new seawall, not sand and lawn (the GSI photo shows the same paving)"
+   "src": "earth: N top + o0 (e_plat.jpg), the reclaimed apron north of the shipyard is two big concrete-paved squares behind a new seawall, not sand and lawn (the GSI photo shows the same paving) [r2] use plaza -> apron: Earth median #817f84 (land2 lustats_top), grey concrete, not cream"
   },
   {
    "use": "vacant",
@@ -559,7 +628,7 @@
    "src": "earth: N top + o90 (e_ship.jpg, z_ship.jpg, oc_ship_o90.jpg), the 大浦 shipyard (宮城県造船鉄工 in OSM): a bare gravel yard with slipway rails, cranes and stacked steel, not a sand beach"
   },
   {
-   "use": "plaza",
+   "use": "apron",
    "ring": [
     [
      1125,
@@ -602,10 +671,10 @@
      576
     ]
    ],
-   "src": "earth: N + M top (e_shore_E.jpg), the shore behind the new seawall is a flat concrete apron (pale grey) with parked cars and fishing gear, not a sand beach and lawn"
+   "src": "earth: N + M top (e_shore_E.jpg), the shore behind the new seawall is a flat concrete apron (pale grey) with parked cars and fishing gear, not a sand beach and lawn [r2] use plaza -> apron: Earth median #7c767e (land2 lustats_top), grey concrete, not cream"
   },
   {
-   "use": "plaza",
+   "use": "apron",
    "ring": [
     [
      1125,
@@ -648,10 +717,10 @@
      680
     ]
    ],
-   "src": "earth: M top (e_shore_E.jpg, e_a.jpg) + o90, the paved fishing-port apron around the shore houses (concrete, then asphalt to the south), not sand"
+   "src": "earth: M top (e_shore_E.jpg, e_a.jpg) + o90, the paved fishing-port apron around the shore houses (concrete, then asphalt to the south), not sand [r2] use plaza -> apron: Earth median #72717b (land2 lustats_top), grey concrete / asphalt, not cream"
   },
   {
-   "use": "plaza",
+   "use": "apron",
    "ring": [
     [
      1100,
@@ -694,29 +763,29 @@
      780
     ]
    ],
-   "src": "earth: M top (z_b.jpg, oc_s_o90.jpg), the 大浦 port apron south of the shrine is a large paved yard inside the seawall, not a beach"
+   "src": "earth: M top (z_b.jpg, oc_s_o90.jpg), the 大浦 port apron south of the shrine is a large paved yard inside the seawall, not a beach [r2] use plaza -> apron: Earth median #6b6c77 (land2 lustats_top), grey asphalt, not cream"
   },
   {
-   "use": "plaza",
+   "use": "levee",
    "ring": [
     [
-     1099,
+     1105.2,
      798
     ],
     [
-     1110,
+     1110.7,
      798
     ],
     [
-     1110,
+     1107.2,
      937
     ],
     [
-     1099,
+     1101.7,
      937
     ]
    ],
-   "src": "earth: S top (e_b.jpg) + o90, the long concrete pier (boats moored along it), not a grassy strip; GSI photo agrees"
+   "src": "earth: S top (e_b.jpg) + o90, the long concrete pier (boats moored along it), not a grassy strip; GSI photo agrees. [r2] the old ring was 11 m wide; the pier is about 5.5 m wide and leans west by about 3.5 m over its length (c12/land2 top, traced x 1105.2..1110.7 at z 798 and 1101.7..1107.2 at z 937). The old Earth sample (#7b7b81) was water-contaminated; the centre strip of the traced pier has median #a49e9f (pale grey concrete), so use plaza -> levee (grey concrete look, not the cream plaza)"
   },
   {
    "use": "vacant",
@@ -763,6 +832,65 @@
    "id": "r14213",
    "remove": true,
    "src": "earth: N + M top (e_shore_E.jpg), no path loops over the new concrete apron west of 大島浪板線; the GSI alley is the pre-seawall shore path"
+  },
+  {
+   "id": "r14211",
+   "width": 14,
+   "pts": [
+    [
+     1213,
+     412
+    ],
+    [
+     1219.5,
+     420
+    ],
+    [
+     1222.8,
+     430
+    ],
+    [
+     1222.5,
+     440
+    ],
+    [
+     1220.8,
+     455
+    ],
+    [
+     1217.3,
+     470
+    ],
+    [
+     1213.7,
+     487
+    ],
+    [
+     1210.3,
+     500
+    ],
+    [
+     1203.3,
+     515
+    ],
+    [
+     1194.4,
+     530
+    ],
+    [
+     1187.2,
+     540
+    ],
+    [
+     1178,
+     552
+    ],
+    [
+     1169,
+     560
+    ]
+   ],
+   "src": "earth: c12/N top (2026-03-11), the shore road was rebuilt about 7 to 10 m east of the GSI centre line (GSI z18 photo shows the old road at x about 1211 at z 470); centre line (the dashed white line) re-measured on the 14 px/m ortho within 1 m"
   }
  ]
 }

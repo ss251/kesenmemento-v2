@@ -13,17 +13,24 @@ import { join } from "node:path";
 import { polyArea, alongPolyline, polylineLength } from "../derive.js";
 
 export const OVERRIDE_VERSION = 1;
-export const LOT_KINDS = ["house", "apartment", "shop", "office", "hotel", "public", "school", "warehouse", "factory", "temple", "shrine"];
+export const LOT_KINDS = ["house", "apartment", "shop", "office", "hotel", "public", "school", "warehouse", "carpark", "factory", "temple", "shrine"];
 export const ROOF_SHAPES = ["flat", "gable", "hip", "shed", "saw"];
 /** facade styles understood by the mid / far builders (src/anime/world/town/facade.js STYLE) */
-export const FACADES = ["house", "apartment", "office", "shop", "warehouse", "plain", "public"];
+export const FACADES = ["house", "apartment", "office", "shop", "warehouse", "plain", "public", "ribbon"];
 export const ROAD_KINDS = ["national", "prefectural", "city", "alley", "bridge"];
 /** landuse use -> the layout class drawn by town/landuse.js (LOOK) and the map (explore/basemap.js) */
-export const LANDUSE_USES = { parking: "parking", vacant: "gravel", park: "park", plaza: "plaza", apron: "apron", forest: "forest", cedar: "cedar", felled: "felled" };   // [v5] apron: plain asphalt (a quay or yard), no stall lines or cars; [v5:fix2] forest / cedar: mixed or 杉 woods (land cover + trees), felled: a clear-cut strip (bare brown, no trees)
+export const LANDUSE_USES = { parking: "parking", vacant: "gravel", park: "park", plaza: "plaza", apron: "apron", levee: "levee", forest: "forest", cedar: "cedar", felled: "felled" };   // [v5] apron: plain asphalt (a quay or yard), no stall lines or cars; [v5:fix2] forest / cedar: mixed or 杉 woods (land cover + trees), felled: a clear-cut strip (bare brown, no trees)
 /** [v5:fix2] uses drawn as land cover (scripts/anime/build-landcover.js) and trees, not as a draped town surface */
 export const COVER_USES = ["forest", "cedar", "felled"];
-export const VACANT_SURFACES = ["gravel", "weeds"];
-export const PROP_TYPES = ["vending", "bike", "tree", "bench", "bollard"];
+export const VACANT_SURFACES = ["gravel", "weeds", "grave"];   // [v6:c5r3] grave: a hillside grave terrace (dark brown-tan ground with rows of stones)
+export const PROP_TYPES = ["vending", "bike", "tree", "bench", "bollard", "busStop", "brtStop"];   // [sys:17] busStop: a city bus stop (pole, plate, timetable, shelter with `shelter`); brtStop: a BRT station (JR panel totem, bench, platform)
+/** [sys:8] roof.pv: the share of a flat roof under solar modules (0..1), or { share, side } with side one of these (the band they cover) */
+export const ARROW_KINDS = ["S", "L", "R", "SL", "SR"];   // [sys:18]
+export const PV_SIDES = ["n", "s", "e", "w", "all"];
+/** [r2:5] roof.plant: rooftop plant read from the Earth top view, drawn exactly as listed by town/mid.js, blocks.js and industrial.js (the random roof boxes are skipped for a lot that has a spec).
+ *  A rect in LOT-LOCAL metres: x along the frontage, z toward the street, the origin at the lot's oriented-box centre; h above the roof deck. (town/roofplant.js PLANT_KINDS is the same list.) */
+export const PLANT_KINDS = ["penthouse", "duct", "condenser-row", "pv"];
+export const MAX_PLANT = 40;
 /** [v6:c7] road-patch `markings.centre` (town/streets.js markCentre): the centre marking drawn on a road */
 export const ROAD_CENTRES = ["white-solid", "white-dashed", "yellow", "hatched-median"];
 /** how far (m) a coordinate may lie outside its cell's bbox */
@@ -64,9 +71,39 @@ export function validateOverride(doc, file = "inline.json") {
     r.forEach((p, i) => inCell(p, `${path}[${i}]`));
     if (min >= 3 && r.every((p) => pt(p, path)) && Math.abs(polyArea(r)) < 1) E(path, "has no area");
   };
+  const plant = (a, path) => {   // [r2:5] [{ x, z, w, d, h, kind }] in lot-local metres
+    if (!Array.isArray(a) || a.length < 1 || a.length > MAX_PLANT) { E(path, `must be a list of 1 to ${MAX_PLANT} rects { x, z, w, d, h, kind }`); return; }
+    a.forEach((q, i) => {
+      const p = `${path}[${i}]`;
+      if (typeof q !== "object" || !q || Array.isArray(q)) { E(p, "must be { x, z, w, d, h, kind }"); return; }
+      allowed(q, p, ["x", "z", "w", "d", "h", "kind"]);
+      num(q.x, p + ".x", -150, 150); num(q.z, p + ".z", -150, 150); num(q.w, p + ".w", 0.3, 120); num(q.d, p + ".d", 0.3, 120); num(q.h, p + ".h", 0.1, 12);
+      oneOf(q.kind, p + ".kind", PLANT_KINDS);
+    });
+  };
   const roof = (o, path) => {
     if (typeof o !== "object" || !o || Array.isArray(o)) { E(path, "must be an object { shape, color, ridge }"); return; }
-    allowed(o, path, ["shape", "color", "ridge"]);
+    allowed(o, path, ["shape", "color", "ridge", "pv", "plant"]);
+    if (o.plant != null) plant(o.plant, path + ".plant");   // [r2:5]
+    if (o.pv != null) {   // [sys:8] solar modules on a flat roof: a share 0..1, or { share, side }
+      if (typeof o.pv === "number") num(o.pv, path + ".pv", 0, 1);
+      else if (o.pv && typeof o.pv === "object" && !Array.isArray(o.pv)) {
+        allowed(o.pv, path + ".pv", ["share", "side", "flush", "rects", "ridgeAt"]);
+        if (o.pv.flush != null || o.pv.rects != null || o.pv.ridgeAt != null) {   // [r3:5] solar blocks lying in the plane of a PITCHED roof: rects in lot-local metres (like roof.plant), the ridge's measured offset
+          if (o.pv.flush !== true) E(path + ".pv.flush", "must be true when rects / ridgeAt are given (modules flush on a pitched roof)");
+          if (!Array.isArray(o.pv.rects) || o.pv.rects.length < 1 || o.pv.rects.length > MAX_PLANT) E(path + ".pv.rects", `must list 1 to ${MAX_PLANT} blocks { x, z, w, d } in lot-local metres`);
+          else o.pv.rects.forEach((q, i) => {
+            const p = `${path}.pv.rects[${i}]`;
+            if (typeof q !== "object" || !q || Array.isArray(q)) { E(p, "must be { x, z, w, d }"); return; }
+            allowed(q, p, ["x", "z", "w", "d"]);
+            num(q.x, p + ".x", -150, 150); num(q.z, p + ".z", -150, 150); num(q.w, p + ".w", 0.8, 120); num(q.d, p + ".d", 0.8, 120);
+          });
+          if (o.pv.ridgeAt != null) num(o.pv.ridgeAt, path + ".pv.ridgeAt", -30, 30);
+          if (o.pv.share != null || o.pv.side != null) E(path + ".pv", "flush blocks take no share / side (the rects are the modules)");
+        } else { num(o.pv.share, path + ".pv.share", 0, 1); if (o.pv.side != null) oneOf(o.pv.side, path + ".pv.side", PV_SIDES); }
+      }
+      else E(path + ".pv", "must be a number 0..1, { share: 0..1, side: n|s|e|w|all } or { flush: true, rects: [{ x, z, w, d }], ridgeAt? }");
+    }
     if (o.shape != null) oneOf(o.shape, path + ".shape", ROOF_SHAPES);
     if (o.color != null && !HEX.test(o.color)) E(path + ".color", "must be #rrggbb");
     if (o.ridge != null && o.ridge !== "x" && o.ridge !== "z") E(path + ".ridge", 'must be "x" (along the frontage) or "z" (front to back)');
@@ -82,7 +119,7 @@ export function validateOverride(doc, file = "inline.json") {
     if (o.facade != null) oneOf(o.facade, path + ".facade", FACADES);
   };
   if (!doc || typeof doc !== "object" || Array.isArray(doc)) throw new OvError(`${file}: the document must be a JSON object`);
-  allowed(doc, "", ["version", "cell", "bbox", "note", "sources", "lots", "newLots", "landuse", "roads", "props"]);
+  allowed(doc, "", ["version", "cell", "bbox", "note", "sources", "lots", "newLots", "landuse", "roads", "props", "crossings", "arrows"]);
   if (doc.version !== OVERRIDE_VERSION) E(".version", `must be ${OVERRIDE_VERSION}`);
   if (typeof doc.cell !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(doc.cell)) E(".cell", "must be a lower-case id (a-z, 0-9, -)");
   if (!bb) E(".bbox", "must be [x0, z0, x1, z1] in ENU metres");
@@ -104,8 +141,10 @@ export function validateOverride(doc, file = "inline.json") {
   list("lots").forEach((o, i) => {
     const p = `.lots[${i}]`;
     if (!o || typeof o !== "object") { E(p, "must be an object"); return; }
-    allowed(o, p, ["id", "remove", "kind", "storeys", "height", "roof", "wall", "name", "nameEn", "facade", "src"]);
+    allowed(o, p, ["id", "remove", "kind", "storeys", "height", "roof", "wall", "name", "nameEn", "unname", "facade", "src"]);
     str(o.id, p + ".id", 60); cite(o, p);
+    if (o.unname != null && o.unname !== true) E(p + ".unname", "must be true when present");   // [v6:c5r2] clears the lot's name (a GSI / OSM name snapped to the wrong building)
+    if (o.unname && (o.name != null || o.nameEn != null)) E(p, "unname cannot be combined with name or nameEn");
     if (o.remove != null && o.remove !== true) E(p + ".remove", "must be true when present");
     if (o.remove && Object.keys(o).some((k) => !["id", "remove", "src"].includes(k))) E(p, "a remove takes only id and src");
     if (!o.remove && !Object.keys(o).some((k) => !["id", "src"].includes(k))) E(p, "changes nothing");
@@ -128,12 +167,14 @@ export function validateOverride(doc, file = "inline.json") {
   list("landuse").forEach((o, i) => {
     const p = `.landuse[${i}]`;
     if (!o || typeof o !== "object") { E(p, "must be an object"); return; }
-    allowed(o, p, ["use", "ring", "holes", "name", "surface", "replace", "fill", "src"]);
+    allowed(o, p, ["use", "ring", "holes", "name", "surface", "replace", "fill", "color", "src"]);
     oneOf(o.use, p + ".use", Object.keys(LANDUSE_USES)); cite(o, p); ring(o.ring, p + ".ring");
     if (o.holes != null) { if (!Array.isArray(o.holes)) E(p + ".holes", "must be a list of rings"); else o.holes.forEach((h, j) => ring(h, `${p}.holes[${j}]`)); }
     if (o.name != null) str(o.name, p + ".name");
     if (o.surface != null) { if (o.use !== "vacant") E(p + ".surface", "only for use vacant"); else oneOf(o.surface, p + ".surface", VACANT_SURFACES); }
     if (o.replace != null && typeof o.replace !== "boolean") E(p + ".replace", "must be true or false");
+    // [v6:c5r3] the swatch of this polygon (the class colour is the default): Earth's mean colour differs by up to 10 L* between grave terraces of one hill
+    if (o.color != null && !(typeof o.color === "string" && /^#[0-9a-fA-F]{6}$/.test(o.color))) E(p + ".color", "must be #rrggbb");
     // [v5:fix2] the share of a car park's stalls that hold a car, counted on the newest imagery (default 0.2)
     if (o.fill != null) { if (o.use !== "parking") E(p + ".fill", "only for use parking"); else if (typeof o.fill !== "number" || !(o.fill >= 0 && o.fill <= 1)) E(p + ".fill", "must be a number from 0 to 1"); }
   });
@@ -177,6 +218,31 @@ export function validateOverride(doc, file = "inline.json") {
     if (o.face != null) num(o.face, p + ".face", -360, 360);
     if (o.y != null) num(o.y, p + ".y", -5, 300);
   });
+  // [sys:14] pedestrian crossings read from the newest imagery: { at: [x, z], road: "r123", remove?: true, width?, diamonds?, src }
+  // remove: no zebra / stop line / crossing sign is painted on that hero arm (streets.js); otherwise a zebra is painted at `at`
+  list("crossings").forEach((o, i) => {
+    const p = `.crossings[${i}]`;
+    if (!o || typeof o !== "object") { E(p, "must be an object"); return; }
+    allowed(o, p, ["at", "road", "remove", "width", "diamonds", "zebraAt", "src"]);
+    cite(o, p); inCell(o.at, p + ".at");
+    if (typeof o.road !== "string" || !/^r\d+$/.test(o.road)) E(p + ".road", 'must be a layout road id ("r123")');
+    if (o.remove != null && o.remove !== true) E(p + ".remove", "must be true when present");
+    if (o.width != null) { num(o.width, p + ".width", 2, 12); if (o.remove) E(p + ".width", "not with remove"); }
+    if (o.diamonds != null && typeof o.diamonds !== "boolean") E(p + ".diamonds", "must be true or false");
+    // [r3:8] zebraAt: the real zebra of a hero junction arm sits `zebraAt` m from the node (centre; `at` = its real position, which picks the arm); streets.js moves the
+    // arm's zebra and its stop line there instead of the default R + 3.2 (nothing is removed)
+    if (o.zebraAt != null) { num(o.zebraAt, p + ".zebraAt", 4, 80); if (o.remove || o.width != null || o.diamonds) E(p + ".zebraAt", "not with remove, width or diamonds"); }
+  });
+  // [sys:18] lane-direction arrows (進行方向別通行区分) on one approach to a node: { road, node: [x, z], lanes: ['S', 'L', ...], src }, the lanes from the
+  // driver's left to right ('S' straight, 'L' / 'R' turn, 'SL' / 'SR' straight or turn): painted 5 m behind the stop line and once more 30 m back
+  list("arrows").forEach((o, i) => {
+    const p = `.arrows[${i}]`;
+    if (!o || typeof o !== "object") { E(p, "must be an object"); return; }
+    allowed(o, p, ["road", "node", "lanes", "src"]);
+    cite(o, p); inCell(o.node, p + ".node");
+    if (typeof o.road !== "string" || !/^r\d+$/.test(o.road)) E(p + ".road", 'must be a layout road id ("r123")');
+    if (!Array.isArray(o.lanes) || o.lanes.length < 1 || o.lanes.length > 4 || !o.lanes.every((k) => ARROW_KINDS.includes(k))) E(p + ".lanes", `must list 1 to 4 lanes, each one of ${ARROW_KINDS.join(", ")}`);
+  });
   if (errs.length) throw new OvError(`invalid override file:\n  ${errs.join("\n  ")}`);
   return { file, ...doc };
 }
@@ -187,7 +253,7 @@ export function validateOverride(doc, file = "inline.json") {
  * Each op carries `ref` ("<file>#<section>/<index>") and `why` (its src). A new lot or road id used twice is an error.
  */
 export function compileOverrides(docs) {
-  const C = { files: docs.map((d) => d.file), lotPatch: new Map(), newLots: [], landuse: [], roadPatch: new Map(), newRoads: [], props: [], meta: [] };
+  const C = { files: docs.map((d) => d.file), lotPatch: new Map(), newLots: [], landuse: [], roadPatch: new Map(), newRoads: [], props: [], crossings: [], arrows: [], meta: [] };
   const seen = new Set();
   const push = (m, id, op) => { let l = m.get(id); if (!l) m.set(id, (l = [])); l.push(op); };
   for (const d of docs) {
@@ -200,8 +266,10 @@ export function compileOverrides(docs) {
       else push(C.roadPatch, o.id, tag("roads", i, o));
     });
     (d.props || []).forEach((o, i) => C.props.push(tag("props", i, o)));
+    (d.crossings || []).forEach((o, i) => C.crossings.push(tag("crossings", i, o)));
+    (d.arrows || []).forEach((o, i) => C.arrows.push(tag("arrows", i, o)));
     C.meta.push({ file: d.file, cell: d.cell, bbox: d.bbox, sources: d.sources, note: d.note ?? null,
-      counts: { lots: (d.lots || []).length, newLots: (d.newLots || []).length, landuse: (d.landuse || []).length, roads: (d.roads || []).length, props: (d.props || []).length } });
+      counts: { lots: (d.lots || []).length, newLots: (d.newLots || []).length, landuse: (d.landuse || []).length, roads: (d.roads || []).length, props: (d.props || []).length, crossings: (d.crossings || []).length, arrows: (d.arrows || []).length } });
   }
   return C;
 }
@@ -235,16 +303,26 @@ export function patchLot(lot, ops, classify = null) {
       if (classify && o.roof?.shape == null && lot.roof && derivedRoof) { lot.roof.shape = classify(o.kind).roofShape; delete lot.roof.ridge; src.roof = "override"; }
     } else if (o.kind != null) src.kind = "override";
     if (o.storeys != null) { lot.storeys = o.storeys; src.h = "override"; if (o.height == null) lot.height = r1(o.storeys * (STOREY_H[lot.kind] || 3)); }
-    if (o.height != null) { lot.height = r1(o.height); src.h = "override"; if (o.storeys == null) lot.storeys = Math.max(1, Math.round(o.height / (STOREY_H[lot.kind] || 3))); }
+    if (o.height != null) { lot.height = r1(o.height); src.h = "override"; if (o.storeys == null) lot.storeys = Math.max(1, Math.floor(o.height / (STOREY_H[lot.kind] || 3) + 0.25)); }   // [sys:29] a 4.8 m store is 1 storey (it rounded to 2)
     if (o.roof) {
       lot.roof ||= {};
       if (o.roof.shape != null) { lot.roof.shape = o.roof.shape; src.roof = "override"; if (o.roof.shape === "flat" || o.roof.shape === "shed") delete lot.roof.ridge; }
       if (o.roof.color != null) { lot.roof.color = o.roof.color.toLowerCase(); delete lot.roof.photo; src.color = "override"; }
       if (o.roof.ridge != null) { lot.roof.ridge = o.roof.ridge; src.roof = "override"; }
+      if (o.roof.plant != null) { lot.roof.plant = o.roof.plant.map((q) => ({ x: r1(q.x), z: r1(q.z), w: r1(q.w), d: r1(q.d), h: r1(q.h), kind: q.kind })); src.plant = "override"; }   // [r2:5]
+      if (o.roof.pv != null) {   // [sys:8] [r3:5]
+        lot.roof.pv = typeof o.roof.pv === "number" ? { share: o.roof.pv, side: "all" }
+          : o.roof.pv.flush ? { flush: true, rects: o.roof.pv.rects.map((q) => ({ x: r1(q.x), z: r1(q.z), w: r1(q.w), d: r1(q.d) })), ...(o.roof.pv.ridgeAt != null ? { ridgeAt: r1(o.roof.pv.ridgeAt) } : {}) }
+          : { share: o.roof.pv.share, side: o.roof.pv.side || "all" };
+        src.pv = "override";
+      }
     }
     if (o.wall != null) { lot.wall = o.wall.toLowerCase(); src.wall = "override"; }
     if (o.name != null) { lot.name = o.name; src.name = "override"; if (o.nameEn == null) delete lot.nameEn; }
     if (o.nameEn != null) lot.nameEn = o.nameEn;
+    // [v6:c5r2] unname: the name came from a record snapped to the wrong building (the GSI facility 観音寺 sat on a 120 m2 house): the lot
+    // loses it. build-layout.js extras() then drops the facility / POI place that carried that name for this lot.
+    if (o.unname) { delete lot.name; delete lot.nameEn; src.name = "override"; }
     if (o.facade != null) lot.facade = o.facade;
     src.ovr = src.ovr ? src.ovr + " + " + o.ref : o.ref;
     src.ovrWhy = src.ovrWhy ? src.ovrWhy + " + " + o.why : o.why;
@@ -253,7 +331,7 @@ export function patchLot(lot, ops, classify = null) {
   return n;
 }
 /** Storey height by kind (m): fold.js STOREY. */
-const STOREY_H = { house: 2.9, shop: 3.0, apartment: 2.9, office: 3.3, hotel: 3.1, public: 3.5, school: 3.6, temple: 5.5, shrine: 4.5, warehouse: 4.5, factory: 4.5, landmark: 3.5 };
+const STOREY_H = { house: 2.9, shop: 3.0, apartment: 2.9, office: 3.3, hotel: 3.1, public: 3.5, school: 3.6, temple: 5.5, shrine: 4.5, warehouse: 4.5, carpark: 2.8, factory: 4.5, landmark: 3.5 };
 
 /** Every lot patch must have found its lot: -> the ids that were never seen (the build fails on them). */
 export function unusedLotPatches(C, seenIds) { return [...C.lotPatch.keys()].filter((id) => !seenIds.has(id)); }
@@ -310,7 +388,7 @@ export function applyLanduseOverrides(landuse, C) {
   for (const o of C.landuse) {
     if (o.replace) { const n = out.length; out = out.filter((l) => { const c = centroidOf(l.ring); return !inRing(c[0], c[1], o.ring); }); replaced += n - out.length; }
     const cls = o.use === "vacant" ? (o.surface || "gravel") : LANDUSE_USES[o.use];
-    out.push({ cls, type: "override:" + o.use, name: o.name ?? null, ring: o.ring.map((p) => [r1(p[0]), r1(p[1])]), holes: (o.holes || []).map((h) => h.map((p) => [r1(p[0]), r1(p[1])])), area: Math.round(Math.abs(polyArea(o.ring))), ...(o.fill != null ? { fill: o.fill } : {}), src: "override", ovr: o.ref, ovrWhy: o.why });
+    out.push({ cls, type: "override:" + o.use, name: o.name ?? null, ring: o.ring.map((p) => [r1(p[0]), r1(p[1])]), holes: (o.holes || []).map((h) => h.map((p) => [r1(p[0]), r1(p[1])])), area: Math.round(Math.abs(polyArea(o.ring))), ...(o.fill != null ? { fill: o.fill } : {}), ...(o.color != null ? { col: o.color.toLowerCase() } : {}), src: "override", ovr: o.ref, ovrWhy: o.why });
   }
   return { landuse: out, replaced };
 }
@@ -320,4 +398,16 @@ export function applyLanduseOverrides(landuse, C) {
  *  default; 90 east); `y` the height of the surface it stands on (T.P. m) where that is not the terrain (a deck, a seawall). */
 export function propPlacements(C) {
   return C.props.map((o) => ({ type: o.type, x: r1(o.at[0]), z: r1(o.at[1]), rotY: r3(Math.PI - ((o.face ?? 0) * Math.PI) / 180), ...(o.y != null ? { y: r1(o.y) } : {}), ovr: o.ref }));
+}
+
+// ------------------------------------------------------------------ crossings
+/** [sys:14] -> { zebras: [{ x, z, road, width?, diamonds?, ovr }], removed: [{ x, z, road, ovr }], moved: [{ x, z, road, zebraAt, ovr }] } for the layout (L.CROSSING_OVR). */
+export function crossingOverrides(C) {
+  const out = { zebras: [], removed: [], moved: [], arrows: C.arrows.map((o) => ({ road: o.road, node: [r1(o.node[0]), r1(o.node[1])], lanes: o.lanes.slice(), ovr: o.ref })) };
+  for (const o of C.crossings) {
+    if (o.remove) out.removed.push({ x: r1(o.at[0]), z: r1(o.at[1]), road: o.road, ovr: o.ref });
+    else if (o.zebraAt != null) out.moved.push({ x: r1(o.at[0]), z: r1(o.at[1]), road: o.road, zebraAt: r1(o.zebraAt), ovr: o.ref });
+    else out.zebras.push({ x: r1(o.at[0]), z: r1(o.at[1]), road: o.road, ...(o.width != null ? { width: r1(o.width) } : {}), ...(o.diamonds ? { diamonds: true } : {}), ovr: o.ref });
+  }
+  return out;
 }

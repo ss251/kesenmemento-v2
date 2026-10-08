@@ -6,7 +6,13 @@
 // Merged per 450 m chunk and per material (4 draw calls per chunk), kept out of the core batcher (custom attributes).
 import * as THREE from 'three';
 import { facadeMaterial, STYLE } from './facade.js';
-import { pick } from './common.js';
+import { pick, roofShapeAt, shedDirOf } from './common.js';
+import { walllessOf, openShedPlan, SHED } from './openshed.js';   // [r2:4]
+import { LOT_TOWER, towerLocal } from './signtower.js';   // [r2:12]
+import { flatPaint } from './flatroof.js';   // [r2:3]
+import { hasPlant, plantBoxes, plantPvRects, rectRing } from './roofplant.js';   // [r2:5]
+import { planPv, PV, PVF, isFlushPv, pvRectToRoof, flushPvBlocks } from './pv.js';   // [sys:8] [r3:5]
+import { carparkPlan, CARPARK } from './carpark.js';   // [v6:c6r3]
 import { wallOf, pitchedRoofOf, flatRoofOf, kawaraColour } from './palette.js';
 import earcut from 'earcut';
 import { wings, outerSides, bodyOf, localPoly, simplifyRing, insetRing, ccw, inRing } from './wings.js';   // [v4:town-accuracy]
@@ -36,7 +42,7 @@ class Buf {
     for (let t = 0; t < idx.length; t += 3) { if (flip) this.i.push(k + idx[t], k + idx[t + 2], k + idx[t + 1]); else this.i.push(k + idx[t], k + idx[t + 1], k + idx[t + 2]); }
   }
   /** axis box in a local frame fn(lx, y, lz) -> world [x,y,z]; nfn(lx,lz) -> world normal */
-  box(Tf, cx, y0, cz, w, h, d, col, uvS = 1) {
+  box(Tf, cx, y0, cz, w, h, d, col, uvS = 1, noTop = false) {
     const x0 = cx - w / 2, x1 = cx + w / 2, z0 = cz - d / 2, z1 = cz + d / 2, y1 = y0 + h;
     const P = (x, y, z) => Tf.p(x, y, z), N = (x, y, z) => Tf.n(x, y, z);
     const uvq = (a, b) => [[0, 0], [a / uvS, 0], [a / uvS, b / uvS], [0, b / uvS]];
@@ -44,7 +50,7 @@ class Buf {
     this.quad([P(x1, y0, z0), P(x0, y0, z0), P(x0, y1, z0), P(x1, y1, z0)], N(0, 0, -1), uvq(w, h), col);
     this.quad([P(x1, y0, z1), P(x1, y0, z0), P(x1, y1, z0), P(x1, y1, z1)], N(1, 0, 0), uvq(d, h), col);
     this.quad([P(x0, y0, z0), P(x0, y0, z1), P(x0, y1, z1), P(x0, y1, z0)], N(-1, 0, 0), uvq(d, h), col);
-    this.quad([P(x0, y1, z1), P(x1, y1, z1), P(x1, y1, z0), P(x0, y1, z0)], N(0, 1, 0), uvq(w, d), col);
+    if (!noTop) this.quad([P(x0, y1, z1), P(x1, y1, z1), P(x1, y1, z0), P(x0, y1, z0)], N(0, 1, 0), uvq(w, d), col);
   }
   mesh(mat) {
     if (!this.vc) return null;
@@ -70,9 +76,80 @@ function frameOf(o) {
   };
 }
 
+/** [r2:4] a wall-less shed (GSI 3111 / 3112): a thin mono-pitch roof slab on steel posts, no walls (openshed.js plans it). The edges and the underside
+ *  go to the vertex-colour buffer, the top face to the roof one. Normals point away from the slab's centre. */
+function openShed(c, F, lot, o, fy, g0, rc, ec, h) {
+  const sp = openShedPlan(o.w, o.d, h, shedDirOf(lot));
+  const P = (a, y, b) => (sp.alongX ? F.p(a, y, b) : F.p(b, y, a));
+  const A = sp.L / 2, B = sp.D / 2, sd = sp.sd, yl = fy + sp.yLow, yh = fy + sp.yHigh, t = sp.t;
+  const top = [P(-A, yl, sd * B), P(A, yl, sd * B), P(A, yh, -sd * B), P(-A, yh, -sd * B)], bot = top.map((q) => [q[0], q[1] - t, q[2]]);
+  const mid = [0, 1, 2].map((k) => (top[0][k] + top[2][k] + bot[0][k] + bot[2][k]) / 4);
+  const face = (buf, ps, col, uvs) => {
+    const e1 = [ps[1][0] - ps[0][0], ps[1][1] - ps[0][1], ps[1][2] - ps[0][2]], e2 = [ps[2][0] - ps[0][0], ps[2][1] - ps[0][1], ps[2][2] - ps[0][2]];
+    let n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+    const l = Math.hypot(...n) || 1; n = n.map((v) => v / l);
+    const q = [0, 1, 2].map((k) => (ps[0][k] + ps[2][k]) / 2);
+    if (n[0] * (q[0] - mid[0]) + n[1] * (q[1] - mid[1]) + n[2] * (q[2] - mid[2]) < 0) n = n.map((v) => -v);
+    buf.quad(ps, n, uvs, col);
+  };
+  const U = [[0, 0], [1, 0], [1, 1], [0, 1]];
+  face(c.met, top, rc, [[0, 0], [sp.L, 0], [sp.L, sp.D], [0, sp.D]]);
+  face(c.ext, [bot[3], bot[2], bot[1], bot[0]], ec.set('#9aa0a6'), U);
+  for (let k = 0; k < 4; k++) { const k2 = (k + 1) % 4; face(c.ext, [bot[k], bot[k2], top[k2], top[k]], ec.set('#e9e4d8'), U); }
+  // posts: square steel, from the lowest terrain of the footprint up to the underside of the slab
+  const TF = { p: (lx, y, lz) => F.p(lx, y, lz), n: F.n }, post = ec.set(SHED.post0).clone();
+  for (const q of sp.posts) { const [lx, lz] = sp.alongX ? [q.a, q.b] : [q.b, q.a]; c.ext.box(TF, lx, g0, lz, SHED.post, fy + q.y1 - g0, SHED.post, post, 1, true); }
+}
+
+/** [v6:c6r3] An open multi-storey car park (carpark.js plans it): a plinth where the hill falls away, a floor slab per deck with a fascia and a parapet
+ *  round its edge, columns, and on the top deck the white stall lines and the parked cars. No walls, windows or ribs. Edges, undersides, columns,
+ *  stall lines and cars go to the vertex-colour buffer (c.ext), the top deck's floor too, in the lot's roof colour (the metal-sheet material of c.met would rib it). */
+function drawCarpark(c, F, lot, fy, g0, rc, ec) {
+  const K = CARPARK, P = carparkPlan(lot), ring = P.ring, inner = P.inner, TF = { p: F.p, n: F.n };
+  const U = [[0, 0], [1, 0], [1, 1], [0, 1]];
+  const conc = new THREE.Color(lot.wall), concLo = conc.clone().multiplyScalar(0.8), concHi = conc.clone().multiplyScalar(1.06);
+  const floor = new THREE.Color(K.floorCol), under = new THREE.Color(K.underCol), lineC = new THREE.Color(K.lineCol), glass = new THREE.Color('#3c4150');
+  const earFill = (pts, y, n, buf, col) => {
+    const tri = earcut(pts.flat());
+    for (let k = 0; k < tri.length; k += 3) { const [A, B, C2] = [pts[tri[k]], pts[tri[k + 1]], pts[tri[k + 2]]]; buf.tri([F.p(A[0], y, A[1]), F.p(B[0], y, B[1]), F.p(C2[0], y, C2[1])], n, [[A[0], A[1]], [B[0], B[1]], [C2[0], C2[1]]], col); }
+  };
+  const top = fy + P.top;
+  // the ground deck: the floor on the plinth
+  earFill(ring, fy + 0.02, F.n(0, 1, 0), c.ext, floor);
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i], b = ring[(i + 1) % ring.length], ia = inner[i], ib = inner[(i + 1) % ring.length], ex = b[0] - a[0], ez = b[1] - a[1], le = Math.hypot(ex, ez) || 1;
+    const n = [ez / le, -ex / le], fn = F.n(n[0], 0, n[1]), fi = F.n(-n[0], 0, -n[1]);
+    if (fy - g0 > 0.05) c.ext.quad([F.p(a[0], g0, a[1]), F.p(b[0], g0, b[1]), F.p(b[0], fy + 0.02, b[1]), F.p(a[0], fy + 0.02, a[1])], fn, U, concLo);   // the retaining plinth
+    for (const d of P.decks) {
+      const y = fy + d.y;
+      c.ext.quad([F.p(a[0], y - K.slab, a[1]), F.p(b[0], y - K.slab, b[1]), F.p(b[0], y + K.parapet, b[1]), F.p(a[0], y + K.parapet, a[1])], fn, U, conc);   // fascia + spandrel
+      c.ext.quad([F.p(ib[0], y + 0.05, ib[1]), F.p(ia[0], y + 0.05, ia[1]), F.p(ia[0], y + K.parapet, ia[1]), F.p(ib[0], y + K.parapet, ib[1])], fi, U, concLo);   // the parapet's inner face
+      c.ext.quad([F.p(a[0], y + K.parapet, a[1]), F.p(b[0], y + K.parapet, b[1]), F.p(ib[0], y + K.parapet, ib[1]), F.p(ia[0], y + K.parapet, ia[1])], F.n(0, 1, 0), U, concHi);   // the cap
+    }
+  }
+  for (const d of P.decks) {
+    const y = fy + d.y;
+    earFill(ring, y - K.slab, F.n(0, -1, 0), c.ext, under);   // the underside the lower deck looks up at
+    if (d.k === P.n) earFill(inner, y + 0.05, F.n(0, 1, 0), c.ext, rc);   // the top deck: the lot's roof colour as paint (flat, no metal-sheet ribs)
+    else earFill(inner, y + 0.05, F.n(0, 1, 0), c.ext, floor);
+  }
+  for (const [x, z] of P.columns) c.ext.box(TF, x, fy, z, K.column, top - K.slab - fy, K.column, conc, 1, true);
+  const ly = top + 0.085;
+  for (const l of P.lines) c.ext.quad([F.p(l.cx - l.w / 2, ly, l.cz + l.d / 2), F.p(l.cx + l.w / 2, ly, l.cz + l.d / 2), F.p(l.cx + l.w / 2, ly, l.cz - l.d / 2), F.p(l.cx - l.w / 2, ly, l.cz - l.d / 2)], F.n(0, 1, 0), U, lineC);
+  for (const car of P.cars) {
+    const body = new THREE.Color(car.color), alongZ = car.nose[1] !== 0, y0 = top + 0.2;
+    c.ext.box(TF, car.cx, y0, car.cz, car.w, 0.55, car.d, body);
+    const cw = alongZ ? car.w * 0.9 : car.w * 0.5, cd = alongZ ? car.d * 0.5 : car.d * 0.9;   // the cabin sits a little behind the middle
+    const ox = car.cx - car.nose[0] * 0.3, oz = car.cz - car.nose[1] * 0.3;
+    c.ext.box(TF, ox, y0 + 0.55, oz, cw, 0.45, cd, glass, 1, true);
+    c.ext.box(TF, ox, y0 + 1.0, oz, cw * 0.96, 0.07, cd * 0.96, body);
+  }
+}
+
 export function styleOf(lot, main) {
   if (lot.facade && STYLE[lot.facade] != null) return STYLE[lot.facade];   // [v4:overrides] a facade style read from the imagery
   const k = lot.kind;
+  if (k === 'carpark') return STYLE.plain;   // [v6:c6r3] an open deck: no ribs or windows (mid draws it in drawCarpark; far shows a plain box)
   if (k === 'warehouse' || k === 'factory') return STYLE.warehouse;
   if (k === 'apartment') return STYLE.apartment;
   if (k === 'office' || k === 'hotel') return STYLE.office;   // [v4:polish1] hotel: a block of room windows
@@ -84,7 +161,7 @@ export function styleOf(lot, main) {
 export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Set(), annex = null, names = null } = {}) {
   const L = ctx.L;
   const facade = facadeMaterial(ctx);
-  const kawara = H.M.kawara, metal = H.M.metal, vc = ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.05 });
+  const kawara = H.M.kawara, metal = H.M.metal, vc = ctx.mat.toon('#ffffff', { vertexColors: true, paint: 0.05, noDormant: true });   // [r3:7]
   const chunks = new Map();
   const get = (x, z) => {
     const k = Math.floor(x / chunk) + ',' + Math.floor(z / chunk);
@@ -109,28 +186,31 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
     const ax = annex?.get(lot.id), isAnnex = !!ax;   // hero lots: the kit house stands on wing 0, the other wings come here
     const W = isAnnex ? { rects: ax.rects, simple: false } : wings(lot);
     if (!W.rects.length || (isAnnex && ax.rects.length < 2)) continue;
-    // ground: the lowest corner so nothing floats; the body sinks into the slope
-    let gmin = 1e9; for (const [lx, lz] of [[-o.w / 2, -o.d / 2], [o.w / 2, -o.d / 2], [-o.w / 2, o.d / 2], [o.w / 2, o.d / 2], [0, 0]]) { const p = F.p(lx, 0, lz); gmin = Math.min(gmin, L.heightAt(p[0], p[2])); }
-    const g0 = Math.max(gmin, lot.groundY - 1.5) - 0.4, fy = Math.max(lot.groundY, gmin) + 0.1;
+    // [sys:6] ground: the floor is lot.groundY (tmax - height + 0.6, within Pmax of the lowest terrain: build-layout.js) and the
+    // lot's lowest terrain is lot.baseY: where they differ, a concrete plinth / retaining wall fills baseY - 0.3 .. groundY
+    const base0 = Math.min(lot.baseY ?? lot.groundY, lot.groundY);
+    const g0 = base0 - 0.3, fy = lot.groundY + 0.1;
+    const plinth = fy - g0 > 0.75, gw = plinth ? fy - 0.1 : g0;   // gw: where the facade (windows) starts
     const top = fy + h;
     const c = get(o.cx, o.cz);
+    // [v6:c6r3] an open multi-storey car park: decks, parapets, columns, stall lines and cars (OSM building=parking)
+    if (lot.kind === 'carpark' && !isAnnex) { drawCarpark(c, F, lot, fy, g0, rc.set(flatPaint(flatRoofOf(lot))), ec); stats.flat++; n++; continue; }
+    // [r2:4] a wall-less shed is a roof on posts (the lot polygon does not matter: it is under 100 m2)
+    if (walllessOf(lot) && !isAnnex) { openShed(c, F, lot, o, fy, g0, rc.set(pitchedRoofOf(lot)), ec, lot.height || 3.4); stats.shed++; n++; continue; }
     col.set(wallOf(lot));
     const nearSea = isWh && L.shoreDist(o.cx, o.cz) > -90;
     const fac = [style, (lot.seed % 997) / 997, h, nearSea ? 0.4 + r() * 0.6 : 0];
     const u0 = (lot.seed % 13) * 0.37;
     // roof shape (measured shapes are kept, [v4:data])
-    let shape = lot.roof.shape;
-    const measured = lot.src?.roof === 'aerial' || lot.src?.roof === 'osm' || lot.src?.roof === 'landmark' || lot.src?.roof === 'override';   // [v4:overrides]
-    if (!measured && shape === 'shed' && !isWh && r() < 0.55) shape = r() < 0.5 ? 'gable' : 'hip';
-    if (!measured && shape === 'flat' && h < 7.5 && !isWh && lot.area < 220 && r() < 0.6) shape = 'gable';
-    if (isWh && shape === 'hip') shape = 'gable';
+    // [sys:4] the shape is the lot's own (a derived one was resolved once in build-layout.js); only geometry changes it here
+    let shape = roofShapeAt(lot, 'mid', { isWh });
     // [v4:polish1] a big curved or many-sided footprint (too many corners for the rectilinear wings) that fills less than
     // 0.8 of its oriented box is built flat on its true polygon, not as the box (the accuracy audit's t12: curved blocks
     // drawn as boxes)
     const oddBig = !isAnnex && W.simple && W.rect < 0.8 && lot.area >= 250;
     if (oddBig) shape = 'flat';
     const colMeasured = lot.src?.color === 'aerial' || lot.src?.color === 'osm' || lot.src?.color === 'landmark' || lot.src?.color === 'override';   // [v4:overrides]
-    let roofCol = shape === 'flat' ? flatRoofOf(lot) : pitchedRoofOf(lot);
+    let roofCol = shape === 'flat' ? flatPaint(flatRoofOf(lot)) : pitchedRoofOf(lot);   // [r2:3] a flat top renders about 3.5 L* lighter than painted
     if (isWh && shape !== 'flat' && !colMeasured && r() < 0.5) roofCol = pick(r, ['#56677a', '#4a78a0', '#8e4540', '#7b8691', '#6f8f8a']);   // [v4:data] measured colours stay
     rc.set(roofCol);
     // [v4:town-accuracy] 瓦 only where the photo shows a tile colour (grey / charcoal / black / brown); painted metal otherwise
@@ -138,8 +218,10 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
     const RB = useKawara ? c.kaw : c.met;
     stats[shape] = (stats[shape] || 0) + 1;
     const over = isWh ? 0.35 : useKawara ? 0.55 : 0.45;
+    const plinthCol = new THREE.Color('#b7b4aa');
     const faceQuad = (a, b, y0, y1, n, uStart, fcol = col, ffac = fac) => {
       const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (plinth && y0 === gw) c.ext.quad([F.p(a[0], g0, a[1]), F.p(b[0], g0, b[1]), F.p(b[0], gw + 0.02, b[1]), F.p(a[0], gw + 0.02, a[1])], F.n(n[0], 0, n[1]), [[0, 0], [1, 0], [1, 1], [0, 1]], plinthCol);
       c.wall.quad([F.p(a[0], y0, a[1]), F.p(b[0], y0, b[1]), F.p(b[0], y1, b[1]), F.p(a[0], y1, a[1])], F.n(n[0], 0, n[1]), [[uStart, y0 - fy], [uStart + len, y0 - fy], [uStart + len, y1 - fy], [uStart, y1 - fy]], fcol, ffac);
       return len;
     };
@@ -153,7 +235,7 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
         const a = ring[i], b = ring[(i + 1) % ring.length], ex = b[0] - a[0], ez = b[1] - a[1], le = Math.hypot(ex, ez) || 1;
         // outward normal of a counter-clockwise ring in (x, z) (signed area > 0 in this module's convention)
         const n = [ez / le, -ex / le];
-        u += faceQuad(a, b, g0, top + 0.55, n, u);
+        u += faceQuad(a, b, gw, top + 0.55, n, u);
         const ia = inner[i], ib = inner[(i + 1) % ring.length];
         const pc = ec.set(wallOf(lot)).multiplyScalar(0.92);
         c.ext.quad([F.p(ib[0], top + 0.05, ib[1]), F.p(ia[0], top + 0.05, ia[1]), F.p(ia[0], top + 0.55, ia[1]), F.p(ib[0], top + 0.55, ib[1])], F.n(-n[0], 0, -n[1]), [[0, 0], [1, 0], [1, 1], [0, 1]], pc);
@@ -166,20 +248,37 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
         c.met.tri([F.p(A[0], top + 0.05, A[1]), F.p(B[0], top + 0.05, B[1]), F.p(C[0], top + 0.05, C[1])], F.n(0, 1, 0), [[A[0], A[1]], [B[0], B[1]], [C[0], C[1]]], rc);
       }
       const TF = { p: F.p, n: F.n };
-      const nU = Math.min(4, Math.floor(lot.area / 120) + (r() < 0.6 ? 1 : 0));
-      for (let k = 0, tries = 0; k < nU && tries < 20; tries++) {
-        const ux = (r() - 0.5) * (o.w - 3), uz = (r() - 0.5) * (o.d - 3);
-        if (!inRing(ux, uz, inner) || !inRing(ux + 1.1, uz + 1.1, inner) || !inRing(ux - 1.1, uz - 1.1, inner)) continue;
-        k++;
-        if (r() < 0.4 && h > 8) { c.ext.box(TF, ux, top + 0.05, uz, 2.0, 1.6, 2.0, ec.set('#c9cdd0').clone()); c.ext.box(TF, ux, top + 1.65, uz, 2.1, 0.12, 2.1, ec.set('#aeb4ba').clone()); }
-        else c.ext.box(TF, ux, top + 0.05, uz, 1.0, 0.7, 0.6, ec.set('#d9dcdc').clone());
+      // [sys:8] solar module rows where the imagery shows a PV roof (lot.roof.pv, override data); the random rooftop units otherwise
+      const plantOn = hasPlant(lot);   // [r2:5] a measured rooftop plant spec: drawn exactly, the random boxes are skipped
+      const pvRows = [...(lot.roof.pv ? planPv(inner.map(([lx, lz]) => { const q = F.p(lx, 0, lz); return [q[0], q[2]]; }), lot.roof.pv) : []),
+        ...(plantOn ? plantPvRects(lot.roof.plant).flatMap((rc2) => planPv(rectRing(rc2).map(([lx, lz]) => { const q = F.p(lx, 0, lz); return [q[0], q[2]]; }), { share: 1, side: 'all' }, { margin: 0.3 })) : [])];
+      if (plantOn) for (const b of plantBoxes(lot.roof.plant)) c.ext.box(TF, b.x, top + 0.05 + b.y0, b.z, b.w, b.h, b.d, ec.set(b.color).clone());
+      if (pvRows.length) {
+        const dk = new THREE.Color(PV.dark), fr = new THREE.Color(PV.frame), ny = Math.cos(PV.tilt), nz = Math.sin(PV.tilt), dy = PV.depth * Math.tan(PV.tilt), nn = [0, ny, nz];
+        const uvq = [[0, 0], [1, 0], [1, 1], [0, 1]], ins = 0.05;
+        for (const rw of pvRows) {
+          const ys = top + 0.14, yn = ys + dy;
+          c.ext.quad([[rw.x0, ys, rw.z1], [rw.x1, ys, rw.z1], [rw.x1, yn, rw.z0], [rw.x0, yn, rw.z0]], nn, uvq, fr);
+          const e = 0.006;
+          c.ext.quad([[rw.x0 + ins, ys + ins * Math.tan(PV.tilt) + e, rw.z1 - ins], [rw.x1 - ins, ys + ins * Math.tan(PV.tilt) + e, rw.z1 - ins], [rw.x1 - ins, yn - ins * Math.tan(PV.tilt) + e, rw.z0 + ins], [rw.x0 + ins, yn - ins * Math.tan(PV.tilt) + e, rw.z0 + ins]], nn, uvq, dk);
+        }
+        stats.pv = (stats.pv || 0) + pvRows.length;
+      } else if (!plantOn) {
+        const nU = Math.min(4, Math.floor(lot.area / 120) + (r() < 0.6 ? 1 : 0));
+        for (let k = 0, tries = 0; k < nU && tries < 20; tries++) {
+          const ux = (r() - 0.5) * (o.w - 3), uz = (r() - 0.5) * (o.d - 3);
+          if (!inRing(ux, uz, inner) || !inRing(ux + 1.1, uz + 1.1, inner) || !inRing(ux - 1.1, uz - 1.1, inner)) continue;
+          k++;
+          if (r() < 0.4 && h > 8) { c.ext.box(TF, ux, top + 0.05, uz, 2.0, 1.6, 2.0, ec.set('#c9cdd0').clone()); c.ext.box(TF, ux, top + 1.65, uz, 2.1, 0.12, 2.1, ec.set('#aeb4ba').clone()); }
+          else c.ext.box(TF, ux, top + 0.05, uz, 1.0, 0.7, 0.6, ec.set('#d9dcdc').clone());
+        }
       }
       mainBody = { cx: 0, cz: 0, w: o.w, d: o.d };
     } else {
       // ---- pitched (or flat annexes): one body + roof per wing; eaves reach the footprint edge, walls stand under them
       const pitch0 = isWh ? 0.14 + r() * 0.06 : useKawara ? 0.42 + r() * 0.1 : 0.3 + r() * 0.1;
       const ridgeMain = lot.roof.ridge ? lot.roof.ridge === 'x' : o.w >= o.d;   // [v4:data] the ridge measured on the aerial photo
-      const shedDir = r() < 0.5 ? 1 : -1;
+      r(); const shedDir = shedDirOf(lot);   // [sys:4] the slope is the lot's own (the draw stays for the rng stream)
       W.rects.forEach((rect, wi) => {
         if (isAnnex && wi === 0) return;
         const sides = outerSides(rect, W.rects);
@@ -191,10 +290,10 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
         const x0 = body.cx - body.w / 2, x1 = body.cx + body.w / 2, z0 = body.cz - body.d / 2, z1 = body.cz + body.d / 2;
         // walls on the outside sides only (shared sides are inside the building)
         let u = u0 + wi * 3.1;
-        if (sides.pz) u += faceQuad([x0, z1], [x1, z1], g0, topW, [0, 1], u);
-        if (sides.px) u += faceQuad([x1, z1], [x1, z0], g0, topW, [1, 0], u);
-        if (sides.nz) u += faceQuad([x1, z0], [x0, z0], g0, topW, [0, -1], u);
-        if (sides.nx) u += faceQuad([x0, z0], [x0, z1], g0, topW, [-1, 0], u);
+        if (sides.pz) u += faceQuad([x0, z1], [x1, z1], gw, topW, [0, 1], u);
+        if (sides.px) u += faceQuad([x1, z1], [x1, z0], gw, topW, [1, 0], u);
+        if (sides.nz) u += faceQuad([x1, z0], [x0, z0], gw, topW, [0, -1], u);
+        if (sides.nx) u += faceQuad([x0, z0], [x0, z1], gw, topW, [-1, 0], u);
         if (flatW) {
           c.met.quad([F.p(x0, topW + 0.05, z1), F.p(x1, topW + 0.05, z1), F.p(x1, topW + 0.05, z0), F.p(x0, topW + 0.05, z0)], F.n(0, 1, 0), [[0, 0], [body.w, 0], [body.w, body.d], [0, body.d]], rc);
           return;
@@ -234,6 +333,20 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
             }
           }
           if (ridgeHalf > 0.3) c.ext.box({ p: (lx, y, lz) => RP(lx, y, lz), n: (a, b, c2) => RN(a, b, c2) }, 0, ridgeY - 0.05, 0, ridgeHalf * 2 + 0.1, 0.16, 0.26, ec.copy(rc).multiplyScalar(0.8));
+          // [r3:5] solar blocks lying in the roof plane (lot.roof.pv = { flush, rects, ridgeAt }: Earth shows gridded arrays on pitched roofs; the flat-roof rack is not used here)
+          if (isFlushPv(lot.roof.pv)) {
+            const spec = lot.roof.pv, mine = spec.rects.filter((q) => Math.abs(q.x - rect.cx) <= rect.w / 2 + 0.5 && Math.abs(q.z - rect.cz) <= rect.d / 2 + 0.5);
+            const blocks = flushPvBlocks(mine.map((q) => pvRectToRoof(q, { x: rect.cx, z: rect.cz }, alongX, spec.ridgeAt ?? null)), { Lh, Dh, rl: ridgeHalf, pitch });
+            const dk = new THREE.Color(PVF.dark), fr2 = new THREE.Color(PVF.frame), uvq = [[0, 0], [1, 0], [1, 1], [0, 1]];
+            const yAt = (t, dy) => ridgeY - t * pitch + dy;
+            for (const bk of blocks) {
+              const ns = nrm(bk.s), N = RN(ns[0], ns[1], ns[2]), s = bk.s;
+              const Q = (a0, a1, t0, t1, dy) => [RP(a0, yAt(t1, dy), s * t1), RP(a1, yAt(t1, dy), s * t1), RP(a1, yAt(t0, dy), s * t0), RP(a0, yAt(t0, dy), s * t0)];
+              c.ext.quad(Q(bk.a0 - PVF.edge, bk.a1 + PVF.edge, bk.t0 - PVF.edge, bk.t1 + PVF.edge, PVF.lift * 0.5), N, uvq, fr2);
+              for (const cl of bk.cells) c.ext.quad(Q(cl.a0, cl.a1, cl.t0, cl.t1, PVF.lift), N, uvq, dk);
+              stats.pv = (stats.pv || 0) + bk.cells.length;
+            }
+          }
         } else if (wShape === 'shed') {
           const rise = Math.min(1.6, Dh * 2 * 0.18), s = shedDir;
           RB.quad([RP(-Lh, eaveY, s * Dh), RP(Lh, eaveY, s * Dh), RP(Lh, eaveY + rise, -s * Dh), RP(-Lh, eaveY + rise, -s * Dh)], RN(0, 1, s * rise / (2 * Dh)), [[-Lh, 0], [Lh, 0], [Lh, 2 * Dh], [-Lh, 2 * Dh]], rc);
@@ -269,6 +382,12 @@ export function buildMid(ctx, lots, { H, roadIdx, chunk = 1800, exclude = new Se
         c.ext.box(TF, 0, fy + fl * 2.9 - 0.12, d / 2 + 0.5, w - 0.6, 0.14, 1.0, ec);
         c.ext.box(TF, 0, fy + fl * 2.9 + 0.02, d / 2 + 0.97, w - 0.6, 1.0, 0.06, ec.set(r() < 0.5 ? '#c9ccd1' : '#e8e6e0').clone());
       }
+    }
+    // [r2:12] the AEON sign tower seen from afar: the beige stair block and the magenta sign box over the roof deck (the logos are hero detail)
+    if (LOT_TOWER[lot.id] && shape === 'flat') {
+      const tw = LOT_TOWER[lot.id], tf = { p: (lx, y, lz) => F.p(lx, y, lz), n: F.n }, tl = towerLocal(tw, o.cx, o.cz, o.rotY);
+      c.ext.box(tf, tl.x, top + 0.55, tl.z, tw.w * 0.92, tw.baseH, tw.d * 0.92, ec.set(tw.body).clone());
+      c.ext.box(tf, tl.x, top + 0.55 + tw.baseH, tl.z, tw.w, tw.signH, tw.d, ec.set(tw.color).clone());
     }
     // AC units / water heaters on house side walls (tiny, read as texture from the air)
     if (style === STYLE.house && r() < 0.5) c.ext.box(TF, w / 2 - 0.9, fy + 0.1, d / 2 + 0.2, 0.8, 0.6, 0.3, ec.set('#e6e6e2').clone());

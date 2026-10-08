@@ -1,0 +1,28 @@
+{
+ "version": 1,
+ "cell": "outside-kujo-e",
+ "bbox": [
+  -1960,
+  1300,
+  -1850,
+  1470
+ ],
+ "note": "outside the 12 cells: 九条小学校 (OSM 765653828, far zone), round 3. The school's two big lots lie outside the 8192 px core ortho (x < -1735), so they were decided on an Earth 2026-03-11 capture (raw/ref/earth/kujo, top + o0): /307 (678 m2, 33 x 21 m) is the red pitched-roof gym beside the pool, /362 the long flat-roofed classroom block north of the yard.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth, imagery dated 2026-03-11 (raw/ref/earth/kujo: top, o0; tools/anime/earth-ref.mjs --cell kujo --bbox -1960,1370,-1850,1460)",
+   "date": "2026-03-11"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58536/25071/307",
+   "roof": {
+    "shape": "gable",
+    "color": "#ae757b"
+   },
+   "src": "earth: kujo top and o0 (2026-03-11): the gym next to the pool has a red-mauve pitched roof (median #a66d73, plus 3 L* for the renderer's pitched-roof shade), ridge along its long axis; landmarks/sites.js lists it as a gym explicitly (round 3 systemic 16)"
+  }
+ ]
+}

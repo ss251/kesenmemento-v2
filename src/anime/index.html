@@ -3,14 +3,395 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<script>try{performance.mark('klc:loader')}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <!-- [v7:pad] maximum-scale=1 / user-scalable=no: no pinch or double-tap zoom, the touch pad owns every touch (ui/touchpad.js) -->
-<title>気仙沼 リビングシティ</title>
+<title>気仙沼リビングシティ</title>
+<!-- [integration] One rule for the whole page: an element with the hidden attribute is gone, whatever display its own CSS gives it.
+     Without it, a component that sets display:flex/grid on its class shows while hidden (a closed sheet dimmed the car; the dive's species chip sat over the title). -->
+<style>[hidden]{display:none!important}</style>
 <!-- [v3:integrate] inline favicon (no /favicon.ico 404 in the console): a moored boat on the bay -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f3a68'/%3E%3Cpath d='M10 40h44l-6 10H16z' fill='%23fbf8f2'/%3E%3Cpath d='M22 40V26h14l6 14' fill='none' stroke='%23fbf8f2' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M29 26V14' stroke='%23ff8f5c' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700&family=Zen+Maru+Gothic:wght@500;700;900&family=Yusei+Magic&family=Yuji+Syuku&display=swap">
+<meta name="theme-color" content="#223A70">
+<!--klc:css--><style id="klc-loader-css">
+/* KesenMemento title (v4): the loading screen and the title screen over the town (docs/loading/README.md).
+   THIS FILE is the source of <style id="klc-loader-css"> in index.html: scripts/anime/loader-inline.js copies it in byte for byte, so the title
+   paints with the first bytes of the page and waits for no stylesheet of the app.
+   House rules (docs/CRAFT.md): traditional colours only (和色大辞典; each is named below); only transform and opacity animate; a 4 px grid.
+   v4: the town is the hero. The UI sits on it with a vignette and two scrims (鉄紺 behind the corner controls, 紺→鉄紺 under the bottom third);
+   one material (生成り glass at 92 %, a 紺 hairline, one soft shadow) and one radius (22 px, inner radii concentric) for the corner controls,
+   the tip bar and the notice. The start prompt has no box: one line of display type between two 山吹 ◆, the Japanese line under it.
+   The ホヤぼーや still (.hoya) has NO animation, NO transition and NO animated ancestor while he is visible: he is cut with display:none at the
+   hand-off (docs/loading/HOYABOYA.md). He stands whole beside the tip bar (official pose NO.1-9), never behind or under a panel. */
+#intro {
+  --ai: #165E83;       /* 藍色 ai: the sea, the tip label */
+  --kon: #223A70;      /* 紺色 kon: night, lettering */
+  --tekkon: #17184B;   /* 鉄紺 tetsukon: the darkest sky, the scrims */
+  --tetsu: #17184B;
+  --asagi: #00A3AF;    /* 浅葱色 asagi: the water's crest line */
+  --wasure: #89C3EB;   /* 勿忘草色 wasurenagusa: the day sky */
+  --shino: #F19072;    /* 東雲色 shinonome: dawn */
+  --yama: #F8B500;     /* 山吹色 yamabuki: gold, the gauge, the ◆ */
+  --yamabuki: #F8B500;
+  --akane: #B7282E;    /* 茜色 akane: the retry */
+  --kinari: #FBFAF5;   /* 生成り色 kinari: paper, light text */
+  --sumi: #595857;     /* 墨 sumi: secondary lettering */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --hz: 72%;
+  --font: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  --dela: "Dela Gothic One", "Zen Maru Gothic", sans-serif;
+  --gothic: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;   /* 中ゴシック: the credit, the source, the footer */
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  /* one material, one radius */
+  --r: 22px;
+  --glass: rgba(251, 250, 245, .92);                     /* 生成り glass */
+  --hair: rgba(34, 58, 112, .12);                         /* a 1 px 紺 hairline */
+  --lift: 0 12px 32px -10px rgba(23, 24, 75, .55), 0 2px 6px rgba(23, 24, 75, .16);
+  --mat: inset 0 1px 0 rgba(255, 255, 255, .7), inset 0 0 0 1px var(--hair), var(--lift);   /* the material: a lit top edge, the hairline, the lift */
+  --ink-shadow: 0 1px 2px rgba(23, 24, 75, .75), 0 0 12px rgba(23, 24, 75, .45);   /* white type over the town */
+  /* the grid: margins and the logo per layout (phone portrait first) */
+  --m: 16px;
+  --edge: 8px;
+  --logo-w: min(84vw, 380px, 42vh);
+  --hoya-h: 84px;
+  position: fixed; inset: 0; z-index: 5; height: 100%; overflow: hidden; color: var(--kon);
+  font-family: var(--font); line-break: strict; background: transparent; pointer-events: none;
+}
+@supports (height: 100dvh) { #intro { height: 100dvh; } }
+html[data-chrome] #intro { --sat: 59px; --sab: 34px; }   /* the iPhone's insets, for comp shots only (?chrome=1) */
+@media (orientation: landscape) { html[data-chrome] #intro { --sat: 0px; --sab: 21px; --safe-l: 59px; --safe-r: 59px; } }
+#intro .bg, #intro .scrim, #intro header, #intro .logo, #intro .bottom, #intro footer, #intro .prompt, #intro .btn, #intro .pager button { pointer-events: auto; }
+#intro .scrim, #intro .bg { pointer-events: none; }
+
+@font-face { font-family: "Zen Maru Gothic"; font-weight: 700; font-style: normal; font-display: swap; src: url("./assets/loader/zen-maru-700.woff2") format("woff2"); unicode-range: U+0020-U+007E, U+00A9, U+00B7, U+2019, U+201C-U+201D, U+2026, U+3001-U+3002, U+300C-U+300D, U+301C, U+3042, U+3044, U+3046, U+3048, U+304A-U+304D, U+304F-U+3055, U+3057-U+3059, U+305B-U+305D, U+305F-U+3061, U+3063-U+306B, U+306D-U+3070, U+3073, U+3076, U+3078-U+3079, U+307B-U+3082, U+3084-U+3085, U+3088-U+308D, U+308F, U+3092-U+3093, U+30A2-U+30A4, U+30A8, U+30AA-U+30AD, U+30AF, U+30B1, U+30B3-U+30B6, U+30B8-U+30B9, U+30BB, U+30BF, U+30C3-U+30C4, U+30C6-U+30CB, U+30CD, U+30CF, U+30D1-U+30D3, U+30D5, U+30D7, U+30D9, U+30DB, U+30DE, U+30E1-U+30E5, U+30E9-U+30EC, U+30F3, U+30F6, U+30FB-U+30FC, U+4E00, U+4E07, U+4E0A, U+4E2D, U+4E57, U+4E80, U+4E95, U+4EBA, U+4ECB, U+4ED9, U+4EE5, U+4EF2, U+4F1D, U+4F7F, U+4FE1, U+5104, U+5149, U+5165, U+516B, U+5178, U+5185, U+51FA, U+5206-U+5207, U+524D, U+5263, U+529B, U+52DD, U+5316, U+5341, U+5343, U+5357, U+53F2, U+540D, U+5473, U+54C1, U+5510, U+56F3, U+56FD, U+571F, U+5730, U+57CE, U+5802, U+5831, U+5834, U+5927, U+5929, U+597D, U+5B50, U+5B66, U+5B88-U+5B89, U+5B9A, U+5BAE, U+5C71, U+5CA9, U+5CB8, U+5CF6, U+5D0E, U+5DDD, U+5E02, U+5E2B, U+5E74, U+5E95, U+5EA6, U+5F01, U+5F62, U+5F79, U+5FB9, U+5FF5, U+60C5, U+611B, U+6240, U+6280, U+6307, U+63A2, U+63DA, U+6563, U+6587, U+65AD, U+65BD, U+65D7, U+65E5, U+65E8, U+65EC, U+6614, U+6642, U+6708, U+672C-U+672D, U+6765, U+6797, U+6804, U+6839, U+6848, U+6851, U+68EE, U+6975, U+697D, U+6A2A, U+6A4B, U+6B96, U+6C17, U+6C34, U+6CBC, U+6CE2, U+6CF3, U+6D41, U+6D5C, U+6D66, U+6D6E, U+6D77, U+6E7E, U+6F01, U+706F, U+7136, U+7269, U+7279, U+738B, U+73E0, U+7406, U+7523, U+767A, U+76AE, U+76F4, U+7701, U+770C, U+771F, U+77E5, U+77F3, U+7802, U+79CB, U+79F0, U+7B49, U+7B56, U+7D04, U+7D39, U+7D71, U+8089, U+80B2, U+80CC, U+8239, U+8272, U+8449, U+84B8, U+898B, U+89B3, U+8A00, U+8A18, U+8A2A, U+8A2D, U+8A66, U+8A87, U+8A9E, U+8AAD, U+8B58, U+8C9D, U+8CA1, U+8DE1, U+8DEF, U+8FB2, U+8FBC, U+8FD4, U+9001, U+9032, U+9053, U+9078, U+90E8, U+91DD, U+9451, U+9589, U+958B, U+9593, U+9662, U+96C6, U+96FB, U+9762, U+9769, U+97F3, U+98DF, U+990A, U+9AD8, U+9B45, U+9B5A, U+9BAE, U+9CF4, U+9DB4, U+9F0E, U+FF01, U+FF08-U+FF09, U+FF1A, U+FF1F, U+FF5C; }
+@font-face { font-family: "Zen Maru Gothic"; font-weight: 900; font-style: normal; font-display: swap; src: url("./assets/loader/zen-maru-900.woff2") format("woff2"); unicode-range: U+0020, U+0041, U+0049, U+0052, U+0054, U+0056, U+0061, U+0069, U+0072, U+0076, U+307E, U+3081, U+77E5, U+8B58; }
+@font-face { font-family: "Dela Gothic One"; font-weight: 400; font-style: normal; font-display: swap; src: url("./assets/loader/dela-gothic-one.woff2") format("woff2"); unicode-range: U+0020, U+0025, U+0030-U+0039, U+0041-U+005A; }
+
+#intro .bg { position: absolute; inset: 0; background: #17184B var(--lqip, none) center top / cover no-repeat; transform-origin: 50% 62%; will-change: opacity, transform; transition: opacity 600ms linear; }
+#intro .bg2 { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+body.klc-live #intro .bg { opacity: 0; }
+html[data-t="asa"] #intro .bg { background-image: url("./assets/loader/poster-phone-asa.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-asa.avif") type("image/avif"), url("./assets/loader/poster-phone-asa.webp") type("image/webp")), var(--lqip, none); }
+html[data-t="hiru"] #intro .bg { background-image: url("./assets/loader/poster-phone-hiru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-hiru.avif") type("image/avif"), url("./assets/loader/poster-phone-hiru.webp") type("image/webp")), var(--lqip, none); }
+html[data-t="yugata"] #intro .bg { background-image: url("./assets/loader/poster-phone-yugata.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-yugata.avif") type("image/avif"), url("./assets/loader/poster-phone-yugata.webp") type("image/webp")), var(--lqip, none); }
+html[data-t="yoru"] #intro .bg { background-image: url("./assets/loader/poster-phone-yoru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-phone-yoru.avif") type("image/avif"), url("./assets/loader/poster-phone-yoru.webp") type("image/webp")), var(--lqip, none); }
+/* the vignette and the scrims: the sky stays clear; the corners and the bottom third darken so the UI reads on any hour */
+#intro .scrim { position: absolute; inset: 0; background:
+  radial-gradient(140% 105% at 50% 36%, rgba(23, 24, 75, 0) 52%, rgba(23, 24, 75, .2) 78%, rgba(23, 24, 75, .42) 100%),
+  linear-gradient(rgba(23, 24, 75, .38), rgba(23, 24, 75, .15) 64px, rgba(23, 24, 75, 0) 140px),
+  linear-gradient(to top, rgba(23, 24, 75, .7), rgba(23, 24, 75, .58) 9%, rgba(28, 43, 94, .4) 19%, rgba(34, 58, 112, .2) 29%, rgba(34, 58, 112, .06) 38%, rgba(34, 58, 112, 0) 46%); }
+
+#intro .vh { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+html[lang="en"] #intro .l-ja, html:not([lang="en"]) #intro .l-en { display: none; }
+/* say what the input is: a coarse pointer taps, a fine pointer clicks (html[data-input] is set before the first paint) */
+html[data-input="mouse"] #intro .k-tap, html:not([data-input="mouse"]) #intro .k-click { display: none; }
+
+/* the corner controls: one material, one height (44 px), one shadow */
+#intro header { position: absolute; top: calc(var(--sat) + var(--edge)); left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); display: flex; justify-content: space-between; align-items: center; }
+#intro .btn { box-sizing: border-box; height: 44px; min-width: 44px; padding: 0; border: 0; border-radius: var(--r); background: var(--glass); box-shadow: var(--mat); display: grid; place-items: center; color: var(--kon); cursor: pointer; font: 700 13px/1 var(--font); -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-user-select: none; user-select: none; transition: transform 140ms var(--ease-out); }
+#intro #ld-sound { width: 44px; }
+#intro #ld-sound:active { transform: scale(.97); }
+#intro .btn svg { width: 20px; height: 20px; }
+#intro #ld-sound[aria-pressed="true"] .ic-off, #intro #ld-sound[aria-pressed="false"] .ic-on { display: none; }
+#intro .lang { display: flex; padding: 4px; gap: 2px; }
+#intro .lang button { box-sizing: border-box; height: 36px; min-width: 44px; padding: 0 12px; border: 0; border-radius: calc(var(--r) - 4px); background: transparent; color: var(--sumi); font: 700 13px/1 var(--font); letter-spacing: .04em; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+#intro .lang button.on { background: var(--kon); color: var(--kinari); }
+#intro .btn:focus-visible, #intro .lang button:focus-visible, #intro .pager button:focus-visible { outline: 2px solid var(--kon); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { #intro .lang button:not(.on):hover { color: var(--kon); } }
+
+/* the mark: smaller and higher than v3, its optical centre at 28-30 % (desktop); a soft 鉄紺 halo lifts it off the town */
+#intro .logo { position: absolute; left: 50%; top: calc(var(--sat) + 64px); width: var(--logo-w); transform: translateX(-50%); }
+#intro .logo::before { content: ""; position: absolute; inset: -22% -16% -26%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(23, 24, 75, .5), rgba(23, 24, 75, .3) 45%, rgba(23, 24, 75, .1) 75%, rgba(23, 24, 75, 0)); }
+#intro .logo svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+/* the bottom: the tip bar with ホヤぼーや, then the gauge or the prompt, then the footer */
+#intro .bottom { position: absolute; left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 54px); display: grid; gap: 14px; }   /* (a phone sets the footer in two lines) */
+#intro .tiprow { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: end; min-width: 0; }   /* (above the prompt's wide target, so the pager always gets its taps) */
+
+/* ホヤぼーや, whole: the city's still at its own proportions, the manual's credit centred under him (13Q : 16Q, p.4), never boxed */
+#intro .hoya { display: grid; justify-items: center; align-self: end; justify-self: start; }
+#intro .hoya img { width: auto; height: var(--hoya-h); display: block; }
+#intro .credit { margin-top: 4px; font: 500 12px/1.35 var(--gothic); color: var(--kinari); text-align: center; white-space: nowrap; letter-spacing: 0; text-shadow: var(--ink-shadow); }
+html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
+html[lang="en"] #intro .credit { font-size: 10.5px; }
+
+/* the tip bar: as tall as what it says */
+#intro .tip { position: relative; min-width: 0; box-sizing: border-box; padding: 10px 12px 12px 16px; border-radius: var(--r); background: var(--glass); box-shadow: var(--mat); }
+#intro .tip-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 28px; margin: 0 -2px 2px 0; }
+#intro .tip .tab { display: inline-flex; align-items: center; gap: 8px; font: 900 12px/1 var(--font); letter-spacing: .12em; color: var(--ai); white-space: nowrap; }
+html[lang="en"] #intro .tip .tab { text-transform: uppercase; letter-spacing: .14em; }
+#intro .tip .tab::before { content: ""; width: 7px; height: 7px; border-radius: 1px; background: var(--yamabuki); transform: rotate(45deg); }
+#intro .tip p { margin: 0; font: 700 15px/1.6 var(--font); color: var(--kon); word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+html[lang="en"] #intro .tip p { line-height: 1.5; }
+@media (min-width: 600px) { html[lang="en"] #intro .tip p { text-wrap: pretty; } }   /* (a wide English bar fills its width and avoids a lone last word; a phone and Japanese, set by phrases, balance their lines) */
+#intro .tip .src { margin-top: 4px; font: 500 11px/1.45 var(--gothic); color: var(--sumi); word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+#intro .pager { display: flex; align-items: center; gap: 4px; font: 700 12px/1 var(--font); color: var(--sumi); font-variant-numeric: tabular-nums; }
+#intro .pager .n { display: inline-flex; align-items: baseline; gap: 4px; min-width: 52px; justify-content: center; letter-spacing: .02em; }
+#intro .pager .n i { font-style: normal; opacity: .6; }
+#intro .pager b { color: var(--kon); font-weight: 700; }
+#intro .pager button { position: relative; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 14px; background: rgba(34, 58, 112, .07); color: var(--kon); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: transform 140ms var(--ease-out); }
+#intro .pager button::before { content: ""; position: absolute; inset: -8px; }   /* a 44 px target */
+#intro .pager button:active { transform: scale(.94); }
+#intro .pager svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { #intro .pager button:hover { background: rgba(34, 58, 112, .14); } }
+
+/* the gauge: thin and rounded, a 山吹 fill, the カツオ running at its head */
+#intro .cta { display: grid; align-items: end; justify-items: center; min-height: 64px; }
+#intro .cta > * { grid-area: 1 / 1; }
+#intro .gauge { display: grid; gap: 14px; width: min(100%, 400px); justify-self: center; align-self: end; margin-bottom: 8px; }
+#intro .gauge .row { display: flex; justify-content: space-between; align-items: baseline; color: var(--kinari); font: 700 12px/1 var(--font); letter-spacing: .08em; text-shadow: var(--ink-shadow); }
+html[lang="en"] #intro .gauge .row { letter-spacing: .02em; }
+#intro .gauge .pct { font: 400 13px/1 var(--dela); font-variant-numeric: tabular-nums; letter-spacing: .04em; min-width: 44px; text-align: right; }
+#intro .gauge .pct small { font-size: 10px; margin-left: 1px; }
+#intro .bar { position: relative; height: 6px; border-radius: 3px; background: rgba(251, 250, 245, .3); box-shadow: 0 1px 2px rgba(23, 24, 75, .3); }
+#intro .bar > i, #intro #ld-fill-in, #intro #ld-work-in { background: var(--yamabuki); }
+#intro .bar > i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 3px; }
+html:not([data-capture]) #intro .bar > i { display: none; }
+/* the solid fill is the completed mark, exactly what the number says; the runner rides its edge. Neither ever moves past the mark (core/loadbar.js) */
+#intro #ld-fill { position: absolute; inset: 0; overflow: hidden; border-radius: 3px; transform: translateX(-100%); will-change: transform; }
+#intro #ld-fill-in { position: absolute; inset: 0; transform: translateX(100%); will-change: transform; }
+html[data-capture] #intro #ld-fill { display: none; }
+/* the working layer: the same bar, built the same way, behind the fill, 山吹 at 38 %. From the mark it creeps toward the end of the stage on the compositor, so a long step still shows life
+   (a buffered bar). It is a forecast: it carries no number, the fill never follows it, and under reduced motion it stays at the mark, behind the fill, unseen. */
+#intro #ld-work { position: absolute; inset: 0; overflow: hidden; border-radius: 3px; opacity: .38; transform: translateX(-100%); will-change: transform; }
+#intro #ld-work-in { position: absolute; inset: 0; transform: translateX(100%); will-change: transform; }
+html[data-capture] #intro #ld-work { display: none; }
+#intro #ld-ride { position: absolute; left: 0; width: 100%; top: 50%; height: 0; transform: translateX(0%); will-change: transform; }
+html[data-capture] #intro #ld-ride { transform: none !important; }
+#intro .runner { position: absolute; top: 0; left: 0; width: 46px; height: 23px; transform: translate(-72%, -52%); overflow: visible; }
+/* the runner swims in place: a bob and a wag about the tail, a transform animation on its own box, so the compositor keeps it going through a long step. Every keyframe repeats the lean
+   (translate(-72%, -52%)): an animated transform replaces the one above. Slower while the stage runs long (.ld-idle); still under reduced motion and in a capture. */
+#intro .runner { transform-origin: 30% 55%; animation: klc-swim 1.1s ease-in-out infinite; will-change: transform; }
+@keyframes klc-swim {
+  0%, 100% { transform: translate(-72%, -52%) translateY(0) rotate(-2.5deg); }
+  50% { transform: translate(-72%, -52%) translateY(-2px) rotate(2.5deg); }
+}
+#intro.ld-idle .runner { animation-duration: 2.4s; }
+html[data-capture] #intro .runner { animation: none !important; }
+/* the standing mascot, on the localhost-only ?hoya=run preview (docs/loading/RUNNER.md): only his POSITION may move, never a turn or a squash (the city's manual): two steps up and down */
+html.klc-hoya-dev #intro .runner { animation: klc-bob2 500ms steps(1, end) infinite; }
+@keyframes klc-bob2 {
+  0% { transform: translate(-72%, -52%) translateY(0); }
+  50% { transform: translate(-72%, -52%) translateY(-3px); }
+}
+html.klc-hoya-dev #intro.ld-idle .runner { animation-duration: 1.2s; }
+
+/* the start prompt: no box. White display type with a soft 紺 shadow, two 山吹 ◆, the Japanese line under it; the whole band around it is the target */
+#intro .prompt, #intro .ld-cta { display: none; justify-items: center; }
+#intro .ld-cta { visibility: hidden; }
+body.loaded #intro .ld-cta { visibility: visible; }
+#intro #go { position: relative; -webkit-appearance: none; appearance: none; box-sizing: border-box; min-height: 44px; margin: 0; padding: 8px 20px 10px; border: 0; border-radius: var(--r); background: transparent; color: var(--kinari); cursor: pointer; gap: 8px; outline: none; box-shadow: none; font-feature-settings: "palt"; -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-user-select: none; user-select: none; transition: transform 140ms var(--ease-out); }
+#intro #go::before { content: ""; position: absolute; inset: -14px -24px -12px; }
+#intro #go:disabled { cursor: default; }
+#intro #go .go-line { display: flex; align-items: center; gap: 14px; }
+#intro #go b { font: 400 21px/1 var(--dela); letter-spacing: .16em; margin-right: -.16em; color: #FFFFFF; text-shadow: 0 2px 14px rgba(23, 24, 75, .7), 0 1px 2px rgba(23, 24, 75, .6); white-space: nowrap; }
+#intro #go .dia { display: block; width: var(--dia, 7px); height: var(--dia, 7px); border-radius: 1px; background: var(--yamabuki); transform: rotate(45deg); box-shadow: 0 1px 3px rgba(23, 24, 75, .55); transition: transform 140ms var(--ease-out); }
+/* a mouse over the prompt: the two ◆ close in on the words, the way a menu cursor marks the choice */
+@media (hover: hover) and (pointer: fine) {
+  #intro #go:enabled:hover .dia:first-child { transform: translateX(3px) rotate(45deg); }
+  #intro #go:enabled:hover .dia:last-child { transform: translateX(-3px) rotate(45deg); }
+}
+#intro #go small { display: block; font: 700 13px/1 var(--font); letter-spacing: .12em; margin-right: -.12em; color: var(--kinari); text-shadow: var(--ink-shadow); white-space: nowrap; }
+#intro #go:enabled:active { transform: scale(.97); }
+/* keyboard focus is visible; a pointer user (and the programmatic focus at load) gets no ring (html[data-kbd] follows the last input) */
+#intro #go:focus-visible { outline: none; box-shadow: none; }
+html[data-kbd] #intro #go:focus-visible { outline: 2px solid var(--kinari); outline-offset: 2px; }
+@media (hover: none) and (pointer: coarse) { #intro #go:focus-visible { outline: none; } }
+
+#intro footer { position: absolute; left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 10px); text-align: center; font: 500 11px/1.4 var(--gothic); color: rgba(251, 250, 245, .78); letter-spacing: .02em; text-shadow: 0 1px 2px rgba(23, 24, 75, .7); text-wrap: balance; }
+#intro footer span { white-space: nowrap; }
+#intro footer span + span::before { content: "·"; margin: 0 .55em; }
+@media (max-width: 599px) and (orientation: portrait) { #intro footer #ld-map { display: block; } #intro footer #ld-map::before { content: none; } }
+
+/* a load that cannot go on: the same material, in the tip bar's place */
+#intro .ld-err { display: none; position: relative; box-sizing: border-box; padding: 16px; border-radius: var(--r); color: var(--tekkon); text-align: center; background: var(--glass); box-shadow: var(--mat); }
+#intro .ld-errmsg { margin: 0; font: 700 14px/24px var(--font); text-wrap: pretty; word-break: keep-all; overflow-wrap: anywhere; }   /* (keep-all only with the <wbr> hand-set at each phrase: docs/CRAFT.md section 2) */
+#intro .ld-err { width: min(100%, 460px); }
+#intro .ld-errmsg .m { display: none; }
+#intro .ld-errmsg[data-kind="slow"] .m-slow, #intro .ld-errmsg[data-kind="offline"] .m-offline, #intro .ld-errmsg[data-kind="failed"] .m-failed { display: inline; }
+html[lang="en"] #intro .ld-errmsg .m-ja, html:not([lang="en"]) #intro .ld-errmsg .m-en { display: none !important; }
+#intro #ld-retry { -webkit-appearance: none; appearance: none; margin-top: 12px; min-height: 44px; padding: 8px 24px; border: 0; border-radius: var(--r); background: var(--akane); color: var(--kinari); font: 700 15px/24px var(--font); cursor: pointer; touch-action: manipulation; transition: transform 140ms var(--ease-out); }
+#intro #ld-retry:active { transform: scale(.97); }
+#intro #ld-retry:focus-visible { outline: 3px solid var(--tekkon); outline-offset: 3px; }
+#intro.ld-failed .ld-card, #intro.ld-failed .gauge, #intro.ld-failed .hoya { display: none; }   /* (the notice takes the tip bar's place; ホヤぼーや steps out with his credit, never under or over a panel) */
+#intro.ld-failed .ld-err { display: block; }
+
+body.playing #intro .hoya img, body.playing #intro .credit { display: none; }
+/* once the town is playing the title layer is gone for good: faded to opacity 0 it would still catch taps meant for the HUD
+   under it (the ☰ under the language toggle); the exit animation and the camera flight are over by the time `playing` is set */
+body.playing #intro { display: none !important; }
+body.playing #intro { pointer-events: none; animation: klc-gone 10ms linear 1.2s forwards; }
+@keyframes klc-gone { to { opacity: 0; } }
+#intro.ld-fade { opacity: 0; visibility: hidden; transition: opacity 160ms linear, visibility 0s linear 160ms; }
+
+/* the desktop and landscape posters (the bay stays in frame) */
+@media (min-width: 900px) {
+  #intro .bg { background-position: center 40%; }
+  html[data-t="asa"] #intro .bg { background-image: url("./assets/loader/poster-desktop-asa.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-asa.avif") type("image/avif"), url("./assets/loader/poster-desktop-asa.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="hiru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-hiru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-hiru.avif") type("image/avif"), url("./assets/loader/poster-desktop-hiru.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yugata"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yugata.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yugata.avif") type("image/avif"), url("./assets/loader/poster-desktop-yugata.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yoru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yoru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yoru.avif") type("image/avif"), url("./assets/loader/poster-desktop-yoru.webp") type("image/webp")), var(--lqip, none); }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  #intro .bg { background-position: center 42%; }
+  html[data-t="asa"] #intro .bg { background-image: url("./assets/loader/poster-desktop-asa.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-asa.avif") type("image/avif"), url("./assets/loader/poster-desktop-asa.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="hiru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-hiru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-hiru.avif") type("image/avif"), url("./assets/loader/poster-desktop-hiru.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yugata"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yugata.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yugata.avif") type("image/avif"), url("./assets/loader/poster-desktop-yugata.webp") type("image/webp")), var(--lqip, none); }
+  html[data-t="yoru"] #intro .bg { background-image: url("./assets/loader/poster-desktop-yoru.webp"), var(--lqip, none); background-image: image-set(url("./assets/loader/poster-desktop-yoru.avif") type("image/avif"), url("./assets/loader/poster-desktop-yoru.webp") type("image/webp")), var(--lqip, none); }
+}
+
+/* ---- layouts ---- */
+@media (orientation: portrait) and (max-width: 599px) {
+  #intro .scrim { background:
+    radial-gradient(140% 105% at 50% 36%, rgba(23, 24, 75, 0) 52%, rgba(23, 24, 75, .2) 78%, rgba(23, 24, 75, .42) 100%),
+    linear-gradient(rgba(23, 24, 75, .38), rgba(23, 24, 75, .15) 64px, rgba(23, 24, 75, 0) 140px),
+    linear-gradient(to top, rgba(23, 24, 75, .7), rgba(23, 24, 75, .58) 12%, rgba(28, 43, 94, .42) 26%, rgba(34, 58, 112, .2) 40%, rgba(34, 58, 112, .06) 50%, rgba(34, 58, 112, 0) 58%); }
+}
+/* a wide portrait screen (iPad, a narrow window): ホヤぼーや stands beside the tip bar; the stack is centred */
+@media (min-width: 600px) {
+  #intro { --m: 32px; --edge: 16px; --logo-w: min(64vw, 520px); --hoya-h: 112px; }
+  #intro .logo { top: calc(var(--sat) + 96px); }
+  #intro .bottom { bottom: calc(var(--sab) + 44px); justify-items: center; gap: 18px; }
+  #intro .tiprow { grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; width: min(100%, 640px); }
+  #intro .hoya { justify-self: center; }
+  #intro .credit { font-size: 12px; }
+  html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
+  html[lang="en"] #intro .credit { font-size: 11px; }
+  #intro .tip { padding: 12px 14px 14px 18px; }
+  #intro .gauge { width: min(100%, 420px); }
+  #intro #go b { font-size: 24px; }
+  #intro #go small { font-size: 14px; }
+  #intro #go { --dia: 8px; }
+}
+/* a landscape tablet or a small desktop window (≥ 900 px, wider than tall): the mark sits as on a desktop, its optical centre at 29 %;
+   the bottom stays the centred stack until there is room for three columns */
+@media (min-width: 900px) and (min-aspect-ratio: 1/1) and (min-height: 561px) {
+  #intro { --edge: 24px; --logo-w: min(32vw, 600px, 58vh); --hoya-h: 120px; }
+  #intro .logo { top: calc(29% - var(--logo-w) * .2983); }
+}
+/* a desktop (≥ 1400 px): the mark top-centre, the prompt bottom-centre, the tip bar and ホヤぼーや bottom-left, all on one baseline */
+@media (min-width: 1400px) and (min-height: 561px) {
+  #intro { --m: 32px; --edge: 24px; --logo-w: min(32vw, 600px, 58vh); --hoya-h: 128px; }
+  #intro .logo { top: calc(29% - var(--logo-w) * .2983); }
+  #intro .bottom { bottom: calc(var(--sab) + 44px); grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 24px; align-items: end; justify-items: stretch; }
+  #intro .tiprow { grid-column: 1; grid-row: 1; justify-self: start; width: auto; max-width: 600px; }
+  #intro .ld-err { grid-column: 1; grid-row: 1; justify-self: start; width: min(100%, 460px); }
+  #intro .cta { grid-column: 2; grid-row: 1; width: auto; min-width: 360px; }
+  #intro .tip { width: min(460px, 100%); }
+  #intro .tip p { font-size: 14px; }
+  #intro .gauge { width: 340px; margin-bottom: 14px; }
+  #intro #go b { font-size: 22px; }
+  #intro #go { --dia: 9px; }
+}
+@media (min-width: 1600px) and (min-height: 861px) {
+  #intro { --hoya-h: 140px; }
+  #intro .tip p { font-size: 15px; }
+  #intro #go b { font-size: 26px; }
+}
+/* a big desktop (2000×1195 at DPR 1): the bottom UI grows with the screen, the corner controls keep their 44 px */
+@media (min-width: 1800px) and (min-height: 1000px) {
+  #intro { --hoya-h: 160px; }
+  #intro .tip { width: min(520px, 100%); padding: 14px 16px 16px 20px; }
+  #intro .tip .tab { font-size: 13px; }
+  #intro .tip p { font-size: 17px; }
+  #intro .tip .src { font-size: 12px; }
+  #intro .credit { font-size: 13px; }
+  html:not([lang="en"]) #intro .credit::first-line { font-size: 11px; }
+  html[lang="en"] #intro .credit { font-size: 12px; }
+  #intro .cta { min-width: 420px; }
+  #intro .gauge { width: 400px; }
+  #intro .gauge .row { font-size: 13px; }
+  #intro #go b { font-size: 30px; }
+  #intro #go small { font-size: 15px; }
+  #intro #go { --dia: 10px; }
+  #intro #go .go-line { gap: 18px; }
+  #intro footer { font-size: 12px; }
+}
+/* a short landscape phone (852×393, and the shorter windows ui-b row 8 measures): one row along the bottom (ホヤぼーや, the tip bar,
+   the prompt) under a smaller mark. The landscape poster keeps the bay in frame. */
+@media (orientation: landscape) and (max-height: 520px) {
+  #intro { --hz: 66%; --m: 16px; --edge: 8px; --logo-w: min(32vw, 54vh, 300px); --hoya-h: min(64px, 17vh); }
+  #intro header { top: calc(var(--sat) + var(--edge)); }
+  #intro .logo { top: calc(var(--sat) + 10px); }
+  #intro .bottom { left: calc(var(--m) + var(--safe-l)); right: calc(var(--m) + var(--safe-r)); bottom: calc(var(--sab) + 30px); grid-template-columns: minmax(0, 1fr) auto; gap: 0 16px; align-items: end; justify-items: stretch; }
+  #intro .tiprow { grid-column: 1; grid-row: 1; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; width: auto; max-width: 560px; justify-self: start; }
+  #intro .ld-err { grid-column: 1; grid-row: 1; padding: 10px; }
+  #intro .cta { grid-column: 2; grid-row: 1; align-self: end; width: auto; min-width: 200px; min-height: 56px; }
+  #intro .credit { font-size: 12px; }
+  html:not([lang="en"]) #intro .credit::first-line { font-size: 10px; }
+  html[lang="en"] #intro .credit { font-size: 10.5px; }
+  #intro .tip { padding: 6px 10px 9px 14px; }
+  #intro .tip-head { height: 24px; margin-bottom: 0; }
+  #intro .tip p { font-size: 13px; line-height: 1.5; }
+  #intro .tip .src { font-size: 10px; margin-top: 2px; }
+  #intro .gauge { width: min(260px, 32vw); margin-bottom: 6px; }
+  #intro #go { padding: 6px 12px 8px; }
+  #intro #go b { font-size: 17px; }
+  #intro #go small { font-size: 12px; }
+  #intro footer { bottom: calc(var(--sab) + 6px); }
+}
+/* too narrow (under 740 px) or too short (300 px) for a whole figure beside the tip and the prompt: he steps out with his credit, the tip keeps its room */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 739px) {
+  #intro .hoya { display: none; }
+}
+@media (orientation: landscape) and (max-height: 300px) {
+  #intro .hoya { display: none; }
+  #intro .tip .src { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #intro .bg, #intro .ld-card, #intro #ld-retry, #intro #go, #intro #go .dia, #intro .btn, #intro .pager button { transition: none !important; animation: none !important; }
+  #intro.ld-fade { transition: opacity 160ms linear, visibility 0s linear 160ms; }
+  #intro .ld-wv, #intro .sr-strip, #intro .sr-bob, #intro .runner { animation: none !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  #intro { --glass: #FBFAF5; }
+}
+@media (prefers-contrast: more) {
+  #intro { --glass: #FBFAF5; --hair: rgba(34, 58, 112, .5); }
+}
+</style><!--/klc:css-->
+<!--klc:slot--><script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  function band(h) { h = ((h % 24) + 24) % 24; if (h >= 5 && h < 10) return "asa"; if (h >= 10 && h < 15) return "hiru"; if (h >= 15 && h < 19) return "yugata"; return "yoru"; }
+  var sky = { dawn: "asa", morning: "asa", day: "hiru", noon: "hiru", afternoon: "hiru", golden: "yugata", dusk: "yugata", blue: "yoru", night: "yoru", midnight: "yoru" };
+  var slot = "hiru", pin = q.get("poster"), preset = q.get("preset") || (q.get("look") === "photo" ? "photo" : "");
+  if (pin === "asa" || pin === "hiru" || pin === "yugata" || pin === "yoru") slot = pin;
+  else if (q.has("hours")) slot = band(Number(q.get("hours")));
+  else if (preset === "asa" || preset === "hiru" || preset === "yugata" || preset === "yoru") slot = preset;
+  else if (preset === "yuyake" || preset === "photo") slot = "yugata";
+  else if (sky[q.get("sky")]) slot = sky[q.get("sky")];
+  else if (/^\d{1,2}:\d{2}$/.test(q.get("sky") || "")) { var hm = q.get("sky").split(":"); slot = band(Number(hm[0]) + Number(hm[1]) / 60); }
+  else { var j = new Date(Date.now() + 9 * 3600000); slot = band(j.getUTCHours() + j.getUTCMinutes() / 60); }
+  document.documentElement.dataset.t = slot;
+  var lqip = {"asa":"UklGRqoAAABXRUJQVlA4IJ4AAACwBQCdASoYADUAPxV0rVCspqQisBv8AZAiiWMAvdAiWu4QnY3RHN6wGHd8+lOV8BUc2HO58AAA/unVEMe03X3cNIzalNEkNpGuKiJKWhfSE/k8pMNi880YCyrBew4MYMHhBlHlbu9sR8nWpubO0yZ/DSU9/v00bQ6HliwnNkACw97/vWr/88QOL3v15+ZxYHa77oJgJlviTOg9TSAAAA==","hiru":"UklGRtIAAABXRUJQVlA4IMYAAADwBQCdASoYADUAPxl8sFGsqCSisBQMAZAjCWYAnTMOhDJ4ICisJxG2xDaw7FP5VtGtrEujnGucgAD9zS7Fm6nz2Mte6gbuyH/yVQOWOp673S3szKMSp9k1P8utUpYv4Vf8O3HYE2km4kDZO9bTBruSO/vHyB3D15jbwIlZd+uT4HXb2HHbVtIeg4+zhqlESlYkQN10VDSpJMV5Aw1iL8ZmC7B+T/W5OapRLcuno/yQvspNPjIfyXIFtDBeMb/7Q9F4MgLAAAA=","yugata":"UklGRqYAAABXRUJQVlA4IJoAAAAQBQCdASoYADUAPw1yrlCsJyQis/maqYAhiUAZQAiwBOtpb6k+Ai5+Og50t6MckqBAAP6uxj5IbnIHzVowPTsiJSjeKS5CDIlWZBzh2Hvd0Mvu58dkqH3gcVXToOrogW76t9I+ZYld1+YnX16oXI+N1atBtIQRU8fgvloNtuwfQEJGpxIQOphCU5W/MFr8stz73RSaCqNfANAA","yoru":"UklGRpQAAABXRUJQVlA4IIgAAABwBQCdASoYADUAPxmCtFMsqSSirBVbMZAjCWNqFFI3EX8Q5YJJ2JjiGf3HWMaSwknWskIAAP7s1UlV/K9GneYD8HWygT8dshvco1RKhf5jM1TnBJHLaS8e7o1gjyF4GE/gVzvdRT4OzhkwK83NPflhzhGPCz8jpr89kKYtAnetfLVnqQbDcAAA"};
+  if (lqip[slot]) document.documentElement.style.setProperty("--lqip", "url(\"data:image/webp;base64," + lqip[slot] + "\")");
+  var lang = "ja";
+  try { var l = q.get("lang") || localStorage.getItem("klc.lang"); if (l === "en" || l === "ja") lang = l; } catch (e) { /* private mode */ }
+  document.documentElement.lang = lang;
+  var pinIn = q.get("input"), coarse = false;
+  try { coarse = matchMedia("(pointer: coarse)").matches; } catch (e) { /* no matchMedia */ }
+  document.documentElement.setAttribute("data-input", pinIn === "touch" || pinIn === "mouse" ? pinIn : (coarse ? "touch" : "mouse"));
+  if (q.get("chrome") === "1") document.documentElement.dataset.chrome = "1";
+  if (q.get("capture") === "1") document.documentElement.dataset.capture = "1";
+})();
+</script><!--/klc:slot-->
+<link rel="preload" href="./assets/loader/zen-maru-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./assets/loader/zen-maru-900.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./assets/loader/dela-gothic-one.woff2" as="font" type="font/woff2" crossorigin>
+<!-- [loader] The web fonts no longer stand between the visitor and the first paint (docs/loading/README.md). The stylesheet loads without blocking (media="print" until it has arrived); the loader draws in
+     the system's rounded Japanese face (Hiragino Maru Gothic on an iPhone) and its wordmark is outlines. window.__klcFonts resolves when the stylesheet is in (or after 5 s, or if it fails):
+     main.js's loadFonts() waits for it, so the world never draws a label before the faces it asks for exist. -->
+<script>window.__klcFonts = new Promise(function (r) { window.__klcFontsDone = r; setTimeout(r, 5000); });</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700&family=Zen+Maru+Gothic:wght@500;700;900&family=Yusei+Magic&family=Yuji+Syuku&display=swap" media="print" onload="this.media='all';__klcFontsDone()" onerror="__klcFontsDone()">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700&family=Zen+Maru+Gothic:wght@500;700;900&family=Yusei+Magic&family=Yuji+Syuku&display=swap"></noscript>
 <style>
   :root {
     --line: #7fb8d8; --line-deep: #2f7fae; --ink: #33304a; --navy: #1f3a68; --paper: #fbf8f2; --sky: #9cc4ea;
@@ -18,42 +399,20 @@
     --round: "Zen Maru Gothic", "Noto Sans JP", "Yu Gothic", "Hiragino Sans", sans-serif;
     --sans: "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", "Meiryo", "Hiragino Sans", sans-serif;
   }
-  html, body { height: 100%; margin: 0; background: #cfdcec; color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  html { background: #223A70; }   /* [loader] 紺: the colour behind everything while it loads (an overscroll, a hidden canvas) */
+  html, body { height: 100%; margin: 0; color: var(--ink); font-family: var(--sans); overflow: hidden; }
+  body { background: #cfdcec; }
   canvas#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
 
-  /* ---------- loading: a station name board (駅名標) */
-  #intro { position: fixed; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 16px; z-index: 5;
-    background: radial-gradient(120% 90% at 70% 10%, #fdf0e4 0%, #e6eef8 55%, #cfdcec 100%); transition: opacity .9s ease, visibility .9s; }
-  body.loaded #intro { background: linear-gradient(180deg, rgba(230,238,248,.35), rgba(207,220,236,.55)); backdrop-filter: blur(2px); }
-  body.playing #intro { opacity: 0; visibility: hidden; }
-  .board { width: min(760px, 100%); min-width: 0; box-sizing: border-box; background: var(--paper); border-radius: 10px; box-shadow: 0 18px 50px rgba(51,48,74,.18), 0 0 0 1px rgba(51,48,74,.08);
-    padding: 26px clamp(16px, 4vw, 34px) 22px; display: grid; gap: 14px; }
-  .kana { text-align: center; font: 700 clamp(15px, 2.4vw, 20px)/1 var(--round); letter-spacing: .5em; color: var(--muted); padding-left: .5em; }
-  .name { text-align: center; font: 900 clamp(56px, 12vw, 104px)/1 var(--round); color: var(--navy); letter-spacing: .08em; }
-  .no { display: inline-grid; place-items: center; width: 1.9em; height: 1.9em; border-radius: 6px; border: 3px solid var(--line-deep); color: var(--navy);
-    font: 900 13px/1 var(--sans); vertical-align: middle; margin-right: .6em; text-align: center; white-space: pre; }
-  .stripe { position: relative; height: 12px; border-radius: 6px; background: #eadfe3; overflow: hidden; }
-  .stripe #bar { position: absolute; inset: 0; background: linear-gradient(90deg, var(--line), var(--line-deep)); transform-origin: left; transform: scaleX(0); transition: transform .35s ease; }
-  body.loaded .stripe #bar { transform: scaleX(1); }
-  .ends { display: flex; justify-content: space-between; gap: 12px; font: 700 clamp(13px, 2vw, 16px)/1.3 var(--round); color: var(--ink); }
-  .ends small { display: block; font: 500 11px/1.3 var(--sans); color: var(--muted); letter-spacing: .06em; }
-  .ends .r { text-align: right; }
-  .roma { text-align: center; font: 500 clamp(13px, 2vw, 16px)/1 var(--sans); letter-spacing: .32em; color: var(--muted); }
-  .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 6px; border-top: 1px dashed rgba(51,48,74,.18); }
-  #loadlabel { font: 500 13px/1.4 var(--sans); color: var(--muted); min-height: 1.4em; }
-  body.loaded #loadlabel::before { content: "準備完了 · 秋の午後 16:30 · Ready"; }
-  #go { font: 700 16px/1 var(--round); color: #fff; background: var(--navy); border: 0; border-radius: 999px; padding: 13px 22px; cursor: pointer;
-    box-shadow: 0 6px 16px rgba(31,58,104,.28); opacity: .35; transition: opacity .3s, transform .15s; }
-  #go:enabled { opacity: 1; }
-  #go:enabled:hover { transform: translateY(-1px); }
-  #go:focus-visible, .chip:focus-visible, select:focus-visible { outline: 3px solid var(--line-deep); outline-offset: 2px; }
-  .keys { display: flex; flex-wrap: wrap; gap: 6px 14px; font: 500 12px/1.6 var(--sans); color: var(--muted); }
+  /* [loader] the loading screen and the title screen are in <style id="klc-loader-css"> above (src/anime/ui/loader/loader.css) */
+  .chip:focus-visible, select:focus-visible { outline: 3px solid var(--line-deep); outline-offset: 2px; }
   kbd { font: 700 11px/1 var(--sans); background: #fff; border: 1px solid rgba(51,48,74,.2); border-bottom-width: 2px; border-radius: 4px; padding: 3px 5px; color: var(--ink); }
 
   /* ---------- HUD */
   .hud { position: fixed; z-index: 3; pointer-events: none; opacity: 0; transition: opacity .6s; }
   body.playing .hud { opacity: 1; }
-  body.noui .hud, body.shot .hud, body.shot #intro { display: none !important; }
+  body.noui .hud, body.shot:not(.klc-ui) .hud, body.shot #intro { display: none !important; }
+  body.shot.klc-ui .hud { opacity: 1; }
   #toast { top: calc(18px + env(safe-area-inset-top, 0px)); left: 18px; }
   #toast .sign { background: var(--glass); backdrop-filter: blur(6px); border-radius: 8px; padding: 10px 16px 10px 14px; display: flex; align-items: center; gap: 10px;
     box-shadow: 0 6px 20px rgba(51,48,74,.14); transform: translateY(-8px); opacity: 0; transition: transform .6s, opacity .6s; border-left: 6px solid var(--line); }
@@ -71,32 +430,492 @@
   @media (pointer: coarse) { #help .desk { display: none; } }
   @media (pointer: fine) { #help .touch { display: none; } }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-  @media (max-width: 520px) { .ends small { display: none; } .keys { display: none; } }
 </style>
 </head>
 <body>
 <canvas id="scene" tabindex="0" aria-label="Kesennuma Living City 3D scene"></canvas>
 
-<div id="intro">
-  <div class="board" role="dialog" aria-labelledby="stname">
-    <div class="kana">けせんぬま</div>
-    <div class="name" id="stname">気仙沼</div>
-    <div class="stripe" aria-hidden="true"><div id="bar"></div></div>
-    <div class="ends">
-      <div>← 内湾<small>Inner Bay · 浮見堂</small></div>
-      <div class="r">魚市場 →<small>Fish Market · 大島</small></div>
+<div id="intro" role="dialog" aria-modal="true" aria-labelledby="ld-brand" data-t="hiru">
+  <h1 id="ld-brand" class="vh"><span class="l-ja">ケセンメメント</span><span class="l-en">KesenMemento</span></h1>
+  <div class="bg"></div><div class="bg2"></div><div class="scrim"></div>
+  <header>
+    <button class="btn" id="ld-sound" type="button" aria-pressed="false" aria-label="音をだす">
+      <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+      <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>
+    </button>
+    <div class="btn lang" role="group" aria-label="言語 / Language"><button type="button" data-lang="ja" lang="ja" class="on" aria-pressed="true">日本語</button><button type="button" data-lang="en" lang="en" aria-pressed="false">EN</button></div>
+  </header>
+  <div class="logo" id="logo"><!--klc:logo--><svg xmlns="http://www.w3.org/2000/svg" viewBox="-37.5 -125.41 480.88 286.91" width="962" height="574" role="img" aria-label="ケセンメメント KesenMemento">
+<defs><path id="l0" d="M99.5 -68.8Q97.5 -56.1 97.5 -46.3H91.8Q89.5 -36.1 84.6 -27.6Q79.7 -19.1 72.5 -13.3Q66.8 -8.6 59.6 -5.7Q52.4 -2.8 41.65 -1.05Q30.9 0.7 14.3 1.6Q11.1 -7.4 8.4 -13Q5.7 -18.6 2.3 -23.1Q6.6 -22.9 14 -22.9Q8.6 -31.4 -0.9 -39.6Q9.4 -45.5 14.8 -54.6Q20.2 -63.7 21.3 -76.8H49.4Q48.7 -72.8 47.9 -68.8ZM64.7 -46.3H39.7L38.2 -43.7Q31.9 -32.7 21.5 -23Q32.9 -23.4 39.95 -25.15Q47 -26.9 51.9 -30.2Q56.1 -33.1 59.55 -37.25Q63 -41.4 64.7 -46.3Z" transform="rotate(-3.92 52.2 -37.11) translate(2.9 0.89) scale(1)" data-base="rotate(-3.92 52.2 -37.11) translate(2.9 0.89) scale(1)" data-cx="52.2" data-cy="-37.11" data-bot="2.49" data-li="0"/><path id="l1" d="M91.9 -24Q90.6 -18.3 90.3 -13.25Q90 -8.2 90 -0.8Q79.4 -0.2 70.2 0.25Q61 0.7 54.2 0.7Q41 0.7 33.2 -1.15Q25.4 -3 21.6 -7.7Q17.8 -12.4 17.8 -21V-40L1.6 -37.6L0.5 -62.7L17.8 -64.5V-75.9H42.3V-67L91.5 -72.1L98.6 -50.9Q94.9 -41.8 89.2 -34.75Q83.5 -27.7 74.3 -22Q79.1 -22.5 91.9 -24ZM42.3 -25.5Q42.3 -23 45 -21.8Q47.7 -20.6 54.2 -20.6Q57.2 -20.6 61.3 -20.9Q58.6 -25.6 55.9 -29.45Q53.2 -33.3 49.5 -37.1Q57.2 -39 62.25 -41.5Q67.3 -44 70.6 -47.6L42.3 -43.5Z" transform="rotate(-1.26 152.95 -33.73) translate(103.4 4.27) scale(1)" data-base="rotate(-1.26 152.95 -33.73) translate(103.4 4.27) scale(1)" data-cx="152.95" data-cy="-33.73" data-bot="4.97" data-li="0"/><path id="l2" d="M2.3 -24.3Q21 -24.3 33.25 -26.75Q45.5 -29.2 54.3 -34.8Q62.3 -39.9 66.7 -49.5Q71.1 -59.1 72.8 -73.8Q78.8 -71.7 84.65 -70.15Q90.5 -68.6 99 -66.6Q96.6 -48 89.95 -36.4Q83.3 -24.8 71.7 -16.6Q61.3 -9.2 47.4 -5.2Q33.5 -1.2 13 0.7Q10.8 -7.4 8.65 -12.95Q6.5 -18.5 2.3 -24.3ZM42.2 -40.1Q29.8 -44.7 22.2 -46.9Q14.6 -49.1 1 -51.8Q5.7 -56.3 10.6 -62.35Q15.5 -68.4 17.8 -72.4Q30.4 -68.9 40.3 -65.6Q50.2 -62.3 60.3 -58.1Z" transform="rotate(2.67 251.5 -34.64) translate(201.5 3.36) scale(1)" data-base="rotate(2.67 251.5 -34.64) translate(201.5 3.36) scale(1)" data-cx="251.5" data-cy="-34.64" data-bot="4.06" data-li="0"/><path id="l3" d="M77.8 -3.1 74 0Q67.1 -9.4 60 -16.7Q51.2 -11.3 40.05 -7.1Q28.9 -2.9 16.4 -0.4Q13.3 -7.5 9.85 -13.4Q6.4 -19.3 0.4 -25.8Q24.5 -28.1 39.6 -33.7Q27.7 -41.6 13.9 -46.8L30.2 -65.6Q45.6 -58.6 60 -49Q63.8 -55.7 63.8 -64.3Q63.8 -69.5 62.5 -75.4H89.1Q90.1 -69.8 90.1 -64.3Q90.1 -47.3 79.7 -33.8Q89 -25.8 97.1 -16.3Q92.3 -14.2 88.05 -11.1Q83.8 -8 77.8 -3.1Z" transform="rotate(3.91 52.22 62.03) translate(-0.43 103.07) scale(1.08)" data-base="rotate(3.91 52.22 62.03) translate(-0.43 103.07) scale(1.08)" data-cx="52.22" data-cy="62.03" data-bot="103.07" data-li="1"/><path id="l4" d="M77.8 -3.1 74 0Q67.1 -9.4 60 -16.7Q51.2 -11.3 40.05 -7.1Q28.9 -2.9 16.4 -0.4Q13.3 -7.5 9.85 -13.4Q6.4 -19.3 0.4 -25.8Q24.5 -28.1 39.6 -33.7Q27.7 -41.6 13.9 -46.8L30.2 -65.6Q45.6 -58.6 60 -49Q63.8 -55.7 63.8 -64.3Q63.8 -69.5 62.5 -75.4H89.1Q90.1 -69.8 90.1 -64.3Q90.1 -47.3 79.7 -33.8Q89 -25.8 97.1 -16.3Q92.3 -14.2 88.05 -11.1Q83.8 -8 77.8 -3.1Z" transform="rotate(1.23 156.15 58.68) translate(103.5 99.72) scale(1.08)" data-base="rotate(1.23 156.15 58.68) translate(103.5 99.72) scale(1.08)" data-cx="156.15" data-cy="58.68" data-bot="99.72" data-li="1"/><path id="l5" d="M2.3 -24.3Q21 -24.3 33.25 -26.75Q45.5 -29.2 54.3 -34.8Q62.3 -39.9 66.7 -49.5Q71.1 -59.1 72.8 -73.8Q78.8 -71.7 84.65 -70.15Q90.5 -68.6 99 -66.6Q96.6 -48 89.95 -36.4Q83.3 -24.8 71.7 -16.6Q61.3 -9.2 47.4 -5.2Q33.5 -1.2 13 0.7Q10.8 -7.4 8.65 -12.95Q6.5 -18.5 2.3 -24.3ZM42.2 -40.1Q29.8 -44.7 22.2 -46.9Q14.6 -49.1 1 -51.8Q5.7 -56.3 10.6 -62.35Q15.5 -68.4 17.8 -72.4Q30.4 -68.9 40.3 -65.6Q50.2 -62.3 60.3 -58.1Z" transform="rotate(-2.69 261.79 59.63) translate(207.79 100.67) scale(1.08)" data-base="rotate(-2.69 261.79 59.63) translate(207.79 100.67) scale(1.08)" data-cx="261.79" data-cy="59.63" data-bot="101.43" data-li="1"/><path id="l6" d="M87.9 -18.3Q67.3 -25.7 39.5 -31.3V0.5H11.3Q12 -16.3 12.15 -33.1Q12.3 -49.9 12.3 -75.1H39.5V-54.4Q52.7 -52.8 68.35 -49.6Q84 -46.4 97.1 -42.7Q93.7 -37.3 91.9 -32.05Q90.1 -26.8 87.9 -18.3Z" transform="rotate(-0.91 359.54 63.93) translate(301.01 104.97) scale(1.08)" data-base="rotate(-0.91 359.54 63.93) translate(301.01 104.97) scale(1.08)" data-cx="359.54" data-cy="63.93" data-bot="105.51" data-li="1"/><g id="word"><use href="#l0"/><use href="#l1"/><use href="#l2"/><use href="#l3"/><use href="#l4"/><use href="#l5"/><use href="#l6"/></g><clipPath id="cw"><use href="#l0"/><use href="#l1"/><use href="#l2"/><use href="#l3"/><use href="#l4"/><use href="#l5"/><use href="#l6"/></clipPath><clipPath id="c0"><use href="#l0"/></clipPath><clipPath id="c1"><use href="#l1"/></clipPath><clipPath id="c2"><use href="#l2"/></clipPath><clipPath id="c3"><use href="#l3"/></clipPath><clipPath id="c4"><use href="#l4"/></clipPath><clipPath id="c5"><use href="#l5"/></clipPath><clipPath id="c6"><use href="#l6"/></clipPath>
+<linearGradient id="gt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd56b"/><stop offset="1" stop-color="#F8B500"/></linearGradient>
+<linearGradient id="gw0" x1="0" y1="-29" x2="0" y2="4.97" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#00A3AF"/><stop offset="1" stop-color="#165E83"/></linearGradient><linearGradient id="gw1" x1="0" y1="68.87" x2="0" y2="105.51" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#00A3AF"/><stop offset="1" stop-color="#165E83"/></linearGradient>
+<pattern id="sgh" width="20" height="10" patternUnits="userSpaceOnUse"><g fill="none" stroke="#fff" stroke-width="1"><path d="M-9 10A9 9 0 0 1 9 10"/><path d="M-6 10A6 6 0 0 1 6 10"/><path d="M-3 10A3 3 0 0 1 3 10"/><path d="M11 10A9 9 0 0 1 29 10"/><path d="M14 10A6 6 0 0 1 26 10"/><path d="M17 10A3 3 0 0 1 23 10"/><path d="M1 5A9 9 0 0 1 19 5"/><path d="M4 5A6 6 0 0 1 16 5"/><path d="M7 5A3 3 0 0 1 13 5"/></g></pattern><filter id="soft" x="-10%" y="-20%" width="120%" height="150%"><feGaussianBlur stdDeviation="5"/></filter>
+</defs>
+<g class="shadow" opacity=".3" transform="translate(0 15)" filter="url(#soft)"><use href="#word" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/></g>
+<g class="extrude"><use href="#word" transform="translate(0 8)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/><use href="#word" transform="translate(0 7)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/><use href="#word" transform="translate(0 6)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/><use href="#word" transform="translate(0 5)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/><use href="#word" transform="translate(0 4)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/><use href="#word" transform="translate(0 3)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/><use href="#word" transform="translate(0 2)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/><use href="#word" transform="translate(0 1)" fill="#17184B" stroke="#17184B" stroke-width="23" stroke-linejoin="round"/></g>
+<use class="edge" href="#word" fill="#FBFAF5" stroke="#FBFAF5" stroke-width="23" stroke-linejoin="round"/>
+<use class="outline" href="#word" fill="#223A70" stroke="#223A70" stroke-width="13" stroke-linejoin="round"/>
+<use class="fill" href="#word" fill="url(#gt)"/>
+<g class="sea" clip-path="url(#cw)"><g class="sealine" data-y="-29" data-lb="4.97" data-ph="0"><path class="sb" d="M-40 -29L-40 -30.84L-35 -31.29L-30 -31.55L-25 -31.58L-20 -31.4L-15 -31.01L-10 -30.44L-5 -29.75L0 -29L5 -28.24L10 -27.55L15 -26.99L20 -26.6L25 -26.41L30 -26.45L35 -26.7L40 -27.15L45 -27.76L50 -28.48L55 -29.24L60 -29.98L65 -30.64L70 -31.15L75 -31.48L80 -31.6L85 -31.49L90 -31.17L95 -30.66L100 -30.01L105 -29.27L110 -28.51L115 -27.79L120 -27.18L125 -26.72L130 -26.45L135 -26.41L140 -26.58L145 -26.97L150 -27.53L155 -28.21L160 -28.96L165 -29.72L170 -30.41L175 -30.98L180 -31.38L185 -31.58L190 -31.56L195 -31.31L200 -30.87L205 -30.26L210 -29.55L215 -28.79L220 -28.05L225 -27.39L230 -26.86L235 -26.52L240 -26.4L245 -26.5L250 -26.81L255 -27.31L260 -27.95L265 -28.69L270 -29.45L275 -30.17L280 -30.79L285 -31.26L290 -31.54L295 -31.59L300 -31.42L305 -31.05L310 -30.5L315 -29.82L320 -29.07L325 -28.31L330 -27.61L335 -27.03L340 -26.62L345 -26.42L350 -26.43L355 -26.67L360 -27.11L365 -27.7L370 -28.41L375 -29.17L380 -29.92L385 -30.58L390 -31.11L395 -31.46L400 -31.6L405 -31.51L410 -31.21L415 -30.71L420 -30.07L425 -29.34L430 -28.58L435 -27.85L440 -27.23L445 -26.75L450 -26.47L451.876 34.97L-40 34.97Z" fill="url(#gw0)"/><path class="sp" d="M-40 -29L-40 -30.84L-35 -31.29L-30 -31.55L-25 -31.58L-20 -31.4L-15 -31.01L-10 -30.44L-5 -29.75L0 -29L5 -28.24L10 -27.55L15 -26.99L20 -26.6L25 -26.41L30 -26.45L35 -26.7L40 -27.15L45 -27.76L50 -28.48L55 -29.24L60 -29.98L65 -30.64L70 -31.15L75 -31.48L80 -31.6L85 -31.49L90 -31.17L95 -30.66L100 -30.01L105 -29.27L110 -28.51L115 -27.79L120 -27.18L125 -26.72L130 -26.45L135 -26.41L140 -26.58L145 -26.97L150 -27.53L155 -28.21L160 -28.96L165 -29.72L170 -30.41L175 -30.98L180 -31.38L185 -31.58L190 -31.56L195 -31.31L200 -30.87L205 -30.26L210 -29.55L215 -28.79L220 -28.05L225 -27.39L230 -26.86L235 -26.52L240 -26.4L245 -26.5L250 -26.81L255 -27.31L260 -27.95L265 -28.69L270 -29.45L275 -30.17L280 -30.79L285 -31.26L290 -31.54L295 -31.59L300 -31.42L305 -31.05L310 -30.5L315 -29.82L320 -29.07L325 -28.31L330 -27.61L335 -27.03L340 -26.62L345 -26.42L350 -26.43L355 -26.67L360 -27.11L365 -27.7L370 -28.41L375 -29.17L380 -29.92L385 -30.58L390 -31.11L395 -31.46L400 -31.6L405 -31.51L410 -31.21L415 -30.71L420 -30.07L425 -29.34L430 -28.58L435 -27.85L440 -27.23L445 -26.75L450 -26.47L451.876 34.97L-40 34.97Z" fill="url(#sgh)" opacity=".2"/><path class="sc" d="M-40 -29L-40 -30.84L-35 -31.29L-30 -31.55L-25 -31.58L-20 -31.4L-15 -31.01L-10 -30.44L-5 -29.75L0 -29L5 -28.24L10 -27.55L15 -26.99L20 -26.6L25 -26.41L30 -26.45L35 -26.7L40 -27.15L45 -27.76L50 -28.48L55 -29.24L60 -29.98L65 -30.64L70 -31.15L75 -31.48L80 -31.6L85 -31.49L90 -31.17L95 -30.66L100 -30.01L105 -29.27L110 -28.51L115 -27.79L120 -27.18L125 -26.72L130 -26.45L135 -26.41L140 -26.58L145 -26.97L150 -27.53L155 -28.21L160 -28.96L165 -29.72L170 -30.41L175 -30.98L180 -31.38L185 -31.58L190 -31.56L195 -31.31L200 -30.87L205 -30.26L210 -29.55L215 -28.79L220 -28.05L225 -27.39L230 -26.86L235 -26.52L240 -26.4L245 -26.5L250 -26.81L255 -27.31L260 -27.95L265 -28.69L270 -29.45L275 -30.17L280 -30.79L285 -31.26L290 -31.54L295 -31.59L300 -31.42L305 -31.05L310 -30.5L315 -29.82L320 -29.07L325 -28.31L330 -27.61L335 -27.03L340 -26.62L345 -26.42L350 -26.43L355 -26.67L360 -27.11L365 -27.7L370 -28.41L375 -29.17L380 -29.92L385 -30.58L390 -31.11L395 -31.46L400 -31.6L405 -31.51L410 -31.21L415 -30.71L420 -30.07L425 -29.34L430 -28.58L435 -27.85L440 -27.23L445 -26.75L450 -26.47" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></g><g class="sealine" data-y="68.87" data-lb="105.51" data-ph="1.7"><path class="sb" d="M-40 68.87L-40 67.3L-35 67.96L-30 68.71L-25 69.47L-20 70.17L-15 70.77L-10 71.21L-5 71.44L0 71.45L5 71.25L10 70.83L15 70.25L20 69.56L25 68.8L30 68.05L35 67.37L40 66.82L45 66.45L50 66.28L55 66.34L60 66.61L65 67.08L70 67.71L75 68.43L80 69.19L85 69.93L90 70.57L95 71.07L100 71.38L105 71.47L110 71.35L115 71L120 70.48L125 69.82L130 69.08L135 68.32L140 67.6L145 67L150 66.56L155 66.32L160 66.29L165 66.49L170 66.89L175 67.47L180 68.16L185 68.92L190 69.67L195 70.35L200 70.91L205 71.29L210 71.47L215 71.42L220 71.15L225 70.69L230 70.07L235 69.35L240 68.59L245 67.85L250 67.2L255 66.7L260 66.38L265 66.27L270 66.39L275 66.73L280 67.24L285 67.9L290 68.64L295 69.4L300 70.12L305 70.72L310 71.17L315 71.43L320 71.46L325 71.27L330 70.88L335 70.31L340 69.62L345 68.87L350 68.11L355 67.43L360 66.86L365 66.47L370 66.29L375 66.32L380 66.58L385 67.04L390 67.65L395 68.36L400 69.13L405 69.87L410 70.52L415 71.03L420 71.36L425 71.47L430 71.37L435 71.04L440 70.53L445 69.88L450 69.14L451.876 135.51L-40 135.51Z" fill="url(#gw1)"/><path class="sp" d="M-40 68.87L-40 67.3L-35 67.96L-30 68.71L-25 69.47L-20 70.17L-15 70.77L-10 71.21L-5 71.44L0 71.45L5 71.25L10 70.83L15 70.25L20 69.56L25 68.8L30 68.05L35 67.37L40 66.82L45 66.45L50 66.28L55 66.34L60 66.61L65 67.08L70 67.71L75 68.43L80 69.19L85 69.93L90 70.57L95 71.07L100 71.38L105 71.47L110 71.35L115 71L120 70.48L125 69.82L130 69.08L135 68.32L140 67.6L145 67L150 66.56L155 66.32L160 66.29L165 66.49L170 66.89L175 67.47L180 68.16L185 68.92L190 69.67L195 70.35L200 70.91L205 71.29L210 71.47L215 71.42L220 71.15L225 70.69L230 70.07L235 69.35L240 68.59L245 67.85L250 67.2L255 66.7L260 66.38L265 66.27L270 66.39L275 66.73L280 67.24L285 67.9L290 68.64L295 69.4L300 70.12L305 70.72L310 71.17L315 71.43L320 71.46L325 71.27L330 70.88L335 70.31L340 69.62L345 68.87L350 68.11L355 67.43L360 66.86L365 66.47L370 66.29L375 66.32L380 66.58L385 67.04L390 67.65L395 68.36L400 69.13L405 69.87L410 70.52L415 71.03L420 71.36L425 71.47L430 71.37L435 71.04L440 70.53L445 69.88L450 69.14L451.876 135.51L-40 135.51Z" fill="url(#sgh)" opacity=".2"/><path class="sc" d="M-40 68.87L-40 67.3L-35 67.96L-30 68.71L-25 69.47L-20 70.17L-15 70.77L-10 71.21L-5 71.44L0 71.45L5 71.25L10 70.83L15 70.25L20 69.56L25 68.8L30 68.05L35 67.37L40 66.82L45 66.45L50 66.28L55 66.34L60 66.61L65 67.08L70 67.71L75 68.43L80 69.19L85 69.93L90 70.57L95 71.07L100 71.38L105 71.47L110 71.35L115 71L120 70.48L125 69.82L130 69.08L135 68.32L140 67.6L145 67L150 66.56L155 66.32L160 66.29L165 66.49L170 66.89L175 67.47L180 68.16L185 68.92L190 69.67L195 70.35L200 70.91L205 71.29L210 71.47L215 71.42L220 71.15L225 70.69L230 70.07L235 69.35L240 68.59L245 67.85L250 67.2L255 66.7L260 66.38L265 66.27L270 66.39L275 66.73L280 67.24L285 67.9L290 68.64L295 69.4L300 70.12L305 70.72L310 71.17L315 71.43L320 71.46L325 71.27L330 70.88L335 70.31L340 69.62L345 68.87L350 68.11L355 67.43L360 66.86L365 66.47L370 66.29L375 66.32L380 66.58L385 67.04L390 67.65L395 68.36L400 69.13L405 69.87L410 70.52L415 71.03L420 71.36L425 71.47L430 71.37L435 71.04L440 70.53L445 69.88L450 69.14" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></g></g>
+<g class="sheen"><g clip-path="url(#c0)"><ellipse cx="32.12" cy="-62.91" rx="24.1" ry="5" transform="rotate(-19.92 32.12 -62.91)" fill="#fff" opacity=".75"/></g><g clip-path="url(#c1)"><ellipse cx="133.33" cy="-58.63" rx="23.54" ry="5" transform="rotate(-17.26 133.33 -58.63)" fill="#fff" opacity=".75"/></g><g clip-path="url(#c2)"><ellipse cx="231.9" cy="-57.44" rx="23.52" ry="5" transform="rotate(-13.33 231.9 -57.44)" fill="#fff" opacity=".75"/></g><g clip-path="url(#c3)"><ellipse cx="31.33" cy="34.64" rx="25.06" ry="5" transform="rotate(-12.09 31.33 34.64)" fill="#fff" opacity=".75"/></g><g clip-path="url(#c4)"><ellipse cx="135.27" cy="31.29" rx="25.06" ry="5" transform="rotate(-14.77 135.27 31.29)" fill="#fff" opacity=".75"/></g><g clip-path="url(#c5)"><ellipse cx="240.62" cy="33.97" rx="25.4" ry="5" transform="rotate(-18.69 240.62 33.97)" fill="#fff" opacity=".75"/></g><g clip-path="url(#c6)"><ellipse cx="341.01" cy="36.86" rx="22.24" ry="5" transform="rotate(-16.91 341.01 36.86)" fill="#fff" opacity=".75"/></g></g>
+<g class="shine" clip-path="url(#cw)"><rect x="-60" y="-115.91" width="26" height="261.41" fill="#fff" opacity=".55" transform="skewX(-22)"/><rect x="-24" y="-115.91" width="8" height="261.41" fill="#fff" opacity=".45" transform="skewX(-22)"/></g>
+<g class="splash" stroke="#223A70" stroke-width="2.4" fill="#FBFAF5" stroke-linejoin="round">
+ <path d="M286.5 -19.905988011422224C290.5 -29.905988011422224 298.5 -33.905988011422224 306.5 -31.905988011422224C300.5 -28.905988011422224 297.5 -23.905988011422224 298.5 -19.905988011422224Z"/>
+ <circle cx="312.5" cy="-39.905988011422224" r="3.6"/><circle cx="303.5" cy="-46.905988011422224" r="2.8"/><circle cx="318.5" cy="-28.905988011422224" r="2.6"/>
+</g><g class="fish" transform="translate(342.5 -53.91) rotate(-26) scale(0.8)">
+ <g fill="#17184B" stroke="#17184B" stroke-width="14" stroke-linejoin="round" opacity=".32" transform="translate(1 5)"><path d="M-44 0C-36 -10 -16 -16 8 -15C26 -14 40 -8 49 -1.5C51 0 51 2 49 3.5C40 10 24 14 6 14C-16 14 -34 9 -44 0Z"/><path d="M-43 0C-50 -7 -57 -17 -61 -25C-54 -22 -48 -14 -44 -7C-47 -15 -49 -22 -49 -27C-44 -19 -42 -10 -41 -2C-44 6 -50 16 -57 23C-50 21 -45 13 -42 5Z"/><path d="M-6 -13C-2 -23 6 -28 13 -29C11 -22 9 -17 9 -14Z"/></g>
+ <g stroke="#FBFAF5" stroke-width="13" stroke-linejoin="round" fill="#FBFAF5"><path d="M-44 0C-36 -10 -16 -16 8 -15C26 -14 40 -8 49 -1.5C51 0 51 2 49 3.5C40 10 24 14 6 14C-16 14 -34 9 -44 0Z"/><path d="M-43 0C-50 -7 -57 -17 -61 -25C-54 -22 -48 -14 -44 -7C-47 -15 -49 -22 -49 -27C-44 -19 -42 -10 -41 -2C-44 6 -50 16 -57 23C-50 21 -45 13 -42 5Z"/><path d="M-6 -13C-2 -23 6 -28 13 -29C11 -22 9 -17 9 -14Z"/></g>
+ <g stroke="#223A70" stroke-width="4" stroke-linejoin="round" fill="#223A70"><path d="M-44 0C-36 -10 -16 -16 8 -15C26 -14 40 -8 49 -1.5C51 0 51 2 49 3.5C40 10 24 14 6 14C-16 14 -34 9 -44 0Z"/><path d="M-43 0C-50 -7 -57 -17 -61 -25C-54 -22 -48 -14 -44 -7C-47 -15 -49 -22 -49 -27C-44 -19 -42 -10 -41 -2C-44 6 -50 16 -57 23C-50 21 -45 13 -42 5Z"/><path d="M-6 -13C-2 -23 6 -28 13 -29C11 -22 9 -17 9 -14Z"/></g>
+ <path d="M-44 0C-36 -10 -16 -16 8 -15C26 -14 40 -8 49 -1.5C51 0 51 2 49 3.5C40 10 24 14 6 14C-16 14 -34 9 -44 0Z" fill="#165E83"/>
+ <path d="M-42 1.5C-32 7 -14 11.5 6 11.5C24 11.5 38 7 47 2.5C38 5 24 6.5 6 6.5C-12 6.5 -30 4.5 -42 1.5Z" fill="#FBFAF5" transform="translate(0 -1.6) scale(1 1.25)"/>
+ <path d="M-30 5.2C-12 8.2 8 9 30 6M-24 8.6C-8 10.6 10 11 26 8.8" fill="none" stroke="#223A70" stroke-width="1.8" stroke-linecap="round"/>
+ <path d="M-36 -5.5C-20 -10.5 4 -12.5 26 -9" fill="none" stroke="#FBFAF5" stroke-width="2.2" stroke-linecap="round" opacity=".5"/>
+ <path d="M-30 -10L-27 -13L-25 -9.5M-21 -12L-18 -15L-16 -11.5" fill="#223A70" stroke="#223A70" stroke-width="1.4" stroke-linejoin="round"/>
+ <circle cx="37" cy="-3.5" r="3.6" fill="#FBFAF5"/><circle cx="37.8" cy="-3.5" r="2.1" fill="#17184B"/><circle cx="38.6" cy="-4.3" r=".75" fill="#fff"/>
+ <path d="M30 -6C31 -2 31 2 29.5 6" fill="none" stroke="#223A70" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
+</g>
+<g class="spark" opacity="0"><path d="M0 -14C1.5 -4 4 -1.5 14 0C4 1.5 1.5 4 0 14C-1.5 4 -4 1.5 -14 0C-4 -1.5 -1.5 -4 0 -14Z" fill="#fff" stroke="#223A70" stroke-width="1.6" stroke-linejoin="round"/></g>
+<metadata id="logo-meta">{"W":405.876,"pad":40,"wave":{"a":2.6,"f":17},"fish":{"x":342.5,"y":-53.905988011422224,"sc":0.8,"r":-26},"splash":{"x":302.5,"y":-19.905988011422224},"top":-75.90598801142222,"bot":105.50803994639519,"sub":{"y":147.50803994639517,"w":312.04}}</metadata>
+<g fill="#223A70" stroke="#FBFAF5" stroke-width="22" paint-order="stroke" stroke-linejoin="round"><g class="sub" transform="translate(46.92 147.51) scale(0.2)"><path d="M56.2 0Q51.5 -8.5 40.6 -26L28.9 -14.4V0H4Q4.8 -19.4 4.8 -36.3Q4.8 -53.2 4 -72.6H28.9V-43.3Q47.3 -61.5 55.1 -72.6H87.5L56 -41.4Q63 -31.6 71.75 -20.1Q80.5 -8.6 87.6 0Z" transform="translate(0 0)"/><path d="M27.6 -18.3Q65.6 -18.5 82.7 -19.4Q82 -15.3 81.85 -10.95Q81.7 -6.6 81.7 0H4Q4.8 -19.4 4.8 -36.3Q4.8 -53.2 4 -72.6H81.7V-54.5H27.6V-44.9Q32.4 -44.8 41.8 -44.8Q57.7 -44.8 74.7 -45.4V-28.2Q57.7 -28.8 41.8 -28.8Q32.4 -28.8 27.6 -28.7Z" transform="translate(127.6 0)"/><path d="M14 -28.3Q21.1 -24.2 30.5 -21.9Q39.9 -19.6 48 -19.6Q56.3 -19.6 59.7 -21.05Q63.1 -22.5 63.1 -24.2Q63.1 -30.3 44.5 -30.3Q24.1 -30.3 14.9 -34.55Q5.7 -38.8 5.7 -48.3Q5.7 -61.8 16.9 -68.2Q28.1 -74.6 46 -74.6Q56.4 -74.6 67.35 -71.95Q78.3 -69.3 87.1 -64.7Q84.2 -58.1 81 -48.6Q80.4 -46.6 80 -45.6Q74.9 -49.7 64.6 -52.45Q54.3 -55.2 46.4 -55.2Q36.9 -55.2 33.6 -53.95Q30.3 -52.7 30.3 -50.3Q30.3 -47.9 34.85 -46.45Q39.4 -45 48 -45Q69.2 -45 78.8 -40.15Q88.4 -35.3 88.4 -25.3Q88.4 -11.3 78.2 -5.15Q68 1 47.3 1Q36.2 1 24.7 -1.45Q13.2 -3.9 4 -8.6Q7.4 -13.7 9.65 -18.1Q11.9 -22.5 14 -28.3Z" transform="translate(250.3 0)"/><path d="M27.6 -18.3Q65.6 -18.5 82.7 -19.4Q82 -15.3 81.85 -10.95Q81.7 -6.6 81.7 0H4Q4.8 -19.4 4.8 -36.3Q4.8 -53.2 4 -72.6H81.7V-54.5H27.6V-44.9Q32.4 -44.8 41.8 -44.8Q57.7 -44.8 74.7 -45.4V-28.2Q57.7 -28.8 41.8 -28.8Q32.4 -28.8 27.6 -28.7Z" transform="translate(378.7 0)"/><path d="M87.9 -72.5Q87.2 -55.6 87.2 -36.3Q87.2 -16.9 87.9 0H52.1L27.9 -54.6L29.7 0H4Q4.8 -19.4 4.8 -36.3Q4.8 -53.1 4 -72.5H40.8L65.1 -16.4L63.4 -72.5Z" transform="translate(501.4 0)"/><path d="M97.5 -72.6 105.3 0H79.4L77.8 -51.8L67.8 0H41.6L31.4 -51.4L29.9 0H4L11.8 -72.6H45.8L54.5 -25.3L62.1 -72.6Z" transform="translate(669.3 0)"/><path d="M27.6 -18.3Q65.6 -18.5 82.7 -19.4Q82 -15.3 81.85 -10.95Q81.7 -6.6 81.7 0H4Q4.8 -19.4 4.8 -36.3Q4.8 -53.2 4 -72.6H81.7V-54.5H27.6V-44.9Q32.4 -44.8 41.8 -44.8Q57.7 -44.8 74.7 -45.4V-28.2Q57.7 -28.8 41.8 -28.8Q32.4 -28.8 27.6 -28.7Z" transform="translate(814.6 0)"/><path d="M97.5 -72.6 105.3 0H79.4L77.8 -51.8L67.8 0H41.6L31.4 -51.4L29.9 0H4L11.8 -72.6H45.8L54.5 -25.3L62.1 -72.6Z" transform="translate(937.3 0)"/><path d="M27.6 -18.3Q65.6 -18.5 82.7 -19.4Q82 -15.3 81.85 -10.95Q81.7 -6.6 81.7 0H4Q4.8 -19.4 4.8 -36.3Q4.8 -53.2 4 -72.6H81.7V-54.5H27.6V-44.9Q32.4 -44.8 41.8 -44.8Q57.7 -44.8 74.7 -45.4V-28.2Q57.7 -28.8 41.8 -28.8Q32.4 -28.8 27.6 -28.7Z" transform="translate(1082.6 0)"/><path d="M87.9 -72.5Q87.2 -55.6 87.2 -36.3Q87.2 -16.9 87.9 0H52.1L27.9 -54.6L29.7 0H4Q4.8 -19.4 4.8 -36.3Q4.8 -53.1 4 -72.5H40.8L65.1 -16.4L63.4 -72.5Z" transform="translate(1205.3 0)"/><path d="M89.9 -51.6Q74.2 -52.1 59.4 -52.2V0H34.4V-52.2Q19.5 -52.1 4 -51.6V-72.6H89.9Z" transform="translate(1333.2 0)"/><path d="M4 -36.9Q4 -54.7 14.75 -64.7Q25.5 -74.7 48.5 -74.7Q71.6 -74.7 82.35 -64.7Q93.1 -54.7 93.1 -36.9Q93.1 -18.8 82.4 -8.9Q71.7 1 48.5 1Q25.6 1 14.8 -8.95Q4 -18.9 4 -36.9ZM69.4 -36.9Q69.4 -45.7 64.5 -50Q59.6 -54.3 48.5 -54.3Q37.5 -54.3 32.6 -50Q27.7 -45.7 27.7 -36.9Q27.7 -28 32.6 -23.7Q37.5 -19.4 48.5 -19.4Q59.6 -19.4 64.5 -23.65Q69.4 -27.9 69.4 -36.9Z" transform="translate(1463.1 0)"/></g></g><g class="rules" stroke="#223A70" stroke-width="2.2" stroke-linecap="round"><path d="M0.92 140.51H32.92M372.96 140.51H404.96"/></g>
+</svg><!--/klc:logo--></div>
+  <div class="bottom">
+    <div class="tiprow">
+      <div class="hoya"><img src="./assets/hoyaboya/1-9.png" width="1300" height="1693" alt="ホヤぼーや" decoding="async"><div class="credit" id="ld-hoya-credit">気仙沼市観光キャラクター<br>「海の子 ホヤぼーや」</div></div>
+      <div class="tip ld-card"><div class="tip-head"><span class="tab"><span class="l-ja">まめ知識</span><span class="l-en">Trivia</span></span><div class="pager"><button type="button" id="tip-prev" aria-label="前のまめ知識"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg></button><span class="n"><b id="tip-n">1</b><i>/</i><span id="tip-N">27</span></span><button type="button" id="tip-next" aria-label="次のまめ知識"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5"/></svg></button></div></div><p id="tip-body"></p><div class="src" id="tip-src"></div></div>
     </div>
-    <div class="roma">KESENNUMA LIVING CITY</div>
-    <div class="foot">
-      <div>
-        <div id="loadlabel">Loading…</div>
-        <div class="keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Walk</span><span>Mouse Look</span><span><kbd>Shift</kbd> Run</span><span><kbd>F</kbd> Fly</span><span><kbd>1</kbd>–<kbd>7</kbd> Places</span></div>
+    <div class="ld-err"><p class="ld-errmsg" data-kind="slow"><span class="m m-slow m-ja">読み込みに<wbr>時間が<wbr>かかっています。<wbr>電波の<wbr>よい<wbr>場所で、<wbr>もう一度<wbr>お試しください。</span><span class="m m-slow m-en">This is taking a while. Please try again on a better connection.</span><span class="m m-offline m-ja">インターネットに<wbr>つながって<wbr>いないようです。<wbr>つながってから、<wbr>もう一度<wbr>お試しください。</span><span class="m m-offline m-en">You seem to be offline. Please reconnect and try again.</span><span class="m m-failed m-ja">うまく<wbr>読み込めませんでした。<wbr>もう一度<wbr>お試しください。</span><span class="m m-failed m-en">Something went wrong while loading. Please try again.</span></p><button type="button" id="ld-retry"><span class="l-ja">もう一度読み込む</span><span class="l-en">Try again</span></button></div>
+    <div class="cta">
+      <div class="gauge">
+        <div class="row"><span id="loadlabel" data-title="1"><span class="l-ja">まちを よみこんでいます</span><span class="l-en">Reading the town…</span></span><span class="pct" id="ld-pct">0<small>%</small></span></div>
+        <div class="bar" id="ld-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="loadlabel"><i></i><div class="ld-work" id="ld-work"><div class="ld-work-in" id="ld-work-in"></div></div><div class="ld-fill" id="ld-fill"><div class="ld-fill-in" id="ld-fill-in"></div></div><div class="ld-ride" id="ld-ride"><!--klc:runner--><svg class="runner" id="fish" data-character="bonito" viewBox="-66 -32 122 61" aria-hidden="true"></svg><template id="klc-hoya-dev" data-src="/data/hoyaboya-dev/runner-a.png" data-aspect="0.6406"></template><!--/klc:runner--></div></div>
       </div>
-      <button id="go" disabled>まちへ出る · Enter the town</button>
+      <button id="go" class="prompt ld-cta" type="button" disabled><span class="go-line"><i class="dia" aria-hidden="true"></i><b><span class="k-tap">TAP TO START</span><span class="k-click">CLICK TO START</span></b><i class="dia" aria-hidden="true"></i></span><small lang="ja"><span class="k-tap">タップしてスタート</span><span class="k-click">クリックしてスタート</span></small></button>
     </div>
   </div>
+  <footer><span>© 2026 KesenMemento</span><span>Ver. 2.0</span><span id="ld-map">地図 © 国土地理院・OpenStreetMap</span></footer>
 </div>
+<!--klc:sky--><script>
+/* [loader] The sky follows the real clock in Kesennuma (JST). Generated by scripts/anime/loader-inline.js from src/web/lib/solar.js and src/anime/ui/loader/sky.js; edit those. */
+(function () {
+const rad = Math.PI / 180;
+function sunPosition(date, lat, lon) {
+  const jd = date.getTime() / 86400000 + 2440587.5;
+  const jc = (jd - 2451545) / 36525;
+  const L0 = (280.46646 + jc * (36000.76983 + jc * 0.0003032)) % 360;
+  const M = 357.52911 + jc * (35999.05029 - 0.0001537 * jc);
+  const e = 0.016708634 - jc * (0.000042037 + 0.0000001267 * jc);
+  const C = Math.sin(M * rad) * (1.914602 - jc * (0.004817 + 0.000014 * jc)) + Math.sin(2 * M * rad) * (0.019993 - 0.000101 * jc) + Math.sin(3 * M * rad) * 0.000289;
+  const trueLong = L0 + C;
+  const omega = 125.04 - 1934.136 * jc;
+  const lambda = trueLong - 0.00569 - 0.00478 * Math.sin(omega * rad);
+  const eps0 = 23 + (26 + (21.448 - jc * (46.815 + jc * (0.00059 - jc * 0.001813))) / 60) / 60;
+  const eps = eps0 + 0.00256 * Math.cos(omega * rad);
+  const decl = Math.asin(Math.sin(eps * rad) * Math.sin(lambda * rad)) / rad;
+  const y = Math.tan((eps / 2) * rad) ** 2;
+  const eqTime = 4 / rad * (y * Math.sin(2 * L0 * rad) - 2 * e * Math.sin(M * rad) + 4 * e * y * Math.sin(M * rad) * Math.cos(2 * L0 * rad)
+    - 0.5 * y * y * Math.sin(4 * L0 * rad) - 1.25 * e * e * Math.sin(2 * M * rad));
+  const utcMin = ((date.getTime() / 60000) % 1440 + 1440) % 1440;
+  let tst = (utcMin + eqTime + 4 * lon) % 1440; if (tst < 0) tst += 1440;
+  let ha = tst / 4 - 180; if (ha < -180) ha += 360;
+  const cosZen = Math.sin(lat * rad) * Math.sin(decl * rad) + Math.cos(lat * rad) * Math.cos(decl * rad) * Math.cos(ha * rad);
+  const zen = Math.acos(Math.max(-1, Math.min(1, cosZen))) / rad;
+  let az = Math.acos(Math.max(-1, Math.min(1, (Math.sin(lat * rad) * Math.cos(zen * rad) - Math.sin(decl * rad)) / (Math.cos(lat * rad) * Math.sin(zen * rad))))) / rad;
+  az = ha > 0 ? (az + 180) % 360 : (540 - az) % 360;
+  const elev0 = 90 - zen;
+  let refr = 0;
+  if (elev0 <= 85) {
+    const te = Math.tan(elev0 * rad);
+    if (elev0 > 5) refr = 58.1 / te - 0.07 / te ** 3 + 0.000086 / te ** 5;
+    else if (elev0 > -0.575) refr = 1735 + elev0 * (-518.2 + elev0 * (103.4 + elev0 * (-12.79 + elev0 * 0.711)));
+    else refr = -20.772 / te;
+    refr /= 3600;
+  }
+  return { azimuth: az, elevation: elev0 + refr };
+}
+const KESENNUMA = Object.freeze({ lat: 38.9086, lon: 141.5698 });
+const WA = Object.freeze({
+  AI: '#165E83',
+  KON: '#223A70',
+  TEKKON: '#17184B',
+  ASAGI: '#00A3AF',     // 浅葱色 asagi: the water's crest line
+  WASURE: '#89C3EB',
+  SHINO: '#F19072',
+  YAMA: '#F8B500',
+  AKANE: '#B7282E',
+  KINARI: '#FBFAF5',
+  SUMI: '#595857',
+});
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const toHex = (a) => '#' + a.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('').toUpperCase();
+function mix(a, b, t) { const x = hex(a), y = hex(b); return toHex(x.map((v, i) => v + (y[i] - v) * t)); }
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const lum = (c) => { const [r, g, b] = hex(c).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const { AI, KON, TEKKON, WASURE, SHINO, YAMA, AKANE, KINARI } = WA;
+const ANCHORS = Object.freeze([
+  { e: -16, am: [TEKKON, KON, mix(KON, AI, 0.3), mix(KON, AI, 0.65)], pm: [TEKKON, KON, mix(KON, AI, 0.3), mix(KON, AI, 0.65)] },
+  { e: -7, am: [KON, mix(KON, AI, 0.5), mix(AI, SHINO, 0.32), mix(SHINO, AI, 0.45)], pm: [KON, mix(KON, AI, 0.5), mix(AI, AKANE, 0.3), mix(AKANE, AI, 0.5)] },
+  { e: 0, am: [mix(AI, WASURE, 0.5), mix(WASURE, SHINO, 0.28), mix(SHINO, YAMA, 0.35), mix(YAMA, KINARI, 0.2)], pm: [mix(AI, WASURE, 0.45), mix(WASURE, AKANE, 0.2), mix(AKANE, YAMA, 0.45), mix(YAMA, KINARI, 0.15)] },
+  { e: 8, am: [mix(WASURE, AI, 0.25), WASURE, mix(WASURE, YAMA, 0.2), mix(YAMA, KINARI, 0.45)], pm: [mix(WASURE, AI, 0.3), WASURE, mix(WASURE, SHINO, 0.25), mix(YAMA, SHINO, 0.35)] },
+  { e: 24, am: [mix(WASURE, AI, 0.18), WASURE, mix(WASURE, KINARI, 0.3), mix(WASURE, KINARI, 0.55)], pm: [mix(WASURE, AI, 0.18), WASURE, mix(WASURE, KINARI, 0.3), mix(WASURE, KINARI, 0.55)] },
+]);
+function stopsFor(elevation, am) {
+  const A = ANCHORS, k = am ? 'am' : 'pm';
+  if (elevation <= A[0].e) return [...A[0][k]];
+  if (elevation >= A[A.length - 1].e) return [...A[A.length - 1][k]];
+  let i = 0; while (elevation > A[i + 1].e) i++;
+  const t = (elevation - A[i].e) / (A[i + 1].e - A[i].e);
+  return A[i][k].map((c, j) => mix(c, A[i + 1][k][j], t));
+}
+function sunPlace(elevation, hours, hz, wide) {
+  const e = clamp(elevation, 0, 56), lo = wide ? 48 : 12, hi = wide ? 82 : 88;
+  return { x: clamp(hi - ((hours - 5.5) / (18.5 - 5.5)) * (hi - lo + (wide ? 0 : 2)), lo, hi), y: Math.max(32, hz - (e / 56) * (hz - 15)) };
+}
+function skyState(date, sunPosition, { lat = KESENNUMA.lat, lon = KESENNUMA.lon, hz = 72, wide = false } = {}) {
+  const jst = new Date(date.getTime() + 9 * 3600000), hours = jst.getUTCHours() + jst.getUTCMinutes() / 60 + jst.getUTCSeconds() / 3600;
+  const { elevation, azimuth } = sunPosition(date, lat, lon);
+  const am = hours < 12;
+  const stops = stopsFor(elevation, am);
+  const night = clamp((-elevation - 3) / 9, 0, 1);
+  const behind = mix(stops[1], stops[2], 0.5);
+  const ink = [KON, TEKKON, KINARI].reduce((best, c) => (contrast(c, behind) > contrast(best, behind) ? c : best));
+  const p = sunPlace(elevation, hours, hz, wide);
+  const sunA = clamp((elevation + 4) / 6, 0, 1);
+  const sunColor = elevation < 6 ? mix(AKANE, YAMA, clamp((elevation + 4) / 10, 0, 1)) : mix(YAMA, KINARI, clamp((elevation - 6) / 18, 0, 1) * 0.7);
+  const glow = Math.round(104 - clamp(elevation, 0, 40) * 1.4);
+  const moon = { x: 22, y: 38, a: +night.toFixed(3) };
+  const sun = { x: +p.x.toFixed(2), y: +p.y.toFixed(2), a: +sunA.toFixed(3), color: sunColor, glow };
+  const vars = {
+    '--s0': stops[0], '--s1': stops[1], '--s2': stops[2], '--s3': stops[3], '--ink': ink,
+    '--sun-x': sun.x + '%', '--sun-y': sun.y + '%', '--sun-a': String(sun.a), '--sun-c': sun.color, '--sun-glow': sun.glow + 'px',
+    '--moon-x': moon.x + '%', '--moon-y': moon.y + '%', '--moon-a': String(moon.a), '--night': String(+night.toFixed(3)),
+    '--h1': mix(stops[3], KON, 0.3), '--h2': mix(stops[3], KON, 0.62), '--h3': mix(mix(KON, TEKKON, 0.45), TEKKON, night),
+  };
+  return { elevation, azimuth, hours, night, stops, ink, sun, moon, vars };
+}
+const SKY_NAMES = Object.freeze({ dawn: '05:50', morning: '08:30', day: '12:00', noon: '12:00', afternoon: '15:00', golden: '16:50', dusk: '17:25', blue: '17:55', night: '22:00', midnight: '00:30' });
+function pinnedSky(value, now = new Date()) {
+  if (!value) return null;
+  const hm = (SKY_NAMES[value] ?? value).match(/^(\d{1,2}):(\d{2})$/);
+  if (!hm) return null;
+  const j = new Date(now.getTime() + 9 * 3600000);
+  return new Date(Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate(), +hm[1], +hm[2]) - 9 * 3600000);
+}
+const POSTER_HOURS = Object.freeze({ asa: 6.5, hiru: 12, yugata: 16.5, yoru: 19.5 });
+const SKY_POSTER = Object.freeze({ dawn: 'asa', morning: 'asa', day: 'hiru', noon: 'hiru', afternoon: 'hiru', golden: 'yugata', dusk: 'yugata', blue: 'yoru', night: 'yoru', midnight: 'yoru' });
+function posterName(hours) {
+  const h = ((Number(hours) % 24) + 24) % 24;
+  if (h >= 5 && h < 10) return 'asa';
+  if (h >= 10 && h < 15) return 'hiru';
+  if (h >= 15 && h < 19) return 'yugata';
+  return 'yoru';
+}
+function posterForQuery(search, now = new Date()) {
+  const q = typeof search === 'string' ? new URLSearchParams(search.startsWith('?') ? search : `?${search}`) : search;
+  const pin = q.get('poster');
+  if (pin && POSTER_HOURS[pin]) return pin;
+  if (q.has('hours')) return posterName(Number(q.get('hours')));
+  const preset = q.get('preset') || (q.get('look') === 'photo' ? 'photo' : '');
+  if (preset === 'asa' || preset === 'hiru' || preset === 'yugata' || preset === 'yoru') return preset;
+  if (preset === 'yuyake' || preset === 'photo') return 'yugata';
+  const sky = q.get('sky');
+  if (sky && SKY_POSTER[sky]) return SKY_POSTER[sky];
+  if (sky && /^\d{1,2}:\d{2}$/.test(sky)) { const [h, m] = sky.split(':').map(Number); return posterName(h + m / 60); }
+  const jst = new Date(now.getTime() + 9 * 3600000);
+  return posterName(jst.getUTCHours() + jst.getUTCMinutes() / 60 + jst.getUTCSeconds() / 3600);
+}
 
+  var intro = document.getElementById('intro');
+  if (intro) {
+    var d = null; try { d = pinnedSky(new URLSearchParams(location.search).get('sky')); } catch (e) { /* no pin */ }
+    var st = skyState(d || new Date(), sunPosition, { wide: innerWidth / Math.max(1, innerHeight) > 1.4 && innerHeight <= 520 });
+    for (var k in st.vars) intro.style.setProperty(k, st.vars[k]);
+    var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', st.stops[1]);
+    try { var slot = posterForQuery(location.search); document.documentElement.dataset.t = slot; intro.dataset.t = slot; } catch (e2) { /* the head script already set it */ }
+  }
+})();
+</script><!--/klc:sky-->
+<!--klc:tips--><script type="application/json" id="klc-tips">[{"id":"mascot-sword-belt","ja":"ホヤぼーやの​剣は​サンマで、​ベルトは​ホタテなんだよ。","en":"Hoya Boya’s sword is a Pacific saury, and his belt is a scallop.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-shark-cape","ja":"ホヤぼーやは、​サメの​皮でできた​マントをつけているよ。","en":"Hoya Boya wears a cape made of shark skin.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-sea-prince","ja":"ホヤぼーやは、​仲間と​気仙沼の​海を​守る、​海の​王子さまなんだよ。","en":"Hoya Boya is a prince of the sea who protects Kesennuma’s ocean with his friends.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-hobbies","ja":"ホヤぼーやのしゅみと​特技は、はまらいんやおどりと​サメ​乗り​サーフィンだよ。","en":"Hoya Boya’s hobby and skill are the Hamarainya dance and surfing on a shark.","src":"気仙沼​市​観光​キャラクター​「海の​子​ ​ホヤぼーや」​デザイン​マニュアル​（気仙沼​市）","srcEn":"Hoya Boya design manual (Kesennuma City)"},{"id":"mascot-favorite-word","ja":"ホヤぼーやの​好きな​言葉​「はまらいんや」は、​気仙沼​弁で​「仲間に​入ろう」だよ。","en":"Hoya Boya’s favorite word “Hamarainya” is Kesennuma dialect for “let’s join in.”","src":"みんな​大好き！​「海の​子​ホヤぼーや」​（気仙沼さ​来てけらいん）","srcEn":"Everyone loves Hoya Boya (Kesennuma tourism site)"},{"id":"mascot-debut-2007","ja":"ホヤぼーやは、みんなから​集めた​案の​中から​選ばれ、​2007​年​7​月に​デビューしたよ。","en":"Hoya Boya was chosen from a public call and debuted in July 2007.","src":"気仙沼​市​観光​キャラクター​「海の​子​ホヤぼーや」​について​（気仙沼​市役所）","srcEn":"About Hoya Boya (Kesennuma City Hall)"},{"id":"katsuo-modori","ja":"秋に​南へもどる、あぶらがのった​カツオは​「もどり​ガツオ」と​よばれるよ。","en":"Bonito that return south in autumn are fatty and are known as “modori-gatsuo.”","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"sanma-sashimi","ja":"気仙沼では、​サンマをさしみやたたきにしても​食べるんだよ。","en":"In Kesennuma, people eat saury not only grilled but also as sashimi and tataki.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"mekajiki-harmonica","ja":"メカジキの​背びれの​つけ根は、​「ハーモニカ」と​よばれる​部分だよ。","en":"The part at the base of a swordfish’s back fin is called the “harmonica.”","src":"極上の​旨みを​味わう！​宮城​県が​誇る​「メカジキ」の​魅力​（宮城​旬​鮮​探訪）","srcEn":"Miyagi’s prized swordfish (Miyagi seasonal food guide)"},{"id":"same-all-used","ja":"サメは、​ヒレを​フカ​ヒレに、​肉をおもにねりものに、​皮を​革にして、ぜんぶ​使うんだよ。","en":"Sharks are used fully: fins for shark fin, meat mostly for fish paste, skin for leather.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"hoya-sea-pineapple","ja":"ホヤは、​ごつごつした​形から​「海の​パイナップル」と​よばれるよ。","en":"Hoya, or sea squirts, are nicknamed “sea pineapples” for their bumpy shape.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"kaki-forest","ja":"気仙沼の​カキは、​森の​栄養が​川から​海へ​流れこんで​育つんだよ。","en":"Kesennuma oysters grow on nutrients that rivers carry from the forests to the sea.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"horumon-cabbage","ja":"気仙沼​ホルモンは、​千切り​キャベツと​食べるのが​気仙沼​流だよ。","en":"Kesennuma-style grilled pork offal, called “horumon,” is eaten with shredded cabbage.","src":"特産​品の​紹介​（気仙沼​市役所）","srcEn":"Local specialties (Kesennuma City Hall)"},{"id":"hotate-swim","ja":"ホタテは、​貝がらを​開け​閉めして、​海の​中を​泳ぐように​進むんだよ。","en":"Scallops move through the sea by opening and closing their shells, like swimming.","src":"宮城​県​産​「ホタテガイ」​徹底​ガイド​（宮城​旬​鮮​探訪）","srcEn":"A guide to Miyagi scallops (Miyagi seasonal food guide)"},{"id":"bay-oshima-calm","ja":"「みどりの​真珠」の​大島が、​気仙沼湾を​一年中​おだやかにしているよ。","en":"Oshima, the “Green Pearl,” sits at the bay’s mouth and keeps Kesennuma Bay calm all year.","src":"気仙沼の​水産​（気仙沼​市役所）","srcEn":"Kesennuma’s fisheries (Kesennuma City Hall)"},{"id":"sanma-light","ja":"サンマ​漁では、​集魚灯という​ライトで​サンマを​よびよせるんだよ。","en":"Saury fishing uses lamps called shugyoto to lure the fish.","src":"水産​情報​等​発信​施設​（気仙沼​市​魚市場）","srcEn":"Fisheries information center (Kesennuma Fish Market)"},{"id":"katsuo-barbless","ja":"カツオの​一本づりの​針には、とげのような​「返し」がないんだよ。","en":"The hooks used for pole-and-line bonito fishing have no barb.","src":"水産​情報​等​発信​施設​（気仙沼​市​魚市場）","srcEn":"Fisheries information center (Kesennuma Fish Market)"},{"id":"defune-okuri","ja":"漁に​出る​船を、​色とりどりの​テープと​大漁​旗で​見送る​「出船おくり」があるよ。","en":"Boats heading out to fish are sent off with streamers and flags (Defune Okuri).","src":"はじめての​気仙沼​（気仙沼さ​来てけらいん）","srcEn":"First time in Kesennuma (Kesennuma tourism site)"},{"id":"market-viewing","ja":"魚市場の​見学​エリアでは、​水揚げや​入札のようすを​見られることがあるよ。","en":"At the fish market’s viewing areas, you can sometimes watch fish being landed and sold.","src":"おすすめ​見学​コース​（気仙沼​市​魚市場）","srcEn":"Recommended viewing route (Kesennuma Fish Market)"},{"id":"ukimido-ebisu","ja":"浮​見​堂​（うきみどう）のそばのえびすさまは、​タイではなく​カツオを​つり上げているよ。","en":"Near Ukimido, the god Ebisu holds up a bonito instead of the usual sea bream.","src":"みなとまち​散策​モデル​コース​（気仙沼さ​来てけらいん）","srcEn":"Harbor town walking route (Kesennuma tourism site)"},{"id":"anbasan-239","ja":"安​波山​（あんばさん）は、​海面から​239​メートルの​高さで、​気仙沼湾が​見​わたせるよ。","en":"Mount Anba rises 239 meters above sea level and overlooks Kesennuma Bay and the town.","src":"安​波山​（気仙沼さ​来てけらいん）","srcEn":"Mount Anba (Kesennuma tourism site)"},{"id":"kugunari-singing-sand","ja":"十八​鳴浜​（くぐなりはま）は、​砂が​キュッキュッと​鳴る、​国の​天然記念物の​浜だよ。","en":"Oshima’s Kugunari Beach has squeaking sand and is a national natural monument.","src":"国​指定​文化財​（史跡・​名勝・​天然記念物）​（気仙沼​市役所）","srcEn":"National cultural properties (Kesennuma City Hall)"},{"id":"tsurukame-bridge","ja":"気仙沼​大島​大橋の​あだ名​「鶴​亀​（つるかめ）​大橋」は、​鶴​ヶ​浦と​亀山からついたよ。","en":"Oshima Bridge’s nickname, Tsurukame, comes from the places Tsurugaura and Kameyama.","src":"道路や​橋などの​名称と​愛称​について​（宮城​県）","srcEn":"Names of roads and bridges (Miyagi Prefecture)"},{"id":"kanae-bridge-name","ja":"かなえ​大橋の​名前は、​気仙沼湾の​昔の​名前​「鼎​（かなえ）が​浦」からきているよ。","en":"Kanae Bridge, which crosses Kesennuma Bay, is named after the bay’s old name, Kanae-ga-ura.","src":"気仙沼湾​横断​橋​（気仙沼さ​来てけらいん）","srcEn":"Kesennuma Bay Crossing Bridge (Kesennuma tourism site)"},{"id":"iwaisaki-fossils","ja":"岩井崎​（いわいさき）の​岩には、​約​2​億​5​千万​年前の​サンゴなどの​化石があるんだよ。","en":"Rocks at Iwaisaki hold fossils of corals and other sea life about 250 million years old.","src":"岩井崎​（気仙沼さ​来てけらいん）","srcEn":"Iwaisaki (Kesennuma tourism site)"},{"id":"naiwan-waterfront","ja":"内湾​（ないわん）の​岸では、あみを​直す​漁師さんや、つりを​楽しむ​人が​見られるよ。","en":"At the Naiwan waterfront you may see fishers mending nets and people enjoying fishing.","src":"みなとまち​散策​モデル​コース​（気仙沼さ​来てけらいん）","srcEn":"Harbor town walking route (Kesennuma tourism site)"},{"id":"hoya-farming-karakuwa","ja":"ホヤの​養殖は、​100​年​以上​前に​気仙沼の​唐桑​（からくわ）ではじまったんだよ。","en":"Sea squirt farming began over 100 years ago in Karakuwa, now part of Kesennuma.","src":"蒸しほや​（むしほや）​｜​にっぽん​伝統​食​図鑑​（農林​水産​省）","srcEn":"Steamed sea squirt (Japan’s agriculture ministry)"}]</script><!--/klc:tips-->
+<!--klc:boot--><script>
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const outCubic = (u) => 1 - (1 - u) ** 3;
+const outBack = (u, k = 1.6) => 1 + (k + 1) * (u - 1) ** 3 + k * (u - 1) ** 2;
+const inOut = (u) => (u < 0.5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2);
+const f2 = (v) => (+v).toFixed(2);
+function createMotion(stage, opts = {}) {
+  const reduced = !!opts.reduced;
+  let tapAt = opts.tapAt ?? Infinity;
+  const progress = opts.progress === undefined ? null : opts.progress;
+  const ramp0 = Number.isFinite(opts.ramp0) ? clamp(opts.ramp0) : 0.62;   // where the comp's own ramp starts (a capture of the whole load passes ?ramp0=0)
+  const svg = stage.querySelector('#logo svg');
+  const M = JSON.parse(svg.querySelector('#logo-meta').textContent);
+  const L = [...svg.querySelectorAll('defs path[id^="l"]')].map((p) => ({ p, base: p.dataset.base, cx: +p.dataset.cx, cy: +p.dataset.cy, bot: +p.dataset.bot }));
+  const S = [...svg.querySelectorAll('.sealine')].map((g) => ({ y: +g.dataset.y, lb: +g.dataset.lb, ph: +g.dataset.ph, sb: g.querySelector('.sb'), sp: g.querySelector('.sp'), sc: g.querySelector('.sc') }));
+  const fish = svg.querySelector('.fish'), splash = svg.querySelector('.splash'), spark = svg.querySelector('.spark'), shine = svg.querySelector('.shine');
+  const sub = [...svg.querySelectorAll('.sub path')].map((p) => ({ p, base: p.getAttribute('transform') || '' })), rules = svg.querySelector('.rules');
+  const $ = (s) => stage.querySelector(s);
+  const ui = { logo: $('.logo'), header: $('header'), tip: $('.tip'), gauge: $('.gauge'), prompt: $('.prompt'), footer: $('footer'), hoya: $('.hoya'), bg: $('.bg'), bg2: $('.bg2'), bar: $('.bar i'), runner: $('.bar .runner'), pct: $('.pct'), dia: [...stage.querySelectorAll('#go .dia')] };
+  const wave = (y0, ph) => { let d = `M-40 ${f2(y0 + M.wave.a * Math.sin(-40 / M.wave.f + ph))}`; for (let X = -35; X <= M.W + 46; X += 5) d += `L${X} ${f2(y0 + M.wave.a * Math.sin(X / M.wave.f + ph))}`; return d; };
+  const window1 = (t, t0, d) => clamp((t - t0) / d);
+  function letters(t) {
+    const idle = clamp((t - 2.6) / 0.6);
+    L.forEach((l, i) => {
+      const s0 = 0.15 + i * 0.09, u = reduced ? 1 : (t - s0) / 0.42;
+      if (u <= 0) { l.p.setAttribute('transform', 'translate(0 -9999)'); return; }
+      let dy = 0, sx = 1, sy = 1, dr = 0;
+      if (u < 0.5) { const v = u / 0.5; dy = -84 * (1 - v * v); sx = sy = lerp(0.72, 1, v); dr = lerp(-16, 0, v); }
+      else if (u < 0.66) { const q = Math.sin(((u - 0.5) / 0.16) * Math.PI); sy = 1 - 0.16 * q; sx = 1 + 0.1 * q; }
+      else if (u < 1) { const v = (u - 0.66) / 0.34, q = Math.sin(v * Math.PI) * (1 - v); dy = -7 * q; sy = 1 + 0.05 * q; sx = 1 / sy; }
+      if (!reduced) { dy += idle * 2.2 * Math.sin((2 * Math.PI * t) / 2.6 + i * 0.9); dr += idle * 1.2 * Math.cos((2 * Math.PI * t) / 2.6 + i * 0.9); }
+      l.p.setAttribute('transform', `translate(0 ${f2(dy)}) translate(${l.cx} ${l.bot}) scale(${f2(sx)} ${f2(sy)}) translate(${-l.cx} ${-l.bot}) rotate(${f2(dr)} ${l.cx} ${l.cy}) ${l.base}`);
+    });
+  }
+  function sea(t) {
+    S.forEach((s, li) => {
+      const t0 = li === 0 ? 0.42 : 0.66, u = reduced ? 1 : window1(t, t0, 0.85), k = t - t0;
+      const slosh = !reduced && k > 0 ? 4 * Math.exp(-2.6 * k) * Math.sin(8.5 * k) : 0;
+      const level = lerp(s.lb + 8, s.y, outCubic(u)) + slosh, crest = wave(level, s.ph + (reduced ? 0 : t * 2.2));
+      const body = `${crest}L${M.W + 46} ${f2(s.lb + 30)}L-40 ${f2(s.lb + 30)}Z`;
+      s.sb.setAttribute('d', body); s.sp.setAttribute('d', body); s.sc.setAttribute('d', crest);
+    });
+  }
+  function leap(t) {
+    const u = reduced ? 1 : (t - 1.05) / 0.46;
+    if (u <= 0) { fish.style.opacity = 0; splash.style.opacity = 0; return; }
+    const v = clamp(u), x0 = M.splash.x + 6, y0 = M.splash.y + 12;
+    let x = lerp(x0, M.fish.x, outCubic(v)), y = lerp(y0, M.fish.y, outCubic(v)) - 30 * Math.sin(Math.PI * v), r = lerp(-75, M.fish.r, outCubic(v));
+    const sc = M.fish.sc * lerp(0.4, 1, outBack(v));
+    const bob = reduced ? 0 : clamp((t - 1.6) / 0.5);
+    y += bob * 1.6 * Math.sin((2 * Math.PI * t) / 2.2); r += bob * 2 * Math.sin((2 * Math.PI * t) / 2.2 + 1);
+    fish.style.opacity = 1; fish.setAttribute('transform', `translate(${f2(x)} ${f2(y)}) rotate(${f2(r)}) scale(${f2(sc)})`);
+    const k = outBack(clamp(u / 0.6), 2.2);
+    splash.style.opacity = 1; splash.setAttribute('transform', `translate(${M.splash.x} ${M.splash.y}) scale(${f2(lerp(0.3, 1, k))}) translate(${-M.splash.x} ${-M.splash.y})`);
+  }
+  function sparkle(t) {
+    const tw = [[1.36, M.fish.x + 22, M.fish.y - 16, 1.15], [3.25, -6, M.top + 8, 0.8], [5.55, M.W - 8, M.top + 112, 0.8]];
+    const a = !reduced && tw.find(([t0]) => t >= t0 && t < t0 + 0.5);
+    if (!a) { spark.style.opacity = 0; return; }
+    const u = (t - a[0]) / 0.5, k = Math.sin(Math.PI * u) * a[3];
+    spark.style.opacity = 1; spark.setAttribute('transform', `translate(${f2(a[1])} ${f2(a[2])}) rotate(${f2(90 * u)}) scale(${f2(k)})`);
+  }
+  function english(t) {
+    const r = reduced ? 1 : outCubic(window1(t, 1.45, 0.4));
+    rules.style.opacity = r; rules.setAttribute('transform', `translate(${M.W / 2} 0) scale(${f2(lerp(0.4, 1, r))} 1) translate(${-M.W / 2} 0)`);
+    sub.forEach((g, i) => { const u = reduced ? 1 : outCubic(window1(t, 1.45 + i * 0.025, 0.3)); g.p.style.opacity = u; g.p.setAttribute('transform', `${g.base} translate(0 ${f2((1 - u) * 40)})`); });
+  }
+  function sweep(t) {
+    const w = !reduced && [1.95, 6.95].find((t0) => t >= t0 && t < t0 + 0.6);
+    if (w === undefined || w === false) { shine.style.opacity = 0; return; }
+    shine.style.opacity = 1; shine.setAttribute('transform', `translate(${f2(lerp(-80, M.W + 140, inOut((t - w) / 0.6)))} 0)`);
+  }
+  let doneAt = null, promptFocused = false;
+  function hud(t) {
+    const live = typeof progress === 'function';
+    const pinned = typeof progress === 'number';
+    const p = live ? clamp(progress()) : pinned ? clamp(progress) : (ramp0 + (1 - ramp0) * inOut(window1(t, 0.3, 2.0)));
+    if (!live && ui.bar) ui.bar.style.width = `calc(${(p * 100).toFixed(2)}% - 4px)`;
+    if (!live && ui.runner) ui.runner.style.left = `${(p * 100).toFixed(2)}%`;
+    if (!live && ui.pct && ui.pct.firstChild) ui.pct.firstChild.nodeValue = String(Math.round(p * 100));
+    const ready = live || pinned ? p >= 1 - 1e-9 : t >= 2.35;
+    if (ready && doneAt === null) doneAt = live ? t : 2.35;
+    if (!ui.gauge || !ui.prompt) return;
+    if (!ready) { ui.gauge.style.visibility = ''; ui.gauge.style.opacity = 1; ui.prompt.style.display = 'none'; return; }
+    const te = 2.35 + (t - doneAt);
+    const fadeDur = 0.2, inDur = reduced ? 0.2 : 0.3;
+    ui.gauge.style.visibility = te > 2.7 ? 'hidden' : ''; ui.gauge.style.opacity = f2(1 - window1(te, 2.5, fadeDur));
+    ui.prompt.style.display = 'grid';
+    if (!promptFocused) {
+      const go = document.getElementById('go');
+      if (go && !go.disabled) {
+        promptFocused = true;
+        requestAnimationFrame(() => { try { if (matchMedia('(pointer: fine)').matches) go.focus({ preventScroll: true }); } catch {  } });
+      }
+    }
+    const u = window1(te, 2.7, inDur), rise = reduced ? 0 : 8 * (1 - outCubic(u));
+    const breathe = reduced ? 1 : 0.8 + 0.2 * Math.cos((Math.PI * Math.max(0, te - 3)) / 1.6);
+    ui.prompt.style.opacity = f2((reduced ? u : outCubic(u)) * (t >= tapAt ? 1 : breathe));
+    if (rise > 0.01) ui.prompt.style.transform = `translateY(${f2(rise)}px)`; else if (ui.prompt.style.transform) ui.prompt.style.transform = '';
+  }
+  function exit(t) {
+    const still = ui.hoya.querySelectorAll('img, .credit');
+    if (t < tapAt) { still.forEach((e) => (e.style.display = '')); for (const k of ['logo', 'header', 'tip', 'gauge', 'prompt', 'footer']) if (ui[k] && k !== 'gauge' && k !== 'prompt') ui[k].style.opacity = ''; ui.bg.style.transform = ''; if (ui.bg2) ui.bg2.style.opacity = 0; ui.dia.forEach((e) => (e.style.transform = '')); return; }
+    still.forEach((e) => (e.style.display = 'none'));
+    const pinch = 5 * Math.sin(Math.PI * window1(t, tapAt, 0.24));
+    ui.dia.forEach((e, i) => (e.style.transform = `translateX(${f2(i ? -pinch : pinch)}px) rotate(45deg)`));
+    const e = inOut(window1(t, tapAt + 0.12, 0.42)), u = inOut(window1(t, tapAt + 0.1, 0.35));
+    ui.logo.style.opacity = 1 - e; ui.logo.style.transform = `translateX(-50%) translateY(${f2(-28 * e)}px) scale(${f2(1 + 0.04 * e)})`;
+    for (const k of ['header', 'tip', 'footer']) ui[k].style.opacity = 1 - u;
+    ui.prompt.style.opacity = 1 - u;
+    const z = inOut(window1(t, tapAt + 0.1, 1.1));
+    ui.bg.style.transform = `scale(${f2(1 + 0.22 * z)})`;
+    if (ui.bg2) { const c = inOut(window1(t, tapAt + 0.65, 0.55)); ui.bg2.style.opacity = c; ui.bg2.style.transform = `scale(${f2(1.08 - 0.08 * c)})`; }
+  }
+  function frameReduced(t) {
+    const a = clamp(t / 0.2);
+    if (svg) svg.style.opacity = String(a);
+    for (const l of L) l.p.setAttribute('transform', l.base);
+    for (const k of ['header', 'tip', 'footer']) if (ui[k]) ui[k].style.opacity = String(a);
+    hud(t);
+    const still = ui.hoya ? ui.hoya.querySelectorAll('img, .credit') : [];
+    if (t < tapAt) { still.forEach((e) => (e.style.display = '')); return; }
+    still.forEach((e) => (e.style.display = 'none'));
+    const u = window1(t, tapAt, 0.2);
+    if (ui.logo) { ui.logo.style.opacity = String(1 - u); ui.logo.style.transform = 'translateX(-50%)'; }
+    for (const k of ['header', 'tip', 'footer', 'prompt']) if (ui[k]) ui[k].style.opacity = String(1 - u);
+    if (ui.bg) ui.bg.style.transform = '';
+    if (ui.bg2) ui.bg2.style.opacity = 0;
+  }
+  function frame(t) {
+    if (reduced) { frameReduced(t); return; }
+    letters(t); sea(t); leap(t); sparkle(t); english(t); sweep(t); hud(t); exit(t);
+  }
+  return { frame, meta: M, setTap(t) { tapAt = t; } };
+}
+(function () {
+  var d = document, q = new URLSearchParams(location.search), stage = d.getElementById('intro');
+  try { performance.mark('klc:loader'); } catch (e) {  }
+  var lang = d.documentElement.lang === 'en' ? 'en' : 'ja';
+  var tips = [];
+  try { tips = JSON.parse(d.getElementById('klc-tips').textContent) || []; } catch (e) {  }
+  var ti = 0;
+  if (tips.length) {
+    var pin = q.get('tip');
+    ti = pin != null ? Math.max(0, Math.min(tips.length - 1, (Number(pin) || 1) - 1)) : Math.floor(Math.random() * tips.length);
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\u200b/g, '<wbr>');
+  }
+  function paintTip() {
+    var t = tips[ti]; if (!t) return;
+    var p = d.getElementById('tip-body'), s = d.getElementById('tip-src'), n = d.getElementById('tip-n'), N = d.getElementById('tip-N');
+    if (p) p.innerHTML = esc(lang === 'en' ? t.en : t.ja);
+    if (s) s.innerHTML = lang === 'en' ? 'Source: ' + esc(t.srcEn || t.src || '') : '出典：' + esc(t.src || '');
+    if (n) n.textContent = String(ti + 1);
+    if (N) N.textContent = String(tips.length);
+  }
+  function soundLabel(on) { return on ? (lang === 'en' ? 'Sound off' : '音をけす') : (lang === 'en' ? 'Sound on' : '音をだす'); }
+  function paintSound(on) {
+    var b = d.getElementById('ld-sound'); if (!b) return;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.setAttribute('aria-label', soundLabel(on));
+  }
+  function setLang(next) {
+    lang = next === 'en' ? 'en' : 'ja';
+    d.documentElement.lang = lang;
+    try { localStorage.setItem('klc.lang', lang); } catch (e) {  }
+    d.querySelectorAll('.lang button').forEach(function (b) { var on = b.getAttribute('data-lang') === lang; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    var mc = d.getElementById('ld-map'); if (mc) mc.textContent = lang === 'en' ? 'Map © GSI Japan · OpenStreetMap' : '地図 © 国土地理院・OpenStreetMap';
+    var hc = d.getElementById('ld-hoya-credit'); if (hc) hc.innerHTML = lang === 'en' ? 'Kesennuma City Mascot,<br>Hoya Boya the Ocean Boy' : '気仙沼市観光キャラクター<br>「海の子 ホヤぼーや」';
+    paintTip();
+    var b = d.getElementById('ld-sound'); if (b) b.setAttribute('aria-label', soundLabel(b.getAttribute('aria-pressed') === 'true'));
+  }
+  d.querySelectorAll('.lang button').forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); }); });
+  setLang(lang);
+  try {
+    var mq = matchMedia('(pointer: coarse)'), pinIn = q.get('input');
+    var paintInput = function () { d.documentElement.setAttribute('data-input', pinIn === 'touch' || pinIn === 'mouse' ? pinIn : (mq.matches ? 'touch' : 'mouse')); };
+    paintInput();
+    if (mq.addEventListener) mq.addEventListener('change', paintInput); else if (mq.addListener) mq.addListener(paintInput);
+  } catch (e) {  }
+  d.addEventListener('keydown', function (e) { if (e.key !== 'Enter') d.documentElement.setAttribute('data-kbd', '1'); }, true);
+  d.addEventListener('pointerdown', function () { d.documentElement.removeAttribute('data-kbd'); }, true);
+  var prev = d.getElementById('tip-prev'), next = d.getElementById('tip-next');
+  if (prev) prev.addEventListener('click', function () { if (!tips.length) return; ti = (ti + tips.length - 1) % tips.length; paintTip(); });
+  if (next) next.addEventListener('click', function () { if (!tips.length) return; ti = (ti + 1) % tips.length; paintTip(); });
+  var fishHost = d.getElementById('fish'), logoFish = d.querySelector('#logo .fish');
+  if (fishHost && logoFish) {
+    var c = logoFish.cloneNode(true);
+    c.removeAttribute('class');
+    c.setAttribute('transform', 'rotate(10) scale(.9)');
+    fishHost.appendChild(c);
+  }
+  var reduced = false;
+  try { reduced = (matchMedia('(prefers-reduced-motion: reduce)').matches && !q.get('force')) || q.get('reduce') === '1'; } catch (e) {  }
+  var capture = q.get('capture') === '1';
+  var progress = null;
+  if (q.get('p') != null && q.get('state') !== 'auto') progress = Math.max(0, Math.min(1, +q.get('p')));
+  else if (!capture) progress = function () { var b = window.__loadBar; return b ? b.position() : 0; };
+  var motion = createMotion(stage, { reduced: reduced, tapAt: q.get('tap') != null ? +q.get('tap') : Infinity, progress: progress, ramp0: q.get('ramp0') != null ? +q.get('ramp0') : undefined });
+  var clock = 0, stingAt = null, stung = false, audio = null;
+  function getT() { return clock; }
+  function frameAt(t) { clock = t; motion.frame(t); }
+  if (capture && !(typeof progress === 'number' && progress < 1)) d.body.classList.add('loaded');
+  if (capture) {
+    window.__T = frameAt;
+    frameAt(q.get('tframe') ? +q.get('tframe') : 0);
+    d.body.dataset.ready = '1';
+  } else {
+    var t0 = -1, lastTick = 0, ended = false;
+    function tick(now) {
+      if (t0 < 0) t0 = now;
+      lastTick = performance.now();
+      frameAt(Math.max(clock, (now - t0) / 1000));
+      var p = typeof progress === 'function' ? progress() : (typeof progress === 'number' ? progress : 0);
+      if (!stung && p >= 1 - 1e-9) { stung = true; stingAt = clock; if (audio && audio.on) audio.sting(getT, stingAt); }
+    }
+    function loop(now) { if (ended) return; tick(now); requestAnimationFrame(loop); }
+    requestAnimationFrame(loop);
+    var guard = setInterval(function () {
+      if (d.body.classList.contains('playing')) { ended = true; clearInterval(guard); return; }
+      if (t0 >= 0 && performance.now() - lastTick > 150) tick(performance.now());
+    }, 100);
+    d.body.dataset.ready = '1';
+  }
+  function loadAudio(then) {
+    import('./audio/title-sfx.js').then(function (m) { if (!audio) audio = m.createTitleSound(); then(audio); }).catch(function () {  });
+  }
+  try {
+    if (localStorage.getItem('klc.titleSound') === '1') {
+      paintSound(true);
+      d.addEventListener('pointerdown', function arm(ev) {
+        if (ev.target && ev.target.closest && ev.target.closest('#ld-sound')) return;
+        d.removeEventListener('pointerdown', arm, true);
+        loadAudio(function (a) { a.enable(getT, stingAt); });
+      }, true);
+    }
+  } catch (e) {  }
+  var soundBtn = d.getElementById('ld-sound');
+  if (soundBtn) soundBtn.addEventListener('click', function () {
+    var on = soundBtn.getAttribute('aria-pressed') !== 'true';
+    paintSound(on);
+    loadAudio(function (a) { if (on) a.enable(getT, stingAt); else a.disable(); });
+  });
+  window.__titleOnGo = function () {
+    if (window.__titleGone) return;
+    window.__titleGone = 1;
+    motion.setTap(clock);
+    if (audio && audio.on) audio.tap();
+    setTimeout(function () {
+      if (window.__titleFly) window.__titleFly();
+      else if (window.__titleArrive) window.__titleArrive();
+    }, reduced ? 200 : 700);
+  };
+  var failed = false;
+  function notice(kind) {
+    var intro = d.getElementById('intro'), msg = d.querySelector('.ld-errmsg');
+    if (!intro || !msg || d.body.classList.contains('loaded') || d.body.classList.contains('playing')) return;
+    msg.setAttribute('data-kind', kind); intro.classList.add('ld-failed'); failed = true;
+  }
+  function clearNotice() { if (!failed) return; failed = false; var intro = d.getElementById('intro'); if (intro) intro.classList.remove('ld-failed'); }
+  function health() { var ok = window.__loadLog && window.__loadLog.length > 0; if (ok) clearNotice(); else if (navigator.onLine === false) notice('offline'); else if (performance.now() > 30000) notice('slow'); }
+  addEventListener('error', function (e) { var t = e.target; if (t && t.tagName === 'SCRIPT' && !(window.__loadLog && window.__loadLog.length)) notice('failed'); }, true);
+  addEventListener('offline', health); addEventListener('online', health);
+  var hb = setInterval(function () { if (d.body.classList.contains('loaded') || d.body.classList.contains('playing')) { clearInterval(hb); return; } health(); }, 2000);
+  var retry = d.getElementById('ld-retry'); if (retry) retry.addEventListener('click', function () { location.reload(); });
+  try {
+    var host = location.hostname, local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]', tpl = d.getElementById('klc-hoya-dev');
+    if (local && tpl && new URLSearchParams(location.search).get('hoya') === 'run') {
+      var run = d.querySelector('.runner');
+      if (run) run.innerHTML = '<div class="sr" data-character="hoyaboya" data-n="1"><div class="sr-bob"><div class="sr-win"><img class="sr-strip" alt=""></div></div></div>';
+      d.documentElement.classList.add('klc-hoya-dev');
+    }
+  } catch (e) {  }
+  try {
+    if (reduced || typeof stage.animate !== 'function') {  }
+  } catch (e) {  }
+})();
+</script><!--/klc:boot-->
 <div class="hud" id="toast"><div class="sign"><span class="t-name"></span></div></div>
 <div class="hud" id="corner">
   <span id="clock">16:30</span>

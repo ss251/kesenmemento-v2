@@ -108,7 +108,7 @@ export const SHINMEI = {
 };
 
 /**
- * 魚町 flap-gate seawall (土木学会デザイン賞 2022; 今川悟 blog: crest T.P. 4.1 m, 1.3 m above the pavement, 21 gates
+ * 魚町 flap-gate seawall (土木学会デザイン賞 2022; imakawa.net blog: crest T.P. 4.1 m, 1.3 m above the pavement, 21 gates
  * of 13.7 m, 311 m). Line = the wall crest on the z18 ortho, west to east; stairs = the white stair / rest-deck units
  * that cross it (measured on the ortho).
  */

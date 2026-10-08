@@ -19,7 +19,9 @@
     "render": "bash blender/render.sh",
     "all": "bun test && bun run scripts/build-web.js",
     "stills": "bash tools/anime/gate.sh chrome bun run scripts/render/stills.js",
-    "qa": "bash tools/anime/gate.sh chrome bun tools/anime/qa3.mjs --build 1 --phone 1"
+    "qa": "bash tools/anime/gate.sh chrome bun tools/anime/qa3.mjs --build 1 --phone 1",
+    "build:railway": "bun run build && bun server/app/bundle.mjs",
+    "start": "cd bundle && bun server.js"
   },
   "dependencies": {
     "3d-tiles-renderer": "0.5.3",
@@ -28,10 +30,15 @@
     "@takram/three-atmosphere": "0.19.1",
     "@takram/three-clouds": "0.7.6",
     "@takram/three-geospatial": "0.9.1",
+    "astronomy-engine": "^2.1.19",
     "earcut": "3",
+    "exifr": "^7.1.3",
     "pbf": "4",
     "postprocessing": "6.39.5",
     "sharp": "^0.35.5",
     "three": "0.186.1"
+  },
+  "engines": {
+    "bun": "1.3.14"
   }
 }

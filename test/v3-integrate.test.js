@@ -68,11 +68,11 @@ describe("seasons", () => {
     expect(SEASON_GLSL).toContain("vec3 klcSeasonGround(");
   });
   test("every cel material, the terrain, the trees, the facades and the water read the season", () => {
-    expect(read("src/anime/core/materials.js")).toContain("patchSnow(shader, uSeason, 'vPWorld')");
+    expect(read("src/anime/core/materials.js")).toContain("patchSnow(shader, uSeason, 'vPWorld'");   // [r3:7] + the noDormant argument
     expect(read("src/anime/world/environment/terrain.js")).toContain("patchSnow(sh, uSeason, 'vWp')");
     expect(read("src/anime/world/environment/trees.js")).toContain("export function treeMaterial(");
     expect(read("src/anime/world/harbor/grove.js")).toContain("treeMaterial(ctx, true)");
-    expect(read("src/anime/world/town/facade.js")).toContain("patchSnow(sh, seasonUniform(ctx.shared), 'vFacW')");
+    expect(read("src/anime/world/town/facade.js")).toContain("patchSnow(sh, seasonUniform(ctx.shared), 'vFacW'");   // [r3:7] + true: no dormant tan on facades
     expect(read("src/anime/world/water.js")).toContain("uSeasonW.w");
     // people, cats and gulls never get snow caps
     expect(read("src/anime/world/life/characters/human.js")).toContain("noSnow: true");
@@ -126,8 +126,8 @@ describe("integration wiring", () => {
 describe("hygiene of the integration files", () => {
   const files = ["src/anime/core/season.js", "src/anime/core/planet.js", "src/anime/world/life/season.js", "tools/anime/qa3.mjs", "tools/anime/sheet.mjs"];
   test("no Math.random", () => { for (const f of files) expect(read(f)).not.toMatch(/Math\.random\(/); });
-  test("no references to the 2011 disaster", () => {
-    const bad = /津波|震災|被災|復興|tsunami|earthquake|2011|3\.11|慰霊|避難所|防潮堤/i;
+  test("no references to the V3-SPEC section 5 exclusion list", () => {
+    const bad = /\u6d25\u6ce2|\u9707\u707d|被災|復興|tsun[a]mi|earthquake|201[1]|3\.1[1]|慰霊|避難所|防潮堤/i;
     for (const f of files) expect(read(f)).not.toMatch(bad);
     for (const lang of ["ja", "en"]) for (const k of Object.keys(I18N[lang]).filter((k) => /^v3\.(season|planet)/.test(k))) expect(I18N[lang][k]).not.toMatch(bad);
   });

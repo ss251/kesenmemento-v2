@@ -65,6 +65,33 @@ export function unitHip() {
   return ng;
 }
 
+/** [sys:4] Shed (mono-pitch) roof: along x, low eave at z = +0.5 (y = 0), high side at z = -0.5 (y = 1), end faces and the back wall in
+ *  the instance colour. Mirrored in z by rotating the instance by PI (town/far.js), as the mid builder's shedDir does. */
+export function unitShed() {
+  const g = new THREE.BufferGeometry();
+  const o = 0.09, E = 0.5 + o, yE = -o * 0.5;
+  const P = [], I = [];
+  const add = (...pts) => { const k = P.length / 3; for (const p of pts) P.push(...p); if (pts.length === 4) I.push(k, k + 1, k + 2, k, k + 2, k + 3); else I.push(k, k + 1, k + 2); };
+  add([-E, yE, E], [E, yE, E], [E, 1, -0.5], [-E, 1, -0.5]);                 // the slope (with the eave overhang)
+  add([0.5, 0, 0.5], [0.5, 0, -0.5], [0.5, 1, -0.5]);                         // end faces
+  add([-0.5, 0, -0.5], [-0.5, 0, 0.5], [-0.5, 1, -0.5]);
+  add([-0.5, 0, -0.5], [-0.5, 1, -0.5], [0.5, 1, -0.5], [0.5, 0, -0.5]);       // the high side's wall
+  add([-E, yE - 0.05, E], [-E, 0.95, -0.5], [E, 0.95, -0.5], [E, yE - 0.05, E]);   // underside
+  g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+  g.setIndex(I);
+  const ng = g.toNonIndexed(); ng.computeVertexNormals();
+  const pos = ng.attributes.position;
+  for (let i = 0; i < pos.count; i += 3) {
+    const a = new THREE.Vector3().fromBufferAttribute(pos, i), b = new THREE.Vector3().fromBufferAttribute(pos, i + 1), c = new THREE.Vector3().fromBufferAttribute(pos, i + 2);
+    const n = new THREE.Vector3().crossVectors(b.clone().sub(a), c.clone().sub(a));
+    const m = a.clone().add(b).add(c).multiplyScalar(1 / 3); m.y -= 0.4;
+    if (n.dot(m) < 0) { pos.setXYZ(i + 1, c.x, c.y, c.z); pos.setXYZ(i + 2, b.x, b.y, b.z); }
+  }
+  ng.computeVertexNormals();
+  ng.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(pos.count * 2), 2));
+  return ng;
+}
+
 export function buildFarTown(H) {
   const { ctx, L } = H;
   const r = ctx.rng('houses-far');
@@ -101,13 +128,13 @@ export function buildFarTown(H) {
     const eg = g.createLinearGradient(0, 0, 0, h * 0.07); eg.addColorStop(0, 'rgba(70,66,80,0.45)'); eg.addColorStop(1, 'rgba(70,66,80,0)');
     g.fillStyle = eg; g.fillRect(0, 0, w, h * 0.07);
   }, { key: 'houses_farfacade' + floors });
-  const mWallF = [1, 2, 3].map(fl => ctx.mat.toon('#ffffff', { map: facade(fl), paint: 0.05 }));
+  const mWallF = [1, 2, 3].map(fl => ctx.mat.toon('#ffffff', { map: facade(fl), paint: 0.05, noDormant: true }));
   const aptTex = T.draw(128, 128, (g, w, h) => {
     g.fillStyle = '#f5f5f5'; g.fillRect(0, 0, w, h);
     for (let f = 0; f < 4; f++) { const y = f * 32; g.fillStyle = '#76808f'; for (let k = 0; k < 4; k++) g.fillRect(6 + k * 31, y + 8, 20, 16); g.fillStyle = 'rgba(90,90,100,0.5)'; g.fillRect(0, y + 28, w, 4); }
   }, { key: 'houses_farapt' });
-  const mApt = ctx.mat.toon('#ffffff', { map: aptTex, paint: 0.05 });
-  const mRoof = ctx.mat.toon('#ffffff', { paint: 0.05 });
+  const mApt = ctx.mat.toon('#ffffff', { map: aptTex, paint: 0.05, noDormant: true });
+  const mRoof = ctx.mat.toon('#ffffff', { paint: 0.05, noDormant: true });
   const mTree = ctx.mat.toon('#ffffff', { paint: 0.07 });
   const box = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
   const gable = unitGable(), hip = unitHip();

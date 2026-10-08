@@ -1,0 +1,33 @@
+{
+ "version": 1,
+ "cell": "honcho-kannonji",
+ "bbox": [-860, 170, -740, 460],
+ "note": "outside the 12 cells: 本町 観音寺 (海岸山, 天台宗, 気仙沼市本町1-4-16) at the foot of the cemetery slope. The GSI Anno facility 観音寺 (sym null, text point (-794.5, 228.4)) is the label of the whole precinct; the footprint snapper put it on lot /25068/324, a 24 x 6 m building on the cemetery slope 175-200 m north of the temple, so search, labels and the sign named the wrong building. Google Earth 2026-03-11 pins 'Kanonji Temple 海岸山 観音寺' and 'Kannonji Temple Kannondo 観音寺観音堂' at about (-789..-808, 403..405) in the c5 and c9 r1003 top captures, over the red-roofed temple halls; that is lot /25069/65 (695 m2, kind temple). 観音寺観音堂 (about (-818, 397)) has no footprint of its own and is not added as a lot.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth, imagery dated 2026-03-11: pins 'Kanonji Temple 海岸山 観音寺' and 'Kannonji Temple Kannondo 観音寺観音堂' (raw/ref/earth/c5/r1003/earth_top_full.png pixel (240,893) and (205,885); raw/ref/earth/c9/r1003/earth_top_full.png pixel (267,232) and (236,224))",
+   "date": "2026-03-11"
+  },
+  {
+   "id": "miyatabi",
+   "what": "miyatabi.net 観音寺 (気仙沼市本町1-4-16, 天台宗 海岸山)",
+   "ref": "https://www.miyatabi.net/miya/kesenuma/kannonji.html"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58539/25069/65",
+   "name": "観音寺",
+   "nameEn": "Kannonji Temple",
+   "src": "earth: the 2026-03-11 pin 'Kanonji Temple 海岸山 観音寺' at ENU about (-798, 409) lies over this temple compound (c5 and c9 r1003 tops); miyatabi: 本町1-4-16, 天台宗 海岸山"
+  },
+  {
+   "id": "16/58539/25068/324",
+   "kind": "house",
+   "facade": "plain",
+   "unname": true,
+   "src": "earth: a small 24 x 6 m building on the cemetery slope, 200 m north of the temple pins (z 199 vs 403-409); not the temple. The GSI Anno 観音寺 label (-794.5, 228.4) was snapped here by build-enrich"
+  }
+ ]
+}

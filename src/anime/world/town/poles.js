@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { makeAtlases, RA, adRect, plateRect, uvOf } from './sakura/poles_atlas.js';
 import { lights } from '../life/lights.js';
 import { resample } from './common.js';
+import { POLES6, NO_SLEEVE6 } from '../harbor/poles6.js';   // [v6:fix1]
 
 const V3 = THREE.Vector3;
 const UV = { shaft: uvOf(RA.shaft), sleeve: uvOf(RA.sleeve), cover: uvOf(RA.cover), trans: uvOf(RA.trans) };
@@ -34,6 +35,7 @@ export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades, runs: g
   // POLE_RUNS cover the main streets; Japanese lanes carry poles too, and their wires are half the look)
   const HS = sharedHardShores(L);   // [v3:fix]
   const runs = (givenRuns || L.POLE_RUNS).map((r) => ({ roadId: r.roadId, pts: r.pts }));
+
   {
     const have = []; for (const r of runs) for (const p of r.pts) have.push(p);
     const hg = new Map(), HC = 16; const hk = (x, z) => Math.floor(x / HC) + ',' + Math.floor(z / HC);
@@ -65,6 +67,12 @@ export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades, runs: g
     }
   }
 
+  // [v6:fix1] the photo survey's pole corrections (harbor/poles6.js): move generated poles to their measured feet, add missing ones
+  if (!givenRuns) {
+    for (const mv of POLES6.move) { let best = null; for (const r of runs) r.pts.forEach((p, i) => { const d = Math.hypot(p[0] - mv.from[0], p[1] - mv.from[1]); if (d < 2.5 && (!best || d < best.d)) best = { r, i, d }; }); if (best) { best.r.pts = best.r.pts.map((p, i) => (i === best.i ? [mv.to[0], mv.to[1]] : p)); (best.r.fix ||= {})[best.i] = mv; } }
+    for (const rm of POLES6.remove || []) { for (const r of runs) { const keep = []; const fixNew = {}; r.pts.forEach((p, i) => { if (Math.hypot(p[0] - rm.from[0], p[1] - rm.from[1]) < 2.5) return; if (r.fix && r.fix[i]) fixNew[keep.length] = r.fix[i]; keep.push(p); }); if (keep.length !== r.pts.length) { r.pts = keep; r.fix = fixNew; } } }
+    for (const ad of POLES6.add) runs.push({ roadId: 'fix6', pts: [[ad.at[0], ad.at[1]]], extra: true, fix: { 0: ad } });
+  }
   // ------------------------------------------------------------------ poles
   runs.forEach((run, ri) => {
     const pts = run.pts;
@@ -77,12 +85,13 @@ export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades, runs: g
       const ang = Math.atan2(a[0] - b[0], a[1] - b[1]);        // run direction (rotY of +z along the run)
       const y = L.heightAt(x, z);
       const hero = inHero(x, z);
-      const Hh = 11.4 + ((ri * 7 + i * 3) % 4) * 0.25;
+      const fx6 = run.fix && run.fix[i];   // [v6:fix1] a surveyed pole: its height / transformer / lamp
+      const Hh = fx6?.H ?? (11.4 + ((ri * 7 + i * 3) % 4) * 0.25);
       // road side: which side of the run is the road? (the nearest road centre-line)
       const nr = roadIdx.nearest(x, z, 20);
       let side = 1;
       if (nr) { const rx = nr.a[0] + (nr.b[0] - nr.a[0]) * nr.t, rz = nr.a[1] + (nr.b[1] - nr.a[1]) * nr.t; const cx = Math.cos(ang), sx = -Math.sin(ang); side = (rx - x) * cx + (rz - z) * sx >= 0 ? 1 : -1; }
-      const p = { id: 'P' + ri + '-' + i, x, z, y, H: Hh, ang, hero, side, run: ri, idx: i, tr: (ri + i) % 3 === 1, lamp: hero && (i % 2 === 0) && !!nr, top: y + Hh };
+      const p = { id: 'P' + ri + '-' + i, x, z, y, H: Hh, ang, hero, side, run: ri, idx: i, tr: fx6?.tr ?? ((ri + i) % 3 === 1), lamp: fx6 ? !!fx6.lamp : hero && (i % 2 === 0) && !!nr, top: y + Hh };
       list.push(p); poles.push(p);
     }
     run._poles = list;
@@ -97,7 +106,7 @@ export function buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades, runs: g
     F.cyl(matA, '#ffffff', rBot, p.H + 0.4, 0, (p.H - 0.4) / 2, 0, { rTop, seg: full ? 9 : 6, open: true, uvx: rectXf(UV.shaft) });
     F.cyl(M.plain, '#b3b2ab', rTop + 0.01, 0.08, 0, p.H + 0.04, 0, { seg: full ? 8 : 5 });
     if (full) {
-      F.cyl(matA, '#ffffff', rBot + 0.012, 1.8, 0, 0.9, 0, { seg: 10, open: true, uvx: rectXf(UV.sleeve) });
+      if (!(p.x > NO_SLEEVE6.x[0] && p.x < NO_SLEEVE6.x[1] && p.z > NO_SLEEVE6.z[0] && p.z < NO_SLEEVE6.z[1])) F.cyl(matA, '#ffffff', rBot + 0.012, 1.8, 0, 0.9, 0, { seg: 10, open: true, uvx: rectXf(UV.sleeve) });   // [v6:fix3] none on the south shore
       // step bolts (足場ボルト) on the upper shaft, alternating sides
       for (let h = p.H - 5.2, k = 0; h < p.H - 1.4; h += 0.5, k++) F.box(M.plain, '#8d939b', 0.32, 0.025, 0.025, 0, h, 0, { ry: k % 2 ? 0 : Math.PI / 2, skip: 'dt' });
       // number plate + ad wrap on the sidewalk face

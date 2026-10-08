@@ -1,0 +1,19 @@
+{
+  "placed": "sourced",
+  "note": "Photographed raft blocks are the GSI z15 fields already in the harbour (rows.js RAFT_FIELDS). The crop on each block is the local set, not a name read off the photo. New longlines stay 80 m off the ship channel. Koizumi Bay is outside the play box, so it is not placed.",
+  "sources": [
+    { "id": "miyagi-kaityu", "title": "宮城県 気仙沼地域の海中案内", "url": "https://www.pref.miyagi.jp/soshiki/kesenmuma-s/kesennuma-kaityu.html" },
+    { "id": "kanko-kaki", "title": "気仙沼観光 カキ養殖", "url": "https://kesennuma-kanko.jp/oshietesensei-kakiyoushoku/" },
+    { "id": "city-suisan", "title": "気仙沼市 気仙沼の水産", "url": "https://www.kesennuma.miyagi.jp/sec/s074/010/010/010/010/1174375791459.html" },
+    { "id": "isokusa", "title": "磯草漁港", "url": "https://fishing-port.jp/fishingpordetail/isokusa/" },
+    { "id": "gsi-rafts", "title": "GSI z15 photo, south of 朝日町 off the 波路上 breakwater", "url": "" }
+  ],
+  "fields": { "southA": "hoya", "southB": "oyster" },
+  "longlines": [
+    { "id": "wakame-mouth", "kind": "wakame", "x": 1700, "z": 7500, "yaw": 0.55, "length": 90, "ropes": 16, "source": "miyagi-kaityu" },
+    { "id": "scallop-isokusa", "kind": "scallop", "x": 2280, "z": 4050, "yaw": 1.15, "length": 70, "ropes": 14, "source": "miyagi-kaityu" }
+  ],
+  "kelp": [
+    { "id": "ukimido-kelp", "x": 355, "z": 5, "n": 18, "r": 8, "kind": "kelp" }
+  ]
+}

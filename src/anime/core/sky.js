@@ -8,6 +8,7 @@
 //   sky.setView(alt)  camera height above ground (main.js calls it every frame)
 import * as THREE from 'three';
 import { LAYER_NO_OUTLINE } from './materials.js';
+import { swimU, SKY_SWIM, skySwimUniforms } from '../play/underwater/fog.js';   // [play:underwater] under the surface the dome is the far water (fog.js)
 import { sunDirAt } from '../world/layout.js';
 
 export const FOG_COLOR = new THREE.Color('#d8dfe9');
@@ -17,8 +18,9 @@ export const FOG_COLOR = new THREE.Color('#d8dfe9');
 const K = [
   { h: 0.0, zenith: '#0d1631', mid: '#1a2850', horizon: '#33406b', warm: '#3d4674', fog: '#27315a', sun: '#8fa6e6', sunI: 0.6, hemiSky: '#51639e', hemiGround: '#2b2842', hemiI: 1.05, cloudLit: '#56628f', cloudShade: '#2c3358', exposure: 1.02, bloom: 0.55, glow: 0.3, leak: 0.0, night: 1 },
   { h: 4.7, zenith: '#152044', mid: '#233466', horizon: '#46507e', warm: '#5a5a86', fog: '#2e3864', sun: '#8fa6e6', sunI: 0.55, hemiSky: '#56679f', hemiGround: '#2d2a44', hemiI: 1.05, cloudLit: '#5d6795', cloudShade: '#303860', exposure: 1.02, bloom: 0.52, glow: 0.28, leak: 0.0, night: 1 },
-  { h: 5.4, zenith: '#3a4f8c', mid: '#8a8dbd', horizon: '#f0b6a4', warm: '#ffc59c', fog: '#b6a8c0', sun: '#ffb487', sunI: 0.9, hemiSky: '#9c9fd6', hemiGround: '#b7a0a8', hemiI: 1.25, cloudLit: '#ffc3a8', cloudShade: '#8e89b8', exposure: 1.0, bloom: 0.42, glow: 0.22, leak: 0.7, night: 0.3 },
-  { h: 6.5, zenith: '#5f8fcf', mid: '#b4c2e2', horizon: '#f5cdbf', warm: '#ffc9ae', fog: '#e8d8dc', sun: '#ffe6c8', sunI: 2.5, hemiSky: '#b2bdec', hemiGround: '#c9c3d2', hemiI: 1.58, cloudLit: '#fff4ea', cloudShade: '#b8c0e0', exposure: 1.02, bloom: 0.36, glow: 0.18, leak: 0.55, night: 0 },   // [v3:polish] clear warm peach morning (was a washed-out cool haze)  [v3:polish3] cooler zenith, pink horizon, pearl fog + low mist (renderer uMist): 朝 must not read as 16:30
+  { h: 5.4, zenith: '#2a3f78', mid: '#5d78b0', horizon: '#f0b6a4', warm: '#ffc59c', fog: '#7e90ae', sun: '#ffb487', sunI: 0.85, hemiSky: '#6e82b4', hemiGround: '#8a8682', hemiI: 1.15, cloudLit: '#e4cfc4', cloudShade: '#5c6e98', exposure: 1.0, bloom: 0.38, glow: 0.18, leak: 0.04, night: 0.35 },   // [live r2] pink only in the horizon band, before sunrise. The town stays blue-grey.
+  { h: 5.9, zenith: '#4a90d8', mid: '#a3c8ee', horizon: '#f4e4ce', warm: '#ffd6aa', fog: '#d7e5f2', sun: '#ffe0b4', sunI: 2.1, hemiSky: '#a6bef2', hemiGround: '#c8baa6', hemiI: 1.8, cloudLit: '#fff8f1', cloudShade: '#b8c8e6', exposure: 1.02, bloom: 0.3, glow: 0.13, leak: 0.32, night: 0 },   // [live r2] just after sunrise: clear, pale warm horizon, low warm sun
+  { h: 6.5, zenith: '#3f86d8', mid: '#8fbfeb', horizon: '#efe0c8', warm: '#ffd2a4', fog: '#d3e0ee', sun: '#ffd9a8', sunI: 2.32, hemiSky: '#9eb6f2', hemiGround: '#c4b6a4', hemiI: 1.74, cloudLit: '#fffaf3', cloudShade: '#b3c3e4', exposure: 1.02, bloom: 0.28, glow: 0.12, leak: 0.38, night: 0 },   // [live r2] 朝: the same clear blue as 09:00, a warm horizon, cooler sky fill so the greens stay saturated
   { h: 9.0, zenith: '#3f86d8', mid: '#8dbdeb', horizon: '#dbe8f3', warm: '#f7e8d6', fog: '#d3dfed', sun: '#fff2df', sunI: 2.75, hemiSky: '#a9b3ee', hemiGround: '#d9c6c8', hemiI: 1.62, cloudLit: '#fbfbf7', cloudShade: '#c3cbe6', exposure: 1.0, bloom: 0.3, glow: 0.13, leak: 0.8, night: 0 },
   { h: 12.0, zenith: '#2f7ddc', mid: '#86bdf0', horizon: '#e9f2fa', warm: '#f7f3ea', fog: '#dbe6f2', sun: '#fffaf0', sunI: 3.15, hemiSky: '#a2b0ee', hemiGround: '#cdc3c6', hemiI: 1.45, cloudLit: '#ffffff', cloudShade: '#bcc6e8', exposure: 1.0, bloom: 0.26, glow: 0.1, leak: 0.45, night: 0 },   // [v3:fix] white-blue noon, crisper shadows
   { h: 15.2, zenith: '#4389d6', mid: '#91bde8', horizon: '#e4e5ea', warm: '#fbe1c6', fog: '#d8dce8', sun: '#ffecd2', sunI: 2.8, hemiSky: '#a9b2ec', hemiGround: '#dbc5c3', hemiI: 1.6, cloudLit: '#fff8ee', cloudShade: '#c1c3e4', exposure: 1.0, bloom: 0.32, glow: 0.14, leak: 1.0, night: 0 },
@@ -72,11 +74,16 @@ export function createSky(scene, sunDir, quality) {
     uCloud: { value: 0.55 },          // coverage 0..1 (weather)
     uSummerK: { value: 0 },           // [v3:polish] summer weight: taller low cumulus towers (入道雲)
     uOvercast: { value: 0 },          // [v5:detail] a grey altocumulus deck over the whole sky (the photo look)
+    uRainK: { value: 0 },             // [live r2] rain flattens that deck into a soft grey sheet; 0 keeps the photo look
     uMorning: { value: 0 },
     // [v3:polish3] the frame's top edge (update() from the camera): x = camera azimuth, y/z = the A/B terms of the top
     // edge elevation atan(A cos(phi) / B) at relative azimuth phi, w = the horizontal half-FOV at the top edge (0 = off)
     uFrame: { value: new THREE.Vector4(0, 0, 1, 0) },           // [v3:polish3] early-morning weight (water.js: a paler pearl sheen; renderer: low mist)
     uNight: { value: 0 },
+    uSwim: { value: 0 },   // [play:underwater] 1 while the camera is under the surface: the dome becomes deep water, and the leap brings the sky back
+    uSwimNear: swimU.uSwimNear,
+    uSwimFar: swimU.uSwimFar,
+    ...skySwimUniforms(),
     uDusk: { value: 0 },
     uWind: { value: new THREE.Vector2(0.93, 0.36) },
     // [v3:fix] the moon over the hills behind the bay. [v3:polish] turned 25 deg (az -72 -> -47) and 3 deg lower so it
@@ -89,8 +96,9 @@ export function createSky(scene, sunDir, quality) {
       varying vec3 vDir;
       void main(){ vDir = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position = p.xyww; }`,
     fragmentShader: /* glsl */`
-      uniform vec3 uSun, uZenith, uMid, uHorizon, uWarm, uFog, uCloudLit, uCloudShade, uMoon; uniform float uTime, uCloud, uNight, uDusk, uSummerK, uOvercast; uniform vec2 uWind; uniform vec4 uFrame;
+      uniform vec3 uSun, uZenith, uMid, uHorizon, uWarm, uFog, uCloudLit, uCloudShade, uMoon, uSwimNear, uSwimFar; uniform float uTime, uCloud, uNight, uDusk, uSummerK, uOvercast, uSwim, uRainK; uniform vec2 uWind; uniform vec4 uFrame;
       varying vec3 vDir;
+      ${SKY_SWIM}
       float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
       float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
         return mix(mix(h21(i),h21(i+vec2(1,0)),f.x), mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x), f.y); }
@@ -223,10 +231,11 @@ export function createSky(scene, sunDir, quality) {
         vec3 col = mix(uHorizon, uMid, smoothstep(0.0, 0.2, h));
         col = mix(col, uZenith, smoothstep(0.16, 0.9, h));
         float hz = 1.0 - smoothstep(0.0, 0.45, h);
-        col = mix(col, uWarm, pow(sd, 2.5) * hz * (0.55 + 0.35 * uDusk));
-        col += uWarm * pow(sd, 10.0) * 0.18;
-        // sun disc + halo (hidden at night)
-        float day = 1.0 - uNight;
+        float coverK = 1.0 - uOvercast;   // [live r2] rain hides the sun disc; the deck is the sky
+        col = mix(col, uWarm, pow(sd, 2.5) * hz * (0.55 + 0.35 * uDusk) * coverK);
+        col += uWarm * pow(sd, 10.0) * 0.18 * coverK;
+        // sun disc + halo (hidden at night and under rain)
+        float day = (1.0 - uNight) * coverK;
         col += vec3(1.0, 0.93, 0.8) * (pow(sd, 22.0) * 0.25 + pow(sd, 380.0) * 0.8) * day;
         col += vec3(1.0, 0.97, 0.9) * smoothstep(0.99925, 0.99965, sd) * 2.4 * day;
         // ---------- stars
@@ -319,10 +328,18 @@ export function createSky(scene, sunDir, quality) {
           deck += uWarm * pow(sd, 3.0) * smoothstep(0.55, 0.8, mott) * 0.5;
           deck = mix(deck, uHorizon, (1.0 - smoothstep(0.0, 0.14, h)) * 0.55);
           deck *= mix(0.88, 1.0, smoothstep(0.85, 0.2, h));
+          // [live r2] rain is a soft grey-blue sheet. The photo look (uRainK = 0) keeps the altocumulus cells.
+          if (uRainK > 0.02) {
+            float soft = fbm(q2 * 0.08 + 2.0);
+            vec3 sheet = mix(uCloudShade, uHorizon, 0.42);
+            sheet = mix(sheet, uCloudLit, 0.22 + soft * 0.16);
+            deck = mix(deck, sheet, smoothstep(0.04, 0.45, uRainK));
+          }
           col = mix(col, deck, uOvercast * smoothstep(-0.03, 0.015, h));
         }
         // below the horizon fades into the fog colour (matches distant terrain)
         col = mix(col, uFog, 1.0 - smoothstep(-0.1, 0.01, h));
+        if (uSwim > 0.5) col = sw_dome(normalize(vDir));   // [play:underwater] the far water, the same colour as the fog at 60 m (fog.js)
         gl_FragColor = vec4(col, 1.0);
       }`,
     side: THREE.BackSide, depthWrite: false, depthTest: true, fog: false,
@@ -377,15 +394,14 @@ export function createSky(scene, sunDir, quality) {
     uniforms.uNight.value = night; uniforms.uDusk.value = dusk;
     scene.fog.color.copy(p.fog);
   }
-  // [v3:fix] morning mist over the bay (06:00-08:30): denser, cooler haze so 朝 reads differently from 夕方
-  // [v3:polish] thinner (x0.45) and it peaks around 07:30, so 06:30 reads clear and warm, not washed out
-  const haze = (h) => { const a = Math.min(1, Math.max(0, (h - 5.8) / 1.7)), b = Math.min(1, Math.max(0, (9.0 - h) / 1.4)); return 0.45 * a * b; };
-  // [v3:polish3] early-morning weight: rises from first light, full 06:00-07:10, gone by 08:40 (low mist + pale sheen)
-  const morning = (h) => { const a = Math.min(1, Math.max(0, (h - 5.1) / 0.9)), b = Math.min(1, Math.max(0, (8.7 - h) / 1.5)); const k = a * b; return k * k * (3 - 2 * k); };
+  // [live r2] a thin mist on the far hills after sunrise (06:00–08:00). It does not cover the town.
+  const haze = (h) => { const hh = wrap24(h); const a = Math.min(1, Math.max(0, (hh - 6.0) / 0.35)), b = Math.min(1, Math.max(0, (8.2 - hh) / 1.15)); return 0.1 * a * b; };
+  // [live r2] pre-sunrise only. After 06:00 this is 0, so the composite mist and the water sheen stay off.
+  const morning = (h) => { const hh = wrap24(h); const a = Math.min(1, Math.max(0, (hh - 4.9) / 0.35)), b = Math.min(1, Math.max(0, (6.0 - hh) / 0.4)); const k = a * b; return k * k * (3 - 2 * k); };
   function applyMorning(h) {
     const k = morning(wrap24(h)); uniforms.uMorning.value = k;
     const cm = state.ctx?.pipeline?.compMat?.uniforms;
-    if (cm?.uMist) { cm.uMist.value = 0.4 * k * (1 - 0.8 * (state.ctx?.shared?.uSeason?.value?.y ?? 0)); cm.uMistCol.value.copy(uniforms.uFog.value).lerp(uniforms.uHorizon.value, 0.35); }
+    if (cm?.uMist) { cm.uMist.value = 0.14 * k * (1 - 0.8 * (state.ctx?.shared?.uSeason?.value?.y ?? 0)); cm.uMistCol.value.copy(uniforms.uFog.value).lerp(uniforms.uHorizon.value, 0.35); }
   }
   const dusk01 = (el) => { const a = Math.min(1, Math.max(0, (20 - el) / 16)); const b = Math.min(1, Math.max(0, (el + 10) / 8.5)); return a * b; };
   /** Standalone time of day (the life package calls setTime instead once it is built). */
@@ -433,14 +449,19 @@ export function createSky(scene, sunDir, quality) {
     applyPalette(p, T.night ?? 0, T.dusk ?? 0);
     const wk = winterGrade(T.night ?? 0), sk = summerGrade(T.night ?? 0);
     uniforms.uOvercast.value = T.overcast || 0;   // [v5:detail]
+    uniforms.uRainK.value = T.shade?.rain || T.weather?.rain || 0;   // [live r2]
     if (T.weather) {
-      uniforms.uCloud.value = 0.3 + 0.6 * Math.min(1, T.weather.cloud ?? 0.35); state.weatherFog = (T.weather.fog || 0) * 2.2 + (T.weather.rain || 0) * 0.8;
-      if ((T.weather.rain || 0) > 0) uniforms.uCloud.value = Math.max(uniforms.uCloud.value, 0.6 + 0.35 * Math.min(1, T.weather.rain));   // [v3:polish3] rain = overcast: no stars, no moon
+      const shade = T.shade || T.weather;
+      const rain = shade.rain || 0, cloud = shade.cloud ?? T.weather.cloud ?? 0.35;
+      uniforms.uCloud.value = 0.3 + 0.6 * Math.min(1, cloud); state.weatherFog = (T.weather.fog || 0) * 2.2 + rain * 0.55;
+      if (rain > 0) uniforms.uCloud.value = Math.max(uniforms.uCloud.value, 0.72 + 0.26 * Math.min(1, rain));   // [live r2] rain is an overcast deck
     }
     if (sk > 0) uniforms.uCloud.value = Math.min(1, uniforms.uCloud.value + 0.25 * sk);   // [v3:polish] summer: more heaps
     if (wk > 0) { uniforms.uCloud.value = Math.min(1, uniforms.uCloud.value + 0.3 * wk); state.weatherFog += 0.6 * wk; }   // [v3:fix] winter: more cloud, a little haze
     state.haze = haze(((T.hours % 24) + 24) % 24);   // [v3:fix]
     applyGrading(p); applyMorning(T.hours);
+    const cmW = state.ctx?.pipeline?.compMat?.uniforms;
+    if (cmW?.uWet) cmW.uWet.value = T.sheen ?? T.shade?.wet ?? T.weather?.wet ?? 0;   // [live r2] wet asphalt sheen in the composite
   }
   function setView(alt) {
     state.alt = alt;

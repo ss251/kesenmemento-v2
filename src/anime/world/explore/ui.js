@@ -18,14 +18,82 @@ const ICON = {
 };
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+/** [craft:C02] Kind weight for a full-map label. A higher weight keeps the name when two labels would overlap. The dot is always drawn. */
+export const MAP_LABEL_KIND = {
+  landmark: 24, station: 22, hospital: 20, public: 18, shrine: 16, temple: 16, church: 16,
+  bridge: 14, park: 12, school: 12, hotel: 10, food: 8, shop: 6, other: 4,
+};
+export function mapLabelWeight(p) {
+  const kind = MAP_LABEL_KIND[catGroup(p.cat)] ?? MAP_LABEL_KIND.other;
+  const group = p.group === 'tour' ? 36 : p.group === 'ship' ? 32 : p.group === 'landmarks' ? 6 : 0;
+  return kind + group;
+}
+/** Below this weight a place is a dot only. Metres per pixel: zoomed out shows fewer names. */
+export function mapLabelFloor(mpp) {
+  if (mpp >= 16) return 28;
+  if (mpp >= 7) return 14;
+  return 0;
+}
+export function mapLabelBox(label, pad = 4) {
+  const h = 14;
+  return { x0: label.x + 8, y0: label.y - h / 2 - pad, x1: label.x + 8 + label.w + pad, y1: label.y + h / 2 + pad };
+}
+const boxHits = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
+/**
+ * Which full-map names to draw. `places` are { id?, ja, en, cat, group, at:[x,z] }.
+ * `project(x, z) -> [sx, sy]`. Dots stay with the caller. Redone whenever the zoom or the frame changes.
+ * -> [{ text, x, y, w, weight }]
+ */
+export function selectMapLabels(places, { W, H, mpp, project, measure, lang = 'ja', blockers = [], pad = 4 } = {}) {
+  const floor = mapLabelFloor(mpp);
+  const cand = [];
+  const dots = [];
+  for (const p of places) {
+    const [x, y] = project(p.at[0], p.at[1]);
+    if (x < -8 || y < -8 || x > W + 8 || y > H + 8) continue;
+    dots.push({ id: p.id || p.ja, x0: x - 8, y0: y - 8, x1: x + 8, y1: y + 8 });
+    const weight = mapLabelWeight(p);
+    if (weight < floor) continue;
+    if (x < 8 || y < 8 || x > W - 8 || y > H - 8) continue;
+    const text = lang === 'en' && p.en ? p.en : p.ja;
+    if (!text) continue;
+    const label = { text, x, y, w: measure(text), weight, id: p.id || text };
+    const r = mapLabelBox(label, pad);
+    if (r.x1 > W - 4 || r.y0 < 4 || r.y1 > H - 4) continue;
+    cand.push({ ...label, r });
+  }
+  cand.sort((a, b) => b.weight - a.weight || a.y - b.y || a.x - b.x || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const placed = blockers.map((b) => ({ x0: b.x0, y0: b.y0, x1: b.x1, y1: b.y1 }));
+  const out = [];
+  for (const c of cand) {
+    if (placed.some((q) => boxHits(c.r, q)) || dots.some((d) => d.id !== c.id && boxHits(c.r, d))) continue;
+    placed.push(c.r);
+    out.push({ text: c.text, x: c.x, y: c.y, w: c.w, weight: c.weight });
+  }
+  return out;
+}
+
+/** [ui-b:12] With the on-screen keyboard up, `visualViewport` is the visible area (iOS Safari and Chrome on Android keep the layout viewport, so innerHeight and 100vh do not shrink).
+ *  The keyboard counts when it covers more than KB_MIN px (Safari's own bars move the edge by about 100). -> { vvh: the visible area's bottom edge in layout px, kb: boolean }. Pure. */
+export const KB_MIN = 120;
+export function viewportMetrics(innerH, vv) {
+  if (!vv || !Number.isFinite(vv.height)) return { vvh: Math.round(innerH), kb: false };
+  const vvh = Math.round(vv.height + (Number.isFinite(vv.offsetTop) ? vv.offsetTop : 0));
+  return { vvh, kb: innerH - vvh > KB_MIN };
+}
+
 export const CSS = /* css */`
-#klc-x { --k-ink: #2d3350; --k-navy: #1f3a68; --k-muted: #6b6f86; --k-glass: rgba(250, 247, 241, 0.86); --k-line: rgba(45, 51, 80, 0.12); --k-accent: #e0703f;
+#klc-x { --k-ink: #2d3350; --k-navy: #1f3a68; --k-muted: #55596f; --k-glass: rgba(250, 247, 241, 0.86); --k-line: rgba(45, 51, 80, 0.12); --k-accent: #e0703f;
   --k-round: "Zen Maru Gothic", "Noto Sans JP", "Hiragino Sans", sans-serif; --k-sans: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif;
-  position: fixed; inset: 0; z-index: 4; pointer-events: none; font-family: var(--k-sans); color: var(--k-ink); -webkit-font-smoothing: antialiased; }
+  position: fixed; inset: 0; z-index: 4; pointer-events: none; font-family: var(--k-sans); color: var(--k-ink); -webkit-font-smoothing: antialiased; line-break: strict; }
+#klc-x :is(h4, b) { word-break: auto-phrase; text-wrap: balance; }
+#klc-x :is(p, small, .hint, .empty, .credit) { text-wrap: pretty; }
 #klc-x[hidden], body.noui #klc-x, body.noui #klc-labels { display: none !important; }
 #klc-x * { box-sizing: border-box; }
-#klc-x button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
-#klc-x button:focus-visible, #klc-x input:focus-visible { outline: 2px solid #2f7fae; outline-offset: 2px; }
+#klc-x button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, color var(--dur-fast) ease; }   /* [ui-b2:6] the press layer: the HUD's (ui/style.js) */
+#klc-x button:active { transform: scale(0.97); }
+#klc-x button:focus-visible, #klc-x input:focus-visible { outline: 2px solid var(--ring-ink, #1f3a68); outline-offset: 2px; box-shadow: 0 0 0 5px var(--ring-halo, rgba(255, 255, 255, 0.92)); }   /* [ui-b2:6] two tones: legible on glass, sky and dark water */
 #klc-x .glass { background: var(--k-glass); backdrop-filter: blur(10px) saturate(1.2); -webkit-backdrop-filter: blur(10px) saturate(1.2); box-shadow: 0 8px 28px rgba(35, 40, 70, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.5) inset; }
 #klc-x svg { width: 18px; height: 18px; flex: none; }
 #klc-x .xbar { position: absolute; top: calc(66px + env(safe-area-inset-top, 0px)); right: 18px; display: flex; gap: 8px; }
@@ -42,19 +110,35 @@ export const CSS = /* css */`
 #klc-x .xsearch { position: absolute; top: calc(112px + env(safe-area-inset-top, 0px)); right: 18px; width: min(380px, calc(100vw - 36px)); border-radius: 16px; padding: 10px; pointer-events: auto; display: grid; gap: 8px; max-height: calc(100vh - 290px); grid-template-rows: auto 1fr; }
 #klc-x .xsearch[hidden] { display: none; }
 #klc-x .xsearch .row { display: flex; gap: 6px; align-items: center; }
-#klc-x .xsearch input { flex: 1; min-width: 0; height: 40px; border-radius: 12px; border: 1px solid var(--k-line); background: rgba(255,255,255,.8); padding: 0 12px; font: 500 15px/1 var(--k-sans); color: var(--k-ink); pointer-events: auto; }
+#klc-x .xsearch input { flex: 1; min-width: 0; height: 40px; border-radius: 12px; border: 1px solid var(--k-line); background: rgba(255,255,255,.8); padding: 0 12px; font: 500 16px/1 var(--k-sans); color: var(--k-ink); pointer-events: auto; }
 #klc-x .xsearch .x { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--k-muted); }
 #klc-x .xsearch ol { list-style: none; margin: 0; padding: 0; overflow: auto; overscroll-behavior: contain; }
 #klc-x .xsearch h4 { margin: 8px 6px 4px; font: 700 11px/1 var(--k-sans); letter-spacing: .16em; color: var(--k-muted); }
-#klc-x .xsearch li button { width: 100%; display: grid; grid-template-columns: 12px 1fr auto; gap: 2px 10px; align-items: center; text-align: left; padding: 8px 8px; border-radius: 10px; }
-#klc-x .xsearch li button:hover, #klc-x .xsearch li button[aria-selected="true"] { background: rgba(31, 58, 104, 0.08); }
+#klc-x .xsearch li button { width: 100%; display: grid; grid-template-columns: 12px 1fr auto; gap: 2px 10px; align-items: center; text-align: left; padding: 8px 8px; border-radius: 12px; }
+@media (hover: hover) and (pointer: fine) { #klc-x .xsearch li button:hover { background: rgba(31, 58, 104, 0.08); } }   /* [ui-b2:6] hover only where hovering is real; the selected row (arrow keys) needs no hover */
+#klc-x .xsearch li button[aria-selected="true"] { background: rgba(31, 58, 104, 0.08); }
+#klc-x .xsearch li button:active { transform: none; background: rgba(31, 58, 104, 0.12); }   /* a result row presses with its background (a scaled row inside a scroller reads as a glitch) */
+#klc-x .xsearch li button:focus-visible { outline-offset: -2px; box-shadow: inset 0 0 0 4px var(--ring-halo, rgba(255, 255, 255, 0.92)); }   /* inside the row: the list scrolls and would clip a ring drawn outside */
 #klc-x .xsearch li i { width: 10px; height: 10px; border-radius: 50%; grid-row: 1 / 3; }
 #klc-x .xsearch li b { font: 700 14px/1.25 var(--k-round); color: var(--k-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #klc-x .xsearch li small { grid-column: 2; font: 500 11px/1.2 var(--k-sans); color: var(--k-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #klc-x .xsearch li em { grid-row: 1 / 3; grid-column: 3; font: 500 11px/1 var(--k-sans); font-style: normal; color: var(--k-muted); font-variant-numeric: tabular-nums; }
 #klc-x .xsearch .empty { padding: 10px 8px; font: 500 13px/1.4 var(--k-sans); color: var(--k-muted); }
+/* [ui-b:12] The search field is 16 px (iOS Safari zooms the page into any field under 16 px) and 44 px under a coarse pointer. The native clear button is hidden: the ✕ at the
+   right closes the sheet, and two ✕ in one row confuse. */
+@media (pointer: coarse) { #klc-x .xsearch input { height: 44px; } }
+#klc-x .xsearch input::-webkit-search-cancel-button, #klc-x .xsearch input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
+/* The minimap steps aside while the search sheet or the full map is open (it painted over the lower right of the results, 176 x 94 px at 1440 x 900), and stays click-through
+   for a moment after, so the touch that closes the sheet cannot open the map (the pad's portrait rule says the same under body.klc-pad). */
+#klc-x[data-search="1"] .mini, #klc-x[data-map="1"] .mini { display: none; }
+#klc-x[data-grace="1"] .mini { pointer-events: none; }
+/* The on-screen keyboard: visualViewport shrinks, 100vh does not. This file sets --vvh (the visible area's bottom edge, px) and data-kb="1" on #klc-x while the keyboard is up
+   (viewportMetrics); the sheet then ends above the keyboard, and a phone on its side moves it to the top (it has about 190 px). Nothing changes without the keyboard. */
+#klc-x[data-kb="1"] .xsearch { max-height: calc(var(--vvh) - 112px - env(safe-area-inset-top, 0px) - 12px); }
+@media (max-width: 720px) { #klc-x[data-kb="1"] .xsearch { max-height: calc(var(--vvh) - 66px - env(safe-area-inset-top, 0px) - 12px); } }
+@media (max-height: 520px) and (orientation: landscape) { #klc-x[data-kb="1"] .xsearch { top: calc(8px + env(safe-area-inset-top, 0px)); max-height: calc(var(--vvh) - 16px - env(safe-area-inset-top, 0px)); } }
 /* full map */
-#klc-x .xmap { position: absolute; inset: calc(64px + env(safe-area-inset-top, 0px)) 18px calc(96px + env(safe-area-inset-bottom, 0px)); border-radius: 20px; overflow: hidden; pointer-events: auto; }
+#klc-x .xmap { position: absolute; inset: calc(64px + env(safe-area-inset-top, 0px)) 18px calc(96px + env(safe-area-inset-bottom, 0px)); border-radius: 22px; overflow: hidden; pointer-events: auto; }
 #klc-x .xmap[hidden] { display: none; }
 #klc-x .xmap canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 #klc-x .xmap .hd { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; gap: 8px; align-items: center; pointer-events: none; }
@@ -62,7 +146,7 @@ export const CSS = /* css */`
 #klc-x .xmap .hd span { font: 500 12px/1.3 var(--k-sans); color: var(--k-muted); padding: 7px 11px; border-radius: 999px; }
 #klc-x .xmap .hd .sp { flex: 1; }
 #klc-x .xmap .hd button { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: var(--k-navy); pointer-events: auto; }
-#klc-x .xmap .credit { position: absolute; left: 10px; bottom: 8px; max-width: calc(100% - 20px); font: 500 10px/1.3 var(--k-sans); color: var(--k-muted); background: rgba(250,247,241,.8); padding: 2px 8px; border-radius: 999px; pointer-events: none; }   /* [v4:docs] bottom left: the minimap (drawn after the map) covered the right end of the ODbL / GSI credit */
+#klc-x .xmap .credit { position: absolute; left: 10px; bottom: 8px; max-width: calc(100% - 20px); font: 500 10px/1.3 var(--k-sans); color: var(--k-muted); background: rgba(250,247,241,.8); padding: 2px 8px; border-radius: 999px; pointer-events: none; line-break: strict; word-break: auto-phrase; overflow-wrap: normal; }   /* [craft:C12] 地理院タイル stays one word; [v4:docs] the minimap covered the right end of this credit */
 /* drive chip */
 #klc-x .xdrive { position: absolute; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; gap: 12px; align-items: center; padding: 8px 16px; border-radius: 999px; white-space: nowrap; }
 #klc-x .xdrive[hidden] { display: none; }
@@ -71,14 +155,14 @@ export const CSS = /* css */`
 #klc-x .xdrive .rd { font: 700 13px/1.2 var(--k-round); color: var(--k-ink); max-width: 36vw; overflow: hidden; text-overflow: ellipsis; }
 #klc-x .xdrive .hint { font: 500 11px/1.2 var(--k-sans); color: var(--k-muted); }
 /* labels */
-#klc-labels { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+#klc-labels { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; line-break: strict; }
 body:not(.playing):not(.shotui) #klc-labels { display: none; }
 body.shot:not(.shotui) #klc-labels { display: none; }
-#klc-labels .xl { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 999px; white-space: nowrap;
+#klc-labels .xl { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 999px; white-space: nowrap; word-break: auto-phrase;
   background: rgba(250, 247, 241, 0.82); box-shadow: 0 3px 10px rgba(35, 40, 70, 0.16); font: 700 12px/1.2 "Zen Maru Gothic", "Noto Sans JP", sans-serif; color: #2d3350; transition: opacity .25s; will-change: transform, opacity; }
 #klc-labels .xl::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 2px; height: 5px; margin-left: -1px; background: rgba(45, 51, 80, 0.35); }
 #klc-labels .xl i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-#klc-labels .xl small { font: 500 10px/1 "Noto Sans JP", sans-serif; color: #6b6f86; }
+#klc-labels .xl small { font: 500 10px/1 "Noto Sans JP", sans-serif; color: #55596f; }
 #klc-labels .xl small:empty { display: none; }
 #klc-labels .xl[data-prio="1"] { font-size: 11px; padding: 2px 8px 2px 6px; background: rgba(250, 247, 241, 0.72); }
 #klc-labels .xl[data-prio="3"] { font-size: 13.5px; }
@@ -100,6 +184,8 @@ body.shot:not(.shotui) #klc-labels { display: none; }
   #klc-labels .xl { font-size: 10.5px; }
 }
 @media (max-width: 480px) { #klc-x .xbar { bottom: calc(214px + env(safe-area-inset-bottom, 0px)); } }
+/* [integrate:fix] a landscape phone (844 x 390): the places list had calc(100vh - 290px) = 100 px under the search row, so the 第一昭福丸 row was cut off and could not be tapped */
+@media (max-height: 520px) and (orientation: landscape) { #klc-x .xsearch { max-height: calc(100vh - 150px - env(safe-area-inset-bottom, 0px)); } }
 @media (prefers-reduced-motion: reduce) { #klc-labels .xl { transition: none; } }
 `;
 
@@ -112,6 +198,14 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
   document.body.appendChild(el);
   const isPhone = () => innerWidth <= 720;
   const ui = { search: false, map: false, sel: -1, results: [], q: '' };
+  // [ui-b:12] list height from visualViewport: --vvh and data-kb on #klc-x (CSS: #klc-x[data-kb="1"] .xsearch), kept current while the keyboard comes and goes
+  const vv = typeof visualViewport !== 'undefined' ? visualViewport : null;
+  function syncVv() {
+    const m = viewportMetrics(innerHeight, vv), kb = m.kb ? '1' : '0';
+    el.style.setProperty('--vvh', m.vvh + 'px'); if (el.dataset.kb !== kb) el.dataset.kb = kb;
+  }
+  if (vv) { vv.addEventListener('resize', syncVv); vv.addEventListener('scroll', syncVv); }
+  addEventListener('resize', syncVv);
 
   el.innerHTML = `
     <div class="xbar">
@@ -120,7 +214,7 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
       <button class="glass" data-act="drive" aria-pressed="false">${ICON.car}<span data-t="v4.x.drive"></span><kbd>C</kbd></button>
     </div>
     <section class="xsearch glass" hidden aria-label="">
-      <div class="row"><input type="search" enterkeyhint="go" autocomplete="off" spellcheck="false"><button class="x" data-act="search-close" aria-label="">${ICON.close}</button></div>
+      <div class="row"><input type="search" enterkeyhint="search" inputmode="search" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"><button class="x" data-act="search-close" aria-label="">${ICON.close}</button></div>
       <ol role="listbox"></ol>
     </section>
     <section class="xmap glass" hidden>
@@ -178,9 +272,16 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
   }
 
   // ------------------------------------------------------------------ search
+  /** [integrate] the search sheet and the full map are modal: the touch pad steps aside while either is open. */
+  function syncPad() { try { ctx.pad?.suppress?.('xui', !!(ui.search || ui.map)); } catch (e) { /* no pad */ } }
+  // The search sheet's and the map's close buttons sit where the minimap is (top right): the minimap is hidden while either is open, and for
+  // a moment after (a touch's follow-up click lands on whatever is under the finger once the sheet is gone: it must not open the map)
+  let grace = 0;
+  function sheetState(was) { el.dataset.search = ui.search ? '1' : '0'; if (was && !ui.search && !ui.map) { el.dataset.grace = '1'; clearTimeout(grace); grace = setTimeout(() => { el.dataset.grace = '0'; }, 500); } }
   function openSearch(v = !ui.search) {
-    ui.search = v; $('.xsearch').hidden = !v; $('[data-act="search"]').setAttribute('aria-pressed', String(v));
-    if (v) { if (ui.map) openMap(false); renderResults(); setTimeout(() => input.focus(), 0); } else input.blur();
+    const was = ui.search || ui.map;
+    ui.search = v; syncPad(); sheetState(was); $('.xsearch').hidden = !v; $('[data-act="search"]').setAttribute('aria-pressed', String(v));
+    if (v) { syncVv(); if (ui.map) openMap(false); renderResults(); if (!document.body.classList.contains('klc-pad')) setTimeout(() => input.focus(), 0); } else input.blur();   // [integrate:fix] a phone: no keyboard until the field is tapped (it covered the places list, most of a landscape screen)
   }
   function renderResults() {
     const q = input.value.trim(); ui.q = q;
@@ -203,6 +304,9 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
   input.addEventListener('input', () => { ui.sel = input.value.trim() ? 0 : -1; renderResults(); });
   input.addEventListener('keydown', (e) => {
     e.stopPropagation();
+    // [ui-b:12] the Enter that confirms a Japanese conversion (IME) is not "go", and the arrows choose candidates there: isComposing, and keyCode 229 on the keydown
+    // WebKit sends right after compositionend (it reports isComposing false by then). The sheet stays open and the first result is not flown to.
+    if (e.isComposing || e.keyCode === 229) return;
     if (e.key === 'Escape') { openSearch(false); return; }
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const n = ui.results.length; if (!n) return; ui.sel = (Math.max(-1, ui.sel) + (e.key === 'ArrowDown' ? 1 : n - 1)) % n; renderResults(); list.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' }); }
     if (e.key === 'Enter') { const p = ui.results[Math.max(0, ui.sel)]; if (p) { openSearch(false); goTo(p); } }
@@ -228,18 +332,26 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
     }
     const P = (x, z) => [W / 2 + (x - cx) / mpp, H / 2 + (z - cz) / mpp];
     if (markers) {
-      const lab = mpp < 6;
       g.font = '700 11px "Zen Maru Gothic", "Noto Sans JP", sans-serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+      const shown = [];
       for (const p of search.featured()) {
         const [x, y] = P(p.at[0], p.at[1]); if (x < -20 || y < -20 || x > W + 20 || y > H + 20) continue;
+        shown.push(p);
         g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 6, 0, Math.PI * 2); g.fill();
         g.fillStyle = CAT_COLORS[catGroup(p.cat)] || CAT_COLORS.other; g.beginPath(); g.arc(x, y, 4.2, 0, Math.PI * 2); g.fill();
-        if (lab || p.group === 'tour') { const t = I.lang === 'en' && p.en ? p.en : p.ja; g.lineWidth = 3; g.strokeStyle = 'rgba(250,247,241,.9)'; g.strokeText(t, x + 9, y); g.fillStyle = '#2d3350'; g.fillText(t, x + 9, y); }
       }
+      // [craft:C02] names only where the rect is free, heavier places first, fewer of them when zoomed out. The dot above is unconditional.
+      const mapLabels = selectMapLabels(shown, {
+        W, H, mpp, project: (x, z) => P(x, z), lang: I.lang, measure: (t) => g.measureText(t).width,
+        blockers: [{ x0: 0, y0: 0, x1: W, y1: 52 }, { x0: 0, y0: H - 28, x1: Math.min(W * 0.72, 420), y1: H }],
+      });
+      g.lineWidth = 3; g.strokeStyle = 'rgba(250,247,241,.9)'; g.fillStyle = '#2d3350';
+      for (const lab of mapLabels) { g.strokeText(lab.text, lab.x + 9, lab.y); g.fillText(lab.text, lab.x + 9, lab.y); }
     } else {
       for (const p of search.featured()) { const [x, y] = P(p.at[0], p.at[1]); if (x < 0 || y < 0 || x > W || y > H) continue; g.fillStyle = CAT_COLORS[catGroup(p.cat)] || CAT_COLORS.other; g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill(); }
     }
     const pin = labels?.pinned; if (pin) { const [x, y] = P(pin.x, pin.z); g.fillStyle = '#e0703f'; g.beginPath(); g.arc(x, y - 7, 5.5, Math.PI, 0); g.lineTo(x, y + 2); g.closePath(); g.fill(); }
+    try { ctx.services.play?.paintMap?.(g, P, { markers, W, H }); } catch (e) { /* [play] charms on the map */ }
     if (heading) {
       // you: an arrow with a view cone
       const cam = ctx.camera, pos = drive?.active ? { x: drive.state.x, z: drive.state.z } : cam.position;
@@ -274,7 +386,8 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
   // ------------------------------------------------------------------ full map
   const fm = { cx: 0, cz: 0, mpp: 4, drag: null, moved: false };
   function openMap(v = !ui.map) {
-    ui.map = v; $('.xmap').hidden = !v; $('[data-act="map"]').setAttribute('aria-pressed', String(v));
+    const was = ui.search || ui.map;
+    ui.map = v; syncPad(); el.dataset.map = v ? '1' : '0'; sheetState(was); $('.xmap').hidden = !v; $('[data-act="map"]').setAttribute('aria-pressed', String(v));
     if (v) { if (ui.search) openSearch(false); const c = ctx.camera.position; fm.cx = c.x; fm.cz = c.z; fm.mpp = 4; document.exitPointerLock?.(); }
   }
   const mapAt = (e) => { const r = mapCv.getBoundingClientRect(); return [fm.cx + (e.clientX - r.left - r.width / 2) * fm.mpp, fm.cz + (e.clientY - r.top - r.height / 2) * fm.mpp]; };
@@ -340,7 +453,7 @@ export function mountExploreUI(ctx, { life, drive, net, bm, labels, places, sear
   let acc = 0, capAcc = 1;
   function update(dt) {
     acc += dt; capAcc += dt;
-    const hl = life?.hud?.i18n?.lang; if (hl && hl !== I.lang) { I.set(hl); texts(); }
+    const hl = life?.hud?.i18n?.lang; if (hl && hl !== I.lang) { I.set(hl); texts(); ctx.services?.explore?.story?.card?.relang?.(hl); }   // [ui-b:13] an open story card follows the language too (relang() was never called)
     if (el.hidden) return;
     if (acc >= 1 / 20) {
       acc = 0;

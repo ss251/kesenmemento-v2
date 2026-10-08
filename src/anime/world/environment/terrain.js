@@ -9,6 +9,7 @@
 // Crown shading follows Sakura's distantMaterial (Kenton-GMI/sakuragaoka-station, MIT).
 import * as THREE from 'three';
 import { patchSnow, seasonUniform } from '../../core/season.js';   // [v3:integrate]
+import { applySwimFog } from '../../play/underwater/fog.js';   // [play:underwater]
 import * as L from '../layout.js';
 import { sharedHardShores } from '../layout/hardshore.js';   // [v3:fix]
 import { PHONE } from '../../core/tier.js';   // [v4:phone]
@@ -103,6 +104,7 @@ export async function loadLandcover() {
   const loader = new THREE.TextureLoader();
   const load = (name, srgb) => loader.loadAsync(L.dataURL(name)).then((t) => {
     t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    if (!srgb) t.format = THREE.RedFormat;   // [mobile-perf] the forest masks are read for .r only: one byte a texel on the GPU, not four (2048² with mips: 22 -> 6 MB)
     t.flipY = false; t.needsUpdate = true;   // image row 0 = the north edge = v 0
     t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.anisotropy = 4; t.generateMipmaps = true;
     t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
@@ -264,6 +266,7 @@ export function terrainMaterial(ctx, lc, o = {}) {
         reflectedLight.directDiffuse *= 1.0 - gGap * 0.55;
         reflectedLight.indirectDiffuse *= 1.0 - gGap * 0.35;`);
     patchSnow(sh, uSeason, 'vWp');   // [v3:integrate] seasons (helpers + winter snow on the ground and crown tops)
+    applySwimFog(sh, 'vWp');   // [play:underwater]
   };
   m.customProgramCacheKey = () => 'klc-terrain';
   return m;
@@ -278,6 +281,60 @@ export function gridSurfaceAt(b, step, hfn, x, z) {
   const ha = hfn(x0, z0), hb = hfn(x0 + sx, z0), hc = hfn(x0, z0 + sz), hd = hfn(x0 + sx, z0 + sz);
   if (Math.abs(ha - hd) < Math.abs(hb - hc)) return u >= v ? ha + (hb - ha) * u + (hd - hb) * v : ha + (hc - ha) * v + (hd - hc) * u;   // split a-d
   return u + v <= 1 ? ha + (hb - ha) * u + (hc - ha) * v : hd + (hc - hd) * (1 - u) + (hb - hd) * (1 - v);                           // split b-c
+}
+
+// ------------------------------------------------------------------ [sys:16] the terrain mesh under the roads
+// Outside the hero box the mesh is a 10 m triangulated grid (5 m patches; 3.5 / 5 m hero), and on concave ground and hillside cuts its triangles pass above the
+// true surface, so the road ribbons (draped on the DEM + 0.05 / 0.14 m) lay under it: 17.7 % of road samples (up to 3.7 m) were buried and the roads rendered
+// torn. The fix pulls the MESH down under the roads and leaves the roads alone (cars, walkers, lots and parking stay on the real DEM): every grid vertex
+// whose cells touch a road ribbon (half-width + 1 m; tunnels and bridges skipped) is clamped to at most the lowest road height over those cells minus 0.05 m.
+export const ROAD_CAP = { margin: 0.05, around: 1.0, edgeReach: 1.0, step: 2 };
+/** The road samples [x, z, y (road height - margin), reach] of the drawn roads: the centre line (reach = half-width + 1 m) and both edges (reach 1 m), every 2 m. */
+export function roadCapSamples(roads, Lw = L, lift = (x, z) => (Math.hypot(x - 180, z + 20) < 420 ? 0.05 : 0.14)) {
+  const out = [];
+  for (const r of roads) {
+    if (r.tunnel || r.kind === 'bridge' || !r.pts || r.pts.length < 2) continue;
+    const hw = (r.width || 4) / 2;
+    for (let i = 1; i < r.pts.length; i++) {
+      const a = r.pts[i - 1], b = r.pts[i], dx = b[0] - a[0], dz = b[1] - a[1], len = Math.hypot(dx, dz);
+      if (len < 1e-3) continue;
+      const nx = -dz / len, nz = dx / len, n = Math.max(1, Math.ceil(len / ROAD_CAP.step));
+      for (let k = 0; k <= n; k++) {
+        const x = a[0] + (dx * k) / n, z = a[1] + (dz * k) / n;
+        for (const [o, reach] of [[0, hw + ROAD_CAP.around], [-hw, ROAD_CAP.edgeReach], [hw, ROAD_CAP.edgeReach]]) {
+          const px = x + nx * o, pz = z + nz * o;
+          if (Lw.isWater(px, pz)) continue;
+          out.push(px, pz, Lw.heightAt(px, pz) + lift(px, pz) - ROAD_CAP.margin, reach);
+        }
+      }
+    }
+  }
+  return Float32Array.from(out);
+}
+/** Per-vertex caps of one grid (Infinity where no ribbon touches): the minimum over the (up to 4) cells around the vertex of the lowest road height in them. */
+export function roadCapGrid(samples, b, step) {
+  const nx = Math.max(1, Math.round((b.x1 - b.x0) / step)), nz = Math.max(1, Math.round((b.z1 - b.z0) / step));
+  const sx = (b.x1 - b.x0) / nx, sz = (b.z1 - b.z0) / nz, cell = new Float32Array(nx * nz).fill(Infinity);
+  for (let k = 0; k < samples.length; k += 4) {
+    const x = samples[k], z = samples[k + 1], y = samples[k + 2], r = samples[k + 3];
+    if (x + r < b.x0 || x - r > b.x1 || z + r < b.z0 || z - r > b.z1) continue;
+    const i0 = Math.max(0, Math.floor((x - r - b.x0) / sx)), i1 = Math.min(nx - 1, Math.floor((x + r - b.x0) / sx)), j0 = Math.max(0, Math.floor((z - r - b.z0) / sz)), j1 = Math.min(nz - 1, Math.floor((z + r - b.z0) / sz));
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const c = j * nx + i; if (y < cell[c]) cell[c] = y; }
+  }
+  const W = nx + 1, vert = new Float32Array(W * (nz + 1)).fill(Infinity);
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) { const y = cell[j * nx + i]; if (y === Infinity) continue; for (const [di, dj] of [[0, 0], [1, 0], [0, 1], [1, 1]]) { const v = (j + dj) * W + i + di; if (y < vert[v]) vert[v] = y; } }
+  return { b, nx, nz, sx, sz, W, vert };
+}
+/** hfn clamped to the road caps of a grid (the grid's vertices only: gridGeometry and gridSurfaceAt sample it there). */
+export function capHeight(hfn, grid) {
+  if (!grid) return hfn;
+  const { b, nx, nz, sx, sz, W, vert } = grid;
+  return (x, z) => {
+    const y = hfn(x, z), i = Math.round((x - b.x0) / sx), j = Math.round((z - b.z0) / sz);
+    if (i < 0 || j < 0 || i > nx || j > nz) return y;
+    const c = vert[j * W + i];
+    return c < y ? c : y;
+  };
 }
 
 // ------------------------------------------------------------------ walk-spot patches
@@ -305,7 +362,7 @@ export function walkPatches(midBox, cityBox, spots = L.TOUR.map((t) => t.walk).f
 }
 
 // ------------------------------------------------------------------ build
-export function buildTerrain(ctx, mat) {
+export function buildTerrain(ctx, mat, { roads = null } = {}) {   // [sys:16] roads: the drawn roads (layout hero + mid, explore's core); the mesh is pulled down under them
   const g = new THREE.Group(); g.name = 'env-terrain';
   const M = LOD.mid;
   const H = ctx.quality?.phone ? { ...LOD.hero, step: PHONE.terrainStep } : LOD.hero;   // [v4:phone] 920 / 5: still on the mid grid lines
@@ -323,8 +380,13 @@ export function buildTerrain(ctx, mat) {
   const horBox = around(cityBox, LOD.horizon.size, LOD.horizon.step, (F.x0 + F.x1) / 2, (F.z0 + F.z1) / 2);
   // [v3:fix] in front of a quay / seawall face the ground drops under the sea (no sand slope climbing the wall)
   const HS = sharedHardShores(L);
-  const hq = (x, z) => HS.clampY(x, z, L.heightAt(x, z));
-  t('hero', () => gridGeometry({ ...heroBox, step: H.step, skirt: 3, hfn: hq }));
+  const hq0 = (x, z) => HS.clampY(x, z, L.heightAt(x, z));
+  // [sys:16] the road caps of each fine grid (the 70 m city grid and the horizon are left alone: a 70 m cell cut to a road would flatten a hillside)
+  const caps = roads && roads.length ? roadCapSamples(roads) : null;
+  const heroCap = caps && roadCapGrid(caps, heroBox, H.step), midCap = caps && roadCapGrid(caps, midBox, M.step);
+  const hqHero = capHeight(hq0, heroCap), hq = capHeight(hq0, midCap);   // hq: the mid grid's height (patches and the DEM along the mid box edge use hq0 below)
+  const hqPatch = (b) => capHeight(hq0, caps && roadCapGrid(caps, b, LOD.patch.step));
+  t('hero', () => gridGeometry({ ...heroBox, step: H.step, skirt: 3, hfn: hqHero }));
   t('mid', () => gridGeometry({ ...midBox, step: M.step, hole: heroBox, skirt: 6, hfn: hq }));
   // [v3:polish3] fine patches round the walk spots beyond the mid grid (かなえ大橋, 大島): on the 70 m city grid the
   // walker stood on bare, flat triangles up to 9 m off the DEM. Each patch lies on city grid lines (cut from the city
@@ -334,11 +396,12 @@ export function buildTerrain(ctx, mat) {
   const cityAt = (x, z) => gridSurfaceAt(cityBox, LOD.city.step, worldHeight, x, z);
   // (a side shared with the mid box keeps the DEM: the mid grid samples the same heights along it)
   const patchHeight = (b) => {
+    const hqP = hqPatch(b);
     const onMid = { x0: b.x0 === midBox.x1, x1: b.x1 === midBox.x0, z0: b.z0 === midBox.z1, z1: b.z1 === midBox.z0 };
     return (x, z) => {
       const e = Math.min(onMid.x0 ? 1e9 : x - b.x0, onMid.x1 ? 1e9 : b.x1 - x, onMid.z0 ? 1e9 : z - b.z0, onMid.z1 ? 1e9 : b.z1 - z);
-      const k = smooth(0, 40, e); if (k >= 1) return hq(x, z);
-      const c = cityAt(x, z); return c + (hq(x, z) - c) * k;
+      const hp = hqP(x, z), k = smooth(0, 40, e); if (k >= 1) return hp;
+      const c = cityAt(x, z); return c + (hp - c) * k;
     };
   };
   patches.forEach((b, i) => t('patch' + i, () => gridGeometry({ ...b, step: LOD.patch.step, skirt: 4, hfn: patchHeight(b) })));
@@ -348,7 +411,7 @@ export function buildTerrain(ctx, mat) {
   ctx.addStatic(g);
   // [v3:polish3] the rendered surface height (the same grid + diagonal rule as gridGeometry), so props scattered on the
   // coarse grids (大島, かなえ大橋: 70 m cells) sit on the drawn triangles, not on the DEM that the triangles skip
-  const grids = [[heroBox, H.step, hq], [midBox, M.step, hq], ...patches.map((b) => [b, LOD.patch.step, patchHeight(b)]), [cityBox, LOD.city.step, worldHeight], [horBox, LOD.horizon.step, worldHeight]];
+  const grids = [[heroBox, H.step, hqHero], [midBox, M.step, hq], ...patches.map((b) => [b, LOD.patch.step, patchHeight(b)]), [cityBox, LOD.city.step, worldHeight], [horBox, LOD.horizon.step, worldHeight]];
   function surfaceAt(x, z) {
     for (const [b, step, hfn] of grids) if (x >= b.x0 && x <= b.x1 && z >= b.z0 && z <= b.z1) return gridSurfaceAt(b, step, hfn, x, z);
     return worldHeight(x, z);

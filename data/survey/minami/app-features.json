@@ -1,12 +1,57 @@
 {
  "note": "window.__features(area) / __featureDims(area) from the built app (tools/anime/survey-diff.mjs)",
  "area": "minami",
- "generated": "2026-10-03T13:21:31.136Z",
+ "generated": "2026-10-03T21:55:58.691Z",
  "features": {
   "totem.pier7": [
    -6.04,
    3.08,
    72.08
+  ],
+  "nw.shop.corner": [
+   -1.98,
+   3.5,
+   71.37
+  ],
+  "nw.shop.glass_end": [
+   2.286,
+   3.5,
+   69.023
+  ],
+  "nw.shop.wall_end": [
+   5.159,
+   3.5,
+   67.442
+  ],
+  "nw.studio.L": [
+   5.654,
+   6.5,
+   72.282
+  ],
+  "nw.slab.end": [
+   -0.176,
+   4.9,
+   75.581
+  ],
+  "nw.col1.foot": [
+   -2.167,
+   2.35,
+   76.837
+  ],
+  "nw.col2.foot": [
+   0.3,
+   2.35,
+   81.528
+  ],
+  "nw.roof.W": [
+   6.145,
+   8.8,
+   69.752
+  ],
+  "nw.roof.A": [
+   -4.104,
+   8.3,
+   75.392
   ],
   "totem.mukaeru": [
    -11.71,
@@ -24,14 +69,9 @@
    48.949
   ],
   "anchor.P2.eave": [
-   -10.8,
-   9.173,
-   48.949
-  ],
-  "anchor.P1.eave": [
-   -15.34,
-   8.82,
-   44.16
+   -10.614,
+   9.146,
+   49.145
   ],
   "mukaeru.box.top#1": [
    -16.36,
@@ -42,6 +82,21 @@
    -8.76,
    14.825,
    36.47
+  ],
+  "totem.yuwaeru": [
+   -26.9,
+   2.4,
+   70.7
+  ],
+  "tree.bleacher#1": [
+   2.55,
+   4,
+   36.1
+  ],
+  "tree.bleacher#2": [
+   3.76,
+   5.05,
+   29.96
   ],
   "cage.top#1": [
    0.83,
@@ -219,20 +274,74 @@
    62.67
   ],
   "ring#3": [
-   21.53,
+   22.1,
    1.83,
-   54.58
+   54.1
   ],
   "ring.tree#1": [
    28.05,
    1.83,
    63.02
+  ],
+  "ringC.gap#1": [
+   19.752,
+   2.1,
+   55.625
+  ],
+  "ringC.gap#2": [
+   19.361,
+   2.1,
+   53.518
+  ],
+  "gate.post": [
+   8.8,
+   1.83,
+   66
+  ],
+  "konbini.pole": [
+   -39.5,
+   2.38,
+   49.2
+  ],
+  "konbini.sign_bottom": [
+   -39.5,
+   9.73,
+   49.2
+  ],
+  "sign.pole.0832": [
+   -15,
+   2.031,
+   63
+  ],
+  "sign.40": [
+   -34.76,
+   5.51,
+   50.27
+  ],
+  "monument.plaque.tl": [
+   131.48,
+   3.17,
+   64.577
+  ],
+  "lamp.0896.foot": [
+   140.3,
+   2.1,
+   81.7
   ]
  },
  "dims": {
+  "nw.slab_y": 5.3,
+  "nw.studio_head": 8,
+  "nw.setback": 4.48,
+  "nw.stair_rise": 0.197,
+  "nw.stair_w": 2.4,
+  "nw.shop_w": 8.15,
   "mukaeru.box_se_w": 8.664,
   "mukaeru.box_top_y": 14.825,
   "anchor.floor": 2.62,
+  "pier7.stilt_pitch": 3.5,
+  "pier7.seam_nw": 2,
+  "pier7.roof_nw_y": 9,
   "plaza.y": 1.83,
   "cage.h": 5.42,
   "cage.front_w": 3.616,
@@ -248,7 +357,15 @@
   "bleach.stair.risers": 16,
   "winch.post_h": 2.67,
   "winch.span": 2.405,
+  "ringC.d_out": 5.6,
+  "ringC.gap_deg": 45,
+  "ring.crown_top#A": 4.7,
+  "ring.crown_top#B": 5.1,
+  "ring.crown_top#C": 5.35,
   "ring.d_out": 4.665,
-  "ring.h": 0.27
+  "ring.h": 0.27,
+  "monument.plaque_w": 1.56,
+  "monument.plaque_h": 0.81,
+  "monument.plinth_h": 0.46
  }
 }

@@ -19,6 +19,8 @@ import { prismWalls, capGeo, paint } from './lmkit.js';
 import { mapMat, textTex, FONT } from './util.js';
 import { nightMat } from './lights.js';
 import { shopGlass } from './detail5.js';
+import { buildDeckCars } from './deckcars6.js';
+import { buildLifeboat } from './lifeboat6.js';
 import MODEL from '../../../../data/survey/market/model.json';
 
 export const DECK = MODEL;
@@ -47,11 +49,11 @@ export function buildCRoofPhotos(ctx, k, { cars }) {
   const t = (c, o) => ctx.mat.toon(c, o), phys = ctx.physics, M = MODEL, D = M.deck, y = D.y;
   const G = k.group([FR.o[0], 0, FR.o[1]], ROT), K = ctx.kit(G);
   const at = (s, off, h = 0) => { const [x, z] = enu(s, off); return [x, y + h, z]; };
-  const slab = paint(ctx, 'c6-slab', 512, 512, (g, w, h) => {   // 10 m tile: 5 x 5 m slabs with saw-cut joints and water stains
+  const slab = paint(ctx, 'c6-slab3', 512, 512, (g, w, h) => {   // [v6:fix1] 9 m tile: 3 x 3 m slabs with saw-cut joints (the photos' joints are 3.0 m apart, not 5) and water stains
     g.fillStyle = '#b5ab97'; g.fillRect(0, 0, w, h);
     const rr = ctx.rng('c6slab');
     for (let i = 0; i < 80; i++) { g.globalAlpha = 0.1; g.fillStyle = rr() < 0.6 ? '#857c6b' : '#cfc6b2'; g.beginPath(); g.ellipse(rr() * w, rr() * h, 10 + rr() * 60, 6 + rr() * 34, rr() * 3, 0, 7); g.fill(); }
-    g.globalAlpha = 1; g.fillStyle = '#5f584c'; for (const v of [0, w / 2]) { g.fillRect(v, 0, 2, h); g.fillRect(0, v, w, 2); }
+    g.globalAlpha = 1; g.fillStyle = '#5f584c'; for (const v of [0, w / 3, 2 * w / 3]) { g.fillRect(Math.round(v), 0, 2, h); g.fillRect(0, Math.round(v), w, 2); }
   }, [1, 1]);
   const panel = paint(ctx, 'c6-blue', 256, 256, (g, w, h) => {   // 8 m tile: pale-blue panels, stepped joint lines
     g.fillStyle = '#93b5d8'; g.fillRect(0, 0, w, h); g.strokeStyle = '#789bbe'; g.lineWidth = 2;
@@ -62,7 +64,7 @@ export function buildCRoofPhotos(ctx, k, { cars }) {
     slab: mapMat(ctx, 'toon', '#ffffff', slab, { paint: 0.03 }), blue: mapMat(ctx, 'toon', '#ffffff', panel, { paint: 0.03 }),
     blueP: t('#9fbcd9', { paint: 0.03 }), base: t('#a7aaa6', { paint: 0.03 }), white: t('#eef0ee', { paint: 0.03 }), whiteD: t('#eceeec', { paint: 0.03, side: 'double' }),
     grey: t('#a3a7a9', { paint: 0.03 }), greyD: t('#9a9fa3', { paint: 0.03, side: 'double' }), roofTop: t('#b9bcbc', { paint: 0.03, side: 'double' }), concrete: t('#c1bfb7', { paint: 0.05 }),
-    frame: t('#6f6a64', { paint: 0 }), rail: t('#b7bec4', { paint: 0 }), cone: t('#df3f2b', { paint: 0.02 }), coneW: t('#f2f0ea', { paint: 0.02 }),
+    frame: t('#6f6a64', { paint: 0 }), rail: t('#b7bec4', { paint: 0 }), cone: t('#c42f28', { paint: 0.02 }), coneW: t('#e9e5dc', { paint: 0.02 }),
     black: t('#2a2b2e', { paint: 0 }), orange: t('#ee5a2a', { paint: 0.03 }), orangeD: t('#c4441f', { paint: 0.03 }), navy: t('#2c3a5c', { paint: 0.02 }), steel: t('#a9b0b6', { paint: 0 }),
     win: t('#3e4954', { paint: 0 }), plinth: t('#a9c6dd', { paint: 0.03 }), solar: t('#1f2833', { paint: 0 }),
     glass: shopGlass(ctx, 'office', 0.75), door: shopGlass(ctx, 'office', 1.0), lamp: nightMat(ctx, '#e8e6dc', '#fff0d0', 2.2),
@@ -71,7 +73,11 @@ export function buildCRoofPhotos(ctx, k, { cars }) {
   const S0 = D.north, S1 = studioS(D.edge), E = D.edge;
   // the slab: C棟's roof between the north edge, the studio face and the parapet; under the penthouse it is roof, not deck
   const deckRing = [[CBOX.o0, S0], [E, S0], [E, studioS(E)], [0, studioS(0)], [0, M.wall.s[0]], [CBOX.o0, M.wall.s[0]]];
-  K.mesh(capGeo(deckRing, y + 0.01, { tile: 10 }), m.slab);
+  const JT = M.markings.joint;   // the joint grid in the wall frame: texture u along off, v along s, phase from the survey
+  K.mesh(capGeo(deckRing, y + 0.01, { tile: JT.pitch * 3, uvFrame: { cx: 0, cz: 0, ax: [1, 0], ay: [0, 1], u0: JT.off0, v0: JT.s0 } }), m.slab);
+  // the painted stall line (IMG_0795): orange-yellow, along off at the surveyed s
+  const stallM = t('#e0a42c', { paint: 0.02 });
+  for (const L of M.markings.stall) K.box(L.off[1] - L.off[0], 0.006, L.w, stallM, [(L.off[0] + L.off[1]) / 2, y + 0.016, L.s]);
   // C棟's body between the lower east strip and the deck (market4 builds the hall below that level)
   const lowY = y - D.lowerDrop, body = [[CBOX.o0, CBOX.s0], [E, CBOX.s0], [E, CBOX.s1], [CBOX.o0, CBOX.s1]];
   K.mesh(prismWalls(body, lowY - 0.05, y, { tile: 4 }), m.white);
@@ -189,21 +195,19 @@ export function buildCRoofPhotos(ctx, k, { cars }) {
     for (const a of [Math.PI / 4, 3 * Math.PI / 4, 5 * Math.PI / 4, 7 * Math.PI / 4]) { const ex = off + Math.cos(a) * 2.6, ez = s + Math.sin(a) * 2.6, hh = 3.0, L = Math.hypot(2.6, hh); const b = K.box(0.05, 0.05, L, m.white, [(off + ex) / 2, y + hh / 2, (s + ez) / 2]); b.rotation.order = 'YXZ'; b.rotation.set(Math.atan2(hh, 2.6), Math.atan2(ex - off, ez - s), 0); }
     if (phys?.addBox) { const [x, z] = enu(s, off); phys.addBox(x, z, 0.9, 0.9, ROT, y, tip); }
   }
-  // the orange enclosed lifeboat on its trailer: a 5.3 x 2.3 m hull (its stencil), stern to the south (IMG_0793)
-  { const LB = M.lifeboat, s1 = LB.stern, s0 = s1 - LB.L, c = (s0 + s1) / 2, o = LB.off, B = LB.B;
-    K.box(1.5, 0.1, LB.L - 0.4, m.steel, [o, y + LB.keel - 0.08, c]); for (const sd of [-1, 1]) { K.box(0.1, 0.12, LB.L + 0.2, m.steel, [o + sd * 0.7, y + 0.3, c]); for (const zz of [s0 + 0.5, s1 - 0.5]) K.cyl(0.14, 0.14, 0.1, m.black, [o + sd * 0.75, y + 0.14, zz], [0, 0, Math.PI / 2], 10); }
-    const hull = new THREE.CapsuleGeometry(B / 2, LB.L - B, 6, 16); hull.rotateX(Math.PI / 2); K.mesh(hull, m.orange, [o, y + LB.keel + (LB.sheer - LB.keel) / 2 + 0.05, c], null, [1, (LB.sheer - LB.keel + 0.1) / B, 1]);
-    K.box(B + 0.06, 0.08, LB.L - 0.3, m.navy, [o, y + LB.sheer, c]);
-    const cab = new THREE.CapsuleGeometry(B / 2 - 0.1, LB.L - B - 0.2, 6, 14); cab.rotateX(Math.PI / 2); K.mesh(cab, m.orange, [o, y + LB.sheer + 0.02, c - 0.1], null, [1, (LB.canopy - LB.sheer) * 2 / (B - 0.2), 1]);
-    K.box(1.3, LB.top - LB.canopy + 0.2, 1.4, m.orange, [o, y + (LB.canopy + LB.top) / 2 - 0.1, s1 - 1.2]);
-    for (const sd of [-1, 1]) K.box(0.05, 0.4, 0.45, m.win, [o + sd * (B / 2 - 0.05), y + 1.45, c - 0.6]);
-    if (phys?.addBox) { const [x, z] = enu(c, o); phys.addBox(x, z, B, LB.L, ROT, y, y + LB.top); } }
+  // [v6:fix2] the enclosed lifeboat on its trailer (harbor/lifeboat6.js): lofted hull, canopy, tower, hatches; positioned on its sheer edge cut in IMG_0793
+  { const LB = M.lifeboat; buildLifeboat(ctx, K, y, LB);
+    if (phys?.addBox) { const tl = (LB.tilt || 0) * Math.PI / 180, sc = LB.bow + LB.L / 2 * Math.cos(tl), oc = LB.off + LB.L / 2 * Math.sin(tl), [x, z] = enu(sc, oc); phys.addBox(x, z, LB.B, LB.L, ROT, y, y + LB.top); } }
   // cones (survey deck.cone#1-4)
   const cones = M.cones.map(([x, z]) => wallOf(x, z));
-  for (const [s, off] of cones) { K.cyl(0.04, 0.16, 0.7, m.cone, [off, y + 0.37, s], null, 10); K.cyl(0.09, 0.12, 0.12, m.coneW, [off, y + 0.42, s], null, 10); K.box(0.4, 0.04, 0.4, m.black, [off, y + 0.02, s]); }
-  // the photographed cars (IMG_0792-0798, 17:07): positions and headings in the wall frame
-  let n = 0;
-  for (const c of M.carsBuilt === false ? [] : M.cars || []) { const [x, z] = enu(c.s, c.o), f = { W: [-FR.n[0], -FR.n[1]], E: FR.n, N: [-FR.u[0], -FR.u[1]], S: FR.u }[c.face]; cars.push({ x, y, z, rot: Math.atan2(f[0], f[1]), color: c.color }); n++; }
+  for (const [s, off] of cones) {   // [v6:fix2] IMG_0793 / 0795: a deep red cone (not orange), three white reflective bands, a collar, a black rubber base on a thin red plate
+    K.cyl(0.035, 0.155, 0.7, m.cone, [off, y + 0.4, s], null, 12);
+    for (const h of [0.2, 0.37, 0.52]) { const rr = (hh) => 0.155 - 0.12 * hh / 0.7, bw = h > 0.45 ? 0.07 : 0.095; K.cyl(rr(h + bw / 2) + 0.004, rr(h - bw / 2) + 0.004, bw, m.coneW, [off, y + 0.05 + h, s], null, 12); }
+    K.cyl(0.19, 0.19, 0.03, m.cone, [off, y + 0.075, s], null, 14);
+    K.box(0.46, 0.05, 0.46, m.black, [off, y + 0.03, s]); K.box(0.5, 0.01, 0.5, m.cone, [off, y + 0.006, s]);
+  }
+  // [v6:fix2] the photographed cars (IMG_0792-0798, 17:07): each its own model (harbor/deckcars6.js), at the measured stands
+  const n = buildDeckCars(ctx, K, y, { physics: phys }).length;
   deckFeatures(ctx, { y, win, cones });
   return { deckY: y, penthouseTop: topMid, lowY, cars: n };
 }
@@ -222,6 +226,7 @@ export function deckFeatures(ctx, { y, win, cones }) {
   W.letters.s.forEach((s, i) => F.add(A, `deck.letter.${i + 1}`, at(s, W.letters.out, y + W.letters.h[i])));
   F.group(A, 'deck.window', win.map((s) => at(s, 0, y + (W.windows.h0 + W.windows.h1) / 2)));
   F.group(A, 'deck.cone', cones.map(([s, off]) => at(s, off, y)));
+  M.markings.stall.forEach((L) => { F.add(A, 'deck.line.stall#1', at(L.s, L.off[0], y)); F.add(A, 'deck.line.stall#2', at(L.s, 11.87, y)); });   // [v6:fix1] the surveyed stall line (near end, a point 2.3 m along)
   F.group(A, 'deck.stack', M.stacks.list.map(([s, off, tip]) => at(s, off, tip)));
   F.group(A, 'deck.pavilion', M.pavilions.list.map((p) => at((p.s[0] + p.s[1]) / 2, (p.o[0] + p.o[1]) / 2, y)));
   F.add(A, 'deck.lifeboat.end_n', [M.lifeboat.n[0], y, M.lifeboat.n[1]]); F.add(A, 'deck.lifeboat.end_s', [M.lifeboat.s[0], y, M.lifeboat.s[1]]);

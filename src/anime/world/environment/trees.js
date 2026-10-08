@@ -212,8 +212,9 @@ export async function buildTrees(ctx, lc) {
       let a = 0, b = 0;
       for (let i = 0; i < counts[t]; i++) {
         const dx = p[i * 2] - cx, dz = p[i * 2 + 1] - cz;
-        if (dx * dx + dz * dz < r2) { am.set(M.subarray(i * 16, i * 16 + 16), a * 16); ac.set(C.subarray(i * 3, i * 3 + 3), a * 3); a++; }
-        else { bm.set(M.subarray(i * 16, i * 16 + 16), b * 16); bc.set(C.subarray(i * 3, i * 3 + 3), b * 3); b++; }
+        // [smooth] copied element by element: two subarray views per tree (thousands per split, every 25 m of travel) were garbage
+        if (dx * dx + dz * dz < r2) { for (let k = 0; k < 16; k++) am[a * 16 + k] = M[i * 16 + k]; for (let k = 0; k < 3; k++) ac[a * 3 + k] = C[i * 3 + k]; a++; }
+        else { for (let k = 0; k < 16; k++) bm[b * 16 + k] = M[i * 16 + k]; for (let k = 0; k < 3; k++) bc[b * 3 + k] = C[i * 3 + k]; b++; }
       }
       A.count = a; B.count = b;
       A.instanceMatrix.needsUpdate = B.instanceMatrix.needsUpdate = true; A.instanceColor.needsUpdate = B.instanceColor.needsUpdate = true;

@@ -18,7 +18,7 @@ import { prismWalls, capGeo, offsetRing, obbOf, seg, barAlong, openRing, signedA
 import { nightMat, addGlint, registry } from './lights.js';
 import { mapMat, textTex, FONT } from './util.js';
 import { shopGlass } from './detail5.js';   // [v5:detail]
-import { buildPier7Photos, buildMukaeruPhotos, buildPlazaPhotos, buildSlowStreetPhotos, buildKonbiniPhotos, buildMarkingsPhotos, buildEastPromenade, clipAxis, LAWN6, PIER7_6, P7POLY6, P7_1F6 } from './minami5.js';   // [v5:photos]
+import { buildPier7Photos, buildMukaeruPhotos, buildPlazaPhotos, buildSlowStreetPhotos, buildKonbiniPhotos, buildMarkingsPhotos, buildEastPromenade, clipAxis, LAWN6, PIER7_6, P7POLY6, P7_1F6, NW7 } from './minami5.js';   // [v5:photos]
 
 const C = { white: '#f1f1ee', roof: '#eceeed', timber: '#d6b88e', timberDark: '#a9825a', render: '#f0efe9', deck: '#b08a62', steel: '#5d6470', concrete: '#c9c6bc', stepTop: '#d7d3c8', lawn: '#8a9566', paveA: '#c6c3b8', paveB: '#b9b6ac', tanStep: '#b5ab9f', ringWhite: '#e9e7e1', soil: '#4f4a3e', lowPlant: '#4d5e3c', louver: '#cdbfa8', pontoon: '#b9bcb6', membrane: '#f4f5f2', glassPale: '#a9bccb', terraceA: '#6d6664', terraceB: '#57545b', p7deck: '#a7a39c', mukGrey: '#cfcfca', mukDark: '#8f8d8b', tanDeck: '#ae9a90',
   // [v5:fix3] 迎 from the author's photos (IMG_0818 / IMG_0824) + Earth 2026-03-11: silver rib siding, khaki render, grey metal roofs
@@ -176,7 +176,7 @@ export function buildMinami(ctx) {
     // [v6:rebuild] the bay face stands 1.5 m inside the seawall line (P7WALL), not on GSI's outline 3.7 m further in (SfM points
     // of the 2F / 3F glass; IMG_0802, 0814-0817): P7POLY6 carries it; the block seams at -0.5 and 39.0 along the axis
     const P6 = P7POLY6, [c0, c1] = PIER7_6.cuts;
-    const MID = clipAxis(P6, T.axis.o, T.axis.u, c0, c1);
+    const MID = clipAxis(clipAxis(P6, NW7.K, NW7.eb, NW7.seam, 1e3), T.axis.o, T.axis.u, -1e3, c1);   // [v6:fix3] the 2F / 3F bar starts 12.4 m along the street face from the NW shop's corner (survey of IMG_0908)
     // [v5:detail] the 2F glazing stands 3.5 m back from the bay edge behind a terrace with tables (IMG_0802, 0815); that
     // also bares the SE block's NW face with 「PIER7」 and the bay painting above the deck (IMG_0816)
     const dBay = Math.max(...MID.map((p) => (p[0] - T.axis.o[0]) * T.bayN[0] + (p[1] - T.axis.o[1]) * T.bayN[1]));
@@ -198,7 +198,7 @@ export function buildMinami(ctx) {
       glazedBand(P, f3, top - 0.55, 1.25, shopGlass(ctx, 'glow', 0.9), f3 + 2.5);
       k.mesh(capGeo(offsetRing(P, -0.4), top - 0.6, { down: true, tile: 2 }), m.timber); }
     // interior warmth: timber-lined ceilings read through the glass
-    k.mesh(capGeo(offsetRing(poly, -0.4), f2 - 0.6, { down: true, tile: 2 }), m.timber); k.mesh(capGeo(offsetRing(MIDb, -0.4), f3 - 0.6, { down: true, tile: 2 }), m.timber);   // [v5:photos] MID
+    k.mesh(capGeo(offsetRing(P7_1F6, -0.4), f2 - 0.6, { down: true, tile: 2 }), m.timber); k.mesh(capGeo(offsetRing(MIDb, -0.4), f3 - 0.6, { down: true, tile: 2 }), m.timber);   // [v6:fix3] the 1F ceiling over the SE part only (the NW shop is minami5's NW7: the stair and deck stand where the old one hung)   // [v5:photos] MID
     // [v5:fix2] the street face: continuous white panels with narrow vertical timber louvers at a 1.1 m pitch in front of
     // the 2F and 3F (Earth o0 / l225: a white face, no punched windows; it read as an apartment block with blue windows
     // and orange panels). The louvers are a muted pale timber so they read as a texture, not as coloured rectangles.
@@ -529,6 +529,6 @@ export function buildMinami(ctx) {
     out.pontoons.push({ poly: pt.poly, y });
   });
   // the cruise boat's berth: along the north long side of the first pontoon, bow out to the bay
-  { const P = PONTOONS[0].poly; out.berth = { a: P[2], b: P[3] }; }
+  { const P = PONTOONS[1].poly; out.berth = { a: P[2], b: P[3] }; }   // [v6:fix3] the bay-cruise boat lies at the NEARER pontoon (IMG_0888: the white two-deck boat behind the canopy of the pontoon at bearing 293 deg / 65 m, not the far one)
   return out;
 }

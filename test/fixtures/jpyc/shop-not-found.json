@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "error": {
+    "code": "SHOP_NOT_FOUND",
+    "message": "Shop not found"
+  }
+}

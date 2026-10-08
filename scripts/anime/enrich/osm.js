@@ -55,6 +55,8 @@ export function roofShapeOf(v) {
 /** OSM building / amenity / shop tags -> a layout lot kind (null when OSM says nothing specific). */
 export function kindFromTags(t) {
   const b = t.building, a = t.amenity, rel = t.religion;
+  // [v6:c6r3] a multi-storey car park (building=parking, or amenity=parking + parking=multi-storey): an open stepped deck, not a closed warehouse box
+  if (b === "parking" || (a === "parking" && t.parking === "multi-storey")) return "carpark";
   if (a === "place_of_worship" || b === "shrine" || b === "temple" || b === "church") {
     if (b === "shrine" || rel === "shinto") return "shrine";
     if (b === "temple" || rel === "buddhist") return "temple";
@@ -160,13 +162,27 @@ const POI_SKIP_HIGHWAY = new Set(["crossing", "traffic_signals", "street_lamp", 
 /** Area amenities whose buildings take the site's name and use. */
 const SITE_AMENITY = new Set(["school", "kindergarten", "college", "university", "hospital", "clinic", "place_of_worship", "townhall", "community_centre", "library", "police", "fire_station", "post_office", "marketplace", "ferry_terminal", "bus_station", "courthouse", "social_facility", "arts_centre", "theatre"]);
 /** Road classes worth drawing (paths and tracks too: they are the walk network in the hills). */
-const ROAD_HW = new Set(["motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", "residential", "service", "living_street", "pedestrian", "footway", "path", "steps", "cycleway", "track", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link"]);
+// [r3:18] "busway": between the 2026-05-06 and 2026-10-04 OSM extracts the mappers re-tagged the 気仙沼線BRT ways from highway=service + service=bus_rapid_transit to highway=busway (79 ways: 79 -> 13 BRT ways and 14 -> 2 BRT stops until it was a road kind here)
+const ROAD_HW = new Set(["motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", "residential", "service", "busway", "living_street", "pedestrian", "footway", "path", "steps", "cycleway", "track", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link"]);
 
 /**
  * Overpass JSON -> { buildings, pois, landuse, waterways, waterAreas, roads, rail, nodes: { signals, crossings, trees, lamps } }.
  */
+/**
+ * [r3:13] OSM place_of_worship polygons that map a whole HILL as the shrine precinct, keyed by OSM id. 北野神社 (w761768594, 17,127 m2, x -1009..-854, z -474..-182, 福美町) outlines the 155 x 290 m hillside: the app
+ * raked it as cream gravel, grew 3D trees in it, hung the name 北野神社 and kind 'shrine' on six house lots, and Earth 2026-03-11 shows a closed wooded ravine with houses along its east edge. Only the compound
+ * round the hall is a precinct. `ring` is the compound's real extent (the OSM shrine buildings w775151444..447 span x -998..-934, z -236..-192; the hall is at (-959, -232)); it replaces the polygon
+ * (landuse and site); `keepOsm` / `near` / `at` are what build-enrich.js lets take the site's name and kind: a footprint that carries one of those OSM building ids or lies within `near` m of an anchor.
+ * The other large religious rings (八幡神社 6,740 m2, 光明寺 9,247 m2) are plausible precincts nothing here checks against Earth: left as mapped.
+ */
+export const PRECINCT_FIX = {
+  w761768594: { ring: [[-992, -252], [-930, -252], [-930, -188], [-992, -188]], keepOsm: ["w775151444", "w775151445", "w775151446", "w775151447"], at: [[-959, -232]], near: 30,
+    why: "OSM maps the whole 福美町 hillside (17,127 m2) as the 北野神社 precinct; Earth 2026-03-11 shows a closed wooded ravine, only the compound round the hall is the precinct" },
+};
 export function parseOsm(json) {
-  const out = { buildings: [], sites: [], pois: [], landuse: [], waterways: [], waterAreas: [], roads: [], rail: [], bridges: [], signals: [], crossings: [], trees: [], counts: {} };
+  const out = { buildings: [], sites: [], pois: [], landuse: [], waterways: [], waterAreas: [], roads: [], rail: [], bridges: [], signals: [], crossings: [], trees: [], busStops: [], busWays: [], brtWays: [], counts: {} };
+  // [sys:17] bus stops (highway=bus_stop / public_transport=platform nodes), the stop_positions on BRT ways, and the ways a bus route uses
+  const stopPositions = [], busWayIds = new Set(), wayPts = new Map();
   for (const e of json.elements || []) {
     const t = e.tags || {};
     const osm = e.type[0] + e.id;
@@ -175,25 +191,29 @@ export function parseOsm(json) {
       if (t.highway === "traffic_signals" || t.crossing === "traffic_signals") out.signals.push(p);
       if (t.highway === "crossing" || t.railway === "level_crossing") out.crossings.push({ p, kind: t.crossing || (t.railway ? "rail" : "unmarked"), signals: t.crossing === "traffic_signals" || undefined });
       if (t.natural === "tree") out.trees.push({ p, species: t["species:ja"] || t.species || t.genus || undefined });
+      if (t.highway === "bus_stop" || (t.public_transport === "platform" && (t.bus === "yes" || t.highway === "bus_stop"))) {
+        out.busStops.push({ osm, p, kind: "bus", name: t.name, nameEn: t["name:en"], operator: t.operator, network: t.network, ref: t.ref, shelter: t.shelter, covered: t.covered, bench: t.bench, bin: t.bin });
+      } else if (t.public_transport === "stop_position") stopPositions.push({ osm, p, name: t.name, nameEn: t["name:en"], operator: t.operator, bus: t.bus });
       if (t.building) out.buildings.push({ osm, node: true, p, tags: pickBuildingTags(t) });
       const k = POI_KEYS.find((key) => t[key] && !(key === "highway" && (POI_SKIP_HIGHWAY.has(t.highway) || !t.name)) && !(key === "natural" && t.natural === "tree"));
       if (k && (t.name || ["amenity", "shop", "tourism", "historic", "office"].includes(k))) out.pois.push({ osm, p, cat: k, type: t[k], ...names(t), cuisine: t.cuisine, religion: t.religion, ele: t.ele ? parseFloat(t.ele) : undefined });
       continue;
     }
     // ways and relations
+    if (e.type === "relation" && t.route === "bus") { for (const m of e.members || []) if (m.type === "way") busWayIds.add(m.ref); continue; }
     if (t.building || t["building:part"]) {
       for (const pg of areaPolys(e)) out.buildings.push({ osm, ring: pg.outer, holes: pg.holes, part: !t.building || undefined, tags: pickBuildingTags(t) });
       continue;
     }
     // a named site (school grounds, hospital, temple precinct, works): the buildings inside it belong to it
     if (t.name && (SITE_AMENITY.has(t.amenity) || t.tourism === "museum" || t.tourism === "hotel" || t.landuse === "religious" || t.man_made === "works" || t.office === "government")) {
-      for (const pg of areaPolys(e)) out.sites.push({ osm, ring: pg.outer, holes: pg.holes, name: t.name, nameEn: t["name:en"], tags: pickBuildingTags(t) });
+      for (const pg of areaPolys(e)) out.sites.push({ osm, ring: PRECINCT_FIX[osm]?.ring ?? pg.outer, holes: PRECINCT_FIX[osm] ? [] : pg.holes, name: t.name, nameEn: t["name:en"], tags: pickBuildingTags(t) });   // [r3:13] a hill-sized precinct is clipped to its compound
     }
     const lu = landuseClass(t);
     if (lu) {
       const polys = areaPolys(e);
       if (polys.length) {
-        for (const pg of polys) out.landuse.push({ osm, cls: lu, ring: pg.outer, holes: pg.holes, name: t.name, type: t.landuse || t.leisure || t.natural || t.amenity, water: t.water });
+        for (const pg of polys) out.landuse.push({ osm, cls: lu, ring: PRECINCT_FIX[osm]?.ring ?? pg.outer, holes: PRECINCT_FIX[osm] ? [] : pg.holes, name: t.name, type: t.landuse || t.leisure || t.natural || t.amenity, water: t.water });
         if (lu === "water" && (t.water === "river" || t.waterway === "riverbank")) for (const pg of polys) out.waterAreas.push({ osm, ring: pg.outer, holes: pg.holes, name: t.name });
         // an area amenity with a name is also a place (parks, schools, parking lots)
         if (t.name && (t.amenity || t.leisure || t.tourism)) out.pois.push({ osm, p: centroidOf(polys[0].outer), cat: t.amenity ? "amenity" : t.leisure ? "leisure" : "tourism", type: t.amenity || t.leisure || t.tourism, area: true, ...names(t) });
@@ -212,18 +232,24 @@ export function parseOsm(json) {
         oneway: t.oneway === "yes" || t.oneway === "1" || t.oneway === "-1" ? (t.oneway === "-1" ? -1 : 1) : undefined, maxspeed: t.maxspeed ? parseInt(t.maxspeed, 10) || undefined : undefined,
         bridge: t.bridge && t.bridge !== "no" ? (t["bridge:name"] || t.bridge) : undefined, tunnel: t.tunnel && t.tunnel !== "no" ? true : undefined, layer: t.layer ? parseInt(t.layer, 10) || undefined : undefined, surface: t.surface, sidewalk: t.sidewalk };
       out.roads.push(r);
+      wayPts.set(e.id, { pts, hw: t.highway, service: t.service, oneway: r.oneway, tunnel: r.tunnel, name: t.name });
+      if (t.service === "bus_rapid_transit" || t.highway === "busway") out.brtWays.push({ osm, pts, oneway: r.oneway, name: t.name });
       if (r.bridge) out.bridges.push({ osm, name: t["bridge:name"] || t.name, kind: t.bridge, pts });
       continue;
     }
     if (t.man_made === "bridge" || (t.bridge && t.bridge !== "no")) { out.bridges.push({ osm, name: t.name, kind: t.bridge || "area", pts }); continue; }
     if ((t.man_made === "pier" || t.man_made === "breakwater" || t.man_made === "embankment" || t.man_made === "dyke") && pts.length >= 2) { out.pois.push({ osm, p: pts[pts.length >> 1], cat: "man_made", type: t.man_made, line: pts, ...names(t) }); continue; }
   }
+  // [sys:17] a stop_position that sits on a BRT way is a BRT stop (with that way's direction of travel); bus-route ways
+  for (const id of busWayIds) { const w = wayPts.get(id); if (w && w.hw && !w.tunnel) out.busWays.push({ osm: "w" + id, pts: w.pts, hw: w.hw, oneway: w.oneway }); }
+  const nearWay = (p, list) => { let best = null; for (const w of list) for (let i = 1; i < w.pts.length; i++) { const a = w.pts[i - 1], b = w.pts[i], dx = b[0] - a[0], dz = b[1] - a[1], l2 = dx * dx + dz * dz || 1e-9, tt = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / l2)), d = Math.hypot(p[0] - a[0] - dx * tt, p[1] - a[1] - dz * tt); if (d < 3 && (!best || d < best.d)) best = { d, w, t: [dx / Math.sqrt(l2), dz / Math.sqrt(l2)] }; } return best; };
+  for (const sp of stopPositions) { const b = nearWay(sp.p, out.brtWays); if (b) out.busStops.push({ osm: sp.osm, p: sp.p, kind: "brt", name: sp.name, nameEn: sp.nameEn, operator: sp.operator || "東日本旅客鉄道", way: b.w.osm, dir: [Math.round(b.t[0] * 1000) / 1000, Math.round(b.t[1] * 1000) / 1000] }); }
   out.counts = Object.fromEntries(Object.entries(out).filter(([, v]) => Array.isArray(v)).map(([k, v]) => [k, v.length]));
   return out;
 }
 function pickBuildingTags(t) {
   const o = {};
-  for (const k of ["building", "building:levels", "building:levels:underground", "roof:levels", "height", "min_height", "roof:shape", "roof:colour", "roof:material", "building:colour", "building:material", "amenity", "shop", "tourism", "office", "religion", "denomination", "man_made", "start_date", "name", "name:en", "name:ja-Latn", "operator", "brand", "cuisine"]) if (t[k] != null) o[k] = t[k];
+  for (const k of ["building", "building:levels", "building:levels:underground", "roof:levels", "height", "min_height", "roof:shape", "roof:colour", "roof:material", "building:colour", "building:material", "amenity", "parking", "shop", "tourism", "office", "religion", "denomination", "man_made", "start_date", "name", "name:en", "name:ja-Latn", "operator", "brand", "cuisine"]) if (t[k] != null) o[k] = t[k];
   return o;
 }
 export function centroidOf(ring) {

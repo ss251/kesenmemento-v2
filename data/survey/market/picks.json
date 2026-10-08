@@ -558,17 +558,17 @@
   {
    "name": "deck.pavilion#8",
    "enu": [
-    748.2,
+    745.512,
     15.585,
-    1100.1
+    1094.826
    ],
    "sigma": [
-    1.5,
+    0.8,
     0.05,
-    1.5
+    0.8
    ],
-   "method": "GSI ortho z18 (roof rectangle beside its L-shaped shadow), at the deck",
-   "note": "pavilions stand in 4 pairs"
+   "method": "roof curl tip in IMG_0794 / 0796 / 0798 (triangulated: s 156.25 +- 0.8, off 14.0, 3.5 deg ray angle, 6 / 4 / 10 px) combined with the GSI ortho centre (s 159.7 +- 1.5): the outer end's tip at the south end puts the centre at s 153.8",
+   "note": "pavilions stand in 4 pairs; the ortho centre alone (748.2, 1100.1) overlaps the studio face by 3 m"
   },
   {
    "name": "deck.cone#1",
@@ -605,15 +605,43 @@
   },
   {
    "name": "deck.cone#4",
+   "pick_m": 0.05,
+   "note": "[v6:fix2] one cone, two photos that disagree: the mid point (0.55 m from each cut, 95 / 150 px in the two photos instead of 0 / 240)",
+   "enu": [
+    713.35,
+    15.585,
+    1038.69
+   ],
+   "sigma": [
+    0.6,
+    0.05,
+    0.6
+   ],
+   "method": "compromise of the IMG_0795 and IMG_0793 footprint cuts (89.06, 11.53) and (89.71, 10.54) in the wall frame: the two stands disagree by 1.1 m on the deck plane (triangulated, the two rays meet 0.4 m below the deck plane: the near-field camera heights are weak)"
+  },
+  {
+   "name": "deck.line.stall#1",
    "obs": {
-    "0793": [
-     2875,
-     4700
+    "0795": [
+     975,
+     2655
     ]
    },
    "plane": "deck",
-   "pick_m": 0.05,
-   "note": "[v6:rebuild] the cone's footprint centre on the deck (the first pick, v 4255, was half way up the cone: it put the cone 0.6 m too far)"
+   "pick_m": 0.1,
+   "note": "the stall line near end (IMG_0795)"
+  },
+  {
+   "name": "deck.line.stall#2",
+   "obs": {
+    "0795": [
+     100,
+     3620
+    ]
+   },
+   "plane": "deck",
+   "pick_m": 0.1,
+   "note": "a point on the same line, 2.3 m along it (IMG_0795)"
   },
   {
    "name": "deck.lifeboat.end_n",
@@ -667,18 +695,6 @@
   {
    "name": "deck.studio.louvre_nw",
    "from_adjust": "deck:studio.louvre_tr"
-  },
-  {
-   "name": "canopy.beam_bottom",
-   "obs": {
-    "0855": [
-     1512,
-     1482
-    ]
-   },
-   "plane": "shedface",
-   "pick_m": 0.05,
-   "note": "underside of the outermost ceiling beam at the open quay face, seen from inside the hall (IMG_0855)"
   }
  ],
  "dims": [
@@ -711,24 +727,6 @@
    "value": 159.83,
    "sigma": 1.5,
    "note": "penthouse east wall, NE corner to the studio corner"
-  },
-  {
-   "name": "canopy.floor_y",
-   "value": 2.19,
-   "sigma": 0.15,
-   "note": "hall floor T.P. from the canopy adjustment (eye 1.45 m, apron 1.85, quay top 1.8)"
-  },
-  {
-   "name": "canopy.open_depth",
-   "value": 39.0,
-   "sigma": 1.5,
-   "note": "the camera stood 39 m in from the quay edge (27 m inside the hall) and saw straight out: no back wall within that depth"
-  },
-  {
-   "name": "canopy.soffit_y",
-   "value": 5.82,
-   "sigma": 0.6,
-   "note": "underside of the outermost ceiling beam at the quay face (feature canopy.beam_bottom): 3.6 m above the hall floor"
   }
  ]
 }

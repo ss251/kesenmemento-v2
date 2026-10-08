@@ -1,0 +1,337 @@
+{
+  "version": 1,
+  "title": {
+    "ja": "気仙沼まめ知識",
+    "en": "Kesennuma Trivia"
+  },
+  "tips": [
+    {
+      "id": "mascot-sword-belt",
+      "topic": "mascot",
+      "ja": "ホヤぼーやの剣はサンマで、ベルトはホタテなんだよ。",
+      "en": "Hoya Boya’s sword is a Pacific saury, and his belt is a scallop.",
+      "source": {
+        "title": "気仙沼市観光キャラクター「海の子 ホヤぼーや」デザインマニュアル（気仙沼市）",
+        "title_en": "Hoya Boya design manual (Kesennuma City)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s084/030/010/010/20260520hoyaboyadesignmanual.pdf",
+        "accessed": "2026-10-07",
+        "page": "p.1 「気仙沼市観光キャラクター「海の子 ホヤぼーや」について」"
+      }
+    },
+    {
+      "id": "mascot-shark-cape",
+      "topic": "mascot",
+      "ja": "ホヤぼーやは、サメの皮でできたマントをつけているよ。",
+      "en": "Hoya Boya wears a cape made of shark skin.",
+      "source": {
+        "title": "気仙沼市観光キャラクター「海の子 ホヤぼーや」デザインマニュアル（気仙沼市）",
+        "title_en": "Hoya Boya design manual (Kesennuma City)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s084/030/010/010/20260520hoyaboyadesignmanual.pdf",
+        "accessed": "2026-10-07",
+        "page": "p.1 「気仙沼市観光キャラクター「海の子 ホヤぼーや」について」"
+      }
+    },
+    {
+      "id": "mascot-sea-prince",
+      "topic": "mascot",
+      "ja": "ホヤぼーやは、仲間と気仙沼の海を守る、海の王子さまなんだよ。",
+      "en": "Hoya Boya is a prince of the sea who protects Kesennuma’s ocean with his friends.",
+      "source": {
+        "title": "気仙沼市観光キャラクター「海の子 ホヤぼーや」デザインマニュアル（気仙沼市）",
+        "title_en": "Hoya Boya design manual (Kesennuma City)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s084/030/010/010/20260520hoyaboyadesignmanual.pdf",
+        "accessed": "2026-10-07",
+        "page": "p.1 「気仙沼市観光キャラクター「海の子 ホヤぼーや」について」"
+      }
+    },
+    {
+      "id": "mascot-hobbies",
+      "topic": "mascot",
+      "ja": "ホヤぼーやのしゅみと特技は、はまらいんやおどりとサメ乗りサーフィンだよ。",
+      "en": "Hoya Boya’s hobby and skill are the Hamarainya dance and surfing on a shark.",
+      "source": {
+        "title": "気仙沼市観光キャラクター「海の子 ホヤぼーや」デザインマニュアル（気仙沼市）",
+        "title_en": "Hoya Boya design manual (Kesennuma City)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s084/030/010/010/20260520hoyaboyadesignmanual.pdf",
+        "accessed": "2026-10-07",
+        "page": "p.1 「気仙沼市観光キャラクター「海の子 ホヤぼーや」について」"
+      }
+    },
+    {
+      "id": "mascot-favorite-word",
+      "topic": "mascot",
+      "ja": "ホヤぼーやの好きな言葉「はまらいんや」は、気仙沼弁で「仲間に入ろう」だよ。",
+      "en": "Hoya Boya’s favorite word “Hamarainya” is Kesennuma dialect for “let’s join in.”",
+      "source": {
+        "title": "みんな大好き！「海の子ホヤぼーや」（気仙沼さ来てけらいん）",
+        "title_en": "Everyone loves Hoya Boya (Kesennuma tourism site)",
+        "url": "https://kesennuma-kanko.jp/hoyaboya2/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "mascot-debut-2007",
+      "topic": "mascot",
+      "ja": "ホヤぼーやは、みんなから集めた案の中から選ばれ、2007年7月にデビューしたよ。",
+      "en": "Hoya Boya was chosen from a public call and debuted in July 2007.",
+      "source": {
+        "title": "気仙沼市観光キャラクター「海の子ホヤぼーや」について（気仙沼市役所）",
+        "title_en": "About Hoya Boya (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s084/030/010/010/20160921145744.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "katsuo-modori",
+      "topic": "food",
+      "ja": "秋に南へもどる、あぶらがのったカツオは「もどりガツオ」とよばれるよ。",
+      "en": "Bonito that return south in autumn are fatty and are known as “modori-gatsuo.”",
+      "source": {
+        "title": "特産品の紹介（気仙沼市役所）",
+        "title_en": "Local specialties (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s081/1147933913730.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "sanma-sashimi",
+      "topic": "food",
+      "ja": "気仙沼では、サンマをさしみやたたきにしても食べるんだよ。",
+      "en": "In Kesennuma, people eat saury not only grilled but also as sashimi and tataki.",
+      "source": {
+        "title": "特産品の紹介（気仙沼市役所）",
+        "title_en": "Local specialties (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s081/1147933913730.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "mekajiki-harmonica",
+      "topic": "food",
+      "ja": "メカジキの背びれのつけ根は、「ハーモニカ」とよばれる部分だよ。",
+      "en": "The part at the base of a swordfish’s back fin is called the “harmonica.”",
+      "source": {
+        "title": "極上の旨みを味わう！宮城県が誇る「メカジキ」の魅力（宮城旬鮮探訪）",
+        "title_en": "Miyagi’s prized swordfish (Miyagi seasonal food guide)",
+        "url": "https://shunsentanbou.pref.miyagi.jp/feature/mekajiki/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "same-all-used",
+      "topic": "food",
+      "ja": "サメは、ヒレをフカヒレに、肉をおもにねりものに、皮を革にして、ぜんぶ使うんだよ。",
+      "en": "Sharks are used fully: fins for shark fin, meat mostly for fish paste, skin for leather.",
+      "source": {
+        "title": "特産品の紹介（気仙沼市役所）",
+        "title_en": "Local specialties (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s081/1147933913730.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "hoya-sea-pineapple",
+      "topic": "food",
+      "ja": "ホヤは、ごつごつした形から「海のパイナップル」とよばれるよ。",
+      "en": "Hoya, or sea squirts, are nicknamed “sea pineapples” for their bumpy shape.",
+      "source": {
+        "title": "特産品の紹介（気仙沼市役所）",
+        "title_en": "Local specialties (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s081/1147933913730.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "kaki-forest",
+      "topic": "food",
+      "ja": "気仙沼のカキは、森の栄養が川から海へ流れこんで育つんだよ。",
+      "en": "Kesennuma oysters grow on nutrients that rivers carry from the forests to the sea.",
+      "source": {
+        "title": "特産品の紹介（気仙沼市役所）",
+        "title_en": "Local specialties (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s081/1147933913730.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "horumon-cabbage",
+      "topic": "food",
+      "ja": "気仙沼ホルモンは、千切りキャベツと食べるのが気仙沼流だよ。",
+      "en": "Kesennuma-style grilled pork offal, called “horumon,” is eaten with shredded cabbage.",
+      "source": {
+        "title": "特産品の紹介（気仙沼市役所）",
+        "title_en": "Local specialties (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s081/1147933913730.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "hotate-swim",
+      "topic": "food",
+      "ja": "ホタテは、貝がらを開け閉めして、海の中を泳ぐように進むんだよ。",
+      "en": "Scallops move through the sea by opening and closing their shells, like swimming.",
+      "source": {
+        "title": "宮城県産「ホタテガイ」徹底ガイド（宮城旬鮮探訪）",
+        "title_en": "A guide to Miyagi scallops (Miyagi seasonal food guide)",
+        "url": "https://shunsentanbou.pref.miyagi.jp/feature/hotate/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "bay-oshima-calm",
+      "topic": "port",
+      "ja": "「みどりの真珠」の大島が、気仙沼湾を一年中おだやかにしているよ。",
+      "en": "Oshima, the “Green Pearl,” sits at the bay’s mouth and keeps Kesennuma Bay calm all year.",
+      "source": {
+        "title": "気仙沼の水産（気仙沼市役所）",
+        "title_en": "Kesennuma’s fisheries (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/sec/s074/010/010/010/010/1174375791459.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "sanma-light",
+      "topic": "port",
+      "ja": "サンマ漁では、集魚灯というライトでサンマをよびよせるんだよ。",
+      "en": "Saury fishing uses lamps called shugyoto to lure the fish.",
+      "source": {
+        "title": "水産情報等発信施設（気仙沼市魚市場）",
+        "title_en": "Fisheries information center (Kesennuma Fish Market)",
+        "url": "https://kesennuma-uoichiba.jp/facility/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "katsuo-barbless",
+      "topic": "port",
+      "ja": "カツオの一本づりの針には、とげのような「返し」がないんだよ。",
+      "en": "The hooks used for pole-and-line bonito fishing have no barb.",
+      "source": {
+        "title": "水産情報等発信施設（気仙沼市魚市場）",
+        "title_en": "Fisheries information center (Kesennuma Fish Market)",
+        "url": "https://kesennuma-uoichiba.jp/facility/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "defune-okuri",
+      "topic": "port",
+      "ja": "漁に出る船を、色とりどりのテープと大漁旗で見送る「出船おくり」があるよ。",
+      "en": "Boats heading out to fish are sent off with streamers and flags (Defune Okuri).",
+      "source": {
+        "title": "はじめての気仙沼（気仙沼さ来てけらいん）",
+        "title_en": "First time in Kesennuma (Kesennuma tourism site)",
+        "url": "https://kesennuma-kanko.jp/about/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "market-viewing",
+      "topic": "port",
+      "ja": "魚市場の見学エリアでは、水揚げや入札のようすを見られることがあるよ。",
+      "en": "At the fish market’s viewing areas, you can sometimes watch fish being landed and sold.",
+      "source": {
+        "title": "おすすめ見学コース（気仙沼市魚市場）",
+        "title_en": "Recommended viewing route (Kesennuma Fish Market)",
+        "url": "https://kesennuma-uoichiba.jp/tourroute/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "ukimido-ebisu",
+      "topic": "culture",
+      "ja": "浮見堂（うきみどう）のそばのえびすさまは、タイではなくカツオをつり上げているよ。",
+      "en": "Near Ukimido, the god Ebisu holds up a bonito instead of the usual sea bream.",
+      "source": {
+        "title": "みなとまち散策モデルコース（気仙沼さ来てけらいん）",
+        "title_en": "Harbor town walking route (Kesennuma tourism site)",
+        "url": "https://kesennuma-kanko.jp/minatomachi_2024/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "anbasan-239",
+      "topic": "places",
+      "ja": "安波山（あんばさん）は、海面から239メートルの高さで、気仙沼湾が見わたせるよ。",
+      "en": "Mount Anba rises 239 meters above sea level and overlooks Kesennuma Bay and the town.",
+      "source": {
+        "title": "安波山（気仙沼さ来てけらいん）",
+        "title_en": "Mount Anba (Kesennuma tourism site)",
+        "url": "https://kesennuma-kanko.jp/anbasan/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "kugunari-singing-sand",
+      "topic": "nature",
+      "ja": "十八鳴浜（くぐなりはま）は、砂がキュッキュッと鳴る、国の天然記念物の浜だよ。",
+      "en": "Oshima’s Kugunari Beach has squeaking sand and is a national natural monument.",
+      "source": {
+        "title": "国指定文化財（史跡・名勝・天然記念物）（気仙沼市役所）",
+        "title_en": "National cultural properties (Kesennuma City Hall)",
+        "url": "https://www.kesennuma.miyagi.jp/edu/s166/010/010/010/071/20160927172928.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "tsurukame-bridge",
+      "topic": "places",
+      "ja": "気仙沼大島大橋のあだ名「鶴亀（つるかめ）大橋」は、鶴ヶ浦と亀山からついたよ。",
+      "en": "Oshima Bridge’s nickname, Tsurukame, comes from the places Tsurugaura and Kameyama.",
+      "source": {
+        "title": "道路や橋などの名称と愛称について（宮城県）",
+        "title_en": "Names of roads and bridges (Miyagi Prefecture)",
+        "url": "https://www.pref.miyagi.jp/site/oshimakakyozigyo/oshimakakyozigyo-shisetsumeisyo.html",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "kanae-bridge-name",
+      "topic": "places",
+      "ja": "かなえ大橋の名前は、気仙沼湾の昔の名前「鼎（かなえ）が浦」からきているよ。",
+      "en": "Kanae Bridge, which crosses Kesennuma Bay, is named after the bay’s old name, Kanae-ga-ura.",
+      "source": {
+        "title": "気仙沼湾横断橋（気仙沼さ来てけらいん）",
+        "title_en": "Kesennuma Bay Crossing Bridge (Kesennuma tourism site)",
+        "url": "https://kesennuma-kanko.jp/kesennumawanoudankyo_open/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "iwaisaki-fossils",
+      "topic": "nature",
+      "ja": "岩井崎（いわいさき）の岩には、約2億5千万年前のサンゴなどの化石があるんだよ。",
+      "en": "Rocks at Iwaisaki hold fossils of corals and other sea life about 250 million years old.",
+      "source": {
+        "title": "岩井崎（気仙沼さ来てけらいん）",
+        "title_en": "Iwaisaki (Kesennuma tourism site)",
+        "url": "https://kesennuma-kanko.jp/iwaisaki/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "naiwan-waterfront",
+      "topic": "places",
+      "ja": "内湾（ないわん）の岸では、あみを直す漁師さんや、つりを楽しむ人が見られるよ。",
+      "en": "At the Naiwan waterfront you may see fishers mending nets and people enjoying fishing.",
+      "source": {
+        "title": "みなとまち散策モデルコース（気仙沼さ来てけらいん）",
+        "title_en": "Harbor town walking route (Kesennuma tourism site)",
+        "url": "https://kesennuma-kanko.jp/minatomachi_2024/",
+        "accessed": "2026-10-07"
+      }
+    },
+    {
+      "id": "hoya-farming-karakuwa",
+      "topic": "culture",
+      "ja": "ホヤの養殖は、100年以上前に気仙沼の唐桑（からくわ）ではじまったんだよ。",
+      "en": "Sea squirt farming began over 100 years ago in Karakuwa, now part of Kesennuma.",
+      "source": {
+        "title": "蒸しほや（むしほや）｜にっぽん伝統食図鑑（農林水産省）",
+        "title_en": "Steamed sea squirt (Japan’s agriculture ministry)",
+        "url": "https://www.maff.go.jp/j/keikaku/syokubunka/traditional-foods/menu/musihoya.html",
+        "accessed": "2026-10-07"
+      }
+    }
+  ]
+}

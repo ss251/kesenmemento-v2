@@ -35,7 +35,10 @@ export const EXTRA_PLACES = [
   { id: 'parkHotel', ja: '気仙沼パークホテル', en: 'Kesennuma Park Hotel', cat: 'hotel', at: [563.0, 930.4], src: 'osm' },
   { id: 'postOffice', ja: '気仙沼郵便局', en: 'Kesennuma Post Office', cat: 'public', at: [-508.8, -142.6], src: 'osm' },
   { id: 'catholic', ja: 'カトリック気仙沼教会', en: 'Kesennuma Catholic Church', cat: 'church', at: [-340.3, -26.2], src: 'osm' },
-  { id: 'kannonji', ja: '観音寺', en: 'Kannon-ji Temple', cat: 'temple', at: [-791.5, 198.9], src: 'gsi' },
+  // [v6:c5r2] the temple compound at the foot of the 沢田 cemetery slope, lot /25069/65 (695 m2): Google Earth (imagery 2026-03-11)
+  // pins 'Kanonji Temple 海岸山 観音寺' at about (-798, 409). The GSI annotation point (-794.5, 228.4) is the precinct's label, and it was
+  // snapped to a 24 x 6 m house 200 m north (overrides/outside cells (本町 観音寺).json)
+  { id: 'kannonji', ja: '観音寺', en: 'Kannon-ji Temple', cat: 'temple', at: [-795.9, 409.4], src: 'gsi' },   // the name is GSI Anno's; the position is the lot the Earth pin sits on (the lot's own place, src override, is what the test finds)
   { id: 'hogenji', ja: '法玄寺', en: 'Hogen-ji Temple', cat: 'temple', at: [-115.7, -376.1], src: 'osm' },
   { id: 'atago', ja: '愛宕神社', en: 'Atago Shrine', cat: 'shrine', at: [-502.0, -452.6], src: 'osm' },
   { id: 'library', ja: '気仙沼図書館', en: 'Kesennuma City Library', cat: 'public', at: [-200.9, 440.6], src: 'osm', ref: '気仙沼市図書館' },
@@ -229,7 +232,7 @@ export const WALK_SET = {
   // screenshot: the computed spots stood under the scaffold, faced a cliff, a grave row, a trunk or the next school
   'lm-newCityHall': { x: -799.6, z: 1313.0, yaw: 60, pitch: 9, dist: 73.0 },            // the frame, the crane and the hoarding across 田中's street
   catholic: { x: -357.8, z: 4.1, yaw: -30, pitch: 2, dist: 37.7 },                      // up the lane to the church grounds on the 南町 slope
-  kannonji: { x: -775.5, z: 171.1, yaw: 150, pitch: 4, dist: 32.1 },                    // from the lane below, the long hall over the houses
+  kannonji: { x: -820, z: 419.8, yaw: -67, pitch: 10, dist: 26.2 },                      // [v6:c5r2] from the lane (r13818) below the compound's west front, the hall up on its terrace behind the grave rows (was 200 m up the slope at the wrong building)
   plazaHotel: { x: 260.7, z: 129.3, yaw: -150, pitch: 12, dist: 97.4 },                  // from the 港町 car park: the lift tower and the hotel on the bluff
   'lm-oshimaTerminal': { x: 3418.6, z: 4486.4, yaw: 135, pitch: 0, dist: 41.9 },        // the timber terminal across 浦の浜's forecourt
   'lm-seigoji': { x: -294.5, z: 177.8, yaw: 15, pitch: -2, dist: 33.8 },                 // the 入母屋 hall over its stone base from the road below

@@ -1,0 +1,1 @@
+{ "name": "kesenmemento-v2-server", "private": true, "type": "module", "scripts": { "start": "bun server.js" }, "dependencies": { "astronomy-engine": "^2.1.19" } }

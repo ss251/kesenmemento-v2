@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "data": {
+    "shops": [
+      {
+        "id": "becfb71a-007c-48c4-9188-5b73a4c16f42",
+        "slug": "otameshi",
+        "name": "0 JPYCで決済お試し（JPYC EC運営）",
+        "description": "「ウォレット操作がよくわからないから決済怖い...」\n\nという方用のために一切無料で試すためのショップをご用意しました\n\nこちらで0 JPYCのサンプル商品をカートに入れてぜひ決済を試してみていただき\n\n「以外とめちゃくちゃ簡単やん」と\n\n思っていただけるとこの上なく嬉しいです！\n\nもちろん 0 JPYC なので一切お金はかからず無料で試すことができます\n\n運営が開設したものなので安心して試していただけます",
+        "logo_url": "https://imagedelivery.net/lEoBH1kNrkZEnFTUBCbLSw/366b5c69-5b59-491d-ebda-c57ea2d23300/public",
+        "hero_image_url": "https://imagedelivery.net/lEoBH1kNrkZEnFTUBCbLSw/6dec1450-87f9-4d6e-9828-2afc9fb96b00/public",
+        "available_chains": [
+          137,
+          1,
+          43114
+        ],
+        "default_chain_id": 137,
+        "free_shipping_threshold": null,
+        "category": "その他",
+        "stock_display_mode": "exact",
+        "low_stock_threshold": 5,
+        "sns_x_url": null,
+        "sns_instagram_url": null,
+        "sns_facebook_url": null,
+        "sns_line_url": null,
+        "sns_other_url": null,
+        "is_demo": true,
+        "x402_enabled": true
+      }
+    ]
+  }
+}

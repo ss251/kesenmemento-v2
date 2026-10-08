@@ -17,8 +17,9 @@
 //
 // Keys (while sailing): W / S or the arrows up / down move the engine order (it stays where you leave it: a ship's
 // telegraph), X stops the engine, A / D or left / right put the rudder over (it returns to midships when released),
-// Shift holds the x4 time compression, P toggles the autopilot, Esc leaves. Touch: the left stick (up/down = order,
-// left/right = rudder); a drag on the right looks around.
+// Shift holds the x4 time compression, P toggles the autopilot, Esc leaves. Touch (ui/touchpad.js, the 'sail' mode that
+// ship/padmode.js registers): the pad's analog stick (up/down = order, left/right = rudder), the 停止 / 自動操船 / 4× /
+// 町へ戻る buttons; a drag on the right looks around the chase camera through player.lookSink (radians, from the pad).
 //
 //   const sail = createSail(ctx, { ship, route })   ship = buildShofukumaru(...) result (or omitted: a 58.6 x 9.2 m stand-in)
 //   sail.enter(at?) / sail.exit() / sail.active / sail.state / sail.setAutopilot(on) / sail.focus() / sail.onEvent(cb)
@@ -29,9 +30,10 @@
 // (s = 29.3 m aft of the stem), local +Z = forward, starboard = local -X, port = local +X.
 import * as THREE from 'three';
 import * as L from '../layout.js';
+import { damp, lerp, lerpAngle } from '../../core/timestep.js';   // [smooth]
 import { OUTBOUND_PATH, BERTH, KANAE_CROSSING, SHOKO, MIRAI, BAY_MOUTH, makePath, SHIP_DIMS } from '../ship/route.js';
 import { KANAE } from '../harbor/real.js';
-import { wakeTexture } from '../harbor/arrivals.js';   // the harbour's painted V wake (shared texture)
+import { KATSUO, KATSUO_SAMPLES } from '../ship/boat-params.js';   // [ippon] the second boat's handling
 
 export const KN = 0.514444;   // m/s per knot
 
@@ -119,8 +121,9 @@ export function hullClearance(s, shoreDist = L.shoreDist, samples = HULL_SAMPLES
  * removed and the rest scrubbed by friction (she slides along). If the push cannot fix it, she stays at `prev`, stopped.
  * Invariant: the returned pose is >= P.margin everywhere whenever `prev` was.
  */
-export function resolveShore(prev, next, dt, shoreDist = L.shoreDist, P = BOAT) {
-  let c = hullClearance(next, shoreDist);
+export function resolveShore(prev, next, dt, shoreDist = L.shoreDist, P = BOAT, samples) {
+  const use = samples || P.samples || HULL_SAMPLES;
+  let c = hullClearance(next, shoreDist, use);
   if (c.d >= P.margin) return next;
   const out = { ...next };
   let nx = 0, nz = 0;
@@ -132,7 +135,7 @@ export function resolveShore(prev, next, dt, shoreDist = L.shoreDist, P = BOAT) 
     gx /= gl; gz /= gl; nx += gx; nz += gz;
     const push = P.margin - c.d + 0.05;
     out.x += gx * push; out.z += gz * push;
-    c = hullClearance(out, shoreDist);
+    c = hullClearance(out, shoreDist, use);
   }
   if (!(c.d >= P.margin)) return { ...prev, u: 0, v: 0, r: 0, contact: 0.5 };
   const nl = Math.hypot(nx, nz) || 1; nx /= nl; nz /= nl;
@@ -146,10 +149,15 @@ export function resolveShore(prev, next, dt, shoreDist = L.shoreDist, P = BOAT) 
   return out;
 }
 
-/** boatStep + resolveShore: the full pure step. */
-export function sailStep(s, input, dt, shoreDist = L.shoreDist, P = BOAT) {
-  return resolveShore(s, boatStep(s, input, dt, P), dt, shoreDist, P);
+/** boatStep + resolveShore: the full pure step. `samples` defaults to the longliner's hull. */
+export function sailStep(s, input, dt, shoreDist = L.shoreDist, P = BOAT, samples) {
+  return resolveShore(s, boatStep(s, input, dt, P), dt, shoreDist, P, samples);
 }
+
+/** Per-boat handling. `shofuku` is BOAT itself (the voyage). `katsuo` is the lighter pole-and-line boat. */
+export const BOATS = { shofuku: BOAT, katsuo: KATSUO };
+export const BOAT_SAMPLES = { shofuku: HULL_SAMPLES, katsuo: KATSUO_SAMPLES };
+export { KATSUO };
 
 // ------------------------------------------------------------------------------------------------ autopilot (pure)
 export const AUTO = {
@@ -178,7 +186,7 @@ export const AUTO = {
  * astern that swings the bow toward the line) until she is `A.clearBy` m off the shore and within 0.5 rad of the
  * point (or `A.roomToTurn` m off it, room to turn ahead: a back-and-fill), then resumes ahead. A backing run is capped at `A.backMax` s (the stern may find a bank too).
  */
-export function pursue(path, s, progress = 0, P = BOAT, A = AUTO, rec = null, dt = 0, shoreDist = L.shoreDist) {
+export function pursue(path, s, progress = 0, P = BOAT, A = AUTO, rec = null, dt = 0, shoreDist = L.shoreDist, out = null) {
   const q = path.project(s.x, s.z, Math.max(0, progress + A.window[0]), progress + A.window[1]);
   const vWorld = Math.abs(s.u) * s.tc;
   const Ld = clamp(70 + vWorld * 7, 70, 200);
@@ -195,24 +203,30 @@ export function pursue(path, s, progress = 0, P = BOAT, A = AUTO, rec = null, dt
   if (left < 160) throttle = left < 30 ? 0 : 0.35;
   const boost = q.s > A.boostFrom && left > A.boostEndBefore;
   const xte = q.d * (q.side || 1);
-  // ---- recovery off a bank
+  // ---- recovery off a bank. `out` and `rec` are reused by the fishing run so a frame allocates nothing.
+  const ret = out || {};
   const r0 = rec || { stuck: 0, backing: false, backT: 0 };
+  const fill = (th, ru, bo, stuck, backing, backT) => {
+    r0.stuck = stuck; r0.backing = backing; r0.backT = backT;
+    ret.throttle = th; ret.rudder = ru; ret.boost = bo; ret.s = q.s; ret.xte = xte; ret.rec = r0;
+    return ret;
+  };
   const off = !nearQuay && left > 30;   // never off the quay (she starts slow there) or at the end
-  if (!off) return { throttle, rudder, boost, s: q.s, xte, rec: { stuck: 0, backing: false, backT: 0 } };
+  if (!off) return fill(throttle, rudder, boost, 0, false, 0);
   const clear = r0.backing || r0.stuck > 0 || s.contact > 0 ? hullClearance(s, shoreDist).d : Infinity;
   if (r0.backing) {
     const backT = r0.backT + dt;
     // off once clear and pointing at the line; or, still pointing away, once there is room to turn ahead (back and fill)
     const done = (clear > P.margin + A.clearBy && Math.abs(alpha) < 0.5) || clear > P.margin + A.roomToTurn || backT > A.backMax;
-    if (!done) return { throttle: -1, rudder: Math.sign(alpha) || 1, boost: false, s: q.s, xte, rec: { stuck: 0, backing: true, backT } };
-    return { throttle, rudder, boost, s: q.s, xte, rec: { stuck: 0, backing: false, backT: 0 } };
+    if (!done) return fill(-1, Math.sign(alpha) || 1, false, 0, true, backT);
+    return fill(throttle, rudder, boost, 0, false, 0);
   }
   const stuckNow = s.contact > 0 || (throttle > 0 && Math.abs(s.u) < 0.3);
   const stuck = stuckNow ? r0.stuck + dt : 0;
   if (stuck > A.stuckFor && Math.abs(alpha) > 0.6 && clear < P.margin + A.clearBy) {
-    return { throttle: -1, rudder: Math.sign(alpha) || 1, boost: false, s: q.s, xte, rec: { stuck: 0, backing: true, backT: 0 } };
+    return fill(-1, Math.sign(alpha) || 1, false, 0, true, 0);
   }
-  return { throttle, rudder, boost, s: q.s, xte, rec: { stuck, backing: false, backT: 0 } };
+  return fill(throttle, rudder, boost, stuck, false, 0);
 }
 
 // ------------------------------------------------------------------------------------------------ events (pure)
@@ -255,6 +269,12 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   const listeners = new Set();
   const fired = new Set();
   let boat = boatState();
+  // [play:ippon] which hull is mounted, and her handling. 第一昭福丸 stays the default so the voyage is unchanged.
+  let boatKind = 'shofuku';
+  let hullP = BOAT;
+  let held = false;
+  let camHook = null;
+  const boats = new Map();
   const state = {
     active: false, autopilot: true, x: boat.x, z: boat.z, yaw: boat.yaw, u: 0, kn: 0, vWorld: 0, tc: 1, rudder: 0, eng: 0,
     s: 0, xte: 0, contact: 0, events: [], idle: 0, recovering: false, towed: 0,
@@ -263,15 +283,23 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   // the look drag handed over by player.js while she sails (see place())
   const lookIn = { dx: 0, dy: 0 };
   const captureLook = (dx, dy) => { lookIn.dx += dx; lookIn.dy += dy; };
-  const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
+  // [ship:pad] the pad's drag look arrives in radians through player.lookSink (the same hook the car's chase camera uses)
+  const lookRad = { dx: 0, dy: 0 };
+  const padLook = (dx, dy) => { lookRad.dx += dx; lookRad.dy += dy; };
+  const pad = { stop: false, boost: false };   // touch buttons (ship/padmode.js): the 4x hold
+  const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), _ct = new THREE.Vector3();
+  // [smooth] the ship one simulation step ago: present() draws her between that and the newest step
+  const was = { x: 0, z: 0, yaw: 0, t: 0 };
+  const keep = () => { was.x = boat.x; was.z = boat.z; was.yaw = boat.yaw; was.t = t; };
   let camInit = false, t = 0;
 
   // ---- the ship: the real model if given, else a stand-in box at the true size (local +Z forward, waterline y = 0)
   const S = ship || makeStandIn(ctx);
   const carrier = new THREE.Group(); carrier.name = 'sail:carrier';
-  const hullG = S.group;
+  let hullG = S.group;
   carrier.add(hullG);
   ctx.add(carrier);
+  boats.set('shofuku', { group: hullG, berth: BERTH });
   const wake = makeWake(ctx, { phone });
   ctx.add(wake.group);
   place(0);
@@ -287,8 +315,8 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
       keys.add(e.code);
       if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
       if (e.code === 'KeyP' && !e.repeat) setAutopilot(!state.autopilot);
-      if (e.code === 'KeyX') { order = 0; takeOver(); }
-      if (e.code === 'Escape') exit();
+      if (e.code === 'KeyX') stopEngine();
+      if (e.code === 'Escape') { if (boatKind === 'katsuo') return; exit(); }
     });
     addEventListener('keyup', (e) => keys.delete(e.code));
     addEventListener('blur', () => keys.clear());
@@ -301,19 +329,30 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   /** Stopped in the water with an engine order ahead and next to the shore: the player left her on a bank. */
   function stalled() { return Math.abs(boat.u) < 0.3 && hullClearance(boat, sd).d < BOAT.margin + AUTO.clearBy; }
   function takeOver() { if (state.autopilot) { state.autopilot = false; order = boat.eng; } state.idle = 0; }
+  // X / 停止: the telegraph to stop, the helm taken (takeOver from the autopilot sets the order to the engine's, so zero it after), and the
+  // autopilot kept off until the next helm input or 自動操船 (else it would re-engage 8 s later, while she still carries way, and run on)
+  let stopHold = false;
+  let guide = null;   // [ippon] an outside helm (follow the birds). A real touch clears it.
+  function stopEngine() { takeOver(); order = 0; stopHold = true; }
   function readInput(dt) {
-    const k = keys, tm = ctx.playerObj?.touchMove || { x: 0, y: 0 };
+    // the stick is the pad's (player.touchMove is the same vector once the pad is attached; a bare player has none)
+    const k = keys, pd = ctx.pad, tm = (pd?.active && pd.move) || ctx.playerObj?.touchMove || { x: 0, y: 0 };
     let dO = 0, rd = 0;
     if (k.has('KeyW') || k.has('ArrowUp')) dO += 1;
     if (k.has('KeyS') || k.has('ArrowDown')) dO -= 1;
     if (k.has('KeyA') || k.has('ArrowLeft')) rd -= 1;
     if (k.has('KeyD') || k.has('ArrowRight')) rd += 1;
     dO -= tm.y; rd += tm.x;
-    const boost = k.has('ShiftLeft') || k.has('ShiftRight');
-    const touched = Math.abs(dO) > 0.05 || Math.abs(rd) > 0.05 || boost;
-    if (touched) takeOver(); else state.idle += dt;
+    const boost = k.has('ShiftLeft') || k.has('ShiftRight') || pad.boost;
+    if (pad.stop) { pad.stop = false; stopEngine(); }
+    // 4x / Shift is time compression, not a helm input: holding it must not take the helm from the autopilot
+    const touched = Math.abs(dO) > 0.05 || Math.abs(rd) > 0.05;
+    if (guide && !touched) return { throttle: clamp(guide.throttle || 0, -1, 1), rudder: clamp(guide.rudder || 0, -1, 1), boost: !!guide.boost || boost };
+    if (touched) guide = null;
+    if (touched) { stopHold = false; takeOver(); } else if (!boost) state.idle += dt;
     // re-engage on idle: underway, or against a bank, or stalled (the autopilot backs her off: pursue's recovery)
-    if (!state.autopilot && state.idle > 8 && (Math.abs(boat.u) > 0.5 || boat.contact > 0 || stalled())) setAutopilot(true);
+    // only 第一昭福丸 hands the helm back to the outbound autopilot; a fishing boat stays with the player
+    if (boatKind === 'shofuku' && !state.autopilot && !stopHold && state.idle > 8 && (Math.abs(boat.u) > 0.5 || boat.contact > 0 || stalled())) setAutopilot(true);
     order = clamp(order + dO * 0.5 * dt, -1, 1);
     return { throttle: order, rudder: clamp(rd, -1, 1), boost };
   }
@@ -328,8 +367,9 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
       eng.o1 = ac.createOscillator(); eng.o1.type = 'sawtooth'; eng.o2 = ac.createOscillator(); eng.o2.type = 'square';
       eng.o1.connect(eng.lp); eng.o2.connect(eng.lp); eng.lp.connect(eng.g); eng.g.connect(ac.destination); eng.o1.start(); eng.o2.start(); eng.on = true;
     }
-    const f = 22 + Math.abs(boat.eng) * 14, level = !state.active || A.muted ? 0 : 0.02 + Math.abs(boat.eng) * 0.025, now = ac.currentTime;
-    eng.o1.frequency.setTargetAtTime(f, now, 0.3); eng.o2.frequency.setTargetAtTime(f * 1.5, now, 0.3); eng.g.gain.setTargetAtTime(level, now, 0.3);
+    const base = hullP.engineHz ?? 22, rise = hullP.engineRise ?? 14, harm = hullP.engineHarm ?? 1.5;
+    const f = base + Math.abs(boat.eng) * rise, level = !state.active || A.muted ? 0 : 0.02 + Math.abs(boat.eng) * 0.025, now = ac.currentTime;
+    eng.o1.frequency.setTargetAtTime(f, now, 0.3); eng.o2.frequency.setTargetAtTime(f * harm, now, 0.3); eng.g.gain.setTargetAtTime(level, now, 0.3);
   }
 
   let progress = { s: 0, d: 0 };
@@ -351,87 +391,194 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
     rec = null; state.recovering = false; state.towed = (state.towed || 0) + 1;
     tow.clock = 0; tow.last = -1e9; camEase = 2.5;
   }
-  function update(dt) {
-    if (!state.active || dt <= 0) return;
+  /** One frame without the fixed clock (tests, tools): a step, then the ship and the camera at the newest state. */
+  function update(dt) { if (step(dt)) present(dt, 1); }
+  /** [smooth] One simulation step (main.js: a fixed 1/60 s): the tow assist, the helm or the autopilot, the ship model, the route. -> moved */
+  function step(dt) {
+    if (ctx.services.swim?.active) return false;   // [play:underwater] the boat stays put while you are the fish
+    if (!state.active || dt <= 0) return false;
+    keep();
     dt = Math.min(dt, 0.05); t += dt;
-    towAssist(dt);
-    const man = readInput(dt);
-    let inp = man;
-    if (state.autopilot) {
-      const ap = pursue(path, boat, progress.s, BOAT, AUTO, rec, dt, sd);
-      rec = ap.rec; state.recovering = rec.backing;
-      inp = { throttle: ap.throttle, rudder: ap.rudder, boost: ap.boost };
-    } else { rec = null; state.recovering = false; }
+    if (boatKind === 'shofuku' && !held) towAssist(dt);
+    let inp;
+    if (held) { order = 0; inp = { throttle: 0, rudder: 0, boost: false }; rec = null; state.recovering = false; }
+    else {
+      const man = readInput(dt);
+      inp = man;
+      if (state.autopilot && boatKind === 'shofuku') {
+        const ap = pursue(path, boat, progress.s, BOAT, AUTO, rec, dt, sd);
+        rec = ap.rec; state.recovering = rec.backing;
+        inp = { throttle: ap.throttle, rudder: ap.rudder, boost: ap.boost || man.boost };
+      } else { rec = null; state.recovering = false; }
+    }
     const prev = boat;
-    boat = sailStep(boat, inp, dt, sd);
+    boat = sailStep(boat, inp, dt, sd, hullP);
     const q = path.project(boat.x, boat.z, Math.max(0, progress.s + AUTO.window[0]), progress.s + AUTO.window[1]);
     progress = { s: q.s, d: q.d };
     for (const ev of routeEvents(prev, boat, progress, fired, path)) emit({ ...ev, t });
-    sync(); place(dt);
+    sync();
+    const pl = ctx.playerObj;
+    if (pl?.pos) { pl.pos.set(boat.x, hullP.playerY ?? 6, boat.z); pl.vel?.set(0, 0, 0); pl.yaw = boat.yaw + Math.PI; }
+    return true;
   }
   function sync() {
     Object.assign(state, { x: boat.x, z: boat.z, yaw: boat.yaw, u: boat.u, kn: boat.u / KN, tc: boat.tc, vWorld: boat.u * boat.tc, rudder: boat.rudder, eng: boat.eng, s: progress.s, xte: progress.d, contact: boat.contact });
   }
 
-  function place(dt) {
-    carrier.position.set(boat.x, LL.SEA?.level ?? 0, boat.z);
-    carrier.rotation.set(0, boat.yaw, 0);
+  /** Put the ship and the camera where she is now (entering, setPose): no blend from an older step. */
+  function place(dt) { keep(); present(dt, 1); }
+  /** [smooth] Draw the ship and the chase camera at this frame: alpha of the way from the step before to the newest (ctx.alpha); the
+   *  camera's easing in the frame's own time, so the same at 60 and 120 Hz. */
+  function present(dt, alpha = 1) {
+    if (ctx.services.swim?.active) return;   // [play:underwater] the swim camera owns the frame
+    const a = alpha >= 1 ? 1 : Math.max(0, alpha);
+    const bx = lerp(was.x, boat.x, a), bz = lerp(was.z, boat.z, a), byaw = lerpAngle(was.yaw, boat.yaw, a), bt = lerp(was.t, t, a);
+    carrier.position.set(bx, LL.SEA?.level ?? 0, bz);
+    carrier.rotation.set(0, byaw, 0);
     // swell + heel: a slow pitch and roll, heeling outward in a turn (to port when turning to starboard)
     const heel = clamp(-boat.r * boat.u * 1.6, -0.06, 0.06);
-    hullG.rotation.set(Math.sin(t * 0.55) * 0.006, 0, Math.sin(t * 0.8) * 0.012 + heel, 'YXZ');
-    hullG.position.y = Math.sin(t * 0.9) * 0.08;
-    wake.update(boat, dt);
+    hullG.rotation.set(Math.sin(bt * 0.55) * 0.006, 0, Math.sin(bt * 0.8) * 0.012 + heel, 'YXZ');
+    hullG.position.y = Math.sin(bt * 0.9) * 0.08;
+    wake.update(boat, dt, hullP);
     if (!state.active) return;
+    if (camHook && camHook({ x: bx, z: bz, yaw: byaw, y: carrier.position.y, t: bt }) === true) {
+      const pl = ctx.playerObj;
+      if (pl?.pos) { pl.pos.set(boat.x, hullP.playerY ?? 6, boat.z); pl.vel?.set(0, 0, 0); pl.yaw = boat.yaw + Math.PI; }
+      return;
+    }
     // touch look-around: player.js accumulates a right-half drag in playerObj.look (its mouse look is gated off while
     // sailing, so a mouse drag is not counted twice). player.update() runs before this in the frame and would consume
     // it, so while she sails it hands the drag to lookCapture (set in enter) and it collects in lookIn
     const plk = ctx.playerObj?.look;
     const ldx = lookIn.dx + (plk?.dx || 0), ldy = lookIn.dy + (plk?.dy || 0);
     lookIn.dx = lookIn.dy = 0; if (plk) plk.dx = plk.dy = 0;
-    if (ldx || ldy) {
-      orbit.yaw -= ldx * 0.0018; orbit.pitch = clamp(orbit.pitch - ldy * 0.0014, -0.8, 0.3); orbit.back = 3;
+    const rdx = lookRad.dx, rdy = lookRad.dy; lookRad.dx = lookRad.dy = 0;
+    if (ldx || ldy || rdx || rdy) {
+      orbit.yaw -= ldx * 0.0018 + rdx; orbit.pitch = clamp(orbit.pitch - ldy * 0.0014 - rdy * 0.6, -0.8, 0.3); orbit.back = 3;
     }
     // chase camera: behind and above the ship; the mouse orbit eases back behind her
-    if (dt > 0 && orbit.back > 0) orbit.back -= dt; else if (dt > 0) orbit.yaw *= 1 - Math.min(1, dt * 1.2);
-    const cy = boat.yaw + Math.PI + orbit.yaw, dist = 92 + Math.abs(boat.u * boat.tc) * 1.6, hgt = 26 - orbit.pitch * 60;
-    const tx = boat.x + Math.sin(cy) * dist, tz = boat.z + Math.cos(cy) * dist;
+    // [smooth] the easings are exponential in the frame's time (they were per frame: 1.21, 1.01 and 3.08 /s are what they gave at 60 Hz)
+    if (dt > 0 && orbit.back > 0) orbit.back -= dt; else if (dt > 0) orbit.yaw *= Math.exp(-1.21 * dt);
+    const cy = byaw + Math.PI + orbit.yaw, dist = (hullP.camBack ?? 92) + Math.abs(boat.u * boat.tc) * (hullP.camSpeed ?? 1.6), hgt = (hullP.camHeight ?? 26) - orbit.pitch * (hullP.camPitch ?? 60);
+    const tx = bx + Math.sin(cy) * dist, tz = bz + Math.cos(cy) * dist;
     const ty = Math.max(hgt, (LL.heightAt ? LL.heightAt(tx, tz) : 0) + 6);
-    if (!camInit || dt <= 0) { camPos.set(tx, ty, tz); camInit = true; } else camPos.lerp(new THREE.Vector3(tx, ty, tz), Math.min(1, dt * (camEase > 0 ? 1.0 : 3)));
+    if (!camInit || dt <= 0) { camPos.set(tx, ty, tz); camInit = true; } else camPos.lerp(_ct.set(tx, ty, tz), damp(camEase > 0 ? 1.01 : 3.08, dt));
     if (camEase > 0) camEase -= dt;
-    camLook.set(boat.x + Math.sin(boat.yaw) * 25, 9, boat.z + Math.cos(boat.yaw) * 25);
+    camLook.set(bx + Math.sin(byaw) * (hullP.lookAhead ?? 25), hullP.lookY ?? 9, bz + Math.cos(byaw) * (hullP.lookAhead ?? 25));
     if (cam) { cam.position.copy(camPos); cam.lookAt(camLook); }
     const pl = ctx.playerObj;
-    if (pl?.pos) { pl.pos.set(boat.x, 6, boat.z); pl.vel?.set(0, 0, 0); pl.yaw = boat.yaw + Math.PI; }
+    if (pl?.pos) { pl.pos.set(boat.x, hullP.playerY ?? 6, boat.z); pl.vel?.set(0, 0, 0); pl.yaw = boat.yaw + Math.PI; }
+  }
+
+  function homeOf(kind) {
+    if (kind === 'shofuku') return BERTH;
+    return boats.get(kind)?.berth || BERTH;
+  }
+  const shofukuHold = new THREE.Group(); shofukuHold.name = 'sail:shofuku-hold'; ctx.add(shofukuHold);
+  /** Park a hull in the world at her own berth (the carrier only holds the boat under way). */
+  function parkBoat(kind) {
+    if (kind === 'shofuku') {
+      shofukuHold.position.copy(carrier.position);
+      shofukuHold.rotation.copy(carrier.rotation);
+      shofukuHold.add(S.group);
+      S.group.position.set(0, 0, 0);
+      S.group.rotation.set(0, 0, 0);
+      return;
+    }
+    const e = boats.get(kind);
+    if (!e?.group) return;
+    const g = e.group, b = e.berth || BERTH;
+    g.parent?.remove(g);
+    g.position.set(b.x, 0, b.z);
+    g.rotation.set(0, b.yaw || 0, 0);
+    ctx.add(g);
+  }
+  function mountBoat(kind) {
+    if (kind === boatKind) return;
+    parkBoat(boatKind);
+    if (kind === 'shofuku') {
+      carrier.add(S.group);
+      S.group.position.set(0, 0, 0);
+      S.group.rotation.set(0, 0, 0);
+      hullG = S.group;
+      return;
+    }
+    const e = boats.get(kind);
+    if (!e?.group) return;
+    const g = e.group;
+    g.parent?.remove(g);
+    g.position.set(0, 0, 0);
+    g.rotation.set(0, 0, 0);
+    carrier.add(g);
+    hullG = g;
+  }
+  function applyBoat(kind) {
+    const id = BOATS[kind] ? kind : 'shofuku';
+    if (id !== 'shofuku' && !boats.has(id)) return boatKind;
+    hullP = BOATS[id];
+    if (id !== boatKind) { mountBoat(id); boatKind = id; }
+    return id;
   }
 
   function enter(at = null) {
-    const p = at || BERTH;
-    boat = boatState(p.x, p.z, p.yaw ?? BERTH.yaw);
+    const prevKind = boatKind;
+    const id = applyBoat(at?.boat || 'shofuku');
+    const home = homeOf(id);
+    const p = (at && (at.x != null || at.z != null)) ? at : (id === 'shofuku' ? (at || BERTH) : home);
+    boat = boatState(p.x, p.z, p.yaw ?? home.yaw ?? BERTH.yaw);
     if (at?.u) boat.u = at.u;
     order = 0; rec = null; fired.clear(); state.events = []; tow.clock = 0; tow.last = -1e9; state.towed = 0;
     progress = { s: path.project(boat.x, boat.z).s, d: 0 };
-    state.active = true; state.autopilot = at?.autopilot ?? true; state.idle = 0;
+    state.active = true; state.autopilot = at?.autopilot ?? (id === 'shofuku'); state.idle = 0;
+    if (id !== 'shofuku') stopHold = true;
+    else if (prevKind !== 'shofuku') stopHold = false;
+    held = false; camHook = null;
     orbit.yaw = 0; orbit.pitch = -0.12; camInit = false;
-    const pl = ctx.playerObj; if (pl) { pl.enabled = false; pl.fly = true; if (pl.look) pl.look.dx = pl.look.dy = 0; pl.lookCapture = captureLook; }
-    lookIn.dx = lookIn.dy = 0;
+    const pl = ctx.playerObj; if (pl) { pl.enabled = false; pl.fly = true; if (pl.look) pl.look.dx = pl.look.dy = 0; pl.lookCapture = captureLook; pl.lookSink = padLook; }
+    lookIn.dx = lookIn.dy = 0; lookRad.dx = lookRad.dy = 0; pad.stop = pad.boost = false;
     ctx.services.life?.tour?.stop?.();
     sync(); place(0);
     return true;
   }
   function exit() {
     if (!state.active) return;
-    state.active = false; keys.clear();
+    state.active = false; keys.clear(); pad.stop = pad.boost = false; held = false; camHook = null;
     const pl = ctx.playerObj;
+    const home = homeOf(boatKind);
+    const ashore = boatKind === 'shofuku' ? 60 : (home.ashore ?? 48);
     if (pl) {
       if (pl.lookCapture === captureLook) pl.lookCapture = null;   // the walker's own look again
+      if (pl.lookSink === padLook) pl.lookSink = null;
       pl.enabled = typeof document !== 'undefined' ? (document.body?.classList?.contains('playing') ?? true) : true;
       // at the berth: step ashore on the quay apron by the gangway; underway: hover where the camera is
-      if (Math.hypot(boat.x - BERTH.x, boat.z - BERTH.z) < 60) { pl.fly = false; pl.setPose?.(BERTH.quay[0], BERTH.quay[1], (BERTH.yaw + Math.PI / 2) * 180 / Math.PI, 0); }
+      if (Math.hypot(boat.x - home.x, boat.z - home.z) < ashore) { pl.fly = false; pl.setPose?.(home.quay[0], home.quay[1], ((home.yaw ?? BERTH.yaw) + Math.PI / 2) * 180 / Math.PI, 0); }
       else pl.setPose?.(cam.position.x, cam.position.z, (boat.yaw + Math.PI) * 180 / Math.PI, -10, cam.position.y);
     }
-    wake.update(boat, 0);
+    // a fishing boat goes back alongside her quay; 第一昭福丸 stays where the voyage left her
+    if (boatKind !== 'shofuku' && home) {
+      boat = boatState(home.x, home.z, home.yaw ?? 0);
+      sync();
+      place(0);
+    } else wake.update(boat, 0, hullP);
   }
-  function setAutopilot(on) { state.autopilot = !!on; state.idle = 0; rec = null; if (!on) order = boat.eng; }
+  /** [play:ippon] Register another hull. She waits at `berth` until enter({ boat: id }). */
+  function registerBoat(id, spec = {}) {
+    const group = spec.group || spec.ship?.group;
+    const berth = spec.berth || spec.home;
+    if (!BOATS[id] || !group || !berth) return false;
+    boats.set(id, { group, berth });
+    if (id !== boatKind) parkBoat(id);
+    return true;
+  }
+  /** [play:ippon] Freeze the helm (the pole is in the water). */
+  function hold(on) { held = !!on; if (held) order = 0; }
+  /** [play:ippon] When the hook returns true, this mode owns the camera for the frame. */
+  function setCam(fn) { camHook = typeof fn === 'function' ? fn : null; }
+  /** [ship:pad] 停止: the engine telegraph to stop (X), taking the helm. */
+  function stop() { pad.stop = true; }
+  /** [ship:pad] 4x: hold (true) / release (false) the time compression, like Shift. */
+  function speed(on) { pad.boost = !!on; }
+  function setAutopilot(on) { stopHold = false; state.autopilot = !!on; state.idle = 0; rec = null; if (!on) order = boat.eng; }
   /** Streaming focus: ahead of the bow, further at speed (the world moves x tc). */
   function focus() { const k = 40 + Math.abs(boat.u * boat.tc) * 12; return { x: boat.x + Math.sin(boat.yaw) * k, z: boat.z + Math.cos(boat.yaw) * k }; }
   /** Put the ship at a pose without sailing (acts: back at the berth for the homecoming). */
@@ -439,19 +586,24 @@ export function createSail(ctx, { ship = null, route = OUTBOUND_PATH, shoreDist 
   function emit(ev) { state.events.push(ev); for (const f of listeners) try { f(ev, api); } catch (e) { console.error(e); } }
 
   if (typeof addEventListener === 'function') addEventListener('keydown', (e) => {
+    if (ctx.services.swim?.active) return;   // [play:underwater] V / R / F leave the water, not the boat
     const typing = e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName);
-    if (state.active && !typing && (e.code === 'KeyV' || e.code === 'KeyR' || e.code === 'KeyF' || e.code === 'KeyC' || /^Digit\d$/.test(e.code))) exit();
+    if (state.active && boatKind !== 'katsuo' && !typing && (e.code === 'KeyV' || e.code === 'KeyR' || e.code === 'KeyF' || e.code === 'KeyC' || /^Digit\d$/.test(e.code))) exit();
   }, true);
+  // [smooth] the ship model at the fixed rate, the drawing every frame (in shot mode and window.__sim: one after the other, as update() did)
+  ctx.onStep((dt) => { step(dt); });
   ctx.onUpdate((dt) => {
     if (state.active && (ctx.services.life?.tour?.flying || ctx.planet?.active)) exit();
     if (state.active || eng.on) try { engine(); } catch (e) { /* no audio */ }
-    update(dt);
+    if (state.active && dt > 0) present(dt, ctx.alpha ?? 1);
   });
 
   const api = {
-    enter, exit, update, focus, setAutopilot, setPose, place,
+    enter, exit, update, focus, setAutopilot, setPose, place, stop, speed, registerBoat, hold, setCam,
+    guide(g) { guide = g || null; },
     get active() { return state.active; }, state,
-    get boat() { return boat; }, get ship() { return S; }, get carrier() { return carrier; }, path,
+    get boat() { return boat; }, get boatKind() { return boatKind; }, get boatId() { return boatKind; }, get handling() { return hullP; },
+    get ship() { return S; }, get carrier() { return carrier; }, path,
     onEvent: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
     dispose() { carrier.parent?.remove(carrier); wake.group.parent?.remove(wake.group); wake.dispose(); listeners.clear(); },
   };
@@ -475,9 +627,8 @@ export function makeStandIn(ctx) {
   return { group: g, anchors: {}, setFlags() {}, setNight() {}, update() {}, dispose() { g.traverse((o) => { o.geometry?.dispose?.(); }); } };
 }
 
-/** Wake: a soft foam ribbon along the recent stern track (prop wash: bright on the centreline, fading to the edges and
- *  with age; it follows her turns), the harbour's painted V wake (harbor/arrivals.js wakeTexture, shared with the AI
- *  boats) and a bow wave, all growing with speed. Three draw calls; the ribbon has 24 rows on the phone tier. */
+/** Wake: a foam ribbon along the recent stern track, a thin V of streaks, and a bow wave.
+ *  Colours stay under the bloom knee so the wash does not turn into white balls. Three draw calls. */
 function makeWake(ctx, { phone }) {
   const N = phone ? 24 : 64, C = 3, group = new THREE.Group(); group.name = 'sail:wake';
   const pos = new Float32Array(N * C * 3), col = new Float32Array(N * C * 4);
@@ -490,17 +641,52 @@ function makeWake(ctx, { phone }) {
   const mat = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, toneMapped: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const ribbon = new THREE.Mesh(geo, mat); ribbon.frustumCulled = false; ribbon.renderOrder = 2; ribbon.name = 'sail:ribbon';
   group.add(ribbon);
-  const flat = (tex) => new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  const flat = (tex) => new THREE.MeshBasicMaterial({ map: tex, color: 0x6a7c86, transparent: true, opacity: 0, depthWrite: false, toneMapped: true, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   // the painted V wake (local +Z = toward the stern once laid flat, see arrivals.js), 1.9 LOA long
-  let vTex = null; try { vTex = ctx.tex?.draw ? wakeTexture(ctx) : null; } catch (e) { vTex = null; }
+  let vTex = null;
+  try {
+    vTex = ctx.tex?.draw ? ctx.tex.draw(256, 512, (g) => {
+      g.clearRect(0, 0, 256, 512);
+      g.lineCap = 'round';
+      g.strokeStyle = 'rgba(160, 176, 184, 0.7)';
+      g.lineWidth = 3;
+      for (const s of [-1, 1]) {
+        g.beginPath();
+        for (let i = 0; i <= 24; i++) {
+          const t = i / 24;
+          const y = 500 - t * 480;
+          const x = 128 + s * (10 + t * 96);
+          if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
+        }
+        g.stroke();
+      }
+      g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(128, 500);
+      g.lineTo(128, 80);
+      g.stroke();
+    }, { key: 'sail-wake-streak' }) : null;
+  } catch (e) { vTex = null; }
   const vmat = flat(vTex), WL = SHIP_DIMS.loa * 1.9, WW = SHIP_DIMS.beam * 3.6;
   const vWake = new THREE.Mesh(new THREE.PlaneGeometry(WW, WL).rotateX(-Math.PI / 2), vmat);
   vWake.renderOrder = 2; vWake.visible = !!vTex; vWake.name = 'sail:vwake'; group.add(vWake);
   // bow wave: a painted moustache of foam either side of the stem
   const bowTex = ctx.tex?.draw ? ctx.tex.draw(128, 128, (g) => {
     g.clearRect(0, 0, 128, 128);
-    for (const sd of [-1, 1]) for (let i = 0; i < 26; i++) { const u = i / 26; g.fillStyle = `rgba(246,250,248,${(0.85 * (1 - u)).toFixed(3)})`; g.beginPath(); g.ellipse(64 + sd * (6 + u * 52), 18 + u * 96, 7 * (1 - u * 0.5), 3.2, sd * 0.5, 0, 7); g.fill(); }
-  }, { key: 'sail-bowwave' }) : null;
+    g.lineCap = 'round';
+    for (const sd of [-1, 1]) {
+      g.beginPath();
+      for (let i = 0; i < 18; i++) {
+        const u = i / 17;
+        const x = 64 + sd * (4 + u * 48);
+        const y = 16 + u * 100;
+        if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.strokeStyle = 'rgba(150, 168, 176, 0.55)';
+      g.lineWidth = 2.2;
+      g.stroke();
+    }
+  }, { key: 'sail-bowwave-streak' }) : null;
   const bmat = flat(bowTex);
   const bowWave = new THREE.Mesh(new THREE.PlaneGeometry(16, 22).rotateX(-Math.PI / 2).rotateY(Math.PI), bmat);
   bowWave.renderOrder = 2; bowWave.visible = !!bowTex; group.add(bowWave);
@@ -508,8 +694,9 @@ function makeWake(ctx, { phone }) {
   const LIFE = 60;    // seconds (model time) a stretch of wash stays visible
   const trail = [];   // [x, z, age, speed]
   let acc = 0;
-  function update(b, dt) {
-    const sy = Math.sin(b.yaw), cy = Math.cos(b.yaw), F = SHIP_DIMS.loa / 2, sp = Math.min(1, Math.abs(b.u) / BOAT.vMax);
+  function update(b, dt, P = null) {
+    const loa = P?.L || SHIP_DIMS.loa, beam = P?.B || SHIP_DIMS.beam, vCap = P?.vMax || BOAT.vMax;
+    const sy = Math.sin(b.yaw), cy = Math.cos(b.yaw), F = loa / 2, sp = Math.min(1, Math.abs(b.u) / vCap);
     const sx = b.x - sy * (F - 2), sz = b.z - cy * (F - 2);
     acc += dt;
     for (const p of trail) p[2] += dt * b.tc;
@@ -519,16 +706,17 @@ function makeWake(ctx, { phone }) {
     for (let i = 0; i < N; i++) {
       const p = trail[Math.min(i, trail.length - 1)] || [sx, sz, 0, 0], q = trail[Math.min(i + 1, trail.length - 1)] || p;
       let dx = p[0] - q[0], dz = p[1] - q[1]; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
-      const age = p[2], w = SHIP_DIMS.beam * 0.4 + age * 0.3, fade = (1 - age / LIFE) ** 2;
+      const age = p[2], w = beam * 0.4 + age * 0.3, fade = (1 - age / LIFE) ** 2;
       const a = i < trail.length && i > 0 ? 0.42 * (p[3] ?? 0) * fade : 0;
       for (let k = 0; k < C; k++) {
         const sd = k - 1, o = (i * C + k) * 3, c = (i * C + k) * 4;
         pos[o] = p[0] - dz * w * sd; pos[o + 1] = 0.07; pos[o + 2] = p[1] + dx * w * sd;
-        col[c] = 0.95; col[c + 1] = 0.98; col[c + 2] = 0.98; col[c + 3] = sd === 0 ? a : 0;
+        col[c] = 0.40; col[c + 1] = 0.46; col[c + 2] = 0.48; col[c + 3] = sd === 0 ? a : 0;
       }
     }
     geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
-    vWake.position.set(b.x - sy * (F * 0.72 + WL / 2), 0.06, b.z - cy * (F * 0.72 + WL / 2)); vWake.rotation.set(0, b.yaw, 0);
+    vWake.scale.set(beam / SHIP_DIMS.beam, 1, loa / SHIP_DIMS.loa);
+    vWake.position.set(b.x - sy * (F * 0.72 + (WL * loa / SHIP_DIMS.loa) / 2), 0.06, b.z - cy * (F * 0.72 + (WL * loa / SHIP_DIMS.loa) / 2)); vWake.rotation.set(0, b.yaw, 0);
     vmat.opacity = 0.8 * sp; vWake.visible = !!vTex && sp > 0.02;
     bowWave.position.set(b.x + sy * (F - 7), 0.08, b.z + cy * (F - 7)); bowWave.rotation.set(0, b.yaw, 0);
     bmat.opacity = Math.min(0.9, sp * 0.9);

@@ -1,8 +1,12 @@
 // [v3:town] The town palette (V3-SPEC section 5): the layout's photo-sampled colours pushed toward an anime harbour
-// town: warm cream / beige / pale-blue / mint / peach walls, dark green, slate, navy, brown, red and terracotta
+// town: white / grey / cream walls with a few salmon and dark ones (sys:9), dark green, slate, navy, brown, red and terracotta
 // pitched roofs, green-coated or warm-grey flat roofs, faded blue / cream / sea-green warehouse sheds. Deterministic
 // by lot seed.
-const WALLS = ['#efe6d2', '#e9dcc4', '#f1e7d6', '#e3d4b8', '#ecd8c6', '#d9e2e6', '#c9d9e2', '#d3e0d0', '#e8e0cc', '#f0e2c6', '#dccfbd', '#e6d9d0', '#cfdcd6', '#efe2b6'];
+// [sys:9] the weighted wall scheme of scripts/anime/derive.js WALLS.house (author photos: white 35 %, grey 20 %, cream 22 %, salmon 6 %,
+// dark 8 %, pale blue 4 %, other 5 %; no mint). Repeat an entry to weight it. wallOf draws from it 45 % of the time.
+const rep = (arr, n) => Array.from({ length: n }, (_, i) => arr[i % arr.length]);
+const WALLS = [...rep(['#f6f4e6', '#f2f0e8', '#eceae0', '#f5f5f0', '#e8e6dc'], 14), ...rep(['#bab9aa', '#c4c4bf', '#a9aaa5', '#8c8e89', '#b5b6b0', '#cfcfca'], 8), ...rep(['#efe6d2', '#e3d4b8', '#e8e0cc', '#e5dabc', '#f0e9cc'], 9),
+  ...rep(['#e1c6ae', '#e6cbbd'], 2), ...rep(['#55585d', '#3f434a', '#6b5a4c'], 4), ...rep(['#c4ccd4', '#cfd6dc'], 1), ...rep(['#d9b48c', '#d6c8a0'], 2)];
 const PITCHED = ['#4d6457', '#56677a', '#3e4a63', '#6a5448', '#8e4540', '#a0573f', '#4a78a0', '#5d6f86', '#4a5f55', '#56677a', '#4d6457', '#6f5a4a'];
 const FLAT = ['#8fa396', '#a8a39a', '#9aa7a2', '#b7b3a8', '#7f978a', '#a3a9ad'];
 const SHED = ['#a9c3d4', '#c9d4d8', '#e3ddd0', '#b8c7b8', '#d6d2c6', '#9fb6c9', '#c7c1b4', '#b2bec9'];
@@ -38,4 +42,7 @@ export function kawaraColour(hex) {
   const mx = Math.max(r, g, b), mn = Math.min(r, g, b), s = mx ? (mx - mn) / mx : 0;
   return mx < 150 && s < 0.36;
 }
+/** [sys:31] A wall colour that was measured (OSM building:colour, an override) is the wall; builders keep their random
+ *  draws and replace only the result. */
+export const measuredWall = (lot) => lot.src?.wall === 'osm' || lot.src?.wall === 'override';
 export { WALLS, PITCHED, FLAT, SHED };

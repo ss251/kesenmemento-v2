@@ -172,6 +172,9 @@ function hullDecal(H, side, u0, u1, y0, y1, map, mat, parent, off = 0.035) {
 
 /** Foam ring hugging the waterline (crisp anime foam). */
 const _hullCache = new Map(), _foamCache = new Map();
+/** [mobile-perf] Let go of the cached hull and foam geometries (78 hulls, ~7 MB of typed arrays after a phone load). A boat in the scene keeps
+ *  its own; the static batch has copied the moored ones, so theirs become garbage; a boat built later makes its hull again. -> entries freed */
+export function releaseBoatCaches() { const n = _hullCache.size + _foamCache.size; _hullCache.clear(); _foamCache.clear(); return n; }
 function foamRing(H, mat, parent, r, type) {
   if (_foamCache.has(type)) { const m = new THREE.Mesh(_foamCache.get(type), mat); m.castShadow = false; m.receiveShadow = false; parent.add(m); return m; }
   const N = 64, pos = [], idx = [];
@@ -214,7 +217,10 @@ function mergeAt(base, pts) {
  *       glints (true), foam (true), deck (deck colour), idle (laid up: anchor light only; deckLit keeps deck lamps).
  */
 export function buildBoat(ctx, type, pose = {}, opts = {}) {
-  const S = BOAT_SPECS[type]; if (!S) throw new Error('unknown boat type ' + type);
+  const S0 = BOAT_SPECS[type]; if (!S0) throw new Error('unknown boat type ' + type);
+  // [v6:c11r3] opts.beam: a beam scale for this hull only (the moored rafts of the market-north and uomachi-ne rows, drawn about 0.8 of the
+  // open-sea beam so the 7.2 m hulls sit side to side at the Earth 2026-03-11 pitch of 7.7 m); BOAT_SPECS itself is never changed
+  const S = opts.beam && opts.beam !== 1 ? { ...S0, B: S0.B * opts.beam } : S0;
   const r = ctx.rng(opts.seed ?? `${type}|${pose.x | 0}|${pose.z | 0}`);
   const trim = opts.trim || r.pick(TRIMS);
   const name = opts.name || boatName(r, type);
@@ -225,7 +231,7 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
   const k = ctx.kit(group);
   const W = makeLiner(ctx, group, dynamic);
   const H = hullShape(S);
-  const M = mats(ctx, trim);
+  const M = mats(ctx, trim, !!opts.moored);
   // [v3:fix] not every wheelhouse is lit at night (the rows read as identical clones): dark, cool or warm, by seed
   { const lr = ctx.rng((opts.seed ?? `${type}|${pose.x | 0}|${pose.z | 0}`) + '|lit')(); if (!dynamic && lr < 0.34) M.glass = nightMat(ctx, '#3f4c63', '#27304a', 0.7); else if (!dynamic && lr < 0.52) M.glass = M.glassCool; }
   const anchors = { lights: [], perches: [], deck: [] };
@@ -234,11 +240,11 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
 
   // hull
   // opts.deck: deck paint (Kesennuma's longliners show bright green decks from the air, data/ortho/core.jpg)
-  const hkey = `${type}|${trim}|${opts.deck || ''}`;
+  const hkey = `${type}|${trim}|${opts.deck || ''}|${S.B}|${opts.moored ? 'm' : ''}`;
   const hg = _hullCache.get(hkey) || _hullCache.set(hkey, type === 'small' ? hullGeometry(S, H, trim, { bandLo: 0.42, bandHi: 0.18, bulwarkT: 0.1, nu: 36, deck: opts.deck || '#9fb3ad', inner: '#dfe6e2', cut: 0.6 })
     : type === 'ferry' ? hullGeometry(S, H, trim, { bandLo: 1.2, bandHi: 0.55, deck: '#8d9994', inner: HULL.white })
     : type === 'cruise' ? hullGeometry(S, H, '#f0f1ec', { bandLo: 0.3, bandHi: 0.1, deck: '#9aa3a8', inner: HULL.white, cut: 0.8 })   // [v4:landmarks-A]
-    : hullGeometry(S, H, trim, { deck: opts.deck })).get(hkey);
+    : hullGeometry(S, H, trim, { deck: opts.deck, inner: opts.moored ? '#d3d1ce' : undefined })).get(hkey);   // [v6:c11r3] a moored hull's bulwark inside is pale grey, not sea green
   const hull = new THREE.Mesh(hg, M.hull); hull.castShadow = true; hull.receiveShadow = true; hull.userData.hull = true; group.add(hull);   // [v3:polish3] tag: reflect.js keeps white hulls white
   if (opts.foam !== false) { const f = foamRing(H, M.foam, group, 0.37, type); ctx.noOutline(f); }
 
@@ -302,14 +308,14 @@ export function buildBoat(ctx, type, pose = {}, opts = {}) {
   return { group, type, spec: S, dims: { L: S.L, B: S.B, T: S.T, air: anchors.air || 0 }, anchors, perches, name, hull: H };
 }
 
-function mats(ctx, trim) {
+function mats(ctx, trim, moored = false) {
   const t = (c, o) => ctx.mat.toon(c, o);
   return {
     hull: t('#ffffff', { vertexColors: true, side: 'double', paint: 0.035 }),
     foam: t('#eef5f3', { paint: 0, polygonOffset: -1 }),
     house: t(HULL.house, { paint: 0.04 }), roof: t(HULL.roof), trim: t(trim), dark: t(HULL.dark), mast: t(HULL.mast),
-    steel: t(HULL.steel), rope: t(HULL.rope), float: t(HULL.float), tarp: t(HULL.tarp), rust: t(HULL.rust), yellow: t(HULL.yellow),
-    deckWood: t(HULL.deckWood), blue: t('#4f86b8'), green: t('#5f8f6a'), red: t('#c2493c'), white: t('#e4e6e0'),
+    steel: t(HULL.steel), rope: t(HULL.rope), float: t(HULL.float), tarp: t(moored ? '#cfd1ce' : HULL.tarp), rust: t(HULL.rust), yellow: t(HULL.yellow),
+    deckWood: t(HULL.deckWood), blue: t(moored ? '#c3c5c3' : '#4f86b8'), green: t('#5f8f6a'), red: t('#c2493c'), white: t('#e4e6e0'),
     glass: nightMat(ctx, '#3f4c63', '#ffd6a0', 1.25),
     glassCool: nightMat(ctx, '#465670', '#dfe9ff', 1.15),
     bulb: nightMat(ctx, '#c9c6bc', '#fff4dc', 2.6),   // [v3:fix] unlit glass by day (the near-white globes bloomed out at dusk)
@@ -437,10 +443,17 @@ function buildKatsuo(T) {
   mastWithRadars(T, 0, zU(0.5), y, 9.5, { radars: 2, dome: true });
   // funnel behind bridge
   funnel(T, zU(0.33), yWH - 0.1, 2.0, 3.2, 2.6);
-  // --- bait wells (活餌槽) hatches on the fore deck
+  // --- bait wells (活餌槽): painted-steel hatch covers, a coaming, two handles. Not foam pads.
   for (let i = 0; i < 3; i++) for (const s of [1, -1]) {
     const u = 0.63 + i * 0.06;
-    k.rbox(1.9, 0.5, 2.2, 0.1, M.blue, [s * 1.6, dY(u) + 0.25, zU(u)]);
+    const x = s * 1.6, y = dY(u), z = zU(u);
+    k.box(2.05, 0.1, 2.32, M.dark, [x, y + 0.08, z]);
+    k.box(1.72, 0.055, 1.96, M.steel, [x, y + 0.14, z]);
+    k.box(1.58, 0.045, 1.8, M.white, [x, y + 0.18, z]);
+    k.box(1.62, 0.03, 0.055, M.dark, [x, y + 0.21, z + 0.86]);
+    k.box(1.62, 0.03, 0.055, M.dark, [x, y + 0.21, z - 0.86]);
+    k.box(0.34, 0.04, 0.07, M.dark, [x - 0.38, y + 0.24, z]);
+    k.box(0.34, 0.04, 0.07, M.dark, [x + 0.38, y + 0.24, z]);
   }
   // --- fore lookout mast with crow's nest
   const uf = 0.84, yf = dY(uf), zf = zU(uf);
@@ -486,6 +499,7 @@ function buildKatsuo(T) {
   anchors.deck.push([0, dY(0.7), zU(0.7)], [2, dY(0.15), zU(0.15)], [-2, dY(0.15), zU(0.15)]);
 }
 
+const ctx0 = (T, c) => T.ctx.mat.toon(c);
 function buildMaguro(T) {
   const { k, M, W, H, S, zU, dY, r, anchors } = T;
   // bridge forward (u 0.6 - 0.8)
@@ -500,7 +514,12 @@ function buildMaguro(T) {
   // line-setting shelter aft (roof on posts), with a trim-coloured roof
   const z0 = zU(0.06), z1 = zU(0.4), yd = dY(0.25), hw = S.B * 0.42;
   for (let i = 0; i <= 5; i++) for (const s of [1, -1]) k.cyl(0.09, 0.09, 2.7, M.white, [s * hw, yd + 1.35, z0 + (z1 - z0) * i / 5], null, 6);
-  k.rbox(hw * 2 + 0.6, 0.22, z1 - z0 + 0.6, 0.08, M.trim, [0, yd + 2.8, (z0 + z1) / 2]);
+  // [v6:c11r3] a moored hull (opts.moored) has no navy 7 x 17 m roof slab: Earth 2026-03-11 shows cluttered grey / white aft decks and no blue,
+  // so the posts stay and the deck carries a gear pile under 2 x 2 m in neutral grey / white
+  if (T.opts.moored) {
+    k.rbox(1.8, 0.55, 1.8, 0.2, ctx0(T, '#cfd1cf'), [hw * 0.3, yd + 0.28, (z0 + z1) / 2]);
+    k.rbox(1.0, 0.4, 1.0, 0.15, ctx0(T, '#9d9fa0'), [-hw * 0.4, yd + 0.2, z0 + (z1 - z0) * 0.3]);
+  } else k.rbox(hw * 2 + 0.6, 0.22, z1 - z0 + 0.6, 0.08, M.trim, [0, yd + 2.8, (z0 + z1) / 2]);
   // line hauler & baskets of branch lines (blue tubs) & radio buoys with flags on the stern
   for (let i = 0; i < 10; i++) k.cyl(0.42, 0.36, 0.55, M.blue, [r.range(-hw * 0.8, hw * 0.8), yd + 0.28, r.range(z0 + 1.5, z1 - 1.5)], null, 10);
   k.rbox(1.2, 1.0, 1.2, 0.1, M.steel, [hw - 0.6, yd + 0.5, zU(0.44)]);
@@ -578,7 +597,8 @@ function buildSanma(T) {
   const bc = k.mesh(mergeAt(capG, caps), M.dark); if (bc) bc.castShadow = false;
   // dip-net boom stowed along the starboard side + net pile
   W.line([[-S.B * 0.3, dY(0.5) + 1.5, zU(0.44)], [-S.B * 0.35, dY(0.85) + 3.5, zU(0.9)]], { width: 0.16, color: '#e2e0d6' });
-  k.rbox(3.2, 0.9, 4.2, 0.35, T.ctx.mat.toon('#4c6b5a'), [S.B * 0.12, dY(0.62) + 0.45, zU(0.62)]);
+  if (T.opts.moored) k.rbox(1.8, 0.7, 1.8, 0.3, T.ctx.mat.toon('#c9cbc8'), [S.B * 0.12, dY(0.62) + 0.35, zU(0.62)]);   // [v6:c11r3] neutral gear pile, no green net heap
+  else k.rbox(3.2, 0.9, 4.2, 0.35, T.ctx.mat.toon('#4c6b5a'), [S.B * 0.12, dY(0.62) + 0.45, zU(0.62)]);
   bitts(T, 0.95); bitts(T, 0.05);
   T.navU = 0.34; T.navY = y1 + 1.0; T.navX = S.B * 0.33;
   anchors.deck.push([0, dY(0.6), zU(0.6)], [1.5, dY(0.5), zU(0.5)]);

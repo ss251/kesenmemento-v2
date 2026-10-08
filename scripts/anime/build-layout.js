@@ -11,15 +11,17 @@ import { ROOT } from "../terrain/tiles.js";
 import { openGrids, makeSampler } from "../../src/anime/world/layout/grids.js";
 import {
   hash32, polyArea, centroid, minAreaRect, obbSides, rotYFacing, segDist, SegHash, polylineLength, alongPolyline,
-  nominalWidth, roadKind, classifyLot, lotRoofColor, lotWallColor, roadWidthFromEdges, simplify, quayKind,
+  nominalWidth, roadKind, classifyLot, lotRoofColor, lotWallColor, roadWidthFromEdges, simplify, quayKind, resolveRoofShape, terrainInRing, plinthGround,
 } from "./derive.js";
 import { CACHE } from "./vt.js";
 // [v4:data] real-source enrichment (OSM, GSI Anno, aerial roof analysis): scripts/anime/enrich/*
-import { existsSync } from "node:fs";
-import { lotTable, roofWhiteBalance, fitRoofTransform, enrichLot, nameRoads, riverWidth, waterEdges, placeId, showable } from "./enrich/fold.js";
+import { existsSync, readFileSync } from "node:fs";
+import { lotTable, roofWhiteBalance, fitRoofTransform, fitPaintTransform, shiftL, RENDER_DL, shapeClass, enrichLot, nameRoads, riverWidth, waterEdges, placeId, showable } from "./enrich/fold.js";
 // [v4:overrides] per-cell reference overrides (data/anime/overrides/*.json, docs/anime/OVERRIDES.md), folded in last
-import { OVERRIDES_DIR, loadOverrides, compileOverrides, overrideFeatures, patchLot, unusedLotPatches, applyRoadOverrides, applyLanduseOverrides, propPlacements } from "./enrich/fold.js";
+import { OVERRIDES_DIR, loadOverrides, compileOverrides, overrideFeatures, patchLot, unusedLotPatches, applyRoadOverrides, applyLanduseOverrides, propPlacements, crossingOverrides } from "./enrich/fold.js";
+import { greenGateErrors } from "./enrich/green.js";   // [r3:2]
 import { tileToLl, llToEnu } from "../../src/core/geo.js";
+import { placeBusStops } from "./busstops.js";   // [sys:17]
 import { LAND_FILL, inFill } from "./landfill.js";   // [v6:c8] reclaimed land GSI still draws as water
 
 export const ZONES = {
@@ -29,12 +31,31 @@ export const ZONES = {
 };
 const r1 = (v) => Math.round(v * 10) / 10, r2 = (v) => Math.round(v * 100) / 100, r3 = (v) => Math.round(v * 1000) / 1000;
 const P1 = (p) => [r1(p[0]), r1(p[1])];
+/** [sys:6] the photo-survey workflow owns the south shore (PIER7, plaza, 迎 / 結 / 拓): its lots keep their ground */
+/** [r2:13] override files whose roof colours never train the GSI -> Earth transform: c9 (the GSI colour shifted in Lab: circular), c7 and c3 (the GSI lightness lifted about 12 L*) */
+export const ROOF_PAIR_SKIP = ["c9.json", "c7.json", "c3.json"];
+const inSurveyBox = (c) => c[0] >= -80 && c[0] <= 200 && c[1] >= 0 && c[1] <= 140;
 export function zoneOf(x, z, pad = 0) {
   if (Math.hypot(x - ZONES.hero.cx, z - ZONES.hero.cz) <= ZONES.hero.r + pad) return "hero";
   if (Math.hypot(x - ZONES.mid.cx, z - ZONES.mid.cz) <= ZONES.mid.r + pad) return "mid";
   return "far";
 }
 const inFar = (x, z) => x >= ZONES.far.x0 && x <= ZONES.far.x1 && z >= ZONES.far.z0 && z <= ZONES.far.z1;
+
+// [sys:19] East shore of the inner bay (鹿折川 mouth to 大浦). GSI / the DEM read these as natural beach, but in Google Earth (imagery
+// 2026-03-11) every stretch is a straight vertical concrete seawall or quay face with deep water to it and no beach. Pieces whose
+// midpoint lies in a box become 'seawall' (小鯖's small-boat basin and E's jetty: 'quay', so boats can moor). The crest (気仙沼市
+// 防潮堤整備計画 B3 大浦・浪板 L1 TP+5.0-7.2) is not measured: top is the apron's 2.5 m until it is read from a low oblique. z 465..545 (the
+// shipyard and its slipways) stays as it is.
+export const SW_SRC = "earth 2026-03-11 c4/h-mouth, c8/h-namiita + sub-n, c12/h-oura + M; 気仙沼市 防潮堤整備計画 B3 大浦・浪板 L1 TP+7.2～5.0";
+export const SEAWALLS = [
+  { id: "A", box: [960, -372, 1030, -100], kind: "seawall", top: 2.5, src: SW_SRC },
+  { id: "B", box: [985, -70, 1135, 135], kind: "seawall", top: 2.5, quayIn: [1080, 0, 1135, 60], src: SW_SRC },
+  { id: "C", box: [1100, 355, 1190, 458], kind: "seawall", top: 2.5, src: SW_SRC },
+  { id: "D", box: [1100, 545, 1170, 725], kind: "seawall", top: 2.5, src: SW_SRC },
+  { id: "E", box: [1100, 780, 1115, 840], kind: "quay", top: 2.2, src: SW_SRC },
+];
+export const TOE_BOX = [960, -205, 1000, -65];
 
 /** opts.overridesDir: the override folder (default data/anime/overrides; tests pass a fixture folder). */
 export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
@@ -53,12 +74,37 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
   const WB = E ? roofWhiteBalance(ET) : [1, 1, 1];
   // [v4:overrides] every override file, in file-name order (validated: the build stops on a malformed file)
   const OV = compileOverrides(loadOverrides(overridesDir));
+  // [r3:2] the green-lot gate: a recolour of a lot whose GSI interior is dark vegetation green (tools/anime/green-scan.mjs -> data/anime/green-flags.json) must name an oblique view (o0 / o180 / l45) or a ground
+  // photo in its src, or the lot is removed: every bad recolour said 'earth: roof #... on the top view' (c2 /76 /79 /3 /49 ...). Skipped under --overrides none and when the flag file is absent.
+  if (existsSync(join(ROOT, "data/anime/green-flags.json")) && OV.lotPatch.size) {
+    const gerr = greenGateErrors((await Bun.file(join(ROOT, "data/anime/green-flags.json")).json()).flagged, OV.lotPatch);
+    if (gerr.length) throw new Error(`overrides: ${gerr.length} recolour(s) of green-scan lots without an oblique / ground-photo confirmation:\n  ${gerr.join("\n  ")}`);
+  }
   // [v5:fix2] the aerial roof colours go through a GSI -> Google Earth 2026-03-11 transform fitted on the override lots
   // (their roof colours were read on Earth), in place of the white balance; without overrides, the white balance
-  const roofPairs = [];
-  for (const [id, ops] of OV.lotPatch) { const c = ops.map((o) => o.roof?.color).filter(Boolean).pop(), e = ET.get(id); if (c && e?.rgb && !(e.veg > 0.5)) roofPairs.push([e.rgb, c.toLowerCase()]); }
-  const ROOF_T = roofPairs.length >= 24 ? fitRoofTransform(roofPairs) : null;
-  log.roofTransform = ROOF_T;
+  // [r2:13] The transform is trained on Earth readings, not on typed colours. (1) data/anime/earth-roofs.json (tools/anime/earth-roofs.mjs): the per-lot Earth top-view median of
+  // every lot in the captured cells (derived colour values, never imagery), shifted by the renderer's paint offset (RENDER_DL), fitted in L*a*b* with the roof shape as a feature
+  // (fitPaintTransform); (2) override roof colours only where they were read raw from Earth (src 'earth: ...') and the lot has no Earth reading: the c9 colours are the GSI colour
+  // shifted in Lab (circular), c7 and c3 held the GSI lightness lifted 12 L*, and a colour read off a ground photo is not an Earth colour. A lot whose Earth reading is solar modules
+  // (pv) or whose GSI colour is a tree (veg) trains nothing. Held out (leave-one-area-out): median dE2000 <= 8.5 and |median dL| <= 3 (test/sys-round2.test.js). Without the file the
+  // v5:fix2 fit on the filtered override colours is used.
+  const EARTH_ROOFS = existsSync(join(ROOT, "data/anime/earth-roofs.json")) ? await Bun.file(join(ROOT, "data/anime/earth-roofs.json")).json() : null;
+  const shapeFor = (id, ops) => ops?.map((o) => o.roof?.shape).filter(Boolean).pop() || ET.get(id)?.roofShape || ET.get(id)?.aShape || "gable";
+  const roofSamples = [], roofPairs = [], haveEarth = new Set();
+  if (EARTH_ROOFS) for (const [id, hexc] of Object.entries(EARTH_ROOFS.lots)) {
+    const e = ET.get(id); if (!e?.rgb || e.veg > 0.5 || EARTH_ROOFS.skip?.[id]) continue;
+    const shape = shapeFor(id, OV.lotPatch.get(id)); haveEarth.add(id);
+    roofSamples.push({ gsi: e.rgb, target: shiftL(hexc, RENDER_DL[shapeClass(shape)]), shape });
+  }
+  for (const [id, ops] of OV.lotPatch) {
+    const op = [...ops].reverse().find((o) => o.roof?.color), e = ET.get(id);
+    if (!op || !e?.rgb || e.veg > 0.5) continue;
+    if (ROOF_PAIR_SKIP.some((f) => op.ref.startsWith(f)) || !/^earth\b/i.test(op.why || "")) continue;   // [r2:13]
+    roofPairs.push([e.rgb, op.roof.color.toLowerCase()]);
+    if (!haveEarth.has(id)) roofSamples.push({ gsi: e.rgb, target: op.roof.color.toLowerCase(), shape: shapeFor(id, ops) });
+  }
+  const ROOF_T = roofSamples.length >= 200 ? fitPaintTransform(roofSamples) : roofPairs.length >= 24 ? fitRoofTransform(roofPairs) : null;
+  log.roofTransform = ROOF_T && ROOF_T.type === "lab" ? { type: "lab", n: ROOF_T.n, dropped: ROOF_T.dropped, rms: ROOF_T.rms, k: ROOF_T.k, earth: haveEarth.size } : ROOF_T;
   const ovLog = { files: OV.files, lots: 0, removed: 0, newLots: OV.newLots.length, warnings: [] };
 
   // ---------------------------------------------------------------- roads (RdCL) + widths from road edges (RdEdg)
@@ -76,7 +122,9 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
     if (zone === "far" && kind === "alley") return;
     let width = nominal;
     if (zone !== "far") {
-      const w = roadWidthFromEdges(pts, f.rnkwidth, edgeHash);
+      // [sys:11] roads in the photo-survey south-shore box keep the old rule (that workflow owns them)
+      const inSurvey = mid[0] >= -80 && mid[0] <= 200 && mid[1] >= 0 && mid[1] <= 140;
+      const w = roadWidthFromEdges(pts, f.rnkwidth, edgeHash, 6, !inSurvey);
       if (w) { width = w; measured++; }
     }
     ROADS.push({ id: "r" + i, pts: (zone === "far" ? simplify(pts, 2) : pts).map(P1), width: r1(width), kind, zone, rank: f.rnkwidth, code: f.code });
@@ -103,6 +151,7 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
 
   // ---------------------------------------------------------------- quays (coastline pieces <= 24 m, classified)
   const QUAYS = [];
+  log.seawalls = {};
   // [v6:c8] the new edge of a land fill (scripts/anime/landfill.js): seawall pieces of 24 m or less, top from the land
   // height like the pieces below. Chained right after the kept piece that ends where the wall starts (so harbor/world.js
   // quayChains joins them), or appended when no piece ends there.
@@ -143,8 +192,16 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
         const inl = s1 < s2 ? 1 : -1;
         const lx = mx + nx * inl * 8, lz = mz + nz * inl * 8;
         const land = S.heightAt(lx, lz), far = S.heightAt(mx + nx * inl * 30, mz + nz * inl * 30);
-        const kind = quayKind({ x: mx, z: mz, zone, land, slope: (far - land) / 22, roadNear: roadHash.near(lx, lz, 14).some((s) => segDist(lx, lz, s.a, s.b).d < 10) });
-        QUAYS.push({ a: P1(pa), b: P1(pb), top: r2(Math.max(1.2, Math.min(kind === "rocks" || kind === "beach" ? 2.2 : 4.2, land))), kind, zone });
+        let kind = quayKind({ x: mx, z: mz, zone, land, slope: (far - land) / 22, roadNear: roadHash.near(lx, lz, 14).some((s) => segDist(lx, lz, s.a, s.b).d < 10) });
+        let top = r2(Math.max(1.2, Math.min(kind === "rocks" || kind === "beach" ? 2.2 : 4.2, land)));
+        // [sys:19] the east shore of the inner bay is concrete wall and quay, not beach (Google Earth 2026-03-11)
+        const sw = kind === "beach" ? SEAWALLS.find((w) => mx >= w.box[0] && mx <= w.box[2] && mz >= w.box[1] && mz <= w.box[3]) : null;
+        if (sw) { kind = sw.quayIn && mx >= sw.quayIn[0] && mx <= sw.quayIn[2] && mz >= sw.quayIn[1] && mz <= sw.quayIn[3] ? "quay" : sw.kind; top = sw.top; log.seawalls[sw.id] = (log.seawalls[sw.id] || 0) + 1; }
+        QUAYS.push({ a: P1(pa), b: P1(pb), top, kind, zone });
+        // the 消波ブロック (wave-dissipating blocks) at the foot of 浪板's west face: a run of armour stone 3 m seaward of the wall
+        if (sw && sw.id === "A" && mx >= TOE_BOX[0] && mx <= TOE_BOX[2] && mz >= TOE_BOX[1] && mz <= TOE_BOX[3]) {
+          const o = 3; QUAYS.push({ a: P1([pa[0] - nx * inl * o, pa[1] - nz * inl * o]), b: P1([pb[0] - nx * inl * o, pb[1] - nz * inl * o]), top: 2.0, kind: "rocks", zone, toe: true }); log.seawalls.toe = (log.seawalls.toe || 0) + 1;
+        }
         for (const f of [...fillWalls.values()]) if (Math.hypot(pb[0] - f.wall[0][0], pb[1] - f.wall[0][1]) < 0.6) pushWall(f);
       }
     }
@@ -187,16 +244,20 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
     seenIds.add(b.id);
     const tag = b.ovr ? null : tagged(c, A, b, ET.get(b.id));   // [v4:landmarks-A] the enrichment carries the lot's OSM match
     const shore = S.shoreDist(c[0], c[1]);
-    const cls = classifyLot({ id: b.id, code: b.code, area: A, h: b.h, zone, shore, front, tag: tag?.kind });
+    const cls = classifyLot({ id: b.id, code: b.code, area: A, h: b.h, zone, shore, front, tag: tag?.kind, legacy: inSurveyBox(c) });   // [r2:2] the survey box keeps the old derived heights
     // ground: the lowest of centre + OBB corners (never float); the frontage height too
     const ca = Math.cos(box.ang), sa = Math.sin(box.ang);
     let gy = S.heightAt(c[0], c[1]);
     for (const [u, v] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) gy = Math.min(gy, S.heightAt(box.cx + ca * box.hu * u - sa * box.hv * v, box.cz + sa * box.hu * u + ca * box.hv * v));
+    // [sys:6] the terrain inside the real polygon (1 m grid, inset 0.5 m); the floor is placed after the height is final
+    // (a far lot is drawn as its oriented box only, so its ground is measured under that box)
+    const ts = terrainInRing(zone === "far" ? [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([u, v]) => [box.cx + ca * box.hu * u - sa * box.hv * v, box.cz + sa * box.hu * u + ca * box.hv * v]) : ring, (x, z) => S.heightAt(x, z));
     const roofShape = tag?.roof || cls.roofShape;
     // [v4:data] real values from OSM, GSI Anno and the aerial photo override the derived ones (fold.js precedence)
-    const classify = (kind) => classifyLot({ id: b.id, code: b.code, area: A, h: b.h, zone, shore, front, tag: kind });
-    const en = enrichLot(ET.get(b.id), { area: A, kind: cls.kind, storeys: cls.storeys, height: cls.height, roofShape, roofColor: tag?.roofColor || lotRoofColor(cls.kind, roofShape, b.rgbWB || b.rgb, b.id),
-      roofSrc: tag?.roofColor ? "landmark" : "derived", wall: lotWallColor(cls.kind, b.id), rotY, landmark: tag?.landmark }, ROOF_T || WB, classify);
+    const classify = (kind) => classifyLot({ id: b.id, code: b.code, area: A, h: b.h, zone, shore, front, tag: kind, legacy: inSurveyBox(c) });
+    const en = enrichLot(ET.get(b.id), { area: A, kind: cls.kind, storeys: cls.storeys, height: cls.height, wallless: cls.wallless, roofShape, roofColor: tag?.roofColor || lotRoofColor(cls.kind, roofShape, b.rgbWB || b.rgb, b.id),
+      roofSrc: tag?.roofColor ? "landmark" : "derived", wall: lotWallColor(cls.kind, b.id), wallFor: (k) => lotWallColor(k, b.id), rotY, landmark: tag?.landmark,
+      keepAerialColour: !!tag?.landmark && !tag?.roofColor }, ROOF_T || WB, classify);   // [sys:32] a landmark lot without a tag colour (a school) takes the aerial roof colour
     if (tag?.storeys) { en.storeys = tag.storeys; en.height = tag.height; en.src.h = "landmark"; }
     const lot = {
       id: b.id, zone, kind: en.kind,
@@ -210,7 +271,9 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
     };
     for (const k of ["name", "nameEn", "use", "facility", "osm"]) if (en[k] != null) lot[k] = en[k];
     if (tag?.landmark) lot.landmark = tag.landmark;
+    const groundBeforeFix = lot.groundY;
     applyLotFix(lot);   // [v4:polish1]
+    const groundFixed = lot.groundY !== groundBeforeFix;
     // [v4:overrides] a new lot takes its values from its op; then every patch of the lot, in file order
     if (b.ovr) { lot.src = { h: "derived", kind: "override", roof: "derived", color: "derived" }; delete lot.roof.photo; if (patchLot(lot, [b.ovr], classify) === "remove") continue; }
     const ops = OV.lotPatch.get(b.id);
@@ -219,6 +282,19 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
       if (patchLot(lot, ops, classify) === "remove") { ovLog.removed++; continue; }
       ovLog.lots++;
     }
+    // [sys:4] one roof per building: a derived shape is decided here (seeded by the lot id), not per builder
+    if (lot.src.roof === "derived" && lot.kind !== "landmark" && !lot.landmark) {
+      lot.roof.shape = resolveRoofShape({ id: lot.id, kind: lot.kind, shape: lot.roof.shape, height: lot.height, area: A });
+      lot.src.roof = "derived-resolved";
+    }
+    // [r2:4] a wall-less shed (GSI 3111 / 3112, under 100 m2) keeps its flag while it is still a low warehouse after OSM and the overrides
+    if (cls.wallless && lot.kind === "warehouse" && lot.height <= 4.5 && !lot.landmark) lot.wallless = true;
+    // [sys:6] floor on a slope: tmax - height + 0.6 clamped to [tmin, tmin + Pmax] (lotfix.js grounds, landmarks and the
+    // photo-survey south shore keep theirs); baseY = the lowest terrain, where the plinth / retaining wall starts
+    if (!groundFixed && !lot.landmark && lot.kind !== "landmark" && !inSurveyBox(c)) {
+      const g = plinthGround({ ts, height: lot.height, kind: lot.kind, groundOld: gy });
+      lot.groundY = r2(Math.max(0.6, g.groundY)); lot.baseY = r2(Math.min(lot.groundY, Math.max(0.6, g.baseY)));
+    } else lot.baseY = lot.groundY;
     LOTS.push(lot);
   }
   console.error("lots", Math.round(performance.now() - t0));
@@ -232,8 +308,15 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
   const lotHash = new SegHash(24);
   for (const l of LOTS) if (l.zone !== "far") { const o = l.obb; lotHash.add([o.cx, o.cz], [o.cx, o.cz], l); }
   const POLE_RUNS = [];
+  // Roads that carry no utility poles on the newest ground photos. Road ids are 'r'+RdCL index, so they are fragile:
+  // the guard below fails the build if a data refresh moved r13918, rather than silently skipping the wrong road.
+  const NO_POLE_ROADS = { r13918: "raw/ref/commons/176190355 (2025-09-28): no poles or wires on the 気仙沼小 classroom-front service road, only shrubs and lamp posts" };
+  const noPoleGuard = ROADS.find((r) => r.id === "r13918");
+  if (!noPoleGuard || !noPoleGuard.pts.length || Math.hypot(noPoleGuard.pts[0][0] - -258.2, noPoleGuard.pts[0][1] - 319.7) > 5)
+    throw new Error("NO_POLE_ROADS: r13918 (気仙沼小 classroom-front road) is missing or no longer starts within 5 m of (-258.2, 319.7); re-check the road id");
   for (const r of ROADS) {
-    if (r.zone === "far" || r.kind === "bridge" || r.width < 3.2) continue;
+    if (NO_POLE_ROADS[r.id]) continue;
+    if (r.zone === "far" || r.kind === "bridge" || r.tunnel || r.width < 3.2) continue;   // [sys:33] no poles over a tunnel (BRT 安波山)
     const L = polylineLength(r.pts);
     if (L < 45) continue;
     const spacing = 28 + (hash32(r.id) % 9);
@@ -270,6 +353,7 @@ export async function buildLayout({ overridesDir = OVERRIDES_DIR } = {}) {
   // [v4:overrides] land use polygons, prop placements, and the provenance of every override file
   if (OV.landuse.length) { const lu = applyLanduseOverrides(X.landuse || [], OV); X.landuse = lu.landuse; ovLog.landuse = { added: OV.landuse.length, replaced: lu.replaced }; }
   if (OV.props.length) X.props = propPlacements(OV);
+  if (OV.crossings.length || OV.arrows.length) X.crossingOvr = crossingOverrides(OV);   // [sys:14] [sys:18] zebras, removed zebras, lane arrows
   if (OV.meta.length) X.overrides = OV.meta;
   log.overrides = ovLog;
   log.extras = Object.fromEntries(Object.entries(X).map(([k, v]) => [k, Array.isArray(v) ? v.length : typeof v]));
@@ -313,9 +397,32 @@ function extras(E, vt, ROADS, LOTS) {
   const add = (o) => { if (!showable(o.name) || /^[（(]旧[）)]/.test(o.name)) return; if (o.nameEn && !showable(o.nameEn)) o.nameEn = null; const k = o.name + "|" + Math.round(o.x / 30) + "," + Math.round(o.z / 30); if (seen.has(k)) return; seen.add(k); places.push({ id: placeId(o.name, [o.x, o.z]), ...o }); };
   // named buildings (lots) first: their position is the building
   for (const l of LOTS) if (l.name) add({ name: l.name, nameEn: l.nameEn ?? null, cat: l.facility || (l.use ? l.use.split(":")[1] : l.kind), x: r1(l.obb.cx), z: r1(l.obb.cz), lot: l.id, src: l.src.name });
-  for (const p of E.pois) if (p.name) add({ name: p.name, nameEn: p.nameEn ?? null, cat: p.type, group: p.cat, x: p.p[0], z: p.p[1], lot: p.lot && lotAt.has(p.lot) ? p.lot : null, src: "osm", osm: p.osm });
-  for (const f of E.facilities) add({ name: f.name, nameEn: null, cat: f.cat, group: "facility", x: f.p[0], z: f.p[1], lot: f.lot ?? null, src: "gsi" });
+  // [v6:c3] an OSM POI sitting on a lot whose name an override has set is dropped (the override is newer: 昭和シェル -> apollostation, 蝠寿水産 -> 福寿水産)
+  // [sys:23] a POI that carries the name its lot had BEFORE an override or LOT_FIX renamed (or cleared) it is the old name: it would
+  // sit in search / labels beside the new one (気仙沼図書館 on the lot that is now 放送大学). Only that exact POI goes, not every POI on a
+  // lot that has any override (neighbourhood and works POIs stay).
+  const FN = E.lots.fields, iName = FN.indexOf("name"), wasName = new Map(E.lots.rows.map((r) => [r[0], r[iName]]));
+  const iGsi = FN.indexOf("gsiName"), gsiNameOf = new Map(E.lots.rows.map((r) => [r[0], r[iGsi]]));
+  for (const p of E.pois) {
+    const L0 = p.lot && lotAt.get(p.lot), was = p.lot && wasName.get(p.lot);
+    if (L0 && (L0.src?.name === "override" || L0.src?.fix) && was && was !== (L0.name ?? null) && p.name === was) continue;
+    if (p.name) add({ name: p.name, nameEn: p.nameEn ?? null, cat: p.type, group: p.cat, x: p.p[0], z: p.p[1], lot: p.lot && lotAt.has(p.lot) ? p.lot : null, src: "osm", osm: p.osm });
+  }
+  // [v6:c5r2] a GSI facility whose lot an override has un-named (`unname`: the record was snapped to the wrong building, 観音寺 on a 120 m2
+  // house 200 m from the temple) is dropped: the lot that really carries the name (override name) puts the place on the map
+  for (const f of E.facilities) { const L0 = f.lot && lotAt.get(f.lot); if (L0 && L0.src?.name === "override" && !L0.name && (f.name === wasName.get(f.lot) || f.name === gsiNameOf.get(f.lot))) continue; add({ name: f.name, nameEn: null, cat: f.cat, group: "facility", x: f.p[0], z: f.p[1], lot: f.lot ?? null, src: "gsi" }); }
   for (const p of E.places) add({ name: p.name, nameEn: null, cat: p.cat, group: "place", x: p.p[0], z: p.p[1], lot: null, src: "gsi" });
+  // [v6:c5r3] one facility, two records (OSM carries both a bare brand node and a branch-named node: ツルハドラッグ / ツルハドラッグ 気仙沼八日町店 on lot 16/58539/25068/444; the same-name merge in
+  // explore/search.js never sees them, the names differ): on the same lot, in the same category, a name that is a strict prefix of another is the same place, and the longer name stays
+  // (the short one's English name is kept when the longer has none). Generic: no hard-coded brand.
+  { const keep = new Set(places), drop = [];
+    for (const a of places) for (const b of places) {
+      if (a === b || !a.lot || a.lot !== b.lot || a.cat !== b.cat || !(b.name.length > a.name.length && b.name.startsWith(a.name))) continue;
+      if (!b.nameEn && a.nameEn) b.nameEn = a.nameEn;
+      keep.delete(a); drop.push(a.name + " -> " + b.name + " (" + a.lot + ")");
+    }
+    if (drop.length) { places.splice(0, places.length, ...places.filter((p) => keep.has(p))); console.log("[places] same-lot prefix duplicates merged: " + drop.length + " (" + [...new Set(drop)].join("; ") + ")"); }
+  }
   const signals = E.signals.map((p) => { const r = nearestRoad(p, 20); return { x: p[0], z: p[1], roadId: r?.id ?? null }; });
   const crossings = E.crossings.map((c) => { const r = nearestRoad(c.p, 20); return { x: c.p[0], z: c.p[1], kind: c.kind, signals: !!c.signals, roadId: r?.id ?? null }; });
   // near the town: the 0.8 m outlines; elsewhere simplified to 2.5 m on a 1 m grid (a far field reads the same)
@@ -324,7 +431,17 @@ function extras(E, vt, ROADS, LOTS) {
   const bridges = E.bridges.filter((b) => showable(b.name)).map((b) => ({ name: b.name, kind: b.kind, pts: b.pts }));
   const rail = E.rail.map((r) => ({ kind: r.kind, name: showable(r.name) ? r.name : null, pts: r.pts, bridge: !!r.bridge, tunnel: !!r.tunnel }));
   applyPlaceFix(places);   // [v4:polish3] reference corrections of GSI annotation points
-  return { landuse, rivers, places, signals, crossings, bridges, rail, credits: E.attribution };
+  // [sys:17] bus stops on the left kerb of the road a bus uses; BRT stops with their platform, bench and totem
+  const busStops = placeBusStops(E.busStops || [], E.busWays || [], ROADS);
+  // [sys:21] the census small areas (町丁) as ENU polygons for the minimap caption (scripts/anime/build-areas-estat.js); en names from the OSM place nodes
+  const estatPath = join(ROOT, "data/anime/areas-estat.json");
+  let areas = [];
+  if (existsSync(estatPath)) {
+    const enOf = new Map(E.pois.filter((p) => p.cat === "place" && p.nameEn).map((p) => [p.name, p.nameEn]));
+    const base = (n) => String(n || "").replace(/[一二三四五六七八九十]+丁目$/, "");
+    areas = JSON.parse(readFileSync(estatPath, "utf8")).areas.map((a) => ({ ja: a.ja, en: enOf.get(a.ja) ?? enOf.get(base(a.ja)) ?? null, ring: a.ring, ...(a.holes ? { holes: a.holes } : {}) }));
+  }
+  return { landuse, rivers, places, signals, crossings, bridges, rail, busStops, areas, credits: E.attribution + "; 出典：政府統計の総合窓口(e-Stat) 境界データ（令和2年国勢調査 小地域）; 国土地理院 逆ジオコーダ（町丁名）" };
 }
 
 function count(arr, k) { const o = {}; for (const a of arr) o[a[k]] = (o[a[k]] || 0) + 1; return o; }
@@ -349,7 +466,7 @@ function landmarkTags(LM) {
     if (Math.hypot(c[0] - 363, c[1] + 126) < 9) return { kind: "shrine", landmark: "isuzuShrine", roof: "gable", roofColor: "#56677a", storeys: 1, height: 5.2 };
     // [v4:landmarks-B] city hall campus, the new city hall site (the demolished hospital blocks), the station, リアス・
     // アーク, the hospitals, schools, temples and the church, 亀山 and 浦の浜: dedicated models (src/anime/world/landmarks)
-    const siteB = siteOfLotB(e?.osm, c[0], c[1], A, b?.poly);   // [v4:integrate] + the footprint (station overlap)
+    const siteB = siteOfLotB(e?.osm, c[0], c[1], A, b?.poly, b?.id);   // [v4:integrate] + the footprint (station overlap)
     if (siteB) return { kind: "landmark", landmark: siteB, ...tagOfSiteB(siteB) };
     return null;
   };
@@ -432,14 +549,14 @@ if (import.meta.main) {
   const KIND = [...new Set(far.map((l) => l.kind))], SHAPE = [...new Set(far.map((l) => l.roof.shape))], RC = [...new Set(far.map((l) => l.roof.color))], WC = [...new Set(far.map((l) => l.wall))];
   out.lots = near;
   out.farLots = { kinds: KIND, shapes: SHAPE, roofColors: RC, walls: WC,
-    fields: ["id", "cx", "cz", "w", "d", "rotY", "storeys", "height", "groundY", "kind", "shape", "roof", "wall", "area", "src", "ridge"],
+    fields: ["id", "cx", "cz", "w", "d", "rotY", "storeys", "height", "groundY", "kind", "shape", "roof", "wall", "area", "src", "ridge", "baseY"],
     // [v4:data] src = index into srcs ("h/kind/roof/color" source key), ridge 0 none / 1 'x' / 2 'z'; names etc. in extra
     srcs: [], extra: {},
     rows: far.map((l) => [l.id, r1(l.obb.cx), r1(l.obb.cz), r1(l.obb.w), r1(l.obb.d), Math.round(l.obb.rotY * 100) / 100, l.storeys, l.height, r1(l.groundY), KIND.indexOf(l.kind), SHAPE.indexOf(l.roof.shape), RC.indexOf(l.roof.color), WC.indexOf(l.wall), l.area]) };
   const SRC = out.farLots.srcs, srcKey = (s) => [s.h, s.kind, s.roof, s.color].join("/");
   far.forEach((l, i) => {
     const k = srcKey(l.src); let j = SRC.indexOf(k); if (j < 0) { j = SRC.length; SRC.push(k); }
-    out.farLots.rows[i].push(j, l.roof.ridge === "x" ? 1 : l.roof.ridge === "z" ? 2 : 0);
+    out.farLots.rows[i].push(j, l.roof.ridge === "x" ? 1 : l.roof.ridge === "z" ? 2 : 0, r1(l.baseY ?? l.groundY));   // [sys:6] baseY: the lowest terrain in the footprint
     const x = {}; for (const f of ["name", "nameEn", "use", "facility", "landmark", "facade"]) if (l[f] != null) x[f] = l[f];   // [v4:landmarks-A] landmark  [v4:overrides] facade
     if (l.src.name) x.nameSrc = l.src.name; if (l.src.wall) x.wallSrc = l.src.wall;
     if (l.src.ovr) { x.ovr = l.src.ovr; x.ovrWhy = l.src.ovrWhy; }   // [v4:overrides] provenance

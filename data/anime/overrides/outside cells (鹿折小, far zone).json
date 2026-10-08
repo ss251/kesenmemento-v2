@@ -1,0 +1,22 @@
+{
+ "version": 1,
+ "cell": "outside-shishiori-e",
+ "bbox": [530, -1870, 700, -1700],
+ "note": "outside the 12 cells: 鹿折小学校 (OSM 762601688, far zone), round 3. tagOfSiteB forces roof 'flat' on every school lot and landmarks/schools.js drew the 3-storey block with a flat deck and the gym with a barrel vault. Commons 150521570 (2024-05-03) shows a long 3-storey block under a dark slate-grey pitched metal roof (median #5c6371, sampled over the roof's whole length) with cream pillars between white walls, and a gym with a pitched gable roof and a teal band, not a barrel; the GSI ortho shows the same (dark pitched planes on the block, a N-S ridge on the gym). The lots keep their landmark model: these patches carry the roof shape and colour as data, and schools.js [v6:shishiori-r3] draws a pitched roof for a school lot whose roof an override set to gable or hip (src.roof 'override'), with the ridge along the footprint's long side. Every other school keeps the flat or barrel default (気仙沼小's gym is a confirmed light-blue barrel).",
+ "sources": [
+  { "id": "commons", "what": "Wikimedia Commons 150521570 Kesennuma city Shishiori elementary school 202405 (raw/ref/commons, reference only): block roof median #5c6371 (pixel sample 560..900 x 368..392), gym band #8aa8a0", "date": "2024-05-03" },
+  { "id": "gsi", "what": "GSI aerial photo (data/ortho/core.jpg, about 2020-22) crop x 520..700, z -1880..-1700: dark pitched planes on the north and east parts of the block (lot 96), a ridged roof on the gym (lot 69)", "date": "2021-01-01" }
+ ],
+ "lots": [
+  {
+   "id": "16/58542/25064/96",
+   "roof": { "shape": "hip", "color": "#5c6371" },
+   "src": "commons: 150521570 (2024-05-03) long 3-storey block under a dark slate-grey pitched metal roof, median #5c6371, hipped ends; gsi: dark pitched planes along the north and east parts of the lot. 86 x 34 m OBB, ridge E-W along the 86 m side"
+  },
+  {
+   "id": "16/58542/25064/69",
+   "roof": { "shape": "gable", "color": "#5c6371" },
+   "src": "commons: 150521570 (2024-05-03) the gym has a pitched gable roof and a teal band, not a barrel; gsi: ridged roof on the lot. Ridge along the long axis (about N-S, rot 1.43)"
+  }
+ ]
+}

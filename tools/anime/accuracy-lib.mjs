@@ -52,3 +52,69 @@ export function dE2000(l1, l2) {
   const Sl = 1 + (0.015 * (Lm - 50) ** 2) / Math.sqrt(20 + (Lm - 50) ** 2), Sc = 1 + 0.045 * Cpm, Sh = 1 + 0.015 * Cpm * T, Rt = -Math.sin(2 * dT * rad) * Rc;
   return Math.sqrt((dL / Sl) ** 2 + (dC / Sc) ** 2 + (dH / Sh) ** 2 + Rt * (dC / Sc) * (dH / Sh));
 }
+
+// ------------------------------------------------------------------ [sys:27] the rendered footprint of a building landmark against its OSM outline
+/** distance (m) from a point to a ring's outline */
+export function ringEdgeDist(x, z, ring) {
+  let d = Infinity;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [ax, az] = ring[j], [bx, bz] = ring[i], dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz || 1, t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / l2)); d = Math.min(d, Math.hypot(x - ax - dx * t, z - az - dz * t)); }
+  return d;
+}
+const inRing = (x, z, ring) => { let c = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, zi] = ring[i], [xj, zj] = ring[j]; if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) c = !c; } return c; };
+/**
+ * Score a render mask against an OSM outline (not against a connected blob, so neighbouring canopies and annexes do not count):
+ *   recall    = share of the outline's pixels rendered as building (height above `buildM` m);
+ *   precision = share of the rendered building pixels within the outline dilated by `dilate` m that fall inside the outline itself;
+ *   iou       = from those counts (inside / (outline + building within the dilated outline - inside));
+ *   centroidErr = the distance from the centroid of the rendered pixels inside the dilated outline to the outline's area centroid.
+ * h: Uint8 heights above the terrain in 0.25 m units (accuracy.mjs acc.mask), px x px over a square `size` m centred on (cx, cz), north up.
+ * A landmark passes with iou >= 0.7 and centroidErr <= 5 m. -> { recall, precision, iou, centroidErr, pass, outlinePx, buildingPx }
+ */
+export function landmarkScore({ h, px, size, cx, cz, poly, buildM = 2.2, dilate = 6, minIou = 0.7, maxErr = 5 }) {
+  const res = size / px, x0 = cx - size / 2, z0 = cz - size / 2;
+  let zmin = Infinity, zmax = -Infinity, xmin = Infinity, xmax = -Infinity; for (const p of poly) { xmin = Math.min(xmin, p[0]); xmax = Math.max(xmax, p[0]); zmin = Math.min(zmin, p[1]); zmax = Math.max(zmax, p[1]); }
+  const i0 = Math.max(0, Math.floor((xmin - dilate - x0) / res)), i1 = Math.min(px - 1, Math.ceil((xmax + dilate - x0) / res)), j0 = Math.max(0, Math.floor((zmin - dilate - z0) / res)), j1 = Math.min(px - 1, Math.ceil((zmax + dilate - z0) / res));
+  let outline = 0, inside = 0, near = 0, sx = 0, sz = 0;
+  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+    const x = x0 + (i + 0.5) * res, z = z0 + (j + 0.5) * res, building = h[j * px + i] > buildM * 4;
+    const inP = inRing(x, z, poly);
+    if (inP) { outline++; if (building) inside++; }
+    if (building && (inP || ringEdgeDist(x, z, poly) <= dilate)) { near++; sx += x; sz += z; }
+  }
+  // the outline's area centroid
+  let a = 0, gx = 0, gz = 0; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const c = poly[j][0] * poly[i][1] - poly[i][0] * poly[j][1]; a += c; gx += (poly[j][0] + poly[i][0]) * c; gz += (poly[j][1] + poly[i][1]) * c; }
+  const ocx = Math.abs(a) > 1e-9 ? gx / (3 * a) : (xmin + xmax) / 2, ocz = Math.abs(a) > 1e-9 ? gz / (3 * a) : (zmin + zmax) / 2;
+  const recall = outline ? inside / outline : 0, precision = near ? inside / near : 0, union = outline + near - inside, iou = union ? inside / union : 0;
+  const centroidErr = near ? Math.hypot(sx / near - ocx, sz / near - ocz) : Infinity;
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+  return { recall: r3(recall), precision: r3(precision), iou: r3(iou), centroidErr: Number.isFinite(centroidErr) ? Math.round(centroidErr * 10) / 10 : null, pass: iou >= minIou && centroidErr <= maxErr, outlinePx: outline, buildingPx: near };
+}
+
+// ------------------------------------------------------------------ [r3:19] coverage of the audit over the accuracy cells
+/**
+ * The headline numbers (buildings.iou, roofs, roads, heights) score only what lies inside the audit region: for the default `core` that is the 1.1 km mid-zone disc round (250, 150), so c4 (59 of its 126
+ * lots), c12 (28 of 44), c9 (242 of 308) and c1 (159 of 160) are only partly measured and the headline says nothing about their other lots. These pure helpers make the coverage explicit.
+ * cells: data/anime/cells.json `cells` ({ id: { bbox: [x0, z0, x1, z1] } }); the pier7 cell (PIER7 / the south shore) belongs to the photo-survey workflow and is left out unless asked for.
+ */
+export function cellIdAt(cells, x, z, { skip = ['pier7', 'kameyama', 'asahi'] } = {}) {
+  for (const [id, c] of Object.entries(cells)) { if (skip.includes(id)) continue; const b = c.bbox; if (x >= b[0] && x < b[2] && z >= b[1] && z < b[3]) return id; }
+  return null;
+}
+/**
+ * items: [{ cx, cz, area }] (footprint centres and areas). scored(item) -> was it inside the audited region AND inside a rendered tile.
+ * -> { cells: { [id]: { n, scored, share, area, areaScored, areaShare } }, all: { n, scored, share, area, areaScored, areaShare } }
+ */
+export function cellCoverage(cells, items, scored) {
+  const blank = () => ({ n: 0, scored: 0, area: 0, areaScored: 0 });
+  const out = {}, all = blank();
+  for (const id of Object.keys(cells)) if (!['pier7', 'kameyama', 'asahi'].includes(id)) out[id] = blank();
+  for (const it of items) {
+    const id = cellIdAt(cells, it.cx, it.cz); if (!id) continue;
+    const s = !!scored(it), a = it.area || 0;
+    for (const t of [out[id], all]) { t.n++; t.area += a; if (s) { t.scored++; t.areaScored += a; } }
+  }
+  const fin = (t) => ({ n: t.n, scored: t.scored, share: t.n ? Math.round((t.scored / t.n) * 1000) / 1000 : null, area: Math.round(t.area), areaScored: Math.round(t.areaScored), areaShare: t.area ? Math.round((t.areaScored / t.area) * 1000) / 1000 : null });
+  return { cells: Object.fromEntries(Object.entries(out).map(([id, t]) => [id, fin(t)])), all: fin(all) };
+}
+/** the share (0..1, 3 decimals) a / b, null for an empty b */
+export const shareOf = (a, b) => (b > 0 ? Math.round((a / b) * 1000) / 1000 : null);

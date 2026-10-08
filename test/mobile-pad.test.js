@@ -22,14 +22,16 @@ describe("pad: the stick", () => {
     expect(just.mag).toBeGreaterThan(0);
     expect(just.mag).toBeLessThan(0.05);
   });
-  test("the magnitude is an eased curve: monotonic, 0..1, and gentler than linear in the lower half", () => {
+  test("[feel] the magnitude: monotonic 0..1, fine near the centre, full walk at 80 % of the travel (before RUN at 85 %)", () => {
     let prev = -1;
     for (let r = 0; r <= 1.0001; r += 0.02) { const m = stickMath(STICK.travel * r, 0).mag; expect(m).toBeGreaterThanOrEqual(prev); prev = m; }
     expect(easeStick(0)).toBe(0); expect(easeStick(1)).toBe(1);
-    const mid = stickMath(STICK.travel * 0.56, 0).mag;   // the linear remap of 0.56 is 0.5
-    expect(mid).toBeCloseTo(0.5, 5);
-    expect(easeStick(0.25)).toBeLessThan(0.25);
-    expect(easeStick(0.75)).toBeGreaterThan(0.75);
+    for (const u of [0.1, 0.25, 0.5, 0.75, 0.9]) expect(easeStick(u)).toBeLessThan(u);   // gentler than linear: fine control near the centre
+    expect(easeStick(0.1)).toBeGreaterThan(0.02);   // ...never dead: a small push past the dead zone is a slow walk
+    const top = stickMath(STICK.travel * STICK.full, 0);
+    expect(top.mag).toBeCloseTo(1, 9); expect(top.run).toBe(false);   // full walking speed is reachable, and it is still a walk
+    const mid = stickMath(STICK.travel * 0.46, 0).mag;   // the remap of 0.46 is 0.5: 0.25 * 0.5 + 0.75 * 0.25
+    expect(mid).toBeCloseTo(0.3125, 5);
   });
   test("travel is clamped to 56 CSS px (the knob stays on the base, the vector never exceeds 1)", () => {
     const r = stickMath(300, 400);   // far past the travel, along (0.6, 0.8)
@@ -193,12 +195,12 @@ describe("pad: the button set per mode", () => {
     expect(b[3].hold).toBeFalsy();
     expect(DATA.ja[b[0].label]).toBe("上昇"); expect(DATA.ja[b[1].label]).toBe("下降"); expect(DATA.ja[b[2].label]).toBe("加速"); expect(DATA.ja[b[3].label]).toBe("歩く");
   });
-  test("drive: ブレーキ (hold), ブースト (hold), 降りる; the stick steers", () => {
+  test("drive: ドリフト (hold), ブースト (hold), 降りる; the stick steers", () => {
     expect(buttonIds("drive")).toEqual(["brake", "nitro", "getout"]);
     const d = builtinModes().drive;
     expect(d.buttons[0].hold && d.buttons[1].hold).toBe(true);
     expect(d.stick).toBe("analog");
-    expect(DATA.ja[d.buttons[0].label]).toBe("ブレーキ"); expect(DATA.ja[d.buttons[1].label]).toBe("ブースト"); expect(DATA.ja[d.buttons[2].label]).toBe("降りる");
+    expect(DATA.ja[d.buttons[0].label]).toBe("ドリフト"); expect(DATA.ja[d.buttons[1].label]).toBe("ブースト"); expect(DATA.ja[d.buttons[2].label]).toBe("降りる");
   });
   test("walk labels are the spec's", () => {
     const w = builtinModes().walk.buttons;

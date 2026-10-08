@@ -11,7 +11,7 @@
  "sources": [
   {
    "id": "earth",
-   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured with tools/anime/earth-ref.mjs into raw/ref/earth/c8 (full_before, sub-n, sub-s; zoomed crops z*_*.jpg)",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured into a local reference folder (c8) (full_before, sub-n, sub-s; zoomed crops z*_*.jpg)",
    "date": "2026-03-11"
   },
   {
@@ -43,9 +43,11 @@
   {
    "id": "16/58543/25068/20",
    "roof": {
-    "color": "#66788a"
+    "color": "#66788a",
+    "shape": "gable",
+    "ridge": "z"
    },
-   "src": "earth: sub-n top (zn_d_earth_gsi.jpg), a dull slate-blue metal roof (Earth #5d616d; the GSI photo's turquoise has weathered)"
+   "src": "earth: sub-n top (zn_d_earth_gsi.jpg), a dull slate-blue metal roof (Earth #5d616d; the GSI photo's turquoise has weathered) | [r3] roof shape: earth: top view rectified at 12 px/m (round 3 systemic 6): a long blue-grey warehouse gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
   },
   {
    "id": "16/58543/25068/22",
@@ -210,6 +212,11 @@
     "color": "#918f95"
    },
    "src": "earth: sub-s top, grey (Earth #87858b), not pink"
+  },
+  {
+   "id": "16/58543/25068/45",
+   "remove": true,
+   "src": "earth top (+o0/o180, c8/sub-s) + GSI photo: scrub/forest, no roof"
   }
  ],
  "newLots": [
@@ -470,8 +477,8 @@
    "surface": "gravel",
    "ring": [
     [
-     1098,
-     48
+     1099,
+     46
     ],
     [
      1170,
@@ -494,11 +501,15 @@
      158
     ],
     [
-     1094,
-     100
+     1090.5,
+     104
+    ],
+    [
+     1098.5,
+     60
     ]
    ],
-   "src": "earth: sub-s top + o0 + o90 (z_s1_earth.jpg), the cleared house terraces of 小鯖 below the road are bare earth and gravel (the app drew lawn)"
+   "src": "earth: sub-s top + o0 + o90 (z_s1_earth.jpg), the cleared house terraces of 小鯖 below the road are bare earth and gravel (the app drew lawn) [round 1 fix: the west edge now follows the 2026 seawall (1097,60)-(1089,100) +1.5 m, not x 1094: the GSI water notch there is reclaimed yard (scripts/anime/landfill.js kosaba-yard)]"
   },
   {
    "use": "vacant",

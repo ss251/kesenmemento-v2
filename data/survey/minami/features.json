@@ -1,6 +1,6 @@
 {
  "area": "minami",
- "note": "South-shore survey features (tools/survey/minami_features.py): ENU metres (x east, y T.P. up, z south), 1-sigma per axis. Names: docs/anime/survey/minami.md. Groups name#k are matched without order by tools/anime/survey-diff.mjs.",
+ "note": "South-shore survey features (tools/survey/minami_features.py): ENU metres (x east, y T.P. up, z south), 1-sigma per axis. Names: docs/anime/survey/minami.md. Groups name#k are matched without order by tools/anime/survey-diff.mjs. [fix1] ring C refit, gate post, 7-Eleven pole, 結 totem, road-sign pole and the east monument added by tools/survey/minami_fix1.py. [fix1] ring C refit, gate post, 7-Eleven pole, 結 totem, road-sign pole and the east monument added by tools/survey/minami_fix1.py. [fix1] ring C refit, gate post, 7-Eleven pole, 結 totem, road-sign pole and the east monument added by tools/survey/minami_fix1.py. [fix2] monument re-measured from IMG_0893 alone (tools/survey/minami_fix2.py). [fix2] monument re-measured from IMG_0893 alone (tools/survey/minami_fix2.py). [fix2] monument re-measured from IMG_0893 alone (tools/survey/minami_fix2.py).",
  "sigma_px": 2.5,
  "georef": {
   "t_sigma_m": 0.23667524778223875,
@@ -609,25 +609,6 @@
    "note": "ring bench centre at the paving (circle fit of 4 outer-top-edge picks, rms 0.12 m) [ringB]"
   },
   {
-   "name": "ring#3",
-   "enu": [
-    21.532,
-    1.84,
-    54.581
-   ],
-   "sigma": [
-    0.406,
-    0.071,
-    0.406
-   ],
-   "method": "ringfit",
-   "views": [
-    "IMG_0807"
-   ],
-   "res_px": {},
-   "note": "ring bench centre at the paving (circle fit of 3 outer-top-edge picks, rms 0.00 m) [ringC]"
-  },
-  {
    "name": "ring.tree#1",
    "enu": [
     28.051,
@@ -850,7 +831,7 @@
     "0823": 8.7,
     "0907": 25.9
    },
-   "note": "PIER7 \u5275 totem: centre of the oval logo"
+   "note": "PIER7 創 totem: centre of the oval logo"
   },
   {
    "name": "totem.mukaeru",
@@ -873,7 +854,389 @@
     "0824": 42.6,
     "0820": 79.6
    },
-   "note": "\u8fce totem: centre of the \u8fce glyph"
+   "note": "迎 totem: centre of the 迎 glyph"
+  },
+  {
+   "name": "ring#3",
+   "enu": [
+    22.1,
+    1.84,
+    54.1
+   ],
+   "sigma": [
+    0.45,
+    0.07,
+    0.45
+   ],
+   "method": "ringfit",
+   "views": [
+    "IMG_0807",
+    "IMG_0808",
+    "IMG_0801"
+   ],
+   "res_px": {},
+   "note": "ring C bench centre: foot + top-edge circle fits IMG_0807 (22.12, 54.20, d 5.42, rms 0.09 m), IMG_0808 (21.80, 54.43, d 6.2, partial arc), IMG_0801 near arc (west edge x 20.2) and the IMG_0807 overlay (z -0.4): mean (22.1, 54.1) [ringC]"
+  },
+  {
+   "name": "ringC.gap#1",
+   "enu": [
+    19.75,
+    2.1,
+    55.62
+   ],
+   "sigma": [
+    0.5,
+    0.07,
+    0.5
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0807",
+    "IMG_0800"
+   ],
+   "res_px": {},
+   "note": "ring C opening, south end face top (t 147 deg): the far wall ends at x 362 in IMG_0807 (ray x circle R 2.8), the end face at x 308 in IMG_0800 [ringC.gap.s]"
+  },
+  {
+   "name": "ringC.gap#2",
+   "enu": [
+    19.36,
+    2.1,
+    53.5
+   ],
+   "sigma": [
+    0.5,
+    0.07,
+    0.5
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0807",
+    "IMG_0800"
+   ],
+   "res_px": {},
+   "note": "ring C opening, north end face top (t 192 deg): x 520 in IMG_0807, the near end in IMG_0800 [ringC.gap.n]"
+  },
+  {
+   "name": "gate.post",
+   "enu": [
+    8.8,
+    1.83,
+    66.0
+   ],
+   "sigma": [
+    0.6,
+    0.07,
+    0.6
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0819",
+    "IMG_0799"
+   ],
+   "res_px": {},
+   "note": "[fix3] the 陸閘 gate pier centre re-solved: IMG_0819 right-edge ray (bearing 235.6 deg; the pier is the strip at the far left, 7 m from the camera) x IMG_0799 bearing 94.5 deg to its SW edge (residuals 0.85 / 0.01 deg); the plaza photos (0806 / 0807, parallel rays at 24-26 m) leave +-1.1 m along the 0819 ray. The old (4.7, 66.4) put a grey box across the whole 0819 view."
+  },
+  {
+   "name": "konbini.pole",
+   "enu": [
+    -39.51,
+    2.38,
+    49.24
+   ],
+   "sigma": [
+    0.2,
+    0.1,
+    0.2
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0829",
+    "IMG_0822"
+   ],
+   "res_px": {},
+   "note": "the 7-Eleven pole sign foot: IMG_0829 (552, 841) x IMG_0822 (721, 1193), rays 0.07 m apart"
+  },
+  {
+   "name": "konbini.sign_bottom",
+   "enu": [
+    -39.51,
+    9.73,
+    49.24
+   ],
+   "sigma": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0829",
+    "IMG_0822"
+   ],
+   "res_px": {},
+   "note": "bottom of the sign panel on the pole (T.P. 9.73; top 12.3, 1.43 m wide)"
+  },
+  {
+   "name": "totem.yuwaeru",
+   "enu": [
+    -26.9,
+    2.4,
+    70.7
+   ],
+   "sigma": [
+    2.5,
+    0.1,
+    2.5
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0830",
+    "IMG_0831"
+   ],
+   "res_px": {},
+   "note": "the 結 totem: bearing 214 deg from the IMG_0830 spot (x 68, far left of the frame) and 217 deg from IMG_0831 (x 823, at the slow-street mouth); range 17 m from its apparent size (54 px x 103 px at 24 mm for a 0.75 x 1.7 m tablet; the row-based cut at T.P. 2.4 said 10.5 m but the front yard is lower)"
+  },
+  {
+   "name": "sign.pole.0832",
+   "enu": [
+    -15.0,
+    2.1,
+    63.0
+   ],
+   "sigma": [
+    0.6,
+    0.1,
+    0.6
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0832"
+   ],
+   "res_px": {},
+   "note": "the road-sign pole foot (ahead-only disc over a school-crossing triangle, top T.P. 5.2), IMG_0832 (338, 1082)"
+  },
+  {
+   "name": "monument.plaque.tl",
+   "enu": [
+    131.483,
+    3.168,
+    64.573
+   ],
+   "sigma": [
+    0.5,
+    0.15,
+    0.5
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0893"
+   ],
+   "res_px": {},
+   "note": "the 港町ブルース plaque frame (1.56 x 0.81 m) top-left corner from IMG_0893 alone (478, 2008): plane 0.29 m behind the plinth face, plinth foot on the 1.9 m paving (see tools/survey/minami_fix2.py)"
+  },
+  {
+   "name": "tree.bleacher#1",
+   "enu": [
+    2.55,
+    4.0,
+    36.1
+   ],
+   "sigma": [
+    1.2,
+    0.3,
+    1.2
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "base of the 6.5 m tree in front of the cage: ray of IMG_0808 (frame 721, 848) cut on the bleacher surface at its tier 3-4 step"
+  },
+  {
+   "name": "tree.bleacher#2",
+   "enu": [
+    3.76,
+    5.05,
+    29.96
+   ],
+   "sigma": [
+    1.5,
+    0.3,
+    1.5
+   ],
+   "method": "cut",
+   "views": [
+    "IMG_0808"
+   ],
+   "res_px": {},
+   "note": "base of the 3.3 m tree on the stair top landing: ray of IMG_0808 (frame 910, 818) cut on the bleacher surface"
+  },
+  {
+   "name": "nw.roof.A",
+   "enu": [
+    -4.104,
+    8.3,
+    75.392
+   ],
+   "sigma": [
+    0.05,
+    0.05,
+    0.05
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0799",
+    "IMG_0823"
+   ],
+   "res_px": {},
+   "note": "[fix3] PIER7 NW pavilion roof: the street tip (apex) of the swept eave, two-view (0.4 px residual)"
+  },
+  {
+   "name": "nw.roof.W",
+   "enu": [
+    6.145,
+    8.8,
+    69.752
+   ],
+   "sigma": [
+    0.1,
+    0.05,
+    0.1
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0907",
+    "IMG_0799",
+    "IMG_0823"
+   ],
+   "res_px": {},
+   "note": "[fix3] the west tip of the swept eave (3 views, 3-6 px)"
+  },
+  {
+   "name": "nw.shop.corner",
+   "enu": [
+    -1.98,
+    3.5,
+    71.37
+   ],
+   "sigma": [
+    0.05,
+    1.0,
+    0.05
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0907",
+    "IMG_0799",
+    "IMG_0823"
+   ],
+   "res_px": {},
+   "note": "[fix3] the 1F shop glass box street / NW corner: a vertical edge from three bearings (0.01 m residual); y is a point on it"
+  },
+  {
+   "name": "nw.shop.glass_end",
+   "enu": [
+    2.29,
+    3.5,
+    69.02
+   ],
+   "sigma": [
+    0.1,
+    1.0,
+    0.1
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0907",
+    "IMG_0799",
+    "IMG_0823"
+   ],
+   "res_px": {},
+   "note": "[fix3] the NW-face glass ends 4.87 m from the corner: the post between glass and plaster"
+  },
+  {
+   "name": "nw.col1.foot",
+   "enu": [
+    -2.19,
+    2.3,
+    76.82
+   ],
+   "sigma": [
+    0.1,
+    0.1,
+    0.1
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0799",
+    "IMG_0823",
+    "IMG_0908"
+   ],
+   "res_px": {},
+   "note": "[fix3] foot of the near column cluster (3 views; heights 2.28 / 2.30 / 2.39)"
+  },
+  {
+   "name": "nw.col2.foot",
+   "enu": [
+    0.29,
+    2.27,
+    81.56
+   ],
+   "sigma": [
+    0.15,
+    0.1,
+    0.15
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0823",
+    "IMG_0908"
+   ],
+   "res_px": {},
+   "note": "[fix3] foot of the far column cluster"
+  },
+  {
+   "name": "nw.studio.L",
+   "enu": [
+    5.69,
+    6.5,
+    72.25
+   ],
+   "sigma": [
+    0.1,
+    1.0,
+    0.1
+   ],
+   "method": "bearings",
+   "views": [
+    "IMG_0907",
+    "IMG_0799",
+    "IMG_0823"
+   ],
+   "res_px": {},
+   "note": "[fix3] the studio glass box NW face end: a vertical edge from three bearings (residual <= 0.06 m)"
+  },
+  {
+   "name": "sign.40",
+   "enu": [
+    -34.76,
+    5.51,
+    50.27
+   ],
+   "sigma": [
+    0.1,
+    0.05,
+    0.1
+   ],
+   "method": "tri",
+   "views": [
+    "IMG_0822",
+    "IMG_0829"
+   ],
+   "res_px": {},
+   "note": "[fix3] the 40 km/h disc at the convenience store kerb (two views, 6 deg apart, 4 px residual)"
   }
  ],
  "dims": [
@@ -990,6 +1353,102 @@
    "value": 2.623,
    "sigma": 0.05,
    "how": "sidewalk T.P. at the face's SE end"
+  },
+  {
+   "name": "ringC.d_out",
+   "value": 5.6,
+   "sigma": 0.4,
+   "how": "outer diameter, IMG_0807 foot arc 5.42 m, IMG_0808 6.2 m, IMG_0801 near edge"
+  },
+  {
+   "name": "ringC.gap_deg",
+   "value": 45.0,
+   "sigma": 6.0,
+   "how": "angular width of the opening in the outer wall (t 147-192 deg), 2.2 m chord"
+  },
+  {
+   "name": "ring.crown_top#C",
+   "value": 5.35,
+   "sigma": 0.3,
+   "how": "crown top T.P. of ring C's tree, IMG_0807 (crown 4.5 m wide, 2.6 m deep)"
+  },
+  {
+   "name": "ring.crown_top#A",
+   "value": 4.7,
+   "sigma": 0.3,
+   "how": "ring A tree crown top, IMG_0803 / 0813 (3.5 m wide)"
+  },
+  {
+   "name": "ring.crown_top#B",
+   "value": 5.1,
+   "sigma": 0.3,
+   "how": "ring B tree crown top, IMG_0803 / 0805 (3.5 m wide)"
+  },
+  {
+   "name": "monument.plaque_w",
+   "value": 1.56,
+   "sigma": 0.1,
+   "how": "IMG_0893: frame 2110 px wide at 4.2 m (f 5622 px)"
+  },
+  {
+   "name": "monument.plaque_h",
+   "value": 0.81,
+   "sigma": 0.06,
+   "how": "IMG_0893: frame 1091 px tall at 4.2 m"
+  },
+  {
+   "name": "monument.plinth_h",
+   "value": 0.46,
+   "sigma": 0.08,
+   "how": "IMG_0893: front face (v 3196 -> 3864) on the 1.9 m paving"
+  },
+  {
+   "name": "pier7.stilt_pitch",
+   "value": 3.5,
+   "sigma": 0.15,
+   "how": "IMG_0817: seven columns fitted on one continuous line along the deck edge (pitch 3.5 m, first 1.2 m from the NW end, mean 0.1 m)"
+  },
+  {
+   "name": "pier7.seam_nw",
+   "value": 2.0,
+   "sigma": 0.6,
+   "how": "along-axis seam NW pavilion / main block: survey cloud main-roof eave starts at s = 2.0"
+  },
+  {
+   "name": "pier7.roof_nw_y",
+   "value": 9.0,
+   "sigma": 0.25,
+   "how": "studio bay-side roof fascia top, IMG_0814 cuts + cloud"
+  },
+  {
+   "name": "nw.slab_y",
+   "value": 5.3,
+   "sigma": 0.1,
+   "how": "[fix3] the shop roof slab top (terrace) from the stair-top / rail cuts in 0908 and 0907"
+  },
+  {
+   "name": "nw.studio_head",
+   "value": 8.0,
+   "sigma": 0.15,
+   "how": "[fix3] the studio glass head (0907 / 0799 triangulation 7.6-8.1)"
+  },
+  {
+   "name": "nw.setback",
+   "value": 4.48,
+   "sigma": 0.2,
+   "how": "[fix3] the studio NW face set back from the shop corner line (fit of the studio silhouette in 0907 / 0799 / 0823, rms 0.04 m)"
+  },
+  {
+   "name": "nw.shop_w",
+   "value": 8.15,
+   "sigma": 0.2,
+   "how": "[fix3] the shop width along its NW face (glass 4.87 m + plaster)"
+  },
+  {
+   "name": "nw.stair_w",
+   "value": 2.4,
+   "sigma": 0.1,
+   "how": "[fix3] the stair width (0908)"
   }
  ]
 }

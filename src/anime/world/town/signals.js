@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { resample } from './common.js';
+import { cwOf, roadLift, crossingRemoved } from './streetlogic.js';   // [sys:12] [sys:13]
 
 const nk = (p) => Math.round(p[0] * 2) + ',' + Math.round(p[1] * 2);
 /** Road graph nodes (shared end points, the same keys as streets.js): Map key -> { x, z, arms: [{ road, end }] } */
@@ -132,7 +133,9 @@ export function buildSignals(ctx, { roads, lotIdx, roadIdx, detail, hero, low = 
     for (let o = -halfW + 0.45; o <= halfW - 0.45; o += 0.9) {
       const cx = x + nx * o, cz = z + nz * o;
       const b = stripes.p.length / 3;
-      for (const [u, v] of [[-0.225, -2], [0.225, -2], [0.225, 2], [-0.225, 2]]) { const px = cx + nx * u + tx * v, pz = cz + nz * u + tz * v; stripes.p.push(px, L.heightAt(px, pz) + 0.075, pz); }
+      // [sys:13] on the road surface: streets.js lays mid asphalt at heightAt + 0.14 (hero 0.05) and its zebras 0.021 above it; at +0.075 every
+      // mid zebra was buried 6.5 cm under the asphalt and showed only as stubs on the pavers
+      for (const [u, v] of [[-0.225, -2], [0.225, -2], [0.225, 2], [-0.225, 2]]) { const px = cx + nx * u + tx * v, pz = cz + nz * u + tz * v; stripes.p.push(px, L.heightAt(px, pz) + roadLift(hero(px, pz)) + 0.021, pz); }
       stripes.i.push(b, b + 2, b + 1, b, b + 3, b + 2);
     }
   };
@@ -150,8 +153,12 @@ export function buildSignals(ctx, { roads, lotIdx, roadIdx, detail, hero, low = 
       const d = dirOf(a), dl = Math.hypot(...d) || 1, tx = d[0] / dl, tz = d[1] / dl;   // out along the arm
       const nx = -tz, nz = tx, hw = a.road.width / 2;
       const onMain = Math.abs((tx * md[0] + tz * md[1]) / ml) > 0.7;
-      // zebra on the arm (mid-zone junctions: streets.js draws the hero ones)
-      if (!hero(n.x, n.z) || a.road.width < 7) zebra(n.x + tx * (R + 3.2), n.z + tz * (R + 3.2), tx, tz, hw - 0.3);
+      // zebra on the arm (mid-zone junctions: streets.js draws the hero ones). [sys:12] It starts 1.5 m past the cross carriageway's edge (not
+      // at the whole road reserve x 0.55 + 3.2) and its bars stop at this arm's carriageway, not on the pavers
+      if (!hero(n.x, n.z) || a.road.width < 7) {
+        const cross = Math.max(0, ...arms.filter((o) => o !== a).map((o) => cwOf(o.road))), dz = cross + 1.5 + 2;
+        zebra(n.x + tx * dz, n.z + tz * dz, tx, tz, cwOf(a.road) - 0.3);
+      }
       // the pole on the kerb to the left of traffic leaving the junction along this arm (left-hand traffic: the
       // far-side signal for drivers coming the other way), 1 m behind the kerb line
       for (const side of [1, -1]) {
@@ -191,11 +198,21 @@ export function buildSignals(ctx, { roads, lotIdx, roadIdx, detail, hero, low = 
     if (!detail(c.x, c.z) || c.kind === 'rail' || c.kind === 'unmarked') continue;
     const road = L.roadById?.(c.roadId); if (!road || road.width < 3) continue;
     if (sigJ.some((n) => Math.hypot(n.x - c.x, n.z - c.z) < 25)) continue;
+    if (crossingRemoved(L.CROSSING_OVR?.removed, c.roadId, c.x, c.z, 8)) continue;   // [sys:14]
     // road tangent at the crossing
     let best = null, bd = 1e9;
     for (let i = 1; i < road.pts.length; i++) { const a = road.pts[i - 1], b = road.pts[i], dx = b[0] - a[0], dz = b[1] - a[1], l2 = dx * dx + dz * dz || 1, t = Math.max(0, Math.min(1, ((c.x - a[0]) * dx + (c.z - a[1]) * dz) / l2)), d = Math.hypot(c.x - a[0] - dx * t, c.z - a[1] - dz * t); if (d < bd) { bd = d; const l = Math.sqrt(l2); best = { x: a[0] + dx * t, z: a[1] + dz * t, tx: dx / l, tz: dz / l }; } }
     if (!best || bd > 6) continue;
-    zebra(best.x, best.z, best.tx, best.tz, road.width / 2 - 0.3); xings++;
+    zebra(best.x, best.z, best.tx, best.tz, cwOf(road) - 0.3); xings++;   // [sys:13] the carriageway, not the whole reserve
+  }
+  // [sys:12] zebras read from the newest imagery (data/anime/overrides `crossings`): the r12500 mid-block crossing, the 市役所 / 鹿折 / 魚市場 junction arms
+  for (const c of L.CROSSING_OVR?.zebras || []) {
+    if (!detail(c.x, c.z)) continue;
+    const road = L.roadById?.(c.road); if (!road || road.width < 3) continue;
+    let best = null, bd = 1e9;
+    for (let i = 1; i < road.pts.length; i++) { const a = road.pts[i - 1], b = road.pts[i], dx = b[0] - a[0], dz = b[1] - a[1], l2 = dx * dx + dz * dz || 1, t = Math.max(0, Math.min(1, ((c.x - a[0]) * dx + (c.z - a[1]) * dz) / l2)), d = Math.hypot(c.x - a[0] - dx * t, c.z - a[1] - dz * t); if (d < bd) { bd = d; const l = Math.sqrt(l2); best = { x: a[0] + dx * t, z: a[1] + dz * t, tx: dx / l, tz: dz / l }; } }
+    if (!best || bd > 8) continue;
+    zebra(best.x, best.z, best.tx, best.tz, cwOf(road) - 0.3); xings++;
   }
   // route shields
   const refRoads = roads.filter((r) => shieldKind(r) && r.width >= 4);

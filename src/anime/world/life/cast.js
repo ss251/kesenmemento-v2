@@ -591,6 +591,10 @@ export function buildCast(ctx, P) {
   const frustum = new THREE.Frustum(), pm = new THREE.Matrix4(), sph = new THREE.Sphere();
   let frame = 0;
   function update(dt, t) {
+    if (ctx.services.playCar?.quiet) {
+      for (const a of actors) for (const hh of a.group || [a.h]) (hh.group || hh).visible = false;
+      return;
+    }
     frame++;
     if (winterQueue.length && (ctx.services.season?.id === 'winter' || isWinter())) winterQueue.shift()();   // [v3:polish] one coat double per frame
     if (cam) { cam.updateMatrixWorld(); pm.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse); frustum.setFromProjectionMatrix(pm); }

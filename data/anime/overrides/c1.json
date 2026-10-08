@@ -46,8 +46,10 @@
   },
   {
    "id": "16/58539/25067/324",
-   "remove": true,
-   "src": "earth: asphalt with parked cars in the car park north-west of the city hall, no building (crops/B_park1.jpg, sheets ABC #42)"
+   "roof": {
+    "color": "#b19d95"
+   },
+   "src": "earth: c1/B top and o0, tan roof at the OSM w929109575 footprint; gsi photo shows the same hip roof"
   },
   {
    "id": "16/58539/25067/338",
@@ -57,7 +59,7 @@
   {
    "id": "16/58539/25067/290",
    "remove": true,
-   "src": "earth: bare brush slope, no roof (sub A top, sheets ABC #23); the teal-roofed house on the GSI photo is gone"
+   "src": "gsi: the teal-roofed footprint of the GSI photo is replaced by ovr:c1:matsuo-house-n (the OSM w929109582 outline), because Earth 2026-03-11 shows a grey hip roof there, not bare brush (sub A top, c1/r1003 top); removed so the old GSI outline is not drawn as a duplicate"
   },
   {
    "id": "16/58539/25067/296",
@@ -121,9 +123,11 @@
   {
    "id": "16/58539/25067/335",
    "roof": {
-    "color": "#b4b4b0"
+    "color": "#b4b4b0",
+    "shape": "gable",
+    "ridge": "z"
    },
-   "src": "earth: light grey flat roof (crops/B_338.jpg, sheets ABC #101)"
+   "src": "earth: light grey flat roof (crops/B_338.jpg, sheets ABC #101) | [r3] roof shape: earth: top view rectified at 12 px/m (round 3 systemic 6): a gable; the derived mono-pitch 'shed' (derive.js resolveRoofShape) is a gable"
   },
   {
    "id": "16/58539/25067/340",
@@ -192,6 +196,54 @@
     "color": "#b8645a"
    },
    "src": "earth: みのり市 has a long salmon-red pitched roof (C/earth_o0.png, sub C top, sheets ABC #156)"
+  },
+  {
+   "id": "16/58539/25068/336",
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (dark scrub beside the 1 CHOME road marking), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2)"
+  },
+  {
+   "id": "16/58539/25067/277",
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (bare scrub slope), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2)"
+  }
+ ],
+ "newLots": [
+  {
+   "id": "ovr:c1:matsuo-house-n",
+   "poly": [
+    [
+     -658.8,
+     -357.7
+    ],
+    [
+     -651.6,
+     -370.6
+    ],
+    [
+     -644.9,
+     -366.8
+    ],
+    [
+     -648.2,
+     -361.1
+    ],
+    [
+     -649.7,
+     -361.9
+    ],
+    [
+     -653.7,
+     -354.9
+    ]
+   ],
+   "kind": "house",
+   "storeys": 1,
+   "roof": {
+    "shape": "hip",
+    "color": "#8a8d96"
+   },
+   "src": "osm: w929109582 + earth: c1/A top (grey hip roof, lit part #868893); GSI shows the same footprint with a teal roof; storeys unverified (OSM has no levels, Earth is 2.5D)"
   }
  ],
  "landuse": [
@@ -391,6 +443,48 @@
    ],
    "replace": true,
    "src": "earth 2026-03-11 (raw/ref/earth/review2-8851/c1-d pair_o0): the OSM park ring of 赤土山自然公園 (© OpenStreetMap contributors) is dark 杉 wood with only a small clearing round the hut, not the mown lawn strip the app drew"
+  },
+  {
+   "use": "felled",
+   "ring": [
+    [
+     -505,
+     -815
+    ],
+    [
+     -490,
+     -826
+    ],
+    [
+     -465,
+     -826
+    ],
+    [
+     -445,
+     -815
+    ],
+    [
+     -440,
+     -790
+    ],
+    [
+     -445,
+     -765
+    ],
+    [
+     -470,
+     -757
+    ],
+    [
+     -492,
+     -760
+    ],
+    [
+     -505,
+     -780
+    ]
+   ],
+   "src": "gsi z18: treeless grass/seedling clearing round ひのでのてらす; earth 2026-03-11 land3/c1 top and o180: open brown low ground, no tall crowns"
   }
  ],
  "roads": [

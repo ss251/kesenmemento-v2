@@ -23,7 +23,7 @@ def enu(lat, lon):
 def photo_index():
     """IMG_xxxx -> {lat, lon, alt, heading, f35, time, batch} over both photo batches (the first batch wins)."""
     out = {}
-    for batch, d in ((1, 'raw/photos-sailesh'), (2, 'raw/photos-sailesh/drive-1003')):
+    for batch, d in ((1, 'raw/author-photos'), (2, 'raw/author-photos/drive-1003')):
         p = os.path.join(ROOT, d, 'index.json')
         if not os.path.exists(p):
             continue

@@ -1,0 +1,39 @@
+{
+  "code": "QEUQ",
+  "seen": "{\"tags\":[\"みずいろのサンマ\"],\"people\":\"2人\",\"cost\":{\"n\":153,\"mean\":0.15686274509809867,\"max\":7}}",
+  "count": "3",
+  "board": "みずいろのサンマ・あなた\nいちばんはやい\n0:05.32\nももいろのサンマ\n0:06.61\n",
+  "cost": "{\"n\":386,\"mean\":0.21761658031088554,\"max\":8}",
+  "lead": {
+    "ok": true,
+    "x": 105.27990105075298,
+    "z": 103.00540516015002,
+    "y": 2.1874838457128787,
+    "yaw": -0.7607726005309796,
+    "active": true,
+    "kind": {
+      "avatar": "hoya",
+      "car": "kei",
+      "gull": "flock",
+      "fish": "fish",
+      "boat": "proxy",
+      "boat1": "proxy"
+    }
+  },
+  "follow": {
+    "ok": true,
+    "x": 99.76719302434431,
+    "z": 108.81118312566,
+    "y": 2.2,
+    "yaw": -0.7590884461445263,
+    "active": true,
+    "kind": {
+      "avatar": "hoya",
+      "car": "kei",
+      "gull": "flock",
+      "fish": "fish",
+      "boat": "proxy",
+      "boat1": "proxy"
+    }
+  }
+}

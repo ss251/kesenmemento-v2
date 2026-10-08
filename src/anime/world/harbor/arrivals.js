@@ -94,27 +94,38 @@ export function wakeTexture(ctx) {   // [v3:polish] shared with traffic.js (the 
   }, { key: 'harbor-wake' });
 }
 
-function labelTexture(ctx, a, sample) {
+const LABEL_COPY = {
+  ja: { due: '予定', in: '入港済み', eta: '入港', prov: '入港予定にもとづく再現', sample: 'サンプル' },
+  en: { due: 'Scheduled', in: 'Berthed', eta: 'ETA', prov: "Re-created from the co-op's arrival schedule", sample: 'Sample' },
+};
+function labelTexture(ctx, a, sample, lang = 'ja', status = 'due') {
   const name = a.vessel;
   const eta = a.time || '';
   const what = [a.catch, a.kg ? `${a.kg >= 1000 ? Math.round(a.kg / 100) / 10 + 't' : a.kg + 'kg'}` : null].filter(Boolean).join(' ');
-  return ctx.tex.draw(512, 160, (g) => {
-    g.clearRect(0, 0, 512, 160);
-    const r = 26, x0 = 8, y0 = 8, w = 496, h = 118;
+  const C = LABEL_COPY[lang] || LABEL_COPY.ja;
+  const W = 512, H = 248;
+  return ctx.tex.draw(W, H, (g) => {
+    g.clearRect(0, 0, W, H);
+    const r = 26, x0 = 8, y0 = 8, w = 496, h = 196;
     g.fillStyle = 'rgba(31,42,68,0.86)';
     g.beginPath(); g.moveTo(x0 + r, y0); g.arcTo(x0 + w, y0, x0 + w, y0 + h, r); g.arcTo(x0 + w, y0 + h, x0, y0 + h, r); g.arcTo(x0, y0 + h, x0, y0, r); g.arcTo(x0, y0, x0 + w, y0, r); g.closePath(); g.fill();
-    // pointer
-    g.beginPath(); g.moveTo(236, y0 + h); g.lineTo(256, 152); g.lineTo(276, y0 + h); g.closePath(); g.fill();
-    g.fillStyle = '#ff7a4a'; g.beginPath(); g.arc(44, 50, 9, 0, 7); g.fill();
+    g.beginPath(); g.moveTo(236, y0 + h); g.lineTo(256, 236); g.lineTo(276, y0 + h); g.closePath(); g.fill();
+    g.fillStyle = '#ff7a4a'; g.beginPath(); g.arc(44, 46, 9, 0, 7); g.fill();
     g.fillStyle = '#f7f2e6'; g.textBaseline = 'middle';
-    g.font = `900 46px ${FONT.serif}`; g.fillText(name, 66, 52, 300);
-    g.font = `700 26px ${FONT.sans}`; g.fillStyle = '#ffd9a0';
-    g.fillText(`入港 ${eta}${what ? '　' + what : ''}`, 30, 102, 452);
+    g.font = `900 42px ${FONT.serif}`; g.fillText(name, 66, 48, 300);
+    g.font = `700 24px ${FONT.sans}`; g.fillStyle = '#ffd9a0';
+    g.fillText(`${C.eta} ${eta}${what ? '　' + what : ''}`, 28, 96, 456);
+    g.fillStyle = status === 'in' ? '#B7282E' : '#F8B500';
+    g.font = `800 22px ${FONT.sans}`;
+    g.fillText(status === 'in' ? C.in : C.due, 28, 132, 200);
+    g.fillStyle = 'rgba(247,242,230,0.82)';
+    g.font = `600 16px ${FONT.sans}`;
+    g.fillText(C.prov, 28, 168, 456);
     if (sample) {
-      g.fillStyle = '#f2c23a'; g.beginPath(); g.roundRect ? g.roundRect(390, 28, 100, 40, 12) : g.rect(390, 28, 100, 40); g.fill();
-      g.fillStyle = '#2b2a33'; g.font = `800 24px ${FONT.sans}`; g.fillText('サンプル', 395, 49, 92);
+      g.fillStyle = '#f2c23a'; g.beginPath(); g.roundRect ? g.roundRect(378, 22, 112, 36, 12) : g.rect(378, 22, 112, 36); g.fill();
+      g.fillStyle = '#2b2a33'; g.font = `800 20px ${FONT.sans}`; g.fillText(C.sample, 390, 41, 96);
     }
-  }, { key: `harbor-label|${name}|${eta}|${what}|${sample ? 1 : 0}` });
+  }, { key: `harbor-label|${name}|${eta}|${what}|${sample ? 1 : 0}|${lang}|${status}` });
 }
 
 /**
@@ -153,6 +164,11 @@ export function planArrivals(list, slots = arrivalSlots()) {
 // from the shore at its bow, midship and stern; if its starboard side has no room, it tries its port side. The offset
 // is chosen once per encounter (latched) from the boat's un-offset route position (bx, bz), and released (eased back
 // to 0 by update()) once she is past. Boats keep the pure stop when they are clear of her lane.
+/** Hours to add to each ETA when the co-op's list is dated after the town's day (tomorrow's 入港予定, published in the evening). */
+export function scheduleShift(portDay, today) {
+  return portDay && today && portDay > today ? 24 : 0;
+}
+
 export const YIELD_R = 120;   // [ship]
 export const YIELD_LANE = { ahead: 400, extra: 10, shift: 25, minShift: 6, shore: 10, ease: 4 };   // [ship] ease: m/s
 const SHIP_HALF = { L: 58.6 / 2, B: 9.2 / 2 };   // [ship] 第一昭福丸 (ship/route.js SHIP_DIMS)
@@ -261,10 +277,10 @@ export function createArrivals(ctx, opts = {}) {
       wake.position.set(0, 0.06, -S.L * 0.36 - wl / 2); wake.renderOrder = 2; wake.name = 'wake';
       ctx.noOutline(wake); carrier.add(wake);
       // label
-      const lm = new THREE.SpriteMaterial({ map: labelTexture(ctx, a, sample), transparent: true, depthWrite: false, toneMapped: false, sizeAttenuation: false });
-      const label = new THREE.Sprite(lm); label.center.set(0.5, 0); label.scale.set(0.2, 0.0625, 1); label.renderOrder = 20; label.name = 'arrival-label';
+      const lm = new THREE.SpriteMaterial({ map: labelTexture(ctx, a, sample, 'ja', 'due'), transparent: true, depthWrite: false, toneMapped: false, sizeAttenuation: false });
+      const label = new THREE.Sprite(lm); label.center.set(0.5, 0); label.scale.set(0.22, 0.106, 1); label.renderOrder = 20; label.name = 'arrival-label';
       ctx.noOutline(label); addToRoot(label);
-      boats.push({ a, h, si, type, S, route, carrier, group: b.group, wake, label, detail, lod: true, handle: b.anchors.lightHandle, air: (b.dims.air || 14) + 6, phase: 'sea', x: 0, z: 0 });
+      boats.push({ a, h, si, type, S, route, carrier, group: b.group, wake, label, detail, lod: true, handle: b.anchors.lightHandle, air: (b.dims.air || 14) + 6, phase: 'sea', x: 0, z: 0, sample, labelLang: 'ja', labelStatus: 'due' });
     }
     stats.boats = boats.length; stats.built += boats.length; stats.ms = Math.round(performance.now() - t0);
     clock.lastH = null;
@@ -273,20 +289,34 @@ export function createArrivals(ctx, opts = {}) {
   }
 
   const _q = new THREE.Vector3();
-  let lastT = 0;
+  let lastT = 0, langAcc = 1, uiLang = 'ja';
+  function readLang() {
+    try {
+      const q = new URLSearchParams(location.search).get('lang');
+      if (q === 'en' || q === 'ja') return q;
+      const s = localStorage.getItem('klc.lang');
+      if (s === 'en' || s === 'ja') return s;
+    } catch { /* ja */ }
+    return 'ja';
+  }
   function update(dt, t) {
+    langAcc += dt || 0;
+    if (langAcc >= 1) { langAcc = 0; uiLang = readLang(); }
     lastT = t;
     const H = hoursNow();
+    // The co-op publishes tomorrow's 入港予定 in the evening. Those boats have not arrived yet.
+    const shift = scheduleShift(ctx.services?.arrivals?.date, ctx.services?.time?.date);
     if (clock.lastH == null || Math.abs(H - clock.lastH) > 1e-5) { clock.lastH = H; clock.t0 = t; }
     const A0 = H + ((t - clock.t0) * RATE) / 3600;            // the arrival clock (hours)   // [ship] A0: per boat A below
     const cam = ctx.camera?.position;
     for (const b of boats) {
       const A = A0 - (b.delay || 0) / 3600;                  // [ship] this boat's clock, less the time it held for the ship
-      const tau = (b.h - A) * 3600;                          // seconds until berthed
+      const bh = b.h + shift;
+      const tau = (bh - A) * 3600;                          // seconds until berthed
       const R = b.route;
       let phase, dist;                                        // dist = metres still to go
       const dw = dwellFor(b.h);   // [v3:fix] berthed until the end of the day
-      if (A > b.h + dw || A < b.h - (Math.min(APPROACH, R.len) + (SPEED * EASE) / 2) / SPEED / 3600) phase = A > b.h + dw ? 'gone' : 'sea';
+      if (A > bh + dw || A < bh - (Math.min(APPROACH, R.len) + (SPEED * EASE) / 2) / SPEED / 3600) phase = A > bh + dw ? 'gone' : 'sea';
       else if (tau > 0) { phase = 'approach'; dist = tau > EASE ? SPEED * (tau - EASE / 2) : (SPEED * tau * tau) / (2 * EASE); }
       else { phase = 'berthed'; dist = 0; }
       b.phase = phase;
@@ -319,7 +349,12 @@ export function createArrivals(ctx, opts = {}) {
       // approaching boats are always named; berthed ones only up close (no clutter over the market from high up)
       const far = phase === 'approach' ? 4200 : 900;
       // [v3:fix] the name label follows a boat in and through its first two hours at the quay (boats now stay all day)
-      b.label.visible = LABELS_ON() && d > 18 && d < far && (phase === 'approach' || A < b.h + 2.0);   // [v3:fix] off in stills (?labels=0)
+      const status = phase === 'berthed' ? 'in' : 'due';
+      if (b.labelLang !== uiLang || b.labelStatus !== status) {
+        b.labelLang = uiLang; b.labelStatus = status;
+        b.label.material.map = labelTexture(ctx, b.a, b.sample, uiLang, status);
+      }
+      b.label.visible = LABELS_ON() && d > 18 && d < far && (phase === 'approach' || A < bh + 2.0);   // [v3:fix] off in stills (?labels=0)
       b.label.position.copy(_q);
       b.label.position.y += (b.route.berth.row === 1 ? 9 : 0) * Math.min(1, d / 300);
       b.label.material.opacity = Math.min(1, (far - d) / 300) * Math.min(1, (d - 18) / 30);

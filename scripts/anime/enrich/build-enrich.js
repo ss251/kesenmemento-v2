@@ -12,7 +12,7 @@ import { ROOT } from "../../terrain/tiles.js";
 import { CACHE } from "../vt.js";
 import { polyArea, simplify } from "../derive.js";
 import { OSM_FILE, OSM_META } from "./fetch-osm.js";
-import { parseOsm, parseLevels, parseHeight, parseColour, roofShapeOf, kindFromTags, LANDUSE_ORDER, ringArea, pointInRing } from "./osm.js";
+import { parseOsm, parseLevels, parseHeight, parseColour, roofShapeOf, kindFromTags, LANDUSE_ORDER, ringArea, pointInRing, PRECINCT_FIX } from "./osm.js";
 import { parseAnno } from "./anno.js";
 import { FootIndex, matchBuildings, assignPoints, biggestNear } from "./match.js";
 import { TileRaster, analyzeRoof, roofClass } from "./aerial.js";
@@ -98,6 +98,10 @@ export async function buildEnrich({ log = console.error, forceAerial = false } =
     for (const i of index.query(b[0], b[1], b[2], b[3])) {
       const c = feats[i].c;
       if (!pointInRing(c[0], c[1], st.ring) || st.holes.some((h) => pointInRing(c[0], c[1], h))) continue;
+      // [r3:13] a clipped hill-sized precinct (osm.js PRECINCT_FIX) names only the footprints that carry one of its OSM building ids or lie within `near` m of the hall; the rest of the
+      // compound's footprints are houses and keep their own kind
+      const fx = PRECINCT_FIX[st.osm];
+      if (fx && !(fx.keepOsm.includes(bm.get(i)?.osm) || fx.at.some((p) => Math.hypot(c[0] - p[0], c[1] - p[1]) <= fx.near))) continue;
       const prev = siteAt.get(i);
       if (!prev || ringArea(st.ring) < ringArea(prev.ring)) siteAt.set(i, st);   // the smallest site wins (a school inside a park)
     }
@@ -185,7 +189,7 @@ export async function buildEnrich({ log = console.error, forceAerial = false } =
   };
   log("enrich ms", Math.round(performance.now() - t0));   // (not in the file: the output stays byte-identical between runs)
   return {
-    version: 1, generated: "scripts/anime/enrich/build-enrich.js", osmBase: osmMeta.osmBase ?? null, attribution: "© OpenStreetMap contributors (ODbL); 出典：国土地理院（地理院タイル）を加工して作成",
+    version: 1, generated: "scripts/anime/enrich/build-enrich.js", osmBase: osmMeta.osmBase ?? null, osmFetched: osmMeta.fetched ?? null, attribution: "© OpenStreetMap contributors (ODbL); 出典：国土地理院（地理院タイル）を加工して作成",
     sources: SOURCES.map((s) => s.id),
     lots: { fields: FIELDS, rows },
     landuse, rivers, riverAreas, roads, pois,
@@ -193,6 +197,9 @@ export async function buildEnrich({ log = console.error, forceAerial = false } =
     signals: O.signals.filter(inCity), crossings: O.crossings.filter((c) => inCity(c.p)), trees: O.trees.filter((t) => inCity(t.p)),
     rail: O.rail.filter((r) => r.pts.some(inCity)).map((r) => ({ ...r, pts: simplify(r.pts, 0.5).map(P1) })),
     bridges: O.bridges.filter((b) => b.pts.some(inCity) && b.name).map((b) => ({ osm: b.osm, name: b.name, kind: b.kind, pts: b.pts.map(P1) })),
+    // [sys:17] bus stops (OSM highway=bus_stop / public_transport=platform nodes, and the stop_positions on BRT ways) and the ways a bus route runs on
+    busStops: O.busStops.filter((b) => inCity(b.p)).map((b) => ({ ...b, p: P1(b.p) })),
+    busWays: O.busWays.filter((w) => w.pts.some(inCity)).map((w) => ({ osm: w.osm, hw: w.hw, pts: simplify(w.pts, 0.5).map(P1) })),
     stats,
   };
 }
@@ -202,6 +209,6 @@ if (import.meta.main) {
   const E = await buildEnrich({ forceAerial: process.argv.includes("--aerial") });
   const txt = JSON.stringify(E);
   await Bun.write(ENRICH_FILE, txt);
-  await Bun.write(join(ROOT, "data/anime/sources.json"), JSON.stringify({ generated: "scripts/anime/enrich/sources.js", osmBase: E.osmBase, sources: SOURCES }, null, 1) + "\n");
+  await Bun.write(join(ROOT, "data/anime/sources.json"), JSON.stringify({ generated: "scripts/anime/enrich/sources.js", osmBase: E.osmBase, osmFetched: E.osmFetched ?? null, sources: SOURCES }, null, 1) + "\n");
   console.log(JSON.stringify({ ok: true, bytes: txt.length, stats: E.stats }, null, 1));
 }

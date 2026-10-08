@@ -45,7 +45,7 @@
    },
    "dwell": 9,
    "blurb": {
-    "ja": "気仙沼の街の始まりの場所。港町の暮らしは、この穏やかな内湾に面して広がってきました。",
+    "ja": "気仙沼の町の始まりの場所。港町の暮らしは、この穏やかな内湾に面して広がってきました。",
     "en": "Where Kesennuma began: the port town grew up around this calm inner bay."
    }
   },
@@ -109,7 +109,7 @@
    },
    "dwell": 7,
    "blurb": {
-    "ja": "ここで撮影したのは、ガラスの下に広がる内湾の街の模型。その模型が、実物大の街への入口になります。",
+    "ja": "ここで撮影したのは、ガラスの下に広がる内湾の町の模型。その模型が、実物大の町への入口になります。",
     "en": "Captured here: a scale model of the inner-bay district under glass. The model is the doorway into the full-size city."
    }
   },
@@ -141,7 +141,7 @@
    },
    "dwell": 8,
    "blurb": {
-    "ja": "三陸沿岸道路の斜張橋。湾の入口をまたぎ、夜は街の新しい目印になります。",
+    "ja": "三陸沿岸道路の斜張橋。湾の入口をまたぎ、夜は町の新しい目印になります。",
     "en": "The cable-stayed bridge of the Sanriku coastal expressway, striding across the mouth of the bay."
    }
   },
@@ -239,7 +239,7 @@
    },
    "dwell": 9,
    "blurb": {
-    "ja": "リアス海岸の唐桑半島。上空から、湾と街の全体が見えてきます。",
+    "ja": "リアス海岸の唐桑半島。上空から、湾と町の全体が見えてきます。",
     "en": "The ria coast of the Karakuwa peninsula, with the whole bay and city beyond."
    },
    "vantage": true
@@ -404,7 +404,7 @@
   "title": {
    "from": 26.6,
    "fade": 1.4,
-   "ja": "気仙沼 リビングシティ",
+   "ja": "気仙沼リビングシティ",
    "en": "Kesennuma Living City"
   }
  }

@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "cell": "c4-c9-rivers",
+  "bbox": [-700, -800, 1300, 1000],
+  "note": "round 3, rivers (c9 大川 x -690..-510 z 660..960, c4 鹿折川 x 990..1040 z -700..-420). The river water colour is not a layout value: it is the per-channel-name table RIVER_TONE in src/anime/world/town/rivers.js (大川 deep #4a5a60 / mid #55666b / edge #66767a; 鹿折川 deep #2f4658 / mid #3a566a / edge #4a6678; the mouth blend fades to the same river tone, not to the default #4f8fab). This file carries no layout operation; it records the evidence. Earth 2026-03-11 from above reads 大川 as muddy grey-green (L* 37 a* 0 b* -7) and 鹿折川 as dark slate (L* 31 b* -16), the 鹿折川 mouth as navy like the bay; the default harbour blues rendered L* 47 b* -32 / -33.",
+  "sources": [
+    { "id": "earth", "what": "Google Earth, imagery dated 2026-03-11 (raw/ref/earth/land3/c9/pair_top.jpg, raw/ref/earth/land3/c4/pair_top.jpg, raw/ref/earth/land3/c4/pair_l45.jpg, raw/ref/earth/land3/bridges_2.png, raw/ref/earth/land3/cityscape2_0.png)", "date": "2026-03-11" }
+  ]
+}

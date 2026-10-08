@@ -138,13 +138,13 @@ describe("7. night", () => {
 describe("8. 朝 06:30 is clear and warm", () => {
   test("the 06:30 keyframe", () => {
     const p = skyPaletteAt(6.5);
-    // [v3:polish3] cooler zenith, pink horizon, pearl fog (+ a low mist in the composite): 朝 must not read as 16:30
-    expect(hex(p.zenith)).toBe("#5f8fcf");
-    expect(hex(p.horizon)).toBe("#f5cdbf");
-    expect(hex(p.warm)).toBe("#ffc9ae");
-    expect(hex(p.fog)).toBe("#e8d8dc");
-    expect(p.sunI).toBeCloseTo(2.5, 5);
-    expect(p.leak).toBeCloseTo(0.55, 5);
+    // [live r2] clear blue overhead, a pale warm horizon, no pearl fog. 朝 matches 09:00's clarity.
+    expect(hex(p.zenith)).toBe("#3f86d8");
+    expect(hex(p.horizon)).toBe("#efe0c8");
+    expect(hex(p.warm)).toBe("#ffd2a4");
+    expect(hex(p.fog)).toBe("#d3e0ee");
+    expect(p.sunI).toBeCloseTo(2.32, 5);
+    expect(p.leak).toBeCloseTo(0.38, 5);
   });
 });
 

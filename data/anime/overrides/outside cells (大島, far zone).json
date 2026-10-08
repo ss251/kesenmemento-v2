@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "cell": "outside-oshima-far",
+  "bbox": [
+    3830,
+    6490,
+    3970,
+    7090
+  ],
+  "note": "outside the 12 cells: two 大島 public buildings of the far zone, round 3 (崎浜保育所 at 3940,7050 and 大島総合開発センター at 3892,6531). Both were derived as tall blocks (3 storeys: the far lots have no measured height) and both are low buildings on Commons photos of 2024-12-01. The far builder draws one oriented box with one roof per lot, so what the photos show beyond a box, a roof shape and colours (the nursery's three connected gables, the centre's balcony railing, roof-deck mesh rail and west hip-roof wing) is NOT drawn and is not claimed here. The Earth 2026-03-11 top view was not re-measured for this round (it gives plan shapes, never heights).",
+  "sources": [
+    {
+      "id": "commons-nursery",
+      "what": "Wikimedia Commons 156292092 Sakihama Nursery School (raw/ref/commons, reference only): one storey, low-pitch blue-grey metal roofs in three connected gables, cream board walls; about 4.2 m to the eaves, 6 m to the ridge",
+      "date": "2024-12-01"
+    },
+    {
+      "id": "commons-center",
+      "what": "Wikimedia Commons 156347709 Oshima Development General Center (raw/ref/commons, reference only): 2 storeys, about 8 m with the parapet, grey-beige weathered concrete walls, flat roof with a roof deck",
+      "date": "2024-12-01"
+    },
+    {
+      "id": "gsi",
+      "what": "GSI footprints in layout.json (基盤地図情報): the lot outlines (nursery 398 m2, centre 955 m2); their storeys and heights are derived, not measured",
+      "date": "2020-01-01"
+    }
+  ],
+  "lots": [
+    {
+      "id": "16/58549/25083/31",
+      "kind": "public",
+      "storeys": 1,
+      "height": 4.3,
+      "roof": {
+        "shape": "gable",
+        "color": "#8fa9bd",
+        "ridge": "x"
+      },
+      "wall": "#e6dcc6",
+      "src": "commons-nursery: 156292092 (2024-12-01) single-storey nursery, low-pitch blue-grey metal roofs, cream board walls, about 4.2 m to the eaves (height is to the eaves; the gable adds the ridge on top, about 6 m). Drawn as ONE gable on the oriented box: the photo's three connected gables, the blue deck and the sand play ring are not drawn (the far builder has one box and one roof per lot)"
+    },
+    {
+      "id": "16/58549/25082/21",
+      "kind": "public",
+      "storeys": 2,
+      "height": 8.0,
+      "wall": "#c8c4b8",
+      "roof": {
+        "shape": "flat",
+        "color": "#9c9890"
+      },
+      "src": "commons-center: 156347709 (2024-12-01) 2-storey concrete building, about 8 m including the parapet, grey-beige weathered walls, flat roof. Not drawn: the first-floor balcony with a white railing, the 1.1 m roof-deck mesh rail (no rail feature on a far lot) and the low hip-roof tile wing on the west (no measured footprint, so no newLot)"
+    }
+  ]
+}

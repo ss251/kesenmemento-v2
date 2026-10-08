@@ -232,31 +232,19 @@ export function makeStreetTextures(ctx) {
 
   const grate = null;   // [v3:town] unused in Kesennuma (canvas budget)
 
-  // ------------------------------------------------------------------ tactile blocks (0.3 m), yellow
+  // ------------------------------------------------------------------ tactile blocks (0.3 m). [r3:9] pale beige-grey: the Earth 2026-03-11 corner pixels read #b8aca5 (L 63.5, b* 7.9) and #9e968a (L 68, b* 8.8), not the Sakura mustard yellow (b* 65)
   const dots = T.draw(256, 256, (g, w, h) => {
-    g.fillStyle = '#e2bb4d'; g.fillRect(0, 0, w, h);
-    speckle(g, 0, 0, w, h, 700, ['rgba(180,140,50,0.25)', 'rgba(250,225,140,0.25)']);
+    g.fillStyle = '#b3a99a'; g.fillRect(0, 0, w, h);
+    speckle(g, 0, 0, w, h, 700, ['rgba(130,120,104,0.25)', 'rgba(222,214,200,0.25)']);
     for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) {
       const x = 26 + i * 51, y = 26 + j * 51;
-      g.fillStyle = 'rgba(150,112,30,0.55)'; circle(g, x + 2.5, y + 3.5, 16);
-      g.fillStyle = '#eecb5c'; circle(g, x, y, 15);
-      g.fillStyle = 'rgba(255,238,170,0.8)'; circle(g, x - 4, y - 5, 5.5);
+      g.fillStyle = 'rgba(104,96,84,0.5)'; circle(g, x + 2.5, y + 3.5, 16);
+      g.fillStyle = '#bdb3a4'; circle(g, x, y, 15);
+      g.fillStyle = 'rgba(232,226,214,0.7)'; circle(g, x - 4, y - 5, 5.5);
     }
-    g.fillStyle = 'rgba(140,110,40,0.75)'; g.fillRect(0, 0, w, 3); g.fillRect(0, 0, 3, h);
+    g.fillStyle = 'rgba(100,92,80,0.7)'; g.fillRect(0, 0, w, 3); g.fillRect(0, 0, 3, h);
     for (let i = 0; i < 10; i++) { g.fillStyle = `rgba(110,96,70,${0.06 + R() * 0.08})`; ellipse(g, R() * w, R() * h, 10 + R() * 30, 8 + R() * 20, R() * 3); }
   }, { key: 'st-dots', repeat: [1, 1] });
-  const bars = T.draw(256, 256, (g, w, h) => {
-    g.fillStyle = '#e2bb4d'; g.fillRect(0, 0, w, h);
-    speckle(g, 0, 0, w, h, 700, ['rgba(180,140,50,0.25)', 'rgba(250,225,140,0.25)']);
-    for (let i = 0; i < 4; i++) {
-      const x = 22 + i * 64;
-      g.fillStyle = 'rgba(150,112,30,0.55)'; T.roundRect(g, x + 3, 18, 30, 226, 14); g.fill();
-      g.fillStyle = '#eecb5c'; T.roundRect(g, x, 14, 28, 226, 14); g.fill();
-      g.fillStyle = 'rgba(255,238,170,0.75)'; g.fillRect(x + 5, 24, 6, 200);
-    }
-    g.fillStyle = 'rgba(140,110,40,0.75)'; g.fillRect(0, 0, w, 3); g.fillRect(0, 0, 3, h);
-    for (let i = 0; i < 10; i++) { g.fillStyle = `rgba(110,96,70,${0.06 + R() * 0.08})`; ellipse(g, R() * w, R() * h, 10 + R() * 30, 8 + R() * 20, R() * 3); }
-  }, { key: 'st-bars', repeat: [1, 1] });
 
   // ------------------------------------------------------------------ worn road paint (tileable both ways, 0.8 m tile)
   const line = T.draw(512, 512, (g, w, h) => {
@@ -572,5 +560,5 @@ export function makeStreetTextures(ctx) {
     for (const k of Object.keys(SIGN)) { if (k === 'back' || k === 'pole') continue; const c = SIGN[k]; speckle(g, c.x, c.y, c.w, c.h, c.w * c.h / 90, ['rgba(120,118,120,0.12)', 'rgba(255,255,255,0.12)'], 0.6, 1.5); }
   }, { key: 'st-signs', anisotropy: 8 });
 
-  return { asphalt, pavers, curb, lgutter, lid, grate, dots, bars, line, paint, glyphs, util, signs };
+  return { asphalt, pavers, curb, lgutter, lid, grate, dots, line, paint, glyphs, util, signs };
 }

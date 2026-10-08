@@ -56,14 +56,14 @@ describe("phone: tier selection", () => {
 
 describe("phone: budgets of the tier", () => {
   const q = qualityPreset("phone", { dpr: 3, touch: true });
-  test("render settings: no MSAA, pixel ratio <= 1.5, small shadow map, 512 px canvases", () => {
+  test("render settings: no MSAA, pixel ratio <= 1.5, a 2048 shadow map at most, 512 px canvases", () => {
     expect(q.phone).toBe(true);
     expect(q.name).toBe("low");   // every low-tier branch applies too
     expect(q.tier).toBe("phone");
     expect(q.msaa).toBe(0);
     expect(q.pixelRatio).toBeGreaterThanOrEqual(1);
     expect(q.pixelRatio).toBeLessThanOrEqual(1.5);
-    expect(q.shadowMap).toBeLessThanOrEqual(1024);
+    expect(q.shadowMap).toBeLessThanOrEqual(2048);   // [mobile-perf] 2048 since 2026-10-08 (the image-quality pass: the drone's shadows were half-metre texels at 1024; the memory budget has room)
     expect(q.shadowMax).toBeLessThanOrEqual(300);
     expect(PHONE.canvasMax).toBeLessThanOrEqual(512);
     expect(PHONE.atlasPage).toBeLessThanOrEqual(2048);

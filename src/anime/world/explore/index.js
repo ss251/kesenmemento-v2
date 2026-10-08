@@ -12,7 +12,7 @@ import { makeRoadNet } from './roadnet.js';
 import { createDrive } from './drive.js';
 import { createBaseMap } from './basemap.js';
 import { createSearch } from './search.js';
-import { createLabels, LABEL_KINDS } from './labels.js';
+import { createLabels, LABEL_KINDS, labelsDefault } from './labels.js';
 import { mountExploreUI } from './ui.js';
 import { EXTRA_PLACES, placeStops, droneFraming, walkFraming, topAt, makeTreeAt } from './places.js';
 import { buildInteriors } from './interiors.js';
@@ -138,6 +138,11 @@ export async function build(ctx) {
   } catch (e) { fail('story', e); }
   const featured = shipPlace.concat(tourFeat).concat(lmStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'landmarks' })), exStops.map((s) => ({ id: s.id, ja: s.ja, en: s.en, cat: s.cat, at: s.at, group: 'places' })));
   featured.splice(shipPlace.length, 0, ...storyFeat);   // [ship:story] the story group right after the boarding entry
+  featured.splice(shipPlace.length + storyFeat.length, 0, {   // [ippon] 第五凪丸, after the story pins. The action closes over the service, which mounts later.
+    id: 'ippon-daigo-nagi', ja: '第五凪丸に乗る', en: 'Board the Daigo Nagi Maru', cat: 'ship', group: 'ship',
+    groupLabel: { ja: '船に乗る', en: 'Go to sea' }, at: [566.8, 656.2],
+    action: () => ctx.services.ippon?.board(),
+  });
   const search = createSearch(L, { featured, near: () => { const p = drive?.active ? drive.state : cam.position; return [p.x, p.z]; } });
   api.search = search;
   const places = {
@@ -166,7 +171,19 @@ export async function build(ctx) {
     // [v4:integrate] buildings occlude; [v4:polish1] at most 10 on the low tier and on a portrait screen (the phone's
     // labels overlapped), re-read on resize
     const portrait = () => typeof innerWidth !== 'undefined' && innerHeight > innerWidth;
-    const labels = createLabels(ctx, { items, max: 26, maxNow: () => (ctx.quality?.name === 'low' || portrait() ? 10 : 26), lotAt });
+    // [mobile] ambient labels are off on phones by default (labels.js labelsDefault); the pinned label of a place you search or pick still shows.
+    // ?labels=1|0 and the ☰ 地名ラベル toggle (hud.js, api.setAmbientLabels) override it, remembered on the device in klc.labels.
+    const mobile = !!ctx.quality?.phone || (typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches);
+    let ambient = true, labelsRef = null;
+    try {
+      const st = typeof localStorage !== 'undefined' ? localStorage : null;
+      const d = labelsDefault({ mobile, search: typeof location !== 'undefined' ? location.search : '', stored: st?.getItem('klc.labels') ?? null });
+      ambient = d.on; if (d.persist) st?.setItem('klc.labels', d.persist);
+    } catch { ambient = !mobile; }
+    const labels = createLabels(ctx, { items, max: 26, maxNow: () => (ambient ? (ctx.quality?.name === 'low' || portrait() ? 10 : 26) : (labelsRef?.pinned ? 1 : 0)), lotAt });
+    labelsRef = labels;
+    api.setAmbientLabels = (on) => { ambient = !!on; try { localStorage.setItem('klc.labels', ambient ? '1' : '0'); } catch { /* private mode */ } return ambient; };
+    Object.defineProperty(api, 'ambientLabels', { get: () => ambient, configurable: true });
     if (SHOT) document.body.classList.add('shotui');
     const ui = mountExploreUI(ctx, { life, drive, net, bm, labels, places, search, force: SHOT });
     api.labels = labels; api.ui = ui; api.basemap = bm;

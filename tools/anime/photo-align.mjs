@@ -171,10 +171,11 @@ async function main() {
     const page = await browser.page({ width: W0, height: H0 });
     const first = list[0];
     const look0 = args.look && args.look !== 'auto' ? args.look : lookFor(first.date, first.hours);
-    const q = new URLSearchParams({ shot: '1', w: String(W0), h: String(H0), t: '0', q: args.q || 'high', fov: '60', hours: String(first.hours) });
+    const q = new URLSearchParams({ shot: '1', nocast: '1', w: String(W0), h: String(H0), t: '0', q: args.q || 'high', fov: '60', hours: String(first.hours) });
     if (look0 !== 'none') q.set('look', look0); else q.set('weather', 'clear');
     await page.goto(`${srv.url}index.html?${q}`);
     await page.waitFor('window.__ready === true', { timeout: 280000 });
+    if (area === 'market') await page.eval('void window.__harbor?.setArrivals?.([])');   // [v6:fix1] the survey compares the static scene: the live arrival boats berth on the very quay the dawn frames look at
     let curLook = look0;
     for (const { p, s, W, H } of frames) {
       if (W !== W0 || H !== H0) throw new Error('mixed aspect ratios in one run: align them in separate runs (--only)');
@@ -193,6 +194,10 @@ async function main() {
         cam.updateProjectionMatrix();
         window.__alignPose = { P, Q };
       })()`);
+      // [v6:fix3] objects that were not there when this photo was taken (cameras.json `absent`: scene object names, e.g. the truck that drove in after
+      // IMG_0853 / 0854): hidden for this frame only. The scene objects must be unbatched (ctx.noBatch) to be found by name.
+      const absentNames = JSON.stringify(p.absent || []);
+      await page.eval(`(() => { const names = ${absentNames}, hid = []; if (names.length) window.__ctx.scene.traverse((o) => { if (names.includes(o.name) && o.visible) { o.visible = false; hid.push(o); } }); window.__hiddenAbsent = hid; })()`);
       await page.frames(10);
       // re-pin (a module may have moved the camera in its update) and render a few more frames
       await page.eval(`(() => { const c = window.__ctx.camera, A = window.__alignPose; c.position.set(...A.P); c.quaternion.set(...A.Q); c.updateMatrixWorld(true); })()`);
@@ -217,6 +222,7 @@ async function main() {
         return { W, H, e: btoa(s) };
       })()`);
       if (ndB64.W !== W || ndB64.H !== H) throw new Error(`pre-pass ${ndB64.W}x${ndB64.H} != frame ${W}x${H}`);
+      await page.eval('(() => { for (const o of window.__hiddenAbsent || []) o.visible = true; window.__hiddenAbsent = []; })()');
       const appEdges = Uint8Array.from(Buffer.from(ndB64.e, 'base64'));
       // the photo: full resolution, undistorted to the pinhole frame
       const srcPath = join(ROOT, p.file);
@@ -232,6 +238,18 @@ async function main() {
       const label = (txt) => Buffer.from(`<svg width="${W}" height="36"><rect width="100%" height="36" fill="rgba(0,0,0,0.6)"/><text x="10" y="25" font-size="18" font-family="Helvetica" fill="#fff">${txt}</text></svg>`);
       const head = `${p.id}  ${p.f35} mm  ENU (${p.position[0].toFixed(1)}, ${p.position[1].toFixed(1)}, ${p.position[2].toFixed(1)})  yaw ${p.euler.yaw.toFixed(1)}`;
       await sharp(ov, { raw: { width: W, height: H, channels: 3 } }).composite([{ input: label(`${head}  chamfer ${ch.mean?.toFixed(1)} / p90 ${ch.p90?.toFixed(1)} px [${tag}]`), left: 0, top: H - 36 }]).jpeg({ quality: 88 }).toFile(join(OUT, `overlay_${p.id}.jpg`));
+      if (args.dump) {   // [v6:fix2] --dump: per-pixel analysis maps for offline breakdowns (R = app edge, G = distance to the nearest photo edge x 4 (clipped), B = photo edge; gitignored with the overlays)
+        const dt = edt(photoEdges, W, H), dm = Buffer.alloc(W * H * 3);
+        for (let i = 0; i < W * H; i++) { dm[i * 3] = appEdges[i] && und.valid[i] ? 255 : 0; dm[i * 3 + 1] = Math.min(255, Math.round(dt[i] * 4)); dm[i * 3 + 2] = photoEdges[i] ? 255 : 0; }
+        await sharp(dm, { raw: { width: W, height: H, channels: 3 } }).png().toFile(join(OUT, `edges_${p.id}.png`));
+      }
+      if (args.heat) {   // [v6:fix1] --heat: the app's edges coloured by their distance to the nearest photo edge (green < 4 px, yellow < 12, red beyond) on the dimmed photo
+        const dt = edt(photoEdges, W, H), hm = Buffer.from(und.data); for (let i = 0; i < hm.length; i++) hm[i] = hm[i] >> 1;
+        for (let i = 0; i < W * H; i++) if (appEdges[i] && und.valid[i]) { const d = dt[i], c = d < 4 ? [0, 220, 0] : d < 12 ? [255, 220, 0] : [255, 40, 40]; for (let dx = 0; dx < 2; dx++) { const j = Math.min(W * H - 1, i + dx) * 3; hm[j] = c[0]; hm[j + 1] = c[1]; hm[j + 2] = c[2]; } }
+        await sharp(hm, { raw: { width: W, height: H, channels: 3 } }).jpeg({ quality: 88 }).toFile(join(OUT, `heat_${p.id}.jpg`));
+        const bands = [0, 280, 440, 600, 1000, H + 1], acc = bands.slice(1).map(() => ({ n: 0, s: 0 })); for (let i = 0; i < W * H; i++) if (appEdges[i] && und.valid[i]) { const y = (i / W) | 0, b = bands.findIndex((v, k) => y >= v && y < bands[k + 1]); acc[b].n++; acc[b].s += dt[i]; }
+        console.log('  bands (rows ' + bands.slice(0, -1).join('/') + '): ' + acc.map((a) => `${a.n}px@${(a.s / Math.max(1, a.n)).toFixed(1)}`).join('  '));
+      }
       const ph = await sharp(und.data, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
       const ap = await sharp(app).resize(W, H).png().toBuffer();
       await sharp({ create: { width: W * 2, height: H, channels: 3, background: '#000' } }).composite([{ input: ph, left: 0, top: 0 }, { input: ap, left: W, top: 0 }, { input: label(`${head}  (photo undistorted | app, same camera)`), left: 0, top: H - 36 }]).jpeg({ quality: 86 }).toFile(join(OUT, `pair_${p.id}.jpg`));

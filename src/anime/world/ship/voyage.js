@@ -112,6 +112,12 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
   function homeYaw(s) { const a = outbound.at(s + 12), b = outbound.at(Math.max(0, s - 12)); return Math.atan2(b.x - a.x, b.z - a.z); }
   function berthHome() { V.home = true; rig.set(BERTH.x, BERTH.z, HOME_YAW); rig.bob(0, 0, 0); }
   const quaySide = () => (BERTH.side === 'port' ? 1 : -1) * (V.home ? -1 : 1);
+  /** [integrate:fix] how the visitor came aboard (walking or flying, and the hour): 町へ戻る gives both back (it left her flying over the quay at the homecoming's 14:30). */
+  function remember() {
+    if (V.prior) return;
+    const pl = ctx.playerObj, T = ctx.services?.time;
+    V.prior = { fly: pl ? !!pl.fly : false, hours: Number.isFinite(T?.hours) ? T.hours : null };
+  }
   function holdPlayer(x, z) {
     const pl = ctx.playerObj; if (!pl) return;
     pl.enabled = false; pl.fly = true;
@@ -384,6 +390,7 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
     setAuto(on) { auto = !!on; },
     sendoff, ocean, ui, rig, TIMING,
     start() {
+      remember();
       V.active = true; V.toasts.clear();
       ctx.services?.life?.tour?.stop?.();
       enter(acts.state, null);
@@ -398,13 +405,20 @@ export function createVoyage(ctx, { ship, sail = null, route, livery = 'fallback
       berth(); ship.setFlags?.(true);
       ui?.hide();
       const pl = ctx.playerObj;
-      if (pl) { pl.enabled = typeof document !== 'undefined' ? (document.body?.classList?.contains('playing') ?? true) : true; pl.fly = true; }
+      if (pl) {
+        pl.enabled = typeof document !== 'undefined' ? (document.body?.classList?.contains('playing') ?? true) : true;
+        // back on the quay the way she came aboard: on foot (the default) or hovering over it; and the hour she boarded at
+        const yawDeg = (BERTH.yaw + Math.PI / 2) * 180 / Math.PI;
+        if (V.prior?.fly) { pl.fly = true; pl.setPose?.(BERTH.quay[0], BERTH.quay[1], yawDeg, -10, 18); } else { pl.fly = false; pl.setPose?.(BERTH.quay[0], BERTH.quay[1], yawDeg, 0); }
+      }
+      if (V.prior?.hours != null) hours(V.prior.hours);
+      V.prior = null;
       V.cam = null;
     },
     send, action, horn, keep, release,
     /** Jump straight to a state (shots and tests): the machine is fast-forwarded legally, then that scene entered. */
     jump(target, { keep: nKeep = Infinity, fishOnScale = false } = {}) {
-      if (!V.active) { V.active = true; }
+      if (!V.active) { remember(); V.active = true; }
       if (ocean.active && ACT_OF[target] !== 2 && !['TRANSSHIP_LAS_PALMAS', 'REEFER', 'SHIMIZU_WEIGH'].includes(target)) ocean.exit();
       if (sail?.active) sail.exit();
       sendoff.dispose();

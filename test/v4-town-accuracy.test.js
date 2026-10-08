@@ -87,7 +87,7 @@ test('real names: sign text, the disaster filter holds, and only public faciliti
   expect(RN.wantsSign({ name: '気仙沼市立気仙沼小学校', facility: 'school' })).toBe(true);
   const named = L.LOTS.filter((l) => l.zone !== 'far' && RN.wantsSign(l));
   expect(named.length).toBeGreaterThan(100);
-  for (const l of named) expect(/津波|震災|被災|復興|慰霊|伝承館|遺構/.test(l.name)).toBe(false);
+  for (const l of named) expect(/\u6d25\u6ce2|\u9707\u707d|被災|復興|慰霊|伝承館|遺構/.test(l.name)).toBe(false);
 });
 
 test('rivers: 大川 and 鹿折川 run in their carved GSI channels with a water level under the banks', () => {

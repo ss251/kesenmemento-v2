@@ -433,35 +433,37 @@ function makeDecalAtlas(ctx) {
 export function makeHouseMaterials(ctx, tex) {
   const { mat } = ctx;
   const vc = (map, extra = {}) => mat.toon('#ffffff', { vertexColors: true, map, paint: 0.05, ...extra });
+  // [r3:7] roofs, walls and facades keep their green in the early-spring preset (klcSnowMix's dormant tan is for ground: lawn, soil, gravel, asphalt, paver)
+  const vb = (map, extra = {}) => vc(map, { noDormant: true, ...extra });
   const M = {
-    plain: vc(null, { paint: 0.05 }),
-    plainLow: vc(null, { paint: 0.02 }),
-    plaster: vc(tex.plaster, { paint: 0.06 }),
-    siding: vc(tex.siding, { paint: 0.04 }),
-    tile: vc(tex.tile, { paint: 0.04 }),
-    wood: vc(tex.wood, { paint: 0.05 }),
-    block: vc(tex.block, { paint: 0.06 }),
-    concrete: vc(tex.concrete, { paint: 0.06 }),
-    kawara: vc(tex.kawara, { paint: 0.05 }),
-    kawaraEdge: vc(tex.kawaraEdge, { paint: 0.03 }),
-    ridge: vc(tex.ridge, { paint: 0.04 }),
-    metal: vc(tex.metal, { paint: 0.04 }),
-    shutter: vc(tex.shutter, { paint: 0.03 }),
+    plain: vb(null, { paint: 0.05 }),
+    plainLow: vb(null, { paint: 0.02 }),
+    plaster: vb(tex.plaster, { paint: 0.06 }),
+    siding: vb(tex.siding, { paint: 0.04 }),
+    tile: vb(tex.tile, { paint: 0.04 }),
+    wood: vb(tex.wood, { paint: 0.05 }),
+    block: vb(tex.block, { paint: 0.06 }),
+    concrete: vb(tex.concrete, { paint: 0.06 }),
+    kawara: vb(tex.kawara, { paint: 0.05 }),
+    kawaraEdge: vb(tex.kawaraEdge, { paint: 0.03 }),
+    ridge: vb(tex.ridge, { paint: 0.04 }),
+    metal: vb(tex.metal, { paint: 0.04 }),
+    shutter: vb(tex.shutter, { paint: 0.03 }),
     gravel: vc(tex.gravel, { paint: 0.05 }),
     asphalt: vc(tex.asphalt, { paint: 0.06 }),
     lawn: vc(tex.lawn, { paint: 0.08 }),
     soil: vc(tex.soil, { paint: 0.06 }),
     paver: vc(tex.paver, { paint: 0.04 }),
-    atlas: vc(tex.atlas.texture, { paint: 0.02 }),
-    atlasCut: mat.toon('#ffffff', { vertexColors: true, map: tex.atlas.texture, alphaTest: 0.5, side: 'double', paint: 0.02 }),
+    atlas: vb(tex.atlas.texture, { paint: 0.02 }),
+    atlasCut: mat.toon('#ffffff', { vertexColors: true, map: tex.atlas.texture, alphaTest: 0.5, side: 'double', paint: 0.02, noDormant: true }),
     decal: mat.decal('#ffffff', { map: tex.decal.texture, vertexColors: true, transparent: true }),
     glass: mat.glass({ tint: '#8fa6bb', opacity: 0.38 }),
     frost: mat.glass({ tint: '#b9c4cc', opacity: 0.5, frost: true, streaks: false }),
-    poly: mat.toon('#dfe6ea', { transparent: true, opacity: 0.55, side: 'double', depthWrite: false, paint: 0.0 }), // polycarbonate roofs
+    poly: mat.toon('#dfe6ea', { transparent: true, opacity: 0.55, side: 'double', depthWrite: false, paint: 0.0, noDormant: true }), // polycarbonate roofs
     lamp: mat.emissive('#ffd9a0', 1.25),
     lampDim: mat.emissive('#ffe2b8', 0.95),
-    farWall: mat.toon('#ffffff', { map: tex.far, paint: 0.04 }),
-    farPlain: mat.toon('#ffffff', { paint: 0.04 }),
+    farWall: mat.toon('#ffffff', { map: tex.far, paint: 0.04, noDormant: true }),
+    farPlain: mat.toon('#ffffff', { paint: 0.04, noDormant: true }),
   };
   return M;
 }

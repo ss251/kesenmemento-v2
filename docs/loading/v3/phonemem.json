@@ -1,0 +1,190 @@
+{
+ "url": "http://127.0.0.1:9437/index.html?fixtures=1&poster=hiru",
+ "desktop": false,
+ "heapcap": null,
+ "crashed": false,
+ "firstFrameMs": 8354,
+ "started": null,
+ "heapPeakMB": 542,
+ "heapPolledPeakMB": 368,
+ "heapModulePeakMB": 542,
+ "heapSettledMB": 215,
+ "heapTotalPeakMB": 419,
+ "heapAfterGcMB": 137,
+ "q": "low",
+ "tier": "phone",
+ "pixelRatio": 1.25,
+ "msaa": 0,
+ "shadowMap": 1024,
+ "canvas": [
+  390,
+  844
+ ],
+ "bench": {
+  "ms": 3.9,
+  "calls": 538,
+  "triangles": 3870112.6666666665,
+  "meanCalls": 568,
+  "meanTriangles": 4145669,
+  "maxCalls": 687,
+  "maxTriangles": 5247892.666666666,
+  "geometries": 263,
+  "textures": 115,
+  "programs": 142
+ },
+ "texMB": 215,
+ "texCount": 142,
+ "atlas": {
+  "pages": 6,
+  "mb": 118.4,
+  "tiles": 285
+ },
+ "atlases": [
+  {
+   "root": "explore-interiors",
+   "tiles": 15,
+   "pages": "1856x1408",
+   "mb": 13.9
+  },
+  {
+   "root": "static",
+   "tiles": 285,
+   "pages": "1600x1600 2048x2048 2048x1984 2048x1920 1984x1984 1920x1856",
+   "mb": 118.4
+  },
+  {
+   "root": "boat:maguro:51喜福丸",
+   "tiles": 3,
+   "pages": "704x256",
+   "mb": 1
+  },
+  {
+   "root": "boat:maguro:38勇仁丸",
+   "tiles": 3,
+   "pages": "704x256",
+   "mb": 1
+  },
+  {
+   "root": "boat:katsuo:18清龍丸",
+   "tiles": 6,
+   "pages": "960x384",
+   "mb": 2
+  },
+  {
+   "root": "boat:katsuo:21愛宕丸",
+   "tiles": 6,
+   "pages": "960x384",
+   "mb": 2
+  }
+ ],
+ "bigTex": [
+  [
+   "CANVAS",
+   2048,
+   2048,
+   22
+  ],
+  [
+   "CANVAS",
+   2048,
+   1984,
+   22
+  ],
+  [
+   "CANVAS",
+   1984,
+   1984,
+   21
+  ],
+  [
+   "CANVAS",
+   2048,
+   1920,
+   21
+  ],
+  [
+   "CANVAS",
+   1920,
+   1856,
+   19
+  ],
+  [
+   "CANVAS",
+   1856,
+   1408,
+   14
+  ],
+  [
+   "CANVAS",
+   1600,
+   1600,
+   14
+  ],
+  [
+   "CANVAS",
+   2048,
+   1024,
+   11
+  ]
+ ],
+ "geoMB": 202,
+ "geoCpuMB": 71,
+ "modules": {
+  "environment": {
+   "ms": 224,
+   "objects": 3,
+   "tris": 367313,
+   "heapMB": 142
+  },
+  "water": {
+   "ms": 33,
+   "objects": 1,
+   "tris": 7200,
+   "heapMB": 166
+  },
+  "town": {
+   "ms": 1297,
+   "objects": 13,
+   "tris": 892243,
+   "heapMB": 280
+  },
+  "harbor": {
+   "ms": 668,
+   "objects": 497,
+   "tris": 822811,
+   "heapMB": 352
+  },
+  "landmarks": {
+   "ms": 427,
+   "objects": 13,
+   "tris": 172586,
+   "heapMB": 410
+  },
+  "life": {
+   "ms": 205,
+   "objects": 22,
+   "tris": 105384,
+   "heapMB": 446
+  },
+  "ship": {
+   "ms": 54,
+   "objects": 2,
+   "tris": 10998,
+   "heapMB": 437
+  },
+  "explore": {
+   "ms": 792,
+   "objects": 3,
+   "tris": 413815,
+   "heapMB": 542
+  }
+ },
+ "errors": 0,
+ "lots": 50817,
+ "pageErrors": [
+  {
+   "type": "log-error",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9437/api/live?fixtures=1"
+  }
+ ]
+}

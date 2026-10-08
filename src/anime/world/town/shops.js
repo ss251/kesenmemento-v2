@@ -104,7 +104,7 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
       card(SM.tops, signs.topOf('posters').rect, -inner / 2 + 0.55, fy + 1.45, zg + 0.03, 0.5, 0.5);
     }
     // fascia board
-    HF.box(M.plain, s.board[0], w + 0.02, fasciaH, 0.14, 0, fasciaY0 + fasciaH / 2, zF + 0.05);
+    HF.box(M.plain, real?.charcoal ? '#2f3133' : s.board[0], w + 0.02, fasciaH, 0.14, 0, fasciaY0 + fasciaH / 2, zF + 0.05);
     boardCard(0, fasciaY0 + fasciaH / 2, zF + 0.125, Math.min(w - 0.2, fasciaH * 4.2), Math.min(fasciaH - 0.08, (w - 0.2) / 4));
     if (s.awning && style !== 'shutter') awning(H, HF, SM, awn, shopIdx, inner, fasciaY0 - 0.02, zF + 0.1, style === 'cafe' ? 1.4 : 1.1);
   } else if (style === 'wa') {
@@ -142,7 +142,7 @@ export function buildShop(H, HF, S, shopIdx, SM, signs, awn, r, out) {
   } else {
     // 'open': rolled-up shutter box, no glass, display tables stepping out onto the pavement
     HF.box(M.plain, '#9aa1a8', inner + 0.1, 0.34, 0.4, 0, fasciaY0 + 0.1, zF - 0.02);
-    HF.box(M.plain, s.board[0], w + 0.02, fasciaH, 0.14, 0, fasciaY0 + fasciaH / 2 + 0.1, zF + 0.05);
+    HF.box(M.plain, real?.charcoal ? '#2f3133' : s.board[0], w + 0.02, fasciaH, 0.14, 0, fasciaY0 + fasciaH / 2 + 0.1, zF + 0.05);
     boardCard(0, fasciaY0 + fasciaH / 2 + 0.1, zF + 0.125, Math.min(w - 0.2, fasciaH * 4.2), Math.min(fasciaH - 0.08, (w - 0.2) / 4));
     if (s.awning) awning(H, HF, SM, awn, shopIdx, inner, fasciaY0, zF + 0.1, 1.6);
     const topKind = s.interior === 'fish' ? pick(r, ['fishTray', 'fishTray2']) : s.interior === 'veg' ? 'vegCrate' : s.interior === 'dry' ? 'dryBags' : s.interior === 'flower' ? 'flowers' : 'boxes';

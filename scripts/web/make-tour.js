@@ -17,7 +17,7 @@ function cam({ lat, lon, alt, back, bearing, lookY = 0, lookAt, pos }) {
 const stops = [
   { id: "bay", ja: "内湾", en: "The inner bay", lat: 38.905, lon: 141.575, splat: null,
     cam: cam({ lat: 38.9045, lon: 141.5795, alt: 120, back: 520, bearing: 45 }),
-    blurb: { ja: "港町の中心、気仙沼の内湾。震災後に再建された岸壁と街並みが、静かな水面を囲みます。",
+    blurb: { ja: "港町の中心、気仙沼の内湾。岸壁と街並みが、静かな水面を囲みます。",
              en: "The heart of the port town. Rebuilt quays and streets wrap around the calm water of the inner bay." } },
   { id: "market", ja: "気仙沼市魚市場", en: "Kesennuma Fish Market", lat: 38.912, lon: 141.577, splat: null,
     cam: cam({ lat: 38.912, lon: 141.5775, alt: 80, back: 420, bearing: 345, lookY: 4 }),
@@ -37,11 +37,11 @@ const stops = [
              en: "Opened in 2019, this arch bridge linked Oshima island to the mainland by road for the first time." } },
   { id: "anba", ja: "安波山展望", en: "Anbasan lookout", lat: 38.918, lon: 141.566, splat: null,
     cam: cam({ lookAt: [38.905, 141.578], pos: [38.918, 141.566, 247], lookY: 0 }),
-    blurb: { ja: "標高239m。「安らかな波」を願って名付けられた山から、港と街を一望します。",
+    blurb: { ja: "標高239m。「安らかな波」を願って名付けられた山から、港と町を一望します。",
              en: "239 m high, named for the wish for calm waves. The whole harbour and town lie below." } },
   { id: "karakuwa", ja: "唐桑半島", en: "Karakuwa Peninsula", lat: 38.87, lon: 141.655, splat: null,
     cam: cam({ lookAt: [38.892, 141.61], pos: [38.852, 141.672, 900], lookY: 0 }),
-    blurb: { ja: "リアス海岸の岬が続く唐桑半島。上空から、湾と街の全体が見渡せます。",
+    blurb: { ja: "リアス海岸の岬が続く唐桑半島。上空から、湾と町の全体が見渡せます。",
              en: "The rugged ria coast of the Karakuwa Peninsula. From above, the whole bay and city open up behind." } },
 ];
 

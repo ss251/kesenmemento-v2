@@ -51,7 +51,7 @@ const SHOTS = [
   ['a3_home_approach', `__voyageShot('HOMECOMING')`, 12],
   ['a3_home', `__voyageShot('HOMECOMING')`, 27],
   ['a3_card', `__voyageShot('CARD')`, 0.5],
-  // [ship] the Usui next pass (docs/ship/Usui's public talk (2026-10-03)): the Shimizu inspection, the closing line and the facts
+  // [ship] the talk-notes pass: the Shimizu inspection, the closing line and the facts
   // panel, in Japanese and in English (the 船のデータ / EN buttons of the voyage UI)
   ['a1_facts', `(__voyageShot('DOCKED'), __shipFacts(true), 'ok')`, 1],
   ['a3_shimizu_en', `(__voyageShot('SHIMIZU_WEIGH'), __shipFacts(false), __shipLang('en'), 'ok')`, 0.5],

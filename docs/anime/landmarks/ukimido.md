@@ -21,7 +21,7 @@
   - The rails are vermilion. This walkway is the 「海上に作られた赤い遊歩道」 of the city page.
   - It runs from the west-side quay around the tip past the pavilion and up the east side. The ortho shows it as a thin
     red-brown band hugging the rocks, about 2 to 2.5 m wide.
-  - The inner-bay scale model displayed in PIER7 (raw/photos IMG_0582, IMG_0598) shows the same **red rim around the
+  - The inner-bay scale model displayed in PIER7 (photos, not included) shows the same **red rim around the
     whole tip** of the peninsula.
   - It is **not** a straight pier from the shore to a pavilion standing out in the sea.
 - History: built in **1932 (昭和7年) by young volunteers of 魚町**, and rebuilt between June 2019 and **May 2020
@@ -50,7 +50,7 @@ A plaque 浮見堂 under the eave (existing app detail; plausible, not verified 
 - Search summary of kesennuma-kanko and 4travel (built 1932 by 魚町 youth, rebuilt June 2019 to May 2020): https://4travel.jp/dm_shisetsu_tips/14364637
 - https://tanji-sendai.blog.jp/archives/shinmei-zaki.kesennuma.html (朱塗りの四阿, the 2020 恵比寿像 with a カツオ)
 - https://4travel.jp/dm_shisetsu/11340236 (「浮見堂という遊歩道が巡っていて」, red fences along the shore)
-- raw/photos IMG_0582, IMG_0598 (the inner-bay scale model in PIER7)
+- photos of the inner-bay scale model in PIER7 (not included)
 - GSI seamlessphoto z18; OSM node 7580455850 (恵比寿像). Crops: `ortho/ukimido.jpg`, `ortho/shinmeizaki.jpg`
 
 ## In the app

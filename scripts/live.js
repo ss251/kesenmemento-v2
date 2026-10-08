@@ -24,6 +24,7 @@ import { JMA, resolveStation, mapStamp, parseObservation, parseForecast, toWeath
 import { TIDE, parseTideTable, toTideState } from "./live/tide.js";
 import { skyState } from "./live/sky.js";
 import { toJst } from "../src/web/lib/solar.js";
+import { aisBlock, ingestRequest } from "../src/server/ais.js";
 
 export const FIXTURE_DIR = join(ROOT, "scripts/live/fixtures");
 const fx = (name) => readFileSync(join(FIXTURE_DIR, name));
@@ -99,16 +100,20 @@ async function portBlock(force) {
 /** Build the whole state. opts.fixtures forces the saved sample; opts.now sets the instant (sun, tide). */
 export async function buildState({ now = new Date(), fixtures = false } = {}) {
   const { ymd, hours } = toJst(now);
-  const [weather, tide, port] = await Promise.all([weatherBlock(hours, fixtures), tideBlock(ymd, hours, fixtures), portBlock(fixtures)]);
+  const [weather, tide, port, ais] = await Promise.all([
+    weatherBlock(hours, fixtures), tideBlock(ymd, hours, fixtures), portBlock(fixtures),
+    aisBlock().catch(() => null),
+  ]);
   const { sun, moon } = skyState(ymd, hours);
   const origins = { weather: weather.origin, tide: tide?.origin ?? "none", port: port.origin };
   const sample = Object.values(origins).includes("fixture");
+  const aisPack = ais || { vessels: [], source: "openwaters", attribution: [], coverage: "empty", fetchedAt: null };
   return {
     v: 2, updated: new Date().toISOString(), at: now.toISOString(), date: ymd, hours: +hours.toFixed(4),
     sample, fixture: sample && Object.values(origins).every((o) => o === "fixture" || o === "none"), origins,
     sampleNote: sample ? FIXTURE_INFO.note : null,
-    sun, moon, weather, tide, port,
-    credits: ["気象庁（アメダス・天気予報・潮位表）", "気仙沼漁業協同組合（入船情報）"],
+    sun, moon, weather, tide, port, ais: aisPack,
+    credits: ["気象庁（アメダス・天気予報・潮位表）", "気仙沼漁業協同組合（入船情報）", ...aisPack.attribution],
   };
 }
 
@@ -124,7 +129,13 @@ const send = (obj, maxAge = 30) => new Response(JSON.stringify(obj), { headers: 
 /** serve.js hook: a Response for /api/live and /api/live/*, null for anything else. */
 export async function liveRoutes(req) {
   const url = new URL(req.url);
-  if (!/^\/api\/live(\/|$)/.test(url.pathname) || req.method !== "GET" && req.method !== "HEAD") return null;
+  if (!/^\/api\/live(\/|$)/.test(url.pathname)) return null;
+  if (req.method === "POST" && url.pathname === "/api/live/ais") {
+    const r = await ingestRequest(req);
+    if (r.status === 200) memo = null;
+    return r;
+  }
+  if (req.method !== "GET" && req.method !== "HEAD") return null;
   const fixtures = url.searchParams.get("fixtures") === "1";
   const at = url.searchParams.get("at");
   const sub = url.pathname.replace(/^\/api\/live\/?/, "");

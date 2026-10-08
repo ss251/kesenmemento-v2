@@ -111,3 +111,9 @@ glazed corner from T.P. 5.62, café RST, the oval, Lander Blue / SHARKS at their
 surveyed coping corners (8.67 m SE face, coping T.P. 14.83, 6.2 m deep); the SE deck at the floor level with four steps and
 the 迎 totem at its triangulated glyph (1.6 m); the 20-riser composite stair; the bay terrace now 3 m deep, meeting the white
 mesh cage, which carries the terrace on along its 21.3 m (see the plaza in `docs/anime/survey/minami.md`).
+
+## [v6:finish] Final survey numbers (2026-10-04)
+
+迎 / ANCHOR face, fascia heights, the glazed corner, the oval, the totems and the SE deck are among the 62 plaza features that now sit within 0.16 m of the survey (mean 0.035 m;
+`data/survey/minami/diff.json`). The ANCHOR letters carry the photo's 102 px pitch (x 1.05 over the old letter spacing); IMG_0911 / 0912 stay at 17-21 px chamfer (wing roofs, cars, wires),
+and the 「nine one」 2F bay lettering is still partly hidden by the NW external stair's landing in 0913. Procedure and tools: `docs/anime/SURVEY.md`.

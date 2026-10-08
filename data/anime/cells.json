@@ -130,6 +130,26 @@
    ],
    "ja": "大浦",
    "note": "v5 accuracy sweep cell (data/anime/overrides/c12.json; docs/shots/v5_cells/c12.jpg)"
+  },
+  "kameyama": {
+   "bbox": [
+    3640,
+    3560,
+    4060,
+    3960
+   ],
+   "ja": "亀山（モノレール）",
+   "note": "outside the 12 cells: the 亀山 monorail from the 駐車場駅 to the 山頂駅 and its clear-cut swath (data/anime/overrides/outside cells (亀山, 大島).json; raw/ref/earth/lm/lm-kameyama)"
+  },
+  "asahi": {
+   "bbox": [
+    1040,
+    1450,
+    1560,
+    1810
+   ],
+   "ja": "朝日町 商港岸壁・湾横断橋南主塔",
+   "note": "outside the 12 cells: the finished 商港岸壁 apron around the south pylon of the かなえ大橋 (data/anime/overrides/outside cells (朝日町 商港岸壁, south pylon of 気仙沼湾横断橋).json; raw/ref/earth/lm/lm-kanae, vfy-asahi-w)"
   }
  }
 }

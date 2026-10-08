@@ -52,6 +52,7 @@ export function sagPts(a, b, sag, n = 10) {
 export function poseGroup(pose = {}, name = '') {
   const g = new THREE.Group(); g.name = name;
   g.position.set(pose.x || 0, pose.y || 0, pose.z || 0); g.rotation.y = pose.rotY || 0;
+  if (pose.scale != null) { if (Array.isArray(pose.scale)) g.scale.set(...pose.scale); else g.scale.setScalar(pose.scale); }   // [v6:c8c12r3] a hull drawn smaller than its type (the east-shore boat yards)
   return g;
 }
 

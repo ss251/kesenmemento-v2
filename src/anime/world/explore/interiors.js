@@ -17,11 +17,16 @@
 //   tasting counter (kesennuma-kanko.jp/otokoyama-new2020, tohokukanko.jp). Its lot (explore/taken.js) is left out by
 //   town. The brewery's own labels (蒼天伝, 美禄, 男山) are on its shelves.
 //
+//   café RST (cafe-rst.js): the roastery café on the 1F of 迎 (ムカエル), with Lander Blue's shark goods in the same room,
+//   built from the project owner's own walk-through video and the surveyed ANCHOR face; the shop's consent and credit are
+//   in that module (CAFE_RST_CONSENT, CAFE_RST_CREDIT). 迎 is a harbor landmark, not a town lot: nothing is taken from town.
+//
 // Interiors are lit like the shop rooms: their surfaces ignore the building's own shadow (the roof would otherwise put
 // every room in the dark band of the cel ramp).
 import * as THREE from 'three';
 import { SITES } from '../harbor/real.js';
 import { EXPLORE_LOTS } from './taken.js';
+import { buildCafeRst, ENABLED as CAFE_RST_ENABLED } from './cafe-rst.js';   // [cafe-rst]
 
 const med = (a) => { const s = a.slice().sort((x, y) => x - y); return s[s.length >> 1]; };
 
@@ -504,7 +509,10 @@ function buildOtokoyama(ctx, root) {
 export function buildInteriors(ctx, { inLot = () => false } = {}) {
   const root = new THREE.Group(); root.name = 'explore-interiors';
   const out = { list: [] };
-  for (const [k, fn] of [['marketC', buildMarketC], ['otokoyama', buildOtokoyama]]) {
+  const KIT = { frame, person, textTex };   // [cafe-rst] the shared placement frame, figure and texture helper for the sibling module
+  const builders = [['marketC', buildMarketC], ['otokoyama', buildOtokoyama]];
+  if (CAFE_RST_ENABLED) builders.push(['cafeRst', (c, r) => buildCafeRst(c, r, KIT)]);
+  for (const [k, fn] of builders) {
     try { const r = fn(ctx, root); if (r) { out[k] = r; out.list.push(r); } } catch (e) { console.warn('[explore] interior', k, e); out[k + 'Error'] = String(e); }
   }
   ctx.addStatic(root);
@@ -520,6 +528,8 @@ export function buildInteriors(ctx, { inLot = () => false } = {}) {
   if (ol) boxes.push({ id: 'otokoyama', cx: ol.obb.cx, cz: ol.obb.cz, w: ol.obb.w, d: ol.obb.d, ux: Math.sin(ol.obb.rotY), uz: Math.cos(ol.obb.rotY), y0: -5, y1: oy.top + 1.5 });
   const mc = out.marketC?.bounds;
   if (mc) { const [a0, a1] = mc.x, [b0, b1] = mc.z, c = Math.cos(mc.rotY), s2 = Math.sin(mc.rotY); boxes.push({ id: 'marketC', local: (x, z) => { const dx = x - mc.O[0], dz = z - mc.O[1]; const lx = dx * c - dz * s2, lz = dx * s2 + dz * c; return lx > a0 && lx < a1 && lz > b0 && lz < b1; }, y0: -5, y1: (out.marketC.y2 || 10) + 8 }); }
+  const cr = out.cafeRst?.bounds;   // [cafe-rst] the room: a quad in the frame of the ANCHOR face
+  if (cr) boxes.push({ id: 'cafeRst', local: cr.local, y0: cr.y0, y1: cr.y1 });
   const hb = st?.hallBox;
   if (hb) boxes.push({ id: 'station', cx: hb.cx, cz: hb.cz, w: hb.w, d: hb.d, ux: hb.ux, uz: hb.uz, y0: hb.y0, y1: hb.y1 });
   out.boxes = boxes;

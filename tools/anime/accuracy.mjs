@@ -1,6 +1,11 @@
 // [v4:town-accuracy] Automated accuracy audit (V3-SPEC section 10): the app, rendered straight down with an orthographic
 // camera, against the real town.
 //
+// [r3:19] COVERAGE. The headline numbers below are scored inside the audit REGION only: the default `core` is the mid-zone disc (1.1 km round (250, 150)), so the accuracy cells c4 (59 of 126 lots), c12 (28 of 44),
+// c9 (242 of 308) and c1 (159 of 160) are partly measured. `cells[id].coverage` (accuracy.json) gives, per cell of data/anime/cells.json, the footprint count and area inside the cell and the share of them
+// that was scored (inside the region AND inside a rendered tile), plus the IoU / recall of the pixels inside the cell's bbox; `coveredShare` (top level, and in buildings / roofs / roads / heights) is that share over
+// all the cells. The core-disc headline stays, labelled `core-only`. To measure the rest run `--region ortho` (the whole core.jpg footprint, about 81 tiles: once, as its own --tag) or `--region ortho --tiles "x,z;x,z"`
+// (`--tiles` alone is still masked by the core disc), for example two 500 m tiles per 500 x 600 m cell: c4 (1050,-550) (1050,-250), c12 (1050,650) (1050,950), c9 (-450,650) (-450,950), plus one for the rest of c1.
 //   tools/anime/gate.sh chrome env -u NODE_OPTIONS bun tools/anime/accuracy.mjs --port 8824 [--region core|ortho]
 //        [--res 0.5] [--tile 500] [--out dist/qa4] [--nobuild] [--tag before] [--tiles "x,z;x,z"] [--saveraw 1]
 //
@@ -22,7 +27,14 @@
 //                        same against the colour the layout assigns (no lighting)
 //   roads.recall / iou   OSM centre-line pixels covered by rendered asphalt; rendered asphalt vs OSM ways buffered by
 //                        their width (width tag, lanes x 3 m, else the class default)
-//   landmarks            the app's position of each reference landmark and the error in metres
+//   landmarks            the app's position of each reference landmark and the error in metres. [sys:27] landmarks.lotTagged is the old number: the lot whose
+//                        polygon holds the reference point and the distance to it, 0 m by construction (polygon and point come from the same OSM / GSI
+//                        outline): a data-tagging check, not a position error, and no longer in under5m. landmarks.buildings scores the RENDER: for each
+//                        building landmark (not PIER7, 迎, 海の市: the photo survey's), a 160 m height mask round its OSM outline: recall, precision (the
+//                        outline dilated 6 m), IoU and the centroid error; it fails below IoU 0.7 or above 5 m.
+//   buildings            [sys:28] iou is against the OVERRIDE-CORRECTED truth (the GSI footprints without the lots an override removes, plus the override newLots);
+//                        selfConsistency is the raw GSI one. roofs.gsi is the legacy colour check against the GSI photo; roofs.earth holds the held-out Earth 2026
+//                        colours (non-override lots) and the fit residual (override lots); heights.byRef.override is the render against the intended override height.
 //   heights              rendered roof height vs OSM height / building:levels, the landmark sheets and lotfix.js [v4:polish1]
 // Side-by-side images: dist/qa4/side_<tile>.jpg (photo | render | coverage diff: grey both, red missed, blue extra) and
 // dist/qa4/mosaic_{photo,render,diff}.jpg over the whole region at 2 m/px.
@@ -30,7 +42,9 @@ import { join, resolve } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import sharp from 'sharp';
 import { build, serve, launch, ROOT } from './cdp.mjs';
-import { fillRing, stampLine, lab, dE2000 } from './accuracy-lib.mjs';
+import { fillRing, stampLine, lab, dE2000, landmarkScore, cellIdAt, cellCoverage, shareOf } from './accuracy-lib.mjs';   // [r3:19]
+import { loadOverrides, compileOverrides, OVERRIDES_DIR } from '../../scripts/anime/enrich/fold.js';   // [sys:28]
+import { OSM as OSM_SITES } from '../../src/anime/world/landmarks/sites.js';   // [sys:27]
 
 const args = {};
 for (let i = 2; i < process.argv.length; i++) { const a = process.argv[i]; if (a.startsWith('--')) { const k = a.slice(2); const v = process.argv[i + 1] !== undefined && !process.argv[i + 1].startsWith('--') ? process.argv[++i] : '1'; args[k] = v; } }
@@ -171,6 +185,8 @@ const ref = Object.fromEntries(lmRef.map((l) => [l.id, l]));
 const LOT_REFS = { pier7: ref.pier7?.enu, mukaeru: ref.mukaeru?.enu, uminoichi: ref.uminoichi?.enu, cityHall: ref['city-hall']?.main, station: ref['kesennuma-station']?.enu, riasArk: ref['rias-ark']?.enu,
   cityHospital: ref.hospitals?.cityHospital, otomo: ref.hospitals?.otomo };   // building centroids (the school refs are campus centres: not a building position)
 
+/** [sys:27] the OSM outlines of the building landmarks the render is scored on (not PIER7, 迎, 海の市: the photo survey's) */
+const LM_OUTLINES = { cityHall: OSM_SITES.cityHall, station: OSM_SITES.station, riasArk: OSM_SITES.riasArk, cityHospital: OSM_SITES.cityHospital, otomo: OSM_SITES.otomo };
 const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 const med = (a) => { if (!a.length) return NaN; const s = Float64Array.from(a).sort(); return s[s.length >> 1]; };
 const pct = (a, p) => { if (!a.length) return NaN; const s = Float64Array.from(a).sort(); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
@@ -221,7 +237,7 @@ if (!args.nobuild) {
   console.log(`build ${r.reused ? 'FAILED (reused the last good build)' : 'ok'} ${r.ms ?? ''} ms`);
 }
 const srv = serve({ port, dist: join(ROOT, `dist/anime-${port}`) });
-const renders = new Map(), masks = new Map(), lmRenders = new Map();
+const renders = new Map(), masks = new Map(), lmRenders = new Map(), lmMasks = new Map();
 const LM_SIZE = 200;
 /** the landmark side-by-sides (English captions: the SVG text renderer has no Japanese glyphs) */
 const LM_SHOTS = [
@@ -273,6 +289,15 @@ try {
       const m = await page.eval(`window.__acc.mask(${t.cx}, ${t.cz}, ${TILE}, ${PX})`);
       masks.set(t.id, { h: new Uint8Array(Buffer.from(m.h, 'base64')), road: new Uint8Array(Buffer.from(m.road, 'base64')) });
     }
+    // [sys:27] a 160 m mask at 0.5 m round the centroid of each building landmark's OSM outline (three of them lie outside the core disc, so the
+    // 500 m tile masks are not reused)
+    for (const [id, o] of Object.entries(LM_OUTLINES)) {
+      if (!o?.poly) continue;
+      let cx = 0, cz = 0; for (const p of o.poly) { cx += p[0] / o.poly.length; cz += p[1] / o.poly.length; }
+      const size = Math.max(160, Math.ceil((Math.max(...o.poly.map((p) => Math.abs(p[0] - cx)), ...o.poly.map((p) => Math.abs(p[1] - cz))) * 2 + 40) / 20) * 20);
+      const m = await page.eval(`window.__acc.mask(${cx}, ${cz}, ${size}, ${Math.round(size / 0.5)})`);
+      lmMasks.set(id, { h: new Uint8Array(Buffer.from(m.h, 'base64')), cx, cz, size, px: Math.round(size / 0.5), poly: o.poly });
+    }
     errs = errs.concat(page.errors().map((e) => e.text.slice(0, 300)));
   }
 } catch (e) {
@@ -287,12 +312,32 @@ console.log(`rendered ${tiles.length} tiles in ${((Date.now() - t0) / 1000).toFi
 
 // ------------------------------------------------------------------ metrics
 const roads = osmRoads();
-const feats = bld.features.map((f, i) => ({ f, i })).filter(({ f }) => f.poly?.length > 2);
-for (const it of feats) { let x = 0, z = 0; for (const p of it.f.poly) { x += p[0]; z += p[1]; } it.cx = x / it.f.poly.length; it.cz = z / it.f.poly.length; }
+// [sys:28] Earth 2026-03-11 roof colours per lot, from the earth-ref captures of the 12 cells (meta.json legend.earthRoof, measured through the DIRECT Earth-to-app
+// registration; a lot in two cells takes the first). Override roof colours were read on Earth (fitRoofTransform fits on them), so the headline Earth score is the
+// HELD-OUT set (non-override lots) and the override lots are reported apart as the fit residual.
+const earthRoof = new Map();
+{ const cs = JSON.parse(readFileSync(join(ROOT, 'data/anime/cells.json'), 'utf8')).cells;
+  for (const c of Object.keys(cs)) { const f = join(ROOT, 'raw/ref/earth', c, 'meta.json'); if (!existsSync(f)) continue; try { for (const g of JSON.parse(readFileSync(f, 'utf8')).legend || []) if (g.id && g.earthRoof && !earthRoof.has(g.id)) earthRoof.set(g.id, g.earthRoof); } catch { /* a capture still being written */ } } }
+const earthHeld = [], earthFit = [];
+// [sys:28] The footprint truth is the GSI set (about 2020-22) CORRECTED by the overrides: the lots an override removes (a lotPatch with remove:true, matched the way
+// lotOfFeat matches: the exact id or id.split('.')[0]) leave it, and every override newLot is appended as an extra truth feature (i = -1: no aerial relief offset).
+// Every city.json feature is mapped to { f, i } FIRST and the removed ones are filtered AFTER (the roof loop reads aerial[fi] by the original index).
+// The raw GSI set stays as buildings.selfConsistency (the app is built from it: it measures self-consistency, and penalises the 2026 corrections).
+const OV = compileOverrides(loadOverrides(OVERRIDES_DIR));
+const removedIds = new Set(); for (const [id, ops] of OV.lotPatch) if (ops.some((o) => o.remove)) removedIds.add(id);
+const isRemoved = (id) => removedIds.has(id) || removedIds.has(String(id).split('.')[0]);
+const featsAll = bld.features.map((f, i) => ({ f, i })).filter(({ f }) => f.poly?.length > 2);
+const feats = featsAll.filter(({ f }) => !isRemoved(f.id)).concat(OV.newLots.filter((o) => o.poly?.length > 2).map((o) => ({ f: { id: o.id, poly: o.poly, holes: [] }, i: -1 })));
+const featsRaw = featsAll;
+for (const it of feats.concat(featsRaw)) { let x = 0, z = 0; for (const p of it.f.poly) { x += p[0]; z += p[1]; } it.cx = x / it.f.poly.length; it.cz = z / it.f.poly.length; }
 const lotById = new Map(L.LOTS.map((l) => [l.id, l]));
 const lotOfFeat = (id) => lotById.get(id) || lotById.get(String(id).split('.')[0]) || null;
-const tot = { I: 0, U: 0, T: 0, Rn: 0, rI: 0, rU: 0, rC: 0, rCn: 0, rT: 0, rR: 0 };
+const tot = { I: 0, U: 0, T: 0, Rn: 0, rI: 0, rU: 0, rC: 0, rCn: 0, rT: 0, rR: 0, I0: 0, U0: 0, T0: 0 };   // I0 / U0 / T0: the raw GSI truth
 const dE = [], dEalb = [], roofPairs = [], perTile = [], hErr = [], bias = [];
+// [r3:19] per-cell pixel tallies (buildings: I / U / T / Rn; centre-line recall) inside each accuracy cell's bbox, and the coverage of the cells by the audit
+const CELLS = JSON.parse(readFileSync(join(ROOT, 'data/anime/cells.json'), 'utf8')).cells;
+const cellTot = {}; for (const id of Object.keys(CELLS)) cellTot[id] = { I: 0, U: 0, T: 0, Rn: 0, rC: 0, rCn: 0, roofs: 0, hRef: 0 };
+const tileOfPt = (x, z) => tiles.some((t) => x >= t.x0 && x < t.x0 + TILE && z >= t.z0 && z < t.z0 + TILE);
 const MOS = 2, MW = Math.ceil((bb.x1 - bb.x0) / MOS), MH = Math.ceil((bb.z1 - bb.z0) / MOS);
 const mos = { photo: new Uint8Array(MW * MH * 3), render: new Uint8Array(MW * MH * 3), diff: new Uint8Array(MW * MH * 3) };
 for (const t of tiles) {
@@ -305,11 +350,12 @@ for (const t of tiles) {
   const inT = (x, z, m = 0) => x >= t.x0 - m && x <= t.x0 + TILE + m && z >= t.z0 - m && z <= t.z0 + TILE + m;
   const here = feats.filter((it) => inT(it.cx, it.cz, 150));
   for (const { f } of here) { fillRing(truth, px, t.x0, t.z0, res, f.poly, 1); for (const h of f.holes || []) fillRing(truth, px, t.x0, t.z0, res, h, 1, true); }
+  for (const { f } of featsRaw.filter((it) => inT(it.cx, it.cz, 150))) { fillRing(truth, px, t.x0, t.z0, res, f.poly, 8); for (const h of f.holes || []) fillRing(truth, px, t.x0, t.z0, res, h, 8, true); }   // [sys:28] raw GSI
   for (const rd of roads) { if (!rd.pts.some(([x, z]) => inT(x, z, 400))) continue; if (rd.bridge) continue; stampLine(truth, px, t.x0, t.z0, res, rd.pts, rd.w / 2, 2); stampLine(truth, px, t.x0, t.z0, res, rd.pts, 0, 4); }
   // road cover dilated by 1 px (a 0.5 m registration tolerance for the centre-line recall)
   const roadD = new Uint8Array(px * px);
   for (let j = 0; j < px; j++) for (let i = 0; i < px; i++) if (M.road[j * px + i]) for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const a = i + di, b = j + dj; if (a >= 0 && b >= 0 && a < px && b < px) roadD[b * px + a] = 1; }
-  const T = { I: 0, U: 0, T: 0, Rn: 0, rI: 0, rU: 0, rC: 0, rCn: 0, rT: 0, rR: 0 };
+  const T = { I: 0, U: 0, T: 0, Rn: 0, rI: 0, rU: 0, rC: 0, rCn: 0, rT: 0, rR: 0, I0: 0, U0: 0, T0: 0 };
   const diff = new Uint8Array(px * px * 3);
   for (let j = 0; j < px; j++) for (let i = 0; i < px; i++) {
     const x = t.x0 + (i + 0.5) * res, z = t.z0 + (j + 0.5) * res, o = j * px + i;
@@ -318,7 +364,10 @@ for (const t of tiles) {
     const c = tb && rb ? [150, 150, 150] : tb ? [220, 50, 40] : rb ? [50, 110, 230] : land ? [245, 244, 238] : [205, 222, 235];
     diff.set(c, o * 3);
     if (!inside || !land) continue;
+    const cid = cellIdAt(CELLS, x, z), CT = cid ? cellTot[cid] : null;   // [r3:19]
+    if (CT) { if (tb && rb) CT.I++; if (tb || rb) CT.U++; if (tb) CT.T++; if (rb) CT.Rn++; if (truth[o] & 4) { CT.rCn++; if (roadD[o]) CT.rC++; } }
     if (tb && rb) T.I++; if (tb || rb) T.U++; if (tb) T.T++; if (rb) T.Rn++;
+    { const t0b = truth[o] & 8 ? 1 : 0; if (t0b && rb) T.I0++; if (t0b || rb) T.U0++; if (t0b) T.T0++; }   // [sys:28] raw GSI truth
     const tr = truth[o] & 2 ? 1 : 0, rr = M.road[o];
     if (tr && rr) T.rI++; if (tr || rr) T.rU++; if (tr) T.rT++; if (rr) T.rR++;   // [v4:polish3] recall / precision apart
     if (truth[o] & 4) { T.rCn++; if (roadD[o]) T.rC++; }
@@ -348,6 +397,7 @@ for (const t of tiles) {
     const P = pr.map(med), Rr = rr.map(med);
     const lot = lotOfFeat(f.id);
     tileRoofs.push({ P, Rr, lot, area, h: pct(hs, 0.9) });
+    { const cid = cellIdAt(CELLS, cx, cz); if (cid) cellTot[cid].roofs++; }   // [r3:19]
     cast = cast.map((v, c) => v + Rr[c] / Math.max(1, P[c])); castN++;
   }
   const g = castN ? cast.map((v) => v / castN) : [1, 1, 1];
@@ -356,11 +406,13 @@ for (const t of tiles) {
     { const a = lab(r.P), b = lab(r.Rr); bias.push([b[0] - a[0], b[1] - a[1], b[2] - a[2], Math.hypot(b[1], b[2]) - Math.hypot(a[1], a[2])]); }
     const eb = dE2000(lab(r.P.map((v, c) => Math.min(255, v * g[c]))), lab(r.Rr));
     roofPairs.push({ raw: e, bal: eb });
+    if (r.lot && earthRoof.has(r.lot.id)) { const ee = dE2000(lab(hexRgb(earthRoof.get(r.lot.id))), lab(r.Rr)); (r.lot.src?.color === 'override' ? earthFit : earthHeld).push(ee); }   // [sys:28]
     if (r.lot) {
       dEalb.push(dE2000(lab(r.P), lab(hexRgb(r.lot.roof.color))));
       // [v4:polish1] reference heights: OSM height / levels, the landmark sheets and the heritage records (KAZEMACHI), and
       // world/lotfix.js (photo-checked); the 26 OSM-tagged buildings alone were too few to judge by
-      if ((r.lot.src?.h === 'osm' || r.lot.src?.h === 'landmark' || r.lot.src?.h === 'ref') && Number.isFinite(r.h)) hErr.push({ id: r.lot.id, ref: r.lot.src.h, osm: r.lot.height, app: +r.h.toFixed(1), err: +(r.h - r.lot.height).toFixed(1) });
+      // [sys:28] + override heights: they measure the render against the INTENDED height (they catch builder bugs such as the hero kit's), not data against reality
+      if ((r.lot.src?.h === 'osm' || r.lot.src?.h === 'landmark' || r.lot.src?.h === 'ref' || r.lot.src?.h === 'override') && Number.isFinite(r.h)) hErr.push({ id: r.lot.id, ref: r.lot.src.h, osm: r.lot.height, app: +r.h.toFixed(1), err: +(r.h - r.lot.height).toFixed(1) });
     }
   }
   perTile.push({ id: t.id, cx: t.cx, cz: t.cz, iou: T.U ? r3(T.I / T.U) : null, recall: T.T ? r3(T.I / T.T) : null, precision: T.Rn ? r3(T.I / T.Rn) : null, roadRecall: T.rCn ? r3(T.rC / T.rCn) : null, roofs: tileRoofs.length });
@@ -394,7 +446,7 @@ for (const [name, r0, a0, lotId] of pairs) {
   if (lotId) {
     r = LOT_REFS[lotId]; const got = landmarksApp?.lots?.[lotId]; a = got?.app || null; extra = got ? { appName: got.name, landmark: got.landmark, kind: got.kind, centreErr: +Math.hypot(got.app[0] - r[0], got.app[1] - r[1]).toFixed(1) } : { missing: true };
     if (!r) continue;
-    lmPairs.push({ name, ref: r, app: a ? a.map((v) => +(+v).toFixed(1)) : null, err: got ? +got.err.toFixed(1) : null, ...extra });
+    lmPairs.push({ tagged: true, name, ref: r, app: a ? a.map((v) => +(+v).toFixed(1)) : null, err: got ? +got.err.toFixed(1) : null, ...extra });   // [sys:27] tagged: lot containment on layout data (0 m by construction)
     continue;
   }
   if (!r) continue;
@@ -404,7 +456,7 @@ for (const [name, r0, a0, lotId] of pairs) {
     let inside = false; for (let i = 0, j = fp.length - 1; i < fp.length; j = i++) { const [xi, zi] = fp[i], [xj, zj] = fp[j]; if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside; }
     let d = Infinity; if (!inside) for (let i = 0, j = fp.length - 1; i < fp.length; j = i++) { const [ax, az] = fp[j], [bx, bz] = fp[i], dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz || 1, t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / l2)); d = Math.min(d, Math.hypot(x - ax - dx * t, z - az - dz * t)); }
     const app = landmarksApp.isuzuHall.app;
-    lmPairs.push({ name: '五十鈴神社 (hall)', ref: r, app: app.map((v) => +(+v).toFixed(1)), err: inside ? 0 : +d.toFixed(1), kind: 'building', centreErr: +Math.hypot(app[0] - x, app[1] - z).toFixed(1) });
+    lmPairs.push({ tagged: true, name: '五十鈴神社 (hall)', ref: r, app: app.map((v) => +(+v).toFixed(1)), err: inside ? 0 : +d.toFixed(1), kind: 'building', centreErr: +Math.hypot(app[0] - x, app[1] - z).toFixed(1) });
     continue;
   }
   let app = a;
@@ -433,22 +485,52 @@ if (args.lmshots) {
   console.log(`wrote lm${TAG}_*.jpg (${lmRenders.size} landmark side-by-sides)`);
 }
 
+// [sys:27] the rendered footprint of each building landmark against its OSM outline
+const lmBuildings = {};
+for (const [id, m] of lmMasks) lmBuildings[id] = { name: LN[id] || id, osm: LM_OUTLINES[id].osm, ...landmarkScore({ h: m.h, px: m.px, size: m.size, cx: m.cx, cz: m.cz, poly: m.poly }) };
+{ const bad = Object.entries(lmBuildings).filter(([, v]) => !v.pass); console.log(`landmark buildings (rendered footprint vs the OSM outline): ${Object.keys(lmBuildings).length - bad.length}/${Object.keys(lmBuildings).length} pass (IoU >= 0.7 and centroid <= 5 m)${bad.length ? '  FAIL: ' + bad.map(([k, v]) => `${k} IoU ${v.iou} centroid ${v.centroidErr} m`).join(', ') : ''}`); }
 const within = (a, x) => a.filter((v) => v < x).length / Math.max(1, a.length);
+// [r3:19] how much of the accuracy cells the audit scored: a point counts when it is inside the audited region AND inside a rendered tile. buildings: the share of the cells' footprint AREA; roofs: the share of the
+// footprints of 40 m2 or more; roads: the share of the OSM centre-line length (sampled every 4 m, bridges left out as the audit does); heights: the share of the lots that carry a reference height (OSM, landmark sheet,
+// lotfix, override).
+const areaOf = (r) => { let a = 0; for (let q = 0, w = r.length - 1; q < r.length; w = q++) a += (r[w][0] + r[q][0]) * (r[w][1] - r[q][1]); return Math.abs(a) / 2; };
+const scoredAt = (x, z) => inRegion(x, z) && tileOfPt(x, z);
+const items = feats.map((it) => ({ cx: it.cx, cz: it.cz, area: areaOf(it.f.poly) }));
+const cov = cellCoverage(CELLS, items, (it) => scoredAt(it.cx, it.cz));
+const covRoofs = cellCoverage(CELLS, items.filter((it) => it.area >= 40), (it) => scoredAt(it.cx, it.cz));
+const refLots = L.LOTS.filter((l) => ['osm', 'landmark', 'ref', 'override'].includes(l.src?.h)).map((l) => ({ cx: l.obb.cx, cz: l.obb.cz, area: l.area }));
+const covHeights = cellCoverage(CELLS, refLots, (it) => scoredAt(it.cx, it.cz));
+let roadN = 0, roadScored = 0;
+for (const rd of roads) { if (rd.bridge) continue; for (let i = 1; i < rd.pts.length; i++) { const a = rd.pts[i - 1], b = rd.pts[i], n = Math.max(1, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / 4)); for (let k = 0; k < n; k++) { const x = a[0] + ((b[0] - a[0]) * (k + 0.5)) / n, z = a[1] + ((b[1] - a[1]) * (k + 0.5)) / n; if (!cellIdAt(CELLS, x, z)) continue; roadN++; if (scoredAt(x, z)) roadScored++; } } }
+const cellsReport = Object.fromEntries(Object.entries(CELLS).filter(([id]) => cov.cells[id]).map(([id, c]) => { const T = cellTot[id]; return [id, { bbox: c.bbox, ja: c.ja, coverage: { footprints: cov.cells[id].n, scoredFootprints: cov.cells[id].scored, share: cov.cells[id].share, area: cov.cells[id].area, areaScored: cov.cells[id].areaScored, areaShare: cov.cells[id].areaShare, iou: T.U ? r3(T.I / T.U) : null, recall: T.T ? r3(T.I / T.T) : null, precision: T.Rn ? r3(T.I / T.Rn) : null, centrelineRecall: T.rCn ? r3(T.rC / T.rCn) : null, roofsCompared: T.roofs, roofsShare: covRoofs.cells[id].share, heightsShare: covHeights.cells[id].share } }]; }));
+const coveredShare = { buildings: cov.all.areaShare, footprints: cov.all.share, roofs: covRoofs.all.share, roads: shareOf(roadScored, roadN), heights: covHeights.all.share, note: 'share of the accuracy cells (cells.json, pier7 left out) that the scored region and tiles cover, per metric' };
 const report = {
-  generated: new Date().toISOString(), tag: args.tag || null, region: { name: args.region || 'core', ...region }, res: RES, tile: TILE, tiles: tiles.length,
+  generated: new Date().toISOString(), tag: args.tag || null, region: { name: args.region || 'core', label: (args.region || 'core') === 'core' ? 'core-only (the 1.1 km mid-zone disc): the headline numbers say nothing about the rest of the cells, see cells[id].coverage and coveredShare' : 'whole core.jpg footprint', ...region }, res: RES, tile: TILE, tiles: tiles.length,
   truth: { buildings: 'GSI 基盤地図情報 building footprints (optimal_bvmap BldA, data/buildings/city.json)', photo: 'GSI seamlessphoto z18 (data/ortho/core.jpg) with per-roof relief offsets', roads: 'OpenStreetMap highways, © OpenStreetMap contributors (ODbL), extract 2026-05-06', landmarks: 'docs/anime/landmarks/landmarks.json' },
-  buildings: { iou: r3(tot.I / tot.U), recall: r3(tot.I / tot.T), precision: r3(tot.I / tot.Rn), truthM2: Math.round(tot.T * RES * RES), renderM2: Math.round(tot.Rn * RES * RES), thresholdM: BUILD_T },
+  buildings: { coveredShare: cov.all.areaShare, label: (args.region || 'core') === 'core' ? 'core-only' : 'region', iou: r3(tot.I / tot.U), recall: r3(tot.I / tot.T), precision: r3(tot.I / tot.Rn), truthM2: Math.round(tot.T * RES * RES), renderM2: Math.round(tot.Rn * RES * RES), thresholdM: BUILD_T,
+    selfConsistency: r3(tot.I0 / Math.max(1, tot.U0)), truth: `GSI footprints without ${removedIds.size} lots the overrides remove, plus ${OV.newLots.length} override newLots (selfConsistency: the raw GSI set the app is built from)` },   // [sys:28]
   roofs: {
+    coveredShare: covRoofs.all.share,
     n: dE.length, dE2000: { median: r3(med(dE)), p75: r3(pct(dE, 0.75)), under10: r3(within(dE, 10)) },
+    gsi: { n: dE.length, median: r3(med(dE)), p75: r3(pct(dE, 0.75)), note: 'legacy check against the GSI photo (about 2020-22): the layout colours are fitted to Earth 2026, so a correct Earth colour scores worse here' },
+    earth: { heldOut: { n: earthHeld.length, median: r3(med(earthHeld)), p75: r3(pct(earthHeld, 0.75)), under10: r3(within(earthHeld, 10)) }, fitResidual: { n: earthFit.length, median: r3(med(earthFit)), p75: r3(pct(earthFit, 0.75)) },
+      note: 'Earth 2026-03-11 roof colour (earth-ref legends) vs the render, per lot: heldOut = lots whose colour is not an override (not in fitRoofTransform\'s training set); fitResidual = the override lots (circular)' },
     dE2000castRemoved: { median: r3(med(roofPairs.map((p) => p.bal))), p75: r3(pct(roofPairs.map((p) => p.bal), 0.75)), under10: r3(within(roofPairs.map((p) => p.bal), 10)) },
     albedo: { n: dEalb.length, median: r3(med(dEalb)), note: 'layout roof colour (unlit) vs the photo' },
     bias: { dL: r3(med(bias.map((b) => b[0]))), da: r3(med(bias.map((b) => b[1]))), db: r3(med(bias.map((b) => b[2]))), dChroma: r3(med(bias.map((b) => b[3]))), note: 'median render - photo in CIELAB' },
   },
   // [v4:polish3] precision (rendered asphalt on the OSM buffer) and recall (the buffer covered) apart: a low IoU with a
   // high centre-line recall means the widths disagree, and these say which way
-  roads: { centrelineRecall: r3(tot.rC / tot.rCn), iou: r3(tot.rI / tot.rU), precision: r3(tot.rI / Math.max(1, tot.rR)), recall: r3(tot.rI / Math.max(1, tot.rT)), renderM2: Math.round(tot.rR * RES * RES), truthM2: Math.round(tot.rT * RES * RES), osmWays: roads.length },
-  landmarks: { pairs: lmPairs, under5m: lmPairs.filter((p) => p.err !== null && p.err < 5).length + '/' + lmPairs.filter((p) => p.err !== null).length },
-  heights: { n: hErr.length, medianAbsErr: hErr.length ? r3(med(hErr.map((h) => Math.abs(h.err)))) : null, sample: hErr.slice(0, 20) },
+  roads: { coveredShare: shareOf(roadScored, roadN), centrelineRecall: r3(tot.rC / tot.rCn), iou: r3(tot.rI / tot.rU), precision: r3(tot.rI / Math.max(1, tot.rR)), recall: r3(tot.rI / Math.max(1, tot.rT)), renderM2: Math.round(tot.rR * RES * RES), truthM2: Math.round(tot.rT * RES * RES), osmWays: roads.length },
+  // [sys:27] under5m no longer counts the building landmarks (their lot-containment error is 0 m by construction): lotTagged keeps that number, buildings scores the render
+  landmarks: { pairs: lmPairs, under5m: lmPairs.filter((p) => !p.tagged && p.err !== null && p.err < 5).length + '/' + lmPairs.filter((p) => !p.tagged && p.err !== null).length,
+    lotTagged: { note: 'the lot that holds the reference point, and the distance to its polygon: a data-tagging check, 0 m by construction', n: lmPairs.filter((p) => p.tagged).length, within5m: lmPairs.filter((p) => p.tagged && p.err !== null && p.err < 5).length },
+    buildings: lmBuildings },
+  heights: { coveredShare: covHeights.all.share, n: hErr.length, medianAbsErr: hErr.length ? r3(med(hErr.map((h) => Math.abs(h.err)))) : null, sample: hErr.slice(0, 20), all: hErr.map((h) => ({ id: h.id, ref: h.ref, osm: h.osm, app: h.app, err: h.err })),   // [audit] the whole list, so two runs can be compared lot by lot
+   
+    byRef: Object.fromEntries(['osm', 'landmark', 'ref', 'override'].map((k) => { const a = hErr.filter((h) => h.ref === k); return [k, { n: a.length, medianAbsErr: a.length ? r3(med(a.map((h) => Math.abs(h.err)))) : null, over1m: a.filter((h) => Math.abs(h.err) > 1).length }]; })),
+    note: 'byRef.override measures the render against the intended override height (it catches builder bugs such as the hero kit\'s), not data against reality' },   // [sys:28]
+  coveredShare, cells: cellsReport,
   perTile, app: townStats, pageErrors: errs.slice(0, 20),
 };
 writeFileSync(join(OUT, `accuracy${TAG}.json`), JSON.stringify(report, null, 1));

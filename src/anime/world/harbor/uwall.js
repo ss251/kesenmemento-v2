@@ -4,7 +4,7 @@
 // lie flat and rise by themselves with the sea (no power, no operator); stair-shaped rest decks cross it at intervals (their white blocks are
 // on the z18 photo), a strip of pale grey concrete block paving runs along the road side ([v5:fix1] Google Earth
 // 2026-03-11; it was warm pink-red), low footlights light it at night.
-// There are no windows in the real wall. 311 m, 土木学会デザイン賞 2022; heights: 今川悟 (imakawa.net/blog/4847).
+// There are no windows in the real wall. 311 m, 土木学会デザイン賞 2022; heights: imakawa.net/blog/4847.
 // Returns { line, crest, gates, stairs, wallDist(x, z) }.
 import * as THREE from 'three';
 import { UWALL } from './real.js';

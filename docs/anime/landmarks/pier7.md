@@ -149,3 +149,18 @@ outline stood 3.7 m further in; no stepped terrace), the roof ridges along the b
 the NW street corner from IMG_0799 / 0823 / 0907 (the 1F glass box 3.8 m inside the GSI street edge, the T.P. 2.45 corner
 deck with two steps, the stair up the street side between two column clusters, the studio set back 2.2 m behind a railed
 terrace, the 創 totem at its triangulated logo centre, 1.8 m tall). The 気仙沼ベイクルーズ banner (not in any photo) is gone.
+
+
+## [v6:fix3] The NW street corner (2026-10-04)
+
+The NW end of the building is a low one-storey shop (8.15 x 11.8 m, glass on the corner, flat roof = a railed terrace at T.P. 5.3) with a glass radio studio set back 4.48 m on it and a
+swept roof (eaves T.P. 8.3-8.8) carried on two clusters of slender columns; a timber stair (15 treads, 2.4 m) climbs along the street face to the hall wall with the 「PIER 7」 lettering and the
+Kesennuma map board. Frame and numbers: `NW7` in `src/anime/world/harbor/minami5.js`, derivation in docs/anime/survey/minami.md (FIX round 3).
+
+## [v6:finish] Final survey numbers (2026-10-04)
+
+All 62 plaza features (stair cage, five bleacher tiers, winch, the three rings and the open C of ring C, 7-Eleven pole, totems, plaque, gate post, the NW shop / studio / slab / stair)
+sit within 0.16 m of the photo survey (mean 0.035 m, median 0.018 m; 35 of 35 dimensions within tolerance; none over 3 sigma). Edge chamfer from the solved cameras: IMG_0808 5.2 px
+(6.7 before the rebuild), plaza mean 11.2 px over 53 photos (20.9 before). Overlays and pairs: `docs/shots/v6_survey/showcase/minami_0808_*.jpg` (local only, they embed the photo).
+**Open:** the dark-grey mat at the winch is a flat panel (the photo has a drain grating and a rust-coloured plate), the 3F gable's NW end and the bay face in 0814-0817 (12-18 px), the
+0913 NW external stair, and 0906 / 0910 (the orange arch) which never registered. Procedure: `docs/anime/SURVEY.md`.

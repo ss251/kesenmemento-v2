@@ -2,7 +2,7 @@
 // Proxies GET/HEAD for an allow-list of app paths to the local server and refuses everything else:
 // no writes (the dev panel's /api/splat-transform), no dotfiles, no traversal, no source maps.
 // [v3:fix] /api/config (the v2 tiles token) is NOT mirrored any more: the v3 anime app never calls it, and a public
-// Funnel link must not hand out a map token. Restart a running mirror to pick this up.
+// public mirror must not hand out a map token. Restart a running mirror to pick this up.
 //   env -u NODE_OPTIONS bun scripts/public-mirror.js [--port 8791] [--upstream http://127.0.0.1:8790]
 //   tailscale funnel --bg --https=443 http://127.0.0.1:8791      (turn off: tailscale funnel --https=443 off)
 
@@ -15,6 +15,13 @@ export const ALLOW = [
   /^\/[\w.-]+\.(js|css|png|jpe?g|svg|ico|webp|woff2?)$/,       // built bundle + icons (no .map)
   /^\/(data|fixtures|vendor|assets|draco)\/[\w./-]+$/,          // app data and vendored assets
   /^\/api\/live(\/[\w./-]*)?$/,                                  // live data is read-only JSON
+  /^\/api\/jpyc\/(shops\/[\w-]{1,64}\/products|products\/[\w-]{1,64})$/,   // [jpyc] 「JPYCで買えるお店」: the cached read proxy of JPYC EC (GET only, like everything here; the upstream allowlists the shops)
+  // [integrate] everything the merged app fetches, named so a future tightening of the generic /data/ rule above cannot drop it:
+  /^\/data\/ship\/[\w./-]+$/,                                  // 第一昭福丸: the nendo livery traces (fetched), i18n and story pins (bundled), the optional send-off music
+  /^\/data\/ui-touch-i18n\.json$/,                              // the touch pad's strings (bundled today; a file you can fetch)
+  /^\/data\/ui-contrib-i18n\.json$/,                           // [contrib] the 「修正を報告」 sheet's strings and privacy notice (bundled today; a file you can fetch). The report backend is another origin (CONTRIB_API): this mirror never proxies it
+  /^\/data\/(i18n|live\/sample)\.json$/,                         // the HUD's strings and the sample arrivals (the page's fallback when /api/live is down)
+  /^\/licenses\/[\w.-]+\.txt$/,                                  // the credit line's licence link (dist/licenses/*.txt)
 ];
 export const DENY = [/\.\./, /\/\./, /^\/api\/splat-transform/, /^\/api\/config/, /\.map$/];   // [v3:fix] never the token route
 // [ship] The nendo livery trace of 第一昭福丸 (data/ship/shofukumaru1/*nendo*.json) is served like any other app data:

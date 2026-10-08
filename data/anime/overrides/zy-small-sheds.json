@@ -1,0 +1,30 @@
+{
+ "version": 1,
+ "cell": "small-sheds",
+ "bbox": [
+  -700,
+  -800,
+  1300,
+  1000
+ ],
+ "note": "[r2:4] Two of the four wall-less sheds (GSI 3111 / 3112) of 100 m2 or more that classifyLot (scripts/anime/derive.js) does not lower, reviewed one by one against the Earth shadow length (2026-03-11 scene: shadow bearing 340, sun elevation 44: h about 0.97 x the shadow length along the bearing). The other two (16/58541/25069/398, 5.6 x 19 m, and 16/58540/25067/22, 7.4 x 34 m) show no readable shadow on the top views (a taller neighbour or a label covers it) and keep the derived height.",
+ "sources": [
+  {
+   "id": "earth",
+   "what": "Google Earth, imagery dated 2026-03-11, top views (raw/ref/earth/meta8928a/c10B, meta8928/c8n), rectified into the lot frame",
+   "date": "2026-03-11"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58541/25069/316",
+   "height": 4.8,
+   "src": "earth: c10 B top, a pale roof 9.6 x 14 m with a dark shadow band 4.7 m long beyond its south edge (shadow bearing 340, so about 5 m along it): about 4.8 m (the derived 6.6 m was as tall as a two-storey house)"
+  },
+  {
+   "id": "16/58543/25068/20",
+   "height": 3.0,
+   "src": "earth: c8 n top, a slate-blue lean-to roof 6.7 x 17.8 m with a 2.2 m shadow strip beside its long edge: about 2.3-3 m, held at the 3.0 m wall-less eave floor (the derived 7.8 m closed box was far too tall)"
+  }
+ ]
+}

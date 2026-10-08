@@ -49,9 +49,16 @@ describe("time of day", () => {
   test("factors are monotone in elevation", () => {
     for (let e = -20; e < 20; e += 0.5) { expect(nightFromElevation(e)).toBeGreaterThanOrEqual(nightFromElevation(e + 0.5)); expect(lampsFromElevation(e)).toBeGreaterThanOrEqual(lampsFromElevation(e + 0.5)); }
   });
-  test("weather dims the key light but never below 55%", () => {
-    const T = createTime(fakeCtx(), { preset: "hiru" }); const clear = T.lights.sun.intensity;
-    T.setWeather({ cover: 1, rain: 1 }); expect(T.lights.sun.intensity).toBeLessThan(clear); expect(T.lights.sun.intensity).toBeGreaterThan(clear * 0.55);
+  test("cloud dims the key a little; heavy rain softens it and lifts the ambient", () => {
+    const T = createTime(fakeCtx(), { preset: "hiru" });
+    const clear = T.lights.sun.intensity, hemi = T.lights.hemi.intensity;
+    T.setWeather({ cover: 1, rain: 0 });
+    expect(T.lights.sun.intensity).toBeLessThan(clear);
+    expect(T.lights.sun.intensity).toBeGreaterThan(clear * 0.55);
+    T.setWeather({ cover: 0.95, rain: 0.8, wet: 0.9 });
+    expect(T.lights.sun.intensity).toBeLessThan(clear * 0.28);
+    expect(T.lights.hemi.intensity).toBeGreaterThan(hemi * 1.15);
+    expect(T.overcast).toBeGreaterThan(0.9);
   });
 });
 
@@ -112,8 +119,9 @@ describe("UI strings", () => {
     const src = readFileSync(join(ROOT, "src/anime/ui/hud.js"), "utf8") + readFileSync(join(ROOT, "src/anime/world/life/index.js"), "utf8");
     const keys = [...src.matchAll(/[^a-zA-Z]t\('([a-zA-Z0-9.]+)'/g)].map((m) => m[1]).filter((k) => !k.endsWith('.')).concat(PRESETS.map((p) => "v3.time." + p.id), ["v3.stop.hero", "v3.stop.market", "v3.attribution"]);
     for (const k of keys) { expect(S.ja[k], k).toBeTruthy(); expect(S.en[k], k).toBeTruthy(); }
-    for (const w of ["国土地理院", "気象庁", "気仙沼漁協", "Sakuragaoka Station (MIT)", "Kenton-GMI"]) expect(S.ja["v3.attribution"]).toContain(w);
-    expect(S.ja["v3.wordmark"]).toBe("気仙沼 リビングシティ"); expect(S.ja["v3.sample"]).toBe("サンプル");
+    for (const w of ["国土地理院", "気象庁", "気仙沼漁協"]) expect(S.ja["v3.attribution"]).toContain(w);
+    expect(S.ja["v3.credits.engine"]).toContain("Sakuragaoka Station"); expect(S.ja["v3.credits.engine"]).toContain("Kenton-GMI");
+    expect(S.ja["v3.wordmark"]).toBe("気仙沼リビングシティ"); expect(S.ja["v3.sample"]).toBe("サンプル");
   });
 });
 

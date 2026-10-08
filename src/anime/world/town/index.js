@@ -25,7 +25,7 @@ import { buildParking } from './parking.js';
 import { buildGardens } from './gardens.js';
 import { makeNameAtlas } from './blocks.js';
 import { makeRealNames } from './realnames.js';   // [v4:town-accuracy]
-import { channels, channelIndex, buildRivers } from './rivers.js';   // [v4:town-accuracy]
+import { channels, channelIndex, buildRivers, crossings } from './rivers.js';   // [v4:town-accuracy]
 import { buildLanduse, parkingIndex } from './landuse.js';   // [v4:town-accuracy]
 import { buildSignals } from './signals.js';   // [v4:town-accuracy]
 import { EXPLORE_LOTS } from '../explore/taken.js';   // [v4:explore] lots explore models with a walk-in interior
@@ -103,7 +103,11 @@ export async function build(ctx) {
   const street = buildStreets(ctx, { lotIdx, roadIdx, roads: phone ? roads.filter((r) => r.pts.some((p) => nearHero(p[0], p[1], PHONE.streetR))) : roads, heroZone, rivers: chIdx, ...(phone && { step: PHONE.streetStep }) });
   t = lap('streets', t);
   let rivers = null;
-  try { rivers = buildRivers(ctx, { chs, index: chIdx, detail: (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 120, roads, asphalt: street.materials?.asphalt }); } catch (e) { console.warn('[town] rivers', e); }
+  // [r3:12] the road bridges of the far zone (気仙沼唐桑線 over the 鹿折川, r9949 / r9918; 大川, r13790 / r13760) were never given a deck: rivers.js built decks only for the non-far roads, so the road ran into the water.
+  // Only buildRivers gets them (not roadIdx, buildStreets or signals), and only their crossings are widened into the detail test (the banks and the channel walls stay as they were).
+  const farBridges = L.ROADS.filter((r) => r.zone === 'far' && r.kind === 'bridge'), farX = crossings(farBridges, chs);
+  const inMid = (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 120;
+  try { rivers = buildRivers(ctx, { chs, index: chIdx, detail: inMid, bridgeDetail: (x, z) => inMid(x, z) || farX.some((c) => Math.hypot(c.x - x, c.z - z) < 1), roads: roads.concat(farBridges), asphalt: street.materials?.asphalt }); } catch (e) { console.warn('[town] rivers', e); }
   t = lap('rivers', t);
   const poleOpts = phone ? phoneRuns(L, nearHero) : {};
   const poles = buildPoles(ctx, H, { lotIdx, roadIdx, heroZone, facades: facadeAnchors(L, heroLots.filter((l) => built.has(l.id))), ...poleOpts });

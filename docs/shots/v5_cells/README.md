@@ -2,7 +2,7 @@
 
 Twelve 500 × 600 m cells (`data/anime/overrides/c1.json` … `c12.json`, bboxes in each file) were checked against
 Google Earth 3D (imagery dated 2026-03-11, reference only, never committed), the GSI aerial photo (about 2020–22) and
-OSM, and corrected with override files ([../../anime/OVERRIDES.md](../anime/OVERRIDES.md)). The integration pass then
+OSM, and corrected with override files ([../../anime/OVERRIDES.md](../../anime/OVERRIDES.md)). The integration pass then
 fixed the code bugs the cells found.
 
 Each `<cell>.jpg` shows, on top, the GSI aerial photo, v4 before and v5 after, all as straight-down renders of the

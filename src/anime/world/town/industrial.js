@@ -3,7 +3,12 @@
 // dark interior with pallets and fish boxes), a high window band, company names painted on the wall, rooftop
 // ventilators, refrigeration units, an office box with an outside stair, and stainless tanks + a chimney for plants.
 import { COMPANIES } from './names.js';
-import { groundRange, pick } from './common.js';
+import { groundRange, pick, isFinalRoof, shedDirOf } from './common.js';
+import { measuredWall } from './palette.js';   // [sys:31]
+import { planPv, PV } from './pv.js';   // [sys:8]
+import { walllessOf, openShedPlan, SHED } from './openshed.js';   // [r2:4]
+import { flatPaint } from './flatroof.js';   // [r2:3]
+import { hasPlant, drawRoofPlant } from './roofplant.js';   // [r2:5]
 
 export function industrialTextures(ctx) {
   const T = ctx.tex;
@@ -40,14 +45,26 @@ export function industrialTextures(ctx) {
 export function industrialMaterials(ctx, tx) {
   const m = ctx.mat;
   return {
-    corr: m.toon('#ffffff', { map: tx.corr, vertexColors: true, paint: 0.05 }),
-    rust: m.toon('#ffffff', { map: tx.rust, vertexColors: true, paint: 0.06 }),
+    corr: m.toon('#ffffff', { map: tx.corr, vertexColors: true, paint: 0.05, noDormant: true }),
+    rust: m.toon('#ffffff', { map: tx.rust, vertexColors: true, paint: 0.06, noDormant: true }),
   };
 }
 
 const WALLS = ['#a9c3d4', '#c9d4d8', '#e3ddd0', '#b8c7b8', '#d6d2c6', '#9fb6c9', '#e6e1d6', '#c7c1b4', '#b2bec9'];
 const ROOFS = ['#56677a', '#4a78a0', '#8e4540', '#7b8691', '#6f8f8a', '#a0573f', '#5d6f86'];
 const SHUT = ['#b9c0c6', '#a8b4bd', '#c9cdd0', '#9fb0bf'];
+
+/** [r2:4] A wall-less shed (GSI 3111 / 3112, openshed.js): a mono-pitch roof slab on steel posts over a small footprint; no walls, ribs, shutters or windows. */
+function buildOpenShed(H, lot, HF, gmax) {
+  const { M, gb } = H;
+  const sp = openShedPlan(lot.obb.w, lot.obb.d, lot.height || 3.4, shedDirOf(lot));
+  const RF = sp.alongX ? HF : HF.sub(0, 0, 0, Math.PI / 2);
+  const fy = gmax + 0.15, A = sp.L / 2 + 0.05, B = sp.D / 2 + 0.05, sd = sp.sd, yL = fy + sp.yLow, yH = fy + sp.yHigh;
+  const sl = H.slab([[-A, yL, sd * B], [A, yL, sd * B], [A, yH, -sd * B], [-A, yH, -sd * B]], sp.t, (q) => [q[0] / 1.08, -(B - sd * q[2]) * 1.02]);
+  gb.mesh(M.metal, lot.roof.color, sl.p, sl.n, sl.u, sl.i, RF.M(0, 0, 0));
+  for (const q of sp.posts) { const g = H.gy(RF, q.a, q.b) - 0.2; RF.boxB(M.plain, SHED.post0, SHED.post, fy + q.y1 - g, SHED.post, q.a, g, q.b); }
+  return true;
+}
 
 /**
  * Warehouse / plant on a real lot. Returns false when the footprint is unusable.
@@ -61,15 +78,21 @@ export function buildWarehouse(H, lot, lod, IM, SM, signs, r, out) {
   const F = H.Frame.at(gb, f.x, f.y, f.z, f.rotY);
   const HF = F.sub(0, 0, -lot.obb.d / 2, 0);
   const { gmin, gmax } = groundRange(H, HF, w, d);
+  if (walllessOf(lot)) { out.warehouses.push({ id: lot.id, rusty: false, plant: false, open: true }); return buildOpenShed(H, lot, HF, gmax); }   // [r2:4]
   const shore = L.shoreDist(lot.obb.cx, lot.obb.cz);
   const nearSea = shore > -70;
   const plant = lot.kind === 'factory' || (lot.area > 900 && r() < 0.5);
   const h = Math.max(4.8, Math.min(plant ? 16 : 12, lot.height || 6));
   const dock = r() < 0.55 && d > 8 ? 1.05 : 0.15;
   const fy = gmax + dock;
-  const rusty = nearSea ? r() < 0.75 : r() < 0.3;
+  // [sys:31] a measured wall (OSM building:colour, an override) is the wall: plain corrugated cladding in that colour, no company stripe.
+  // Every draw stays where it was; only the results are replaced.
+  const mw = measuredWall(lot);
+  const rusty0 = nearSea ? r() < 0.75 : r() < 0.3;
+  const rusty = mw ? false : rusty0;
   const wallMat = rusty ? IM.rust : IM.corr;
-  const wall = pick(r, WALLS);
+  const wall0 = pick(r, WALLS);
+  const wall = mw ? lot.wall : wall0;
   const measuredCol = lot.src?.color === 'aerial' || lot.src?.color === 'osm' || lot.src?.color === 'override';   // [v4:overrides]   // [v4:data] the photo / OSM colour
   const roofCol = measuredCol ? lot.roof.color : lot.roof.color === '#d8dbd6' || lot.roof.color === '#b9bab4' ? pick(r, ROOFS) : (r() < 0.5 ? lot.roof.color : pick(r, ROOFS));
   // plinth + dock
@@ -88,7 +111,7 @@ export function buildWarehouse(H, lot, lod, IM, SM, signs, r, out) {
   HF.boxB(M.plain, trim, w + 0.06, 0.3, d + 0.06, 0, fy + h - 0.55, 0);
   // [v3:fix] a painted company colour stripe round the shed (blue / green / maroon, as the mid-zone facades): the hero
   // sheds by the promenade read as plain white boxes. Own RNG so the rest of the shed keeps its seeded look.
-  { const r2 = ctx.rng('wh-stripe-' + lot.id); if (r2() < 0.75 && h > 5.2) { const sc = pick(r2, ['#3f6aa0', '#3d7a62', '#8a3b3b', '#2f5f8f']); const sy = fy + baseH + (h - baseH) * (0.5 + r2() * 0.1); HF.boxB(M.plain, sc, w + 0.05, 0.8, d + 0.05, 0, sy, 0); if (r2() < 0.5) HF.boxB(M.plain, '#f1efe8', w + 0.055, 0.12, d + 0.055, 0, sy + 0.86, 0); } }
+  { const r2 = ctx.rng('wh-stripe-' + lot.id); if (r2() < 0.75 && h > 5.2 && !mw) { const sc = pick(r2, ['#3f6aa0', '#3d7a62', '#8a3b3b', '#2f5f8f']); const sy = fy + baseH + (h - baseH) * (0.5 + r2() * 0.1); HF.boxB(M.plain, sc, w + 0.05, 0.8, d + 0.05, 0, sy, 0); if (r2() < 0.5) HF.boxB(M.plain, '#f1efe8', w + 0.055, 0.12, d + 0.055, 0, sy + 0.86, 0); } }
   // high window band
   if (lod >= 1) {
     const n = Math.floor(w / 3.5);
@@ -147,10 +170,37 @@ export function buildWarehouse(H, lot, lod, IM, SM, signs, r, out) {
   const RF = alongX ? HF : HF.sub(0, 0, 0, Math.PI / 2);
   const hx = (alongX ? w : d) / 2 + 0.35, hz = (alongX ? d : w) / 2 + 0.4;
   const top = fy + h;
-  if (lot.roof.shape === 'flat' || (plant && r() < 0.4)) {
+  // [sys:34] a stored roof shape (measured, or resolved once in build-layout.js: sys:4) is built as it is; a lot with no src still gets the
+  // plant rolls. Both draws are taken first so the rng stream of every other detail does not move.
+  const rf = plant ? r() : 1, rs = plant && w * d > 800 ? r() : 1, stored = isFinalRoof(lot);
+  if (lot.roof.shape === 'flat' || (!stored && rf < 0.4)) {
     HF.boxB(M.concrete, '#c9c7c0', w + 0.1, 0.5, d + 0.1, 0, top, 0, { uv: { world: 2 } });
-    HF.boxB(M.plain, roofCol, w - 0.5, 0.06, d - 0.5, 0, top + 0.5, 0);   // [v5] above the parapet's top face (top + 0.5): it z-fought there
-  } else if (lot.roof.shape === 'saw' || (plant && w * d > 800 && r() < 0.5)) {
+    HF.boxB(M.plain, flatPaint(roofCol), w - 0.5, 0.06, d - 0.5, 0, top + 0.5, 0);   // [v5] above the parapet's top face (top + 0.5): it z-fought there; [r2:3] a flat top renders about 3.5 L* lighter than painted
+    if (hasPlant(lot)) drawRoofPlant(HF, M, lot, top + 0.56);   // [r2:5] the measured rooftop plant (plant roofs drew none)
+    // [sys:8] solar module rows (lot.roof.pv): a frame slab and a dark cell slab per row, tilted 10 degrees toward the frontage (+z) over the
+    // slab box; this builder has no inner polygon
+    if (lot.roof.pv) {
+      const pw = (w - 0.5) / 2, pd = (d - 0.5) / 2;
+      for (const rw of planPv([[-pw, -pd], [pw, -pd], [pw, pd], [-pw, pd]], lot.roof.pv)) {
+        const xc = (rw.x0 + rw.x1) / 2, zc = (rw.z0 + rw.z1) / 2, len = rw.x1 - rw.x0, y = top + 0.5 + 0.06 + 0.16;
+        HF.box(M.plain, PV.frame, len, 0.05, PV.depth, xc, y, zc, { rx: PV.tilt });
+        HF.box(M.plain, PV.dark, len - 0.1, 0.02, PV.depth - 0.1, xc, y + 0.03, zc, { rx: PV.tilt });
+      }
+    }
+  } else if (lot.roof.shape === 'shed' && stored) {
+    // [sys:4] a mono-pitch roof (GSI 3111 sheds, mid and far draw it too): low eave on one side, rising across the short axis
+    const sd = shedDirOf(lot), rise = Math.min(1.6, hz * 2 * 0.14), tv = 0.12, yL = top + tv - 0.3 * 0.12;
+    const pts = [[-hx, yL, sd * hz], [hx, yL, sd * hz], [hx, yL + rise, -sd * hz], [-hx, yL + rise, -sd * hz]];
+    const sl = H.slab(pts, tv, (q) => [q[0] / 1.08, -(hz - sd * q[2]) * 1.02]);
+    gb.mesh(M.metal, roofCol, sl.p, sl.n, sl.u, sl.i, RF.M(0, 0, 0));
+    const ww = alongX ? w : d, dd = alongX ? d : w;
+    for (const s of [1, -1]) {
+      const x = s * ww / 2;
+      const yAt = (b) => yL + rise * (hz - sd * b) / (2 * hz) - 0.1;
+      const tri = H.poly([[x, top, -dd / 2], [x, top, dd / 2], [x, Math.max(top, yAt(dd / 2)), dd / 2], [x, Math.max(top, yAt(-dd / 2)), -dd / 2]], [s, 0, 0], (q) => [q[2] / 4, (q[1] - top) / 4]);
+      gb.mesh(wallMat, wall, tri.p, tri.n, tri.u, tri.i, RF.M(0, 0, 0));
+    }
+  } else if (lot.roof.shape === 'saw' || (!stored && rs < 0.5)) {
     // saw-tooth roof along the long axis
     const L2 = alongX ? w : d, D2 = alongX ? d : w, teeth = Math.max(2, Math.round(D2 / 6));
     for (let k = 0; k < teeth; k++) {

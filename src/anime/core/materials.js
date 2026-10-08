@@ -2,6 +2,7 @@
 // Toon (三渲二) material library. All modules should get materials from here so the
 // look stays consistent and identical materials are shared (=> static batching works).
 import * as THREE from 'three';
+import { applySwimFog } from '../play/underwater/fog.js';   // [play:underwater] depth fog and caustics, gated by uSwim
 import { patchSnow, seasonUniform } from './season.js';   // [v3:integrate]
 
 export const LAYER_NO_OUTLINE = 1;
@@ -53,7 +54,7 @@ float paintNoise(vec3 p){ return (pn_noise(p*0.45)*0.6 + pn_noise(p*1.9+11.0)*0.
 `;
 
 /** Adds world-space hand-painted colour variation (+ optional ground grime) to a built-in material. */
-function patchPaint(material, amount, grime, uSeason = null) {
+function patchPaint(material, amount, grime, uSeason = null, noDormant = false) {
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uPaint = { value: amount };
     shader.uniforms.uGrime = { value: grime };
@@ -71,9 +72,10 @@ function patchPaint(material, amount, grime, uSeason = null) {
         { float pn = paintNoise(vPWorld);
           diffuseColor.rgb *= 1.0 + uPaint * pn;
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb*vec3(0.93,0.93,0.97), uPaint*2.0*clamp(pn*1.5,0.0,1.0)); }`);
-    if (uSeason) patchSnow(shader, uSeason, 'vPWorld');   // [v3:integrate] winter snow on every cel surface
+    if (uSeason) patchSnow(shader, uSeason, 'vPWorld', noDormant);   // [v3:integrate] winter snow on every cel surface; [r3:7] noDormant: no early-spring tan on roofs / facades
+    applySwimFog(shader, 'vPWorld');   // [play:underwater] inside this callback, so batch2 still sees the same onBeforeCompile
   };
-  material.customProgramCacheKey = () => (uSeason ? 'paint-s' : 'paint');   // [v3:integrate] snow variant
+  material.customProgramCacheKey = () => (uSeason ? (noDormant ? 'paint-s-roof' : 'paint-s') : 'paint') + '|swim';   // [v3:integrate] snow variant
 }
 
 // [v3:harbor] Cache keys without Texture.toJSON: JSON.stringify calls toJSON() before the replacer, so the old
@@ -89,7 +91,8 @@ export function createMaterials(shared) {
   /** Main cel-shaded material. color: hex/Color. opts:
    *  map, alphaMap, alphaTest, transparent, opacity, side ('front'|'back'|'double'), vertexColors,
    *  emissive, emissiveIntensity, paint (0..0.15 hand-painted variation, default 0.05),
-   *  polygonOffset (number: factor, negative pulls toward camera), depthWrite, name, flatShading */
+   *  polygonOffset (number: factor, negative pulls toward camera), depthWrite, name, flatShading,
+   *  [r3:7] noDormant (roofs, facades, building materials: no early-spring dormant-tan conversion of green albedo; ground and lawns keep it) */
   function toon(c = '#ffffff', opts = {}) {
     const key = 'toon|' + color(c).getHexString() + '|' + optsKey(opts);
     if (cache.has(key)) return cache.get(key);
@@ -109,8 +112,8 @@ export function createMaterials(shared) {
       name: opts.name || '',
     });
     if (opts.polygonOffset) { m.polygonOffset = true; m.polygonOffsetFactor = opts.polygonOffset; m.polygonOffsetUnits = opts.polygonOffset * 2; }
-    patchPaint(m, opts.paint ?? 0.05, opts.grime ?? 0, opts.noSnow ? null : uSeason);
-    m.userData.toon = { paint: opts.paint ?? 0.05, grime: opts.grime ?? 0, polygonOffset: opts.polygonOffset || 0 };
+    patchPaint(m, opts.paint ?? 0.05, opts.grime ?? 0, opts.noSnow ? null : uSeason, !!opts.noDormant);
+    m.userData.toon = { paint: opts.paint ?? 0.05, grime: opts.grime ?? 0, polygonOffset: opts.polygonOffset || 0, noDormant: !!opts.noDormant };
     Object.defineProperty(m.userData.toon, 'obc', { value: m.onBeforeCompile, enumerable: false });
     if (opts.nightGlow) nightGlow(m, opts.nightGlow);
     if (opts.winterHide && uSeason) winterHide(m);

@@ -229,8 +229,8 @@ describe("fold: precedence and sources", () => {
     expect(a.kind).toBe("landmark"); expect(a.roof.shape).toBe("flat"); expect(a.roof.color).toBe("#dcdcd4");
   });
   test("disaster references never become names (V3-SPEC section 5)", () => {
-    expect(showable("気仙沼市東日本大震災遺構・伝承館")).toBe(false); expect(showable("復興祈念公園")).toBe(false); expect(showable("気仙沼市役所")).toBe(true);
-    const a = enrichLot({ id: "z", gsiName: "東日本大震災遺構・伝承館" }, base, [1, 1, 1], classify);
+    expect(showable("気仙沼市東日本大\u9707\u707d遺構・伝承館")).toBe(false); expect(showable("復興祈念公園")).toBe(false); expect(showable("気仙沼市役所")).toBe(true);
+    const a = enrichLot({ id: "z", gsiName: "東日本大\u9707\u707d遺構・伝承館" }, base, [1, 1, 1], classify);
     expect(a.name).toBeUndefined();
   });
   test("river width from water-area edges", () => {
@@ -287,7 +287,7 @@ describe("data: produced files", () => {
     for (const l of L.LOTS) if (l.name) expect(SENSITIVE.test(l.name), l.name).toBe(false);
   });
   test("every lot records its sources; far lots keep names and ridges", () => {
-    const ok = new Set(["osm", "aerial", "gsi", "landmark", "derived", "ref", "override"]);   // [v4:polish1] ref: world/lotfix.js  [v5] override: data/anime/overrides (docs/anime/OVERRIDES.md)
+    const ok = new Set(["osm", "aerial", "gsi", "landmark", "derived", "derived-resolved", "ref", "override"]);   // [sys:4] derived-resolved: a derived roof shape decided once in build-layout.js   // [v4:polish1] ref: world/lotfix.js  [v5] override: data/anime/overrides (docs/anime/OVERRIDES.md)
     for (const l of L.LOTS) { expect(l.src, l.id).toBeTruthy(); for (const k of ["h", "kind", "roof", "color"]) expect(ok.has(l.src[k]), `${l.id} ${k}`).toBe(true); }
     const far = L.LOTS.filter((l) => l.zone === "far");
     expect(far.some((l) => l.name)).toBe(true);

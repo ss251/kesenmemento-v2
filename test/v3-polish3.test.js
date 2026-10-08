@@ -29,6 +29,7 @@ const { worldHeight } = await import("../src/anime/world/environment/terrain.js"
 const { scatterPlan, buildScatter } = await import("../src/anime/world/environment/scatter.js");
 const { FRAMES, tourStops } = await import("../src/anime/world/life/tour.js");
 const { stillPlan } = await import("../scripts/render/stills.js");
+const { fovFor, FOV } = await import("../src/anime/core/fov.js");   // [ui-c2] the portrait rule lives in core/fov.js now
 
 const src = (p) => readFileSync(new URL("../" + p, import.meta.url), "utf8");
 const DEG = Math.PI / 180;
@@ -80,12 +81,18 @@ describe("2. no cloud heap is cut by the top of the frame", () => {
 
 describe("3. the phone layout", () => {
   test("a portrait viewport keeps a ~64 deg horizontal view (capped at 88 deg vertical)", () => {
-    const m = src("src/anime/main.js");
-    expect(m).toContain("camera.aspect < 1 ? Math.min(88, 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(64) / 2) / camera.aspect) * 180 / Math.PI) : 55");
+    // [ui-c2] the rule moved out of resize() into core/fov.js (one function for the screen and for photo mode); the pin follows it: resize() calls it, the module holds the same formula
+    const m = src("src/anime/main.js"), f = src("src/anime/core/fov.js");
+    expect(m).toContain("camera.fov = ctx.fovFor(camera.aspect);");
+    expect(f).toContain("aspect < 1");
+    expect(f).toContain("Math.min(FOV.portraitMax, 2 * Math.atan(Math.tan((FOV.portraitHorizontal * DEG2RAD) / 2) / aspect) * 180 / Math.PI)");
+    expect(FOV).toEqual({ landscape: 55, portraitHorizontal: 64, portraitMax: 88 });
     const fov = (a) => Math.min(88, 2 * Math.atan(Math.tan(64 * DEG / 2) / a) / DEG);
     const hfov = (a) => 2 * Math.atan(Math.tan(fov(a) * DEG / 2) * a) / DEG;
     expect(hfov(390 / 844)).toBeGreaterThan(45);   // was ~28 deg at a fixed 55 deg vertical
     expect(fov(1.2)).toBeGreaterThan(55);          // (landscape keeps 55: the formula is only used below aspect 1)
+    for (const a of [0.3, 390 / 844, 0.75, 0.999]) expect(fovFor(a)).toBe(fov(a));   // the module's function is that formula
+    for (const a of [1, 1.2, 16 / 9, 3]) expect(fovFor(a)).toBe(55);
   });
   test("the hero stop has a portrait drone pose, tilted up; stops pick it on a portrait viewport only", () => {
     const P = FRAMES.hero.portrait, D = FRAMES.hero.drone;
@@ -213,15 +220,19 @@ describe("11-13. framings", () => {
 });
 
 describe("14. 朝 reads as morning", () => {
-  test("a cool zenith, a pink horizon, pearl fog; the low mist and the pale sheen follow the morning weight", () => {
+  test("06:30 is a clear morning; pink stays in the pre-sunrise sky, and the mist does not cover the town", () => {
     const p = skyPaletteAt(6.5);
-    expect("#" + p.zenith.getHexString()).toBe("#5f8fcf");
-    expect("#" + p.horizon.getHexString()).toBe("#f5cdbf");
-    expect("#" + p.fog.getHexString()).toBe("#e8d8dc");
+    expect("#" + p.zenith.getHexString()).toBe("#3f86d8");
+    expect("#" + p.horizon.getHexString()).toBe("#efe0c8");
+    expect("#" + p.fog.getHexString()).toBe("#d3e0ee");
+    const dawn = skyPaletteAt(5.4);
+    expect("#" + dawn.horizon.getHexString()).toBe("#f0b6a4");
     const ctx = makeCtx(), sky = skyWith(ctx), mist = ctx.pipeline.compMat.uniforms.uMist;
-    sky.setHours(6.5); expect(mist.value).toBeGreaterThan(0.3); expect(sky.uniforms.uMorning.value).toBeGreaterThan(0.9);
+    sky.setHours(6.5); expect(mist.value).toBe(0); expect(sky.uniforms.uMorning.value).toBe(0);
+    sky.setHours(5.35); expect(mist.value).toBeGreaterThan(0.05); expect(mist.value).toBeLessThan(0.2);
     sky.setHours(16.5); expect(mist.value).toBe(0); expect(sky.uniforms.uMorning.value).toBe(0);
     expect(src("src/anime/core/renderer.js")).toContain("float lowK = 1.0 - smoothstep(-2.0, uMistH, wy);");
+    expect(src("src/anime/core/renderer.js")).toContain("smoothstep(900.0, 2000.0, dist)");
     expect(src("src/anime/world/water.js")).toContain("uMornW: sky?.uMorning");
   });
 });
@@ -252,6 +263,6 @@ describe("16. the credit line reads on a light sky", () => {
   test("a shadow and a soft backing pill", () => {
     const s = src("src/anime/ui/style.js");
     expect(s).toContain("text-shadow: 0 1px 2px rgba(20, 30, 60, 0.45)");
-    expect(s).toContain("background: rgba(24, 32, 62, 0.26)");
+    expect(s).toContain("background: rgba(18, 26, 52, 0.62)");   // [ui-b2:14] was rgba(24, 32, 62, 0.26): white on it was 1.9:1 over cloud, now 5.3
   });
 });

@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "cell": "outside-sai4",
+  "bbox": [
+    -200,
+    970,
+    -30,
+    1070
+  ],
+  "note": "outside the 12 cells (south of c10, 幸町4丁目): OSM landuse=construction (brownfield) polygon #1171 (centre -98.7, 1022.6, 2,670 m2) painted cream bare earth under two flat-roofed store buildings and their asphalt yard. Earth 2026-03-11 shows the 幸町 land readjustment finished here: a built NE yard and a dry-brown bare SW lot.",
+  "sources": [
+    {
+      "id": "earth",
+      "what": "Google Earth (the 2026-03-11 aerial image draped on the terrain; no 3D buildings), imagery dated 2026-03-11 (raw/ref/earth/land3/c10 and raw/ref/earth/c10-sai4-r3)",
+      "date": "2026-03-11"
+    }
+  ],
+  "landuse": [
+    {
+      "use": "vacant",
+      "surface": "gravel",
+      "replace": true,
+      "ring": [
+        [
+          -114.7,
+          1032.7
+        ],
+        [
+          -112.0,
+          1025.8
+        ],
+        [
+          -98.4,
+          1021.0
+        ],
+        [
+          -91.1,
+          1019.5
+        ],
+        [
+          -89.0,
+          1028.9
+        ],
+        [
+          -78.5,
+          1039.3
+        ],
+        [
+          -77.5,
+          1043.1
+        ],
+        [
+          -96.2,
+          1052.8
+        ]
+      ],
+      "src": "earth: raw/ref/earth/c10-sai4-r3 top (annot grid), the SW bare-earth lot of OSM brownfield #1171 is dry brown (Earth L* 55 a* 5 b* 3, not the cream L* 78 b* +23 the app painted), gravel like c10's neighbouring vacant #5; ring from the finding (vertices within about 1 m of the OSM ring's corners). Listed first: its ring contains #1171's vertex centroid (-98.7, 1022.6), so replace drops that polygon (the apron ring does not contain it)",
+      "color": "#84746e"
+    },
+    {
+      "use": "apron",
+      "replace": true,
+      "ring": [
+        [
+          -98.4,
+          1021.0
+        ],
+        [
+          -88.9,
+          1007.9
+        ],
+        [
+          -62.3,
+          983.3
+        ],
+        [
+          -41.1,
+          1015.3
+        ],
+        [
+          -77.5,
+          1043.1
+        ],
+        [
+          -78.5,
+          1039.3
+        ],
+        [
+          -89.0,
+          1028.9
+        ],
+        [
+          -91.1,
+          1019.5
+        ]
+      ],
+      "src": "earth: raw/ref/earth/c10-sai4-r3 top, the built NE yard of #1171 (two flat-roofed store buildings, forecourt and aisle) is grey asphalt: the 幸町 land readjustment is finished; the stalled car park is cut out as a hole and drawn as its own parking item",
+      "holes": [
+        [
+          [
+            -90.6,
+            1019.4
+          ],
+          [
+            -81.0,
+            1013.0
+          ],
+          [
+            -75.0,
+            1014.8
+          ],
+          [
+            -68.6,
+            1028.0
+          ],
+          [
+            -75.0,
+            1035.8
+          ],
+          [
+            -78.2,
+            1038.8
+          ],
+          [
+            -88.5,
+            1028.7
+          ]
+        ]
+      ]
+    },
+    {
+      "use": "parking",
+      "fill": 0.3,
+      "ring": [
+        [
+          -90.6,
+          1019.4
+        ],
+        [
+          -81.0,
+          1013.0
+        ],
+        [
+          -75.0,
+          1014.8
+        ],
+        [
+          -68.6,
+          1028.0
+        ],
+        [
+          -75.0,
+          1035.8
+        ],
+        [
+          -78.2,
+          1038.8
+        ],
+        [
+          -88.5,
+          1028.7
+        ]
+      ],
+      "src": "earth: raw/ref/earth/c10-sai4-r3 top, the stalled sub-area of the yard (x about -91..-69, z 1013..1039: stall lines west of the shop, a column of parked cars along its SW edge, about 30 percent of stalls with a car)"
+    }
+  ]
+}

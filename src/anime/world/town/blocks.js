@@ -5,12 +5,15 @@
 // Offices / public buildings: ribbon windows (life's window material: anime glass by day, a lit fraction at night),
 // coloured spandrels, a glass entrance with a canopy, rooftop plant and a parapet.
 import { buildWindow } from './kit/house.js';
-import { groundRange, pick } from './common.js';
-import { flatRoofOf } from './palette.js';
+import { groundRange, pick, clamp } from './common.js';
+import { flatRoofOf, measuredWall } from './palette.js';
+import { flatPaint } from './flatroof.js';   // [r2:3] a flat top renders about 3.5 L* lighter than painted
+import { hasPlant, drawRoofPlant } from './roofplant.js';   // [r2:5]
 import { OFFICES } from './names.js';
 import { lights } from '../life/lights.js';
 
-const BODY = ['#e6e1d6', '#dcd6ca', '#e9e4da', '#d6dde0', '#e3dccd', '#d2d6d2', '#ece6d8'];
+const measuredH = (lot) => lot.src?.h === 'osm' || lot.src?.h === 'override' || lot.src?.h === 'landmark' || lot.src?.h === 'ref';   // [r2:12] + LOT_FIX heights   // [sys:29]
+const BODY = ['#e6e1d6', '#dcd6ca', '#e9e4da', '#d8d6cf', '#e3dccd', '#d2d6d2', '#ece6d8'];
 const ACCENT = ['#8c5a4a', '#4f6f8f', '#6d8a6a', '#b88a4a', '#5d6f86', '#9a6b5b'];
 
 /** Name atlas: vertical building names (64×256 cells, 8 per row, 512×512). */
@@ -53,20 +56,22 @@ export function buildApartmentBlock(H, lot, lod, r, T, wing = null) {
   const sx = r() < 0.5 ? 1 : -1;
   const BF = bf.BF.sub(-sx * 1.4, 0, 0, 0), Lw = bf.Lw - 2.8, D = bf.D;
   const n = Math.max(3, Math.min(14, lot.storeys));
-  const FH = 2.9;
+  // [sys:29] a measured height (OSM, an override, a landmark sheet) is built as given: the storeys fill lot.height less the slab and the 0.9 m parapet
+  const FH = measuredH(lot) ? clamp((lot.height - 0.25 - 0.9) / n, 2.6, 4.5) : 2.9;
   const { gmin, gmax } = groundRange(H, BF, Lw, D);
   const fy = gmax + 0.25, top = fy + n * FH;
   const corridor = D >= 8.5;
   const bd = D - 1.25 - (corridor ? 1.2 : 0), bz = (corridor ? 1.2 : 0) / 2 - 1.25 / 2;     // body depth + centre z
   const zFront = bz + bd / 2, zBack = bz - bd / 2;
-  const body = pick(r, BODY), accent = pick(r, ACCENT), rail = r() < 0.5 ? '#f1eee6' : '#dfe3e6';
+  let body = pick(r, BODY); const accent = pick(r, ACCENT), rail = r() < 0.5 ? '#f1eee6' : '#dfe3e6';
+  if (measuredWall(lot)) body = lot.wall;   // [sys:31] OSM building:colour / an override: the pick above stays so the other draws do not move
   const S = { rng: r, frameColor: '#8e949b', sillColor: '#8e949b', trim: '#e9e6df', roof: { mat: 'metal', color: '#7b8691' }, interiors: null, shutterClosed: 0.02, shutterStyle: 'none', hoods: false, traditional: false, floorY: fy, fh: FH, lod };
   // plinth + body + parapet
   BF.boxB(M.concrete, '#bdbcb5', Lw + 0.1, fy - gmin + 0.3, D + 0.1, 0, gmin - 0.3, 0, { uv: { world: 2 } });
   BF.boxB(M.tile, body, Lw, n * FH, bd, 0, fy, bz, { uv: { world: 0.96 } });
   BF.boxB(M.plain, body, Lw + 0.1, 0.9, bd + 0.1, 0, top, bz);
   // [v5] the roof deck sits ON the parapet box (it was at top + 0.6, inside it, so no roof colour showed): the measured colour
-  BF.boxB(M.plain, flatRoofOf(lot), Lw - 0.3, 0.05, bd - 0.3, 0, top + 0.9, bz);
+  BF.boxB(M.plain, flatPaint(flatRoofOf(lot)), Lw - 0.3, 0.05, bd - 0.3, 0, top + 0.9, bz);
   // accent stripe on the end walls (vertical) + the building name
   for (const sx of [-1, 1]) BF.boxB(M.plain, accent, 0.06, n * FH * 0.8, 1.2, sx * (Lw / 2 + 0.03), fy + n * FH * 0.1, bz);
   const real = T.real?.get(lot);   // [v4:town-accuracy] the real building name (OSM), on a board over the entrance
@@ -167,23 +172,37 @@ function schoolSignMat(ctx, key, SG) {
       g.fillText(SG.side, 256, 98);
     }
   }, { key: 'town-school-sign-' + key, anisotropy: 8 });
-  return { mat: ctx.mat.toon('#ffffff', { map: tex, paint: 0.01 }), main: [0, 0.5, 1, 1], side: [0, 0, 1, 0.5] };
+  return { mat: ctx.mat.toon('#ffffff', { map: tex, paint: 0.01, noDormant: true }), main: [0, 0.5, 1, 1], side: [0, 0, 1, 0.5] };
+}
+
+/** [r2:6] Punched windows (the facade of a small office, a branch, a public building): PAIRS of 0.85 m panes (a sash of about 1.7 m) on a 3 m pitch, sill 0.9 m, head 2.1-2.4 m, grey frames
+ *  and a sill. The 2026-03-29 lookout photo of 港町 / 南町 (about 25 mid-rise buildings) shows not one curtain-wall or continuous-ribbon facade: offices and apartments are RC or
+ *  tile-clad boxes with discrete punched windows, and the tax-office ground photo (Commons 2024-12) shows pairs of sashes about 3 m apart (the old 3 panes at 5 m was too sparse for a
+ *  22 m wall). The wall colour stays the lot's own. -> { groups, pitch, head, gw } for a wall of `len` m and a storey of `FH` m */
+export const PUNCH = { pane: 0.85, panes: 2, pitch: 3, sill: 0.9, headMax: 2.4, headMin: 2.1 };
+export function punchedPlan(len, FH) {
+  const gw = PUNCH.panes * PUNCH.pane, groups = Math.max(1, Math.floor((len - 1.5) / PUNCH.pitch)), pitch = (len - 1.5) / groups;
+  const head = clamp(FH - 0.9, PUNCH.headMin, PUNCH.headMax);
+  return { groups, pitch, head, gw };
 }
 
 export function buildOfficeBlock(H, lot, lod, r, T, wing = null) {
   const { M } = H;
-  const { BF, Lw, D } = blockFrame(H, lot, wing);
+  const { BF, Lw, D, HF } = blockFrame(H, lot, wing);
   if (Lw < 6 || D < 5) return false;
   const n = Math.max(2, Math.min(12, lot.storeys));
-  const FH = 3.4;
+  const FH = measuredH(lot) ? clamp((lot.height - 0.2 - 0.9) / n, 2.8, 5.5) : 3.4;   // [sys:29] built as given
   const { gmin, gmax } = groundRange(H, BF, Lw, D);
   const fy = gmax + 0.2, top = fy + n * FH;
   const body0 = pick(r, ['#e3dccd', '#d6d8d4', '#cfc8bc', '#e6e1d6', '#c9cfd3']), span = pick(r, ['#8a8f96', '#6d7680', '#b8b2a6', '#5d6f86', '#9a8c7c']);
   // [v6:c6] a wall colour from an override (read from a photo) is the body colour
-  const body = lot.src?.wall === 'override' && lot.wall ? lot.wall : body0;
+  const body = measuredWall(lot) && lot.wall ? lot.wall : body0;   // [sys:31] + OSM building:colour
   // [v6:c6] a facade style other than office (an override's `facade`): punched windows in groups of panes with wall
   // between them, no spandrel band; a school gets a set-back top storey clad in navy with its name (schoolSigns)
-  const punched = !!lot.facade && lot.facade !== 'office';
+  // [r2:6] punched windows are the default for an office or a public building (the glass ribbon was every office's face: small company offices read as curtain-wall blocks); an
+  // explicit facade 'office' stays on glass; hotels (no ground-photo evidence) and schools keep their ribbon
+  const punched = lot.facade ? lot.facade !== 'office' : (lot.kind === 'office' || lot.kind === 'public');
+  const ribbon = lot.facade === 'ribbon';   // [v6:c5r3] (punched stays true for it: the facade !== 'office' line above is test-pinned)
   const school = lot.kind === 'school' && n >= 3;
   const nb = school ? n - 1 : n;                         // storeys of the main body
   const topB = fy + nb * FH;
@@ -191,21 +210,34 @@ export function buildOfficeBlock(H, lot, lod, r, T, wing = null) {
   const win = lights(H.ctx).windowMaterial({ kind: lot.kind === 'public' ? 'public' : 'office', tint: glassTint });
   BF.boxB(M.concrete, '#bdbcb5', Lw + 0.1, fy - gmin + 0.3, D + 0.1, 0, gmin - 0.3, 0, { uv: { world: 2 } });
   BF.boxB(M.tile, body, Lw, nb * FH + (school ? 0.45 : 0.9), D, 0, fy, 0, { uv: { world: 0.96 } });
+  if (ribbon) BF.boxB(M.tile, '#e7e9e8', Lw + 0.03, FH, D + 0.03, 0, fy, 0, { uv: { world: 0.96 } });   // [v6:c5r3] the plain white ground floor
   // ribbon windows on all four faces, per pane quads (life's window material wants uv 0..1 per pane)
   const faces = [[0, D / 2, 0, Lw], [0, -D / 2, Math.PI, Lw], [Lw / 2, 0, Math.PI / 2, D], [-Lw / 2, 0, -Math.PI / 2, D]];
   const pane = (FF, x0, x1, y0, y1) => H.quads(FF, win, '#ffffff', [{ p: [[x0, y0, 0.02], [x1, y0, 0.02], [x1, y1, 0.02], [x0, y1, 0.02]], n: [0, 0, 1], uv: [[0, 0], [1, 0], [1, 1], [0, 1]] }], { shadow: false, noOutline: true });
   for (const [fx, fz, ry, len] of faces) {
     const FF = BF.sub(fx, 0, fz, ry);
+    if (ribbon) {
+      // [v6:c5r3] ribbon: a plain ground floor (a row of small square vents on the long faces, IMG Commons 2017-09), then one continuous narrow window band per upper storey: sill 1.5 m, 0.95 m high, 1.2 m panes, and a thin aluminium head / sill line
+      const panes = Math.max(2, Math.round((len - 1.2) / 1.2)), pw = (len - 1.2) / panes;
+      for (let f = 1; f < n; f++) {
+        const y0 = fy + f * FH, sill = y0 + Math.min(1.5, FH * 0.5);
+        FF.box(M.plain, '#c9d0d6', len - 0.9, 0.06, 0.05, 0, sill - 0.03, 0.025);
+        FF.box(M.plain, '#c9d0d6', len - 0.9, 0.06, 0.05, 0, sill + 0.98, 0.025);
+        for (let p = 0; p < panes; p++) { const cu = -len / 2 + 0.6 + (p + 0.5) * pw; pane(FF, cu - pw / 2 + 0.03, cu + pw / 2 - 0.03, sill, sill + 0.95); }
+      }
+      if (lod >= 1 && len > 8 && fz <= 0) for (let k = 0; k < Math.floor((len - 2) / 2.3); k++) FF.box(M.plain, '#8f98a0', 0.42, 0.42, 0.04, -len / 2 + 1.4 + k * 2.3, fy + 1.3, 0.04);
+      continue;
+    }
     if (punched) {
-      // groups of three 0.85 m panes (grey frames and mullions), about 5 m apart, sill 0.9 m, head 2.4 m
-      const gw = 3 * 0.85, groups = Math.max(1, Math.floor((len - 1.5) / 5)), pitch = (len - 1.5) / groups;
+      // [r2:6] pairs of 0.85 m panes (grey frames and a mullion) on a 3 m pitch, sill 0.9 m, head 2.1-2.4 m
+      const { groups, pitch, head, gw } = punchedPlan(len, FH);
       for (let f = 0; f < nb; f++) {
         const y0 = fy + f * FH;
         if (f === 0 && fz > 0) continue;   // ground floor front: the entrance
         for (let k = 0; k < groups; k++) {
           const gc = -len / 2 + 0.75 + (k + 0.5) * pitch;
-          FF.box(M.plain, '#9aa0a6', gw + 0.16, 1.66, 0.024, gc, y0 + 0.82 + 0.83, 0);
-          for (let p = 0; p < 3; p++) { const x0 = gc - gw / 2 + p * 0.85; pane(FF, x0 + 0.05, x0 + 0.8, y0 + 0.9, y0 + 2.4); }
+          FF.box(M.plain, '#9aa0a6', gw + 0.16, head - 0.82 + 0.08, 0.024, gc, y0 + 0.82 + (head - 0.82 + 0.08) / 2, 0);
+          for (let p = 0; p < PUNCH.panes; p++) { const x0 = gc - gw / 2 + p * PUNCH.pane; pane(FF, x0 + 0.05, x0 + PUNCH.pane - 0.05, y0 + PUNCH.sill, y0 + head); }
           if (lod >= 1) FF.box(M.plain, '#e2e2de', gw + 0.3, 0.08, 0.14, gc, y0 + 0.82, 0.07);   // sill
         }
       }
@@ -227,11 +259,11 @@ export function buildOfficeBlock(H, lot, lod, r, T, wing = null) {
     // light-grey metal eave line round the main body (IMG_0822), its roof deck, and the set-back top storey: a pale
     // lower band, then navy cladding to the parapet
     BF.boxB(M.plain, '#b9bec2', Lw + 0.5, 0.35, D + 0.5, 0, topB + 0.1, 0);
-    BF.boxB(M.plain, flatRoofOf(lot), Lw - 0.2, 0.05, D - 0.2, 0, topB + 0.45, 0);
+    BF.boxB(M.plain, flatPaint(flatRoofOf(lot)), Lw - 0.2, 0.05, D - 0.2, 0, topB + 0.45, 0);
     const sb = Math.min(2.5, Math.min(Lw, D) * 0.12), tw = Lw - 2 * sb, td = D - 2 * sb, y1 = topB + 0.45;
     BF.boxB(M.tile, '#dfe1e0', tw, 1.2, td, 0, y1, 0, { uv: { world: 0.96 } });
     BF.boxB(M.plain, SCHOOL_NAVY, tw + 0.06, top + 0.9 - (y1 + 1.2), td + 0.06, 0, y1 + 1.2, 0);
-    BF.boxB(M.plain, flatRoofOf(lot), tw - 0.3, 0.05, td - 0.3, 0, top + 0.9, 0);
+    BF.boxB(M.plain, flatPaint(flatRoofOf(lot)), tw - 0.3, 0.05, td - 0.3, 0, top + 0.9, 0);
     // the sign faces: the one facing the lot's street, and the more southern of its neighbours
     const tf = [[0, td / 2, 0, tw], [tw / 2, 0, Math.PI / 2, td], [0, -td / 2, Math.PI, tw], [-tw / 2, 0, -Math.PI / 2, td]].map(([fx, fz, ry, len]) => {
       const F2 = BF.sub(fx, 0, fz, ry), o = F2.w(0, 0, 0), q = F2.w(0, 0, 1);
@@ -261,14 +293,14 @@ export function buildOfficeBlock(H, lot, lod, r, T, wing = null) {
         WF.boxB(M.concrete, '#bdbcb5', q.w + 0.1, fy - g.gmin + 0.3, q.d + 0.1, 0, g.gmin - 0.3, 0, { uv: { world: 2 } });
         WF.boxB(M.tile, body, q.w, topB + 0.45 - fy, q.d, 0, fy, 0, { uv: { world: 0.96 } });
         WF.boxB(M.plain, '#b9bec2', q.w + 0.5, 0.35, q.d + 0.5, 0, topB + 0.1, 0);
-        WF.boxB(M.plain, flatRoofOf(lot), q.w - 0.2, 0.05, q.d - 0.2, 0, topB + 0.45, 0);
+        WF.boxB(M.plain, flatPaint(flatRoofOf(lot)), q.w - 0.2, 0.05, q.d - 0.2, 0, topB + 0.45, 0);
         for (const [fx, fz, ry, len] of [[0, q.d / 2, 0, q.w], [0, -q.d / 2, Math.PI, q.w], [q.w / 2, 0, Math.PI / 2, q.d], [-q.w / 2, 0, -Math.PI / 2, q.d]]) {
           if (len < 4 || inside(q.cx + fx + Math.sign(fx) * 0.4, q.cz + fz + Math.sign(fz) * 0.4)) continue;   // a face against another wing
-          const FF = WF.sub(fx, 0, fz, ry), gw = 3 * 0.85, groups = Math.max(1, Math.floor((len - 1.5) / 5)), pitch = (len - 1.5) / groups;
+          const FF = WF.sub(fx, 0, fz, ry), { groups, pitch, head, gw } = punchedPlan(len, FH);
           for (let fl = 0; fl < nb; fl++) for (let k = 0; k < groups; k++) {
             const y0 = fy + fl * FH, gc = -len / 2 + 0.75 + (k + 0.5) * pitch;
-            FF.box(M.plain, '#9aa0a6', gw + 0.16, 1.66, 0.024, gc, y0 + 1.65, 0);
-            for (let p = 0; p < 3; p++) { const x0 = gc - gw / 2 + p * 0.85; pane(FF, x0 + 0.05, x0 + 0.8, y0 + 0.9, y0 + 2.4); }
+            FF.box(M.plain, '#9aa0a6', gw + 0.16, head - 0.82 + 0.08, 0.024, gc, y0 + 0.82 + (head - 0.82 + 0.08) / 2, 0);
+            for (let p = 0; p < PUNCH.panes; p++) { const x0 = gc - gw / 2 + p * PUNCH.pane; pane(FF, x0 + 0.05, x0 + PUNCH.pane - 0.05, y0 + PUNCH.sill, y0 + head); }
           }
         }
         H.col(WF, 0, 0, q.w, q.d, 0, g.gmin - 1, topB + 1);
@@ -280,14 +312,17 @@ export function buildOfficeBlock(H, lot, lod, r, T, wing = null) {
   const FFr = BF.sub(0, 0, D / 2, 0);
   { const real = school ? null : T.real?.get(lot);   // [v4:town-accuracy] the real name (OSM / GSI 注記) over the entrance canopy ([v6:c6] a school's is on its top storey)
     if (real) { const bw = Math.min(Lw - 1, 0.6 * [...real.name].length + 0.8, 10), bh = bw / real.aspect * 1.2; FFr.boxB(M.plain, real.colors[0], bw + 0.12, bh + 0.12, 0.06, 0, fy + 3.25, 0.04); H.card(FFr, real.mat, real.rect, 0, fy + 3.31 + bh / 2, 0.075, bw, bh); } }
-  FFr.box(M.glass, null, Math.min(Lw - 1, 8), 2.8, 0.02, 0, fy + 1.4, 0.02, { shadow: false, noOutline: true });
-  FFr.box(M.plain, '#dcd8ce', Math.min(Lw - 0.5, 9), 0.25, 2.2, 0, fy + 3.0, 1.1);
-  FFr.box(H.ctx.mat.emissive('#ffd9a0', 1.1), null, 1.6, 0.03, 0.4, 0, fy + 2.86, 1.2, { shadow: false });
+  // [v6:c5r3] ribbon block: a plain white ground floor with one recessed door (2.8 m of glass under a 3.4 m slab), not an 8 m glass front
+  FFr.box(M.glass, null, ribbon ? 2.8 : Math.min(Lw - 1, 8), 2.8, 0.02, ribbon ? -Lw / 2 + 4.2 : 0, fy + 1.4, 0.02, { shadow: false, noOutline: true });
+  FFr.box(M.plain, '#dcd8ce', ribbon ? 3.4 : Math.min(Lw - 0.5, 9), 0.25, ribbon ? 1.0 : 2.2, ribbon ? -Lw / 2 + 4.2 : 0, fy + 3.0, ribbon ? 0.5 : 1.1);
+  FFr.box(H.ctx.mat.emissive('#ffd9a0', 1.1), null, 1.6, 0.03, 0.4, ribbon ? -Lw / 2 + 4.2 : 0, fy + 2.86, ribbon ? 0.6 : 1.2, { shadow: false });
   // roof plant + parapet
   // [v5] the body box rises to top + 0.9: the deck goes on it (at top + 0.4 it was hidden inside the body)
-  if (!school) BF.boxB(M.plain, flatRoofOf(lot), Lw - 0.4, 0.05, D - 0.4, 0, top + 0.9, 0);
+  if (!school) BF.boxB(M.plain, flatPaint(flatRoofOf(lot)), Lw - 0.4, 0.05, D - 0.4, 0, top + 0.9, 0);
   const nu = 1 + Math.floor(Lw * D / 250);
-  if (!school) for (let k = 0; k < Math.min(5, nu); k++) BF.boxB(M.plain, pick(r, ['#c9cdd0', '#d9dcdc', '#aeb4ba']), 1.6 + r() * 2, 1.0 + r() * 1.2, 1.2 + r() * 1.5, (r() - 0.5) * (Lw - 4), top + 0.95, (r() - 0.5) * (D - 4));
+  // [r2:5] a measured rooftop plant spec replaces the random boxes (and takes no random draw: the rest of the block keeps its seeded look)
+  if (!school && hasPlant(lot)) drawRoofPlant(HF, M, lot, top + 0.95, wing);
+  else if (!school) for (let k = 0; k < Math.min(5, nu); k++) BF.boxB(M.plain, pick(r, ['#c9cdd0', '#d9dcdc', '#aeb4ba']), 1.6 + r() * 2, 1.0 + r() * 1.2, 1.2 + r() * 1.5, (r() - 0.5) * (Lw - 4), top + 0.95, (r() - 0.5) * (D - 4));
   H.col(BF, 0, 0, Lw, D, 0, gmin - 1, top + 2);
   T.out.bigBuildings.push({ id: lot.id, kind: lot.kind, floors: n });
   return true;

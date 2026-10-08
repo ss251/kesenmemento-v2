@@ -20,7 +20,7 @@ export const STOPS = [
     cam: { from: { bearing: 225, dist: 260, height: 120 }, look: { bearing: 45, dist: 250, height: 0 } },
     splat: null,
     blurb: {
-      ja: "気仙沼の街の始まりの場所。港町の暮らしは、この穏やかな内湾に面して広がってきました。",
+      ja: "気仙沼の町の始まりの場所。港町の暮らしは、この穏やかな内湾に面して広がってきました。",
       en: "Where Kesennuma began: the port town grew up around this calm inner bay.",
     },
   },
@@ -42,7 +42,7 @@ export const STOPS = [
     cam: { from: { bearing: 260, dist: 0, height: 1.6 }, look: { bearing: 80, dist: 60, height: 1.0 } },
     splat: "model", // P3 output data/splats/model.rad (the inner-bay scale model, ADDENDUM-model)
     blurb: {
-      ja: "ここで撮影したのは、ガラスの下に広がる内湾の街の模型。その模型が、実物大の街への入口になります。",
+      ja: "ここで撮影したのは、ガラスの下に広がる内湾の町の模型。その模型が、実物大の町への入口になります。",
       en: "Captured here: a scale model of the inner-bay district under glass. The model is the doorway into the full-size city.",
     },
   },
@@ -53,7 +53,7 @@ export const STOPS = [
     cam: { from: { bearing: 300, dist: 520, height: 60 }, look: { bearing: 0, dist: 0, height: 20 } },
     splat: null,
     blurb: {
-      ja: "三陸沿岸道路の斜張橋。湾の入口をまたぎ、夜は街の新しい目印になります。",
+      ja: "三陸沿岸道路の斜張橋。湾の入口をまたぎ、夜は町の新しい目印になります。",
       en: "The cable-stayed bridge of the Sanriku coastal expressway, striding across the mouth of the bay.",
     },
   },
@@ -86,7 +86,7 @@ export const STOPS = [
     cam: { from: { bearing: 110, dist: 1500, height: 900 }, look: { lat: 38.906, lon: 141.575, height: 0 } },
     splat: null,
     blurb: {
-      ja: "リアス海岸の唐桑半島。上空から、湾と街の全体が見えてきます。",
+      ja: "リアス海岸の唐桑半島。上空から、湾と町の全体が見えてきます。",
       en: "The ria coast of the Karakuwa peninsula, with the whole bay and city beyond.",
     },
   },

@@ -1,0 +1,28 @@
+{
+  "name": { "ja": "第五凪丸", "en": "Daigo Nagi Maru", "note": "Fictional. Not in the 2025–2026 landing reports." },
+  "hull": {
+    "L": 28,
+    "B": 5.8,
+    "note": "A game model of a 近海 boat (trade range about 80–180 t; a measured 71 t hull is 23.65 × 5.27 m). Not a measured ship.",
+    "source": "https://fra.repo.nii.ac.jp/record/2016706/files/jam_n_452.pdf"
+  },
+  "berth": { "x": 579.5, "z": 650.4, "yaw": -2.7125, "quay": [566.8, 656.2], "note": "Market quay slot from routes.json. Ashore on the apron." },
+  "season": {
+    "from": [5, 20],
+    "to": [11, 30],
+    "source": "https://kesennuma-kanko.jp/uoichiba-report/"
+  },
+  "record": {
+    "years": 28,
+    "span": "1997-2024",
+    "note": "2025 ended the run. 2026 is a likely comeback and is not official until the season closes.",
+    "source": "https://kesennuma-kanko.jp/katsuonihonichi2026/"
+  },
+  "priceExample": {
+    "yenPerKg": 372,
+    "day": "2026-10-06",
+    "source": "https://kahoku.news/articles/JY6XRKVF4JKHN.html",
+    "payout": false
+  },
+  "weight": { "a": 5.5293e-6, "b": 3.336, "source": "https://kokushi.fra.go.jp/R07/R07_29_SKJ-EPO.pdf" }
+}

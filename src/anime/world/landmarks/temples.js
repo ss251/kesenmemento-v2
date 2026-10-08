@@ -4,7 +4,7 @@
 //   気仙沼ハリストス正教会 (主の復活聖堂, OSM 436715760): a white church on the 魚町 hillside with a green roof, the
 //     small belfry over the entrance with its green cupola and the Orthodox cross (visible from the bay).
 //   一景島神社 (OSM 362542440): the dense dark grove of the former islet, the small shrine halls inside, a torii where
-//     the path enters from the west. 松尾神社, the 南町 shrine building (name not verified, so not labelled) and the
+//     the path enters from the west. 松尾神社, the 南町 shrine 紫神社 (name verified by the Earth 2026-03-11 pin; red-brown roof) and the
 //     OSM shrine nodes 愛宕神社, 大杉神社, 稲荷大明神: small halls with a torii toward the approach.
 import * as THREE from 'three';
 import { OSM, SPEC } from './sites.js';
@@ -167,10 +167,11 @@ export function buildTemples(ctx) {
   // ---------------------------------------------------------------- small shrines with a torii
   const small = [
     { id: 'matsuo', poly: OSM.matsuo.poly },
-    { id: 'minamiShrine', poly: OSM.minamiShrine.poly },
+    { id: 'minamiShrine', poly: OSM.minamiShrine.poly, roof: '#8e5a55', name: '紫神社' },  // Earth 2026-03-11 pins 紫神社 on this hall; red-brown roof (Earth #7c5f6e / #895e64, GSI #927e77)
     { id: 'atago', at: [-502, -452], name: '愛宕神社' },          // OSM node 7113790365
     { id: 'osugi', at: [-120, -776], name: '大杉神社' },           // OSM node 7113790419
     { id: 'inari', at: [-276, -285], name: '稲荷大明神' },         // OSM node 7448263222
+    { id: 'itsukushima', at: [1131.9, 742], name: '厳島神社' },    // 大浦: c12.json newLot ovr:c12:itsukushima (kind shrine); Earth 2026-03-11 pins it on the wooded mound beside the quay
   ];
   for (const s of small) {
     let o;
@@ -180,7 +181,7 @@ export function buildTemples(ctx) {
     let best = null; for (let a = 0; a < 8; a++) { const r = a * Math.PI / 4, h = L.heightAt(o.cx + Math.sin(r) * 10, o.cz + Math.cos(r) * 10); if (!best || h < best.h) best = { h, r }; }
     const face = best.r;
     const oo = { cx: o.cx, cz: o.cz, w: Math.min(o.w, o.d), d: Math.max(o.w, o.d), rotY: face, ux: Math.sin(face), uz: Math.cos(face) };
-    shrineHall(ctx, k, { ...oo, w: Math.max(oo.w, 2.6), d: Math.max(oo.d, 3) }, L.heightAt(o.cx, o.cz) + 0.1, { roof: s.id === 'inari' ? '#4f5258' : '#5f8f7c' });
+    shrineHall(ctx, k, { ...oo, w: Math.max(oo.w, 2.6), d: Math.max(oo.d, 3) }, L.heightAt(o.cx, o.cz) + 0.1, { roof: s.roof || (s.id === 'inari' ? '#4f5258' : '#5f8f7c') });
     torii(ctx, k, o.cx + Math.sin(face) * 7, o.cz + Math.cos(face) * 7, face, { color: s.id === 'matsuo' || s.id === 'atago' ? '#b9b5aa' : '#cf4a30', s: 0.8 });
     out[s.id] = { x: o.cx, z: o.cz };
   }

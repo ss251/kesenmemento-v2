@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "cell": "c11-quay-north",
+  "bbox": [395, 230, 560, 520],
+  "note": "round 3, finding 1 (moored fishing vessels along the quay line (473.4,237.8)->(403.2,508.7)). The moored boats are not lots, roads or props, so the override schema has nothing to patch: the fix is in code (src/anime/world/harbor/rows.js MOORING_ROWS pitch / MOORED_BEAM / RAFT_GAP / DECKS; src/anime/world/harbor/boats.js buildBoat opts.beam + opts.moored). This file records the Earth 2026-03-11 readings it was made from and carries no operation. Hull centre pitch 7.7 m (7 hulls in 55 m of x 420..475 z 395..450, 13-14 over z 395..515), 7-7.5 m abeam, rafted with fenders (no water lane), grey / white cluttered decks (#b9b6b4 #8d8f8e #a9a5a0), no blue or navy block.",
+  "sources": [
+    { "id": "earth", "what": "Google Earth, imagery dated 2026-03-11 (raw/ref/earth/meta8928r3/_view/c11A_420_395_475_450_top.jpg, c11A_295_395_555_605_top.jpg)", "date": "2026-03-11" }
+  ]
+}

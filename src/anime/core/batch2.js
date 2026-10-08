@@ -7,10 +7,28 @@
 //  * cells are 48 m near the play area and 200 m for distant scenery.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { PAD, shelfPages, planAtlas, tileUV, texMB } from './atlaspack.js';
+import { buildCells, groupMergeable } from './phonecells.js';   // [mobile-perf] the phone's cells straight from the sources
 
-const PAGE = 4096, PAD = 6, MAXTILE = 2048;
-/** [v4:phone] Atlas limits for every batchStatic call (main.js sets the phone tier's: pages <= 2048, tiles <= 512). */
-export const ATLAS = { page: PAGE, tileMax: MAXTILE };
+export { shelfPages };   // [v4:phone] (moved to core/atlaspack.js with the page layout; still exported from here)
+
+const PAGE = 4096, MAXTILE = 2048;
+/** [v4:phone] Atlas limits for every batchStatic call (main.js sets the phone tier's: pages <= 2048, tiles <= 512).
+ *  [v6:phone-budget] `trim` (the phone tier): the same layout, but every page canvas is cut down to its content, rounded
+ *  up to `quantum` px (core/atlaspack.js). Off, the pages are the full squares the desktop tiers always had. */
+export const ATLAS = { page: PAGE, tileMax: MAXTILE, trim: false, quantum: 64, release: false, density: 0, minTile: 64 };   // [mobile-perf] release: free each page's canvas once it is on the GPU; density: px per metre of the sign's size in the world (0: off) — the phone
+
+/** [mobile-perf] Free a canvas texture's backing store after its upload: a WebKit tab pays for every canvas (an atlas page is 16 MB at
+ *  2048², and the GPU holds its own copy). Only for a texture that is never drawn into or uploaded again (an atlas page); its size stays
+ *  in userData.freed. */
+export function freeOnUpload(t) {
+  t.onUpdate = () => {
+    t.onUpdate = null;
+    const c = t.image;
+    if (c && typeof c.getContext === 'function' && c.width > 1) { t.userData.freed = [c.width, c.height]; c.width = 1; c.height = 1; }
+  };
+  return t;
+}
 
 function uvInUnit(g) {
   const uv = g.attributes.uv; if (!uv) return false;
@@ -19,6 +37,7 @@ function uvInUnit(g) {
 }
 function atlasableTex(t) {
   if (!t || !t.image || t.isDataTexture || t.isCompressedTexture || t.isVideoTexture) return false;
+  if (t.userData?.freed) return false;   // [mobile-perf] its canvas went after the upload (freeOnUpload): the GPU copy is the only one
   const img = t.image; const w = img.width, h = img.height;
   if (!(w > 0 && h > 0) || w > MAXTILE || h > MAXTILE) return false;
   if (t.repeat.x !== 1 || t.repeat.y !== 1 || t.offset.x !== 0 || t.offset.y !== 0 || t.rotation !== 0) return false;
@@ -27,49 +46,43 @@ function atlasableTex(t) {
   return true;
 }
 
-// [v4:phone] Shelf packing of the tiles (w, h already scaled) into square pages of side S: the page count.
-export function shelfPages(list, S) {
-  let pages = 1, x = 0, y = 0, shelf = 0;
-  for (const it of list) {
-    const W = it.w + PAD * 2, H = it.h + PAD * 2;
-    if (W > S || H > S) return Infinity;
-    if (x + W > S) { x = 0; y += shelf; shelf = 0; }
-    if (y + H > S) { pages++; x = 0; y = 0; shelf = 0; }
-    x += W; shelf = Math.max(shelf, H);
-  }
-  return pages;
-}
+/** [v6:phone-budget] The atlases this page has built, newest last (the last 40): { root, pages: [[w, h]], tiles: [[w, h]] },
+ *  the source size of every canvas tile. `window.__atlas` shows it to tools/anime/phonemem.mjs and tools/anime/atlas-dump.js,
+ *  which writes test/fixtures/phone-atlas-tiles.json (the inputs test/v6-phone-budget.test.js pins). */
+export const ATLAS_LOG = [];
+if (typeof window !== 'undefined') window.__atlas = ATLAS_LOG;
 
-/** Pack canvas textures into atlas pages. [v4:phone] A page is the smallest power of two (256 .. `page`) that holds
- *  every tile, so a boat's few name plates no longer take a whole 4096² page (10 arriving boats held ~0.9 GB of
- *  texture); `tileMax` scales tiles down to at most that many pixels on a side (the phone tier: 512). */
-function buildAtlas(textures, { page: PAGE_MAX = PAGE, tileMax = MAXTILE } = {}) {
-  // shelf packing, tallest first
-  const list = [...textures].map((t) => { const k = Math.min(1, tileMax / Math.max(t.image.width, t.image.height)); return { t, w: Math.max(1, Math.round(t.image.width * k)), h: Math.max(1, Math.round(t.image.height * k)) }; }).sort((a, b) => b.h - a.h || b.w - a.w);
-  let S = 256; while (S < PAGE_MAX && shelfPages(list, S) > 1) S *= 2;
-  const pages = []; const map = new Map();
-  let page = null, x = 0, y = 0, shelf = 0;
-  const newPage = () => { const c = document.createElement('canvas'); c.width = S; c.height = S; page = { canvas: c, g: c.getContext('2d'), used: 0 }; pages.push(page); x = 0; y = 0; shelf = 0; };
-  for (const it of list) {
-    const W = it.w + PAD * 2, H = it.h + PAD * 2;
-    if (!page) newPage();
-    if (x + W > S) { x = 0; y += shelf; shelf = 0; }
-    if (y + H > S) { newPage(); }
-    const px = x + PAD, py = y + PAD;
-    try {
-      page.g.drawImage(it.t.image, px - PAD, py - PAD, it.w + PAD * 2, it.h + PAD * 2); // stretched gutter
-      page.g.drawImage(it.t.image, px, py, it.w, it.h);
-    } catch (e) { continue; }
-    map.set(it.t, { page: pages.length - 1, u0: px / S, v0: 1 - (py + it.h) / S, su: it.w / S, sv: it.h / S });
-    x += W; shelf = Math.max(shelf, H); page.used++;
-  }
-  const texs = pages.map(p => { const t = new THREE.CanvasTexture(p.canvas); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.userData.atlas = true; t.needsUpdate = true; return t; });
+/** Pack canvas textures into atlas pages (the layout is core/atlaspack.js's planAtlas). [v4:phone] A page is the smallest
+ *  power of two (256 .. `page`) that holds every tile, so a boat's few name plates no longer take a whole 4096² page (10
+ *  arriving boats held ~0.9 GB of texture); `tileMax` scales tiles down to at most that many pixels on a side (the phone
+ *  tier: 512). [v6:phone-budget] `trim` pages are not square: each is cut down to its content (`quantum` px steps), so
+ *  the mostly empty last page of a set no longer costs a full 2048² (22 MB with mips) on the phone. */
+function buildAtlas(textures, { page: PAGE_MAX = PAGE, tileMax = MAXTILE, trim = false, quantum = 64, release = false, caps = null } = {}) {
+  const src = [...textures];
+  const plan = planAtlas(src.map((t) => ({ w: t.image.width, h: t.image.height, max: caps?.get(t) || 0 })), { page: PAGE_MAX, tileMax, trim, quantum });
+  const map = new Map();
+  const texs = plan.pages.map((pl, pi) => {
+    const c = document.createElement('canvas'); c.width = pl.w; c.height = pl.h;
+    const g = c.getContext('2d');
+    if (caps) g.imageSmoothingQuality = 'high';   // [mobile-perf] tiles scaled well down keep their lettering (the default filter aliases a 4x reduction)
+    for (const tl of pl.tiles) {
+      const img = src[tl.i].image;
+      try {
+        g.drawImage(img, tl.x - PAD, tl.y - PAD, tl.w + PAD * 2, tl.h + PAD * 2); // stretched gutter
+        g.drawImage(img, tl.x, tl.y, tl.w, tl.h);
+      } catch (e) { continue; }
+      map.set(src[tl.i], { page: pi, ...tileUV(tl, pl) });
+    }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.userData.atlas = true; t.needsUpdate = true;
+    if (release) freeOnUpload(t);
+    return t;
+  });
   return { map, texs };
 }
 
 function sideName(m) { return m.side === THREE.DoubleSide ? 'double' : m.side === THREE.BackSide ? 'back' : 'front'; }
 
-export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, farR = 150, center = [0, 10], atlas: atlasOpts = ATLAS } = {}) {   // [v3:integrate] center: the play area (Kesennuma: the hero zone)
+export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, farR = 150, center = [0, 10], atlas: atlasOpts = ATLAS, direct = null } = {}) {   // [mobile-perf] direct: { cell, upload, release } (the phone)   // [v3:integrate] center: the play area (Kesennuma: the hero zone)
   root.updateMatrixWorld(true);
   const box = new THREE.Box3(), c = new THREE.Vector3();
   const cand = [];
@@ -92,7 +105,25 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
   }
   // texture must be atlasable for ALL its users, otherwise keep it separate
   if (mat) for (const o of cand) { const m = o.material; if (m.map && atlasTex.has(m.map) && !uvOk.get(o.geometry)) atlasTex.delete(m.map); }
-  const atlas = atlasTex.size ? buildAtlas(atlasTex, atlasOpts) : { map: new Map(), texs: [] };
+  // [mobile-perf] density: a tile is no finer than `density` px per metre of the largest thing that wears it (its uvs stay inside [0,1], so the
+  // texture spans at most that thing's size): a 0.5 m plaque does not need the 512 px of a 6 m banner. 200 px/m out-resolves the phone's
+  // render (1.25 x 390 px across ~48 degrees) from 2.7 m on; closer, letters soften a little.
+  let caps = null;
+  if (atlasTex.size && atlasOpts.density > 0) {
+    caps = new Map(); const sz = new THREE.Vector3();
+    for (const o of cand) {
+      const t = o.material.map; if (!t || !atlasTex.has(t)) continue;
+      const g = o.geometry; if (!g.boundingBox) g.computeBoundingBox();
+      box.copy(g.boundingBox).applyMatrix4(o.matrixWorld).getSize(sz);
+      caps.set(t, Math.max(caps.get(t) || 0, Math.max(sz.x, sz.y, sz.z)));
+    }
+    for (const [t, m] of caps) caps.set(t, Math.max(atlasOpts.minTile || 64, Math.ceil(m * atlasOpts.density)));
+  }
+  const atlas = atlasTex.size ? buildAtlas(atlasTex, { ...atlasOpts, caps }) : { map: new Map(), texs: [] };
+  if (atlas.texs.length) {
+    ATLAS_LOG.push({ root: root.name || root.type, pages: atlas.texs.map((t) => [t.image.width, t.image.height]), tiles: [...atlasTex].map((t) => [t.image.width, t.image.height]) });
+    if (ATLAS_LOG.length > 40) ATLAS_LOG.shift();
+  }
 
   // ---- group
   const groups = new Map(); const shared = new Map();
@@ -113,7 +144,7 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
       let sig;
       if (m.isMeshToonMaterial) {
         const t = m.userData.toon;
-        sig = `T|${mapKey}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${t.paint}|${t.grime}|${t.polygonOffset}|${m.emissive.getHexString()}|${m.emissiveIntensity}`;
+        sig = `T|${mapKey}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${t.paint}|${t.grime}|${t.polygonOffset}|${t.noDormant ? 'nd' : ''}${m.userData.noSnow ? 'ns' : ''}|${m.emissive.getHexString()}|${m.emissiveIntensity}`;
       } else {
         sig = `B|${mapKey}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${m.fog}|${m.toneMapped}`;
       }
@@ -125,6 +156,8 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
         if (m.isMeshToonMaterial) {
           const t = m.userData.toon;
           const opts = { ...common, paint: t.paint, grime: t.grime };
+          if (t.noDormant) opts.noDormant = true;   // [r3:7]
+          if (m.userData.noSnow) opts.noSnow = true;   // [cafe-rst] a room's material tagged `userData.noSnow` keeps its no-snow shell in the merged group (winter snow lies on every other cel surface)
           if (t.polygonOffset) opts.polygonOffset = t.polygonOffset;
           if (m.emissive && (m.emissive.r || m.emissive.g || m.emissive.b)) { opts.emissive = '#' + m.emissive.getHexString(); opts.emissiveIntensity = m.emissiveIntensity; }
           sm = mat.toon('#ffffff', opts);
@@ -141,9 +174,34 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
     arr.items.push({ o, bake, tile });
   }
 
+  // [mobile-perf] the summary needs every candidate and group: taken now, so the sources can be let go of while merging (below)
+  const hist = {};
+  for (const [, grp] of groups) { const m = grp.mat; let k = m.type; if (m.map) k += m.map.userData?.atlas ? '+atlas' : '+map'; if (m.transparent) k += '+tr'; if (m.alphaTest) k += '+at'; hist[k] = (hist[k] || 0) + 1; }
+  const nonAtlas = {}; for (const o of cand) { const m = o.material; if (m.map && !atlas.map.has(m.map)) { const r = !atlasableTex(m.map) ? 'tex:' + (m.map.wrapS !== THREE.ClampToEdgeWrapping ? 'wrap' : m.map.repeat.x !== 1 || m.map.repeat.y !== 1 ? 'repeat' : (m.map.image && (m.map.image.width > MAXTILE || m.map.image.height > MAXTILE)) ? 'big' : 'other') : 'uv'; nonAtlas[r] = (nonAtlas[r] || 0) + 1; } }
+  const sharedN = shared.size, atlasN = atlas.map.size, atlasPages = atlas.texs.length, atlasMB = Math.round(atlas.texs.reduce((a, t) => a + texMB(t.image.width, t.image.height), 0) * 10) / 10;
+  cand.length = 0; uvOk.clear(); atlasTex.clear(); atlas.map.clear();
+
   // ---- merge
   let merged = 0, sources = 0;
-  const victims = [];
+  // [mobile-perf] the phone (`direct`): the groups the outline / shadow proxies would merge per cell (core/phonecells.js) are written straight
+  // from their sources into those cells, cell by cell, without this function's clone and merged copy; the rest is merged below as before.
+  let proxies = null;
+  if (direct) {
+    const lists = new Map(), gb = new THREE.Box3(), ib = new THREE.Box3(), gs = new THREE.Sphere();
+    for (const [key, grp] of groups) {
+      const list = grp.items, s0 = list[0].o;
+      if (list.length < 2 && grp.mat === s0.material) continue;   // (stays as it is, as before)
+      if (!groupMergeable(grp.mat, s0)) continue;
+      gb.makeEmpty();
+      for (const it of list) { const g = it.o.geometry; if (!g.boundingBox) g.computeBoundingBox(); ib.copy(g.boundingBox).applyMatrix4(it.o.matrixWorld); gb.union(ib); }
+      gb.getBoundingSphere(gs);
+      const ck = (gs.radius > direct.cell ? 'L' : Math.floor(gs.center.x / direct.cell) + ',' + Math.floor(gs.center.z / direct.cell)) + '|' + (s0.receiveShadow ? 1 : 0);
+      let l = lists.get(ck); if (!l) lists.set(ck, (l = [])); l.push(grp);
+      groups.delete(key);
+      merged++; sources += list.length;
+    }
+    proxies = buildCells(root, lists, { upload: direct.upload, release: direct.release });
+  }
   const out = new THREE.Group(); out.name = 'static-batched';
   for (const [key, grp] of groups) {
     const list = grp.items, matT = grp.mat;
@@ -199,14 +257,13 @@ export function batchStatic(root, { mat = null, nearCell = 48, farCell = 200, fa
     mesh.renderOrder = s.renderOrder; mesh.frustumCulled = s.frustumCulled;
     mesh.matrixAutoUpdate = false; mesh.updateMatrix();
     out.add(mesh);
-    for (const it of list) victims.push(it.o);
+    // [mobile-perf] the sources leave the scene now, not after every group: a source geometry nothing else holds is garbage from here
+    // (the load's peak used to hold every source, every merged copy and the clones' garbage at once)
+    for (const it of list) it.o.parent && it.o.parent.remove(it.o);
     merged++; sources += list.length;
+    groups.delete(key);
   }
-  for (const o of victims) o.parent && o.parent.remove(o);
   root.add(out);
   root.traverse((o) => { if (!o.userData.dynamic) o.updateMatrix(); });
-  const hist = {};
-  for (const [, grp] of groups) { const m = grp.mat; let k = m.type; if (m.map) k += m.map.userData?.atlas ? '+atlas' : '+map'; if (m.transparent) k += '+tr'; if (m.alphaTest) k += '+at'; hist[k] = (hist[k] || 0) + 1; }
-  const nonAtlas = {}; for (const o of cand) { const m = o.material; if (m.map && !atlas.map.has(m.map)) { const r = !atlasableTex(m.map) ? 'tex:' + (m.map.wrapS !== THREE.ClampToEdgeWrapping ? 'wrap' : m.map.repeat.x !== 1 || m.map.repeat.y !== 1 ? 'repeat' : (m.map.image && (m.map.image.width > MAXTILE || m.map.image.height > MAXTILE)) ? 'big' : 'other') : 'uv'; nonAtlas[r] = (nonAtlas[r] || 0) + 1; } }
-  return { merged, sources, sharedMaterials: shared.size, atlasTextures: atlas.map.size, atlasPages: atlas.texs.length, groupsByKind: hist, nonAtlasReasons: nonAtlas };
+  return { merged, sources, sharedMaterials: sharedN, atlasTextures: atlasN, atlasPages, atlasMB, groupsByKind: hist, nonAtlasReasons: nonAtlas, proxies };
 }

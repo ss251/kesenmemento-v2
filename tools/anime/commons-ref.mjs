@@ -36,7 +36,7 @@ export const OLD_OK = {
   'File:Kesennuma City Hospital.jpg': '気仙沼市立病院, the new building opened 2017-10-29 (docs/anime/landmarks/hospitals.md); standing in the GSI aerial photo',
   'File:JR East BRT Kesennuma City Hospital Station.jpg': 'the BRT stop at the new 気仙沼市立病院 (opened 2017-10-29, docs/anime/landmarks/hospitals.md); check the shelter against newer imagery',
   'File:Kesennuma City Hall 01.JPG': '気仙沼市役所 本庁舎 (八日町), standing with the same footprint and roof in Google Earth 2026-03-11 (raw/ref/earth/c1/B, c1/C)',
-  'File:気仙沼市役所 - panoramio.jpg': '気仙沼市役所 本庁舎 (八日町), standing with the same footprint and roof in Google Earth 2026-03-11 (raw/ref/earth/c1/B, c1/C); 2011 photo: check for temporary post-tsunami signage',
+  'File:気仙沼市役所 - panoramio.jpg': '気仙沼市役所 本庁舎 (八日町), standing with the same footprint and roof in Google Earth 2026-03-11 (raw/ref/earth/c1/B, c1/C); an older photo: check for temporary signage',
 };
 
 let last = 0;

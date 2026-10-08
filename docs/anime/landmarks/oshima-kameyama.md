@@ -38,7 +38,7 @@ photo found). Use a low timber and glass pavilion with a dark metal roof until a
 - https://kesennuma-kanko.jp/kameyama/ (235 m; 亀山テラス360°; the monorail takes 6 to 7 minutes; the terrace with sofas; the rest house and café; the address; opening 7/19)
 - https://kameyama360.jp/ (the official site)
 - http://www.oshima-kanko.jp/see/kameyama.html (the observation deck and camellias)
-- Commons "Kameyama slopecar4.jpg"; raw/photos IMG_0603
+- Commons "Kameyama slopecar4.jpg"; a photo of the scale model (not included)
 - OSM nodes 3663140756, 3668222567 and 8871013335; ways 363067537 and 362542444 (© OpenStreetMap contributors); city DEM
 - Crop: `ortho/kameyama.jpg`
 
@@ -49,3 +49,9 @@ photo found). Use a low timber and glass pavilion with a dark metal roof until a
   駐車場駅舎 and 待合・休憩棟; the parking; the summit station; terrace 1 (three tiers, 49 sofas); terraces 2 and 3;
   ほしのてらす; the café; the two kept rest houses (a fan-shaped hall and a teal-roofed block); and the summit post.
 - Far houses are scattered on the slopes.
+
+## [v6:outside-kameyama-summit] Cars, track and summit promenade (Commons 2026-08-05, reference only)
+
+- Cars: white body (#f4f6f6, 1.1 m) over a blue skirt (#1a4c9a, 0.5 m, wedge underside), a 0.06 m gold band (#d4b04a) at the seam, black-framed glazing (1.5 m, from the Commons photo ratio; was 1.9 m), a white roof with an AC box. Source: 'Kameyama Monorail and Oshima Below'.
+- Track: dark brown steel truss (#3b322d: two chords, diagonal web bars) with the walk and hand rail, on splayed A-frame leg pairs (+-8 deg, tie bar at mid height) on pale concrete footing blocks (#d8dad6). Source: 'Between Stations'.
+- Promenade (`PROMENADE` in `landmarks/oshima.js`): a 2.5 m terracotta ribbon (#9e6668) with flush 0.35 m gravel edging (#5e5c60) from (3729,3640) to (3843,3638), black railings where the ground falls away; `data/anime/overrides/outside cells (亀山 summit).json` keeps trees off a 12 m corridor. APPROXIMATE: traced from the pre-opening Earth strip (2026-03-11). Re-trace it from a post-July 2026 capture and add any station-to-terrace-1 spur.

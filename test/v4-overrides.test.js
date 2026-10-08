@@ -113,6 +113,15 @@ describe("[v4:overrides] operations", () => {
     expect(l.roof.ridge).toBeUndefined();
     expect(l.src.h).toBe("override");
   });
+  test("[v6:c5r2] unname clears a name that a record snapped to the wrong building, and cannot be combined with a name", () => {
+    const U = compileOverrides([validateOverride(doc({ lots: [{ id: "U", kind: "house", unname: true, src: "earth: the label belongs to the compound 200 m south" }] }), "pier7.json")]);
+    const l = lot("U", 40, 80, { name: "観音寺", nameEn: "Kannonji", src: { h: "derived", kind: "osm", roof: "derived-resolved", color: "aerial", name: "gsi" } });
+    patchLot(l, U.lotPatch.get("U"), classify);
+    expect(l.name).toBeUndefined(); expect(l.nameEn).toBeUndefined();
+    expect(l.src.name).toBe("override");
+    expect(() => validateOverride(doc({ lots: [{ id: "U", unname: true, name: "x", src: "earth" }] }), "bad.json")).toThrow(/unname cannot be combined/);
+    expect(() => validateOverride(doc({ lots: [{ id: "U", unname: false, kind: "house", src: "earth" }] }), "bad.json")).toThrow(/unname/);
+  });
   test("storeys and height fill each other in", () => {
     const a = lot("S", 0, 0), b = lot("S", 0, 0);
     patchLot(a, [{ storeys: 3, ref: "t#0", why: "earth" }]); patchLot(b, [{ height: 10, ref: "t#0", why: "earth" }]);
@@ -176,9 +185,10 @@ describe("[v4:overrides] wiring", () => {
     expect(read("src/anime/world/town/props.js")).toContain("L.PROPS");
     // the builders take override values as measured (heights, roof shapes, roof and wall colours are not re-randomised)
     expect(read("src/anime/world/town/hero.js")).toContain("lot.src?.h === 'override'");
-    expect(read("src/anime/world/town/hero.js")).toContain("lot.src?.roof === 'override'");
-    expect(read("src/anime/world/town/palette.js").match(/=== 'override'/g).length).toBe(3);
-    expect(read("src/anime/world/town/mid.js").match(/=== 'override'/g).length).toBe(2);
+    expect(read("src/anime/world/town/hero.js")).toContain("roofShapeAt(lot, 'hero')");   // [sys:4] the kit takes the lot's own shape: measured ones (override included) are never re-rolled
+    expect(read("src/anime/world/town/palette.js").match(/=== 'override'/g).length).toBe(4);   // [sys:31] + measuredWall
+    expect(read("src/anime/world/town/mid.js").match(/=== 'override'/g).length).toBe(1);   // [sys:4] the roof predicate is town/common.js isMeasuredRoof
+    expect(read("src/anime/world/town/common.js")).toContain("lot.src?.roof === 'override'");
     expect(existsSync(join(ROOT, "docs/anime/OVERRIDES.md"))).toBe(true);
   });
   test("every committed override file is valid", () => {

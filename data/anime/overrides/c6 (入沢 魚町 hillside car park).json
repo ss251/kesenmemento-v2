@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "cell": "c6-hillside-carpark",
+  "bbox": [-10, -205, 55, -155],
+  "note": "c6 round 3: the 入沢 / 魚町 hillside multi-storey car park (OSM w775150096: amenity=parking, building=parking, parking=multi-storey), GSI lots 16/58540/25068/398 (centre 19.8,-175.0, 519 m2) and 16/58541/25068/31 (centre 31.5,-180.1, 337 m2). The code half is in scripts/anime/enrich/osm.js kindFromTags (building=parking -> kind 'carpark') and src/anime/world/town/carpark.js + mid.js drawCarpark (open decks with a parapet, columns, stall lines and cars painted on the top deck; no windows, no warehouse ribbing). Heights and the number of decks are NOT set here: Earth is 2.5D and no ground photo of the car park exists, so storeys / height stay the derived placeholders (2 decks of 2.8 m) until a ground photo measures them. No parking landuse ring is drawn: landuse paints the ground, which the deck covers, and the stall lines come from the carpark roof painter. The lot 398 grey deck colour (#a8a6a2) is already in c6.json lots/4.",
+  "sources": [
+    { "id": "earth", "what": "Google Earth, imagery dated 2026-03-11 (raw/ref/earth/meta8928r3/_view/c6a_-10_-215_70_-150_top.jpg): the green top deck at x 28..41, z -196..-170 reads #718275, the grey stalled deck at x 8..16, z -186..-174 reads #aca3a4", "date": "2026-03-11" },
+    { "id": "osm", "what": "OpenStreetMap way 775150096 (raw/osm/overpass.json, OSM base 2026-05-06): amenity=parking, building=parking, parking=multi-storey, no building:levels or height. © OpenStreetMap contributors (ODbL)", "date": "2026-05-06" }
+  ],
+  "lots": [
+    {
+      "id": "16/58541/25068/31",
+      "facade": "plain",
+      "roof": { "shape": "flat", "color": "#718275" },
+      "src": "earth: the green top deck of the multi-storey car park at x 28..41, z -196..-170 reads #718275 (meta8928r3/_view/c6a top); osm w775150096 building=parking, parking=multi-storey (kind 'carpark', no ribbed warehouse facade)"
+    },
+    {
+      "id": "16/58540/25068/398",
+      "facade": "plain",
+      "src": "osm: w775150096 building=parking, parking=multi-storey, so no ribbed warehouse facade; the grey stalled deck colour #a8a6a2 is already set in c6.json lots/4 (earth 2026-03-11 reads #aca3a4 at x 8..16, z -186..-174)"
+    }
+  ]
+}

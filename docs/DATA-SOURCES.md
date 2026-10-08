@@ -6,7 +6,7 @@ The app shows this short line at the bottom of the screen (with a link to the li
 with `?credit=1`. It lives in `data/i18n.json` under `v3.attribution` (JA and EN), and `test/v4-data.test.js` checks
 that every language keeps © OpenStreetMap contributors:
 
-> © OpenStreetMap contributors · 出典：国土地理院, 気象庁, 気仙沼漁協 · Sakuragaoka Station (MIT) by Kenton-GMI
+> © OpenStreetMap contributors · 出典：国土地理院、気象庁、気仙沼漁協 · Sakuragaoka Station (MIT) by Kenton-GMI
 
 The full map (N) draws OpenStreetMap and GSI data, so it carries its own credit in its bottom-left corner, from
 `layout.credits`:
@@ -66,7 +66,7 @@ kit or in a video description.
   named shops and amenities mapped as points inside a building; land use (parks, fields, cemeteries, schoolyards,
   parking, forest, sport, beaches); rivers and streams with their names (大川, 神山川, 鹿折川, 面瀬川, ...); road names,
   refs, lanes, one-way and speed limits; traffic signals and crossings; rail; named bridges.
-- Sensitive names, such as memorials and similar facilities, are never shown, so the app shows Kesennuma as it lives
+- Names that the exclusion list of the filter covers are never shown, so the app shows Kesennuma as it lives
   today: `scripts/anime/enrich/fold.js` (`SENSITIVE`) filters them from lot names, places, roads, rivers and land use.
 
 ## 国土地理院 Anno (注記) and the aerial photo, per building [v4]
@@ -102,6 +102,22 @@ kit or in a video description.
   against, so the IoU measures how faithfully the town is built on them (walls under the eaves, wings, landmarks
   replacing lots), not the footprints themselves. The roads are built on GSI and checked against OSM, which is
   independent.
+
+## Census small areas, address names and derived readings [sys:21, sys:22, r2:13, r3:2]
+
+- **Small areas (町丁).** `data/anime/areas-estat.json` holds the 令和2年国勢調査 small-area boundaries of 気仙沼市, one polygon per
+  町丁, projected to the layout's metres and simplified to 5 m (`scripts/anime/build-areas-estat.js`). Source: 政府統計の総合窓口
+  (e-Stat) 境界データ, <https://www.e-stat.go.jp/>. 出典：政府統計の総合窓口(e-Stat)の境界データを加工して作成. The site's terms
+  (政府標準利用規約) are compatible with CC BY 4.0.
+- **Address names (町丁名).** `data/anime/areas-gsi.json` is a 25 m grid of the town-block name that the 国土地理院 reverse
+  geocoder returns, for the arrival toast (`scripts/anime/build-areas-gsi.js`, from `test/fixtures/gsi_revgeo_50m.json`). It is
+  factual address data, not imagery. 出典：国土地理院.
+- **Roof colours read on Google Earth.** `data/anime/earth-roofs.json` keeps one derived colour per building (the median of the
+  60 % core of its roof polygon in a top view, imagery dated 2026-03-11): values only, never imagery. They fit the GSI to Earth
+  colour transform (`fitRoofTransform` in `scripts/anime/enrich/fold.js`) and are the held-out reference of its test. The capture
+  tools that wrote the readings are not part of this repository.
+- **Vegetation flags.** `data/anime/green-flags.json` lists the buildings whose interior on the GSI aerial photo is dark vegetation
+  green (`scripts/anime/enrich/green.js`): an advisory list derived from the photo. 出典：国土地理院.
 
 ## 気象庁 (JMA): weather and tide
 
@@ -158,6 +174,9 @@ URLs. They are grouped in `data/anime/sources.json` as `landmark-refs`, `landmar
 - **On-site photos** (kept under `raw/`, not committed) of the inner-bay scale model displayed in PIER7 were compared
   with 浮見堂, 神明崎, PIER7 and 亀山. The photo surveys in `docs/anime/survey/` measure other on-site photos in the same
   way. The photos are not shipped; only the measured results (`data/survey/`) are.
+- **café RST** (the ground floor of 迎, 南町海岸1-14) is redrawn from the project owner's own walk-through video of the room and the surveyed ANCHOR face
+  (`docs/anime/interiors-cafe-rst.md`). No photograph or frame is copied; the sign boards carry no other company's mark. The shop agreed to be shown on 2026-10-07 (verbal;
+  the written form is pending) and is credited 「協力：café RST」 in the room and in the interior's record.
 
 Facts (dimensions, dates, positions) are cited from these pages; no text or image from them is shipped.
 
@@ -179,6 +198,18 @@ Facts (dimensions, dates, positions) are cited from these pages; no text or imag
   from the town's fictional catalogue (`src/anime/world/town/names.js`), chosen for its trade;
   `test/v3-town.test.js` checks that catalogue against a blocklist of real brands.
 
+## JPYC EC: shops and products that take JPYC [jpyc]
+
+| Data | URL | Used for |
+|---|---|---|
+| Public read API (no key): `GET /api/v1/shops/{slug}/products`, `GET /api/v1/products/{id}` | `https://ec.jpyc-service.com/api/v1/…` (docs: https://github.com/Mameta29/jpyc-skill, OpenAPI `/api/v1/openapi.yaml`) | The 「JPYCで買えるお店」 sheet: a shop's product names, prices in JPYC, first photo, stock and sale status. Fetched only for the shops of `data/shops/jpyc.json`, through the production server's cache (`server/app/jpyc.js`, five minutes, no cookies, nothing about the visitor); the photos are shown from the platform's own image host and not copied. |
+| Product pages, the shop page, the guide 「JPYCの入手方法」 | `https://ec.jpyc-service.com/shops/{shop}/products/{product}`, `/shops/{shop}`, `/blog/how-to-get-jpyc` | Links only (a new tab). The app takes no payment. |
+| Google Maps search link | `https://www.google.com/maps/search/?api=1&query=…` | A link on a Kesennuma shop's card; no Google API, embed or content is used. |
+
+JPYC EC is operated by MAMETA; JPYC is a registered trademark of JPYC Inc.; KesenMemento is not affiliated with either (the credit line in the app says so). The operator's permission to use the API and to
+show the demo shop has **not been confirmed yet** (the questions to put to him are in [docs/jpyc/README.md](jpyc/README.md)); a real shop appears only with its owner's consent record in `data/shops/jpyc.json`, its alcohol only when the row declares the mail-order licence and the age check, and nothing at all appears in production until a shop is switched on (the demo shop ships with `"enabled": false`).
+The recorded responses in `test/fixtures/jpyc/` come from the demo shop, which JPYC EC runs itself, with the wallet address redacted.
+
 ## Code, engine and fonts
 
 | Item | Licence | Where |
@@ -188,7 +219,7 @@ Facts (dimensions, dates, positions) are cited from these pages; no text or imag
 | `@mapbox/vector-tile` 2.0.5, `pbf` 4.0.2 | BSD-3-Clause | build scripts only |
 | `earcut` 3.2.4 | ISC | runtime (bundled) and build scripts |
 | `sharp` 0.35.5 | Apache-2.0 | build scripts only |
-| Noto Sans JP, Noto Serif JP, Zen Maru Gothic, Yusei Magic, Yuji Syuku | SIL Open Font License 1.1 | loaded from Google Fonts at runtime (`src/anime/index.html`) |
+| Noto Sans JP, Noto Serif JP, Zen Maru Gothic, Yusei Magic, Yuji Syuku | SIL Open Font License 1.1 | the HUD loads them from Google Fonts (`src/anime/index.html`). The title also self-hosts Zen Maru Gothic subsets and a Dela Gothic One subset; the logo is outlines only. The licence text is [THIRD-PARTY-NOTICES](../THIRD-PARTY-NOTICES). |
 | This project's own code | MIT ([LICENSE](../LICENSE)) | The build copies the Sakuragaoka Station and three.js licence texts to `dist/licenses/`, and the in-app credit links to them. [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md) lists every dependency. |
 
 ## Not shipped

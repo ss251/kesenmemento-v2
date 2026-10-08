@@ -12,7 +12,10 @@ export async function build(ctx) {
   const stats = {};
   const lc = await loadLandcover();
   const mat = terrainMaterial(ctx, lc);
-  const terrain = buildTerrain(ctx, mat);
+  // [sys:16] the drawn roads (layout hero + mid, and explore's far core at full precision): the terrain mesh is pulled down under them
+  const ex = await L.loadData('explore.json').catch(() => null);
+  const roads = L.ROADS.filter((r) => r.zone !== 'far').concat(ex?.roads || []);
+  const terrain = buildTerrain(ctx, mat, { roads });
   stats.terrain = terrain.stats;
   let trees = null;
   try { trees = await buildTrees(ctx, lc); stats.trees = trees?.stats; } catch (e) { console.error('[environment] trees', e); stats.treesError = String(e); }

@@ -11,6 +11,7 @@ import { buildHospitals } from './hospitals.js';
 import { buildSchools } from './schools.js';
 import { buildTemples } from './temples.js';
 import { buildOshima } from './oshima.js';
+import { buildGasHolder } from './gasholder.js';   // [v6:c9r3]
 import { buildFarGround } from './farground.js';
 import { PLACES_B } from './sites.js';
 
@@ -23,6 +24,7 @@ const BUILDERS = [
   ['schools', buildSchools],
   ['temples', buildTemples],
   ['oshima', buildOshima],
+  ['gasHolder', buildGasHolder],
   ['ground', buildFarGround],
 ];
 

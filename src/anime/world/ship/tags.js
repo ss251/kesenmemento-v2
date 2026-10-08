@@ -1,7 +1,7 @@
 // [ship:acts] Catch-documentation tags for the game's bluefin (pure; tested in test/ship-acts.test.js).
 //
 // The real 第一昭福丸 tags every Atlantic bluefin with a blue strap tag carrying a serial number and an embedded chip:
-// "FY2020 East Atlantic Bluefin / 7KFY-20-0001" with a QR sticker (Usui's slide 72, raw/ref/usufuku-slides/IMG_0954.jpg;
+// "FY2020 East Atlantic Bluefin / 7KFY-20-0001" with a QR sticker (a slide of the talk (no. 72);
 // source notes section 5). The game must never print that format: every tag it makes carries a DEMO- prefix, so a
 // screenshot of the game can never be mistaken for, or collide with, a real catch record.
 //

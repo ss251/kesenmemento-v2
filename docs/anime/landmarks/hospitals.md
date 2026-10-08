@@ -10,9 +10,9 @@
 | Floors | legally **7F + B1**, of which **6 storeys** above ground are built as floors | hospital |
 | Structure | steel-reinforced concrete (SRC) with **seismic isolation**, parts RC and S | hospital |
 | Total floor area | 28,944 m²; site 52,248 m² | hospital |
-| Beds | 340 | hospital; 復興庁 |
-| Opened | moved here **2017-10-29** from 田中 | 復興庁; hospital history |
-| Heliport | a new heliport for emergency medical transport | search summary of 復興庁 and hospital pages; the exact location is not verified |
+| Beds | 340 | hospital; a national agency's page |
+| Opened | moved here **2017-10-29** from 田中 | a national agency's page; hospital history |
+| Heliport | a new heliport for emergency medical transport | search summary of a national agency's page and hospital pages; the exact location is not verified |
 | BRT | the 気仙沼市立病院 BRT station stands at the hospital (OSM node 7117374801) | OSM |
 
 - Roof on the ortho: #c5d4d2 → light grey #c7c9c6, with rooftop plant.

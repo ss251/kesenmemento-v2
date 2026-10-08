@@ -9,6 +9,28 @@ import { boundarySeg, boundarySegZ } from './kit/lot.js';
 import { foliageMaterial } from './kit/foliage.js';
 
 export const TAU = Math.PI * 2;
+// ------------------------------------------------------------------ [sys:4] one roof per building
+/** A roof shape read from the imagery (aerial photo, OSM, a landmark sheet, an override) rather than derived. */
+export const isMeasuredRoof = (lot) => lot.src?.roof === 'aerial' || lot.src?.roof === 'osm' || lot.src?.roof === 'landmark' || lot.src?.roof === 'override';
+/** A shape no builder may change: measured, or a derived one that build-layout.js resolved once (src.roof 'derived-resolved'). */
+export const isFinalRoof = (lot) => isMeasuredRoof(lot) || lot.src?.roof === 'derived-resolved';
+/** Which way a shed roof falls (+1 / -1): the lot's own, so mid, hero and far draw the same slope. */
+export const shedDirOf = (lot) => ((lot.seed >>> 5) & 1 ? 1 : -1);
+/** [sys:29] Storey height of a kit building whose height was measured (OSM, an override, a landmark sheet): the floors fill
+ *  lot.height less the 0.32 m floor slab and, for a flat roof, 0.9 m of parapet / deck. Clamped to a believable storey. */
+export const realFh = (lot, floors, roofType) => clamp(((lot.height || floors * 2.9) - 0.32 - (roofType === 'flat' ? 0.9 : 0)) / Math.max(1, floors), 2.6, 5.5);
+/**
+ * The roof shape a level of detail draws for a lot ('mid' | 'hero' | 'far'), after the geometric constraints only:
+ * a warehouse hip is a gable in mid (the measured-hip warehouses are drawn gable, 'leave as is'), far has no saw-tooth
+ * instance (flat), hero's kit draws what the lot says. A derived shape is never re-rolled here (test/sys-roof.test.js).
+ */
+export function roofShapeAt(lot, lod, geo = {}) {
+  const sh = lot.roof?.shape || 'flat';
+  if (lod === 'far') return sh === 'saw' || sh === 'flat' ? 'flat' : sh === 'hip' ? 'hip' : sh === 'shed' ? 'shed' : 'gable';
+  if (lod === 'mid') return geo.isWh && sh === 'hip' ? 'gable' : sh;
+  return sh;
+}
+
 export const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 export const pick = (r, a) => a[Math.floor(r() * a.length)];
 export const wpick = (r, items) => { let s = 0; for (const [, w] of items) s += w; let x = r() * s; for (const [v, w] of items) { x -= w; if (x <= 0) return v; } return items[items.length - 1][0]; };
@@ -42,7 +64,7 @@ export function makeH(ctx) {
       const cx = e1[1] * e2[2] - e1[2] * e2[1], cy = e1[2] * e2[0] - e1[0] * e2[2], cz = e1[0] * e2[1] - e1[1] * e2[0];
       if (cx * q.n[0] + cy * q.n[1] + cz * q.n[2] >= 0) I.push(k, k + 1, k + 2, k, k + 2, k + 3); else I.push(k, k + 2, k + 1, k, k + 3, k + 2);
     }
-    if (quads.length) gb.mesh(mat, col, P, N, U, I, fr.M(0, 0, 0), fl);
+    if (quads.length) H.gb.mesh(mat, col, P, N, U, I, fr.M(0, 0, 0), fl);   // [v6:c5] H.gb, not the closure: explore swaps H.gb per tile capture, so cards / decals / fences were lost in the streamed kit
   };
   H.quads = quadsMesh;
   H.slopedWall = (fr, a, b, z, h, t, mat, col, uS, vS, base) => {
@@ -74,7 +96,7 @@ export function makeH(ctx) {
       P.push(x, L.heightAt(w.x, w.z) - w.y + lift, z); N.push(0, 1, 0); U.push(w.x / uvS, -w.z / uvS);
     }
     for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) { const a = j * (nx + 1) + i, b = a + 1, c = a + nx + 1, d = c + 1; I.push(a, c, b, b, c, d); }
-    gb.mesh(mat, col, P, N, U, I, fr.M(0, 0, 0), { shadow: false });
+    H.gb.mesh(mat, col, P, N, U, I, fr.M(0, 0, 0), { shadow: false });
   };
   H.decal = (fr, name, x, y, w, h, z, col, o = {}) => {
     const rc = tex.decal.rects[name]; if (!rc) return;
@@ -202,30 +224,7 @@ export function makeRoadIndex(roads, cell = 20) {
   };
 }
 
-/** Resample a polyline every `step` metres: [{x, z, tx, tz, s}] (unit tangent, arclength). */
-export function resample(pts, step) {
-  const out = []; let s = 0;
-  for (let i = 1; i < pts.length; i++) {
-    const [ax, az] = pts[i - 1], [bx, bz] = pts[i];
-    const len = Math.hypot(bx - ax, bz - az); if (len < 1e-3) continue;
-    const tx = (bx - ax) / len, tz = (bz - az) / len;
-    const n = Math.max(1, Math.ceil(len / step));
-    for (let k = 0; k < n; k++) out.push({ x: ax + (bx - ax) * k / n, z: az + (bz - az) * k / n, tx, tz, s: s + len * k / n });
-    s += len;
-  }
-  if (pts.length > 1) {
-    const [ax, az] = pts[pts.length - 2], [bx, bz] = pts[pts.length - 1]; const len = Math.hypot(bx - ax, bz - az) || 1;
-    out.push({ x: bx, z: bz, tx: (bx - ax) / len, tz: (bz - az) / len, s });
-  }
-  // smooth tangents at joints
-  for (let i = 1; i < out.length - 1; i++) {
-    const a = out[i - 1], b = out[i + 1]; let tx = b.x - a.x, tz = b.z - a.z; const l = Math.hypot(tx, tz) || 1;
-    out[i].tx = tx / l; out[i].tz = tz / l;
-  }
-  return out;
-}
-
-export function polyLength(pts) { let s = 0; for (let i = 1; i < pts.length; i++) s += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return s; }
+export { resample, polyLength } from './geom.js';
 
 /** Simple vertex-coloured mesh accumulator (world coordinates). */
 export class VBuf {

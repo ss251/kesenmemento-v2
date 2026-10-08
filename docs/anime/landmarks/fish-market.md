@@ -125,3 +125,36 @@ bay. `harbor/market5.js` (`buildCRoofPhotos`) replaces the v4 equipment boxes th
 
 The C棟 roof deck and the north facility's quay hall are rebuilt from the measured spec `data/survey/market/model.json`
 (method, numbers and remaining gaps: `docs/anime/survey/market.md`, section "Rebuild").
+
+## v6:fix1 (2026-10-03): the quay hall to the re-solved dawn cameras
+
+The dawn frames were taken from the north facility's 2F gallery (5.0 m above the hall floor, 48 m from the quay edge). The hall is rebuilt
+(`harbor/hall6.js`, spec `data/survey/market/model.json` `hall`): roof edge at d -19.8 from the quay edge (the OSM outline moved 7.5 m inland), ceiling
+slab at T.P. 11.2 with deep girders, columns on a 21.6 m grid (「7」 at a 81.3), the floor falling from T.P. 2.15 to the apron's 1.84, two tub rows,
+the sorting conveyor, hopper and tub stacks, a 2 t truck, the striped curb and bitts, and 「KD1-875」 simplified. C棟's deck: 24 windows (not 30),
+pavilion #8 measured, cone #4 re-picked, 3.0 m saw-cut joints and the stall line. Details and numbers: `docs/anime/survey/market.md`, "Fix round 1".
+
+## v6:fix2 (2026-10-04): the roof deck's cars, cones and lifeboat, and one ceiling member
+
+- **Cars.** The 16 cars of the deck photos are built, each its own lofted model (`harbor/deckcars6.js`, spec `data/survey/market/cars.json`: the row of
+  twelve nose-in along the east side of the stalls (silver kei, teal Citroen C4 Cactus, white Crown, Mazda 3, Swift, Spacia, dark RAV4, Aqua, white van, blue
+  hatch, two more whites) and the north group behind the C棟 pavilion #4 (Stepwgn, two hatches, a white 2 t truck)). Stands from the survey (`tools/survey/car_fit.py`).
+- **Cones** are the deep red of the photos with three white reflective bands, a collar and a black rubber base on a thin red plate; cone #4 stands between its two photo cuts.
+- **Lifeboat.** Rebuilt from IMG_0793 as a lofted enclosed boat (`harbor/lifeboat6.js`): round bow, tumblehome hull, navy rub rail, canopy, the raised coxswain's tower
+  with two windows, two silver-framed hatches a side; 2.9 m south and 1.3 m west of where the first version stood.
+- Numbers and method: `docs/anime/survey/market.md`, "Fix round 2".
+
+## v6:fix3 (2026-10-04): the quay hall's contents built to the dawn frames
+
+The dawn frames (IMG_0853-0861) now show what the photos show: the tubs as separate crates with their rims, latches and plates (`harbor/crate6.js`), the JF みやぎ flat-bed
+truck (`harbor/truck6.js`; it drove in after IMG_0853 / 0854), the white tug 「KO1-875」 with the 龍 funnel, life rings, stair, house and gangway, the squid boat with its rod rack
+beside it and the vessel at its bow (`harbor/tug6.js`, measured in `data/survey/market/tug.json`), the sorting conveyor No.1 with its sorter re-measured (a 67.7-70.0, 1.4 m wide),
+the hopper's chutes and legs, the U-rail, the hose bib, the cables beside column 7, the deflector plate under the girder, the bird net on the soffit and three people. C棟's deck cars
+have pillars between their windows. Method, numbers (89 / 89 features, dawn chamfer 7.6-11.2 px) and gaps: `docs/anime/survey/market.md`, "Fix round 3".
+
+## [v6:finish] Final survey numbers (2026-10-04)
+
+89 of 89 features within 0.34 m of the survey (mean 0.063 m, median 0.026 m, p90 0.162 m; 14 of 14 dimensions within tolerance; none over 3 sigma). Edge chamfer from the solved
+cameras over the 12 market photos: mean 7.0 px (11.9 before the rebuild), 11 of 12 at 10 px or better, worst IMG_0860 11.2 px. Showcase: `docs/shots/v6_survey/showcase/market_0792_*.jpg`
+(roof deck) and `market_0797_*.jpg` (quay hall); local only. The dawn quay's depth scale remains the least certain part of the solve (the tele frames are a few metres apart): see
+"Gaps (after fix3)" in `docs/anime/survey/market.md`. Procedure: `docs/anime/SURVEY.md`.

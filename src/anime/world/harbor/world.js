@@ -7,7 +7,7 @@ import { buildUnloadScene } from './unload.js';   // [v3:fix]
 import { bridgeExtras } from './traffic.js';   // [v3:fix]
 import * as THREE from 'three';
 import { buildQuay } from './quay.js';
-import { buildBoat, BOAT_SPECS, mooringLines } from './boats.js';
+import { buildBoat, BOAT_SPECS, mooringLines, releaseBoatCaches } from './boats.js';
 import { buildBayLife } from './traffic.js';   // [v3:polish]
 import { buildFishMarketLots, finishConveyors } from './market.js';
 import { buildUkimido, buildIsuzuTorii, buildIsuzuShrine, buildAnbaLookout } from './shrine.js';
@@ -16,7 +16,9 @@ import { buildGulls } from './gulls.js';
 import { hmats, buoy } from './props.js';
 import { nightUniform, registry, addGlint } from './lights.js';   // [v3:fix] registry, addGlint: channel lights
 import { buildMooringRows, rowDist, buildRafts } from './rows.js';
+import { buildYards } from './yards.js';   // [v6:c8c12r3] the east-shore boat yards (浪板, 大浦)
 import { createArrivals, slotAvoid } from './arrivals.js';
+import { createAis } from './ais.js';
 import { buildShrineGrove } from './grove.js';
 import { buildReflection } from './reflect.js';
 // [v4:landmarks-A] the landmarks rebuilt on their real outlines and dimensions (harbor/real.js)
@@ -74,6 +76,9 @@ function straightRuns(c, minLen = 40, maxTurn = 0.12) {
   return runs;
 }
 
+/** [v6:fix3] Water the south-shore photos show EMPTY (IMG_0888: the whole bay west of the east promenade is clear water up to the pontoons; the two near hulls the
+ *  generator moored there are not in the photo): [x, z, radius]. */
+const KEEP_OUT6 = [[100, 52, 40], [150, 60, 25]];
 /** Moor boats along a straight berth, checking every hull corner is on water. Returns built boats. */
 function moorRun(ctx, run, types, r, { fender = 1.0, gap = 4, isWater, max = 99, raft = 0, avoid = [], smallNear = [] } = {}) {
   const { a, b, len } = run; const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len, nx = uz, nz = -ux;
@@ -88,7 +93,7 @@ function moorRun(ctx, run, types, r, { fender = 1.0, gap = 4, isWater, max = 99,
     const corners = [[-S.L / 2, -S.B / 2], [S.L / 2, -S.B / 2], [-S.L / 2, S.B / 2], [S.L / 2, S.B / 2], [0, 0]];
     const wet = corners.every(([l, w]) => isWater(cx + ux * l + nx * w, cz + uz * l + nz * w));
     const free = !avoid.some(([x, z, rr]) => Math.hypot(cx - x, cz - z) < rr + S.L / 2);   // arrival berths stay open
-    if (wet && free) {
+    if (wet && free && !KEEP_OUT6.some(([x, z, rr]) => Math.hypot(cx - x, cz - z) < rr + S.L / 2)) {
       const fwd = r.chance(0.5) ? 1 : -1;
       const bt = buildBoat(ctx, type, { x: cx, y: 0, z: cz, rotY: Math.atan2(ux * fwd, uz * fwd) }, { seed: `${type}|${Math.round(cx)}|${Math.round(cz)}`, flags: type === 'katsuo' && r.chance(0.5) });
       boats.push(bt);
@@ -142,8 +147,11 @@ export function buildHarbor(ctx, opts = {}) {
       if (inUomachi(mx, mz) && (kind === 'promenade' || kind === 'seawall')) { kind = 'quay'; apron = Math.max(3, Math.min(14, wallSide(mx, mz) - 0.5)); props = false; }
       if (inMinami(mx, mz) && kind === 'seawall') { kind = 'quay'; props = false; apron = 6; }
       const tq = performance.now();
+      // [v6:fix1] the plaza's east quay is flush with its paving, T.P. 1.83 (IMG_0809-0812: tile paving out to the railing, no raised slab)
+      const plazaQuay = mx > 25 && mx < 52 && mz > 20 && mz < 58;
+      const eastQuay = mx > 105 && mx < 192 && mz > 55 && mz < 100;   // [v6:fix2] the east promenade is flush at the survey's T.P. 1.9 (minami5 buildEastPromenade lays its deck there)
       const q = buildQuay(ctx, a, b, {
-        kind, top: run.top ?? 2, apron,
+        kind, top: plazaQuay ? 1.83 : eastQuay ? 1.9 : (run.top ?? 2), apron,
         props, lod: hero ? 'hero' : 'mid', windows: false, noLand: false,
         setback: 1.4, seed: `q|${Math.round(mx)}|${Math.round(mz)}`,
       });
@@ -197,14 +205,24 @@ export function buildHarbor(ctx, opts = {}) {
   const SOUTH = { a: [170, 60], b: [398, 101] };   // shared with the hero-run filter below
   if (opts.southQuay !== false) {
     const run = { a: SOUTH.a, b: SOUTH.b }; run.len = D2(run.a, run.b); run.top = 2.2;
-    out.boats.push(...moorRun(ctx, run, hull(['sanma', 'small', 'maguro', 'small', 'small', 'sanma', 'small', 'katsuo']), r, { fender: 1.0, gap: 4, isWater, max: phone ? 2 : low ? 4 : 10, raft: 0.4 }));
+    out.boats.push(...moorRun(ctx, run, hull(['sanma', 'small', 'maguro', 'small', 'small', 'sanma', 'small', 'katsuo']), r, { fender: 1.0, gap: 4, isWater, max: phone ? 2 : low ? 4 : 10, raft: 0.4, smallNear: [[130, 66, 75]] }));   // [v6:fix2] the east promenade photos (IMG_0888-0896) show small working hulls and one white 20 m boat in the first 50 m, not さんま boats with lamp booms
+  }
+  // [v6:fix3] the far shore of IMG_0890: the fishing boats at the 魚町 wall seen from the east promenade (rays of the solved camera hit the wall at (60, -51) .. (123, -91), 135-160 m out;
+  // hulls at the pixel columns of the photo: a small white boat at the left edge, a small one, the 19 m white trawler, the dark-hulled trawler and its neighbour at the right)
+  if (opts.farBoats !== false && !phone) {
+    const d = [0.84, -0.54], nrm = [0.54, 0.84];
+    for (const [al, off, name] of [[0.02, 3.0, null], [0.27, 3.2, null], [0.60, 3.4, null], [0.84, 3.6, null], [0.95, 3.2, null]]) {
+      const x = 60 + 63 * al + nrm[0] * off, z = -51 - 40 * al + nrm[1] * off;
+      if (!isWater(x, z)) continue;
+      out.boats.push(buildBoat(ctx, 'small', { x, y: 0, z, rotY: Math.atan2(d[0], d[1]) + (al > 0.5 ? Math.PI : 0) }, { seed: `far6|${al}` }));
+    }
   }
   const heroRuns = [];
   const southD = (q) => { const m = { x: (q.a[0] + q.b[0]) / 2, z: (q.a[1] + q.b[1]) / 2 }; return segDist(m, SOUTH); };
   for (const c of chains) if (c.zone === 'hero' && (c.kind === 'quay' || c.kind === 'seawall' || c.kind === 'promenade')) heroRuns.push(...straightRuns(c, 30).filter((q) => (opts.rows === false || rowDist((q.a[0] + q.b[0]) / 2, (q.a[1] + q.b[1]) / 2) > 14) && (opts.southQuay === false || southD(q) > 14)));
   heroRuns.sort((p, q) => q.len - p.len);
   // [v4:polish3] the first street-level frame (HERO.walk, the promenade) had a さんま boat's lamp booms 1-3 m from the eye
-  const heroNear = L.HERO?.walk ? [[L.HERO.walk.x, L.HERO.walk.z, 30]] : [];
+  const heroNear = [...(L.HERO?.walk ? [[L.HERO.walk.x, L.HERO.walk.z, 30]] : []), [130, 66, 75]];   // [v6:fix2] + the east promenade (IMG_0888-0896: small hulls only within 75 m)
   const heroTypes = hull(['small', 'sanma', 'small', 'small', 'maguro', 'small', 'katsuo', 'small', 'sanma']);   // [v3:fix] more working hulls in the inner bay
   for (const run of heroRuns) {
     if (out.boats.length >= maxBoats) break;
@@ -225,6 +243,15 @@ export function buildHarbor(ctx, opts = {}) {
     out.rows = buildMooringRows(ctx, { isWater, lite: phone ? PHONE.rowsEvery : low });
     for (const { boat } of out.rows) out.boats.push(boat);
     out.stats.rows = out.rows.length; out.stats.rowsMs = Math.round(performance.now() - tr);
+  }
+  // [v6:c8c12r3] the east-shore yards (浪板 finger floats, ramp and slipway; 大浦 pier end): an explicit list read off Earth 2026-03-11 (yards.js), not a mooring row
+  if (opts.yards !== false) {
+    const ty = performance.now();
+    try {
+      out.yards = buildYards(ctx, { isWater, thin: phone ? 3 : low ? true : 0 });
+      out.boats.push(...out.yards.boats);
+      out.stats.yards = { boats: out.yards.boats.length, floats: out.yards.floats, dry: out.yards.dry, ships: out.yards.ships, rejected: out.yards.rejected.length, ms: Math.round(performance.now() - ty) };
+    } catch (e) { console.warn('[harbor] yards', e); }
   }
   // [ship] safety net: no moored hull (any builder) in 第一昭福丸's send-off berth (ship/route.js BERTH_RESERVE)
   if (opts.shipBerth !== false) {   // [ship]
@@ -386,6 +413,7 @@ export function buildHarbor(ctx, opts = {}) {
 
   // ---- arriving boats (today's 入船情報 from life's ctx.services.arrivals, or setArrivals(list) directly)
   if (opts.arrivals !== false) out.arrivals = createArrivals(ctx, { isWater, ...(phone && { max: PHONE.arrivals }) });   // [v4:phone] the nearest arrivals only
+  if (opts.ais !== false) out.ais = createAis(ctx, { isWater, ...(phone && { max: 8 }) });   // real AIS: nothing until the bay has a receiver
 
   out.stats.ms = Math.round(performance.now() - t0);
   ctx.services.harbor = {
@@ -399,6 +427,7 @@ export function buildHarbor(ctx, opts = {}) {
     anbaEye: out.anba?.eye || null, bridges: { kanae: out.kanae?.towers || null, oshima: out.oshima?.towers || null },
     gulls: out.gulls ? { count: out.gulls.count, positions: out.gulls.positions } : null,
     stats: out.stats,
+    releaseCaches: releaseBoatCaches,   // [mobile-perf] main.js, after the static batch on a phone
   };
   return out;
 }

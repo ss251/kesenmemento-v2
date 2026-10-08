@@ -23,7 +23,7 @@ import { resolveFlags } from './flags.js';
 export const SHIP = {
   name: '第一昭福丸', nameEn: 'SHOFUKU MARU No.1', callSign: '7KFY', registration: 'MG1-2112',   // WCPFC VID 11921, IATTC 18109; MG1-2112 painted on the bridge (designboom-1800)
   imo: 9896660, mmsi: 431629000,                 // WCPFC, VesselFinder
-  owner: '株式会社臼福本店', builder: '株式会社みらい造船 (気仙沼市朝日町)', completed: '2020-02-05',   // WCPFC, IATTC, Usui slide
+  owner: '株式会社臼福本店', builder: '株式会社みらい造船 (気仙沼市朝日町)', completed: '2020-02-05',   // WCPFC, IATTC, a slide of the talk
   LOA: 58.60,                                    // usufuku.jp, slide, VesselFinder
   Lpp: 50.5, Lreg: 50.95,                        // JASNAOE Ship of the Year 2020; WCPFC/IATTC
   B: 9.2,                                        // moulded breadth (SOY, WCPFC, IATTC); VesselFinder's 10.0 is AIS rounding
@@ -33,9 +33,9 @@ export const SHIP = {
   GT: 486, speedKn: 12.3, engineKW: 735,         // registries; SOY; WCPFC
   holdM3: 523.1, holdC: -60,                     // WCPFC; 北かつ
   crew: 23,                                      // berths (nendo); 25 normal complement (WCPFC)
-  crewMix: { japanese: [6, 7], indonesian: 18 }, // slide; Usui's talk 2026-10-03 (Usui's public talk at Hackatsuon, 2026-10-03)
-  voyageMonths: [9, 15],                         // about a year on average (Usui's public talk, 2026-10-03)
-  fleet: { ships: 6, retired: { n: 1, year: 2026 } },   // 臼福本店 now runs 6 tuna vessels (Usui's public talk, 2026-10-03; usufuku.jp still lists 7)
+  crewMix: { japanese: [6, 7], indonesian: 18 }, // slide; the 臼福本店 talk 2026-10-03 (the 臼福本店 public talk at Hackatsuon, 2026-10-03)
+  voyageMonths: [9, 15],                         // about a year on average (the 臼福本店 public talk, 2026-10-03)
+  fleet: { ships: 6, retired: { n: 1, year: 2026 } },   // 臼福本店 now runs 6 tuna vessels (the 臼福本店 public talk, 2026-10-03; usufuku.jp still lists 7)
   midS: 29.3,                                    // local origin (the builders' shared frame)
   airDraft: 21.0,                                // source notes §2: ≈ 21 m to the top of the radar lattice (mast top measured 20.7 + lamp); かなえ大橋 clearance 32 m
   stemHead: 6.2, sheerMid: 5.0,                  // measured (source notes section 3)

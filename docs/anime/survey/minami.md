@@ -569,3 +569,202 @@ All 53 photos: mean 20.88 -> 16.17 px, median 17.01 -> 14.24 px, mean p90 57.3 -
   the map board, the east promenade's sculpture / plaque / clock tower, PIER7's stilt count (built every 4.2 m along the wall,
   not counted), the walkway's piers beyond the two measured.
 - The zz-photos.json forecourt landuse entry applies on the next layout build (the runtime plaza paving is minami5.js's own).
+
+## FIX round 1 (v6:fix1, 2026-10-03 evening): south-shore blockers after the verify1 check
+
+Tags: `chamfer.json` `fix1` (53 photos), `data/survey/minami/diff-fix1.json`; picks and features added by `tools/survey/minami_fix1.py`
+(`picks_fix1` in picks.json); road paint orthorectified by `tools/survey/roadpaint.py` (`road-paint.json`, vector polygons only).
+
+**Numbers.** Survey diff: 52 features compared, 0 missing, 3D error mean 0.084 m, median 0.037, p90 0.158, max 1.32 (the east
+monument's plaque corner, whose height has a 0.9 m sigma); 24 of 24 dimensions agree. Edge chamfer (app edges to photo edges, 1440 px
+frame, 53 photos): mean 16.16 -> **12.67 px**, median 14.25 -> 12.11, mean p90 43.2 -> 32.9; photos <= 6 px: 1 -> 7, <= 10 px: 11 -> 20,
+<= 15 px: 28 -> 37. The 6 px target is NOT met for 46 of 53 photos; IMG_0808 stays at 5.5 px. Biggest gains: 0888 37.8 -> 10.8 (camera
+re-solved), 0838 / 0839 / 0837 26 -> 5 / 5 / 7.6 (festoons), 0823 28.4 -> 9.4 and 0799 22.0 -> 7.9 (PIER7 NW roof), 0810 / 0813 / 0809 /
+0801 (paving, quay edge, ring trees) -4 to -5 px. Worse: 0893 +5.3 and 0894 +3.0 (the new monument is an approximation), 0913 +3.1.
+
+**What was rebuilt (all constants and sources in the code, tagged `[v6:fix1]`):**
+- Plaza north / east (IMG_0809-0812): tile paving at T.P. 1.83 out to the quay edge (`PLAZA_E`, `EDGE6`), the quay slab there lowered to 1.83
+  (`world.js`), GROUND_PADS and the layout landuse extended; the white pipe railing (`RAIL6`, 8 A-frames about every 3.2 m counted from 0810,
+  two rails, black net, two benches). Sett bands re-measured by ground cuts in 0803 / 0809 / 0812 / 0813: all run at compass 328 deg
+  (`PAV6`: lateral offsets -7.5, -4.2, -1.6, +4.8, +6.7 m, widths 0.8-1.15 m); pavers 0.44 x 0.15 m with the long side along the bands.
+- Rings (`RINGS6`): C is an open C-arc (centre 22.1, 54.1, d 5.6, 45 deg opening t 147-192) fitted to foot / top-edge contours of 0807 (d 5.42,
+  rms 0.09 m) and 0808 (6.2 m) and 0801's near arc; crowns of A / B / C are broad rounded ellipsoids sized from 0803 / 0807 (top T.P. 4.7 / 5.1 /
+  5.35, 3.5 / 3.5 / 4.5 m wide, 2.0-2.6 m deep).
+- IMG_0808 items: winch rebuilt (0.20 m posts, 0.30-0.80 m gearboxes, 0.58 m wheel 0.7 m up by the S gearbox, galvanised grey on an I-beam);
+  cage frame and mesh now light grey with a fine slotted perforation; the gate pier is light-grey concrete across the whole front face (no
+  dark gate leaf); 迎's bay-side 2F is dark timber with two round signs and no glazed band; the 3F box carries one 2 x 3 dark window block on
+  its bay face and no extra window on the left face; the far block's railed landing (stair rails) removed. Two round-crown trees there are
+  ring trees of A / B / C only.
+- PIER7 NW corner: the huge slab replaced by a low hip roof over the measured 12 x 12 m square (corner heights 8.25 / 9.05 / 9.5 / 8.7 from
+  0799 / 0823 / 0907 triangulation); dark vertical-timber wall with 3-D 「PIER 7」 letters; the 創 totem is a flat-topped burgundy tablet with
+  a concentric oval logo; all NAIWAN totems lost the cone cap (迎 1.56 m).
+- 注意 gate post re-solved to (4.7, 66.4) (it was 2.2 m west, in open view of 0819 / 0821); pier 2.2 x 1.3 m, board 1.7 x 1.2 m at T.P.
+  2.54-3.70; walkway fascia light grey.
+- PIER7 bay face: dark timber balcony band raised 0.45 m, festoons shallow and just under the deck edge, radio sign moved 0.85 m right and
+  0.3 m up, the A-frame racks pale timber.
+- 結 junction: 7-Eleven pole sign triangulated from 0829 + 0822 at (-39.5, 49.2), panel T.P. 9.73-12.3; poles moved / removed by `harbor/poles6.js`
+  (read by `town/poles.js`); the zebra crossing and the hatched median re-built from the orthorectified paint (crossing at s 111.2-114.9 m along
+  the road, ten bars; hatch s 91-110 m, bars slanting 50 deg); the street kerb moved 1.6 m east to the measured line and the foreground
+  bollards moved to the real far-kerb row; the 結 totem moved 8 m (bearings 214 / 217 deg from 0830 / 0831); the road sign of 0832 added; the
+  oversized fourth street tree dropped. 迎 NW face: the red 91 round sign and 「nine one」 cut on the face plane in 0913; the wing's roof overhang
+  0.5 m and 0.6 m lower; grey face with a navy band.
+- Slow street: festoons anchored at the fascias (4.1-4.4 m), every 4.5 m, none within 6.5 m of the 0834-0839 standing spot; the BLACK TIDE
+  lettering sits on the fascia (it was 0.45 m high). East promenade: the railing's first leg re-placed from 0891 foot cuts, the monument,
+  propeller, ring, wing sculpture, blue board, solar lamp and bench added from 0891 / 0893.
+- Cameras: IMG_0888 rotation re-solved from three surveyed 3-D points (0.45 deg rms; before 3-4 deg); IMG_0840 / 0841 centres moved to the
+  0834-0839 spot. They share no verified feature with any other photo (ALIKED + LightGlue and SIFT), so a PnP has no correspondences; a +-12
+  deg yaw sweep of both gives a flat 18-21 px chamfer, i.e. the 拓 face model, not the pose, limits them.
+
+**Not done / remaining (round 1):** PIER7 NW stair position in 0816 and the 3F roof plane above the studio in 0814 (the app still draws a high
+roof edge there: 0814 stays at 26 px); the 迎 totem / NW wing detail and wave roof crest in 0913 (21.5 px); stilt count along the bay face (still
+every 4.2 m by assumption); 結 frontage swap (lit café shopfront on the low left building); crossings of 0907 / 0908 / 0911 / 0912 are drawn from
+the same paint map but the orange-arch crossing (0906 / 0910 unregistered) is not; the 港町ブルース monument is an approximation (plaque corner
+only is measured); the street-light and crossarm poles of 0831 could not be placed (their ground cuts contradict 0839 / 0908); the 6 px chamfer
+target is unmet. The market blockers (15 a-e) belong to the market lane and were not touched.
+
+## FIX round 2 (v6:fix2, 2026-10-03 night): south-shore blockers after the verify2 check
+
+Tags: `chamfer.json` `fix2` (53 photos; `fix2a` is the run before the east station B re-registration), `data/survey/minami/diff-fix2.json`.
+New measurements are merged by `tools/survey/minami_fix2.py` (`picks_fix2` in picks.json; it also applies the one camera correction below);
+`tools/survey/ortho.py` is a new helper that orthorectifies the paving from solved photos into a labelled plan (the plans embed photos and
+stay in the scratchpad). Every code change is tagged `[v6:fix2]`. `test/v6-fix2-minami.test.js` pins the new constants to the survey.
+
+**Numbers.** Survey diff (54 features, 30 dimensions, 0 missing): 3D error mean 0.084 -> **0.037 m**, median 0.037 -> 0.019, p90 0.158 -> 0.089,
+**max 1.32 -> 0.159 m** (mukaeru.box.top, 0.66 sigma); 0 features over 1 m or over 3 sigma; 0 dimensions off. Edge chamfer (53 photos, 1440 px
+frame): mean 12.67 -> **11.64 px**, median 12.11 -> 11.22, mean p90 32.9 -> 30.0; <= 6 px: 7 -> 7 (0808 5.2, 0809 6.0, 0810, 0811, 0837 4.9, 0838 4.1, 0839 4.1; 0812 5.87 -> 6.16 left
+the list: it sees the plaza and the new trees / lamp position), <= 10 px: 20 -> 21, <= 15 px: 37 -> 41, > 20 px: 6 -> 4 (0819, 0913, 0912, 0841). The 6 px bar is NOT met by 46 of 53 photos.
+IMG_0808 5.5 -> **5.2 px**. Biggest gains: 0895 20.0 -> 8.6, 0894 24.9 -> 11.5, 0814 26.0 -> 17.6, 0835 18.6 -> 14.3, 0836 14.4 -> 9.5, 0837 7.5 -> 4.9,
+0834 8.6 -> 6.4, 0896 15.7 -> 12.7, 0891 11.8 -> 9.9, 0893 19.6 -> 17.3, 0818 13.5 -> 11.9. Worse: 0912 +1.1, 0911 +1.2, 0826 / 0827 / 0824 +1.3 / +1.6 / +0.9
+(the raised bay roof edge shows behind the street edge). The street-side group (0819, 0912, 0913, 0841, 0840, 0907, 0908, 0911, 0830) is still 17-22 px.
+
+**IMG_0808 (the photo that started this).** 迎's roof: it is a dark wavy roof on dark timber walls, and it rises toward the bay. The roof edge
+silhouette of 0808 cut on the vertical plane 0.5 m out from the bay face gives T.P. 8.4-13.0 along 14 points (`ROOF_BAY6`; two humps at s 17.5 and
+1.2, a trough at the 3F box); the survey cloud's eave line (11.8-12.0, from s = 2.0) and 0913's street-side silhouette (9.1-10.2 on the street plane, i.e. the
+bay edge seen through it) agree. The slab now has a street edge (the old wave) and the measured bay edge, the café plate follows it (dark timber
+soffit), the 3F box rises through it, the bay-face infill is dark timber up to the roof. Also: the 7-Eleven pole sign is visible again (the roof used to
+cover it), the two slender young trees in front of the cage are built (bleacher tier 3-4 step (2.55, 4.0, 36.1), 6.5 m; stair landing (3.76, 5.05, 29.96), 3.3 m;
+base rays of 0808 cut on the bleacher surface), ring C's second lamp moved from 240 to 202 deg (the glow of 0808 cuts at (20.1, 2.3, 53.3); the old lamp was the
+"bollard the photo lacks"), and the cast (people, cats) is not built when the URL carries `?look=photo|sunny|dawn` or `?nocast` (the comparison looks show the
+static scene; the three NPCs on the steps are the cast; the photo-align renders pass `nocast=1`).
+
+**Survey-diff blockers.** totem.yuwaeru (dy -0.50): the tablet foot is T.P. 2.40 on a low plinth. konbini.pole (dy -0.35): foot 2.38, the pole is built from
+there down to the lot. monument.plaque.tl (1.32 m): see below. anchor.P2.eave (0.27): registered 0.27 m past the glass corner along the face, where the
+survey cuts it.
+
+**The 港町ブルース monument was measured wrongly in fix1.** Its two-view triangulation (0893 x 0891) put the plaque 6.9 m from 0893 with the top 0.3 m
+under the eye, impossible for a plinth on the 1.9 m paving: the two stations are tied only by far hills and phone GPS. From IMG_0893 alone (eye 1.43 m over the
+paving): plinth front foot on the paving 3.9 m away, front face T.P. 2.36 (0.46 m high), plaque frame 1.56 x 0.81 m standing 0.29 m back, top T.P. 3.17, top-left
+(131.48, 3.17, 64.57); plinth 2.97 m long (0891's ground cuts of its ends). The monument is rebuilt from that (`MON6`: granite plinth, stainless frame, the green
+button, the brass propeller behind the right end, the steel hoop edge-on at the left end, the twin-wing pole; the blue board, solar lamp and bench placed from
+0891's ground cuts relative to the plinth). **Station B (IMG_0888 / 0890 / 0891) is moved by (-0.7, 0, +2.6) m** in `cameras.json` (`adjust_fix2`): from B the
+plaque lies 2.6 m north of where A (0893-0896, four photos) puts it, and with the move the rail-top rays of 0891 (T.P. 3.0) fall on GSI's quay line
+((127.6, 66.2) -> (131.6, 62.5) against the edge through (131.9, 62.0)); A keeps its solve. 0891: 11.8 -> 18.1 (monument moved, B not) -> 9.9 px.
+
+**East promenade (0888-0896).** GSI's quay line (131.9, 62) -> (146.7, 66.4) -> (184.4, 76.5) is 2-4 m outside the 5 m DEM's shore, so the phone stood in water in the
+app: the promenade is its own flat slab at T.P. 1.9 from the quay edge 8 m inland on a board-formed face (`buildEastPromenade`; the quay pieces there are flush at
+1.9 in `world.js`), the railing's first leg is GSI's line. A raised concrete kerb with black bollards (yellow band, three rails, 1.5 m apart) runs along z = 70 from
+x 131.5 east (the bases of 0894 and 0895 cut on the same line: (141.9, 70.0) -> (134.4, 70.7), kerb 0.45 m over the paving). The two moored hulls near the camera are small
+working boats (`smallNear` in `world.js`; the old さんま boats' lamp booms were the masts the photos lack), and the two generated utility poles that 0895 does not
+show (27 m and 44 m out) are removed (`poles6.js`; the photo's two small poles are 75-90 m away and stay).
+
+**PIER7.** (1) The studio's bay roof (0814): the old edge was 4 m inland of the bay face and 1.3 m low. It is a plate whose fascia top is T.P. 9.0 (cut 9.25-9.45 at
+1.5 m out, 8.65-8.85 at 3 m; cloud points 8.7-9.1), 2.2 m beyond the glass, with white rafters every 2 m and the glass head rising from 7.95 to 8.5 at the bay face.
+(2) The NW seam of the main block moved from s = -0.5 to **2.0** m (the cloud's main-eave line starts at (18.9, 12.0, 77.2) = s 2.0; 0814's rake edge says the
+same; 0814 26.0 -> 17.6 px). (3) Stilts: the old build restarted a 4.2 m pitch on every leg of the wall; IMG_0817's seven columns fit ONE line with a **3.5 m**
+pitch and the first 1.2 m from the NW end (mean 0.1 m); the wall-foot lamps stand at every second stilt (7 m, 0817's four lamps). (4) The balcony and the
+3F band of 0815 / 0817 were already in place. Not done: the timber stair of 0816 (the photo's is a large free-standing flight at the left, rising to the right to the
+deck at the SE block's NW end; the app's is a different flight on the right: its position cannot be cut, the ground rays at 36-45 m are 5-8 m wide at that grazing angle),
+the "PIER 7" sign and billboard of 0816 (they are on the SE block's NW face, the survey could not place the face).
+
+**結 / BLACK TIDE (0834-0841) (second pass).** IMG_0835's edges cut on the wall plane (insensitive to the plane's depth, 0.1-2 m, because the camera looks nearly square-on): the double
+door spans 1.8-3.7 m west of the BLACK TIDE east corner at T.P. 2.25-4.14 (the shop floor stands 0.5 m over the lot on a grey concrete base), the window over the slatted counter 3.7-5.5 m at
+2.72-4.15; the banner is one maroon nobori at the west end post (base cut 5.7 m west, 2.35 m out); the back volume's top is 0.5 m lower and its edge 0.45 m further in. IMG_0836 cuts the
+neighbours on the same wall: the double window W 8.6-11.3 (2.7-4.1), the clothes shop's small window W 15.2-16.7 and glazing W 16.7-19.5; the colonnade posts are placed once each on one
+line 2.05 m out (BLACK TIDE phase 1.8 + 1.9 j m), de-duplicated against the neighbouring lots' strip posts. (The "extra post" at 0836's third position is a wall step of the lot polygons, not a
+post.) 0834 8.6 -> 6.4, 0835 18.6 -> 14.3, 0836 14.4 -> 9.5, 0837 7.5 -> 4.9.
+
+**結 / BLACK TIDE (0834-0841).** The colonnade posts of the BLACK TIDE frontage stand where 0835's feet cut on the colonnade plane: 1.8, 3.7, 5.6 m west of the
+frontage's east corner, then every 1.9 m (the old phase was up to 0.95 m off; the phase now runs along the whole collinear colonnade). The uplight glow on the
+fascia is 0.3 (was 0.6; the fascia is white corrugated metal, not tan). 拓's slow-street face: the 12 black bollards in front of it (0840 / 0841: none) are gone,
+the pergola is pale timber (0.14 m posts) not steel, the KNEWS board hangs flush on the grey timber panel with the dark BLACK TIDE board beside it (0841), and the
+paving bands are the two thin bands the photos cut (red 0.45 m + dark 0.32 m, bearing 306 deg, i.e. across the street at 80 deg, through (-28.2, 89.9)); the old 0.9 m dark band
+down the street is in no photo. 0840 / 0841 stay 19-21 px: the 拓 face itself sits 1.5-2.8 m from where the photos put its plane (the GSI footprint edge is the
+pergola line, the wall is behind it); that offset is not yet applied (BLACK TIDE's door size also says its wall is ~1.5 m behind the GSI edge).
+
+**Not done / remaining (round 2).** (a) 0816: the stair position, the "PIER 7" sign and billboard; (b) 0818 / 0819: the under-walkway service space is an open dark bay in
+the photo, the app draws a timber screen; the gate pier of 0819 stands somewhere along the 0807 ray (the two bearings are nearly parallel, depth is unknown), the app puts
+it dead ahead and the photo does not show it; (c) 0830-0832, 0820-0822: the east kerb of 魚町港町線 (the app's sits 3.8 m ahead of 0830's camera, the photo has open
+road there), the parked cars of 結's lot, the pole sleeves (the photo's poles have none); (d) 0912 / 0913 / 0907 / 0908 / 0911: the cars, street trees and the NW wing's
+street-side wall heights (about 0.5 m high at the crest); (e) the 拓 and BLACK TIDE wall planes (above); (f) the far-shore skyline in 0891 / 0893-0896 is generic;
+(g) market photos belong to the market lane. The 6 px bar is far from met: 46 of 53 photos are over it. The chamfer tags `wip`, `work` and `var` of earlier rounds were dropped
+from chamfer.json to keep it small (their numbers are in the round-1 notes above).
+
+## FIX round 3 (v6:fix3, 2026-10-04): south-shore blockers after the verify3 check
+
+Tags: `chamfer.json` `fix3` (all 53 photos), `data/survey/minami/diff-fix3.json`. New helpers: `tools/survey/tri3.py` (`tri` multi-view triangulation of hand-read raw pixels,
+`bear` vertical edges from >= 2 photos, `cut` rays against a plane or a height, `ht` height above a known x, z, `wire` project an ENU wireframe into a solved photo,
+`proj`), `tools/survey/minami_fix3.py` (the 0840 / 0841 pitch), `tools/anime/eval-app.mjs` (evaluate JS in the built app, e.g. list the generated poles or raycast the
+scene from a solved camera). `test/v6-fix3-minami.test.js` pins the new constants to the survey. The market blockers (the dawn quay, #6 of the verify list) belong to the
+market lane and were not touched.
+
+**Numbers.** Survey diff (62 features, 35 dimensions, 0 missing): 3D error mean **0.035 m**, median 0.018, p90 0.083, **max 0.159 m**; 0 features over 1 m or over 3 sigma;
+0 dimensions off. Caveat that the numbers do not hide: the app registers the surveyed constants it was built from, so this checks the construction, not the survey; the
+survey's own sigmas (0.05-1.4 m; the studio glass and the column feet are 0.1-0.15 m, the single-view cuts 0.25-1.4 m) bound the real accuracy. Edge chamfer (1440 px frame,
+53 photos): mean 11.64 -> **11.17 px**, median 11.22 -> 10.60, mean p90 30.0 -> 28.7; photos <= 6 px: 7 -> 6 (0808 5.2, 0810 4.3, 0811 5.8, 0837 5.0, 0838 4.1, 0839 4.1;
+0809 6.05 and 0803 6.4 just over), <= 10 px: 21 -> 22, <= 15 px: 41 -> 43, > 20 px: 4 -> 1 (0912 21.1). The 6 px bar is still NOT met by 47 of 53 photos. Gains: 0799
+7.9 -> 6.7 and 0823 9.4 -> 7.8 (the NW block), 0907 25.2 -> 14.2, 0908 20.7 -> 16.2, 0819 23.1 -> 17.9, 0829 22.3 -> 14.8, 0822 19.1 -> 14.7, 0841 36.6 -> 15.1 (after the
+pitch re-solve; 21.5 before it), 0840 20.3 -> 15.1, 0890 8.8 -> 8.5, 0888 10.8 -> 9.95. Worse or flat: 0814 17.6 -> 18.4, 0893 17.3 -> 17.2 and 0912 / 0911 / 0913 (17-21 px: the
+roof edges of 迎's wings, the parked cars as boxes and the sky wires dominate; the ANCHOR panes now line up with the photo's).
+
+**PIER7 NW block (0799, 0814, 0823, 0907, 0908): rebuilt as a low shop with a terrace, not two glazed storeys under a roof.** `NW7` in `minami5.js` is a frame solved from
+three views: origin = the 1F shop's street corner at (-1.98, 71.37) (bearings from 0907 / 0799 / 0823, 0.01 m residual), `ea` = inland along the NW face (61 deg),
+`eb` = along the street face (151 deg). Measured: the shop is 8.15 m (NW face: 4.87 m of glass in 1.22 m panes, then plaster with a side door) x 11.8 m (street face: 4.7 m of glass,
+then timber behind the stair) on the corner deck (T.P. 2.35); its flat roof is a railed terrace at **T.P. 5.3** (slab 0.4 m, rail 0.98 m, timber top rail); the radio studio is a glass
+box 5.75 x 7.0 m set back **4.48 m** from the NW face (fit of its silhouette in the three photos: rms 0.04 m; head T.P. 8.0); the swept roof is a 11.7 x 12.1 m square whose eave
+corners were triangulated (apex at the street corner 8.3 at (-4.10, 75.39), the west tip 8.8 at (6.15, 69.75), the far corner 8.3 at b 14.9 by a cut on the street plane); the bay
+deck (4.2) and 3F (8.6) of the SfM stay for the SE part, whose 1F ring now starts beyond the shop (`P7_1F6`) and whose 2F / 3F glass bar starts 12.4 m along the street face
+(`NW7.seam`). The old build drew a glazed 1F + 2F under a roof 8.05 over the whole block. Chamfer 0799 6.7, 0823 7.8 px.
+**Open:** the main (3F) gable's NW end: the photos show a small upswept corner there (0823 raw (2200, 1530); 0908 (970, 600)) whose triangulation did not close (the two picks are
+different corners; 72-165 px residual), so the gable still starts at the SfM seam (s = 2.0) and shows as a tall wedge behind the NW roof in 0823; 0814 / 0815 / 0816 / 0817
+(the bay face, 12-18 px) are unchanged.
+
+**PIER7 NW stair (0908).** 15 open-riser timber treads (2.4 m wide, T.P. 2.35 -> 5.3, 0.197 m rise) between a street-side rail and the hall wall, a stringer, two timber
+hand rails with three wires and posts every three treads, a landing to the hall passage; the dark timber hall wall (T.P. 5.3-7.8) carries the 3-D lettering 「PIER 7」 as
+cut on the wall plane in 0908 (bottom 5.38, caps 1.07 m tall, the 7 1.5 m, from b 6.1 to 9.05); the blue Kesennuma City-area map board on two navy posts (panel T.P. 2.55-3.65,
+posts to 4.0, 1.35 m wide) at the stair's SE end; two clusters of three slender white columns (feet from three-view bearings at (-2.19, 76.82) and (0.29, 81.56), T.P. 2.3,
+near plumb with a 4-5 deg lean toward +b). The first attempt leaned the columns +-0.5 m (a fan); the photo's clusters are near plumb.
+
+**0819 / 0840 / 0841.** 0819: the gate pier is re-solved by IMG_0819's right-edge ray (bearing 235.6 deg, i.e. the pier is the strip at the far left, 7 m away) x IMG_0799's 94.5 deg
+bearing to its SW edge: **(8.80, 66.00) +-0.6 m** (was (4.7, 66.4), which put a grey box across the 0819 view); the walkway now bends east to it (`WALKWAY`) and meets PIER7's NW
+terrace, as the photo shows. The plaza photos 0806 / 0807 (24-26 m, rays nearly parallel to 0819's) leave +-1.1 m along that ray and put the pier's left edge ~190 px (1 m) left
+of where the app now has it in 0807: the plaza station's georegistration, not a second solution, so the 0819 near-field wins. 0840 / 0841: the SfM pitch of -7.8 / -8.0 deg of this 2-photo island is wrong
+(the photos' verticals are plumb to 1 deg, which a camera pitched 8 deg down cannot do; the base of the KNEWS board lands at the right row for +0.8 deg): `minami_fix3.py` sets
+pitch +0.8 (yaw, position unchanged). With it the board edges of 0841, cut on the 拓 face plane, are 1.2 m (KNEWS, f 0.717-0.747 from the SW end) and 1.3 m (BLACK TIDE, 0.676-0.708)
+wide: the boards, glazed doors, canopy, pergola and planters were 5-6 m too far NE and are re-placed (`buildSlowStreetPhotos`). The nobori are the navy 「気仙沼 かつお」 banners every
+2.4 m with white bases (not floral), the KNEWS 気仙沼DMC board and the BLACK TIDE BREWING board hang on the wall at those cuts. 0840 / 0841 stay registered (their position is the
+0834-0839 spot, +-3 m).
+
+**The items of blocker 7.** ANCHOR letters (0911 / 0912): the photo's pitch is 102 px per letter against the app's 97, so the R was 20-45 px left; the pitch is x 1.05 and the panes line up
+(overlay of 0912). 0913: the 2F bay and lettering of 「nine one」 exist in the code but the NW external stair's landing hides them (not fixed); the tiger-striped pole sleeves are gone on the
+whole south shore (`NO_SLEEVE6`: bare concrete, IMG_0830 / 0913 / 0829) and the pole at (-29.9, 40.1) that 0913 does not show is removed; the transformer pole of 0830 is at its ground cut
+(-28.2, 61.7). 0896: the tall curved street-lamp mast (foot (140.3, 2.1, 81.7), head T.P. 9.5, arm over the road toward the NE), the leaning wooden pole and the concrete pole of the cluster
+(feet (147.34, 84.6) / (147.46, 83.47), top 11.3) are built. 0829 / 0822: the 40 km/h disc over the no-parking disc on one white pole at (-34.9, 50.2) (the discs triangulate at
+(-34.8, 5.5, 50.3) / (-35.1, 4.9, 50.1)) are added, the row of black bollards on the far kerb is removed (none in either photo; one stands in 0822's foreground). 0830: the pole is
+re-placed; the shop colour (grey weathered boards on the left building of 0830, the app's cedar is orange) and 結's totem were NOT changed. 0890 / 0888: the bay west of the east
+promenade is empty water in 0888 (two near hulls removed with a keep-out disc), the bay-cruise boat lies at the nearer pontoon, and five small hulls stand at the 魚町 wall seen across the bay in
+0890 (the quay line was read off the app by raycasting from the solved camera: (60, -51) -> (123, -91), 135-160 m out); they are 14 m hulls (the photo's trawlers are 19-30 m: `buildBoat` has no scale option) at pixel columns
+of the photo, not measured individually. 0893: the plaque reads 港町ブルース (the title ran off the plaque and read ブルー). The NAIWAN totems carry the shallow five-sided gable of the photo
+(0.13 m over 0.9 m, not a flat top or a cone), the two-line 「NAI / WAN」 wordmark and a redrawn maze-oval glyph (outer ring open at the top right, inner ring, a disc in a loop above a hooked
+stem: IMG_0907 close-up). 0891: the east promenade's rail is a 6 x 5 cm top rail over three 1 cm cables on 4.5 cm posts (it was a 12 x 8 cm plank), the paving is blue-grey granite.
+
+**Not done / remaining (round 3).** (a) The 3F gable's NW end and the bay face of 0814-0817 (12-18 px); (b) the 結 shop colour and the 結 totem (0830); (c) 0913's NW external stair and the nine-one
+lettering behind its landing; (d) the far-shore boats are placed by pixel column, not measured, and at 14 m; the ferry's hull and the pontoon canopy are the generic ones; (e) 0912 / 0911 /
+0913 (17-21 px) the wing roofs, cars and wires; (f) 0906 / 0910 (the orange arch) are still unregistered and the crossing there is unbuilt; (g) the 6 px chamfer bar is met by 6 of 53 photos. The
+fish-market dawn quay (blocker 6) is the market lane's.
+
+## FINAL (v6:finish, 2026-10-04)
+
+`survey-diff` (tag final, `diff.json`): 62 / 62 features, 0 missing, 3D error mean 0.035 m, median 0.018, p90 0.083, max 0.159 (horizontal mean 0.020 m, vertical 0.021 m), none over 1 m or 3 sigma,
+35 / 35 dimensions within tolerance. `photo-align` tag `final` over the 53 registered photos: mean chamfer 11.2 px (median 10.8, worst 21.4 px, IMG_0912), 6 photos at <= 6 px and 22 at <= 10 px
+(before the rebuild: mean 20.9, worst 76.3, none <= 6); IMG_0808 5.2 px (6.7 before). Best: 0838 4.1, 0839 4.1, 0810 4.3, 0837 5.0, 0808 5.2. Phone tier (`phonemem`): 0 errors, texture 243 MB,
+heap 220 MB settled. Tests: `test/v6-finish.test.js`. Procedure: `docs/anime/SURVEY.md`.

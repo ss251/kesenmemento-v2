@@ -4,6 +4,8 @@
 import { Frame } from './gb.js';
 import { makeSpec } from './lot.js';
 import { buildHouse } from './house.js';
+import { realFh } from '../common.js';   // [sys:29]
+import { isFlushPv } from '../pv.js';   // [r3:5]
 
 const pick = (r, a) => a[Math.floor(r() * a.length)];
 const wpick = (r, items) => { let s = 0; for (const [, w] of items) s += w; let x = r() * s; for (const [v, w] of items) { x -= w; if (x <= 0) return v; } return items[items.length - 1][0]; };
@@ -29,13 +31,14 @@ export function buildLotHouse(H, lot, lod) {
   const shape = lot.roof.shape;
   let roofType = shape === 'flat' ? 'flat' : shape === 'hip' ? 'hip' : shape === 'shed' ? 'shed' : 'gable';
   if (roofType === 'flat' && floors <= 2 && !tall) roofType = r() < 0.5 ? 'gable' : 'hip';
-  const S = makeSpec(r, { floors, roofType, allowFlat: true, antennaP: tall ? 0 : 0.5, traditional: lot.kind === 'house' && r() < 0.12 });
+  const S = makeSpec(r, { floors, roofType, allowFlat: true, antennaP: tall ? 0 : 0.5, traditional: lot.kind === 'house' && r() < 0.12, pvData: lot.roof?.pv != null });   // [r3:5] pvData masks the seeded roof panel
+  if (isFlushPv(lot.roof?.pv)) S.pvFlush = { rects: lot.roof.pv.rects, ridgeAt: lot.roof.pv.ridgeAt ?? null, off: { x: 0, z: 0 } };   // [r3:5] HF is the lot's box centre here
   // the real roof colour (sampled from the aerial photo, snapped to the palette); walls from the layout
   S.roof.color = lot.roof.color;
   if (roofType !== 'flat' && roofType !== 'shed' && r() < 0.55) S.roof.mat = 'kawara';
   if (S.wall.kind === 'plaster' || S.wall.kind === 'paint') S.wall.color = lot.wall;
   if (tall) { S.wall = { kind: r() < 0.6 ? 'tile' : 'paint', color: r() < 0.6 ? pick(r, ['#d9d2c6', '#cdd0cd', '#e3dccd']) : lot.wall }; S.wall2 = null; S.antenna = false; S.solar = false; }
-  Object.assign(S, { w, d, floors, fh: 2.85, lod });
+  Object.assign(S, { w, d, floors, fh: lot.src?.h === 'osm' || lot.src?.h === 'landmark' || lot.src?.h === 'override' || lot.src?.h === 'ref' ? realFh(lot, floors, roofType) : 2.85, lod });   // [sys:29]
   const { gmin, gmax } = groundRange(H, HF, w, d);
   S.floorY = gmax + 0.32;
   S.groundMin = gmin;

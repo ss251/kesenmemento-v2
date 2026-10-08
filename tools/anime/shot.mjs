@@ -30,7 +30,7 @@ const srv = serve({ port, dist });
 let browser;
 try {
   browser = await launch({ quiet: !args.verbose });
-  const page = await browser.page({ width: W, height: H });
+  const page = await browser.page({ width: W, height: H, dpr: Number(args.dpr || 1) });
   const q = new URLSearchParams({ shot: '1', w: String(W), h: String(H), t: String(args.t || 0), q: args.q || 'high' });
   for (const k of ['only', 'hours', 'preset', 'fov', 'batch', 'date', 'debug', 'season', 'weather']) if (args[k]) q.set(k, args[k]);
   if (args.query) for (const [k, v] of new URLSearchParams(args.query)) q.set(k, v);

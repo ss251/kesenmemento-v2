@@ -10,6 +10,7 @@ import { AERIAL_LANDUSE } from './landuse_aerial.js';
 import { LOT_FIX, applyLotFix, applyPlaceFix } from './lotfix.js';   // [v4:polish1]
 import { openGrids, makeSampler } from './layout/grids.js';
 import { sunPosition, dayOfYear } from './layout/sun.js';
+import { onceByKey } from '../core/once.js';   // [ui-c2] one request per data file (loadData below)
 
 export const ORIGIN = { lat: 38.9060, lon: 141.5750 };
 export const M_PER_DEG = { lon: 86744.0, lat: 111014.0 };
@@ -34,9 +35,14 @@ export function dataURL(name) {
   if (IS_BROWSER) return (globalThis.__KLC_DATA__ || new URL("data/anime/", location.href).href) + name;
   return new URL("../../../data/anime/" + name, import.meta.url).href;
 }
-/** Load a JSON file from data/anime/ (modules use this for their own precomputed data). */
-export const loadData = (name) => load(name, "json");
-const [GMETA, GBUF, D] = await Promise.all([load('grids.json', 'json'), load('grids.bin', 'bin'), load('layout.json', 'json')]);
+/** Load a JSON file from data/anime/ (modules use this for their own precomputed data).
+ *  [ui-c2] In the browser explore.json is fetched ONCE per page: environment, the schools and explore each asked for it (2 MB) and each paid for its own request (three, mobile review F24).
+ *  Later callers get the first one's promise, so the same parsed object; the modules build one after another and none of them writes to it before the next has read it. A failed request is
+ *  forgotten (the next caller tries again). Under bun (tests, tools) every call still reads the file. */
+const loadJsonOnce = onceByKey((name) => load(name, "json"));
+const SHARED = new Set(["explore.json"]);   // (only the file with several users: the others have one, and a shared parse would stay on the heap for the life of the page)
+export const loadData = (name) => (IS_BROWSER && SHARED.has(name) ? loadJsonOnce(name) : load(name, "json"));
+const [GMETA, GBUF, D, AGSI] = await Promise.all([load('grids.json', 'json'), load('grids.bin', 'bin'), load('layout.json', 'json'), load('areas-gsi.json', 'json').catch(() => null)]);   // [sys:22] areas-gsi.json: the HUD's 町丁 grid
 const S = makeSampler(openGrids(GMETA, GBUF));
 
 // ------------------------------------------------------------------ zones
@@ -59,8 +65,13 @@ export const GROUND_PADS = [
   { ring: [[-17.4, 43.4], [-9.5, 50.1], [-3.9, 47.4], [2, 44], [6, 52], [6, 62], [-6, 64], [-20, 62], [-24, 50], [-20, 44]], max: 2.3, feather: 2.5, src: 'author photos IMG_0824-0827, 0820' },
   // [v6:rebuild] the plaza south of 内湾 and its forecourt up to the bleachers' far block: the photo survey puts the paving at
   // T.P. 1.83 (the cage foot, the ring and winch feet; docs/anime/survey/minami.md); the DEM's 2.1-3.6 m there is the
-  // pre-2018 ground and the old wall. The pad sits 13 cm under the paving (harbor/minami5.js) so the plaza landuse surface (+4 cm) stays below it.
-  { ring: [[-9.5, 50.1], [-3.9, 47.4], [-9.9, 31.1], [-9.5, 14], [4, 10], [20, 22], [40.2, 64.8], [23.9, 72.6], [7.6, 67.8], [-4.5, 74.9]], max: 1.70, feather: 2.0, src: 'author photos IMG_0807-0813 via the photo survey: data/survey/minami/features.json (cage.foot, ring, winch.foot)' },
+  // pre-2018 ground and the old wall. The pad sits 13 cm under the paving (harbor/minami5.js) so the plaza landuse surface (+4 cm) stays below it. [v6:fix1] The ring runs out east to the quay edge (IMG_0809-0812: paving to the railing).
+  { ring: [[-9.5, 50.1], [-3.9, 47.4], [-9.9, 31.1], [-9.5, 14], [4, 10], [20, 22], [29.8, 23.8], [35, 32.2], [41.4, 45.7], [42.5, 45], [48.6, 55.3], [40.2, 64.8], [23.9, 72.6], [7.6, 67.8], [-4.5, 74.9]], max: 1.70, feather: 2.0, src: 'author photos IMG_0807-0813 via the photo survey: data/survey/minami/features.json (cage.foot, ring, winch.foot)' },
+  // [cafe-rst] the room of café RST (floor T.P. 2.62, explore/cafe-rst.js) stands where the DEM still carries 迎's old bulk: it rises from 2.2 m at the
+  // street wall to 4.2 m at the rear wall, i.e. through the room's floor. The ground under the room (inside the hollow building, hidden by its walls) is
+  // clamped to the street's level; the ring is the room's footprint plus the wall thickness, reaching the bay face at the rear (data: the room frame of
+  // harbor/cafe-front.js FRONT, x_r -0.6..10.6, y_r -0.5..8.3).
+  { ring: [[-16.1, 44.1], [-8.5, 52.1], [-3.5, 47.6], [-7.1, 42.1], [-9.7, 38]], max: 2.3, feather: 1.0, src: 'author photos IMG_1047 (the room) over the surveyed ANCHOR face: harbor/cafe-front.js, explore/cafe-rst.js' },
 ].map((p) => { const xs = p.ring.map((q) => q[0]), zs = p.ring.map((q) => q[1]); return { ...p, x0: Math.min(...xs) - p.feather, x1: Math.max(...xs) + p.feather, z0: Math.min(...zs) - p.feather, z1: Math.max(...zs) + p.feather }; });
 function padded(x, z, h) {
   for (const p of GROUND_PADS) {
@@ -108,13 +119,13 @@ export function registerRoads(list) { for (const r of list) roadMap.set(r.id, r)
 function expandFar(F) {
   const out = [];
   for (const r of F.rows) {
-    const [id, cx, cz, w, d, rotY, storeys, height, groundY, k, sh, rc, wc, area, sx, rg] = r;
+    const [id, cx, cz, w, d, rotY, storeys, height, groundY, k, sh, rc, wc, area, sx, rg, baseY] = r;   // [sys:6] baseY (16)
     const c = Math.cos(rotY), s = Math.sin(rotY), hw = w / 2, hd = d / 2;
     // local x axis = (cos, -sin), local z axis = (sin, cos) for three.js rotation.y
     const P = (lx, lz) => [Math.round((cx + lx * c + lz * s) * 10) / 10, Math.round((cz - lx * s + lz * c) * 10) / 10];
     const lot = { id, zone: 'far', kind: F.kinds[k], poly: [P(-hw, -hd), P(hw, -hd), P(hw, hd), P(-hw, hd)],
       obb: { cx, cz, w, d, rotY }, front: { rotY, roadId: null, x: P(0, hd)[0], z: P(0, hd)[1], dist: null },
-      storeys, height, groundY, roof: { shape: F.shapes[sh], color: F.roofColors[rc] }, wall: F.walls[wc], seed: hashId(id), area };
+      storeys, height, groundY, baseY: baseY ?? groundY, roof: { shape: F.shapes[sh], color: F.roofColors[rc] }, wall: F.walls[wc], seed: hashId(id), area };
     // [v4:data] value sources ("h/kind/roof/color"), the aerial ridge axis, and names for the named far buildings
     if (F.srcs && sx != null) { const [h, kind, roof, color] = F.srcs[sx].split('/'); lot.src = { h, kind, roof, color }; }
     if (rg) lot.roof.ridge = rg === 1 ? 'x' : 'z';
@@ -172,15 +183,34 @@ export const SUN_DIR = sunDirAt(16.5);
 /** Player bounds (walk): the city bbox less a 200 m margin ([v3:fix] was the mid square, which clamped the walk spots
  *  at the bridges; the far zone is coarse but walkable). */
 export const WORLD = { play: { x0: ZONES.far.x0 + 200, x1: ZONES.far.x1 - 200, z0: ZONES.far.z0 + 200, z1: ZONES.far.z1 - 200 } };
-/** Area names for the HUD toast (rough boxes, place names from GSI annotations). */
+/** Nickname boxes for the HUD toast (the places a visitor knows by a nickname: the inner bay, the cape, the fish market). [sys:22] The 魚町 /
+ *  八日町 / 南町 boxes are gone: they sat on 入沢 / 港町 / 柏崎 / 陣山 (a walker at (-150, -200) was told 八日町 in 入沢); the 町丁 comes from
+ *  areaAtGsi below. */
 export const AREAS = [
   { name: '内湾', x0: 20, x1: 330, z0: -150, z1: 60 },
   { name: '神明崎', x0: 320, x1: 380, z0: -160, z1: -10 },
-  { name: '魚町', x0: 60, x1: 320, z0: -260, z1: -150 },
-  { name: '八日町', x0: -250, x1: 60, z0: -300, z1: -60 },
-  { name: '南町', x0: -100, x1: 250, z0: 60, z1: 260 },
   { name: '魚市場', x0: 420, x1: 800, z0: 500, z1: 1000 },
 ];
+/** [sys:22] The 町丁 name at (x, z) from the GSI 逆ジオコーダ grid (data/anime/areas-gsi.json, 25 m): the nearest cell; '' over the sea, outside the
+ *  grid, or when the file is missing (main.js then asks explore's search.areaAt). 出典：国土地理院. */
+export function areaAtGsi(x, z) {
+  if (!AGSI) return '';
+  const i = Math.round((x - AGSI.x0) / AGSI.step), j = Math.round((z - AGSI.z0) / AGSI.step);
+  if (i < 0 || j < 0 || i >= AGSI.nx || j >= AGSI.nz) return '';
+  const k = AGSI.idx[j * AGSI.nx + i];
+  return k >= 0 ? AGSI.names[k] : '';
+}
+/** [sys:21] The census small areas (町丁, e-Stat 令和2年国勢調査) as ENU polygons: { ja, en, ring, holes?, bbox }. */
+export const AREA_POLYS = (D.areas || []).map((a) => { let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity; for (const [x, z] of a.ring) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (z < z0) z0 = z; if (z > z1) z1 = z; } return { ...a, bbox: [x0, z0, x1, z1] }; });
+const inRing = (x, z, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const a = p[i], b = p[j]; if ((a[1] > z) !== (b[1] > z) && x < ((b[0] - a[0]) * (z - a[1])) / (b[1] - a[1]) + a[0]) c = !c; } return c; };
+/** The census area containing (x, z), or null (over the sea, or outside 04205). */
+export function areaPolyAt(x, z) {
+  for (const a of AREA_POLYS) {
+    const b = a.bbox; if (x < b[0] || x > b[2] || z < b[1] || z > b[3]) continue;
+    if (inRing(x, z, a.ring) && !(a.holes || []).some((h) => inRing(x, z, h))) return a;
+  }
+  return null;
+}
 export const NAMES = { city: '気仙沼', cityEn: 'Kesennuma', bay: '内湾', market: '気仙沼市魚市場' };
 
 // ------------------------------------------------------------------ [v4:data] real-world layers (OSM + GSI, scripts/anime/enrich)
@@ -203,11 +233,23 @@ applyPlaceFix(PLACES);   // [v4:polish3]
 /** Traffic signals { x, z, roadId } and crossings { x, z, kind, signals, roadId } from OSM. */
 export const SIGNALS = D.signals || [];
 export const CROSSINGS = D.crossings || [];
+/** [sys:14] [sys:18] Crossings and lane arrows read from the newest imagery (data/anime/overrides `crossings` / `arrows`): zebras to paint, `removed`
+ *  zebras the hero junction rule must not paint, and { road, node, lanes } lane arrows. */
+export const CROSSING_OVR = { zebras: [], removed: [], moved: [], arrows: [], ...(D.crossingOvr || {}) };
 /** Named bridges { name, kind, pts } and rail { kind, name, pts, bridge, tunnel } from OSM. */
 export const BRIDGES = D.bridges || [];
 export const RAIL = D.rail || [];
+/** [sys:17] Bus stops { id, kind: 'bus' | 'brt', name, nameEn, operator, shelter?, covered?, bench?, x, z, rotY, road } on the left kerb of the road a bus uses. */
+export const BUS_STOPS = D.busStops || [];
+/** [craft:C13] Show the generated credit line with Japanese punctuation. Official source titles stay; ASCII `;` and `()` do not. */
+export function presentCredits(raw) {
+  return String(raw || '出典：国土地理院')
+    .replace(/\s*;\s*/g, '、')
+    .replace(/\s*\(([^)]+)\)/g, '（$1）')
+    .replace(/([ぁ-んァ-ヶー一-鿿　-〿（）]) +(?=[ぁ-んァ-ヶー一-鿿])/g, '$1');   // （） are U+FF08/09, outside U+3000–303F
+}
 /** Data credit line required by the sources (OSM: © OpenStreetMap contributors). */
-export const CREDITS = D.credits || '出典：国土地理院';
+export const CREDITS = presentCredits(D.credits || '出典：国土地理院');
 /** [v4:overrides] Prop placements from data/anime/overrides ({ type, x, z, rotY, ovr }; town/props.js builds them). */
 export const PROPS = D.props || [];
 /** [v4:overrides] The override files folded into this layout ({ file, cell, bbox, sources, note, counts }). */

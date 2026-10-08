@@ -1,0 +1,56 @@
+{
+ "preview": {
+  "paint": [
+   {
+    "name": "first-paint",
+    "ms": 420
+   },
+   {
+    "name": "first-contentful-paint",
+    "ms": 420
+   }
+  ],
+  "wallMs": 2387,
+  "frames": 90,
+  "p50": 16.7,
+  "longTasks": [],
+  "p95": 16.7,
+  "p99": 16.8
+ },
+ "url": "http://127.0.0.1:9437/",
+ "liveAtMs": 13146,
+ "deltaE": {
+  "mean": 2.33,
+  "max": 74.2,
+  "samples": 230400,
+  "live": "docs/loading/v3/live-hiru-desktop.png",
+  "still": "/tmp/klc-title-posters/title_desktop_hiru.png"
+ },
+ "idle": {
+  "p50": 16.7,
+  "p95": 16.7,
+  "p99": 16.7,
+  "n": 90,
+  "longTasks": [
+   76,
+   159,
+   2616,
+   1052,
+   392,
+   414,
+   71,
+   710,
+   63,
+   124,
+   5480,
+   415,
+   656
+  ]
+ },
+ "errors": [
+  {
+   "type": "log-error",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9437/api/live"
+  }
+ ]
+}

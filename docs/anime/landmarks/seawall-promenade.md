@@ -8,12 +8,12 @@ street-level place in town and must be right.
 | Item | Value | Source |
 |---|---|---|
 | Line | along 県道 気仙沼港線 on the north shore, from the NW corner of the bay at about (15, −25) east to the 神明崎 neck at about (300, −150). On the ortho it is a straight wall with a pink-red paved strip | ortho `ortho/seawall.jpg`; the app's `SPOTS.promenade` runs (7.7, −22.6) → (298, −116.6) |
-| Length | **311 m** (the measured line above is 311 m) | 土木学会デザイン賞 2022; 今川悟 blog: 312 m of works |
-| Crest | **T.P. 4.1 m** | 今川悟 blog; Miyagi Prefecture page |
-| Seen from the land | **only 1.3 m** above the pavement. The land behind is at most T.P. 2.8 m | 今川悟 blog |
-| Flap gates | a **1 m freeboard (余裕高) of flap gates** on the crest that rise by themselves with the water, with no power and no operator. There are **21 gates**, 13.7 m wide each, which replace a planned T.P. 5.1 m solid wall | the prefecture via the search summary; 今川悟 blog; 気仙沼市 video page |
+| Length | **311 m** (the measured line above is 311 m) | 土木学会デザイン賞 2022; imakawa.net blog: 312 m of works |
+| Crest | **T.P. 4.1 m** | imakawa.net blog; Miyagi Prefecture page |
+| Seen from the land | **only 1.3 m** above the pavement. The land behind is at most T.P. 2.8 m | imakawa.net blog |
+| Flap gates | a **1 m freeboard (余裕高) of flap gates** on the crest that rise by themselves with the water, with no power and no operator. There are **21 gates**, 13.7 m wide each, which replace a planned T.P. 5.1 m solid wall | the prefecture via the search summary; imakawa.net blog; 気仙沼市 video page |
 | Extras | **陸閘 (gates for fishermen), stair-shaped rest decks (階段状の休憩デッキ), night lighting** | デザイン賞 |
-| Road behind | 気仙沼港線, 11.5 m wide | 今川悟 blog |
+| Road behind | 気仙沼港線, 11.5 m wide | imakawa.net blog |
 
 **Look.**
 

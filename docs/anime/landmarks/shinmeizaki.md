@@ -40,7 +40,7 @@ The peninsula seawalls, the west revetment, the walkway and the 浮見堂 are al
 - GSI seamlessphoto z18 (`ortho/shinmeizaki.jpg`) and the core DEM (`data/terrain/core.f32`)
 - OSM nodes 2495986401 (五十鈴神社), 2495986403 (猪狩神社), 7653079720 (社務所) and 7580455850 (恵比寿像)
 - https://kesennuma-kanko.jp/ukimido/ and https://tavitan.com/kanko/miya/p_kesennuma_wan.html (神明崎 as a spot that seems to float in the bay)
-- raw/photos IMG_0582, IMG_0598 (the scale model)
+- photos of the inner-bay scale model in PIER7 (not included)
 
 ## In the app
 

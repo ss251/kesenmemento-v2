@@ -285,6 +285,16 @@ def measure(picks_path):
         pos[name] = np.array(rec['enu'])
     for d in P.get('dims', []):
         dims.append(dict(d))
+    hp = os.path.join(ROOT, 'data/survey/market/hall-features.json')    # the quay hall: tools/survey/market_hall.py
+    if os.path.exists(hp):
+        H = json.load(open(hp))
+        feats += H['features']
+        dims += H['dims']
+    tp = os.path.join(ROOT, 'data/survey/market/tug-features.json')    # the berthed tug: tools/survey/tug_spec.py
+    if os.path.exists(tp):
+        T_ = json.load(open(tp))
+        feats += T_['features']
+        dims += T_['dims']
     out = dict(note='Market survey features (tools/survey/market_features.py): ENU metres (x east, y T.P. up, z south), 1-sigma per axis. '
                'Names: docs/anime/survey/market.md. Groups name#k are matched without order by tools/anime/survey-diff.mjs.',
                area='market', features=feats, dims=dims)

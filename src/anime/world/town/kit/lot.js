@@ -9,9 +9,9 @@ const pick = (r, a) => a[Math.floor(r() * a.length)];
 const wpick = (r, items) => { let s = 0; for (const [, w] of items) s += w; let x = r() * s; for (const [v, w] of items) { x -= w; if (x <= 0) return v; } return items[items.length - 1][0]; };
 
 export const PAL = {
-  plaster: ['#e8dcc6', '#e3d4b8', '#efe4cf', '#ddd0b8', '#e9dfd0', '#eadbc4', '#ecdcc8'],
+  plaster: ['#e8dcc6', '#e3d4b8', '#f1efe6', '#ddd0b8', '#e9dfd0', '#f3f1e8', '#ecdcc8'],   // [sys:9] two of the seven creams are white
   paint: ['#efe9dc', '#ece8e0', '#f0ebe1', '#e7e3da', '#eee6d8'],
-  siding: ['#b7cddb', '#c2d3de', '#aec6d6', '#bccfdc', '#d8d4c8', '#c9c3b3', '#b9c4b4', '#e6dfcf', '#d3c6b4', '#c8d6cf'],
+  siding: ['#f1efe6', '#e9e7dd', '#bab9aa', '#a5a69f', '#d8d4c8', '#c9c3b3', '#55585d', '#e6dfcf', '#d3c6b4', '#8c8e89'],   // [sys:9] white / grey / charcoal 窯業系 siding (4 of the 10 were pale blue)
   tile: ['#cdd0cd', '#d3d2cc', '#c7c9c6', '#d6cfc4', '#bfc2c1', '#d9d2c6'],
   wood: ['#6b4f3c', '#5f4636', '#7a5a43'],
   kawara: ['#4a4f58', '#555a63', '#4f545c', '#56677a', '#5d6f82', '#4d6457', '#4a5f55', '#50565f'],
@@ -50,7 +50,7 @@ export function makeSpec(r, o) {
     belt: light && r() < 0.45, cornerTrim: r() < 0.5, porchColor: pick(r, ['#c9bfb0', '#b9b1a4', '#d6cfc4', '#a9a49b', '#c4b39a']),
     canopyColor: pick(r, ['#ece8df', '#d8d2c4', '#6b5242', '#8e949b']), balconySlab: pick(r, ['#e2ddd2', '#d8d2c4']),
     railColor: pick(r, ['#8e949b', '#4b4d52', '#6b5242', '#c9ccd1']), poleColor: pick(r, ['#8fb3c9', '#c9ccd1', '#a8c7a0']),
-    bigFront: r() < 0.7, antenna: r() < (o.antennaP ?? 0.55), solar: !trad && roofType !== 'flat' && r() < 0.1,
+    bigFront: r() < 0.7, antenna: r() < (o.antennaP ?? 0.55), solar: (!trad && roofType !== 'flat' && r() < 0.1) && !o.pvData,   // [r3:5] the draw stays exactly where it was (the rng stream of every following per-house value is unchanged); measured PV data (lot.roof.pv) masks the random panel
     propane: r() < 0.22, interiors: trad ? ['int_shoji', 'int_lace', 'int_shoji', 'int_dark', 'int_room'] : null,
   };
 }
@@ -107,14 +107,14 @@ export function buildLot(H, D) {
 
   // ------------------------------------------------------------ house spec
   const S = makeSpec(r, { floors, traditional: D.traditional, roofType: D.roofType, allowFlat: floors >= 2 && hw < 7.5, antennaP: D.antennaP });
-  Object.assign(S, { w: hw, d: hd, floors, fh: 2.85, lod });
+  Object.assign(S, { w: hw, d: hd, floors, fh: D.fh ?? 2.85, lod });   // [sys:29] D.fh: a measured storey height
   if (D.specOverride) Object.assign(S, D.specOverride);
   // ground under the footprint
   const HF = F.sub(hcx, 0, hcz, 0);
   let gmin = 1e9, gmax = -1e9;
   for (const [x, z] of [[hx0, hz0], [hx1, hz0], [hx0, hz1], [hx1, hz1], [hcx, hcz]]) { const g = gy(x, z); gmin = Math.min(gmin, g); gmax = Math.max(gmax, g); }
   S.floorY = gmax + 0.45 + (S.traditional ? 0.08 : 0);
-  S.groundMin = gmin;
+  S.groundMin = Math.min(gmin, D.baseY ?? gmin);   // [sys:6] D.baseY: the lowest terrain of the lot (the plinth reaches it)
   S.groundFront = gy(hcx, hz1 + 1);
   // door position on the front face (u relative to house centre)
   let du;

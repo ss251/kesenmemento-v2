@@ -30,6 +30,7 @@ import { buildPoles, facadeAnchors } from '../town/poles.js';
 import { buildLanduse, LOOK } from '../town/landuse.js';
 import { farLanduse, TOWN_LU } from '../landmarks/farground.js';
 import { tileOf } from './tiles.js';
+import { PHONE } from '../../core/tier.js';   // [mobile-perf] the crash-loop guard's lighter radii (PHONE.streamRadii, main.js)
 
 /** Radii (m, from the focus point to the nearest point of a tile) per quality tier. */
 export const RADII = {
@@ -54,7 +55,7 @@ export function wantLevel(dist, mode, R, current = { l0: false, l1: false }) {
 
 export function createStream(ctx, { tiles, kit, farTown, lotIdx, roadIdx, real2, quality = 'high' }) {
   const L = ctx.L, THREEc = THREE;
-  const R = RADII[quality] || RADII.high;
+  const R = quality === 'phone' && PHONE.streamRadii ? { ...RADII.phone, ...PHONE.streamRadii } : (RADII[quality] || RADII.high);
   const sb = new StreamBatch(ctx, { name: 'explore-stream' });
   const T = kit.T, H = kit.H;
   // OSM land use of the far core (car parks, school yards, pitches, parks, cemeteries, fields): each polygon wholly
@@ -148,9 +149,9 @@ export function createStream(ctx, { tiles, kit, farTown, lotIdx, roadIdx, real2,
       }
       const names = [];
       for (let i = 0; i < t.far.length; i += 48) { const part = t.far.slice(i, i + 48); step(capB, () => buildMid(ctx, part, { H, roadIdx, names })); yield 'mid'; }
-      if (names.length) step(capB, () => { const b = real2.boards(names); ctx.addStatic(b.group); });
-      colliders(t.far, 'f1:' + t.key);
-      commit('s1:' + t.key, capS, { slot: slotOf('s1', t) });
+      if (names.length) { step(capB, () => { const b = real2.boards(names); ctx.addStatic(b.group); }); yield 'boards'; }
+      colliders(t.far, 'f1:' + t.key); yield 'colliders';   // [smooth] boards, colliders, the streets' commit and the buildings' swap were one step
+      commit('s1:' + t.key, capS, { slot: slotOf('s1', t) }); yield 'streets-in';
       commit('f1:' + t.key, capB, { visible: st.get(t.key).l0 !== 'ready', slot: slotOf('f1', t) });
       farTown?.hide(t.far.map((l) => l.id));
     } catch (e) { dropCap(capS); dropCap(capB); ctx.physics.removeTag('f1:' + t.key); throw e; }
@@ -197,18 +198,25 @@ export function createStream(ctx, { tiles, kit, farTown, lotIdx, roadIdx, real2,
         colliders(leftovers, 'k0:' + t.key);
         yield 'leftovers';
       }
-      step(cap, () => tileProps(ctx, H, cap.out, { lotIdx, roadIdx, seed: t.key }));
-      step(cap, () => cap.laundry.build());
-      step(cap, () => cap.gb.flush(cap.group, 'explore-kit'));
+      // [smooth] one piece of work per frame slice: the props, the laundry and the kit's merge were one 30-70 ms step with the swap below
+      step(cap, () => tileProps(ctx, H, cap.out, { lotIdx, roadIdx, seed: t.key })); yield 'props';
+      step(cap, () => cap.laundry.build()); yield 'laundry';
+      step(cap, () => cap.gb.flush(cap.group, 'explore-kit')); yield 'kit';
       // swap: show the kit and hide the simplified buildings of this tile (one change: drawn in the same frame, [v4:polish3])
-      sb.group(() => { commit('k0:' + t.key, cap); sb.setVisible('m1:' + t.key, false); sb.setVisible('f1:' + t.key, false); });
+      // [mobile-perf] the kit fades in by dither over the simplified buildings (StreamBatch.fade, ~0.35 s), which go when it is whole: a
+      // street's detail no longer pops at 40 m. (Shot mode and settle(): at once, as before.)
+      sb.group(() => { commit('k0:' + t.key, cap); });
+      sb.fade('k0:' + t.key, 0, 1, () => sb.group(() => { sb.setVisible('m1:' + t.key, false); sb.setVisible('f1:' + t.key, false); }));
       ctx.physics.removeTag('m1:' + t.key); ctx.physics.removeTag('f1:' + t.key);
       stats.lastL0 = { tile: t.key, kit: built.length, simplified: leftovers.length, shops: cap.out.shopFronts.length };
     } catch (e) { dropCap(cap); throw e; }
   }
   function unloadL0(t) {
     const s = st.get(t.key);
-    sb.group(() => { sb.remove('k0:' + t.key); if (s.m1) sb.setVisible('m1:' + t.key, true); if (s.l1 === 'ready' && t.far.length) sb.setVisible('f1:' + t.key, true); });
+    // [mobile-perf] the simplified buildings come back at once and the kit fades out over them, then goes
+    sb.group(() => { if (s.m1) sb.setVisible('m1:' + t.key, true); if (s.l1 === 'ready' && t.far.length) sb.setVisible('f1:' + t.key, true); });
+    const k = 'k0:' + t.key;
+    sb.fade(k, 1, 0, () => sb.remove(k));
     ctx.physics.removeTag('k0:' + t.key);
     if (s.m1) colliders(t.mid, 'm1:' + t.key);
     if (s.l1 === 'ready' && t.far.length) colliders(t.far, 'f1:' + t.key);
@@ -256,6 +264,7 @@ export function createStream(ctx, { tiles, kit, farTown, lotIdx, roadIdx, real2,
     j.t._ab = workId;   // not again in this work() call
     try { j.gen.return(); } catch { /* generator cleanup */ }
     ctx.physics.removeTag((j.lvl === 'l0' ? 'k0:' : 'f1:') + j.t.key); if (j.lvl === 'l1') ctx.physics.removeTag('s1:' + j.t.key);
+    if (j.lvl === 'l1') sb.remove('s1:' + j.t.key);   // [smooth] the streets may be in already (jobL1 commits them a slice before the buildings)
     finish(j, false);
   }
   /** Run jobs for up to `budget` ms. */
@@ -288,15 +297,18 @@ export function createStream(ctx, { tiles, kit, farTown, lotIdx, roadIdx, real2,
       sb.cull(ctx.planet?.active ? null : ctx.camera);
       return busy;
     },
-    /** Build (and unload) everything the focus wants, now. */
+    /** Build (and unload) everything the focus wants, now. [mobile-perf] With no fades: a settled view has no half-faded tile. */
     settle(fx, fz, m = 'ground', maxMs = 60000) {
-      plan(fx, fz, m);
-      const t0 = performance.now();
-      while (performance.now() - t0 < maxMs) { plan(fx, fz, m); if (!work(1e9) && !job) break; }
-      plan(fx, fz, m);
-      sb.flush(ctx.pipeline?.size);
-      sb.cull(ctx.camera);
-      return api.summary();
+      const fadeMs = sb.fadeMs; sb.fadeMs = 0;
+      try {
+        plan(fx, fz, m);
+        const t0 = performance.now();
+        while (performance.now() - t0 < maxMs) { plan(fx, fz, m); if (!work(1e9) && !job) break; }
+        plan(fx, fz, m);
+        sb.flush(ctx.pipeline?.size);
+        sb.cull(ctx.camera);
+        return api.summary();
+      } finally { sb.fadeMs = fadeMs; }
     },
     level(key) { const s = st.get(key); return s ? { l1: s.l1, l0: s.l0, m1: s.m1 } : null; },
     flush: () => sb.flush(ctx.pipeline?.size),

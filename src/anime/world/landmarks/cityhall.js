@@ -58,17 +58,29 @@ export function buildCityHall(ctx) {
   {
     const sp = SPEC.cityHall2, poly = OSM.cityHall2.poly, o = obbOf(poly), gs = groundSpan(L, poly);
     const y0 = gs.lo + 0.4, top = y0 + sp.storeys * sp.fh;
+    // [v6:c1] Commons 2026-03-29 (raw/ref/commons/untagged/187673491): the windows are grouped into wide bands of
+    // 3-4 white aluminium sash units, each about 1.7 m wide with a 2x2 pane grid and a top transom, separated by narrow
+    // piers of weathered board siding. One tile = one bay of 8.4 m x one floor: a band of four 1.68 m units across
+    // X 0.1..0.9 and a plain siding pier (0.84 m) at each tile end.
+    const BAY = 8.4, WIN = [0.1, 0.22, 0.9, 0.8];
     const siding = (g, W, H) => {
       g.fillStyle = sp.wall; g.fillRect(0, 0, W, H);
       for (let y = 0; y < H; y += 6) { g.fillStyle = y % 12 ? '#564d42' : '#665c4f'; g.fillRect(0, y, W, 5); g.fillStyle = '#463e35'; g.fillRect(0, y + 5, W, 1); }
-      const X0 = W * 0.2, X1 = W * 0.8, Y0 = H * 0.2, Y1 = H * 0.72;
-      g.fillStyle = '#e9e6dc'; g.fillRect(X0 - 3, Y0 - 3, X1 - X0 + 6, Y1 - Y0 + 6);
-      const gr = g.createLinearGradient(0, Y0, 0, Y1); gr.addColorStop(0, '#61788a'); gr.addColorStop(1, '#adbfca'); g.fillStyle = gr; g.fillRect(X0, Y0, X1 - X0, Y1 - Y0);
-      g.fillStyle = '#e9e6dc'; g.fillRect((X0 + X1) / 2 - 1.5, Y0, 3, Y1 - Y0); g.fillRect(X0, (Y0 + Y1) / 2 - 1.5, X1 - X0, 3);
+      const X0 = W * WIN[0], X1 = W * WIN[2], Y0 = H * (1 - WIN[3]), Y1 = H * (1 - WIN[1]), uw = (X1 - X0) / 4, fw = 2;
+      const gl = (x, y, w, h, c0, c1) => { const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, c0); gr.addColorStop(1, c1); g.fillStyle = gr; g.fillRect(x, y, w, h); };
+      for (let i = 0; i < 4; i++) {
+        const x = X0 + i * uw;
+        g.fillStyle = '#e9e6dc'; g.fillRect(x, Y0 - 2, uw, Y1 - Y0 + 4);                                 // the sash frame
+        const gx = x + fw, gw = uw - 2 * fw, tr = (Y1 - Y0) * 0.2, gy = Y0 + fw + tr;                   // glass, transom height
+        gl(gx, Y0 + fw, gw, tr - fw, '#61788a', '#86a0b0');                                                 // the top transom
+        gl(gx, gy, gw, Y1 - fw - gy, '#6a8294', '#adbfca');                                                 // the 2x2 pane grid below
+        g.fillStyle = '#e9e6dc'; g.fillRect(gx, gy - fw, gw, fw);                                           // transom rail
+        g.fillRect(gx + gw / 2 - 1, gy, 2, Y1 - fw - gy); g.fillRect(gx, (gy + Y1 - fw) / 2 - 1, gw, 2);  // the 2x2 mullions
+      }
     };
-    const fac = facadeMat(ctx, 'cityhall2', { draw: siding, win: [0.2, 0.28, 0.8, 0.8], lit: 0.3 });
+    const fac = facadeMat(ctx, 'cityhall2', { draw: siding, win: WIN, lit: 0.3, W: 256 });
     k.mesh(prismWalls(poly, gs.lo - 1, y0, { tile: 3 }), t('#8f8a80', { paint: 0.06 }));
-    k.mesh(wallGeo(poly, y0, top, { tu: 2.7, tv: sp.fh, yRef: y0 }), fac);
+    k.mesh(wallGeo(poly, y0, top, { tu: BAY, tv: sp.fh, yRef: y0 }), fac);
     // the main gable roof over the long bar (local x −4.4..7.4) and flat caps over the stair bays that stand out
     const core = { cx: 0, cz: 0, w: 11.8, d: 47.6 }; const cc = obbPt(o, 1.5, 0);
     const ro = { ...o, cx: cc[0], cz: cc[1], w: core.w, d: core.d };
@@ -76,6 +88,35 @@ export function buildCityHall(ctx) {
     const rm = t(sp.roof, { paint: 0.05 });
     k.mesh(R.roof, rm); k.mesh(R.fascia, t('#5a6266', { paint: 0 })); if (R.gables) k.mesh(R.gables, t(sp.wall, { paint: 0.03 }));
     for (const z of [-15, -4, 14.2, 20]) { const c = obbPt(o, -6.4, z); k.box(4.4, 0.25, 5.6, rm, [c[0], top + 0.1, c[1]], [0, o.rotY, 0]); }
+    // [v6:c1] trims on the long walls (Commons 2026-03-29): a white pipe line between the floors, white downpipes at the
+    // piers (every 8.4 m, eave to ground) and, on the car-park (south-east) wall, small bracketed pent roofs (庇) over
+    // the 1F window bands. wallGeo puts the tile joints at s = -(len % BAY) / 2 (mod BAY) along each edge.
+    {
+      const P = poly, white = t('#e9e6dc', { paint: 0 }), timber = t('#4a3f33', { paint: 0.05 });
+      const SE = 3;                                                                           // the 42.3 m car-park wall
+      const dirOf = (i) => { const a = P[i], b = P[(i + 1) % P.length], l = Math.hypot(b[0] - a[0], b[1] - a[1]); return { a, l, dx: (b[0] - a[0]) / l, dz: (b[1] - a[1]) / l }; };
+      const ref = dirOf(SE);
+      for (let i = 0; i < P.length; i++) {
+        const e = dirOf(i);
+        if (e.l < 12 || Math.abs(e.dx * ref.dx + e.dz * ref.dz) < 0.9) continue;          // the long walls only
+        const G = k.group([e.a[0], y0, e.a[1]], Math.atan2(e.dx, e.dz)), kk = ctx.kit(G);   // local z along the edge, outward = -x
+        const ph = (((-(e.l % BAY)) / 2) % BAY + BAY) % BAY;
+        kk.box(0.08, 0.08, e.l - 0.3, white, [-0.07, sp.fh, e.l / 2]);                        // the pipe line between the floors
+        for (let s0 = ph - BAY; s0 < e.l; s0 += BAY) {
+          const pier = s0 + BAY;                                                              // the tile joint = the pier centre
+          if (pier > 0.6 && pier < e.l - 0.6) kk.box(0.1, sp.storeys * sp.fh - 0.3, 0.1, white, [-0.1, (sp.storeys * sp.fh - 0.3) / 2, pier]);
+          if (i !== SE) continue;
+          const z0 = Math.max(0.15, s0 + BAY * WIN[0] - 0.2), z1 = Math.min(e.l - 0.15, s0 + BAY * WIN[2] + 0.2);
+          if (z1 - z0 < 2) continue;
+          kk.box(0.62, 0.07, z1 - z0, rm, [-0.31, 2.78, (z0 + z1) / 2], [0, 0, 0.2]);          // the pent roof, dipping outward
+          for (let z = s0 + BAY * WIN[0]; z <= s0 + BAY * WIN[2] + 1e-3; z += BAY * (WIN[2] - WIN[0]) / 4) {
+            if (z < z0 || z > z1) continue;
+            kk.box(0.06, 0.06, 0.06, timber, [-0.5, 2.62, z]);                                 // the bracket ends
+            kk.box(0.05, 0.42, 0.05, timber, [-0.2, 2.5, z], [0, 0, -0.6]);                    // the exposed timber bracket
+          }
+        }
+      }
+    }
     colliders(ctx, poly, gs.lo - 2, top + 1);
   }
   // ---------------------------------------------------------------- 第三庁舎, 東分庁舎, 第二東分庁舎
@@ -90,17 +131,64 @@ export function buildCityHall(ctx) {
   }
   // ---------------------------------------------------------------- ワン・テン庁舎
   {
-    const sp = SPEC.oneTen, poly = OSM.oneTen.poly, o = obbOf(poly), gs = groundSpan(L, poly);
-    const y0 = gs.lo + 0.2, f2 = y0 + 2 * 3.5, top = f2 + 2 * 2.9;
-    const base = facadeMat(ctx, 'oneten', { draw: (g, W, H) => {
+    const sp = SPEC.oneTen, poly0 = OSM.oneTen.poly, o = obbOf(poly0), gs = groundSpan(L, poly0);
+    const y0 = gs.lo + 0.2, f1 = y0 + 3.5, f2 = y0 + 2 * 3.5, top = f2 + 2 * 2.9;
+    // [v6:c5] the street corner (the vertex nearest the crossing, B) is a rounded entrance bay (Commons 2026-03-29): a
+    // quarter circle R = 6 m of 9 chords, edge indices 1..9 of the ring; every other vertex keeps its OSM position
+    const R = 6, NA = 9, B = poly0[1], A = poly0[0], C = poly0[2];
+    const uBA = [A[0] - B[0], A[1] - B[1]], uBC = [C[0] - B[0], C[1] - B[1]];
+    const lBA = Math.hypot(...uBA), lBC = Math.hypot(...uBC); uBA[0] /= lBA; uBA[1] /= lBA; uBC[0] /= lBC; uBC[1] /= lBC;
+    const th = Math.acos(uBA[0] * uBC[0] + uBA[1] * uBC[1]), tl = R / Math.tan(th / 2);
+    const bis = [uBA[0] + uBC[0], uBA[1] + uBC[1]], bl = Math.hypot(...bis);
+    const cc = [B[0] + bis[0] / bl * R / Math.sin(th / 2), B[1] + bis[1] / bl * R / Math.sin(th / 2)];
+    const P1 = [B[0] + uBA[0] * tl, B[1] + uBA[1] * tl], P2 = [B[0] + uBC[0] * tl, B[1] + uBC[1] * tl];
+    const a1 = Math.atan2(P1[1] - cc[1], P1[0] - cc[0]); let da = Math.atan2(P2[1] - cc[1], P2[0] - cc[0]) - a1; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+    const arc = []; for (let i = 0; i <= NA; i++) arc.push([cc[0] + Math.cos(a1 + da * i / NA) * R, cc[1] + Math.sin(a1 + da * i / NA) * R]);
+    const poly = [A, ...arc, ...poly0.slice(2)];
+    const onArc = (i) => i >= 1 && i <= NA;
+    const segLen = Math.abs(da) * R / NA;
+    const midI = Math.floor(NA / 2), mid = [(arc[midI][0] + arc[midI + 1][0]) / 2, (arc[midI][1] + arc[midI + 1][1]) / 2];
+    const nMid = [mid[0] - cc[0], mid[1] - cc[1]], nl = Math.hypot(...nMid); nMid[0] /= nl; nMid[1] /= nl;
+    // 1F: glazed shopfronts and the entrance between square piers, a teal fascia above
+    const glass1 = (g, W, H, x0, x1) => {
+      const gr = g.createLinearGradient(0, H * 0.2, 0, H * 0.9); gr.addColorStop(0, '#4f6b7a'); gr.addColorStop(1, '#a9bcc6');
+      g.fillStyle = '#d9d3d4'; g.fillRect(x0 * W - 2, H * 0.2 - 2, (x1 - x0) * W + 4, H * 0.7 + 4); g.fillStyle = gr; g.fillRect(x0 * W, H * 0.2, (x1 - x0) * W, H * 0.7);
+      g.fillStyle = '#c9c1c3'; g.fillRect((x0 + x1) * W / 2 - 1.5, H * 0.2, 3, H * 0.7);
+    };
+    const shop1 = facadeMat(ctx, 'oneten-1f', { draw: (g, W, H) => {
       g.fillStyle = sp.base; g.fillRect(0, 0, W, H);
-      g.fillStyle = sp.band; g.fillRect(0, H * 0.02, W, H * 0.07);
-      const X0 = W * 0.08, X1 = W * 0.92, Y0 = H * 0.16, Y1 = H * 0.8;
-      g.fillStyle = '#e6dfe0'; g.fillRect(X0 - 2, Y0 - 2, X1 - X0 + 4, Y1 - Y0 + 4);
-      const gr = g.createLinearGradient(0, Y0, 0, Y1); gr.addColorStop(0, '#5c7488'); gr.addColorStop(1, '#b6c6d0'); g.fillStyle = gr; g.fillRect(X0, Y0, X1 - X0, Y1 - Y0);
-    }, win: [0.08, 0.2, 0.92, 0.84], lit: 0.55 });
+      g.fillStyle = sp.band; g.fillRect(0, 0, W, H * 0.16);
+      g.fillStyle = '#7a6870'; g.fillRect(0, H * 0.16, W, H * 0.03);
+      glass1(g, W, H, 0.1, 0.9);
+    }, win: [0.1, 0.1, 0.9, 0.8], lit: 0.55 });
+    const door1 = facadeMat(ctx, 'oneten-1f-bay', { draw: (g, W, H) => {
+      g.fillStyle = sp.base; g.fillRect(0, 0, W, H);
+      g.fillStyle = sp.band; g.fillRect(0, 0, W, H * 0.16);
+      glass1(g, W, H, 0.03, 0.97);
+    }, win: [0.03, 0.1, 0.97, 0.8], lit: 0.55 });
+    // 2F: a solid mauve stone-panel wall (joints every 1.5 m) with one punched window per 4.5 m tile and a thin teal cornice
+    const wall2 = facadeMat(ctx, 'oneten-2f', { draw: (g, W, H) => {
+      g.fillStyle = sp.base; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#a48c92';
+      for (let i = 0; i < 3; i++) g.fillRect(Math.round(i * W / 3) - 1, 0, 2, H);
+      for (let j = 0; j < 3; j++) g.fillRect(0, Math.round(H - j * H * 1.5 / 3.5) - 1, W, 2);
+      const X0 = 0.36 * W, X1 = 0.64 * W, Y0 = (1 - 0.75) * H, Y1 = (1 - 0.25) * H;
+      g.fillStyle = '#d9d3d4'; g.fillRect(X0 - 2, Y0 - 2, X1 - X0 + 4, Y1 - Y0 + 4);
+      const gr = g.createLinearGradient(0, Y0, 0, Y1); gr.addColorStop(0, '#4f6b7a'); gr.addColorStop(1, '#a9bcc6'); g.fillStyle = gr; g.fillRect(X0, Y0, X1 - X0, Y1 - Y0);
+      g.fillStyle = sp.band; g.fillRect(0, 0, W, H * 0.05);
+    }, win: [0.36, 0.25, 0.64, 0.75], lit: 0.55 });
+    const ribbon2 = facadeMat(ctx, 'oneten-2f-ribbon', { draw: (g, W, H) => {
+      g.fillStyle = sp.base; g.fillRect(0, 0, W, H);
+      const X0 = 0.1 * W, X1 = 0.9 * W, Y0 = (1 - 0.82) * H, Y1 = (1 - 0.45) * H;
+      g.fillStyle = '#d9d3d4'; g.fillRect(X0 - 2, Y0 - 2, X1 - X0 + 4, Y1 - Y0 + 4);
+      const gr = g.createLinearGradient(0, Y0, 0, Y1); gr.addColorStop(0, '#4f6b7a'); gr.addColorStop(1, '#a9bcc6'); g.fillStyle = gr; g.fillRect(X0, Y0, X1 - X0, Y1 - Y0);
+      g.fillStyle = sp.band; g.fillRect(0, 0, W, H * 0.05);
+    }, win: [0.1, 0.45, 0.9, 0.82], lit: 0.55 });
     k.mesh(prismWalls(poly, gs.lo - 1, y0, { tile: 3 }), t('#a09a94', { paint: 0.05 }));
-    k.mesh(wallGeo(poly, y0, f2, { tu: 4.5, tv: 3.5, yRef: y0 }), base);
+    k.mesh(wallGeo(poly, y0, f1, { tu: 4.5, tv: 3.5, yRef: y0, skip: (i) => onArc(i) }), shop1);
+    k.mesh(wallGeo(poly, y0, f1, { tu: segLen, tv: 3.5, yRef: y0, skip: (i) => !onArc(i) }), door1);
+    k.mesh(wallGeo(poly, f1, f2, { tu: 4.5, tv: 3.5, yRef: f1, skip: (i) => onArc(i) }), wall2);
+    k.mesh(wallGeo(poly, f1, f2, { tu: segLen, tv: 3.5, yRef: f1, skip: (i) => !onArc(i) }), ribbon2);
     // the parking decks: slab edges and solid parapet bands with the dark open storey between
     const deck = t(sp.deck, { paint: 0.07 }), dark = t('#4a4d55', { paint: 0 });
     const inner = offsetRing(poly, -0.6);
@@ -112,16 +200,30 @@ export function buildCityHall(ctx) {
     }
     k.mesh(prismWalls(poly, top, top + 1.1, { tile: 3 }), deck);
     k.mesh(capGeo(poly, top + 0.02, { tile: 3 }), t('#a7a8a6', { paint: 0.05 }));
+    // 「One/10 気仙沼市役所」 over the corner doors, on the 2F wall of the rounded bay
+    sign(ctx, k, 'One/10 気仙沼市役所', 3.4, 1.1, mid[0] + nMid[0] * 0.04, f1 + 0.95, mid[1] + nMid[1] * 0.04, Math.atan2(nMid[0], nMid[1]), { color: '#f1ecee', bg: '#a98f97', depth: 0.3, size: 0.52 });
+    // three green canvas awnings over the side door (the short south-west face, beside the tower)
+    {
+      const e = edges(poly).find((q) => q.i === NA + 2);   // C to D, 8.2 m
+      const awn = t('#2f6b4f', { paint: 0.02 }), ang = Math.atan2(e.n[0], e.n[1]);
+      for (let j = 0; j < 3; j++) {
+        const s = e.len * (0.2 + 0.3 * j), G = k.group([e.a[0] + e.ux * s, y0 + 2.7, e.a[1] + e.uz * s], ang), kk = ctx.kit(G);
+        kk.box(2.2, 0.08, 1.3, awn, [0, 0, 0.6], [0.38, 0, 0]);
+      }
+    }
     // roof-deck parking: white stall lines and a few parked cars (kei and sedans in the town's colours)
     const lines = t('#f2f2ee', { paint: 0 }), cars = ['#e8e8e4', '#3d4f6a', '#9c2f33', '#c9cbd0', '#2d2f36'];
     for (let i = -3; i <= 3; i++) { const c = obbPt(o, i * 5.6, 8); k.box(0.12, 0.02, 5.2, lines, [c[0], top + 0.05, c[1]], [0, o.rotY, 0]); const c2 = obbPt(o, i * 5.6, -12); k.box(0.12, 0.02, 5.2, lines, [c2[0], top + 0.05, c2[1]], [0, o.rotY, 0]); }
     for (const [i, z, ci] of [[-2.5, 8, 0], [0.5, 8, 1], [1.5, -12, 2], [-1.5, -12, 3], [2.5, 8, 4]]) { const c = obbPt(o, i * 5.6, z); const C = k.group([c[0], top + 0.05, c[1]], o.rotY), kc = ctx.kit(C); kc.boxB(1.75, 0.8, 4.3, t(cars[ci], { paint: 0.02 }), [0, 0.15, 0]); kc.boxB(1.55, 0.55, 2.2, t('#44546a', { paint: 0 }), [0, 0.95, -0.2]); }
-    // the corner tower with the One-Ten logo (NE corner of the outline)
+    // the corner tower: raw grey concrete with the red-and-teal 「One/Ten」 script mounted on it (no cladding, no cap)
     const tc = obbPt(o, o.w / 2 - 3, o.d / 2 - 3);
     const T = k.group([tc[0], y0, tc[1]], o.rotY), kt = ctx.kit(T);
-    kt.boxB(5.2, top - y0 + 4.2, 5.2, t('#ece8e2', { paint: 0.02 }), [0, 0, 0]);
-    kt.boxB(5.3, 0.6, 5.3, t(sp.band, { paint: 0 }), [0, top - y0 + 3.6, 0]);
-    const logo = ctx.tex.draw(512, 256, (g, W, H) => { g.fillStyle = '#ece8e2'; g.fillRect(0, 0, W, H); g.fillStyle = '#3f8f94'; g.font = `italic 700 118px ${FONT.en || 'serif'}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('One-Ten', W / 2, H * 0.45); g.fillStyle = '#6d5a60'; g.font = `700 34px ${FONT.sans}`; g.fillText('気仙沼市役所 ワン・テン庁舎', W / 2, H * 0.82); }, { key: 'lmB-oneten-logo' });
+    kt.boxB(5.2, top - y0 + 4.2, 5.2, t(sp.deck, { paint: 0.02 }), [0, 0, 0]);
+    const logo = ctx.tex.draw(512, 256, (g, W, H) => {
+      g.fillStyle = sp.deck; g.fillRect(0, 0, W, H); g.font = `italic 700 118px ${FONT.en || 'serif'}`; g.textAlign = 'left'; g.textBaseline = 'middle';
+      const w1 = g.measureText('One').width, w2 = g.measureText('Ten').width, x0 = (W - w1 - w2 - 14) / 2;
+      g.fillStyle = '#3f8f94'; g.fillText('One', x0, H * 0.5); g.fillStyle = '#c8343c'; g.fillText('Ten', x0 + w1 + 14, H * 0.5);
+    }, { key: 'lmB-oneten-logo2' });
     const lm = mapMat(ctx, 'toon', '#ffffff', logo, { paint: 0 });
     for (const [rx, px, pz] of [[0, 0, 2.62], [Math.PI / 2, 2.62, 0], [-Math.PI / 2, -2.62, 0]]) kt.plane(4.6, 2.3, lm, [px, top - y0 + 1.6, pz], [0, rx, 0]);
     colliders(ctx, poly, gs.lo - 2, top + 2);

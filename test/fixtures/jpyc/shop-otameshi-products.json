@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "data": {
+    "shop": {
+      "id": "becfb71a-007c-48c4-9188-5b73a4c16f42",
+      "slug": "otameshi",
+      "name": "0 JPYCで決済お試し（JPYC EC運営）",
+      "wallet_address": "0x0000000000000000000000000000000000000000",
+      "available_chains": [
+        137,
+        1,
+        43114
+      ],
+      "default_chain_id": 137,
+      "category": "その他",
+      "stock_display_mode": "exact",
+      "low_stock_threshold": 5,
+      "is_demo": true,
+      "x402_enabled": true,
+      "checkout_options": []
+    },
+    "products": [
+      {
+        "id": "e899a1dd-754d-4a97-b07b-58fcd5940e36",
+        "slug": null,
+        "name": "【テスト用】決済お試し商品（0 JPYC）",
+        "description": "決済フローの動作確認用商品です。\r\nこちらは0 JPYCで購入可能で一切お金はかかりません。実際に送金フローが完了するかお試しください。",
+        "price_jpyc": "0.000000000000000000",
+        "stock": 9932,
+        "max_quantity_per_order": null,
+        "image_urls": [
+          "https://imagedelivery.net/lEoBH1kNrkZEnFTUBCbLSw/1042ad63-6bb7-4275-ad26-c09a501f7c00/public"
+        ],
+        "category": "その他",
+        "tags": [
+          "テスト",
+          "お試し"
+        ],
+        "requires_shipping": false,
+        "grants_free_shipping": false,
+        "online_sale_starts_at": "2026-09-19T23:10:00.000Z",
+        "online_sale_ends_at": null,
+        "variants": null,
+        "review_avg_rating": 4,
+        "review_count": 1,
+        "has_nft_discount": false,
+        "online_sale_status": "on_sale",
+        "online_purchase_available": true
+      }
+    ],
+    "has_nft_discounts": false,
+    "server_time": "2026-10-06T01:36:41.282Z"
+  }
+}

@@ -167,6 +167,9 @@ leave the intro card (`body.playing`), and without it phonemem measures the city
 | City with the ship berthed | 398 MB | 131 MB | 232 MB (+12 MB) | 457 (519 mean, 612 max) | 3.18 M (3.61 M mean, 4.26 M max) | none (the dev server's `/api/live` 404 only) |
 | Act 2 at sea (`?ship=1&act=2 --start`) | 434 MB | 133 MB | 232 MB | 139 mean, 166 max | 37.8 k mean, 44.3 k max | none (the dev server's `/api/live` 404 only) |
 
+- **2026-10-05:** the texture estimates in this table predate the later additions to the static atlas (a sixth page: new crate,
+  boat and tug plates; not the ship). The phone tier's trimmed atlas pages bring them to 215 MB, the ship's 11 MB included
+  (`docs/ARCHITECTURE.md`, "Phone texture budget").
 - **The heap peak is the transient load peak**, reached while `explore` builds, and it moves by tens of MB from run to
   run: the berthed city measured 377 MB, 442 MB and 398 MB in three runs, Act 2 387 MB, 432 MB and 434 MB. The figures
   that hold still are the heap after GC (131–133 MB), the texture estimate (231–232 MB), the draw calls and the

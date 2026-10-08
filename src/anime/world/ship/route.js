@@ -36,7 +36,7 @@ import ROUTES from '../../../web/scene/boats/routes.json';
 
 /** The ship dimensions the route checks need (the full particulars live in ship/shofukumaru1.js SHIP; same sources). */
 export const SHIP_DIMS = {
-  loa: 58.6,        // usufuku.jp, Usui slide, VesselFinder
+  loa: 58.6,        // usufuku.jp, a slide of the talk, VesselFinder
   beam: 9.2,        // moulded breadth, JASNAOE Ship of the Year 2020, WCPFC, IATTC
   draft: 3.54,      // design draft d, JASNAOE SOY 2020
   airDraft: 21.0,   // waterline to the top of the radar lattice mast, measured on nendo's port profile (0.1226 m/px)

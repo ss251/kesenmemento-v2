@@ -1,0 +1,266 @@
+{
+  "v": 1,
+  "quests": [
+    {
+      "id": "morning-catch",
+      "code": "KATSU",
+      "giver": "auctioneer",
+      "title": "play.quest.morning-catch.title",
+      "offer": "play.quest.morning-catch.offer",
+      "active": "play.quest.morning-catch.active",
+      "done": "play.quest.morning-catch.done",
+      "fact": "play.quest.morning-catch.fact",
+      "factFrom": "play.quest.morning-catch.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [4, 6],
+      "voucher": true,
+      "reward": { "stamp": "katsu", "title": "play.quest.morning-catch.reward" },
+      "steps": [
+        { "type": "talk", "npc": "captain", "mark": "quest", "start": "ippon", "line": "play.quest.morning-catch.captain", "hint": "play.quest.morning-catch.s0" },
+        { "type": "ippon", "kg": 2, "hint": "play.quest.morning-catch.s1" },
+        { "type": "talk", "npc": "auctioneer", "line": "play.quest.morning-catch.turn", "hint": "play.quest.morning-catch.s2" }
+      ]
+    },
+    {
+      "id": "quay-photo",
+      "code": "PIER",
+      "giver": "fisher",
+      "title": "play.quest.quay-photo.title",
+      "offer": "play.quest.quay-photo.offer",
+      "active": "play.quest.quay-photo.active",
+      "done": "play.quest.quay-photo.done",
+      "fact": "play.quest.quay-photo.fact",
+      "factFrom": "play.quest.quay-photo.from",
+      "source": "https://kesennuma-kanko.jp/kesennumagyokou_uoichiba/",
+      "minutes": [4, 6],
+      "voucher": false,
+      "reward": { "stamp": "pier", "title": "play.quest.quay-photo.reward" },
+      "steps": [
+        { "type": "photo", "x": 40, "z": 70, "r": 28, "hint": "play.quest.quay-photo.s0" },
+        { "type": "reach", "x": 580, "z": 760, "r": 36, "hint": "play.quest.quay-photo.s1" }
+      ]
+    },
+    {
+      "id": "shrine-visit",
+      "code": "SHRINE",
+      "giver": "shrine",
+      "title": "play.quest.shrine-visit.title",
+      "offer": "play.quest.shrine-visit.offer",
+      "active": "play.quest.shrine-visit.active",
+      "done": "play.quest.shrine-visit.done",
+      "fact": "play.quest.shrine-visit.fact",
+      "factFrom": "play.quest.shrine-visit.from",
+      "source": "https://ja.wikipedia.org/wiki/%E4%BA%94%E5%8D%81%E9%88%B4%E7%A5%9E%E7%A4%BE_(%E6%B0%97%E4%BB%99%E6%B2%BC%E5%B8%82)",
+      "minutes": [3, 5],
+      "voucher": false,
+      "reward": { "stamp": "shrine", "title": "play.quest.shrine-visit.reward" },
+      "steps": [
+        { "type": "reach", "x": 345, "z": -145.3, "r": 14, "hint": "play.quest.shrine-visit.s0" },
+        { "type": "reach", "x": 347.6, "z": -33.4, "r": 16, "hint": "play.quest.shrine-visit.s1" },
+        { "type": "photo", "x": 347.6, "z": -33.4, "r": 18, "hint": "play.quest.shrine-visit.s2" }
+      ]
+    },
+    {
+      "id": "ferry-view",
+      "code": "FERRY",
+      "giver": "ferry",
+      "title": "play.quest.ferry-view.title",
+      "offer": "play.quest.ferry-view.offer",
+      "active": "play.quest.ferry-view.active",
+      "done": "play.quest.ferry-view.done",
+      "fact": "play.quest.ferry-view.fact",
+      "factFrom": "play.quest.ferry-view.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [3, 5],
+      "voucher": false,
+      "reward": { "stamp": "ferry", "title": "play.quest.ferry-view.reward" },
+      "steps": [
+        { "type": "reach", "x": 347.6, "z": -33.4, "r": 18, "hint": "play.quest.ferry-view.s0" },
+        { "type": "photo", "x": 347.6, "z": -33.4, "r": 18, "hint": "play.quest.ferry-view.s1" }
+      ]
+    },
+    {
+      "id": "cape-trees",
+      "code": "CAPE",
+      "giver": "barista",
+      "title": "play.quest.cape-trees.title",
+      "offer": "play.quest.cape-trees.offer",
+      "active": "play.quest.cape-trees.active",
+      "done": "play.quest.cape-trees.done",
+      "fact": "play.quest.cape-trees.fact",
+      "factFrom": "play.quest.cape-trees.from",
+      "source": "https://kesennuma-kanko.jp/ukimido/",
+      "minutes": [3, 5],
+      "voucher": true,
+      "reward": { "stamp": "cape", "title": "play.quest.cape-trees.reward" },
+      "steps": [
+        { "type": "reach", "x": 348, "z": -50, "r": 16, "hint": "play.quest.cape-trees.s0" },
+        { "type": "photo", "x": 348, "z": -36, "r": 14, "hint": "play.quest.cape-trees.s1" }
+      ]
+    },
+    {
+      "id": "raft-swim",
+      "code": "RAFT",
+      "giver": "farmer",
+      "title": "play.quest.raft-swim.title",
+      "offer": "play.quest.raft-swim.offer",
+      "active": "play.quest.raft-swim.active",
+      "done": "play.quest.raft-swim.done",
+      "fact": "play.quest.raft-swim.fact",
+      "factFrom": "play.quest.raft-swim.from",
+      "source": "https://kesennuma-uoichiba.jp/fishmarket/",
+      "minutes": [3, 5],
+      "voucher": false,
+      "reward": { "stamp": "raft", "title": "play.quest.raft-swim.reward" },
+      "steps": [
+        { "type": "swim", "x": 175, "y": -1.2, "z": -110, "r": 14, "hint": "play.quest.raft-swim.s0" }
+      ]
+    },
+    {
+      "id": "golden-three",
+      "code": "GOLD",
+      "giver": "kid",
+      "title": "play.quest.golden-three.title",
+      "offer": "play.quest.golden-three.offer",
+      "active": "play.quest.golden-three.active",
+      "done": "play.quest.golden-three.done",
+      "fact": "play.quest.golden-three.fact",
+      "factFrom": "play.quest.golden-three.from",
+      "source": "https://kesennuma-kanko.jp/ukimido/",
+      "minutes": [3, 6],
+      "voucher": false,
+      "reward": { "stamp": "gold", "title": "play.quest.golden-three.reward" },
+      "steps": [
+        { "type": "collect", "n": 3, "hint": "play.quest.golden-three.s0" }
+      ]
+    },
+    {
+      "id": "ebisu-photo",
+      "code": "EBISU",
+      "giver": "visitor",
+      "title": "play.quest.ebisu-photo.title",
+      "offer": "play.quest.ebisu-photo.offer",
+      "active": "play.quest.ebisu-photo.active",
+      "done": "play.quest.ebisu-photo.done",
+      "fact": "play.quest.ebisu-photo.fact",
+      "factFrom": "play.quest.ebisu-photo.from",
+      "source": "https://kesennuma-kanko.jp/ukimido/",
+      "minutes": [3, 4],
+      "voucher": true,
+      "reward": { "stamp": "ebisu", "title": "play.quest.ebisu-photo.reward" },
+      "steps": [
+        { "type": "photo", "x": 348, "z": -36, "r": 12, "yaw": -0.47, "yawTol": 1.1, "hint": "play.quest.ebisu-photo.s0" }
+      ]
+    },
+    {
+      "id": "anba-top",
+      "code": "ANBA",
+      "giver": "hiker",
+      "title": "play.quest.anba-top.title",
+      "offer": "play.quest.anba-top.offer",
+      "active": "play.quest.anba-top.active",
+      "done": "play.quest.anba-top.done",
+      "fact": "play.quest.anba-top.fact",
+      "factFrom": "play.quest.anba-top.from",
+      "source": "https://kesennuma-kanko.jp/anbasan/",
+      "minutes": [3, 6],
+      "voucher": false,
+      "reward": { "stamp": "anba", "title": "play.quest.anba-top.reward" },
+      "steps": [
+        { "type": "reach", "x": -493.6, "z": -990.2, "r": 28, "hint": "play.quest.anba-top.s0" }
+      ]
+    },
+    {
+      "id": "port-medal",
+      "code": "MINATO",
+      "giver": "driver",
+      "title": "play.quest.port-medal.title",
+      "offer": "play.quest.port-medal.offer",
+      "active": "play.quest.port-medal.active",
+      "done": "play.quest.port-medal.done",
+      "fact": "play.quest.port-medal.fact",
+      "factFrom": "play.quest.port-medal.from",
+      "source": "https://kesennuma-kanko.jp/kesennumagyokou_uoichiba/",
+      "minutes": [3, 6],
+      "voucher": false,
+      "reward": { "stamp": "minato", "title": "play.quest.port-medal.reward", "garage": "wave-stripe" },
+      "steps": [
+        { "type": "medal", "course": "minato", "min": "bronze", "hint": "play.quest.port-medal.s0" }
+      ]
+    },
+    {
+      "id": "gull-seat",
+      "code": "GULL",
+      "giver": "gull",
+      "title": "play.quest.gull-seat.title",
+      "offer": "play.quest.gull-seat.offer",
+      "active": "play.quest.gull-seat.active",
+      "done": "play.quest.gull-seat.done",
+      "fact": "play.quest.gull-seat.fact",
+      "factFrom": "play.quest.gull-seat.from",
+      "source": "https://kesennuma-kanko.jp/ukimido/",
+      "minutes": [3, 5],
+      "voucher": false,
+      "reward": { "stamp": "gull", "title": "play.quest.gull-seat.reward" },
+      "steps": [
+        { "type": "gull", "x": 352, "z": -28, "r": 36, "hint": "play.quest.gull-seat.s0" }
+      ]
+    },
+    {
+      "id": "first-dive",
+      "code": "DIVE",
+      "giver": "diver",
+      "title": "play.quest.first-dive.title",
+      "offer": "play.quest.first-dive.offer",
+      "active": "play.quest.first-dive.active",
+      "done": "play.quest.first-dive.done",
+      "fact": "play.quest.first-dive.fact",
+      "factFrom": "play.quest.first-dive.from",
+      "source": "https://kesennuma-kanko.jp/kesennumagyokou_uoichiba/",
+      "minutes": [3, 5],
+      "voucher": false,
+      "reward": { "stamp": "dive", "title": "play.quest.first-dive.reward" },
+      "steps": [
+        { "type": "swim", "x": 330, "y": -2, "z": -15, "r": 18, "hint": "play.quest.first-dive.s0" }
+      ]
+    },
+    {
+      "id": "bus-slip",
+      "code": "BUS",
+      "giver": "stop",
+      "title": "play.quest.bus-slip.title",
+      "offer": "play.quest.bus-slip.offer",
+      "active": "play.quest.bus-slip.active",
+      "done": "play.quest.bus-slip.done",
+      "fact": "play.quest.bus-slip.fact",
+      "factFrom": "play.quest.bus-slip.from",
+      "source": "https://kesennuma-kanko.jp/ukimido/",
+      "minutes": [3, 5],
+      "voucher": false,
+      "grant": "slip",
+      "reward": { "stamp": "bus", "title": "play.quest.bus-slip.reward" },
+      "steps": [
+        { "type": "reach", "x": 186, "z": 99, "r": 14, "hint": "play.quest.bus-slip.s0" },
+        { "type": "deliver", "item": "slip", "to": "guide", "line": "play.quest.bus-slip.give", "hint": "play.quest.bus-slip.s1" }
+      ]
+    },
+    {
+      "id": "quay-run",
+      "code": "QUAY",
+      "giver": "guide",
+      "title": "play.quest.quay-run.title",
+      "offer": "play.quest.quay-run.offer",
+      "active": "play.quest.quay-run.active",
+      "done": "play.quest.quay-run.done",
+      "fact": "play.quest.quay-run.fact",
+      "factFrom": "play.quest.quay-run.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [4, 6],
+      "voucher": false,
+      "reward": { "stamp": "quay", "title": "play.quest.quay-run.reward" },
+      "steps": [
+        { "type": "race", "ms": 480000, "hint": "play.quest.quay-run.s0" }
+      ]
+    }
+  ]
+}

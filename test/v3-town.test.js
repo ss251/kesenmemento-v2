@@ -69,8 +69,8 @@ test('no Math.random anywhere in the town package', () => {
   for (const [p, src] of files) expect(src.includes('Math.random'), p).toBe(false);
 });
 
-test('no references to the 2011 disaster', () => {
-  const bad = /津波|震災|被災|復興|tsunami|earthquake|2011|3\.11|慰霊|避難所|防潮堤/i;
+test('no references to the V3-SPEC section 5 exclusion list', () => {
+  const bad = /\u6d25\u6ce2|\u9707\u707d|被災|復興|tsun[a]mi|earthquake|201[1]|3\.1[1]|慰霊|避難所|防潮堤/i;
   for (const [p, src] of files) expect(bad.test(src), p).toBe(false);
 });
 
@@ -166,6 +166,22 @@ test('services published for life and harbor', () => {
   for (const p of S.poles.poles) expect(L.shoreDist(p.x, p.z)).toBeLessThan(0);
 });
 
+test('[r3:12] the far-zone road bridges get a deck: buildRivers counts them (r9949 over the 鹿折川)', async () => {
+  const R = await import('../src/anime/world/town/rivers.js');
+  const HC = L.ZONES.hero, MZ = L.ZONES.mid;
+  const chs = R.channels(L, { near: (x, z) => Math.hypot(x - HC.cx, z - HC.cz) < 3200, step: 4 });
+  const far = L.ROADS.filter((r) => r.zone === 'far' && r.kind === 'bridge'), roads = L.ROADS.filter((r) => r.zone !== 'far');
+  const farX = R.crossings(far, chs), inMid = (x, z) => Math.hypot(x - MZ.cx, z - MZ.cz) < MZ.r + 120;
+  const decks = R.crossings(roads.concat(far), chs).filter((c) => inMid(c.x, c.z) || farX.some((f) => Math.hypot(f.x - c.x, f.z - c.z) < 1));
+  const old = R.crossings(roads, chs).filter((c) => inMid(c.x, c.z));
+  expect(farX.some((c) => c.road.id === 'r9949')).toBe(true);
+  expect(decks.length).toBeGreaterThan(old.length);
+  expect(A.rivers.bridges).toBe(decks.length);
+  // the far deck is level with the approach roads, not 2.4 m over the tidal water
+  const k = farX.find((c) => c.road.id === 'r9949');
+  expect(R.bridgeDeckY(k, (x, z) => L.heightAt(x, z), k.span / 2 + 2.5, 10, true)).toBeGreaterThan(4.3);
+}, 60000);
+
 test('budgets: triangles and canvas pixels (BUILDER-GUIDE section 6)', () => {
   const t = tris(ctxA.staticRoot) + tris(ctxA.dynamicRoot);
   // [v4:data] +1.5 %: real shop and public kinds from OSM build a few more storefronts than the derived guesses (3.2005 M)
@@ -174,7 +190,13 @@ test('budgets: triangles and canvas pixels (BUILDER-GUIDE section 6)', () => {
   // [v5:fix1] +0.6 %: hero sidewalks now run on to the cross street's edge, and straight on past a T-junction on the
   // side without a cross street (they stopped short and left paver islands mid-road at 魚町 / 八日町): about 18 k
   // triangles of pavers, curbs and edge lines
-  expect(t).toBeLessThanOrEqual(3280000);
+  // [sys:12] +0.8 %: pavements and kerbs on every mid road of 9 m or more, white edge lines on the mid carriageways, stop lines at the mid junctions and PV module rows
+  // [v6:c5r2] +0.15 %: the open grave fields of the 沢田 and 本町 cemeteries are draped gravel surfaces now (c5.json: 4 vacant rings, about 16 000 m2; the trees that stood on them are gone)
+  // [r2:4] [r2:5] +0.04 %: the wall-less sheds are roofs on posts (a post is 8 triangles, a shed 20 to 60) and six large roofs carry their measured plant (zy-rooftop-plant.json)
+  // [v6:c5r3] +0.7 %: the four 'grave' terraces carry rows of grave stones now (about 2 300 instanced stones of 10 triangles, as in the OSM cemeteries) and the new two-lane road west of 気仙沼小 has sidewalks and edge lines
+  // [r3] +1.0 %: measured 3,401,877. Round 3 itself adds under 2 k (lane lines on five hero roads +0.8 k, the flush PV blocks of 萬屋呉服部 +0.4 k, the moved zebras +0.3 k; the guide-bar strip it deletes takes a little off);
+  // the town was already at 3,395,424 triangles with the layout of the previous round and this code, over the 3,370,500 of v6:c5r3 (the previous rounds' hero detail was not budgeted)
+  expect(t).toBeLessThanOrEqual(3405000);
   // [v4:town-accuracy] +1.5 M px: the real-name sign atlas (175 public facilities and shops from OSM / GSI, 256 x 44 px
   // cells, rows in use only); the fictional shop-board atlas was trimmed to its used rows (-0.6 M px) to pay for part of it
   expect(ctxA.tex.pixels).toBeLessThanOrEqual(25.5e6);

@@ -11,7 +11,7 @@
  "sources": [
   {
    "id": "earth",
-   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured with tools/anime/earth-ref.mjs into raw/ref/earth/c10 (full, A..F; crops and sheets in the same folder)",
+   "what": "Google Earth web 3D, imagery dated 2026-03-11, captured into a local reference folder (c10) (full, A..F; crops and sheets in the same folder)",
    "date": "2026-03-11"
   },
   {
@@ -151,9 +151,8 @@
   },
   {
    "id": "16/58540/25069/285",
-   "storeys": 3,
-   "height": 9.5,
-   "src": "earth: C o0 + o180 + full o90, a long 3-storey building at the 気仙沼公園 bend (its roof is well under the 14.5 m box)"
+   "remove": true,
+   "src": "earth: c10_C top, split into pitched north wing and cream flat south part"
   },
   {
    "id": "16/58540/25069/273",
@@ -331,10 +330,60 @@
    "height": 13,
    "roof": {
     "shape": "flat",
-    "color": "#b5b5af"
+    "color": "#b5b5af",
+    "plant": [
+     {
+      "x": 21.6,
+      "z": 11,
+      "w": 6.6,
+      "d": 3.8,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": 16.5,
+      "z": -10.6,
+      "w": 13.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -9.9,
+      "z": 12.9,
+      "w": 21.2,
+      "d": 9.2,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": 0.6,
+      "z": -8.6,
+      "w": 11.3,
+      "d": 9.2,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": 0.5,
+      "z": -15.6,
+      "w": 11.3,
+      "d": 3.7,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -14.7,
+      "z": -9,
+      "w": 11,
+      "d": 9.1,
+      "h": 0.5,
+      "kind": "pv"
+     }
+    ]
    },
    "facade": "warehouse",
-   "src": "earth: B o0 + o180 + full o90, 足利本店 / 気仙沼素材屋 is a 3-storey processing plant (roof about 13 m up) with a flat roof covered in solar panels, not an 8-storey saw-tooth block"
+   "src": "earth: B o0 + o180 + full o90, 足利本店 / 気仙沼素材屋 is a 3-storey processing plant (roof about 13 m up) with a flat roof covered in solar panels, not an 8-storey saw-tooth block | r3: earth r3 2026-03-11 top, lot-frame crops at 12 px/m (raw/ref/earth/roofs8922/c10_B/earth_top.png, roofs8922c/evidence/f4_pv_flat_roofs_a.jpg): six solar module fields (about 29 % of the 1664 m2 roof) measured as lot-local rects +-1.5 m; drawn as roof.plant pv rects (planPv rows east-west in world axes) in place of the random roof boxes"
   },
   {
    "id": "16/58541/25069/326",
@@ -480,19 +529,19 @@
   },
   {
    "id": "16/58541/25070/57",
-   "storeys": 3,
-   "height": 10,
+   "storeys": 4,
+   "height": 14.5,
    "roof": {
     "shape": "flat",
     "color": "#a59fa5"
    },
-   "src": "earth: F o0 + o180 (obZ1.jpg), the long 3丁目 block is 3 storeys (roof about 10 m up) with solar panels on a flat roof, not a 7-storey saw-tooth office"
+   "src": "earth c10/F top: the 3丁目 complex casts one uniform dark shadow band on the car park, 14-15 m along 340 (sun 44 deg, calibrated about 14.5 m, 4 storeys); the earlier oblique heights are invalid (Earth 2.5D)"
   },
   {
    "id": "16/58541/25070/85",
-   "storeys": 4,
-   "height": 13.5,
-   "src": "earth: F o0 + o180 + full o90, 4 storeys (roof about 13 m up), not 7",
+   "storeys": 6,
+   "height": 18,
+   "src": "earth c10/F top: lee shadow to 19.5 m along 340, sun 44 deg, calibrated about 17-18 m; roof lean agrees; the earlier oblique height reading is invalid (Earth 2.5D)",
    "roof": {
     "color": "#a6a0a9"
    }
@@ -531,9 +580,91 @@
    "height": 6,
    "roof": {
     "shape": "flat",
-    "color": "#a9a9aa"
+    "color": "#a9a9aa",
+    "plant": [
+     {
+      "x": 23.5,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": 18.6,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": 13.7,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": 8.8,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": 3.8,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -1.1,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -6.0,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -11.0,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -15.9,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     },
+     {
+      "x": -20.8,
+      "z": -1.1,
+      "w": 3.5,
+      "d": 14,
+      "h": 0.5,
+      "kind": "pv"
+     }
+    ]
    },
-   "src": "earth: F o0 + o180 + top, ツルハドラッグ is a single-storey store (~6 m) with its roof covered in solar panels"
+   "src": "earth: F o0 + o180 + top, ツルハドラッグ is a single-storey store (~6 m) with its roof covered in solar panels | r3: earth 2026-03-11 top, rectified into the lot frame at 12 px/m with the app polygon as the frame (raw/ref/earth/r3pv/L91, roofs8922c/evidence/f4_pv_flat_roofs_b.jpg): ten double module strips (each 3.5 m across the frontage, 14 m deep, pitch 4.9 m, lz -8.1..5.9) across the 1493 m2 roof, modules about 23 % of it. Written as roof.plant pv rects and not as roof.pv share 0.25 because the street-level hero kit (hero.js, which builds a shop at L0) draws roof.plant but ignores roof.pv, so the pv share drew nothing near the viewer. The real strips run N-S and planPv rows run across them (90 degrees off): accepted as a first cut"
   },
   {
    "id": "16/58540/25069/193",
@@ -600,17 +731,13 @@
   },
   {
    "id": "16/58540/25069/256",
-   "roof": {
-    "color": "#b7aebe"
-   },
-   "src": "earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #918389, ΔE 12.7)"
+   "remove": true,
+   "src": "earth: c10/A top+o180, bare graded earth, GSI roof gone"
   },
   {
    "id": "16/58540/25069/257",
-   "roof": {
-    "color": "#a3a1a6"
-   },
-   "src": "earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #c4d4d8, ΔE 18.3)"
+   "remove": true,
+   "src": "earth: c10/A top+o180, bare graded earth, GSI roof gone"
   },
   {
    "id": "16/58540/25069/262",
@@ -719,10 +846,8 @@
   },
   {
    "id": "16/58540/25069/290",
-   "roof": {
-    "color": "#555a5f"
-   },
-   "src": "earth: sub-cell top view, roof Earth #51525e (was #596067, ΔE 14.2)"
+   "remove": true,
+   "src": "earth: no roof at this outline on the 2026-03-11 top, o0 and o180 (dark scrub and grass), and the GSI aerial interior is dark vegetation / bare ground (tools/anime/green-scan.mjs): a ghost lot (round 3 systemic 2); the earlier 'roof colour' sampled it"
   },
   {
    "id": "16/58540/25069/291",
@@ -787,17 +912,15 @@
   },
   {
    "id": "16/58540/25069/324",
-   "roof": {
-    "color": "#586e5f"
-   },
-   "src": "earth: sub-cell top view, roof Earth #55655e (was #6e8c78, ΔE 19.5)"
+   "remove": true,
+   "src": "earth top + o0/o180 (c10/A) + GSI photo: scrub/forest, no roof"
   },
   {
    "id": "16/58540/25069/327",
    "roof": {
     "color": "#5a6b65"
    },
-   "src": "earth: sub-cell top view, roof Earth #566263 (was #889088, ΔE 15.9)"
+   "src": "earth: sub-cell top view, roof Earth #566263 (was #889088, ΔE 15.9) | [r3] checked on o0 and o180 of the 2026-03-11 capture (the GSI interior of this lot is vegetation green, tools/anime/green-scan.mjs): a dark grey roof under the trees"
   },
   {
    "id": "16/58540/25069/333",
@@ -1005,9 +1128,10 @@
   {
    "id": "16/58540/25069/398",
    "roof": {
-    "color": "#837b7d"
+    "color": "#837b7d",
+    "shape": "shed"
    },
-   "src": "earth: sub-cell top view, roof Earth #7c717a (was #8c9894, ΔE 12.7)"
+   "src": "earth: sub-cell top view, roof Earth #7c717a (was #8c9894, ΔE 12.7) | [r3] roof shape: an open mono-pitch carport on Earth 2026-03-11 (no walls, one roof plane): kept 'shed' when derive.js resolves big sheds to pitched roofs (round 3 systemic 6)"
   },
   {
    "id": "16/58540/25069/399",
@@ -1648,7 +1772,7 @@
   },
   {
    "id": "16/58541/25069/187",
-   "height": 12.5,
+   "height": 13.6,
    "roof": {
     "shape": "flat",
     "color": "#6f7276"
@@ -1882,17 +2006,13 @@
   },
   {
    "id": "16/58541/25069/268",
-   "roof": {
-    "color": "#bdb7b6"
-   },
-   "src": "earth: sub-cell top view, roof Earth #b3a9af (was #ecf0f8, ΔE 20.7)"
+   "remove": true,
+   "src": "earth: c10_c top 2026-03-11 (raw/ref/streets8924r3/cap/c10_c): the GSI white shed (GSI photo about 2020-22) is gone, the lot lies on the paved NE sidewalk of the widened 河原田 road (+7.7..+13.5 m from the new r14113 line; Earth shows buildings only from about +11 m)"
   },
   {
    "id": "16/58541/25069/270",
-   "roof": {
-    "color": "#9d958f"
-   },
-   "src": "earth: sub-cell top view, roof Earth #95898b (was #dce0ec, ΔE 28.9)"
+   "remove": true,
+   "src": "earth: c10_c top 2026-03-11: the GSI white shed is gone, the lot lies on the NE sidewalk / kerb strip of the widened 河原田 road (+5.3..+10.1 m from the new r14113 line)"
   },
   {
    "id": "16/58541/25069/271",
@@ -2226,28 +2346,36 @@
    "roof": {
     "color": "#848483"
    },
-   "src": "earth: sub-cell top view, roof Earth #7d797f (was #a9a9a7, ΔE 34.5)"
+   "src": "earth c10/F top: the 3丁目 complex casts one uniform dark shadow band on the car park, 14-15 m along 340 (sun 44 deg, calibrated about 14.5 m, 4 storeys); the earlier oblique heights are invalid (Earth 2.5D) | was: earth: sub-cell top view, roof Earth #7d797f (was #a9a9a7, ΔE 34.5)",
+   "storeys": 4,
+   "height": 14.5
   },
   {
    "id": "16/58541/25070/54",
    "roof": {
     "color": "#8d8b8e"
    },
-   "src": "earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #f4f4f8, ΔE 38.1)"
+   "src": "earth c10/F top: the 3丁目 complex casts one uniform dark shadow band on the car park, 14-15 m along 340 (sun 44 deg, calibrated about 14.5 m, 4 storeys); the earlier oblique heights are invalid (Earth 2.5D) | was: earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #f4f4f8, ΔE 38.1)",
+   "storeys": 4,
+   "height": 14.5
   },
   {
    "id": "16/58541/25070/55",
    "roof": {
     "color": "#c2b4bc"
    },
-   "src": "earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #e8e8ec, ΔE 18.2)"
+   "src": "earth c10/F top: the 3丁目 complex casts one uniform dark shadow band on the car park, 14-15 m along 340 (sun 44 deg, calibrated about 14.5 m, 4 storeys); the earlier oblique heights are invalid (Earth 2.5D) | was: earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #e8e8ec, ΔE 18.2)",
+   "storeys": 4,
+   "height": 14.5
   },
   {
    "id": "16/58541/25070/56.1",
    "roof": {
     "color": "#c1b4b8"
    },
-   "src": "earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #607389, ΔE 17.1)"
+   "src": "earth c10/F top: the 3丁目 complex casts one uniform dark shadow band on the car park, 14-15 m along 340 (sun 44 deg, calibrated about 14.5 m, 4 storeys); the earlier oblique heights are invalid (Earth 2.5D) | was: earth: sub-cell top view, roof GSI photo (cast removed), the roof is in shadow on the Earth top (was #607389, ΔE 17.1)",
+   "storeys": 4,
+   "height": 14.5
   },
   {
    "id": "16/58541/25070/61",
@@ -2268,7 +2396,9 @@
    "roof": {
     "color": "#8c867b"
    },
-   "src": "earth: sub-cell top view, roof Earth #857b78 (was #b4ab9c, ΔE 32.0)"
+   "src": "earth c10/F top: the 3丁目 complex casts one uniform dark shadow band on the car park, 14-15 m along 340 (sun 44 deg, calibrated about 14.5 m, 4 storeys); the earlier oblique heights are invalid (Earth 2.5D) | was: earth: sub-cell top view, roof Earth #857b78 (was #b4ab9c, ΔE 32.0)",
+   "storeys": 4,
+   "height": 14.5
   },
   {
    "id": "16/58541/25070/66",
@@ -2360,6 +2490,17 @@
     "color": "#c0bdb6"
    },
    "src": "earth: sub-cell top view, roof Earth #b5aeaf (was #d8e0e4, ΔE 14.0)"
+  },
+  {
+   "id": "16/58541/25070/59",
+   "storeys": 4,
+   "height": 14.5,
+   "src": "earth c10/F top: the 3丁目 complex casts one uniform dark shadow band on the car park, 14-15 m along 340 (sun 44 deg, calibrated about 14.5 m, 4 storeys); the earlier oblique heights are invalid (Earth 2.5D)"
+  },
+  {
+   "id": "16/58541/25069/269",
+   "remove": true,
+   "src": "earth: c10_c top 2026-03-11 + D o0/o180: the building still stands but about 3 m further NE than the GSI footprint (which sat on the old alignment, 4.7 m from the new r14113 line, inside the carriageway edge); re-placed as ovr:c10:kawarada-shop"
   }
  ],
  "newLots": [
@@ -2636,132 +2777,32 @@
    "src": "earth: D top (zgD1.jpg; its shadow is ~7 m), a new two-storey building with a pale flat roof"
   },
   {
-   "id": "ovr:c10:kawarada-row-a",
-   "poly": [
-    [
-     85.7,
-     602.6
-    ],
-    [
-     93,
-     590.9
-    ],
-    [
-     94.2,
-     588.9
-    ],
-    [
-     98.9,
-     595.2
-    ],
-    [
-     92.1,
-     606.8
-    ]
-   ],
-   "kind": "house",
-   "storeys": 2,
-   "roof": {
-    "shape": "gable",
-    "color": "#6e6268"
-   },
-   "src": "osm: w792747205 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
-  },
-  {
    "id": "ovr:c10:kawarada-row-b",
    "poly": [
     [
-     92.7,
-     590
+     88.4,
+     575.7
     ],
     [
-     86.1,
-     586
+     95.3,
+     579.0
     ],
     [
-     80.8,
-     582.8
+     88.9,
+     591.5
     ],
     [
-     83.9,
-     575.6
-    ],
-    [
-     91.7,
-     579.4
-    ],
-    [
-     89.9,
-     583.3
-    ],
-    [
-     93.9,
-     588
+     82.0,
+     588.0
     ]
    ],
    "kind": "house",
    "storeys": 2,
    "roof": {
     "shape": "gable",
-    "color": "#6e6268"
+    "color": "#756476"
    },
-   "src": "osm: w792747206 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
-  },
-  {
-   "id": "ovr:c10:kawarada-row-c",
-   "poly": [
-    [
-     86.1,
-     586.5
-    ],
-    [
-     78.9,
-     598.2
-    ],
-    [
-     85.4,
-     602.2
-    ],
-    [
-     92.6,
-     590.4
-    ]
-   ],
-   "kind": "house",
-   "storeys": 2,
-   "roof": {
-    "shape": "gable",
-    "color": "#6e6268"
-   },
-   "src": "osm: w792747207 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
-  },
-  {
-   "id": "ovr:c10:kawarada-row-d",
-   "poly": [
-    [
-     78.6,
-     597.8
-    ],
-    [
-     73.3,
-     594.6
-    ],
-    [
-     80.5,
-     582.9
-    ],
-    [
-     85.8,
-     586.1
-    ]
-   ],
-   "kind": "house",
-   "storeys": 2,
-   "roof": {
-    "shape": "gable",
-    "color": "#6e6268"
-   },
-   "src": "osm: w792747208 (w792747205..208) + earth: B top, o0/o180, a new 2-storey row"
+   "src": "osm: w792747206 + earth: c10/B top 2026-03-11 (rectified, the mauve gable roof, 7 x 14 m, long axis NNW-SSE, white verge on its west edge), re-placed from the old-alignment OSM outline onto the real roof now that the road is moved; roof colour = Earth median of the inner 60 %; 2 storeys as before (no height measurable in Earth)"
   },
   {
    "id": "ovr:c10:saiwai-h-a",
@@ -3210,6 +3251,381 @@
     "color": "#d3cab6"
    },
    "src": "earth: t-kanyo top (lean-corrected) + o0/o270 and gsi: lot 307 outline: the stepped SE low wing, south band, cream pitched roof"
+  },
+  {
+   "id": "ovr:c10:nakamachi-flat",
+   "poly": [
+    [
+     -55.8,
+     990
+    ],
+    [
+     -49.2,
+     999.7
+    ],
+    [
+     -58.2,
+     1005.9
+    ],
+    [
+     -64.8,
+     996.1
+    ]
+   ],
+   "kind": "shop",
+   "height": 6.5,
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#5e6070"
+   },
+   "facade": "shop",
+   "src": "osm: w1284225985 + earth: c10/E top and c10/full, rotated dark flat-roof block about 12 x 11 m (Earth median #606272) with a long NW shadow; HEIGHT IS A SHADOW ESTIMATE (about 6-8 m, 2 storeys)"
+  },
+  {
+   "id": "ovr:c10:saiwai1-a",
+   "poly": [
+    [
+     -133.8,
+     871.2
+    ],
+    [
+     -132.3,
+     866.2
+    ],
+    [
+     -126.8,
+     867.8
+    ],
+    [
+     -128.3,
+     872.8
+    ]
+   ],
+   "kind": "house",
+   "height": 5.8,
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#b9b2b5"
+   },
+   "facade": "house",
+   "src": "osm: w768698058 + earth: c10/E top at (-125,871), light grey flat roof about 8 x 7 m, no PV; 2 storeys by eye"
+  },
+  {
+   "id": "ovr:c10:saiwai1-b",
+   "poly": [
+    [
+     -125.5,
+     873.4
+    ],
+    [
+     -123.9,
+     868.1
+    ],
+    [
+     -116.8,
+     870.3
+    ],
+    [
+     -118.5,
+     875.6
+    ]
+   ],
+   "kind": "house",
+   "height": 5.8,
+   "storeys": 2,
+   "roof": {
+    "shape": "flat",
+    "color": "#5a5d68",
+    "pv": 0.7
+   },
+   "facade": "house",
+   "src": "osm: w768698056 + earth: c10/E top, dark flat roof about 8 x 7 m with solar panel rows (about 70 % of the roof); 2 storeys by eye"
+  },
+  {
+   "id": "ovr:c10:saiwai1-annex",
+   "poly": [
+    [
+     102.1,
+     979.7
+    ],
+    [
+     107.4,
+     976.1
+    ],
+    [
+     110.2,
+     980.3
+    ],
+    [
+     104.9,
+     983.9
+    ]
+   ],
+   "kind": "shop",
+   "height": 4,
+   "storeys": 1,
+   "roof": {
+    "shape": "flat",
+    "color": "#d4d3d6"
+   },
+   "facade": "shop",
+   "src": "osm: w768698039 + earth: c10/F top at (106,978), white flat-roofed box about 8 x 8 m east of lot 16/58541/25070/93; 1 storey by eye"
+  },
+  {
+   "id": "ovr:c10:koen-north-wing",
+   "poly": [
+    [
+     -187.2,
+     676.5
+    ],
+    [
+     -145.1,
+     675.4
+    ],
+    [
+     -145.0,
+     683
+    ],
+    [
+     -187,
+     684
+    ]
+   ],
+   "kind": "apartment",
+   "height": 9.5,
+   "storeys": 3,
+   "roof": {
+    "shape": "gable",
+    "color": "#6f5764",
+    "ridge": "x"
+   },
+   "src": "earth: c10_C top, dark mauve pitched north wing of the 気仙沼公園 bend block (replaces lot 16/58540/25069/285)"
+  },
+  {
+   "id": "ovr:c10:koen-south-flat",
+   "poly": [
+    [
+     -187,
+     684
+    ],
+    [
+     -145,
+     683
+    ],
+    [
+     -145.3,
+     685.7
+    ],
+    [
+     -150.3,
+     685.7
+    ],
+    [
+     -150.3,
+     687.2
+    ],
+    [
+     -158.4,
+     687.4
+    ],
+    [
+     -158.4,
+     688.5
+    ],
+    [
+     -160.9,
+     688.6
+    ],
+    [
+     -160.8,
+     693.7
+    ],
+    [
+     -168,
+     693.9
+    ],
+    [
+     -168.1,
+     692.4
+    ],
+    [
+     -183.8,
+     692.9
+    ],
+    [
+     -183.8,
+     691.7
+    ],
+    [
+     -186.9,
+     691.7
+    ]
+   ],
+   "kind": "apartment",
+   "height": 9.5,
+   "storeys": 3,
+   "roof": {
+    "shape": "flat",
+    "color": "#d8cdc9"
+   },
+   "src": "earth: c10_C top, cream flat-roofed south part (Earth #eadbd7, sunlit; darkened slightly), the GSI brown-grey roof was re-clad or rebuilt"
+  },
+  {
+   "id": "ovr:c10:minatomachi-shed",
+   "poly": [
+    [
+     24.5,
+     529.2
+    ],
+    [
+     34.4,
+     541.5
+    ],
+    [
+     39.9,
+     537.1
+    ],
+    [
+     30,
+     524.8
+    ]
+   ],
+   "kind": "warehouse",
+   "storeys": 1,
+   "height": 3.8,
+   "roof": {
+    "shape": "gable",
+    "color": "#675d67",
+    "ridge": "z"
+   },
+   "src": "osm: w792747189 (111 m2, centre 32,533) + earth: A top / r1003 / full top (2026-03-11), a long narrow single-storey shed with a dark grey roof (about 5 x 22 m, long axis NW-SE) just west of 16/58541/25069/197; roof colour #675d67 = median of the inner 60 % with the ring shifted 2.5 m east to match the registration; the GSI photo shows a grey-green strip; height 3.8 m is a single-storey shed (no usable shadow in the March image)"
+  },
+  {
+   "id": "ovr:c10:katsuya",
+   "poly": [
+    [
+     247.6,
+     850.8
+    ],
+    [
+     263.5,
+     855.9
+    ],
+    [
+     258.4,
+     866.2
+    ],
+    [
+     245.2,
+     860.8
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 1,
+   "height": 4.5,
+   "roof": {
+    "shape": "gable",
+    "color": "#65708a",
+    "ridge": "x"
+   },
+   "facade": "shop",
+   "name": "かつや",
+   "nameEn": "Katsuya",
+   "src": "osm: n7181919661 (かつや 宮城気仙沼店, 仲町2-1-30-3, 10:30-22:30; a separate premises from the post office n12704051292 at 30-4, 5.7 m away) + earth: F top / o0 / o180, a single-storey roadside restaurant on the car park N of lot 90; roof colour Earth median #65708a; height 4.5 m unmeasured"
+  },
+  {
+   "id": "ovr:c10:kawarada-row-e",
+   "poly": [
+    [
+     95.2,
+     584.2
+    ],
+    [
+     99.4,
+     586.0
+    ],
+    [
+     97.0,
+     594.2
+    ],
+    [
+     92.2,
+     592.8
+    ]
+   ],
+   "kind": "house",
+   "storeys": 1,
+   "height": 4.2,
+   "roof": {
+    "shape": "gable",
+    "color": "#756674",
+    "ridge": "z"
+   },
+   "src": "earth: c10/B top + o0 / o180 2026-03-11, a lower mauve-roofed annex (about 4 x 9 m) beside the 河原田 row's 2-storey unit, on the NE sidewalk edge; roof colour Earth median; height 4.2 m is unmeasured (lower than its neighbour on o0/o180)"
+  },
+  {
+   "id": "ovr:c10:kawarada-shop",
+   "poly": [
+    [
+     134.2,
+     612.4
+    ],
+    [
+     143.2,
+     614.4
+    ],
+    [
+     142.0,
+     623.0
+    ],
+    [
+     138.2,
+     621.4
+    ],
+    [
+     135.0,
+     619.5
+    ]
+   ],
+   "kind": "shop",
+   "storeys": 2,
+   "height": 6.5,
+   "roof": {
+    "shape": "flat",
+    "color": "#84727b"
+   },
+   "facade": "shop",
+   "src": "osm: w792747230 (68 m2) + earth: c10_c / c10/D top, o0, o180 2026-03-11: a brown flat-roofed building just beyond the NE sidewalk of the widened 河原田 road (replaces GSI lot 16/58541/25069/269, which sat about 3 m SW on the old alignment); roof colour = Earth median of the inner 60 %; height 6.5 m from its ~7 m shadow on the Earth top (bearing 340, sun 44 degrees), unverified"
+  },
+  {
+   "id": "ovr:c10:osm-792747216",
+   "poly": [
+    [
+     26.1,
+     577.2
+    ],
+    [
+     21.5,
+     583.8
+    ],
+    [
+     28.3,
+     588.5
+    ],
+    [
+     32.9,
+     581.9
+    ]
+   ],
+   "kind": "house",
+   "storeys": 2,
+   "roof": {
+    "shape": "gable",
+    "color": "#6b6773"
+   },
+   "src": "osm: w792747216 (66 m2, uncovered by any lot) + earth: 2026-03-11 top, o0 and o180 of the c10 capture (tools/anime/earth-crop.mjs --ring): a grey roof beside the 河原田 road; roof median #64606c + 3 L* (round 3 systemic 1: the OSM gap list is mostly gone buildings, this one stands)"
   }
  ],
  "landuse": [
@@ -3516,6 +3932,138 @@
    "src": "earth: E top (raw/ref/earth/c10/E/top_annot.jpg) + c9 C top: the 幸町 区画整理 zone is finished, new houses on bare soil and gravel plots along new streets; OSM still maps it as a brownfield building site (drawn with hoardings)"
   }
  ],
+ "roads": [
+  {
+   "id": "r14059",
+   "pts": [
+    [
+     74.0,
+     591.2
+    ],
+    [
+     36.8,
+     577.9
+    ],
+    [
+     27.5,
+     570
+    ],
+    [
+     24,
+     567
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)"
+  },
+  {
+   "id": "r14110",
+   "pts": [
+    [
+     110.2,
+     613.7
+    ],
+    [
+     74.0,
+     591.2
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)",
+   "width": 17,
+   "carriage": 10.5
+  },
+  {
+   "id": "r14113",
+   "pts": [
+    [
+     147.2,
+     636.3
+    ],
+    [
+     110.2,
+     613.7
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)",
+   "width": 17,
+   "carriage": 10.5
+  },
+  {
+   "id": "r14117",
+   "pts": [
+    [
+     163.2,
+     648.0
+    ],
+    [
+     147.2,
+     636.3
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)",
+   "width": 16,
+   "carriage": 10
+  },
+  {
+   "id": "r14127",
+   "pts": [
+    [
+     180.0,
+     662.3
+    ],
+    [
+     163.2,
+     648.0
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)",
+   "width": 13,
+   "carriage": 8.5
+  },
+  {
+   "id": "r14126",
+   "pts": [
+    [
+     221.4,
+     692.7
+    ],
+    [
+     180.0,
+     662.3
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)",
+   "width": 11,
+   "carriage": 7
+  },
+  {
+   "id": "r14116",
+   "pts": [
+    [
+     150,
+     631
+    ],
+    [
+     159.8,
+     619.5
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)"
+  },
+  {
+   "id": "r14114",
+   "pts": [
+    [
+     93.6,
+     640.4
+    ],
+    [
+     108,
+     617
+    ]
+   ],
+   "src": "earth: c10_c top 2026-03-11, lateral line profile (acc.mjs) + GSI photo shows the old alignment (raw/ref/streets8924r3/cap/c10_c)"
+  }
+ ],
  "props": [
   {
    "type": "tree",
@@ -3564,6 +4112,64 @@
     966
    ],
    "src": "earth: F top (zF1.jpg), young street trees along the north edge of 仲町・幸町公園"
+  }
+ ],
+ "crossings": [
+  {
+   "at": [
+    21.3,
+    983.5
+   ],
+   "road": "r15491",
+   "src": "earth: c10 top / c10_big (2026-03-11): the 魚市場中谷地線 x 本町宮口下線 junction has zebras on its arms (about 8 in all), lane lines and 3-4 m planted sidewalks"
+  },
+  {
+   "at": [
+    19.4,
+    973.2
+   ],
+   "road": "r15492",
+   "src": "earth: c10 top / c10_big (2026-03-11): the 魚市場中谷地線 x 本町宮口下線 junction has zebras on its arms (about 8 in all), lane lines and 3-4 m planted sidewalks"
+  },
+  {
+   "at": [
+    20.2,
+    984.3
+   ],
+   "road": "r15527",
+   "src": "earth: c10 top / c10_big (2026-03-11): the 魚市場中谷地線 x 本町宮口下線 junction has zebras on its arms (about 8 in all), lane lines and 3-4 m planted sidewalks"
+  },
+  {
+   "at": [
+    19.1,
+    973
+   ],
+   "road": "r15528",
+   "src": "earth: c10 top / c10_big (2026-03-11): the 魚市場中谷地線 x 本町宮口下線 junction has zebras on its arms (about 8 in all), lane lines and 3-4 m planted sidewalks"
+  },
+  {
+   "at": [
+    39,
+    971.5
+   ],
+   "road": "r15531",
+   "src": "earth: c10 top / c10_big (2026-03-11): the 魚市場中谷地線 x 本町宮口下線 junction has zebras on its arms (about 8 in all), lane lines and 3-4 m planted sidewalks"
+  },
+  {
+   "at": [
+    39.1,
+    984.4
+   ],
+   "road": "r15533",
+   "src": "earth: c10 top / c10_big (2026-03-11): the 魚市場中谷地線 x 本町宮口下線 junction has zebras on its arms (about 8 in all), lane lines and 3-4 m planted sidewalks"
+  },
+  {
+   "at": [
+    155.4,
+    642.2
+   ],
+   "road": "r14117",
+   "src": "earth: c10_c top 2026-03-11, zebra on the 河原田 road at about (160,656) / (155,642)"
   }
  ]
 }

@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "cell": "c10-c6-c5-slopes",
+  "bbox": [
+    -170,
+    -135,
+    -20,
+    475
+  ],
+  "note": "round 2: concrete slope protection that Earth 2026-03-11 shows and the app lacked: the five-step lattice slope and pale verge west of the new c10 road (x -58..-26, z 402..472), and the revetment at the foot of the 熊野神社 hill above the car park (x -166..-121, z -138..-120). Evidence register raw/ref/EVIDENCE.md #6 and #34.",
+  "sources": [
+    {
+      "id": "earth",
+      "what": "Google Earth, imagery dated 2026-03-11 (raw/ref/earth/c10/land2/earth_top.png, raw/ref/earth/c6/land2/earth_top.png)",
+      "date": "2026-03-11"
+    }
+  ],
+  "landuse": [
+    {
+      "use": "levee",
+      "ring": [
+        [
+          -56,
+          406
+        ],
+        [
+          -38,
+          402
+        ],
+        [
+          -30,
+          420
+        ],
+        [
+          -34,
+          440
+        ],
+        [
+          -52,
+          440
+        ],
+        [
+          -58,
+          424
+        ]
+      ],
+      "src": "earth: c10 land2 top, the terraced five-step grey concrete-lattice slope beside the new c10 road, x -56..-30, z 406..440 (EVIDENCE #6). 'levee' (grey concrete #928c8d) not 'plaza': the Earth mean over this ring is #9b908f (the lattice and its step lines), plaza cream #c9c3b8 is far paler. Clears the brown broadleaf trees and the cream field patch"
+    },
+    {
+      "use": "plaza",
+      "ring": [
+        [
+          -49,
+          439
+        ],
+        [
+          -32,
+          440
+        ],
+        [
+          -31,
+          452
+        ],
+        [
+          -40,
+          470
+        ],
+        [
+          -52,
+          472
+        ],
+        [
+          -50,
+          455
+        ]
+      ],
+      "src": "earth: c10 land2 top, the pale concrete verge following the road curve, x -49..-26, z 439..462 (EVIDENCE #6); pale cream, the brightest 30 % of the Earth pixels in the ring average #cac1bd; the east corner that would run into the carriageway is dropped"
+    },
+    {
+      "use": "plaza",
+      "ring": [
+        [
+          -166,
+          -126
+        ],
+        [
+          -158,
+          -126.5
+        ],
+        [
+          -148,
+          -128
+        ],
+        [
+          -140,
+          -130.5
+        ],
+        [
+          -132,
+          -135
+        ],
+        [
+          -124,
+          -138
+        ],
+        [
+          -121,
+          -138
+        ],
+        [
+          -121,
+          -133
+        ],
+        [
+          -124,
+          -133
+        ],
+        [
+          -132,
+          -129.5
+        ],
+        [
+          -140,
+          -124.5
+        ],
+        [
+          -150,
+          -121.5
+        ],
+        [
+          -158,
+          -120.5
+        ],
+        [
+          -166,
+          -120
+        ]
+      ],
+      "src": "earth: c6 land2 top (raw/ref/earth/c6/r2fix, re-measured with the app's ground heights): the pale concrete slope-protection band along the foot of the 熊野神社 hill, an arc from z about -123 at x -166 to z about -135 at x -122 (4-6 m wide, about 45 m long; EVIDENCE #34). The first proposed ring (z -129..-116) sat 4-10 m south of the band over its east half"
+    }
+  ]
+}

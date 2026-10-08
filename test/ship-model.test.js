@@ -124,8 +124,8 @@ describe('budgets', () => {
 });
 
 describe('flags.js: nendo by default on every host (臼福本店 permission, 2026-10-03)', () => {
-  const PUBLIC = ['example.tail1234.ts.net', 'EXAMPLE.TAIL1.TS.NET', 'kesennuma.example.jp', 'example.github.io', 'klc.up.railway.app', ''];
-  test('a public host (the Funnel link, any deploy) means nendo', () => {
+  const PUBLIC = ['host.example.net', 'HOST.EXAMPLE.NET', 'kesennuma.example.jp', 'example.github.io', 'klc.up.railway.app', ''];
+  test('a public host (the public mirror, any deploy) means nendo', () => {
     for (const h of PUBLIC) expect(resolveFlags({ search: '', hostname: h, define: null })).toEqual({ nendoLivery: true, source: 'default' });
   });
   test('local hosts mean nendo too', () => {
@@ -154,7 +154,7 @@ describe('flags.js: nendo by default on every host (臼福本店 permission, 202
   });
   test('isDevHost (the local music probe only) still knows local from public', () => {
     for (const h of ['localhost', '127.0.0.1', 'app.localhost']) expect(isDevHost(h)).toBe(true);
-    for (const h of ['example.tail1234.ts.net', 'localhost.evil.com', '']) expect(isDevHost(h)).toBe(false);
+    for (const h of ['host.example.net', 'localhost.evil.com', '']) expect(isDevHost(h)).toBe(false);
   });
   test('the public mirror serves the nendo trace (the default livery must load on the public link)', () => {
     for (const f of ['livery-nendo.json', 'lines-nendo.json', 'livery-nendo-marks.json']) expect(allowed('/data/ship/shofukumaru1/' + f)).toBe(true);

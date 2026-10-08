@@ -1512,18 +1512,18 @@
     0.0
    ],
    "position": [
-    -26.7305,
-    3.3495,
-    88.9711
+    -26.45,
+    3.3,
+    85.9
    ],
    "quaternion": [
-    -0.024877767219442744,
-    0.9592373689808859,
-    0.06513244578591067,
-    0.2738658999487678
+    -0.003938103390836508,
+    0.9616641242043739,
+    -0.008381741841656727,
+    0.27407362142974895
    ],
    "yaw": -211.8199,
-   "pitch": -7.9658,
+   "pitch": 0.8,
    "roll": -0.6973,
    "heading_deg": 211.82,
    "reproj_px": 0.32,
@@ -1531,7 +1531,9 @@
    "gps_offset_m": 1.31,
    "eye_m": 1.49,
    "registered": true,
-   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns 拓's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
+   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns 拓's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m).",
+   "fix2": "[v6:fix1] centre moved from the GPS-held (-26.7, 89.0) to the standing spot of IMG_0834-0839 (-26.45, 85.9): the photographer turned on the spot (the SfM puts 0834-0839 within 0.5 m of it); rotation unchanged (compass 212 / 200, checked against the vanishing point of 拓's 226 deg face at the right frame edge). 0840 / 0841 share no verified feature with any other photo (ALIKED + LightGlue and SIFT found none), so a PnP on surveyed points has no correspondences to run on: their verification stays weak (chamfer is flat, 18-21 px, across +-12 deg of yaw: the 拓 face model, not the pose, dominates it).",
+   "fix3": "[v6:fix3] pitch -7.97 -> +0.80 deg (verticals plumb, KNEWS base row; see tools/survey/minami_fix3.py)"
   },
   {
    "id": "IMG_0841",
@@ -1551,18 +1553,18 @@
     0.0
    ],
    "position": [
-    -26.6161,
-    3.3393,
-    89.0231
+    -26.45,
+    3.3,
+    85.9
    ],
    "quaternion": [
-    -0.03224161993418805,
-    0.9818264548777191,
-    0.06310226642396417,
-    0.17605508915799264
+    -0.01919766850875497,
+    0.984338175496022,
+    -0.01050379039433046,
+    0.17492705957724863
    ],
    "yaw": -200.1703,
-   "pitch": -7.7739,
+   "pitch": 0.8,
    "roll": -2.3769,
    "heading_deg": 200.17,
    "reproj_px": 0.35,
@@ -1570,7 +1572,9 @@
    "gps_offset_m": 1.95,
    "eye_m": 1.47,
    "registered": true,
-   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns 拓's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m)."
+   "fix": "[v6:rebuild] rotated +36 deg about the vertical to the compass heading: the SfM put this 2-photo island (0840/0841, linked only to each other) 36 deg off, which turns 拓's slow-street face across the view; the photo shows it receding on the left (compass 212/200). Chamfer 24.8 -> 20.0 (0840), 36.4 -> 16.7 px (0841). Position is GPS-grade (+-3 m).",
+   "fix2": "[v6:fix1] centre moved from the GPS-held (-26.7, 89.0) to the standing spot of IMG_0834-0839 (-26.45, 85.9): the photographer turned on the spot (the SfM puts 0834-0839 within 0.5 m of it); rotation unchanged (compass 212 / 200, checked against the vanishing point of 拓's 226 deg face at the right frame edge). 0840 / 0841 share no verified feature with any other photo (ALIKED + LightGlue and SIFT found none), so a PnP on surveyed points has no correspondences to run on: their verification stays weak (chamfer is flat, 18-21 px, across +-12 deg of yaw: the 拓 face model, not the pose, dominates it).",
+   "fix3": "[v6:fix3] pitch -7.77 -> +0.80 deg (verticals plumb, KNEWS base row; see tools/survey/minami_fix3.py)"
   },
   {
    "id": "IMG_0842",
@@ -1596,25 +1600,31 @@
     0.0
    ],
    "position": [
-    126.861,
+    126.161,
     2.6477,
-    67.3821
+    69.9821
    ],
    "quaternion": [
-    0.05642689,
-    0.59650155,
-    0.00675713,
-    0.80059743
+    0.0166454,
+    0.58130223,
+    -0.00117187,
+    0.81351661
    ],
-   "yaw": 73.5628,
-   "pitch": 4.7202,
-   "roll": 4.4968,
-   "heading_deg": 286.437,
+   "yaw": 71.11,
+   "pitch": 1.63,
+   "roll": 1.0,
+   "heading_deg": 288.89,
    "reproj_px": 0.0,
    "obs": 1,
    "gps_offset_m": 0.0,
    "eye_m": 1.45,
-   "registered": true
+   "registered": true,
+   "fix2": "[v6:fix1] rotation re-solved from three surveyed 3-D points (the 迎 3F box's S / E coping corners mukaeru.box.top#1 / #2 and the 7-Eleven pole sign (-39.5, 11.0, 49.2) triangulated from IMG_0829 + 0822), camera centre held at the GPS fix, roll fixed at 1 deg (hand held): yaw 73.56 -> 71.11, pitch 4.72 -> 1.63, rms residual 0.45 deg (about 16 px at 48 mm) against 3-4 deg before (the single-observation SfM rotation). The centre is 135 m from every reference, so +-3 m of GPS only moves the references by 1.2 deg.",
+   "adjust_fix2": [
+    -0.7,
+    0,
+    2.6
+   ]
   },
   {
    "id": "IMG_0890",
@@ -1634,9 +1644,9 @@
     0.0
    ],
    "position": [
-    128.0388,
+    127.3388,
     3.6258,
-    64.4722
+    67.0722
    ],
    "quaternion": [
     0.03566541,
@@ -1652,7 +1662,12 @@
    "obs": 79,
    "gps_offset_m": 2.9,
    "eye_m": 2.25,
-   "registered": true
+   "registered": true,
+   "adjust_fix2": [
+    -0.7,
+    0,
+    2.6
+   ]
   },
   {
    "id": "IMG_0891",
@@ -1672,9 +1687,9 @@
     -5.18e-05
    ],
    "position": [
-    128.1313,
+    127.4313,
     3.2975,
-    64.6038
+    67.2038
    ],
    "quaternion": [
     -0.02936034,
@@ -1690,7 +1705,12 @@
    "obs": 790,
    "gps_offset_m": 4.01,
    "eye_m": 1.89,
-   "registered": true
+   "registered": true,
+   "adjust_fix2": [
+    -0.7,
+    0,
+    2.6
+   ]
   },
   {
    "id": "IMG_0893",

@@ -14,11 +14,12 @@
 //     roof decks are pale green (Google Earth 2026-03-11: #a5ada2..#afb9ae, GSI #bed5cb); and the お魚いちば signs
 //     and the 気仙沼温泉 pylon at the lift's foot (IMG_0895);
 //   the glass lift tower at the cliff foot on 港町 (GSI footprint 6 × 7 m, T.P. 2.3) with the roundel on its white
-//     head, a lattice spire, and the enclosed bridge (GSI footprint 25 × 3.7 m) running up to the tower's floor on the
-//     bluff.
+//     head, a lattice spire, and the enclosed bridge. The GSI footprint (25 × 3.7 m) stops short of both the lift
+//     shaft and the podium; the mesh runs from the shaft (embedded in the head) to the first hotel wall at deck
+//     height (IMG_0896: it enters the low building under the tower, with no gap and no mid-span pier).
 import * as THREE from 'three';
 import { nightMat } from './lights.js';
-import { wallGeo, flatRoof, colliders, textTex, FONT, mapMat, facadeMat, paintWindow, obbOf, obbPt, capGeo } from '../landmarks/kit.js';
+import { wallGeo, flatRoof, colliders, textTex, FONT, mapMat, facadeMat, paintWindow, obbOf, obbPt, capGeo, openRing } from '../landmarks/kit.js';
 
 export const PLAZA = {
   main: '16/58541/25068/142', wing: '16/58541/25069/27', annex: '16/58541/25068/141', bridge: '16/58541/25068/137', lift: '16/58541/25068/136', liftHall: '16/58541/25068/135',
@@ -28,13 +29,25 @@ export const PLAZA = {
 /** The lots the hotel replaces (town, the mid builder and explore leave them: world/lotfix.js tags them). */
 export const PLAZA_LOTS = [PLAZA.main, PLAZA.wing, PLAZA.annex, PLAZA.bridge, PLAZA.lift, PLAZA.liftHall];
 
+/** [plaza-bridge] The hotel mark on the lift head and the crown (IMG_0896, both roundels): a 巴 of two commas,
+ *  red in the upper right and navy in the lower left, a white ring, and a thin white S on the join. The old
+ *  straight diagonal (red upper left, blue lower right) read as a soft-drink logo. */
 function roundelTex(ctx) {
   return ctx.tex.draw(256, 256, (g, W, H) => {
     g.fillStyle = '#f4f1ea'; g.fillRect(0, 0, W, H);
-    const r = W * 0.38, cx = W / 2, cy = H / 2;
-    g.fillStyle = '#d2413a'; g.beginPath(); g.arc(cx, cy, r, Math.PI * 0.75, Math.PI * 1.75); g.fill();
-    g.fillStyle = '#2d5fa8'; g.beginPath(); g.arc(cx, cy, r, Math.PI * 1.75, Math.PI * 2.75); g.fill();
-    g.strokeStyle = '#f4f1ea'; g.lineWidth = W * 0.05; g.beginPath(); g.moveTo(cx - r * 0.75, cy + r * 0.75); g.bezierCurveTo(cx - r * 0.1, cy + r * 0.1, cx + r * 0.1, cy - r * 0.1, cx + r * 0.75, cy - r * 0.75); g.stroke();
+    const cx = W / 2, cy = H / 2, R = W * 0.42, r = R - W * 0.048;
+    g.fillStyle = '#f7f6f2'; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#1a2f5e'; g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();   // 紺, the lower-left comma
+    g.fillStyle = '#c4383a'; g.beginPath();
+    g.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, false);                                     // the right half, head up
+    g.arc(cx, cy + r / 2, r / 2, Math.PI / 2, -Math.PI / 2, true);                           // tail back through the centre
+    g.arc(cx, cy - r / 2, r / 2, Math.PI / 2, -Math.PI / 2, false);                          // the upper bowl, head to the right
+    g.fill();
+    g.strokeStyle = '#f7f6f2'; g.lineWidth = W * 0.022; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath();
+    g.arc(cx, cy + r / 2, r / 2, Math.PI / 2, -Math.PI / 2, true);
+    g.arc(cx, cy - r / 2, r / 2, Math.PI / 2, -Math.PI / 2, false);
+    g.stroke();
   }, { key: 'plaza-roundel', anisotropy: 8 });
 }
 
@@ -149,6 +162,151 @@ function buildUoichiSigns(ctx, root) {
   return { front: { x: G.position.x, z: G.position.z, len: Math.round(len * 10) / 10, rotY: G.rotation.y }, pylon: { x: px, z: pz, y: py, top: py + dy + a * Math.SQRT1_2 + 0.2 } };
 }
 
+// [plaza-bridge] The enclosed bridge. The GSI footprint is the axis and the width, not the length: it ends on the
+// lift hall, short of the glass shaft, and again in the air before the bluff. The near end is the shaft face (kept
+// at the lift head, 0.3 m inside it). The far end is the first hotel wall the cross-section meets at deck height
+// (annex, lift hall or podium — the hall is too low to count), embedded 0.3 m, or the bluff crest if no wall does.
+const BRIDGE_EMBED = 0.3;
+const BRIDGE_HALF = 1.75;   // the pale-green roof, the widest part of the tube
+
+function inRing(x, z, P) {
+  let c = false;
+  for (let i = 0, k = P.length - 1; i < P.length; k = i++) {
+    const xi = P[i][0], zi = P[i][1], xk = P[k][0], zk = P[k][1];
+    if ((zi > z) !== (zk > z) && x < ((xk - xi) * (z - zi)) / ((zk - zi) || 1e-12) + xi) c = !c;
+  }
+  return c;
+}
+/** First time the ray origin + t·dir (t > tMin) enters the ring. */
+function rayEntry(origin, dir, P, tMin) {
+  let best = null;
+  for (let i = 0; i < P.length; i++) {
+    const a = P[i], b = P[(i + 1) % P.length];
+    const sx = b[0] - a[0], sz = b[1] - a[1], den = dir[0] * sz - dir[1] * sx;
+    if (Math.abs(den) < 1e-8) continue;
+    const qx = a[0] - origin[0], qz = a[1] - origin[1];
+    const t = (qx * sz - qz * sx) / den, u = (qx * dir[1] - qz * dir[0]) / den;
+    if (u < -1e-4 || u > 1 + 1e-4 || !(t > tMin)) continue;
+    if (!inRing(origin[0] + dir[0] * (t + 0.02), origin[1] + dir[1] * (t + 0.02), P)) continue;
+    if (!best || t < best.t) best = { t, i, a, b, x: origin[0] + dir[0] * t, z: origin[1] + dir[1] * t };
+  }
+  return best;
+}
+function distToRing(x, z, P) {
+  let d = 1e9;
+  for (let i = 0; i < P.length; i++) {
+    const a = P[i], b = P[(i + 1) % P.length], sx = b[0] - a[0], sz = b[1] - a[1], l2 = sx * sx + sz * sz || 1;
+    let u = ((x - a[0]) * sx + (z - a[1]) * sz) / l2; u = Math.max(0, Math.min(1, u));
+    d = Math.min(d, Math.hypot(x - (a[0] + sx * u), z - (a[1] + sz * u)));
+  }
+  return d;
+}
+/** Where the deck-height terrain along the axis first reaches deckY, else the crest. */
+function bluffT(L, origin, dx, dz, deckY) {
+  let prev = L.heightAt(origin[0], origin[1]), best = { t: 0, h: prev };
+  for (let t = 0.5; t <= 80; t += 0.25) {
+    const h = L.heightAt(origin[0] + dx * t, origin[1] + dz * t);
+    if (prev < deckY && h >= deckY) return t - 0.25 * (h - deckY) / ((h - prev) || 1);
+    if (h > best.h) best = { t, h };
+    prev = h;
+  }
+  return best.t;
+}
+
+/**
+ * The bridge centre line, derived from the lots. `t` is metres along the footprint axis from its lift end,
+ * negative back into the shaft. Returns the mesh ends and the wall the far end enters.
+ */
+export function plazaBridgeSpan(L, deckY) {
+  const bridge = L.lotById(PLAZA.bridge), lift = L.lotById(PLAZA.lift);
+  if (!bridge || !lift) return null;
+  const o = obbOf(bridge.poly), p0 = obbPt(o, 0, -o.d / 2), p1 = obbPt(o, 0, o.d / 2);
+  const lc = obbOf(lift.poly);
+  const nearFp = Math.hypot(p0[0] - lc.cx, p0[1] - lc.cz) < Math.hypot(p1[0] - lc.cx, p1[1] - lc.cz) ? p0 : p1;
+  const farFp = nearFp === p0 ? p1 : p0;
+  let dx = farFp[0] - nearFp[0], dz = farFp[1] - nearFp[1];
+  const footprint = Math.hypot(dx, dz) || 1; dx /= footprint; dz /= footprint;
+  const rx = -dz, rz = dx;
+  const at = (t, off = 0) => [nearFp[0] + dx * t + rx * off, nearFp[1] + dz * t + rz * off];
+  const liftP = openRing(lift.poly);
+  let tBack = 0;
+  for (const off of [-BRIDGE_HALF, 0, BRIDGE_HALF]) {
+    const e = rayEntry(at(0, off), [-dx, -dz], liftP, 0.05);
+    if (e && e.t > tBack) tBack = e.t;
+  }
+  const tNear = -(tBack + BRIDGE_EMBED);
+  // walls that exist at the deck: the podium (towerY + 4.6, the same top the mesh uses), the annex, the lift hall
+  const walls = [];
+  const push = (id, y0, y1) => { const lot = L.lotById(id); if (lot && y1 > deckY && y0 < deckY) walls.push({ id, P: openRing(lot.poly) }); };
+  push(PLAZA.main, 0, PLAZA.towerY + 4.6);
+  const annex = L.lotById(PLAZA.annex); if (annex) push(PLAZA.annex, annex.groundY, annex.groundY + annex.height);
+  const hall = L.lotById(PLAZA.liftHall); if (hall) push(PLAZA.liftHall, hall.groundY, hall.groundY + hall.height);
+  let tWall = -1, lotId = null, center = null;
+  const sides = [];
+  for (const off of [-BRIDGE_HALF, 0, BRIDGE_HALF]) {
+    let hit = null;
+    for (const w of walls) {
+      const e = rayEntry(at(0, off), [dx, dz], w.P, 1);
+      if (e && (!hit || e.t < hit.t)) hit = { ...e, id: w.id };
+    }
+    if (hit) {
+      if (hit.t > tWall) { tWall = hit.t; lotId = hit.id; }
+      if (off === 0) center = hit;
+      if (off !== 0) sides.push(hit);
+    } else {
+      const tt = bluffT(L, at(0, off), dx, dz, deckY);
+      if (tt > tWall) tWall = tt;
+    }
+  }
+  const tFar = (tWall < 0 ? bluffT(L, nearFp, dx, dz, deckY) : tWall) + BRIDGE_EMBED;
+  const near = at(tNear), far = at(tFar);
+  const end = [at(tFar, -BRIDGE_HALF), at(tFar, BRIDGE_HALF)];
+  const nearEnd = [at(tNear, -BRIDGE_HALF), at(tNear, BRIDGE_HALF)];
+  const P = lotId ? openRing(L.lotById(lotId).poly) : null;
+  const gap = P ? Math.min(...end.map((p) => distToRing(p[0], p[1], P)), distToRing(far[0], far[1], P)) : null;
+  let portal = null;
+  if (center && sides.length === 2 && sides.every((s) => s.id === center.id && s.i === center.i)) {
+    const sx = center.b[0] - center.a[0], sz = center.b[1] - center.a[1], el = Math.hypot(sx, sz) || 1;
+    const opening = Math.hypot(sides[0].x - sides[1].x, sides[0].z - sides[1].z);
+    const inside = [center.x + dx * 0.4, center.z + dz * 0.4];
+    let nx = sz / el, nz = -sx / el;
+    if ((inside[0] - center.x) * nx + (inside[1] - center.z) * nz > 0) { nx = -nx; nz = -nz; }
+    portal = { x: center.x, z: center.z, yaw: Math.atan2(nx, nz), opening, edge: [center.a, center.b], outward: [nx, nz] };
+  }
+  return {
+    near, far, end, nearEnd, portal, lot: lotId, gap,
+    len: Math.hypot(far[0] - near[0], far[1] - near[1]),
+    footprint, y: deckY,
+    yaw: Math.atan2(far[0] - near[0], far[1] - near[1]),
+  };
+}
+
+/** Open the podium wall where the bridge enters, and keep the rest of that edge solid. */
+function cutPortal(ctx, a, b, hit, opening, deckY, roofY) {
+  const ph = ctx.physics; if (!ph?.removeNear || !ph.addBox) return;
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len;
+  const gone = ph.removeNear((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, len / 2 + 1, (it) => {
+    if (it.type !== 'box' || it.hw > 0.4) return false;
+    const vx = it.cx - a[0], vz = it.cz - a[1], s = vx * ux + vz * uz;
+    return Math.hypot(vx - ux * s, vz - uz * s) < 0.8 && s > -0.5 && s < len + 0.5 && it.y1 > deckY && it.y0 < deckY;
+  });
+  if (!gone.length) return;
+  const y0 = Math.min(...gone.map((it) => it.y0)), y1 = Math.max(...gone.map((it) => it.y1));
+  const th = gone[0].hw * 2, it = gone[0], sIt = (it.cx - a[0]) * ux + (it.cz - a[1]) * uz;
+  const nx = it.cx - (a[0] + ux * sIt), nz = it.cz - (a[1] + uz * sIt), nl = Math.hypot(nx, nz) || 1, n = [nx / nl, nz / nl];
+  const place = (u0, u1, yA, yB) => {
+    if (u1 - u0 < 0.25 || yB - yA < 0.2) return;
+    const sm = (u0 + u1) / 2;
+    ph.addBox(a[0] + ux * sm + n[0] * th / 2, a[1] + uz * sm + n[1] * th / 2, th, u1 - u0 + th, Math.atan2(ux, uz), yA, yB);
+  };
+  const cu = (hit[0] - a[0]) * ux + (hit[1] - a[1]) * uz, half = opening / 2 + 0.2;
+  const s0 = Math.max(0, cu - half), s1 = Math.min(len, cu + half);
+  place(0, s0, y0, y1);
+  place(s1, len, y0, y1);
+  place(s0, s1, y0, deckY - 0.05);    // solid under the deck
+  place(s0, s1, roofY, y1);            // solid over the roof; the deck itself is the opening
+}
+
 export function buildPlazaHotel(ctx) {
   const L = ctx.L, lot = (id) => L.lotById(id);
   const main = lot(PLAZA.main); if (!main) return null;
@@ -157,7 +315,7 @@ export function buildPlazaHotel(ctx) {
   // [v6:c7] roof: the pale-green decks (Earth 2026-03-11 x 1.17 #c6d0c7, GSI #bed5cb); tile / crown: the 2026 cladding
   // (IMG_0896 sunlit slab bands #d9bcab / #d4bdb0); white stays for the lift head, the bridge roof, frames and parapets
   const M = {
-    white: t('#eeeae2', { paint: 0.02 }), grey: t('#b9b6ae'), roof: t('#c2d4c9', { paint: 0.04 }),
+    white: t('#eeeae2', { paint: 0.02 }), grey: t('#b9b6ae'), roof: t('#a2aca1', { paint: 0.04 }),
     tile: t('#d3b6a8'), crown: t('#cdb0a3'), cream: t('#e3dbcf'), signBox: t('#cfcac0'),
     frame: t('#f6f4ee', { paint: 0.01 }), steel: t('#9aa1a8', { paint: 0 }), glass: nightMat(ctx, '#7f98ab', '#ffe2b8', 1.3),
   };
@@ -242,18 +400,40 @@ export function buildPlazaHotel(ctx) {
     out.lift = { x: o.cx, z: o.cz, y: ly, top };
   }
   if (hall) { const hy = hall.groundY; W.mesh(wallGeo(hall.poly, g0, hy + 3.6, { tu: 3, tv: 3.6, yRef: hy }), halls); flatRoof(W, hall.poly, hy + 3.6, M.roof, M.white, 0.4); colliders(ctx, hall.poly, hy - 1, hy + 4); }
-  if (bridge) {
-    // the enclosed bridge: the footprint's long axis, a glazed box on a steel truss, from the lift's head to the bluff
-    const o = obbOf(bridge.poly), a = obbPt(o, 0, -o.d / 2), b = obbPt(o, 0, o.d / 2);
-    const len = Math.hypot(b[0] - a[0], b[1] - a[1]), yaw = Math.atan2(b[0] - a[0], b[1] - a[1]);
-    const G = new THREE.Group(); G.position.set((a[0] + b[0]) / 2, deckY, (a[1] + b[1]) / 2); G.rotation.y = yaw; root.add(G);
+  const span = bridge && plazaBridgeSpan(L, deckY);
+  if (span) {
+    // level with the bluff floor (T.P. 25.8): the deck does not step where it enters the building.
+    // IMG_0896 shows no pier under the span, so nothing is added between the two ends.
+    const { near, far, len, yaw } = span;
+    const G = new THREE.Group(); G.position.set((near[0] + far[0]) / 2, deckY, (near[1] + far[1]) / 2); G.rotation.y = yaw; root.add(G);
     const kb = ctx.kit(G);
     kb.boxB(3.4, 0.5, len, M.grey, [0, -0.5, 0]);
-    kb.boxB(3.2, 2.7, len, M.glass, [0, 0, 0]);
-    kb.boxB(3.5, 0.35, len + 0.2, M.white, [0, 2.7, 0]);
+    // side panes, not a closed box: the ends are open, so no glass end face shows once they sit inside the head and the wall
+    for (const s of [-1, 1]) kb.boxB(0.08, 2.7, len, M.glass, [s * 1.56, 0, 0]);
+    kb.boxB(3.5, 0.35, len, M.roof, [0, 2.7, 0]);   // [v6:c7r1] pale green in Earth 2026-03-11 (#bdc2bb)
     for (let z = -len / 2; z <= len / 2 + 0.01; z += 3) for (const s of [-1, 1]) kb.boxB(0.12, 2.7, 0.12, M.frame, [s * 1.62, 0, z]);
     for (let z = -len / 2 + 2; z < len / 2; z += 4) { const d = kb.box(0.12, 0.12, 4.4, M.steel, [0, -1.6, z]); d.rotation.x = 0.45; }
-    out.bridge = { len: Math.round(len * 10) / 10, y: deckY };
+    if (span.portal) {
+      // a frame on the wall plane, larger than the cut, so the joint reads as a portal from outside
+      const p = span.portal, F = new THREE.Group();
+      F.position.set(p.x + p.outward[0] * 0.08, deckY, p.z + p.outward[1] * 0.08); F.rotation.y = p.yaw; root.add(F);
+      const kf = ctx.kit(F), b = 0.22, ow = p.opening + 0.35, h0 = -0.15, h1 = 3.2;
+      kf.boxB(ow + b * 2, b, 0.2, M.white, [0, h1, 0]);
+      kf.boxB(ow + b * 2, b, 0.2, M.white, [0, h0 - b, 0]);
+      kf.boxB(b, h1 - h0, 0.2, M.white, [-(ow / 2 + b / 2), h0, 0]);
+      kf.boxB(b, h1 - h0, 0.2, M.white, [ow / 2 + b / 2, h0, 0]);
+      cutPortal(ctx, p.edge[0], p.edge[1], [p.x, p.z], p.opening, deckY, deckY + 3.2);
+    }
+    if (ctx.physics?.addBox) {
+      const mx = (near[0] + far[0]) / 2, mz = (near[1] + far[1]) / 2, c = Math.cos(yaw), s = Math.sin(yaw);
+      ctx.physics.addWalkBox(mx, mz, 2.8, len, yaw, deckY, deckY - 0.8);   // the walk-through deck, flat, no step
+      for (const side of [-1, 1]) ctx.physics.addBox(mx + side * 1.58 * c, mz - side * 1.58 * s, 0.16, len, yaw, deckY - 0.2, deckY + 3.05);
+    }
+    const r2 = (v) => Math.round(v * 100) / 100;
+    out.bridge = {
+      len: Math.round(len * 10) / 10, y: deckY, lot: span.lot, footprint: Math.round(span.footprint * 10) / 10, gap: span.gap == null ? null : r2(span.gap),
+      near: near.map(r2), far: far.map(r2), end: span.end.map((p) => p.map(r2)), nearEnd: span.nearEnd.map((p) => p.map(r2)),
+    };
   }
   out.uoichi = buildUoichiSigns(ctx, root);
   root.updateMatrixWorld(true);

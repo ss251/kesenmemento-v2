@@ -12,6 +12,8 @@ import * as THREE from 'three';
 import * as L from './layout.js';
 import { seasonUniform } from '../core/season.js';   // [v3:integrate]
 import { sharedHardShores } from './layout/hardshore.js';   // [v3:fix]
+import { freeDataOnUpload } from '../core/textures.js';   // [mobile-perf]
+import { applySwimFog, SNELL } from '../play/underwater/fog.js';   // [play:underwater] Snell's window from below
 
 function gridTexture(g) {
   const n = g.w * g.h, data = new Uint16Array(n * 2);
@@ -32,7 +34,8 @@ export function waterMaterial(ctx, o = {}) {
   const HM = sharedHardShores(L).maskTexture(THREE, { x0: L.ZONES.mid.cx - L.ZONES.mid.r - 200, z0: L.ZONES.mid.cz - L.ZONES.mid.r - 200, x1: L.ZONES.mid.cx + L.ZONES.mid.r + 200, z1: L.ZONES.mid.cz + L.ZONES.mid.r + 200 }, 4);
   const U = {
     tHard: { value: HM.tex }, uBbHard: { value: new THREE.Vector4(HM.box.x0, HM.box.z0, 1 / (HM.box.x1 - HM.box.x0), 1 / (HM.box.z1 - HM.box.z0)) },
-    tCore: { value: gridTexture(G.core) }, tCity: { value: gridTexture(G.city) },
+    // [mobile-perf] the phone drops the two shore-distance grids' CPU copies (4.8 MB each) once they are on the GPU
+    tCore: { value: ctx.quality?.phone ? freeDataOnUpload(gridTexture(G.core)) : gridTexture(G.core) }, tCity: { value: ctx.quality?.phone ? freeDataOnUpload(gridTexture(G.city)) : gridTexture(G.city) },
     uBbCore: { value: box(G.core) }, uBbCity: { value: box(G.city) },
     // [v3:fix] a touch less saturated (the bay read as flat poster blue); depth + wind bands carry the variation
     uShallow: { value: C(o.shallow || '#83c2bd') }, uMid: { value: C(o.mid || '#4a8fac') }, uDeep: { value: C(o.deep || '#336d95') }, uOcean: { value: C(o.ocean || '#2d5f88') },
@@ -43,13 +46,16 @@ export function waterMaterial(ctx, o = {}) {
     // [v3:integrate] mirror sky after sunset + warm light streaks from the lit waterfront at night
     uSkyZenith: sky?.uZenith || { value: C('#4d86cf') }, uSkySun: sky?.uSun || { value: new THREE.Vector3(0, 1, 0) },
     uSeasonW: seasonUniform(ctx.shared),   // [v3:integrate] winter: colder, deeper sea
-    uMornW: sky?.uMorning || { value: 0 },   // [v3:polish3] 朝: a paler pearl sheen
+    uMornW: sky?.uMorning || { value: 0 },   // pre-sunrise weight only; the bay stays deep blue after 06:00
+    uRainW: ctx.shared?.uRain || { value: 0 },   // [live r2] darker grey-blue water in the rain
   };
   const m = new THREE.MeshToonMaterial({ color: C('#ffffff'), gradientMap: ctx.mat.gradientMap });
+  m.side = THREE.DoubleSide;   // [play:underwater] the underside is the surface you look up at. Compiled from the start, so the dive does not hitch.
   m.name = 'water-bay';
   m.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, U);
-    sh.uniforms.uTime = ctx.shared.uTime; sh.uniforms.uSunW = ctx.shared.uSunDir; sh.uniforms.uWindW = ctx.shared.uWind;
+    sh.uniforms.uTm = ctx.shared.uTime; sh.uniforms.uRipple = ctx.shared.uRipple || { value: 1 };
+    sh.uniforms.uSunW = ctx.shared.uSunDir; sh.uniforms.uWindW = ctx.shared.uWind;
     sh.uniforms.uLampsW = ctx.shared.uLamps || { value: 0 };   // [v3:integrate] life's lamps factor (compiled after life built)
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vWp;')
@@ -59,9 +65,10 @@ export function waterMaterial(ctx, o = {}) {
       .replace('#include <lights_fragment_begin>', THREE.ShaderChunk.lights_fragment_begin.split('( directLight.visible && receiveShadow ) ? getShadow(').join('( directLight.visible && receiveShadow ) ? 0.6 + 0.4 * getShadow('))
       .replace('#include <common>', `#include <common>
         varying vec3 vWp;
-        uniform sampler2D tCore, tCity, tHard; uniform vec4 uBbCore, uBbCity, uBbHard; uniform float uTime, uNightW;
+        uniform sampler2D tCore, tCity, tHard; uniform vec4 uBbCore, uBbCity, uBbHard; uniform float uTm, uRipple, uNightW;
+        #define uTime (uTm*uRipple)
         uniform vec3 uShallow, uMid, uDeep, uOcean, uRiver, uFoam, uSkyHorizon, uSkyMid, uSkyWarm, uSunW; uniform vec2 uWindW;
-        uniform vec3 uSkyZenith, uSkySun; uniform float uLampsW, uDuskW, uMornW; uniform vec4 uSeasonW;
+        uniform vec3 uSkyZenith, uSkySun; uniform float uLampsW, uDuskW, uMornW, uRainW; uniform vec4 uSeasonW;
         float w_h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
         float w_vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
           return mix(mix(w_h21(i), w_h21(i + vec2(1, 0)), f.x), mix(w_h21(i + vec2(0, 1)), w_h21(i + vec2(1, 1)), f.x), f.y); }
@@ -92,6 +99,22 @@ export function waterMaterial(ctx, o = {}) {
           float dist = length(vWp - cameraPosition);
           // colour bands by distance from the shore (anime: few flat bands with soft 1.5 m transitions)
           float d = max(sdf, 0.0);
+          // [sys:20] the river seam: the grid's river-to-sea class boundary (grids.bin, z -378..-372 at the 鹿折川 mouth) is a straight line across the
+          // channel. Four taps of the class field at +-6 m tell how close the 'inland water' class is on the SEA side of it; there the pale shoal
+          // and both foam lines are dropped and the tone blends into the river's, so the water is one continuous surface (Earth 2026-03-11)
+          float nearR = 0.0, nearF = 0.0;
+          {
+            vec2 r0 = w_field(xz + vec2(6.0, 0.0)), r1 = w_field(xz - vec2(6.0, 0.0)), r2 = w_field(xz + vec2(0.0, 6.0)), r3 = w_field(xz - vec2(0.0, 6.0));
+            nearR = max(max(smoothstep(1.2, 1.8, r0.g), smoothstep(1.2, 1.8, r1.g)), max(smoothstep(1.2, 1.8, r2.g), smoothstep(1.2, 1.8, r3.g)));
+            // the seam's foam line runs a little past the channel's own width: a second ring of taps at 16 m
+            vec2 q0 = w_field(xz + vec2(16.0, 0.0)), q1 = w_field(xz - vec2(16.0, 0.0)), q2 = w_field(xz + vec2(0.0, 16.0)), q3 = w_field(xz - vec2(0.0, 16.0));
+            nearR = max(nearR, 0.8 * max(max(smoothstep(1.2, 1.8, q0.g), smoothstep(1.2, 1.8, q1.g)), max(smoothstep(1.2, 1.8, q2.g), smoothstep(1.2, 1.8, q3.g))));
+            // and a third ring at 40 m for the foam only: the straight shore line across the mouth (the grid's class seam) is wider than the ribbon
+            vec2 f0 = w_field(xz + vec2(40.0, 0.0)), f1 = w_field(xz - vec2(40.0, 0.0)), f2 = w_field(xz + vec2(0.0, 40.0)), f3 = w_field(xz - vec2(0.0, 40.0));
+            nearF = max(nearR, max(max(smoothstep(1.2, 1.8, f0.g), smoothstep(1.2, 1.8, f1.g)), max(smoothstep(1.2, 1.8, f2.g), smoothstep(1.2, 1.8, f3.g))));
+            nearR *= step(0.0, sdf) * (1.0 - river); nearF *= step(0.0, sdf) * (1.0 - river);
+          }
+          d = max(d, mix(d, 6.0, nearR));
           // [v3:fix] hard shores (quays, seawalls) have no shoal: deep harbour water right up to the wall
           vec2 uh = (xz - uBbHard.xy) * uBbHard.zw;
           float hard = texture2D(tHard, clamp(uh, 0.0, 1.0)).r * step(0.0, uh.x) * step(uh.x, 1.0) * step(0.0, uh.y) * step(uh.y, 1.0);
@@ -107,7 +130,11 @@ export function waterMaterial(ctx, o = {}) {
           // [v5:fix2] a deeper navy along the quay walls and seawalls (Google Earth 2026-03-11: the bay is darkest at the
           // walls; the open bay stays the anime blue)
           col = mix(col, uDeep * vec3(0.78, 0.82, 0.9), smoothstep(0.35, 0.8, hard) * (1.0 - smoothstep(3.0, 36.0, d)) * 0.55);
+          col = mix(col, uRiver, nearR * 0.85);   // [sys:20] the sea side of the seam takes the river's tone
           col = mix(col, uRiver, river);
+          float rainK = smoothstep(0.02, 0.42, clamp(uRainW, 0.0, 1.0));   // [live r2] light rain is already most of the way to the grey bay
+          col = mix(col, vec3(0.13, 0.24, 0.32), rainK * 0.84);
+          col *= mix(1.0, 0.7, rainK);
           col = mix(col, col * vec3(0.72, 0.84, 0.92), uSeasonW.w);   // [v3:integrate] winter sea
           col = mix(col, vec3(dot(col, vec3(0.3, 0.5, 0.2))) * vec3(0.9, 0.97, 1.08), uSeasonW.w * 0.45);   // [v3:fix] desaturated winter sea
           // [v3:fix] wind bands: broad slow patches of ruffled (lighter, greyer) and glassy (deeper) water, like cat's paws
@@ -163,7 +190,7 @@ export function waterMaterial(ctx, o = {}) {
           float lw = mix(0.1, 0.35, smoothstep(8.0, 90.0, dist));
           float dashes = smoothstep(0.3, 0.55, w_vn(xz * 0.11 + vec2(uTime * 0.05, 0.0) + 5.0));
           float line2 = smoothstep(lw, 0.0, abs(sdf - (2.2 + lap * 1.6))) * smoothstep(0.35, 0.65, n) * 0.85 * dashes * mix(0.45, 1.0, coreK);
-          float foam = max(line1, line2) * step(0.0, sdf + 0.3) * (1.0 - river) * (1.0 - smoothstep(600.0, 2500.0, dist));
+          float foam = max(line1, line2) * step(0.0, sdf + 0.3) * (1.0 - river) * (1.0 - nearF) * (1.0 - smoothstep(600.0, 2500.0, dist));   // [sys:20] no foam at the river seam
           foam *= 1.0 - smoothstep(0.35, 0.75, hard);   // [v3:fix] quay faces carry their own thin foam strip (harbor quay.js)
           col = mix(col, uFoam, foam);
           // sky reflection + sun sparkles (emissive, so they survive the cel ramp and bloom)
@@ -178,9 +205,9 @@ export function waterMaterial(ctx, o = {}) {
           // haze line: low promenade / boat / drone views read the lower frame as a pale white sheet
           vec3 skyC = mix(mix(uSkyHorizon, uSkyMid, 0.35), uSkyMid, smoothstep(0.0, 0.5, R.y));
           skyC = mix(skyC, uSkyZenith, smoothstep(0.45, 1.0, R.y) * afterglow);
-          skyC = mix(skyC, uSkyWarm, pow(sd, 3.0) * 0.7);
-          skyC = mix(skyC, mix(uSkyHorizon, vec3(0.93, 0.88, 0.9), 0.35), uMornW * 0.45);   // [v3:polish3] pearl morning sheen
-          diffuseColor.rgb = mix(col, skyC * 0.92, (fres * (0.42 + 0.4 * afterglow + 0.3 * uMornW) + afterglow * 0.14 + uMornW * 0.16) * (1.0 - foam));
+          skyC = mix(skyC, uSkyWarm, pow(sd, 3.0) * 0.7 * (1.0 - rainK));
+          // [live r2] no pearl veil over the morning bay. Sun glitter (below) is the light on the water.
+          diffuseColor.rgb = mix(col, skyC * 0.92, (fres * (0.42 + 0.4 * afterglow) + afterglow * 0.14) * (1.0 - foam) * (1.0 - 0.82 * rainK));
           gWaterEmis = skyC * afterglow * (0.08 + 0.42 * fres) * (1.0 - foam);
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.12 + 0.03, ripL * (1.0 - foam));
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.84, 0.86, 0.94), ripD * (1.0 - foam));
@@ -231,10 +258,12 @@ export function waterMaterial(ctx, o = {}) {
           float twinkle = step(0.93, sp) * smoothstep(0.93, 1.0, sp) * max(dash, crs * 0.8) * blink * 1.6;
           float path = pow(sd, 60.0) * 2.0 + pow(sd, 8.0) * 0.18;
           float glit = twinkle * pow(sd, 48.0) * 4.0 * lod + path * (0.3 + streak * 0.6);   // [v3:fix] no swell term: its noise contours drew ghost ellipses in the sun path
+          glit *= 1.0 - rainK * 0.94;   // [live r2] no hard sun path in the rain
           gWaterEmis += mix(vec3(1.0, 0.95, 0.85), uSkyWarm * 1.3, 0.4) * glit * (1.0 - uNightW * 0.85) * (1.0 - foam);
           gWaterEmis *= 1.0 - river * 0.6;
         }`)
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance += gWaterEmis;');
+    applySwimFog(sh, 'vWp', SNELL);   // [play:underwater]
   };
   m.customProgramCacheKey = () => 'klc-water';
   return m;

@@ -40,14 +40,42 @@ export function convertible(m) {
 const sideName = (m) => (m.side === THREE.DoubleSide ? 'double' : m.side === THREE.BackSide ? 'back' : 'front');
 function attrSig(g) { return Object.keys(g.attributes).sort().map((k) => k + g.attributes[k].itemSize).join(','); }
 const nextCap = (need, cur) => { let c = Math.max(cur, 4096); while (c < need) c = Math.ceil(c * 1.6); return c; };
+/** [smooth] the most vertices a stream pool takes before the next part of its kind opens a new one */
+export const CHUNK_V = 1 << 17;
 const IDENTITY = new THREE.Matrix4();
 const _pm = new THREE.Matrix4(), _fr = new THREE.Frustum(), _cp = new THREE.Vector3();
+
+// [smooth] A pool draws its material through a view of its own (an object whose prototype is the material: it reads every property, now
+// and later). three.js keeps one program state per material object: a kit material drawn on the static batches (plain meshes) and on a
+// pool (a BatchedMesh) in the same frame switched program variant back and forth, a program check and its garbage each time (about ten a
+// frame, tools/perf/progchurn.page.js), and a pool's program compiled ahead (_warm) was overwritten by the plain one before it was used.
+const _views = new WeakMap();
+// [mobile-perf] A pool's slot fades in and out (a tile's full detail replacing its simplified buildings, StreamBatch.fade): the slot's instance
+// colour carries the fade in its alpha (BatchedMesh per-instance colours: vColor.a in the shader) and a screen-door dither (interleaved gradient
+// noise) keeps that share of the fragments. Opaque materials stay opaque: no blending, no sorting, the depth buffer as before.
+export const FADE_GLSL = /* glsl */`
+#ifdef USE_BATCHING_COLOR
+  if ( vColor.a < 0.999 ) { float klcFz = fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) ); if ( klcFz >= vColor.a ) discard; }
+#endif`;
+export function batchedView(m) {
+  let v = _views.get(m);
+  if (!v) {
+    v = Object.create(m);
+    const base = m.onBeforeCompile, key = m.customProgramCacheKey;
+    v.onBeforeCompile = function (sh, r) { base.call(this, sh, r); sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>' + FADE_GLSL); };
+    v.customProgramCacheKey = function () { return key.call(this) + '|fade'; };
+    _views.set(m, v);
+  }
+  return v;
+}
+const _c4 = new THREE.Vector4();
 
 /** One BatchedMesh per material + render flags; its instances are slots (a kit tile, or a block of coarse tiles). */
 class Pool {
   constructor(root, proto, material, name, mark) {
     this.material = material; this.mark = mark;   // mark(pool, slot): queue a slot for a rebuild (StreamBatch's FIFO)
-    this.verts = nextCap(proto.v * 3, 1 << 14); this.index = nextCap(proto.i * 3, 1 << 15); this.inst = 32;
+    // (a second chunk of a kind starts at half a chunk: that kind is known to fill one, so it grows once at most instead of five times)
+    this.verts = nextCap(proto.v * 3, proto.chunk ? CHUNK_V >> 1 : 1 << 14); this.index = nextCap(proto.i * 3, proto.chunk ? CHUNK_V : 1 << 15); this.inst = proto.chunk ? 64 : 32;
     const bm = new THREE.BatchedMesh(this.inst, this.verts, this.index, material);
     // no per-instance culling inside three (it re-uploads the draw list once per pool per render pass); the slots are
     // culled once a frame by StreamBatch.cull instead
@@ -55,12 +83,31 @@ class Pool {
     bm.castShadow = proto.cast; bm.receiveShadow = proto.receive; bm.layers.mask = proto.mask; bm.renderOrder = proto.order;
     bm.userData.noBatch = true; bm.userData.dynamic = true;
     this.bm = bm; this.slots = new Map(); this.liveV = 0; this.liveI = 0; this.used = 0; this.optimized = 0; this.grown = 0;
+    this.partsV = 0;   // [smooth] the vertices of every part it holds, drawn or not (StreamBatch.add opens a new chunk past CHUNK_V)
     root.add(bm);
   }
   slot(key) { let s = this.slots.get(key); if (!s) this.slots.set(key, (s = { key, parts: new Map(), gid: -1, iid: -1, resV: 0, resI: 0, v: 0, i: 0, sphere: null, culled: false, shown: false })); return s; }
-  addPart(slotKey, entryKey, geo, visible) { const s = this.slot(slotKey); s.parts.set(entryKey, { geo, visible }); this.mark(this, s); }
-  removePart(slotKey, entryKey) { const s = this.slots.get(slotKey); if (s && s.parts.delete(entryKey)) this.mark(this, s); }
+  addPart(slotKey, entryKey, geo, visible) { const s = this.slot(slotKey), old = s.parts.get(entryKey); if (old) this.partsV -= old.geo.attributes.position.count; s.parts.set(entryKey, { geo, visible }); this.partsV += geo.attributes.position.count; this.mark(this, s); }
+  removePart(slotKey, entryKey) { const s = this.slots.get(slotKey), p = s?.parts.get(entryKey); if (p && s.parts.delete(entryKey)) { this.partsV -= p.geo.attributes.position.count; this.mark(this, s); } }
   setPartVisible(slotKey, entryKey, v) { const s = this.slots.get(slotKey), p = s?.parts.get(entryKey); if (p && p.visible !== v) { p.visible = v; this.mark(this, s); } }
+  /** [mobile-perf] A slot's fade (0 hidden .. 1 whole), kept for its next instance. */
+  setFade(slotKey, a) { const s = this.slots.get(slotKey); if (!s) return; s.fadeA = a; if (s.iid >= 0) this.bm.setColorAt(s.iid, _c4.set(1, 1, 1, a)); }
+  /** [mobile-perf] Nothing left in it (every tile that used it unloaded). */
+  get empty() { return this.slots.size === 0 && this.partsV === 0; }
+  /** [mobile-perf] Far below its capacity: its buffers grew for a place the session has left. */
+  get slack() { return this.verts > (1 << 15) && this.liveV < this.verts * 0.3 && this.liveI < this.index * 0.3; }
+  /** [mobile-perf] Compact and shrink the buffers to what is live, with room to grow (a copy and one upload of the smaller buffers). */
+  shrink() {
+    const bm = this.bm;
+    bm.optimize(); this.optimized++;
+    const v = Math.max(1 << 14, Math.ceil(this.liveV * 1.5), bm._nextVertexStart), i = Math.max(1 << 15, Math.ceil(this.liveI * 1.5), bm._nextIndexStart);
+    if (v >= this.verts && i >= this.index) return false;
+    bm.setGeometrySize(Math.min(v, this.verts), Math.min(i, this.index));
+    this.verts = Math.min(v, this.verts); this.index = Math.min(i, this.index); this.shrunk = (this.shrunk || 0) + 1;
+    return true;
+  }
+  /** [mobile-perf] Free the BatchedMesh (its buffers, its data textures); the shared material stays. */
+  dispose() { this.bm.removeFromParent(); this.bm.dispose(); this.slots.clear(); }
   _ensure(nv, ni) {
     const bm = this.bm;
     const fits = () => bm._nextVertexStart + nv <= this.verts && bm._nextIndexStart + ni <= this.index;
@@ -92,6 +139,8 @@ class Pool {
       this._ensure(rv, ri);
       if (this.used + 1 >= this.inst) { this.inst *= 2; this.bm.setInstanceCount(this.inst); }
       s.gid = this.bm.addGeometry(g, rv, ri); s.iid = this.bm.addInstance(s.gid);
+      this.bm.setColorAt(s.iid, _c4.set(1, 1, 1, s.fadeA ?? 1));   // [mobile-perf] the slot's fade (1: opaque)
+      if (this.onFirst) { const f = this.onFirst; this.onFirst = null; f(); }   // [smooth] its geometry has its attributes now: compile ahead (StreamBatch._warm)
       s.resV = rv; s.resI = ri; this.liveV += rv; this.liveI += ri; this.used++; s.shown = true;
     }
     if (!g.boundingSphere) g.computeBoundingSphere();
@@ -132,7 +181,9 @@ class Merged {
     const old = this.mesh.geometry;
     this.mesh.geometry = geos.length ? (geos.length === 1 ? geos[0].clone() : mergeGeometries(geos, false) || new THREE.BufferGeometry()) : new THREE.BufferGeometry();
     this.mesh.geometry.computeBoundingSphere();
-    this.mesh.visible = geos.length > 0;
+    this.mesh.userData.wantVisible = geos.length > 0;
+    if (geos.length && this.onFirst) { const f = this.onFirst; this.onFirst = null; f(); }   // [smooth] compile ahead now that it has its attributes
+    this.mesh.visible = geos.length > 0 && !this.mesh.userData.warming;   // [smooth] held back while its program compiles (StreamBatch._warm)
     old.dispose();
     return true;
   }
@@ -146,6 +197,7 @@ export class StreamBatch {
     this.root.userData.noBatch = true;
     ctx.add(this.root);
     this.pools = new Map(); this.merged = new Map(); this.shared = new Map();
+    this.open = new Map(); this.chunks = new Map();   // [smooth] signature -> the key of its open chunk / how many chunks it has
     this.entries = new Map();   // key -> { slot, pools: Set, merged: Set, holder, visible, verts }
     // [v4:polish3] one FIFO of slots to rebuild across every pool, tagged with the change (op) that dirtied them first.
     // flush() under a time budget only stops between ops, so the pools of one change (a tile's kit shown and its
@@ -156,8 +208,30 @@ export class StreamBatch {
     this._mark = (pool, s) => { const q = this.queue.get(s); if (q && q.op === this.op) return; if (q) this.queue.delete(s); this.queue.set(s, { pool, op: this.op }); };
     this.name = name;
     this.lastCull = null;
+    this.trimEvery = 30; this._trimTick = 0; this.trimmed = { freed: 0, shrunk: 0 };   // [mobile-perf] trim(): about twice a second at 60 fps
+    this._fading = new Set(); this.fadeMs = 350;   // [mobile-perf] fade(): entries mid-fade; 0 ms (shot mode, settle) applies the end at once
   }
   has(key) { return this.entries.has(key); }
+  /** [smooth] A new pool (a material the streamed tiles had not used yet) is held back until its program is compiled, off the main thread
+   *  (renderer.compileAsync, KHR_parallel_shader_compile): drawn at once, its first frame stalled while the driver compiled it (the drive's
+   *  runtime compiles in docs/perf/BASELINE.md). The tile's other parts show as before; this material's part a few frames later. */
+  _warm(obj) {
+    const r = this.ctx?.renderer, cam = this.ctx?.camera, scene = this.ctx?.scene;
+    if (!this.warmNew || !r || typeof r.compileAsync !== 'function' || !cam || !scene) return;   // (main.js turns it on after the load: the load compiles everything itself)
+    obj.userData.warming = true;
+    const was = obj.visible; obj.visible = false;
+    const done = () => { if (!obj.userData.warming) return; obj.userData.warming = false; if (obj.isBatchedMesh) obj.visible = was; else obj.visible = obj.userData.wantVisible ?? false; };
+    const prevRT = r.getRenderTarget?.() ?? null, rt = this.ctx.pipeline?.targets?.rtColor ?? null;
+    try {
+      obj.visible = true;   // (compile only looks at objects that would be drawn)
+      // the colour pass draws into the linear HDR target: compiled against the canvas (sRGB output) it would be another program, unused
+      if (rt) r.setRenderTarget(rt);
+      const pr = r.compileAsync(obj, cam, scene);
+      if (rt) r.setRenderTarget(prevRT);
+      obj.visible = false;
+      Promise.race([pr, new Promise((res) => setTimeout(res, 3000))]).then(done, done);   // never held back more than 3 s
+    } catch (e) { done(); }
+  }
   /** Run fn() as one change: every slot it dirties is rebuilt in the same flush. */
   group(fn) { if (!this.grouping) this.op++; this.grouping++; try { return fn(); } finally { this.grouping--; } }
   _next() { if (!this.grouping) this.op++; }
@@ -168,7 +242,7 @@ export class StreamBatch {
     let target = m, bake = null;
     if (mat && convertible(m)) {
       let sig;
-      if (m.isMeshToonMaterial) { const t = m.userData.toon; sig = `T|${m.map ? m.map.uuid : 'none'}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${t.paint}|${t.grime}|${t.polygonOffset}|${m.emissive.getHexString()}|${m.emissiveIntensity}`; }
+      if (m.isMeshToonMaterial) { const t = m.userData.toon; sig = `T|${m.map ? m.map.uuid : 'none'}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${t.paint}|${t.grime}|${t.polygonOffset}|${t.noDormant ? 'nd' : ''}|${m.emissive.getHexString()}|${m.emissiveIntensity}`; }
       else sig = `B|${m.map ? m.map.uuid : 'none'}|${sideName(m)}|${m.transparent}|${m.opacity}|${m.alphaTest}|${m.depthWrite}|${m.fog}|${m.toneMapped}`;
       let sm = this.shared.get(sig);
       if (!sm) {
@@ -176,6 +250,7 @@ export class StreamBatch {
         const side = sideName(m); if (side !== 'front') common.side = side;
         if (m.isMeshToonMaterial) {
           const t = m.userData.toon, opts = { ...common, paint: t.paint, grime: t.grime };
+          if (t.noDormant) opts.noDormant = true;   // [r3:7]
           if (t.polygonOffset) opts.polygonOffset = t.polygonOffset;
           if (m.emissive && (m.emissive.r || m.emissive.g || m.emissive.b)) { opts.emissive = '#' + m.emissive.getHexString(); opts.emissiveIntensity = m.emissiveIntensity; }
           sm = mat.toon('#ffffff', opts);
@@ -239,18 +314,23 @@ export class StreamBatch {
       if (mk) { let b = byMerge.get(mk); if (!b) byMerge.set(mk, (b = { o, geos: [] })); b.geos.push(o.geometry); return; }
       keep.push(o);
     });
-    const e = { slot: slot || key, pools: new Set(), merged: new Set(), holder: null, visible, verts: 0 };
+    const e = { key, slot: slot || key, pools: new Set(), merged: new Set(), holder: null, visible, verts: 0 };
     for (const [sig, b] of bySig) {
       const geo = b.geos.length === 1 ? b.geos[0] : mergeGeometries(b.geos, false);
       if (!geo) continue;
-      let pool = this.pools.get(sig);
-      if (!pool) { pool = new Pool(this.root, { v: geo.attributes.position.count, i: geo.index.count, cast: b.o.castShadow, receive: b.o.receiveShadow, mask: b.o.layers.mask, order: b.o.renderOrder | 0 }, b.material, this.name + ':' + (b.material.name || b.o.name || ''), this._mark); this.pools.set(sig, pool); }
+      // [smooth] chunks: a pool past CHUNK_V vertices is full and the next part of this kind opens a new one. Growing a pool copies and
+      // re-uploads all of it (three's setGeometrySize, optimize): the drive's 20-50 ms 'batching' stalls were one pool growing to 700 k
+      // vertices; capped, the largest copy is CHUNK_V. (One more draw per chunk and pass.)
+      const nv = geo.attributes.position.count;
+      let pk = this.open.get(sig) || sig, pool = this.pools.get(pk);
+      if (pool && pool.partsV > 0 && pool.partsV + nv > CHUNK_V) { const n = (this.chunks.get(sig) || 0) + 1; this.chunks.set(sig, n); pk = sig + '#' + n; this.open.set(sig, pk); pool = null; }
+      if (!pool) { pool = new Pool(this.root, { chunk: pk !== sig, v: geo.attributes.position.count, i: geo.index.count, cast: b.o.castShadow, receive: b.o.receiveShadow, mask: b.o.layers.mask, order: b.o.renderOrder | 0 }, batchedView(b.material), this.name + ':' + (b.material.name || b.o.name || ''), this._mark); this.pools.set(pk, pool); pool.onFirst = () => this._warm(pool.bm); }   // (after its first geometry: an empty BatchedMesh has no normals yet, another program)
       pool.addPart(e.slot, key, geo, visible);
       e.pools.add(pool); e.verts += geo.attributes.position.count;
     }
     for (const [mk, b] of byMerge) {
       let mg = this.merged.get(mk);
-      if (!mg) { mg = new Merged(this.root, b.o, this.name + ':' + (b.o.name || b.o.material.name || 'custom')); this.merged.set(mk, mg); }
+      if (!mg) { mg = new Merged(this.root, b.o, this.name + ':' + (b.o.name || b.o.material.name || 'custom')); this.merged.set(mk, mg); mg.onFirst = () => this._warm(mg.mesh); }   // (after its first geometry, as for a pool)
       for (const g of b.geos) { mg.add(key, g, visible); e.verts += g.attributes.position.count; }
       e.merged.add(mg);
     }
@@ -274,16 +354,49 @@ export class StreamBatch {
   remove(key) {
     const e = this.entries.get(key); if (!e) return;
     this._next();
+    if (e.fade) { e.fade = null; this._fading.delete(key); }   // [mobile-perf] a fade's end never runs for a removed entry
     for (const p of e.pools) p.removePart(e.slot, key);
     for (const m of e.merged) m.remove(key);
     // kept meshes: free their GPU buffers (a geometry shared with the static town is simply uploaded again when drawn)
     if (e.holder) { e.holder.traverse((o) => { o.geometry?.dispose?.(); if (o.isInstancedMesh) o.dispose?.(); }); e.holder.removeFromParent(); }
     this.entries.delete(key);
   }
+  /** [mobile-perf] Fade an entry with a slot of its own (a kit tile) from `from` to `to` (0 hidden, 1 whole) over `ms` (default fadeMs), then
+   *  call `done`. Its pool parts fade by dither; its merged parts (lit windows, wires) and kept meshes show at the end of a fade in and go at
+   *  the start of a fade out. An entry in a shared block slot cannot fade: its end is applied at once. -> true when a fade started */
+  fade(key, from, to, done = null, ms = this.fadeMs) {
+    const e = this.entries.get(key);
+    if (!e) { done?.(); return false; }
+    if (e.fade) { e.fade = null; this._fading.delete(key); }
+    const own = e.slot === key;
+    if (!(ms > 0) || !own) { this._applyFade(e, to); done?.(); return false; }
+    this._applyFade(e, from);
+    e.fade = { from, to, t0: performance.now(), ms, done };
+    this._fading.add(key);
+    return true;
+  }
+  _applyFade(e, a) {
+    for (const p of e.pools) p.setFade(e.slot, a);
+    const whole = a >= 0.999;
+    for (const m of e.merged) m.setVisible(e.key, whole && e.visible);
+    if (e.holder) e.holder.visible = whole && e.visible;
+    e.fadeA = a;
+  }
+  /** Advance the fades (flush runs it every frame). */
+  tickFades(now = performance.now()) {
+    for (const key of this._fading) {
+      const e = this.entries.get(key), f = e?.fade;
+      if (!f) { this._fading.delete(key); continue; }
+      const u = Math.min(1, Math.max(0, (now - f.t0) / f.ms));
+      this._applyFade(e, f.from + (f.to - f.from) * u);
+      if (u >= 1) { this._fading.delete(key); e.fade = null; f.done?.(); }
+    }
+  }
   /** Rebuild the slots and merged meshes that changed (within `budget` ms; the rest waits for the next frame); keep
    *  the wires' screen size current. -> slots still dirty */
   flush(size = null, budget = Infinity) {
     const t0 = performance.now();
+    if (this._fading.size) this.tickFades(t0);   // [mobile-perf]
     let op = null;
     for (const [s, q] of this.queue) {
       // over budget: stop, but only between two changes (never half a change drawn)
@@ -294,8 +407,27 @@ export class StreamBatch {
     }
     const left = this.queue.size;
     for (const m of this.merged.values()) { m.flush(); if (size && m.mesh.material.uniforms?.uRes) m.mesh.material.uniforms.uRes.value.set(size.x, size.y); }
+    if (++this._trimTick >= this.trimEvery) { this._trimTick = 0; this.trim(left ? new Set([...this.queue.values()].map((q) => q.pool)) : null); }   // [mobile-perf] (a pool with a rebuild waiting is left for the next round)
     if (this.lastCull) this._cull(this.lastCull.camera, this.lastCull.keep);
     return left;
+  }
+  /** [mobile-perf] Give back the memory of places the session has left. A pool's buffers only ever grew, and a pool emptied by unloads stayed
+   *  allocated: a 3-minute phone roam took the stream from 9 pools / 0.57 M vertices of capacity to 80 / 3.45 M (live: 0.29 M), ~150 MB on the
+   *  GPU and twice that in CPU copies. Now an empty pool is freed and one under 30 % full is compacted to 1.5 x what it holds (one a call).
+   *  flush() runs it every `trimEvery` calls, leaving out the pools a waiting rebuild will touch (busy). -> { freed, shrunk } */
+  trim(busy = null) {
+    let freed = 0, shrunk = 0;
+    for (const [k, p] of this.pools) {
+      if (busy && busy.has(p)) continue;
+      if (p.empty) {
+        p.dispose(); this.pools.delete(k); freed++;
+        for (const [sig, ok] of this.open) if (ok === k) this.open.delete(sig);
+        continue;
+      }
+      if (!shrunk && p.slack) { try { if (p.shrink()) shrunk++; } catch (e) { console.warn('[sbatch] shrink', e); } }
+    }
+    this.trimmed.freed += freed; this.trimmed.shrunk += shrunk;
+    return { freed, shrunk };
   }
   /** View culling per slot, once a frame for the main camera: a slot wholly outside the view frustum and farther than
    *  `keep` m (it could still throw a shadow into the view closer in) is left out of every pass. camera = null shows
@@ -355,6 +487,6 @@ export class StreamBatch {
     for (const p of this.pools.values()) { cap += p.verts; optimized += p.optimized; grown += p.grown; for (const s of p.slots.values()) { verts += s.v; slots++; if (s.shown) shown++; } }
     for (const m of this.merged.values()) verts += m.verts;
     for (const e of this.entries.values()) if (e.holder) holders += e.holder.children.length;
-    return { pools: this.pools.size, merged: this.merged.size, entries: this.entries.size, slots, shown, verts, capacity: cap, holders, optimized, grown, pending: this.queue.size };
+    return { pools: this.pools.size, merged: this.merged.size, entries: this.entries.size, slots, shown, verts, capacity: cap, holders, optimized, grown, pending: this.queue.size, freed: this.trimmed.freed, shrunk: this.trimmed.shrunk };
   }
 }

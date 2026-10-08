@@ -45,9 +45,6 @@
    "h0": 1.0,
    "h1": 2.64,
    "list": [
-    6.15,
-    10.1,
-    14.05,
     20.91,
     24.82,
     29.27,
@@ -63,9 +60,6 @@
     94.9,
     98.99,
     103.08,
-    108.9,
-    112.85,
-    116.8,
     122.72,
     126.56,
     130.36,
@@ -77,18 +71,16 @@
     157.97
    ],
    "vents": [
-    10.1,
     24.82,
     39.67,
     54.53,
     69.19,
     98.99,
-    112.85,
     126.56,
     140.57,
     154.25
    ],
-   "src": "24 centres measured on the wall plane (deck.window#1-24, IMG_0792 / 0795 / 0798); the triplets at s 6-14 and 109-117 by the 14.4 m triplet period (no photo sees them square-on)"
+   "src": "24 centres measured on the wall plane (deck.window#1-24, IMG_0792 / 0795 / 0798) and nothing else is built. The earlier build added six by the 14.4 m triplet period (30 windows): the triplet at s 6-14 is plain wall in IMG_0792 (every other window there shows as a dark strip), and the one at s 109-117 is visible in IMG_0794 but only at the frame edge at a grazing angle (a ray cut of its windows is 4-5 m off), so its positions are not measured and it is left out; count 24"
   },
   "vents": {
    "w": 1.6,
@@ -374,8 +366,8 @@
    },
    {
     "s": [
-     151.7,
-     160.0
+     149.65,
+     157.95
     ],
     "o": [
      13.7,
@@ -384,7 +376,7 @@
     "outer": "S"
    }
   ],
-  "src": "6.6 m wide, 8.3 m long (#6 6.9 m): #4 from IMG_0793 (SW corner s 73.56 / off 13.7, south face 6.6 m wide, plinth 0.79 / glass 2.1 / fascia 2.5 / raised roof end 3.6-3.8 m, cut on the measured face plane); pair 3 (#5, #6) from an edge fit of the well-registered IMG_0794 / 0796 / 0798 (best west face off 16, #5 north end s 94-95; #6 south end s 114.5 from its corner seen in all three, north end bounded by the stack S56 in the gap); IMG_0797 is not used (its pose is held only by its GPS fix: the cactus's plate cuts 7 m apart in IMG_0796 and IMG_0797, and the two photos' distances to it break the triangle inequality); pairs 1, 2, 4 centred on the GSI ortho (deck.pavilion#1-3, #7, #8, sigma 1.5 m), #8 clamped 1 m short of the studio face; outer (swept-up) ends alternate N / S within each pair (IMG_0793, 0797)"
+  "src": "6.6 m wide, 8.3 m long (#6 6.9 m): #4 from IMG_0793 (SW corner s 73.56 / off 13.7, south face 6.6 m wide, plinth 0.79 / glass 2.1 / fascia 2.5 / raised roof end 3.6-3.8 m, cut on the measured face plane); pair 3 (#5, #6) from an edge fit of the well-registered IMG_0794 / 0796 / 0798 (best west face off 16, #5 north end s 94-95; #6 south end s 114.5 from its corner seen in all three, north end bounded by the stack S56 in the gap); IMG_0797 is not used (its pose is held only by its GPS fix: the cactus's plate cuts 7 m apart in IMG_0796 and IMG_0797, and the two photos' distances to it break the triangle inequality); pairs 1, 2, 4 centred on the GSI ortho (deck.pavilion#1-3, #7, #8, sigma 1.5 m), #8 from the roof's curl tip triangulated in IMG_0794 / 0796 / 0798 (s 156.25 +- 0.8, off 14.0) combined with the ortho centre (s 159.7 +- 1.5): centre s 153.8, south end 3 m short of the studio face (the ortho centre alone put an 8.3 m pavilion 3 m into the studio); outer (swept-up) ends alternate N / S within each pair (IMG_0793, 0797)"
  },
  "stacks": {
   "r": 0.38,
@@ -427,7 +419,7 @@
     20.71
    ],
    [
-    150.1,
+    149.1,
     15.5,
     20.6
    ]
@@ -443,15 +435,25 @@
    716.33,
    1034.12
   ],
-  "src": "deck.lifeboat.end_n / end_s (trailer ends on the deck, IMG_0793); the hull's stencil reads 5.30 x 2.30 x 1.00 (L x B x D); the stern faces IMG_0793 6.4 m away (its keel, sheer, canopy and hatch-box tops 0.45 / 1.07 / 1.92 / 2.23 m above the deck at that range)",
-  "stern": 86.6,
+  "src": "[v6:fix2] the sheer edge (the navy rub rail) cut at its own height 1.07 in IMG_0793: s 84.5 / off 13.52 at the left end of the visible line, s 88.32 / off 13.76 at the frame edge, so the flank is at off 13.6 and the axis 3.6 deg off the wall line; the boat is 2.3 m wide (stencil 5.30 x 2.30 x 1.00), so its centreline stands at off 14.75 and the bow dome starts at s 84.0 (the first version put the boat 2.9 m too far north and 1.3 m too far east, and its end-on form was wrong: the photo shows its west flank, the stern notch toward the camera); the tower window edge cut at 2.23: s 86.5, off 14.25-14.97; trailer ends n / s are the deck picks of IMG_0793 (the trailer's frame, the stern end of the boat is cut by the frame edge)",
   "L": 5.3,
   "B": 2.3,
-  "off": 16.0,
+  "off": 14.75,
   "keel": 0.45,
   "sheer": 1.07,
   "canopy": 1.92,
-  "top": 2.23
+  "top": 2.23,
+  "color": "#e0432b",
+  "bow": 84.0,
+  "tilt": 3.6,
+  "tower": [
+   2.3,
+   3.95
+  ],
+  "trailer": [
+   0.2,
+   4.6
+  ]
  },
  "cones": [
   [
@@ -467,100 +469,349 @@
    1036.356
   ],
   [
-   713.056,
-   1039.146
+   713.35,
+   1038.69
   ]
  ],
  "hall": {
-  "floor": 2.19,
-  "soffit": 7.0,
-  "edgeBeam": 5.82,
-  "beam": 6.4,
-  "col": {
-   "at": [
-    556.49,
-    667.5
+  "quay": {
+   "p0": [
+    543.9,
+    590.4
    ],
-   "w": 0.7,
-   "d": -8.1,
+   "p1": [
+    647.0,
+    816.0
+   ]
+  },
+  "shift": 7.5,
+  "floor": 2.15,
+  "apron": 1.84,
+  "soffit": 11.2,
+  "edgeBeam": 7.2,
+  "face": -19.8,
+  "col": {
+   "a": 81.3,
+   "d": -21.75,
+   "w": 1.5,
+   "spacing": 21.6,
    "label": 7,
    "dir": -1,
-   "note": "column 「7」: its foot cut on the hall floor in IMG_0853 (d -7.5) and IMG_0860 (d -8.7), 8.1 m inside the face line (the roof overhangs the column line by 8 m; the outer beam band at the face is the T.P. 5.82 edge beam); a 62.2 m from the shed's south quay corner. No other column is in view over a 51.9-62.2, so the spacing is > 10.3 m: 15 m (12 bays) is assumed. The other numbers are taken to rise toward the north end (the photos show only 「7」)"
-  },
-  "src": "the north facility's quay hall (IMG_0853-0861, 06:53 dawn): floor T.P. 2.19 (canopy.floor_y), open from the quay face to the land-side wall (canopy.open_depth), the face edge beam's underside T.P. 5.82 (canopy.beam_bottom), a longitudinal girder over the column line (underside 6.4 where IMG_0855's dark band ends), a lighter beam band at d -4 (6.1), transverse beams over the columns",
-  "midBeam": {
-   "d": -4.0,
-   "bottom": 6.1
-  },
-  "spacing": 14.98,
-  "frame": {
-   "o": [
-    538.2,
-    607.5
+   "band": [
+    3.1,
+    3.85
    ],
-   "to": [
-    612.4,
-    771.3
+   "top": 7.5,
+   "wd": 0.3
+  },
+  "trans": {
+   "a0": 59.7,
+   "pitch": 21.6,
+   "w": 0.7,
+   "bottom": 7.76
+  },
+  "long": [
+   {
+    "d": -34.3,
+    "bottom": 7.72,
+    "w": 0.5
+   },
+   {
+    "d": -32.07,
+    "bottom": 6.92,
+    "w": 0.5
+   },
+   {
+    "d": -21.4,
+    "bottom": 7.55,
+    "w": 1.0
+   }
+  ],
+  "edge": {
+   "d": -19.8,
+   "bottom": 7.2,
+   "w": 0.5
+  },
+  "tubs": {
+   "h": 0.74,
+   "w": 1.19,
+   "l": 1.44,
+   "rows": [
+    {
+     "a0": 64.7,
+     "pitch": 1.23,
+     "n": 8,
+     "d0": -29.9
+    },
+    {
+     "a0": 65.5,
+     "pitch": 1.23,
+     "n": 4,
+     "d0": -35.5
+    }
+   ]
+  },
+  "conveyor": {
+   "belt": {
+    "a": [
+     70.0,
+     75.9
+    ],
+    "d": [
+     -23.0,
+     -21.2
+    ],
+    "y": [
+     0.39,
+     0.85
+    ]
+   },
+   "casters": [
+    [
+     75.02,
+     -21.95
+    ],
+    [
+     75.31,
+     -22.61
+    ],
+    [
+     69.83,
+     -21.95
+    ],
+    [
+     69.99,
+     -22.88
+    ],
+    [
+     68.06,
+     -21.07
+    ],
+    [
+     68.18,
+     -21.86
+    ]
+   ]
+  },
+  "sorter": {
+   "a": [
+    67.7,
+    70.0
    ],
-   "note": "a = metres along the quay face from its south corner, d = metres out from the face (east, + to the sea)"
+   "d": [
+    -22.3,
+    -20.9
+   ],
+   "y": [
+    0.45,
+    1.48
+   ],
+   "src": "[v6:fix3] the sorter at the conveyor's head cut in IMG_0855 (head fully in frame): its left casters (68.06 / 68.18, the survey's), left end 67.6-67.8, grate top T.P. 3.63 (floor + 1.48), channel top 2.8-2.9; 1.4 m wide between its casters' lines (the fix2 box, a 66-70 x d -24..-20.2, was twice as long and 2.7x as wide as the head in the photo)"
+  },
+  "hopper": {
+   "a": [
+    77.4,
+    81.8
+   ],
+   "d": [
+    -25.2,
+    -22.4
+   ],
+   "y": [
+    0.69,
+    1.56
+   ],
+   "legs": [
+    [
+     78.11,
+     -23.78
+    ],
+    [
+     79.44,
+     -24.21
+    ],
+    [
+     78.3,
+     -22.49
+    ]
+   ]
+  },
+  "stacks": [
+   {
+    "a": [
+     78.6,
+     79.85
+    ],
+    "d": [
+     -23.45,
+     -22.05
+    ],
+    "n": 4
+   },
+   {
+    "a": [
+     82.3,
+     83.55
+    ],
+    "d": [
+     -23.45,
+     -22.05
+    ],
+    "n": 4
+   },
+   {
+    "a": [
+     83.55,
+     84.8
+    ],
+    "d": [
+     -23.45,
+     -22.05
+    ],
+    "n": 4
+   }
+  ],
+  "truck": {
+   "front": [
+    80.41,
+    -5.39
+   ],
+   "rear": [
+    82.85,
+    -5.76
+   ],
+   "width": 1.695,
+   "cab": {
+    "l": 1.75,
+    "h": 1.95
+   },
+   "bed": {
+    "l": 3.0,
+    "h": 0.9,
+    "gate": 0.38
+   },
+   "overhang": [
+    0.95,
+    1.15
+   ]
+  },
+  "curb": {
+   "d": [
+    -0.5,
+    0.0
+   ],
+   "a": [
+    40.0,
+    150.0
+   ],
+   "h": 0.18
+  },
+  "bitts": {
+   "a0": 83.07,
+   "pitch": 9.65,
+   "n": [
+    -4,
+    6
+   ]
   },
   "clutterFree": [
-   35,
-   75
+   28,
+   125
   ],
-  "scaleWarning": "The dawn cluster's depth scale looks 2-3x short: at the solved ranges the 2 t truck's cab front (1.7 m) measures 0.8 m and the 1 t fish tubs 0.46 m wide (IMG_0855). Hall items closer than the quay face are therefore not placed from these photos (the tub rows, the conveyor); the bays they stand in are left free of the generic clutter."
+  "src": "the north facility's quay hall as the five dawn frames (IMG_0853-0861, 06:53) see it with the re-solved cameras (camera 5.0 m above the hall floor, 48 m from the quay edge, on the 2F gallery by the land wall; the truck's plate and wheelbase, the tub rows' 1.44 x 1.19 m rims and the quay line fix the scale, tools/survey/market_adjust.py canopy). Floor items are cut on their plane (tools/survey/market_hall.py, data/survey/market/hall-picks.json; the two camera stands agree to 0.01-0.05 m). Overhead: the lower edge of the transverse beam is fitted from both stands (a 59.7, bottom T.P. 7.76); the longitudinal beams are the one-parameter family along the quay (the stands' baseline runs along them): bottom 7.7 at d -34.3 / -27.7, the column girder 7.55 and the edge beam 7.2 from the line of the roof edge's shadow on the floor (d -34.5, 14.5 deg sun): roof edge at d -19.8. The shed outline is moved 7.5 m inland (the OSM way is traced on a roof 13 m up: relief displacement); the column grid is 21.6 m (a 14.4 m grid would put column 8 in the middle of IMG_0855 / 0861, where there is none; 21.6 m puts the next column on the measured transverse beam, a 59.7, and out of every frame); the floor falls smoothly from T.P. 2.15 to the apron's 1.84 (the tie points and the unbroken wet floor in IMG_0853 / 0855: no step); the ceiling slab is at T.P. 11.2: the near face of the transverse girder (a 59.7) fills IMG_0853 / 0861 up to the top of the frame, 10.5 m up at its nearest, so the beams are 3.5-4 m deep girders hanging from it",
+  "ramp": {
+   "d": [
+    -19.8,
+    -8.0
+   ]
+  },
+  "vessel": {
+   "hull": [
+    [
+     62.0,
+     0.4
+    ],
+    [
+     92.0,
+     0.4
+    ],
+    [
+     98.5,
+     2.2
+    ],
+    [
+     98.5,
+     4.2
+    ],
+    [
+     92.0,
+     6.0
+    ],
+    [
+     62.0,
+     6.0
+    ]
+   ],
+   "floor": 0.2,
+   "sheer": 3.5,
+   "house": {
+    "a": [
+     89.5,
+     95.0
+    ],
+    "d": [
+     1.2,
+     5.2
+    ],
+    "top": 5.65
+   },
+   "fin": {
+    "a": [
+     82.4,
+     84.6
+    ],
+    "d": [
+     2.4,
+     4.0
+    ],
+    "base": 5.1,
+    "top": 7.7
+   },
+   "src": "the white 20-30 m vessel 「KD1-875」 berthed at the curb (IMG_0853 / 0855 / 0861): sheer, deckhouse top and funnel-fin tip cut on the hull-side plane d = +2 (3.5 / 5.65 / 7.7 above T.P. 0), deckhouse a 84-95, stern out of every frame (assumed at a 62), bow at a 98.5; a simplified hull and house, no rigging; the white deckhouse with the windows spans a 89.5-95 (IMG_0855 u 1700-2300), the lower deck and gear forward of it top out at 4.7",
+   "lower": {
+    "a": [
+     84.6,
+     89.5
+    ],
+    "d": [
+     1.2,
+     5.2
+    ],
+    "top": 4.7
+   }
+  },
+  "edgeFit": "[v6:fix3] NOT adopted: tools/survey/hall_fit.py puts the edge beam's lower edge on the family y = 7.16 + 0.0409 (d + 47.7) (5.7 px instead of 16.5 px over the five frames at d -19.8 / y 8.30; with the shadow line d -34.52 it picks d -16.3 / T.P. 8.44), but the beams in front (long[0], long[1], d -34 / -32) hide that line from every dawn frame: moving it changes no pixel of the app's edge maps, so there is nothing in the frames to confirm it and the fix 2 build (d -19.8 / 7.20) stays",
+ "ceilingFit": "[v6:fix2] tools/survey/hall_fit.py: the longitudinal members run along the dawn stands' baseline, so the frames fix only a family (d, bottom) for each; long[1] is moved to where the frames' edges are (the metric's Canny): d -27.7 -> -32.07, bottom 7.70 -> 6.92 (4.6 px instead of 20.8 px at the 1080 frame). Held: the transverse beams at the surveyed 7.76 (canopy.beam_t1.y), the column girder on its columns, the slab at 11.2 and the edge beam (its height is tied to the surveyed shadow line canopy.shadow_d; the frames' edges would put it 1.1 m higher, which the shadow does not allow)",
+  "vesselFitNote": "[v6:fix2] tried: tools/survey/vessel_fit.py moved the four vessel components by about -1.2 m along the quay (and the hull top +1 m) and cut their wireframe edge distance by a third, but the 5 frames' chamfer did not improve (+0.1 px): not adopted, the first-build vessel (hull-side plane d +2, cut in 3 frames) stays"
  },
- "cars": [
-  {
-   "name": "silver kei (IMG_0794)",
-   "s": 92.6,
-   "o": 10.2,
-   "face": "W",
-   "color": "#b9bcbf"
-  },
-  {
-   "name": "cactus",
-   "s": 94.96,
-   "o": 10.14,
-   "face": "W",
-   "color": "#2f7f8f"
-  },
-  {
-   "name": "crown",
-   "s": 96.74,
-   "o": 10.27,
-   "face": "W",
-   "color": "#e9eae6"
-  },
-  {
-   "name": "mazda",
-   "s": 98.82,
-   "o": 10.2,
-   "face": "W",
-   "color": "#f2f2ee"
-  },
-  {
-   "name": "swift",
-   "s": 100.51,
-   "o": 10.5,
-   "face": "W",
-   "color": "#f0f0ec"
-  },
-  {
-   "name": "spacia",
-   "s": 102.18,
-   "o": 10.5,
-   "face": "W",
-   "color": "#ecebe5"
-  },
-  {
-   "name": "dark SUV (IMG_0794 / 0797)",
-   "s": 104.6,
-   "o": 10.4,
-   "face": "W",
-   "color": "#3b3e42"
+ "markings": {
+  "stall": [
+   {
+    "s": 90.8,
+    "off": [
+     9.55,
+     13.5
+    ],
+    "w": 0.13,
+    "src": "IMG_0795: the orange-yellow parking-stall line left of the black car, cut on the deck plane at (s 90.92, off 9.55) and (s 90.77, off 11.87); it runs to the frame edge, so the far end (off 13.5) is assumed"
+   }
+  ],
+  "joint": {
+   "pitch": 3.0,
+   "s0": 0.5,
+   "off0": 0.0,
+   "src": "saw-cut joints cut on the deck plane: s 87.56, 90.7 (IMG_0795), 88.1 (IMG_0793), 111.46, 114.48 (IMG_0798) and off 5.6, 8.55 (IMG_0798), 8.35, 11.17 (IMG_0793), 6.2, 9.4 (IMG_0795): a 3.0 m grid aligned with the wall (it was 5 m), phase s 0.5 +- 0.1, off 0.0 +- 0.5 (the off lines of IMG_0795 sit 0.85 m off the other two photos'; see docs/anime/survey/market.md, cone)"
   }
- ],
- "carsSrc": "cactus and crown: their plates cut at the plate height (0.45 m) in IMG_0796; mazda, swift and spacia at the plate spacing IMG_0797 shows (its absolute position is not trusted); centres 2.1 m behind the plate, facing west; the silver kei and the dark SUV at the row's ends (IMG_0794). Not built: the parked cars are transient (and box cars add edges that cannot match the photos); the measured positions stay here for reference",
- "carsBuilt": false
+ },
+ "carsNote": "[v6:fix2] the photographed cars are built from data/survey/market/cars.json (src/anime/world/harbor/deckcars6.js)"
 }

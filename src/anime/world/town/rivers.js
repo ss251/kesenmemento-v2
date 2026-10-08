@@ -14,6 +14,28 @@ import { resample } from './common.js';
 
 const DEF_W = { river: 10, canal: 6, stream: 3, drain: 2, ditch: 1.5 };
 
+/** [r2:11] A river mouth widens: 鹿折川 (OSM w1133916768, width 37.2) is 70 m across at z -470 and 108-124 m at z -395 (Earth 2026-03-11 teal mask 71 / 78 / 86 / 97 / 108 / 125 m
+ *  at z -470 / -455 / -440 / -425 / -410 / -395; the GSI water grid 72 / 76 / 84 / 96 / 108 / 124), while the ribbon was capped at 1.6 x the OSM width = 59.5 m and left
+ *  12-48 m of the carved channel bare beside cream banks. Within MOUTH_REACH m (arclength) of the sea the cap is max(1.6 x width, MOUTH_W); the grid run (+1.5 m) still binds, so
+ *  the ribbon follows it and cannot overshoot into merged ponds. Upstream (z -740..-560) all three agree at 36-42 m; 大川 (c9) matches its grid: only river mouths are affected. */
+export const MOUTH_REACH = 150, MOUTH_W = 140, MOUTH_PAD = 5;
+/** Arclength (m) at which a river's sample line meets the sea: the first sample on sea water, else where its end, run on along its tangent, reaches the sea within `ahead` m; Infinity if never. */
+export function seaArclength(L, S, ahead = 40) {
+  if (!L.isWater || !S.length) return Infinity;
+  for (const p of S) if (L.isWater(p.x, p.z)) return p.s;
+  const e = S[S.length - 1];
+  for (let o = 0; o <= ahead; o += 4) if (L.isWater(e.x + e.tx * o, e.z + e.tz * o)) return e.s + o;
+  return Infinity;
+}
+
+/** [r3:rivers] Water tones per channel name (vertex colours of the river ribbon; the toon lighting and the flow weave lift them a little). Earth 2026-03-11 seen from above reads 大川 (c9) as muddy
+ *  grey-green, L* 37 a* 0 b* -7, and 鹿折川 (c4) as dark slate, L* 31 b* -16, and the 鹿折川 mouth as the same navy as the bay. `sea` is where the mouth blend ends (the river fades to it by p.mouth). A channel
+ *  with no entry keeps the default harbour blues. */
+export const RIVER_TONE = {
+  '大川': { deep: '#42474d', mid: '#4e535a', edge: '#5c6167', sea: '#42474d' },
+  '鹿折川': { deep: '#2f4658', mid: '#3a566a', edge: '#4a6678', sea: '#2f4658' },
+};
+
 /** River channels from layout RIVERS: [{ name, kind, w, S: [{ x, z, tx, tz, s, y }] }] with a water level y per sample
  *  (1.2 m under the lower bank, >= 0.08, never rising downstream). `near(x, z)` limits detail to an area. */
 export function channels(L, { near = () => true, step = 3, minW = 2.5 } = {}) {
@@ -27,8 +49,10 @@ export function channels(L, { near = () => true, step = 3, minW = 2.5 } = {}) {
     if (S.length < 2) continue;
     // align with the GSI water area (the carved channel of grids.bin): the OSM centre line can run 10-20 m off it
     const wc = L.waterClass ? (x, z) => L.waterClass(x, z) : () => 0;
+    const sSea = seaArclength(L, S);   // [r2:11] where the line meets the bay; the last MOUTH_REACH m before it may be wider than 1.6 x the OSM width
     for (const p of S) {
-      const nx = -p.tz, nz = p.tx, R = Math.ceil(w * 0.9 + 14);
+      const reach = p.s >= sSea - MOUTH_REACH;   // [r2:11] the search reaches the far bank of a mouth up to MOUTH_W wide (it stopped at 0.9 w + 14 m, 48 m for 鹿折川: 97 m of channel)
+      const nx = -p.tz, nz = p.tx, R = Math.ceil(reach ? Math.max(w * 0.9 + 14, MOUTH_W / 2 + 10) : w * 0.9 + 14);
       let best = null, a = null;
       for (let o = -R; o <= R + 1; o += 1) {
         const inW = o <= R && wc(p.x + nx * o, p.z + nz * o) === 2;
@@ -37,7 +61,8 @@ export function channels(L, { near = () => true, step = 3, minW = 2.5 } = {}) {
       }
       p.wet = !!best && best.d < w * 0.6 + 6;
       p.c = p.wet ? (best.a + best.b) / 2 : 0;
-      p.w = p.wet ? Math.max(2, Math.min(w * 1.6, best.b - best.a + 1.5)) : w;
+      // [r2:11] the measured grid run is still the binding cap at the mouth (+5 m there: the grid is 5-15 m narrower than Earth)
+      p.w = p.wet ? Math.max(2, Math.min(reach ? Math.max(w * 1.6, MOUTH_W) : w * 1.6, best.b - best.a + (reach ? MOUTH_PAD : 1.5))) : w;
     }
     // smooth the centre offset and width along the river (window 7)
     { const c = S.map((p) => p.c), ww = S.map((p) => p.w); for (let i = 0; i < S.length; i++) { let sc = 0, sw = 0, n = 0; for (let k = Math.max(0, i - 3); k <= Math.min(S.length - 1, i + 3); k++) { sc += c[k]; sw += ww[k]; n++; } S[i].c = sc / n; S[i].w = sw / n; } }
@@ -57,6 +82,7 @@ export function channels(L, { near = () => true, step = 3, minW = 2.5 } = {}) {
     for (let i = 1; i < S.length; i++) S[i].y = Math.min(S[i].y, S[i - 1].y);
     // [v4:polish2] the mouth: where the channel meets the bay, the last 30 m of water ease down to the sea surface
     // (+0.08 m), so the ribbon slides into the bay instead of ending in a hard shelf (鹿折川 mouth, a_3.png)
+    for (const p of S) p.mouth = 0;   // [sys:20] easeMouth sets the weight where the channel meets the bay
     easeMouth(L, S, 30);
     out.push({ name: r.name || null, nameEn: r.nameEn || null, kind: r.kind, w, S });
   }
@@ -80,8 +106,9 @@ export function easeMouth(L, S, len = 30) {
     if (d > len) break;
     const t = 1 - d / len, k = t * t * (3 - 2 * t);
     S[i].y = Math.max(yS, S[i].y + (yS - S[i].y) * k);
+    S[i].mouth = k;   // [sys:20] the same smoothstep weight, kept: the foam, the banks and the colour fade out with it (rivers.js buildRivers)
   }
-  for (let i = iw + 1; i < S.length; i++) S[i].y = Math.min(S[i].y, yS);
+  for (let i = iw + 1; i < S.length; i++) { S[i].y = Math.min(S[i].y, yS); S[i].mouth = 1; }
   return true;
 }
 
@@ -132,8 +159,21 @@ export function crossings(roads, chs) {
       }
     }
   }
-  // one crossing per road and channel within 15 m (polyline joints can report the same crossing twice)
-  return out.filter((c, i) => !out.slice(0, i).some((o) => o.road === c.road && o.ch === c.ch && Math.hypot(o.x - c.x, o.z - c.z) < 15));
+  // one crossing per road and channel within 15 m (polyline joints can report the same crossing twice). [r3:12] A crossing within 15 m of an earlier one on the same channel whose road has the same
+  // name or ref is a duplicate too: 大川 x 気仙沼唐桑線 is two road ids (r13790 / r13760, 16 m) that would lay two coplanar decks
+  const sameRoad = (a, b) => a === b || (a.name && a.name === b.name) || (a.ref && a.ref === b.ref);
+  return out.filter((c, i) => !out.slice(0, i).some((o) => o.ch === c.ch && Math.hypot(o.x - c.x, o.z - c.z) < 15 && sameRoad(o.road, c.road)));
+}
+/**
+ * [r3:12] The deck height of a crossing (m, T.P.). A hero / mid road: 2.3 m over the water (c.y), as before. A FAR road (zone far: 気仙沼唐桑線's bridge over the 鹿折川, r9949): a LEVEL deck at the approach
+ * height, max(c.y + 2.3, the lower of the two approach grounds + 0.1): the bank roads there are 4.3 m, the water -0.25 m, and a deck 2.3 m over the water (2.4 m) dipped 1.9 m below both approaches.
+ * groundAt(x, z) -> terrain height; half: half the span plus 2.5 m; ramp: the approach length.
+ */
+export function bridgeDeckY(c, groundAt, half, ramp, far = false) {
+  const base = c.y + 2.3;
+  if (!far) return base;
+  const a = groundAt(c.x - c.tx * (half + ramp), c.z - c.tz * (half + ramp)), b = groundAt(c.x + c.tx * (half + ramp), c.z + c.tz * (half + ramp));
+  return Math.max(base, Math.min(a, b) + 0.1);
 }
 
 /** The river flow texture: soft painted streaks along v (downstream), tileable. */
@@ -154,10 +194,10 @@ function flowTexture(ctx) {
 }
 
 /**
- * Build the rivers. opts: { detail(x, z) -> true where banks + bridges are built (hero + mid), roads (hero + mid ROADS),
- * asphalt (the street asphalt material) }. -> { channels, index, stats }
+ * Build the rivers. opts: { detail(x, z) -> true where banks + bridges are built (hero + mid), roads (hero + mid ROADS, plus [r3:12] the far roads of kind 'bridge'),
+ * bridgeDetail(x, z) -> true where a bridge crossing gets its deck (default: detail; [r3:12] index.js widens it for the far bridge crossings only), asphalt (the street asphalt material) }. -> { channels, index, stats }
  */
-export function buildRivers(ctx, { chs, index, detail, roads, asphalt }) {
+export function buildRivers(ctx, { chs, index, detail, roads, asphalt, bridgeDetail = null }) {
   const L = ctx.L;
   const root = new THREE.Group(); root.name = 'town-rivers';
   const tex = flowTexture(ctx);
@@ -167,7 +207,9 @@ export function buildRivers(ctx, { chs, index, detail, roads, asphalt }) {
   const W = { p: [], n: [], u: [], c: [], i: [] }, Fm = { p: [], n: [], i: [] }, C = { p: [], n: [], c: [], i: [] };
   // [v5:fix1] the bay's harbour blues (鹿折川 and 大川 are tidal here; Google Earth 2026 shows them as dark as the bay, the
   // turquoise #3f8791 / #5ea3a3 / #8cc2b8 read as a different water)
-  const deep = new THREE.Color('#336d95'), mid = new THREE.Color('#4a8fac'), edge = new THREE.Color('#6f9fb4');
+  const dflt = { deep: new THREE.Color('#336d95'), mid: new THREE.Color('#4a8fac'), edge: new THREE.Color('#6f9fb4'), sea: new THREE.Color('#4f8fab') };   // [sys:20] sea = water.js uRiver: the tone the sea shader gives the river water it meets
+  // [r3:rivers] a per-river tone, keyed by the channel name (RIVER_TONE): the default palette still rendered saturated cobalt from above (L* 47, b* -32 / -33) where Earth 2026-03-11 reads 大川 as muddy grey-green and 鹿折川 as dark slate
+  const tones = Object.fromEntries(Object.entries(RIVER_TONE).map(([n, t]) => [n, Object.fromEntries(Object.entries(t).map(([k, v]) => [k, new THREE.Color(v)]))]));
   const cc = new THREE.Color();
   const put = (B, x, y, z, n = [0, 1, 0], col = null, uv = null) => { B.p.push(x, y, z); B.n.push(n[0], n[1], n[2]); if (B.c) { const c = col || { r: 1, g: 1, b: 1 }; B.c.push(c.r, c.g, c.b); } if (B.u) B.u.push(uv ? uv[0] : 0, uv ? uv[1] : 0); return B.p.length / 3 - 1; };
   const quad = (B, a, b, c, d) => B.i.push(a, b, c, a, c, d);
@@ -175,23 +217,31 @@ export function buildRivers(ctx, { chs, index, detail, roads, asphalt }) {
   for (const ch of chs) {
     const S = ch.S;
     // ---- water: 5 lanes across (edge / mid / deep / mid / edge) so the colour bands read like the bay
+    const tn = tones[ch.name] || dflt, deep = tn.deep, mid = tn.mid, edge = tn.edge, seaRiver = tn.sea;
     const lanes = [-0.5, -0.36, -0.12, 0.12, 0.36, 0.5], lc = [edge, mid, deep, deep, mid, edge];
     let prev = null, prevF = null;
     for (const p of S) {
-      const nx = -p.tz, nz = p.tx, y = p.y, w = p.w;
-      const row = lanes.map((o, k) => put(W, p.x + nx * o * w, y, p.z + nz * o * w, [0, 1, 0], lc[k], [o * w / 12 + 0.5, p.s / 24]));
+      // [sys:20] the ribbon dips under the sea surface as the mouth weight rises (0.2 m at the mouth), so it ends under the bay's own water, not on a shelf
+      const nx = -p.tz, nz = p.tx, y = p.y - 0.2 * (p.mouth || 0), w = p.w;
+      // [sys:20] near the mouth the lane colours blend into the bay's tone (the river and the sea meet as one dark surface)
+      const mo = p.mouth || 0;
+      const row = lanes.map((o, k) => { const cl = mo > 0 ? cc.copy(lc[k]).lerp(seaRiver, mo) : lc[k]; return put(W, p.x + nx * o * w, y, p.z + nz * o * w, [0, 1, 0], cl, [o * w / 12 + 0.5, p.s / 24]); });
       if (prev) for (let k = 0; k < lanes.length - 1; k++) quad(W, prev[k], prev[k + 1], row[k + 1], row[k]);
       prev = row;
       // foam: two thin lines just inside each edge
-      const fr = [];
-      for (const [o0, o1] of [[-0.5, -0.5 + 0.9 / w], [0.5 - 0.9 / w, 0.5]]) { fr.push(put(Fm, p.x + nx * o0 * w, y + 0.015, p.z + nz * o0 * w), put(Fm, p.x + nx * o1 * w, y + 0.015, p.z + nz * o1 * w)); }
-      if (prevF) { quad(Fm, prevF[0], prevF[1], fr[1], fr[0]); quad(Fm, prevF[2], prevF[3], fr[3], fr[2]); }
-      prevF = fr;
+      // [sys:20] the two strips narrow to zero as the mouth weight rises and stop where it passes 0.5: no white bar across the river-sea seam
+      if (mo > 0.5) { prevF = null; }
+      else {
+        const fr = [], fw = (0.9 / w) * (1 - mo);
+        for (const [o0, o1] of [[-0.5, -0.5 + fw], [0.5 - fw, 0.5]]) { fr.push(put(Fm, p.x + nx * o0 * w, y + 0.015, p.z + nz * o0 * w), put(Fm, p.x + nx * o1 * w, y + 0.015, p.z + nz * o1 * w)); }
+        if (prevF) { quad(Fm, prevF[0], prevF[1], fr[1], fr[0]); quad(Fm, prevF[2], prevF[3], fr[3], fr[2]); }
+        prevF = fr;
+      }
     }
     // ---- banks (hero + mid only): revetment slope from the water to the bank top, and a coping kerb
     let pr = null;
     for (const p of S) {
-      if (!detail(p.x, p.z) || !p.wet) { pr = null; continue; }
+      if (!detail(p.x, p.z) || !p.wet || (p.mouth || 0) > 0.3) { pr = null; continue; }   // [sys:20] the levee tips end on land, not in the water
       const nx = -p.tz, nz = p.tx, row = [], w = p.w;
       for (const sd of [-1, 1]) {
         const ex = p.x + nx * sd * w / 2, ez = p.z + nz * sd * w / 2;
@@ -205,12 +255,12 @@ export function buildRivers(ctx, { chs, index, detail, roads, asphalt }) {
     }
   }
   // ---- bridges
-  const X = crossings(roads, chs).filter((c) => detail(c.x, c.z));
+  const X = crossings(roads, chs).filter((c) => (bridgeDetail || detail)(c.x, c.z));
   const D = { p: [], n: [], u: [], c: [], i: [] };
   const physics = ctx.physics;
   for (const c of X) {
     const road = c.road, hw = road.width / 2 + 0.5, ramp = 10, half = c.span / 2 + 2.5;
-    const deckY = c.y + 2.3;
+    const deckY = bridgeDeckY(c, (x, z) => L.heightAt(x, z), half, ramp, road.zone === 'far');   // [r3:12] a far road's deck is level at the approach height
     const S = [];
     for (let s = -half - ramp; s <= half + ramp + 1e-6; s += 1) {
       const x = c.x + c.tx * s, z = c.z + c.tz * s;

@@ -9,10 +9,20 @@
 //     floating pier of the 気仙沼ベイクルーズ on its gangway, and the fishing-boat jetty of the basin.
 import * as THREE from 'three';
 import { drapeTriangles } from '../town/landuse.js';
+import { extrude } from '../../core/geo.js';
 import { KAMEYAMA, URANOHAMA } from './sites.js';
 import { group, obbOf, obbPt, groundSpan, pitchedRoof, prismWalls, capGeo, colliders, wallGeo, facadeMat, paintWindow, mapMat, textTex, FONT, nightMat, sign, frame, centroid } from './kit.js';
 
 const TIMBER = '#b08a62', DARK = '#3a3634', CREAM = '#e7dcc4';
+
+/**
+ * [v6:outside-kameyama-summit] The summit promenade of 亀山テラス360°: a terracotta-red rubber-surfaced path (about 2.5 m wide,
+ * #9e6e70 sampled on the Commons photo 'Kameyama Terrace 360°', 2026-08) with a flush 0.35 m dark grey gravel strip on both
+ * edges, along the ridge from the 山頂駅 to the east terrace (ほしのてらす). APPROXIMATE: the route is traced from the
+ * pre-opening Google Earth strip (imagery 2026-03-11, the path was not yet surfaced); no post-July 2026 capture of the top view
+ * exists yet. Re-trace it from one and add any spur from the station to terrace 1 that it shows.
+ */
+export const PROMENADE = { approx: true, width: 2.5, edge: 0.35, ctrl: [[3729, 3640], [3760, 3636], [3800, 3637], [3843, 3638]] };
 
 /** Polyline helpers: resampled points with arclength, and a point at s. */
 function railSamples(L, pts, step = 3) {
@@ -87,27 +97,54 @@ export function buildOshima(ctx) {
   // ================================================================ the monorail
   const S = railSamples(L, K.rail, 3), len = S.at(-1).s;
   {
-    const beam = t('#6d747d', { paint: 0.02 }), post = t('#8a9098', { paint: 0 }), grate = t('#5b6068', { paint: 0 }), rail = t('#9aa0a8', { paint: 0 });
+    // [v6:outside-kameyama-summit] the track as photographed (Commons 2026-08 'Between Stations', 'Monorail and Oshima Below'): a
+    // dark brown steel truss (a top and a bottom chord with diagonal web bars) carrying the rack rail and the inspection walk,
+    // on splayed A-frame leg pairs with a tie bar at mid height, each leg on a pale concrete footing block
+    const STEEL = '#3b322d', beam = t(STEEL, { paint: 0.02 }), post = t(STEEL, { paint: 0.02 }), grate = t(STEEL, { paint: 0.02 }), rail = t('#2b2926', { paint: 0 }), foot = t('#d8dad6', { paint: 0.03 });
+    const LEAN = 8 * Math.PI / 180;
     for (let i = 0; i < S.length - 1; i++) {
       const a = S[i], b = S[i + 1], mx = (a.x + b.x) / 2, mz = (a.z + b.z) / 2, my = (a.y + b.y) / 2, l = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
       const ry = Math.atan2(b.x - a.x, b.z - a.z), pitch = -Math.atan2(b.y - a.y, Math.hypot(b.x - a.x, b.z - a.z));
       const B = k.group([mx, my, mz], ry); B.rotation.x = pitch; B.rotation.order = 'YXZ'; const kb = ctx.kit(B);
-      kb.box(0.5, 0.6, l + 0.05, beam, [0, 0, 0]);                  // the box-girder track with the rack
+      kb.box(0.5, 0.1, l + 0.05, beam, [0, 0.27, 0]);               // the top chord and the rack plate
+      kb.box(0.34, 0.1, l + 0.05, beam, [0, -0.27, 0]);             // the bottom chord
+      const dl = Math.hypot(l, 0.44), da = Math.atan2(0.44, l) * (i % 2 ? 1 : -1);
+      for (const sx of [-0.2, 0.2]) kb.box(0.06, 0.06, dl, beam, [sx, 0, 0], [da, 0, 0]);   // the diagonal web bars, one per bay, alternating
       kb.box(0.9, 0.06, l + 0.05, grate, [1.1, -0.2, 0]);          // the inspection walk
       kb.box(0.04, 0.04, l, rail, [1.55, 0.8, 0]);                 // its hand rail
       if (i % 2 === 0) kb.box(0.04, 1.0, 0.04, rail, [1.55, 0.3, 0]);
-      if (i % 2 === 0) { const h = a.y - a.g - 0.3; k.box(0.3, h + 0.6, 0.3, post, [a.x, a.g + h / 2 - 0.2, a.z]); }
+      if (i % 2 === 0) {
+        // the A-frame: two legs lean +-8 deg across the track, meeting under the girder; a tie bar at mid height; a footing block under each
+        const top = a.y - 0.32, G = k.group([a.x, 0, a.z], ry), kg2 = ctx.kit(G), cs = Math.cos(ry), sn = Math.sin(ry);
+        const legs = [];
+        for (const sg of [-1, 1]) {
+          const bx0 = sg * (0.3 + (top - a.g) * Math.tan(LEAN)), gb0 = L.heightAt(a.x + bx0 * cs, a.z - bx0 * sn);
+          const H = Math.max(0.3, top - (gb0 + 0.3)), bx = sg * (0.3 + H * Math.tan(LEAN)), gb = L.heightAt(a.x + bx * cs, a.z - bx * sn), Hf = Math.max(0.3, top - (gb + 0.3));
+          kg2.box(0.22, Hf / Math.cos(LEAN), 0.22, post, [sg * (0.3 + (Hf / 2) * Math.tan(LEAN)), gb + 0.3 + Hf / 2, 0], [0, 0, sg * LEAN]);
+          kg2.box(0.6, 0.4, 0.6, foot, [sg * (0.3 + Hf * Math.tan(LEAN)), gb + 0.1, 0]);   // the pale concrete footing block
+          legs.push({ sg, H: Hf });
+        }
+        const H = Math.min(legs[0].H, legs[1].H);
+        if (H > 1.1) { const ym = top - H / 2, hw = 0.3 + (H / 2) * Math.tan(LEAN); kg2.box(2 * hw, 0.12, 0.12, post, [0, ym, 0]); }
+      }
     }
-    // the train: two fully glazed cars (white roof, navy base), kept level on the slope; animated
+    // the train: two fully glazed cars, kept level on the slope; animated. [v6:outside-kameyama-summit] Commons 2026-08 ('Monorail
+    // and Oshima Below'): a white body (#f5f8f9) over a deep blue skirt (#1f518f) tapering to a wedge, a thin gold pinstripe at the
+    // seam, black-framed glazing above and a white roof with an air-conditioner box
     const train = new THREE.Group(); train.name = 'lmB-monorail';
     const cars = [];
+    const skirtGeo = extrude([[-1.15, 0.5], [1.15, 0.5], [0.78, 0], [-0.78, 0]], 3.6);
     for (let c = 0; c < 2; c++) {
       const car = new THREE.Group(), kc = ctx.kit(car);
-      kc.boxB(2.3, 0.7, 3.6, t('#1f3558', { paint: 0 }), [0, 0.3, 0]);
-      kc.boxB(2.2, 1.9, 3.4, t('#a9c3d3', { paint: 0.0, transparent: true, opacity: 0.55 }), [0, 1.0, 0]);
-      for (const [x, z] of [[-1.1, -1.7], [1.1, -1.7], [1.1, 1.7], [-1.1, 1.7]]) kc.boxB(0.08, 1.9, 0.08, t('#2a2d33', { paint: 0 }), [x, 1.0, z]);
-      kc.boxB(2.4, 0.2, 3.7, t('#f2f2ee', { paint: 0 }), [0, 2.9, 0]);
-      for (let i = 0; i < 4; i++) kc.boxB(0.9, 0.5, 0.5, t('#e8e4da', { paint: 0 }), [(i % 2 ? 0.55 : -0.55), 1.0, (i < 2 ? -0.8 : 0.8)]);   // the seats inside
+      kc.mesh(skirtGeo, t('#1a4c9a', { paint: 0 }));                                             // the blue skirt, 0.5 m, wedge underside
+      kc.boxB(2.32, 0.06, 3.62, t('#d4b04a', { paint: 0 }), [0, 0.5, 0]);                        // the gold band at the seam
+      kc.boxB(2.3, 1.1, 3.6, t('#f4f6f6', { paint: 0 }), [0, 0.56, 0]);                          // the white lower body, 1.1 m
+      kc.boxB(2.2, 1.5, 3.4, t('#a9c3d3', { paint: 0.0, transparent: true, opacity: 0.55 }), [0, 1.66, 0]);   // the glazing
+      for (const [x, z] of [[-1.1, -1.7], [1.1, -1.7], [1.1, 1.7], [-1.1, 1.7]]) kc.boxB(0.08, 1.5, 0.08, t('#2a2d33', { paint: 0 }), [x, 1.66, z]);
+      kc.boxB(2.24, 0.06, 3.44, t('#2a2d33', { paint: 0 }), [0, 1.66, 0]);                      // the black sill frame
+      kc.boxB(2.4, 0.2, 3.7, t('#f2f2ee', { paint: 0 }), [0, 3.16, 0]);                          // the white roof slab
+      kc.boxB(1.0, 0.35, 0.7, t('#eef0f0', { paint: 0 }), [-0.3, 3.36, -0.9]);                   // the air-conditioner unit
+      for (const sx of [-1, 1]) kc.boxB(0.04, 0.04, 3.2, t('#9aa0a8', { paint: 0 }), [sx * 1.0, 2.62, 0]);   // the inside hand rails (passengers stand)
       kc.box(0.4, 0.8, 3.4, t('#3a3f47', { paint: 0 }), [0, -0.1, 0]);
       train.add(car); cars.push(car);
     }
@@ -215,6 +252,43 @@ export function buildOshima(ctx) {
     const [sx, sz] = K.summit, sy = L.heightAt(sx, sz);
     k.box(0.35, 1.6, 0.35, t('#d9d4c4', { paint: 0.03 }), [sx, sy + 0.8, sz]);
     sign(ctx, k, '亀山 235m', 1.3, 0.3, sx, sy + 1.2, sz + 0.2, 0, { color: '#2d2a26', bg: '#e9e1cc', font: FONT.serif });
+    // [v6:outside-kameyama-summit] the promenade (PROMENADE above): a ribbon draped on the ridge with flush gravel edges, and black
+    // steel railings wherever the ground falls away beside it. The land use under it is cleared of trees by the override file.
+    {
+      const P = PROMENADE, C = P.ctrl, pts = [];
+      for (let i = 0; i < C.length - 1; i++) {   // Catmull-Rom through the control points, one sample every 1.5 m
+        const p0 = C[Math.max(0, i - 1)], p1 = C[i], p2 = C[i + 1], p3 = C[Math.min(C.length - 1, i + 2)], n = Math.max(2, Math.round(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 1.5));
+        for (let j = i ? 1 : 0; j <= n; j++) {
+          const u = j / n, u2 = u * u, u3 = u2 * u, f = (a, b, c, d) => 0.5 * (2 * b + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u2 + (-a + 3 * b - 3 * c + d) * u3);
+          pts.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1])]);
+        }
+      }
+      const nrm = pts.map((q, i) => { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)], dx = b[0] - a[0], dz = b[1] - a[1], l = Math.hypot(dx, dz) || 1; return [dz / l, -dx / l]; });
+      const strip = (o0, o1, col) => {   // a ribbon between offsets o0 and o1 (m, + to the right of travel), draped on the terrain
+        const pos = [], idx = [];
+        pts.forEach((q, i) => { for (const o of [o0, o1]) { const x = q[0] + nrm[i][0] * o, z = q[1] + nrm[i][1] * o; pos.push(x, L.heightAt(x, z) + 0.07, z); } });
+        for (let i = 0; i < pts.length - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+        const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+        const m = new THREE.Mesh(g, t(col, { paint: 0.04, side: 'double', polygonOffset: -0.6 })); m.receiveShadow = true; k.parent.add(m);
+      };
+      const hw = P.width / 2;
+      strip(-hw, hw, '#9e6668');                                    // the terracotta-red surface
+      strip(hw, hw + P.edge, '#5e5c60'); strip(-hw - P.edge, -hw, '#5e5c60');   // the dark grey gravel edging, flush, no kerb
+      const black = t('#1b1d20', { paint: 0 });
+      let rails = 0;
+      for (const sg of [-1, 1]) {
+        const off = sg * (hw + P.edge + 0.5);
+        const hp = pts.map((q, i) => L.heightAt(q[0], q[1])), drop = pts.map((q, i) => hp[i] - L.heightAt(q[0] + nrm[i][0] * sg * 4, q[1] + nrm[i][1] * sg * 4));
+        for (let i = 0; i < pts.length - 1; i++) {
+          if (drop[i] < 1.2 || drop[i + 1] < 1.2) continue;   // railing only where the ridge drops off (a 1.2 m fall within 4 m)
+          const A = [pts[i][0] + nrm[i][0] * off, pts[i][1] + nrm[i][1] * off], B = [pts[i + 1][0] + nrm[i + 1][0] * off, pts[i + 1][1] + nrm[i + 1][1] * off];
+          const ya = L.heightAt(A[0], A[1]), yb = L.heightAt(B[0], B[1]), l = Math.hypot(B[0] - A[0], B[1] - A[1]), mx = (A[0] + B[0]) / 2, mz = (A[1] + B[1]) / 2, ry = Math.atan2(B[0] - A[0], B[1] - A[1]), yy = (ya + yb) / 2;
+          for (const hh of [1.0, 0.5]) k.box(0.04, 0.04, l + 0.02, black, [mx, yy + hh, mz], [0, ry, 0]);
+          k.box(0.05, 1.05, 0.05, black, [A[0], ya + 0.52, A[1]]); rails++;
+        }
+      }
+      out.promenade = { approx: P.approx, width: P.width, edge: P.edge, length: Math.round(pts.reduce((s2, q, i) => s2 + (i ? Math.hypot(q[0] - pts[i - 1][0], q[1] - pts[i - 1][1]) : 0), 0)), from: C[0], to: C.at(-1), railSegments: rails };
+    }
     out.summit = { x: us.cx, z: us.cz, y: uy };
   }
   // ================================================================ 浦の浜

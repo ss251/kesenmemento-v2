@@ -56,11 +56,11 @@
    "grass": 0.055,
    "field": 0.071,
    "dirt": 0,
-   "sand": 0.007,
-   "paving": 0.167,
-   "town": 0.211,
+   "sand": 0.003,
+   "paving": 0.169,
+   "town": 0.21,
    "water": 0,
-   "felled": 0.001
+   "felled": 0.005
   }
  },
  "city": {
@@ -81,7 +81,7 @@
    "paving": 0.019,
    "town": 0.309,
    "water": 0,
-   "felled": 0
+   "felled": 0.001
   }
  }
 }

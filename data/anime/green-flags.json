@@ -1,0 +1,565 @@
+{
+ "note": "ADVISORY ghost-lot leads: lots whose GSI aerial interior is dark vegetation green (tools/anime/green-scan.mjs, scripts/anime/enrich/green.js). build-layout.js fails an override that recolours one of them (not a sliver: touches) unless its src names an oblique view (o0 / o180 / l45) or a ground photo; remove: true is always allowed.",
+ "rule": {
+  "lumMax": 132,
+  "gOverR": 9,
+  "share": 0.8,
+  "inset": 0.8,
+  "step": 0.6,
+  "minSamples": 12
+ },
+ "flagged": {
+  "16/58539/25067/300": {
+   "cell": "c1",
+   "kind": "house",
+   "area": 110,
+   "lum": 130.4,
+   "share": 0.83,
+   "touches": false
+  },
+  "16/58539/25067/308": {
+   "cell": "c1",
+   "kind": "house",
+   "area": 66,
+   "lum": 126.9,
+   "share": 0.97,
+   "touches": false
+  },
+  "16/58539/25067/322": {
+   "cell": "c1",
+   "kind": "house",
+   "area": 150,
+   "lum": 114.6,
+   "share": 0.83,
+   "touches": true
+  },
+  "16/58539/25067/328": {
+   "cell": "c1",
+   "kind": "house",
+   "area": 92,
+   "lum": 119.9,
+   "share": 0.97,
+   "touches": false
+  },
+  "16/58539/25067/332": {
+   "cell": "c1",
+   "kind": "warehouse",
+   "area": 19,
+   "lum": 113.4,
+   "share": 1,
+   "touches": false
+  },
+  "16/58539/25068/414": {
+   "cell": "c5",
+   "kind": "shop",
+   "area": 17,
+   "lum": 118.3,
+   "share": 1,
+   "touches": false
+  },
+  "16/58539/25068/416": {
+   "cell": "c5",
+   "kind": "shop",
+   "area": 27,
+   "lum": 121.2,
+   "share": 1,
+   "touches": true
+  },
+  "16/58539/25068/418": {
+   "cell": "c5",
+   "kind": "shop",
+   "area": 118,
+   "lum": 125.1,
+   "share": 1,
+   "touches": false
+  },
+  "16/58539/25068/419": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 29,
+   "lum": 127.3,
+   "share": 0.86,
+   "touches": false
+  },
+  "16/58539/25068/459": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 79,
+   "lum": 129.6,
+   "share": 0.83,
+   "touches": false
+  },
+  "16/58539/25068/480": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 18,
+   "lum": 115.7,
+   "share": 0.9,
+   "touches": false
+  },
+  "16/58539/25068/494": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 36,
+   "lum": 118.6,
+   "share": 1,
+   "touches": false
+  },
+  "16/58539/25068/512": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 27,
+   "lum": 131.9,
+   "share": 0.94,
+   "touches": true
+  },
+  "16/58539/25069/172": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 78,
+   "lum": 125.1,
+   "share": 0.82,
+   "touches": false
+  },
+  "16/58539/25069/194": {
+   "cell": "c9",
+   "kind": "house",
+   "area": 79,
+   "lum": 125.3,
+   "share": 0.88,
+   "touches": true
+  },
+  "16/58539/25069/203": {
+   "cell": "c9",
+   "kind": "house",
+   "area": 15,
+   "lum": 122.6,
+   "share": 1,
+   "touches": false
+  },
+  "16/58539/25070/312": {
+   "cell": "c9",
+   "kind": "house",
+   "area": 35,
+   "lum": 122.8,
+   "share": 0.9,
+   "touches": false
+  },
+  "16/58539/25070/332": {
+   "cell": "c9",
+   "kind": "house",
+   "area": 16,
+   "lum": 120.3,
+   "share": 1,
+   "touches": false
+  },
+  "16/58540/25067/109": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 22,
+   "lum": 113.4,
+   "share": 1,
+   "touches": false
+  },
+  "16/58540/25067/148": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 86,
+   "lum": 130.9,
+   "share": 0.89,
+   "touches": false
+  },
+  "16/58540/25067/188": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 100,
+   "lum": 127.2,
+   "share": 0.91,
+   "touches": true
+  },
+  "16/58540/25067/253": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 104,
+   "lum": 113.6,
+   "share": 0.85,
+   "touches": true
+  },
+  "16/58540/25067/277": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 50,
+   "lum": 82.4,
+   "share": 0.82,
+   "touches": false
+  },
+  "16/58540/25067/299": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 21,
+   "lum": 125,
+   "share": 1,
+   "touches": true
+  },
+  "16/58540/25067/309": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 62,
+   "lum": 131.6,
+   "share": 1,
+   "touches": true
+  },
+  "16/58540/25067/331": {
+   "cell": "c2",
+   "kind": "shop",
+   "area": 49,
+   "lum": 130.3,
+   "share": 0.91,
+   "touches": false
+  },
+  "16/58540/25068/178": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 60,
+   "lum": 104.8,
+   "share": 0.95,
+   "touches": true
+  },
+  "16/58540/25068/251": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 32,
+   "lum": 94.6,
+   "share": 1,
+   "touches": false
+  },
+  "16/58540/25068/260": {
+   "cell": "c6",
+   "kind": "warehouse",
+   "area": 22,
+   "lum": 124,
+   "share": 1,
+   "touches": true
+  },
+  "16/58540/25068/354": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 41,
+   "lum": 125.3,
+   "share": 0.84,
+   "touches": false
+  },
+  "16/58540/25068/62": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 19,
+   "lum": 91.5,
+   "share": 1,
+   "touches": false
+  },
+  "16/58540/25069/173": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 90,
+   "lum": 131.1,
+   "share": 0.96,
+   "touches": false
+  },
+  "16/58540/25069/175": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 56,
+   "lum": 126.9,
+   "share": 0.98,
+   "touches": false
+  },
+  "16/58540/25069/194": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 98,
+   "lum": 123.5,
+   "share": 0.83,
+   "touches": false
+  },
+  "16/58540/25069/200": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 91,
+   "lum": 126.7,
+   "share": 1,
+   "touches": true
+  },
+  "16/58540/25069/220": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 69,
+   "lum": 131.9,
+   "share": 1,
+   "touches": false
+  },
+  "16/58540/25069/327": {
+   "cell": "c10",
+   "kind": "house",
+   "area": 170,
+   "lum": 130.3,
+   "share": 0.81,
+   "touches": false
+  },
+  "16/58540/25069/336": {
+   "cell": "c10",
+   "kind": "house",
+   "area": 50,
+   "lum": 98.3,
+   "share": 0.97,
+   "touches": false
+  },
+  "16/58540/25069/346": {
+   "cell": "c10",
+   "kind": "house",
+   "area": 47,
+   "lum": 121.8,
+   "share": 0.85,
+   "touches": true
+  },
+  "16/58540/25069/39": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 57,
+   "lum": 112.1,
+   "share": 0.92,
+   "touches": false
+  },
+  "16/58540/25069/40": {
+   "cell": "c5",
+   "kind": "house",
+   "area": 20,
+   "lum": 100.8,
+   "share": 1,
+   "touches": false
+  },
+  "16/58540/25069/86": {
+   "cell": "c5",
+   "kind": "school",
+   "area": 24,
+   "lum": 131.7,
+   "share": 1,
+   "touches": false
+  },
+  "16/58541/25066/144": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 274,
+   "lum": 128.7,
+   "share": 0.89,
+   "touches": false
+  },
+  "16/58541/25067/120": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 21,
+   "lum": 127.5,
+   "share": 0.92,
+   "touches": false
+  },
+  "16/58541/25067/124": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 14,
+   "lum": 129.6,
+   "share": 1,
+   "touches": true
+  },
+  "16/58541/25067/142": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 124,
+   "lum": 121.2,
+   "share": 0.9,
+   "touches": false
+  },
+  "16/58541/25067/153": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 49,
+   "lum": 122.4,
+   "share": 1,
+   "touches": true
+  },
+  "16/58541/25067/189": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 20,
+   "lum": 87.4,
+   "share": 0.83,
+   "touches": true
+  },
+  "16/58541/25067/22": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 22,
+   "lum": 129.2,
+   "share": 1,
+   "touches": true
+  },
+  "16/58541/25067/230": {
+   "cell": "c2",
+   "kind": "shop",
+   "area": 78,
+   "lum": 122.6,
+   "share": 0.89,
+   "touches": false
+  },
+  "16/58541/25067/270": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 34,
+   "lum": 111.1,
+   "share": 0.82,
+   "touches": false
+  },
+  "16/58541/25067/295": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 103,
+   "lum": 111.8,
+   "share": 0.86,
+   "touches": false
+  },
+  "16/58541/25067/327": {
+   "cell": "c3",
+   "kind": "house",
+   "area": 168,
+   "lum": 129.3,
+   "share": 0.86,
+   "touches": false
+  },
+  "16/58541/25067/38": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 95,
+   "lum": 122.5,
+   "share": 0.87,
+   "touches": false
+  },
+  "16/58541/25067/42": {
+   "cell": "c2",
+   "kind": "house",
+   "area": 43,
+   "lum": 124.5,
+   "share": 1,
+   "touches": true
+  },
+  "16/58541/25069/14": {
+   "cell": "c10",
+   "kind": "house",
+   "area": 52,
+   "lum": 119.3,
+   "share": 0.88,
+   "touches": true
+  },
+  "16/58541/25069/140": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 15,
+   "lum": 115.8,
+   "share": 1,
+   "touches": false
+  },
+  "16/58541/25069/143": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 138,
+   "lum": 99.8,
+   "share": 0.81,
+   "touches": false
+  },
+  "16/58541/25069/154": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 46,
+   "lum": 110.4,
+   "share": 1,
+   "touches": false
+  },
+  "16/58541/25069/156": {
+   "cell": "c6",
+   "kind": "shop",
+   "area": 34,
+   "lum": 105.7,
+   "share": 0.95,
+   "touches": false
+  },
+  "16/58541/25069/184": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 78,
+   "lum": 125,
+   "share": 0.8,
+   "touches": false
+  },
+  "16/58541/25069/43": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 81,
+   "lum": 126.4,
+   "share": 1,
+   "touches": false
+  },
+  "16/58541/25069/46": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 18,
+   "lum": 109.3,
+   "share": 1,
+   "touches": false
+  },
+  "16/58541/25069/53": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 128,
+   "lum": 131.4,
+   "share": 1,
+   "touches": true
+  },
+  "16/58541/25069/96": {
+   "cell": "c6",
+   "kind": "house",
+   "area": 32,
+   "lum": 107.7,
+   "share": 1,
+   "touches": false
+  },
+  "16/58542/25067/55": {
+   "cell": "c3",
+   "kind": "warehouse",
+   "area": 41,
+   "lum": 110.9,
+   "share": 0.82,
+   "touches": true
+  },
+  "16/58543/25069/15": {
+   "cell": "c8",
+   "kind": "house",
+   "area": 17,
+   "lum": 114.1,
+   "share": 1,
+   "touches": false
+  },
+  "ovr:c10:kawarada-row-e": {
+   "cell": "c10",
+   "kind": "house",
+   "area": 42,
+   "lum": 117.1,
+   "share": 0.89,
+   "touches": false
+  },
+  "ovr:c9:park-pavilion": {
+   "cell": "c9",
+   "kind": "public",
+   "area": 86,
+   "lum": 109.3,
+   "share": 1,
+   "touches": false
+  }
+ }
+}

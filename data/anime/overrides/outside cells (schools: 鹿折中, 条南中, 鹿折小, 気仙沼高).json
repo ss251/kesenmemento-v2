@@ -1,0 +1,77 @@
+{
+ "version": 1,
+ "cell": "outside-schools-r3",
+ "bbox": [
+  -1260,
+  -1880,
+  1350,
+  1900
+ ],
+ "note": "outside the 12 cells, round 3 (facade palette of the far-zone schools the 2024-05 Commons photos sample). The three grounds (条南中 x -1250..-1050 z 1660..1900, 鹿折中 x 1200..1340 z -1400..-1190, 鹿折小 x 530..700 z -1870..-1700) are drawn by the school landmark model (schools.js), whose per-ground palette lives in SCHOOL_INFO.<ground>.look (sites.js, [v6:schools-r3]); the wall values here keep the layout in step with it (test/v6-schools-r3.test.js). 気仙沼中, 気仙沼高, 九条小 and 東陵高 are not sampled by any recent photo and keep the default grey-white palette; 気仙沼小 keeps its concrete variant. 鹿折中's lot /196 is the 3-storey classroom block (GSI hull of the block, its wings and the courtyard): the area rule had it a 14.1 m barrel-roofed gym. The roof colour of 鹿折小 (#4a4d55) is SCHOOL_INFO.schShishioriE.look.roof: 'outside cells (鹿折小, far zone).json' applies after this file (file-name order) and sets #5c6371 on the same lots, so a roof colour written here would lose.",
+ "sources": [
+  {
+   "id": "jonan",
+   "what": "Wikimedia Commons 153670155 Kesennuma city Jonan junior high school 202405 (raw/ref/commons, reference only): cream walls, 4 rows of 4-sash windows with narrow wall between, yellow roof-edge band on the bar and the wing, stair tower with small square windows",
+   "date": "2024-05-03"
+  },
+  {
+   "id": "shishiorij",
+   "what": "Wikimedia Commons 163963448 Kesennuma city Shishiori junior high school 202405 (raw/ref/commons, reference only): 3-storey block, warm cream walls, concrete-grey balcony slabs, groups of sash windows",
+   "date": "2024-05-03"
+  },
+  {
+   "id": "shishiorie",
+   "what": "Wikimedia Commons 150521570 Kesennuma city Shishiori elementary school 202405 (raw/ref/commons, reference only): cream piers #e9e0c5 (sampled) about 1 m wide between white infill walls, light-grey balcony rails, dark slate hipped roof, white gym with teal stripes",
+   "date": "2024-05-03"
+  },
+  {
+   "id": "ortho",
+   "what": "GSI aerial photo data/ortho/core.jpg (about 2020-22), crop x 1190..1350 z -1410..-1180: 鹿折中's classroom complex is a hollow コ of long south block (about x 1246..1329, z -1356..-1336), north wing and east wing round a courtyard; lot /195 is the barrel-roofed gym",
+   "date": "2021-01-01"
+  }
+ ],
+ "lots": [
+  {
+   "id": "16/58538/25072/175",
+   "wall": "#e4dfca",
+   "src": "jonan: main bar, walls a mild warm cream-white (about #e4dfca, less saturated than #eadfbd); SCHOOL_INFO.schJonanJ.look"
+  },
+  {
+   "id": "16/58538/25072/168",
+   "wall": "#e4dfca",
+   "src": "jonan: low wing, walls a mild warm cream-white (about #e4dfca, less saturated than #eadfbd); SCHOOL_INFO.schJonanJ.look"
+  },
+  {
+   "id": "16/58538/25072/169",
+   "wall": "#e4dfca",
+   "src": "jonan: stair tower, walls a mild warm cream-white (about #e4dfca, less saturated than #eadfbd); SCHOOL_INFO.schJonanJ.look"
+  },
+  {
+   "id": "16/58538/25072/105",
+   "wall": "#e4dfca",
+   "src": "jonan: 2-storey block, walls a mild warm cream-white (about #e4dfca, less saturated than #eadfbd); SCHOOL_INFO.schJonanJ.look"
+  },
+  {
+   "id": "16/58538/25072/182",
+   "wall": "#e4dfca",
+   "src": "jonan: 2-storey block, walls a mild warm cream-white (about #e4dfca, less saturated than #eadfbd); SCHOOL_INFO.schJonanJ.look"
+  },
+  {
+   "id": "16/58543/25065/196",
+   "storeys": 3,
+   "height": 10.8,
+   "wall": "#e0dbc8",
+   "src": "shishiorij: the 3-storey classroom block (3 x 3.6 m = 10.8 m), walls about #e0dbc8 with concrete-grey balcony slabs; ortho: the lot is the GSI hull of the block, its wings and the courtyard, not a gym"
+  },
+  {
+   "id": "16/58542/25064/96",
+   "wall": "#e8e6e1",
+   "src": "shishiorie: 3-storey block, white infill and spandrels #e8e6e1 between cream piers #ece3c8 (SCHOOL_INFO.schShishioriE.look)"
+  },
+  {
+   "id": "16/58542/25064/113",
+   "wall": "#e8e6e1",
+   "src": "shishiorie: 2-storey block, white infill and spandrels #e8e6e1 between cream piers #ece3c8 (SCHOOL_INFO.schShishioriE.look)"
+  }
+ ]
+}

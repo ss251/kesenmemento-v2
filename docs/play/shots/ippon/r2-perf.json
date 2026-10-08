@@ -1,0 +1,1 @@
+{"own":{"n":180,"p50":0,"p95":1,"max":1.000000000001819},"frames":8,"names":["other","upd:main","upd:environment","upd:water","upd:town","upd:harbor","upd:landmarks","upd:life","upd:ship","explore:stream","upd:explore","explore:drive","player","physics","updates","audio","view","sky","render","hud"],"brief":{"upd:harbor":{"n":1,"p95":1}}}

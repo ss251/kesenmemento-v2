@@ -9,8 +9,10 @@
 //   ctx.services.arrivals  ./live.js ({ list, sample, origin, onChange })
 //   ctx.services.life      { time, lights, live, tour, weather, cast, paths, sound, hud, stats }   (also window.__life)
 // URL: ?preset=asa|hiru|yugata|yuyake|yoru  ?hours=17.1  ?weather=clear|cloudy|rain|live  ?cloud=0..1  ?rain=0..1
-//      ?ui=1 (show the UI in shot mode)  ?fixtures=1 (/api/live sample)  ?nolamps=1  ?nocast=1
-import { createTime, PRESETS } from './time.js';
+//      ?ui=1 (show the UI in shot mode)  ?fixtures=1 (/api/live sample)  ?nolamps=1  ?nocast=1 (also implied by ?look=photo|sunny|dawn: the comparison looks show the survey's static scene, the people of the cast are not in the photos)
+import { createTime, PRESETS, LOOKS } from './time.js';
+import { jstNow } from './clock.js';
+import { posterForQuery, POSTER_HOURS } from '../../ui/loader/sky.js';
 import { lights, buildLights } from './lights.js';
 import { buildPaths } from './paths.js';
 import { buildCast } from './cast.js';
@@ -34,10 +36,21 @@ export async function build(ctx) {
   // ---- time & lights
   // [v5:detail] ?look=photo (or ?preset=photo): the photo-match lighting (life/time.js LOOKS)
   const look = params.get('look') || (params.get('preset') === 'photo' ? 'photo' : undefined);
-  const T = createTime(ctx, { preset: (params.get('preset') !== 'photo' && params.get('preset')) || undefined, look, hours: params.has('hours') ? Number(params.get('hours')) : undefined, date: params.get('date') || undefined });
+  const preset = (params.get('preset') !== 'photo' && params.get('preset')) || undefined;
+  // Live JST unless a shot, a look, or ?hours / ?preset pins the clock. A shot with no hour keeps the poster slot.
+  const shotPin = SHOT && params.get('live') !== '1';
+  const liveClock = !params.has('hours') && !preset && !look && !shotPin;
+  const boot = liveClock ? jstNow() : null;
+  const T = createTime(ctx, {
+    preset: params.has('hours') ? undefined : preset,
+    look,
+    hours: params.has('hours') ? Number(params.get('hours')) : liveClock ? boot.hours : (shotPin && !preset ? POSTER_HOURS[posterForQuery(params)] : undefined),
+    date: params.get('date') || (liveClock ? boot.ymd : undefined),
+    live: liveClock,
+  });
   ctx.services.time = T;
   const wq = params.get('weather');
-  if (WEATHER[wq]) T.setWeather(WEATHER[wq]);
+  if (WEATHER[wq]) T.setWeather({ ...WEATHER[wq], sky: wq });
   if (params.has('cloud')) T.setWeather({ cover: (Number(params.get('cloud')) - 0.3) / 0.6 });
   if (params.has('rain')) T.setWeather({ rain: Number(params.get('rain')) });
   if (params.has('wet')) T.setWeather({ wet: Number(params.get('wet')) });   // [v3:integrate] ?wet=0..1 wet streets without rain
@@ -50,7 +63,7 @@ export async function build(ctx) {
   const paths = safe('paths', () => buildPaths(ctx), stats) || { paths: [], at() { return {}; }, blocked: () => true };
   life.paths = paths; stats.paths = paths.paths.length;
   if (!params.has('nolamps')) { stats.lamps = safe('lamps', () => buildLamps(ctx, paths), stats); paths.posts = stats.lamps?.posts || []; if (stats.lamps) stats.lamps = { ...stats.lamps, posts: paths.posts.length }; }
-  const cast = params.has('nocast') ? null : safe('cast', () => buildCast(ctx, paths), stats);
+  const cast = (params.has('nocast') || LOOKS[params.get('look')]) ? null : safe('cast', () => buildCast(ctx, paths), stats);
   life.cast = cast; if (cast) stats.cast = cast.stats;
   const W = safe('weather', () => buildWeather(ctx, T), stats);
   life.weather = W;
@@ -60,7 +73,9 @@ export async function build(ctx) {
   stats.lights = NL.stats;
 
   // ---- live data, tour camera, sound, UI
-  const live = createLive(ctx, T, { fixtures: params.get('fixtures') === '1', offline: SHOT && !params.has('live'), applyWeather: wq === 'live' || (!SHOT && !WEATHER[wq] && !params.has('cloud')), poll: SHOT ? 0 : 600000 });
+  // Shot stills stay on the built-in sky unless the clock is live (?live=1) or ?weather=live. A pinned ?weather= still wins.
+  const weatherPin = !!WEATHER[wq] || params.has('cloud');
+  const live = createLive(ctx, T, { fixtures: params.get('fixtures') === '1', offline: SHOT && !params.has('live'), applyWeather: wq === 'live' || (!weatherPin && (!SHOT || params.get('live') === '1')), poll: SHOT ? 0 : 600000 });
   life.live = live;
   const tour = createTour(ctx);
   life.tour = tour;
@@ -82,6 +97,9 @@ export async function build(ctx) {
   const skyHasTime = typeof sky?.setTime === 'function';
   let lastPlanetSig = '';
   ctx.onUpdate((dt, t) => {
+    // a flight or the fishing voyage owns the hour; the live clock waits and eases back afterwards
+    const busy = !!(tour.flying || ctx.services?.ship?.voyage?.active);
+    T.hold(busy);
     T.update(dt);
     if (skyHasTime) sky.setTime(T);
     NL.update(dt, t);
@@ -100,9 +118,9 @@ export async function build(ctx) {
     window.__life = life;
     window.__season = (id) => { season?.set(id, { instant: true }); return season?.id; };   // [v3:integrate]
     // shot / film helpers: jump the time instantly, render the film path
-    window.__lifeSet = (p) => { if (typeof p === 'number') T.setHours(p); else T.set(p, { instant: true }); if (skyHasTime) sky.setTime(T); };
+    window.__lifeSet = (p) => { if (typeof p === 'number') T.setHours(p, { pin: true }); else T.set(p, { instant: true }); if (skyHasTime) sky.setTime(T); };
     // film: camera along tour.filmPose, the afternoon sliding from 16:30 into the 17:20 sunset
-    window.__film = (t, dur = 30, h0 = 16.5, h1 = 17 + 20 / 60) => { T.setHours(h0 + (h1 - h0) * Math.min(1, Math.max(0, t / dur))); if (skyHasTime) sky.setTime(T); return tour.applyFilm(t, dur); };
+    window.__film = (t, dur = 30, h0 = 16.5, h1 = 17 + 20 / 60) => { T.setHours(h0 + (h1 - h0) * Math.min(1, Math.max(0, t / dur)), { pin: true }); if (skyHasTime) sky.setTime(T); return tour.applyFilm(t, dur); };
     // photo mode without the HUD too (shot tools): __photo(scale, { data, noDownload })
     window.__photo = (scale = 1, o = {}) => (hud ? hud.photo(scale, o) : takePhoto(ctx, T, { ...o, scale }));
   }

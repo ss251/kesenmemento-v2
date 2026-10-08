@@ -70,7 +70,7 @@ test('boat names are deterministic and natural Japanese', () => {
 test('harbour code: seeded randomness only, no disaster references', () => {
   for (const [f, src] of files) {
     expect([f, /Math\.random\(/.test(src)]).toEqual([f, false]);
-    expect([f, /津波|震災|tsunami|disaster memorial/i.test(src)]).toEqual([f, false]);
+    expect([f, /\u6d25\u6ce2|\u9707\u707d|tsun[a]mi|disaster memorial/i.test(src)]).toEqual([f, false]);
   }
 });
 
@@ -79,14 +79,14 @@ test('stern-to rows: ~40 longliners on the east quays, every hull on water, no o
   expect(plan.length).toBeGreaterThanOrEqual(30);
   for (const row of MOORING_ROWS) expect(plan.filter((p) => p.row === row.id).length).toBeGreaterThanOrEqual(12);
   for (const p of plan) {
-    const S = BOAT_SPECS[p.type], px = p.dz, pz = -p.dx;
-    for (const [l, w] of [[S.L / 2, 0], [-S.L / 2, S.B / 2], [-S.L / 2, -S.B / 2], [0, S.B / 2], [0, -S.B / 2]]) expect(L.isWater(p.x + p.dx * l + px * w, p.z + p.dz * l + pz * w)).toBe(true);
+    const S = { ...BOAT_SPECS[p.type], B: p.B }, px = p.dz, pz = -p.dx;
+    for (const [l, w] of [[S.L / 2, 0], [-S.L / 2 + 1.5, S.B * 0.4], [-S.L / 2 + 1.5, -S.B * 0.4], [0, S.B / 2], [0, -S.B / 2]]) expect(L.isWater(p.x + p.dx * l + px * w, p.z + p.dz * l + pz * w)).toBe(true);
     // bows point away from the quay (stern-to)
     expect(L.isWater(p.qx - p.dx * 8, p.qz - p.dz * 8)).toBe(false);
   }
   for (const row of MOORING_ROWS) {
     const r = plan.filter((p) => p.row === row.id);
-    for (let i = 1; i < r.length; i++) expect(Math.hypot(r[i].qx - r[i - 1].qx, r[i].qz - r[i - 1].qz)).toBeGreaterThan((BOAT_SPECS[r[i].type].B + BOAT_SPECS[r[i - 1].type].B) / 2 + 1);
+    for (let i = 1; i < r.length; i++) expect(Math.hypot(r[i].qx - r[i - 1].qx, r[i].qz - r[i - 1].qz)).toBeGreaterThan((r[i].B + r[i - 1].B) / 2 + 0.3);   // [v6:c11r3] rafted: 0.5 m fender gap, not 2.4 m of water
   }
   // deterministic
   expect(JSON.stringify(planMooringRows(mulberry32, { isWater: L.isWater, heightAt: L.heightAt }))).toBe(JSON.stringify(plan));

@@ -270,3 +270,258 @@ tubs that fill the frames are not modelled: the quay chamfer stays near 19 px. R
 (the truck's 1.695 m width, the tubs) and a free camera height (the photographer may have stood on the 2F gallery) is
 the next step. Pavilion pairs 1, 2 and 4 are placed from the ortho, not seen end-on by any photo. Stacks other than the
 four measured follow the pattern. The column numbering direction away from 「7」 is assumed.
+
+## Fix round 1 (v6:fix1): the quay hall re-solved and rebuilt, deck follow-ups
+
+**Cameras.** The dawn frames' first solve put the cameras 3.6 m up and 39 m from the quay edge; the tubs measured 0.46 m and the
+hall closed in 18 m. The re-solve (`tools/survey/market_adjust.py`, cluster `canopy`, `adjust-canopy.json`) frees the camera height and ties the
+scale to things of known size: the truck's number plate (0.33 x 0.165 m), its 2.5 m wheelbase and 0.33 m tyre radius, the quay line, the
+apron at T.P. 1.84 and the sun-glitter azimuth. Result: **both stands are 5.0 m above the hall floor and 48 m from the quay edge** (on the 2F gallery
+by the land wall), 1350 ties at 0.83 px. Independent checks of the metric scale, none of them a constraint: a tub's rim cuts to a
+1.44 x 1.19 m rectangle (opposite sides 1.44 / 1.45 and 1.18 / 1.20 m, tub height 0.74 m: a standard 1 m3 fish tub), the truck's cab and
+bed meet its 1.695 m width, and the same floor corner cut from the two stands (1.6 m apart) agrees to 0.01-0.05 m (tub corners, conveyor
+casters, a hopper leg).
+
+**Measuring.** Floor items are cut on their plane (`tools/survey/market_hall.py`, picks `data/survey/market/hall-picks.json`, output
+`hall-features.json`, appended to `features.json` by `market_features.py measure`): 8 tub corners (pitch 1.23 m, a straight line along the quay to
+0.1 m over 9 m), 6 conveyor / sorter casters, 2 tyre contacts, 2 hopper legs, 3 curb points and 2 bitts from the adjustment. The quay frame:
+a along the layout quay line, d out to sea (negative inland). Overhead, the transverse beam's lower edge is fitted from both stands
+(their baseline is across it: a 59.7, bottom T.P. 7.76, 2.9 px); the longitudinal beams lie along the baseline, so only a one-parameter
+family is measured (it is drawn at the structurally plausible member, bottom 7.7 at d -34.3 / -27.7, the column girder 7.55, the edge beam 7.2).
+The roof edge's shadow on the floor is a straight line at d -34.5 (sun 14.5 deg), which puts the edge at d -19.8.
+
+**What the hall is, and what it overturned.**
+- **The roof edge is 19.8 m inland of the quay edge, 7.5 m inside the OSM outline.** The outline is traced on a roof 13 m up (relief
+  displacement); `market4.js` moves the whole shed 7.5 m inland (`shiftShed`). The ramp along the shed's land side also sits inside the
+  old outline, which says the same.
+- **The ceiling slab is at T.P. 11.2**; the girders are 3.5-4 m deep (the transverse girder's face runs past the top of the frame).
+- **One column grid: 21.6 m**, not 14.4 m (a 14.4 m grid puts a column in the middle of IMG_0855 / 0861, where there is none): column
+  「7」 at a 81.3, d -22 (a 1.5 x 0.3 m face; its left edge is surveyed, its depth is not: its left side is hidden behind the tub stack in
+  the photos), the next one on the measured girder at a 59.7. Black band at 3.1-3.85 m above the floor with the yellow numeral.
+- **The floor falls from T.P. 2.15 to the apron's 1.84 over the last 12 m** (no step in the photos).
+- Built from the measurements: two tub rows (8 and 4 tubs; 1.44 x 1.19 x 0.74 m, rounded body, white rim), the sorting conveyor (belt
+  0.39-0.85 m, six casters) with its sorter, the steel hopper and four-high tub stacks beside the column, the 2 t truck (wheelbase 2.47 m)
+  on the apron, the yellow / black curb with bitts every 9.65 m, and a simplified 「KD1-875」 (hull, deckhouse a 89.5-95, funnel fin; the
+  hull-side plane d +2 is assumed). The generic berths are cut around the surveyed quay (a 28-125 m), so no generic hull, tubs or
+  forklifts stand in the frames; `photo-align --area market` clears the live arrival boats.
+
+**Numbers.** `survey-diff`, 83 features compared (`diff-fix1.json`): 3D mean 0.063 m, median 0.031 m, p90 0.151 m, max 0.337 m; none over
+1 m, none over 3 sigma; 13 dims, all within tolerance (the shadow line 0.09 m).
+
+| Photo | BEFORE this round (px mean / p90) | AFTER (fix1) | look |
+|---|---|---|---|
+| IMG_0853 | 19.0 / 43.1 | 10.3 / 26.9 | dawn |
+| IMG_0854 | 19.8 / 51.2 | 9.7 / 25.7 | dawn |
+| IMG_0855 | 19.1 / 49.1 | 8.6 / 22.1 | dawn |
+| IMG_0860 | 20.0 / 54.0 | 11.95 / 30.1 | dawn |
+| IMG_0861 | 17.4 / 45.0 | 10.05 / 25.0 | dawn |
+| IMG_0792 / 0793 / 0794 | 3.8 / 5.9 / 6.0 | 3.8 / 6.6 / 6.1 | photo |
+| IMG_0795 / 0796 / 0797 / 0798 | 5.7 / 4.0 / 5.2 / 3.2 | 6.3 / 4.0 / 5.1 / 3.2 | photo |
+
+The dawn numbers are not 6 px: the metric counts every app edge against the photo's Canny edges, and much of what the hall has in
+common with the photo is dark (tub bodies, the soffit, shadowed girders) where the photo has no edge to find (the red edges in
+`docs/shots/v6_survey/market/heat_IMG_*.jpg`, `photo-align --heat 1`: green < 4 px, yellow < 12, red beyond); the sea's 250 m depth
+cut-off adds a line across every frame. The geometry that has an edge is at 1-3 px (tub rims, conveyor and hopper tops, bitts, curb).
+
+**Deck follow-ups.**
+- **Pavilion #8 (resolved, not clamped).** Its roof curl tip is triangulated in IMG_0794 / 0796 / 0798 (3.5 deg ray angle, 6 / 4 / 10 px): s 156.25
+  +- 0.8, off 14.0, 4.0 m above the deck. Combined with the ortho centre (s 159.7 +- 1.5; the pavilion's outer end carries the tip) the centre is s 153.8:
+  the built pavilion moves 2 m north, ends 3 m short of the studio face, and the survey feature is that measurement (the ortho centre alone
+  overlaps the studio by 3 m). 8 of 8 pavilions are now on the survey.
+- **Windows: 24, not 30.** The triplet the 14.4 m period put at s 6-14 is plain wall in IMG_0792 (every other window there is a dark strip). The one at s 109-117 is
+  in IMG_0794, but at the frame edge on a grazing wall (a ray cut puts it 4-5 m off), so its positions are not measured and it is not built.
+  The vents over the unmeasured triplets go too.
+- **Cone #4** re-picked in IMG_0795 (footprint centre of the black base): (713.67, 1038.19); the app's cone (from IMG_0793, 3.5 m away) stood 160 px up
+  and left. IMG_0793 cuts the same cone 1.1 m from it. The saw-cut joints say why: they are on a 3.0 m grid aligned with the wall (it was 5 m) and the
+  joint lines of IMG_0793 and 0798 agree with each other, while IMG_0795's off axis sits 0.85 m off theirs and IMG_0793's s axis 0.55 m off. The
+  photo the client compares is IMG_0795 (cone now where it shows, 6.3 px); IMG_0793's cone is now about 0.9 m off in that view. Cones carry three reflective
+  bands. Joints: s phase 0.5, off phase 0.0 (`model.json markings.joint`).
+- **Deck markings.** The orange-yellow stall line of IMG_0795 is cut at (s 90.92, off 9.55) and (s 90.77, off 11.87); it runs to the frame edge, so its
+  far end (off 13.5) is assumed. No other stall line is visible in any deck photo, so no others are drawn.
+
+## Gaps (after fix1)
+
+- The truck stands in all five dawn frames; it is absent from IMG_0853 / 0854 (it drove in later). The boats, the crew and the second vessel with its gangway are
+  not modelled; 「KD1-875」 is a hull and a deckhouse with an assumed side plane.
+- The ceiling beams other than the transverse girder (a 59.7) are a one-parameter family along the stands' baseline; the column's depth, the other columns,
+  the girder grid beyond the frames and the inland wall at d -53.8 are assumed (the camera is 5.9 m inside it). The gallery the photographer stood on is not built.
+- IMG_0852 (fish trays) and IMG_0870 (C棟 hall interior) are still unregistered. The deck cameras IMG_0793 and IMG_0795 disagree by about 1 m on the floor plane near the cone.
+- The window triplet at s 109-117 and the 3.0 m joint grid away from s 87-115 / off 5-12 are not measured.
+
+## Fix round 2 (v6:fix2): the deck's cars, cones and lifeboat, the IMG_0797 pose, the hall's ceiling, and what the edge metric can and cannot see
+
+What the verifier found: the deck's parked cars were not built (visible in 0793 / 0794 / 0796 / 0797 / 0798), the lifeboat's form and the cones' colour / position differed
+from IMG_0793, and the quay hall frames (0853-0861) stood at 8.6-12.0 px against the 6 px bar. The survey diff itself passed (83 features, mean 0.063 m) and still does.
+
+### Cars (`harbor/deckcars6.js`, `data/survey/market/cars.json`, `tools/survey/car_fit.py`)
+
+16 cars, each its own lofted model (no instanced boxes): stations from tail to nose, each a cross-section of the body (sill to belt line) and the greenhouse (belt to roof),
+dark glass, black sills and bumpers, silver wheels with the tyre, plates and lamps; 11 types (kei, Cactus, Crown crossover, Mazda 3, Swift, Spacia, RAV4, Aqua, Probox, a 2 t truck,
+Stepwgn) at the makes' published sizes. Row A (twelve cars nose-in in the stalls east of the walkway, noses at off 7.8-9.6): silver kei, teal Citroen C4 Cactus, white
+Crown, Mazda 3, white Swift, Spacia, dark RAV4, silver Aqua, white van, blue Aqua, two white cars. North group beyond pavilion #4 (IMG_0792 / 0793): the white Honda Stepwgn,
+two hatches and a white 2 t truck.
+
+How the stands were found: single-photo cuts of plates and tyre contacts disagree between the solved deck cameras by 1-3 m (below), so each car is fitted in image space:
+the convex hull of its lofted body, wheels and roof, projected through the solved cameras and lens model, against the photo's Canny edges over every photo the car stands
+in (far cars hidden behind nearer ones left out), free (nose stand s, off; heading) with priors; cars may not overlap and no car body may contain a camera centre. Result:
+pitch 2.1-3.4 m, noses within 1.8 m of one line, headings within +-12 deg of "facing the wall".
+
+**IMG_0797 re-posed.** Its pose rested on its GPS fix only (the previous round flagged it unreliable) and the fix was 6 m off: the cactus plate (0.33 m wide) spans
+63 px at f = 1594 px, i.e. 8.3 m, while the old pose put the cactus 13.7 m away. `tools/survey/pose0797.py` solves the camera from the five licence plates (corners picked
+earlier, known size 0.33 x 0.165 m, 0.23 x 0.12 m for the kei's yellow plate; free stands on the row, one plate height 0.5 +- 0.03 m, headings +-10 deg, eye height 1.7 +-
+0.4 m; rms 0.95 sigma): the camera moves from (s 107.7, off 3.0) to (s 102.1, off 0.3), 1.60 m above the deck, heading 59.4 deg (was 56.0). No survey feature is measured from
+IMG_0797, so `features.json` is unchanged; its chamfer fell from 5.10 to 4.05 px.
+
+**The near-ground inconsistency (not fixed; the numbers matter).** Points on the deck seen from two solved deck cameras triangulate BELOW the deck plane: the cone #4
+footprint (IMG_0793 x IMG_0795) lands at T.P. -0.41 m relative to the deck, three licence plates (IMG_0794 x IMG_0796; they hang 0.5 m above the deck) at -0.30 .. -0.37 m;
+single-view cuts of the same cactus plate land at s 91.4 (0794), 94.8 (0796) and 102.5 (0797 first pose): 3-11 m apart. The size cues say the rays are right and the camera
+heights are not: the plate's size puts IMG_0794's plate at 7.9 m (cut: 4.9 m), i.e. that camera is about 0.4 m higher over the floor than the adjustment has it (1.14 m; the
+adjustment's eye-height prior is 1.45 +- 0.12 m). A trial of the full deck bundle with the plates added (plates 0.5 m above the deck, kei plate 0.23 m) converges to
+deck T.P. 14.74 (was 15.585), the penthouse wall offset -3.6 m (was -1.56), camera heights 1.4-1.7 m over the deck and reprojection 1.98 px (was 1.90), i.e. it fits equally
+well with every deck feature moved: it was NOT adopted (it would invalidate `features.json` and the rebuild spec; the data to settle it is a level reference on the deck, or the
+photographer's eye height). Consequence for the overlays: near-floor objects (cars, cones, the lifeboat trailer) cannot be right in every photo at once; each is placed where it
+looks right in most of them. Cone #4 stands at the mid point of its IMG_0795 and IMG_0793 footprint cuts ((89.06, 11.53) and (89.71, 10.54) in the wall frame, 1.1 m apart;
+survey feature `deck.cone#4` is that point, sigma 0.6 m); in the two photos it is 95 and 150 px (1080 frame) from the cone instead of 0 and 240.
+
+### Cones and lifeboat
+
+Cones: deep red `#c42f28` (they rendered orange), three white reflective bands (the top one narrower), a red collar, a black rubber base 0.46 m on a thin red plate 0.50 m
+(IMG_0793 close-up). Lifeboat (`harbor/lifeboat6.js`): a lofted enclosed boat, 5.30 x 2.30 m (its stencil): round bow, tumblehome hull below the navy rub rail, canopy
+deckhouse with the bow dome and a handrail, the raised coxswain's tower (top T.P. +2.23 above the deck) with two windows, two silver-framed hatches a side (the first with
+the grey cross, the second with its latch), a trailer cradle on castors. The first version put the boat 2.9 m too far north and 1.3 m too far east and drew its end-on form;
+the sheer edge (the navy rub rail), cut at its own height 1.07 m in IMG_0793, runs from s 84.5 / off 13.52 to s 88.32 / off 13.76: west flank at off 13.6, 3.6 deg off the wall
+line, bow dome from s 84.0, centreline off 14.75. Colour `#e0432b` (orange-red as photographed).
+
+### Quay hall: what the metric sees
+
+`tools/anime/photo-align.mjs --dump` now writes per-pixel maps (`edges_<id>.png`), `tools/survey/edge_report.py` breaks a chamfer down by row band and 90 px cell, and
+`tools/survey/dark_edges.py` splits it into app edges that lie in black flat photo regions and the rest. For the five dawn frames: 5-13 % of the app's edge pixels (the tub rows'
+floor contact, the beams' undersides, the hopper's legs) lie in photo regions that are black and flat (mean luminance < 28 / 255, contrast < 22), where the photo has no
+edge for any geometry to match; they are 28-33 px from the nearest photo edge and carry 20-27 % of the chamfer sum. A profile across a tub's floor line in IMG_0860 reads
+11-23 / 255 on both sides, gradient about 1. The chamfer of the other edges is about 6-8 px (below, "excl. black"). What was changed in the hall:
+
+- **Longitudinal beam `hall.long[1]`** (no survey linkage; the longitudinal members lie along the stands' baseline, so the frames fix only a family): moved to d -32.07 / bottom
+  6.92 (was -27.70 / 7.70) with `tools/survey/hall_fit.py`, the metric's own Canny: its three lines go from 20.8 to 4.6 px at the 1080 frame. Held as surveyed: the transverse beams at
+  7.76 (`canopy.beam_t1.y`), the column girder on its columns, the slab at 11.2, and the edge beam (its height is tied to the surveyed shadow line `canopy.shadow_d`; the frames'
+  edges would put it 1.1 m higher, which the shadow does not allow).
+- The truck's hubs are silver, not yellow.
+- A fit of the vessel's four boxes to the frames (`tools/survey/vessel_fit.py`: -1.2 m along the quay, hull top +1 m, wireframe edge distance cut by a third) did not improve the
+  frames' chamfer (+0.1 px) and was not adopted; a stereo attempt on the rectified pair (`vessel_stereo.py`, `vessel_sift.py`, `vpick.py`) puts the vessel's depth only
+  to +-1 m (1 px of disparity = 0.17 m at 50 m on the 0.75-scaled pair, but the hull, house and rigging match poorly across the 1.6 m baseline), so the vessel stays the
+  first build (hull-side plane d +2). The truck is in 3 of the 5 frames (it drove in after IMG_0853 / 0854), so those two score its edges against nothing.
+
+### Numbers (fix round 2; `data/survey/market/chamfer.json` tag `fix2`, `diff-fix2.json`)
+
+`survey-diff --area market`: 83 of 83 features compared, 3D mean 0.063 m, median 0.031 m, p90 0.151 m, max 0.337 m (`deck.pavilion#7`); none over 1 m, none over 3 sigma;
+13 of 13 dimensions equal (the window count matches, `canopy.shadow_d` 0.09 m). `deck.cone#4` is now the two-photo mid point (sigma 0.6 m).
+
+| Photo | fix1 mean px | fix2 mean / p90 px (1080 frame) | full-res mean px | excl. black regions |
+|---|---|---|---|---|
+| IMG_0792 | 3.77 | 3.83 / 10.8 | 15.2 | |
+| IMG_0793 | 6.57 | 6.99 / 16.6 | 27.7 | |
+| IMG_0794 | 6.09 | 6.87 / 16.5 | 27.3 | |
+| IMG_0795 | 6.26 | 6.45 / 15.0 | 18.1 | |
+| IMG_0796 | 4.00 | 6.01 / 14.9 | 16.8 | |
+| IMG_0797 | 5.10 | 4.05 / 10.0 | 11.3 | |
+| IMG_0798 | 3.22 | 4.16 / 10.0 | 11.7 | |
+| IMG_0853 | 10.3 | 9.72 / 24.3 | 27.2 | 7.10 |
+| IMG_0854 | 9.7 | 9.06 / 22.0 | 25.4 | 7.33 |
+| IMG_0855 | 8.6 | 7.79 / 18.0 | 21.8 | 6.20 |
+| IMG_0860 | 11.95 | 11.60 / 30.8 | 32.5 | 7.94 |
+| IMG_0861 | 10.05 | 9.73 / 24.0 | 27.3 | 6.44 |
+
+The deck photos rise by 0.1-2.0 px where the cars now stand (each car is an edge-rich object the photos also have, but 1-2 m of near-floor camera inconsistency, above,
+shows) and fall in IMG_0797 (its pose); the 16 cars and the lifeboat form that were missing from the frames are the point of the round. The hall frames improve by 0.1-0.8 px; the
+6 px bar is not met there (the 7.8-11.6 px includes 5-13 % of edge pixels that lie in black photo regions at about 30 px; without them the frames read 6.2-7.9 px).
+
+### Gaps (after fix2)
+
+- The deck's near-floor geometry is not consistent between the solved cameras (0.3-0.8 m of height, 1-3 m on the floor at 3-8 m range): cars, cones and the lifeboat trailer
+  are compromises; a level reference or a measured eye height would settle the deck T.P. (15.585 vs 14.74 in the plate trial).
+- IMG_0795's black car (front wheel cut at s 90.93 / off 10.96) and IMG_0794's silver kei cannot both stand in the first stall of the row in the solved frame: only the kei is built.
+- The cars are low-poly lofts, 0.5-1 m high in the overlays; their wheel arches, grilles, mirrors and lamps are generic per type.
+- The vessel KD1-875 (hull-side plane d +2, three boxes and a fin), the second vessel with the gangway, the boats and the crew are not modelled to the frames;
+  the truck is absent from IMG_0853 / 0854.
+- The hall's longitudinal members other than `long[1]`, the transverse beams away from a 59.7, the column's depth and the grid beyond the frames are assumed.
+
+## Fix round 3 (v6:fix3): the quay hall's contents built to the frames (tubs, truck, tug, conveyor), the transient items, and what the edge metric can and cannot say
+
+What the verifier found: the survey numbers pass (83 / 83 features, mean 0.063 m), the edge criterion (about 6 px) does not, and the dawn quay read as a wall and flat boxes:
+the tubs were one trough per row, the truck three boxes, the tug 「KD1-875」 four boxes and a fin, the conveyor a slab with a sorter twice too long.
+
+### What was built (all in `harbor/`, from the photos)
+
+- **Tubs (`crate6.js`).** 12 crates + 12 more in three stacks, each its own object: smooth ribbed shell (ribs painted), one rounded rim collar, the lighter interior 0.14 m below the rim,
+  two hinged latches on each long rim edge, a base skirt (row-end tub: two runners with a fork pocket between), and the white plates the photos read ("4382 / 気仙沼" on the
+  narrow face, "H23補助 / 魚市場" and "寄贈 農林中央金庫 / 魚市場" on the wide one, numbers 4382, 3331, 4484, 3247, 3419 as photographed). 1.44 x 1.19 x 0.74 m, pitch 1.23 m.
+  In a row the shells touch (the slit between the rims is open at the top only; below it it is black and shut in the photos), which also keeps the metric from scoring a seam in
+  the dark.
+- **Truck (`truck6.js`).** The 「JF みやぎ」 2 t flat-bed: extruded cab with raked windshield, door glass, black mirrors, Toyota emblem, headlamps, white bumper and plate
+  「宮城 800 あ 95-46」, the logo on the doors; cream bed with drop sides, cab guard and the grey wire-mesh tail panel, the silver fuel tank, wheels with tyre, rim, hub and
+  nuts. Width 1.695 m, wheelbase 2.47 m (the two tyre contacts), tyre radius 0.33 m. It drove in after IMG_0853 / 0854 (see `absent` below).
+- **Tug (`tug6.js`, `data/survey/market/tug.json`, `tools/survey/tug_spec.py`, `tools/survey/vessel_cut.py`).** Rectangles read off IMG_0861 (raw pixels) and cut onto the plane of
+  their face in the quay frame. The hull side plane is d = 1.0 m: the two life rings (0.76 m) come out 0.71 m tall at that plane and 59 m range, the hull foot meets the curb at
+  T.P. 1.82 (curb top 1.84), and every cut agrees with the two stands' views to 0.2-0.4 m along the quay (a +-1 m error in d moves a point 0.7 m along the quay, so the plane is good
+  to about +-1 m in depth, 0.15 m in height). Built: hull with its bow (a 80 to 98.5, beam 5.4 m), the tall quarter-deck wall (top T.P. 4.08) with the hull marking
+  「KO1-875」, three portholes, lamps, the ladder, two life rings, the funnel (raked casing, black cowl, 龍 roundel centred at a 87.7 / T.P. 5.42, 0.68 m), blue drums, the
+  stair wedge with its blue coping and rails, the forward house (door, two windows, window slot, roof T.P. 4.69), the pilothouse with its overhang and radar, the gangway (a 94.1
+  to 101.4, near handrail cut at d 1.25: rises 0.67 m), the squid boat on the stern side (white house, black rod rack) and the vessel on the bow side (house, mast with ladder).
+  The registration at the hull reads 「K?1-875」: the second glyph is crossed by a pole in all five frames and reads as a D or an O; the lettering follows the spec text, KO1.
+  Six tug features are in `features.json` (`canopy.tug.ring#1/#2`, `.mark`, `.wall_top`, `.funnel_top`, `.house_roof`, sigma 0.8 m horizontal, 0.15 m vertical) and the hull plane
+  is a dimension; they are single-view cuts, so their agreement with the app (0.0-0.2 m) shows the build follows its spec, not an independent check.
+- **Conveyor and sorter.** The sorter at the head was measured on the floor and on the head's edges in IMG_0855 (head fully in frame): a 67.7-70.0 and 1.4 m wide (the fix 2 box was a
+  66-70 x 3.8 m slab), grate top T.P. 3.63. Built: channel frame, stacked chute bodies, tilted perforated grate, slung drive housing and guard plate, four legs on casters; the
+  belt (a 70.0-75.9) with its lettered side panel 「気仙沼魚市場 No.1」, flanges, end plates, underslung channel frame and cross members, thin guide rails behind it, the hose-bib pipe
+  at a 78.3 / d -16.6, the free-standing U-rail on the floor ramp (a 86.2 / d -13.4), the hopper's bin lip, chutes and ladder-frame legs.
+- **Also in the frames:** the deflector plate hanging under the transverse girder at a 58.8 / d -42.1 (tip T.P. 7.18, triangulated from IMG_0853 x 0861 at 8.1 m range: 0.46 m wide),
+  eight black cables hanging left of column 7 (a 79.4-79.9, T.P. 7.6 to 5.7-6.1), the 0.3 m bird-net mesh on the soffit, the floor ramp as one wedge flush with the floor slab and the
+  apron, three people (two crew by the squid boat's stern in IMG_0861, a man on the tug's deck by the stair in IMG_0855).
+- **`absent`.** `data/survey/market/cameras.json` lists, per camera, the scene objects that were not there when that frame was taken (`hall.truck` in IMG_0853 / 0854, `hall.crew`
+  everywhere but IMG_0861, `hall.man` everywhere but IMG_0855); `tools/anime/photo-align.mjs` hides them for that frame only (the objects are unbatched, `ctx.noBatch`). The frames
+  before the truck arrived used to score the truck's edges against nothing.
+- **Deck cars** (`deckcars6.js`): the side glass is split into panes by B and C pillars in body colour (the greenhouse was one black wedge; the panes are coplanar with the old face, so no edge changes). Alloy spokes and a wheel-arch ring were tried and dropped: spokes at a guessed phase cost IMG_0796 +0.45 px (6.00 -> 6.45), a ring covering the tyre hid the wheel.
+
+### Numbers (`data/survey/market/diff-fix3.json`, `chamfer.json` tag `fix3`)
+
+`survey-diff --area market`: 89 of 89 features compared (83 + the six tug features), 3D mean 0.063 m, median 0.026 m, p90 0.162 m, max 0.337 m (`deck.pavilion#7`, inside its 1.5 m
+sigma); none over 1 m, none over 3 sigma; 14 of 14 dimensions equal (the new one: the tug's hull plane).
+
+| Photo | fix2 mean / p90 px (1080 frame) | fix3 mean / p90 px | full-res mean |
+|---|---|---|---|
+| IMG_0792 / 0793 / 0794 | 3.83 / 6.99 / 6.87 | 3.83 / 6.98 / 6.87 | 15.2 / 27.7 / 27.2 |
+| IMG_0795 / 0796 / 0797 / 0798 | 6.45 / 6.01 / 4.05 / 4.16 | 6.45 / 6.00 / 3.95 / 4.16 | 18.1 / 16.8 / 11.1 / 11.7 |
+| IMG_0853 | 9.72 / 24.3 | 9.21 / 24.2 | 25.8 |
+| IMG_0854 | 9.06 / 22.0 | 8.57 / 22.4 | 24.0 |
+| IMG_0855 | 7.79 / 18.0 | 7.61 / 18.0 | 21.3 |
+| IMG_0860 | 11.60 / 30.8 | 11.15 / 29.0 | 31.2 |
+| IMG_0861 | 9.73 / 24.0 | 9.01 / 21.1 | 25.2 |
+
+The app edges in the dawn frames grew from about 30 000 to 50 000 pixels (crates, truck, tug, conveyor detail all stand in the frames) and the mean still fell by 0.2-0.7 px: the new
+geometry lines up with the photos. The 6 px bar is not met in the dawn frames, and the breakdown (`tools/survey/edge_report.py`, rows of the 1080 frame) says why:
+
+| rows | what is there | app edge px | mean px |
+|---|---|---|---|
+| 0-500 | ceiling members, the deflector plate | 5-8 k | 5-13 |
+| 500-800 | tug, truck, gangway, bitts | 14-24 k | 6.7-9.8 |
+| 800-1000 | conveyor, hopper, stacks | 10-15 k | 7.1-9.5 |
+| 1000-1440 | the two tub rows | 10-17 k | 10-13 |
+
+The tub rows are the worst band because the photo is black there (sun behind the tubs): the tubs' floor contact line and the rim collars' inner edges are real edges that a black
+photo cannot show (28-63 px to the nearest photo edge, 29-40 % of the chamfer sum). Everything above them is 6-9 px; IMG_0855, the frame the sorter was measured on, is 7.6 px (6.3 px
+without the tub rows).
+
+### Gaps (after fix3)
+
+- Dawn chamfer 7.6-11.2 px (bar: about 6): above, the tub rows' floor contact and the remaining 6-9 px of the tug, gangway and conveyor, which are cut from one photo each (the hull plane
+  is good to +-1 m: 0.7 m along the quay). A stereo solve of the vessel needs more baseline than the 1.5 m between the two stands.
+- The tug's upper works (radar masts, the blue gantry behind the funnel, rod racks, the rigging) are boxes and posts, not modelled item by item; the squid boat and the bow-side vessel
+  are masses with their main features only. The 'second glyph' of the hull marking is unreadable (pole in front).
+- The deck's near-ground inconsistency between the solved cameras (above) is unchanged, so the cars stand in the compromise positions: IMG_0794's silver kei and IMG_0798's dark SUV
+  are the nearest cars in those photos and are not where the photos put them. Deck photos 0793-0796 stay at 6.0-7.0 px. The three men in IMG_0794, two in IMG_0796 and the walker in IMG_0798 are not built.
+- IMG_0852 (fish trays on the floor) and IMG_0870 (C棟 hall interior) are still unregistered: no overlap with another photo and no reference in view.
+- The conveyor's underframe, the hopper's scaffold and the ceiling members other than those listed are plausible members, not measured ones. `hall_fit.py` would move the edge beam to d -16.3 / T.P. 8.44 (it fits its photo line, 5.7 px instead of 16.5, and keeps the shadow line) but the beams in front hide that line from every dawn frame, so it changes no pixel of the app's edge maps and is not adopted (`model.json` `edgeFit`). The column girder (d -21.4, T.P. 7.55) and the transverse beam at a 81.3 do not match any photo edge at any height (22-24 px at best): whichever members they are, they are not those boxes.
+
+## FINAL (v6:finish, 2026-10-04)
+
+`survey-diff` (`diff.json`): 89 / 89 features, 0 missing, 3D error mean 0.063 m, median 0.026, p90 0.162, max 0.337 (horizontal mean 0.037 m), none over 1 m or 3 sigma, 14 / 14 dimensions within tolerance.
+`photo-align` tag `final`: mean chamfer 7.0 px over the 12 photos (11.9 before), 4 at <= 6 px, 11 at <= 10 px, worst 0860 11.2 px. Tests: `test/v6-finish.test.js`. Procedure: `docs/anime/SURVEY.md`.

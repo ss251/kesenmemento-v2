@@ -8,6 +8,7 @@ each part comes from and what applies to it.
 | Terrain, aerial photo tiles, building footprints, place names (`data/terrain`, `data/ortho`, `data/buildings`, parts of `data/anime`) | 国土地理院 (GSI) 地理院タイル: elevation, seamless aerial photo, vector tiles | 出典：国土地理院（地理院タイル）を加工して作成. Used under the [GSI tile terms](https://maps.gsi.go.jp/development/ichiran.html). |
 | Roads, building attributes and names merged into the layout | © OpenStreetMap contributors | [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/). The layout files that merge OSM data are derived databases offered under ODbL 1.0. |
 | Weather, forecast and tides (`data/live`, fetched at runtime) | 気象庁 (JMA) | 出典：気象庁ホームページ. JMA's terms are compatible with CC BY 4.0. |
+| Census small areas (`data/anime/areas-estat.json`) and address names (`data/anime/areas-gsi.json`) | 政府統計の総合窓口 (e-Stat) 境界データ（令和2年国勢調査 小地域、気仙沼市）; the town-block name that the 国土地理院 reverse geocoder returns on a 50 m and 25 m grid | 出典：政府統計の総合窓口(e-Stat)の境界データを加工して作成, under the site's terms (政府標準利用規約, compatible with CC BY 4.0). 出典：国土地理院 for the address names, which are factual address data, not imagery. |
 | Boat arrivals (fetched at runtime) | 気仙沼漁業協同組合's public 入船情報 pages | Read at runtime for display. For offline development the repository keeps one day of saved public pages (2026-09-29, `scripts/live/fixtures/`) and the sample built from them (`data/live/sample.json`, always labelled サンプル in the app). |
 | Corrections (`data/anime/overrides/*.json`) and the survey (`data/survey/*`) | The KesenMemento team | See below. |
 
@@ -19,7 +20,8 @@ The evidence comes from:
 - the team's own photographs and the photo survey (structure from motion, measured in metres);
 - the GSI aerial photo and OpenStreetMap;
 - Wikimedia Commons photographs (their own licences; none is included here);
-- Google Earth's 3D view (imagery dated 2026-03-11).
+- Google Earth's 3D view (imagery dated 2026-03-11). The roof colours read on its top views are kept only as derived values
+  (`data/anime/earth-roofs.json`: one colour per building, no imagery) and as the colours written into the override files.
 
 Google Earth was used as a visual reference while modelling: to see what stands today, how tall it is and what
 colour its roof is. **No Google imagery, 3D content, screenshots or capture tools are included in this repository.**

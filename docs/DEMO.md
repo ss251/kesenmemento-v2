@@ -63,8 +63,10 @@ Useful keys if something drifts: **R** returns to the inner-bay drone view, **V*
 **F** flies (through walls) if you get stuck, **Esc** closes the search or the map, and **G** starts an auto tour
 through all 51 places that runs on its own, which is handy for Q&A. Press G again to stop it.
 
-**Photo mode (P).** The 写真 button saves a 3840×2160 PNG. Photo mode has only been tested at 1920×1080, so test P once
-on the demo machine before you use it live.
+**Photo mode (P).** On a computer the 写真 button saves a 3840×2160 PNG; it has only been tested at 1920×1080, so test P once on the demo Mac before you use it live. **On a phone** (the QR link) 写真 is in the time sheet:
+it takes a 1920-pixel picture in the shape of the screen and shows a card; **保存・共有** opens the iPhone share sheet (*Save Image*
+puts it in Photos; AirDrop and LINE are there too) and 「保存しました」 appears only once the sheet has done its job. Try it on the
+demo phone before the day: three photos in a row, then 閉じる.
 
 ## Offline fallback
 

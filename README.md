@@ -8,8 +8,8 @@ Hackatsuon 2025 project, which won the Mayor's Award and the People's Choice awa
 Living City.)
 
 **Live demo: <https://kesennuma-living-city-production.up.railway.app/>** (add `?ship=1` to board the tuna longliner
-第一昭福丸, see [The ship](#the-ship)). The first load builds the city in your browser and takes a while; the station-name
-board shows the progress.
+第一昭福丸, see [The ship](#the-ship)). The first load builds the city in your browser and takes a while; the title screen
+shows the progress.
 
 ![The inner bay at 16:30, seen from the drone](docs/shots/v4_readme_drone.png)
 
@@ -18,7 +18,8 @@ board shows the progress.
 | ![Walking along the quay at 魚町, with moored boats and a seafood stall](docs/shots/v4_hero_walk.png) | ![The inner bay at night, with place labels and the minimap](docs/shots/v4_night.png) |
 | ![Place search for 気仙沼駅, with place labels over the town](docs/shots/v4_search.png) | ![Inside 男山本店's shop on 魚町](docs/shots/v4_otokoyama_inside.png) |
 
-On a phone the town plays like a game, with a floating thumbstick and an arc of action buttons:
+On a phone the town plays like a game, with a floating thumbstick and an arc of action buttons, and the HUD folds down to
+one top bar, a ☰ menu and two bottom pills that open sheets:
 
 <img src="docs/shots/mobile/walk_portrait.png" alt="The phone layout with the touch pad" width="260">
 
@@ -34,8 +35,10 @@ On a phone the town plays like a game, with a floating thumbstick and an arc of 
 - **Walk, drive, fly.** The whole core, about 4.3 × 4.4 km from 気仙沼駅 to the bay and from 鹿折 to 南気仙沼, streams in
   100 m tiles around you, with full detail (shop fronts, 電柱 and wires, bikes, vending machines) within about 100 m.
   Buildings, quay edges and river channels are walls. You can drive a kei car on the real road network or fly freely.
-- **Search and maps.** Place search covers about 3,500 real names in Japanese and English. There are POI labels, a
-  minimap and a full map, and 51 places that each have a drone framing and a walk spot on the nearest street.
+- **Search, maps and real names.** Place search covers about 3,500 real names in Japanese and English. There are POI
+  labels, a minimap and a full map, and 51 places (the 7 classic tour stops, 17 civic landmarks and 27 places in town) that
+  each have a drone framing and a walk spot on the nearest street. Public buildings and every shop that OpenStreetMap or
+  GSI names carry their real name on their signs; the other shops get fictional but plausible names for their trade.
 - **Landmarks at true size.** Each is modelled from a reference sheet in [docs/anime/landmarks/](docs/anime/landmarks/):
   the fish market (all four halls and 海の市), かなえ大橋 and 大島大橋, 神明崎 with 浮見堂 and 五十鈴神社, the 魚町
   seawall with its flap gates, PIER7 and 迎, 安波山, the city hall, 気仙沼駅, リアス・アーク美術館, the hospitals, eight
@@ -46,17 +49,27 @@ On a phone the town plays like a game, with a floating thumbstick and an arc of 
   0.075 m). See [docs/anime/survey/](docs/anime/survey/).
 - **Walk-in interiors.** The fish market C hall (the visitors' entrance, the 2F information hall and the gallery over
   the landing floor), 男山本店's shop on 魚町, and 気仙沼駅's waiting hall with its ticket gates and the day's departures.
-- **The harbour, live.** Tuna longliners and saury boats lie in rows, and today's arrivals glide into the market under
-  their real names. Weather comes from 気象庁 (JMA) and arrivals from the 気仙沼漁協 (the fishing co-op). If a live fetch
-  fails, the app shows a saved sample and labels it **サンプル**; a copy older than an hour is labelled **キャッシュ**.
+- **The harbour, live.** Tuna longliners and saury boats lie in rows, working boats line the quays, and today's arrivals
+  glide into the market under their real names. Weather comes from 気象庁 (JMA) and arrivals from the 気仙沼漁協 (the
+  fishing co-op), through `GET /api/live`. The chip at the top says what it is showing: if a live fetch fails, the app
+  shows a saved sample and labels it **サンプル**; a copy older than an hour (or a port list from an earlier day) is
+  labelled **キャッシュ** with its time; with nothing at all it says so (天気情報なし, ライブ情報なし).
 - **It changes.** Five times of day (lit for 10 October 2026), four seasons, rain and wet streets, traffic signals that
   cycle, and a harbour soundscape.
-- **A phone tier.** A game-style touch pad (floating stick, drag to look, buttons that follow the mode) and a low tier
-  that fits phone memory. See [docs/MOBILE-CONTROLS.md](docs/MOBILE-CONTROLS.md).
+- **A phone layout.** A game-style touch pad (floating stick, drag to look, buttons that follow the mode), a portrait HUD
+  folded to a top bar, a ☰ menu and bottom sheets with 44 px targets, bottom-sheet motion with press states, and a low
+  tier that fits phone memory. A key press or a tap ends a camera flight at once. See
+  [docs/MOBILE-CONTROLS.md](docs/MOBILE-CONTROLS.md).
 - **A true-scale tuna longliner.** 第一昭福丸 (owner 臼福本店) berths at the コの字岸壁 and can be boarded and played in
   three acts: the send-off, the longline set and haul, and the chain that brings the catch to Japan.
-- **Tours and photos.** An auto tour, a tiny-planet view of the whole bay, a photo mode that saves a 3840×2160 PNG, a UI in
-  Japanese and English.
+- **Tours and photos.** An auto tour, a tiny-planet view of the whole bay, and a photo mode: on a computer it saves a
+  3840×2160 PNG with no UI; on a phone it takes a 1920-pixel picture in the shape of the screen and opens the share sheet
+  (Save Image, AirDrop, LINE). The PNG carries the camera pose in a text chunk, so a shared picture knows where it was
+  taken. The UI is in Japanese and English.
+- **Two optional modules, switched off here.** A report sheet (修正を報告: residents and visitors can tell the team what
+  is wrong in the town) and a sheet of shops that take JPYC (a read-only link-out to JPYC EC). Both are in the code, with
+  tests and docs, behind switches that are off in the build this repository makes, so nothing of them shows or runs
+  unless a team turns it on. See [Optional modules](#optional-modules-off-by-default).
 
 ## Quick start
 
@@ -87,8 +100,8 @@ bun run scripts/live.js --fixtures              # the saved sample state
 
 ## Controls
 
-Click **まちへ出る · Enter the town** on the station-name board, or press Enter. The help line at the bottom of the screen
-lists the keys.
+Press the start button on the title screen (**CLICK TO START**, or **TAP TO START** on a phone), or press Enter. The help line at
+the bottom of the screen lists the keys.
 
 | Key | Action |
 |---|---|
@@ -104,20 +117,48 @@ lists the keys.
 | O | Tiny planet on or off |
 | P | Photo: saves a 3840×2160 PNG with no UI |
 | H / M / \` | Hide the UI / sound on or off / frame counter |
+| B | 修正を報告 (report a correction): only where the report flow is switched on, which is always the case on localhost and never in a default build |
 
 **Interiors** need no key: walk in through the door. Search 魚市場 (or press 2) for the fish market C hall, 男山 for the sake
 shop, or 気仙沼駅 for the station hall.
 
 **On a phone** the touch pad has a floating thumbstick on the left (push past 85 % to run, or to boost in the car), a drag on
-the right to look, and an arc of buttons at the bottom right that follows the mode. The chip at the top left switches
-歩く / 飛ぶ / 運転. `?touch=1` shows the pad on a desktop and `?touch=0` turns it off. Details:
-[docs/MOBILE-CONTROLS.md](docs/MOBILE-CONTROLS.md).
+the right to look, and an arc of buttons at the bottom right that follows the mode: ジャンプ / ダッシュ / 飛ぶ / 乗る or 入る
+on foot, 上昇 / 下降 / 加速 / 歩く in flight, ブレーキ / ブースト / 降りる in the car. The chip at the top left switches
+歩く / 飛ぶ / 運転, and its settings button swaps the sides (left-handed), inverts the look and sets the sensitivity.
+Held upright, the HUD is one top bar (the time and weather chip, search and a ☰ menu with language, season, sound, place
+labels, the tiny planet, hide and the credits), a small minimap and two pills at the bottom (the place and the time of day) that open the places strip
+(自動で巡る is its first chip) and the time dock as bottom sheets; ⓘ in the menu opens the credits and the licence. At the
+helm of 第一昭福丸 the same pad steers the ship. `?touch=1` shows the pad on a desktop and `?touch=0` turns it off.
+Details: [docs/MOBILE-CONTROLS.md](docs/MOBILE-CONTROLS.md).
 
 **URL options:** `?preset=asa|hiru|yugata|yuyake|yoru`, `?hours=17.1`, `?season=spring|summer|autumn|winter`,
 `?weather=clear|cloudy|rain|live`, `?wet=0..1`, `?lang=ja|en`, `?q=high|medium|low`, `?fixtures=1` (force the sample data),
-`?places=1` (open the places panel), `?stats`, `?cam=x,y,z>lx,ly,lz` (start from a given camera), `?stream=0` (no
-street-level streaming), `?labels=0` (hide the boat labels), `?credit=1` (burn the credit line into stills), and
-`?ship=1` (board the ship).
+`?places=1` (open the places panel), `?stats`, `?dbg=1` (a diagnostics strip for a phone: iOS and Safari version, viewport
+heights, safe areas, audio state, time to ready), `?cam=x,y,z>lx,ly,lz` (start from a given camera) or
+`?cam=x,y,z,heading,pitch,fov` (the exact view of a report), `?stream=0` (no street-level streaming), `?labels=1|0` (show or hide
+the place labels; the choice is remembered on the device and phones start with them hidden; `0` also hides the boat labels),
+`?credit=1` (burn the credit line into stills), and `?ship=1` (board the ship). The optional modules add
+`?contrib=1|0`, `?contribApi=<url>`, `?jpyc=off|dev`, `?jpycApi=<loopback origin>` and `?src=chirashi`, see below.
+
+## Optional modules (off by default)
+
+Two modules are part of the code but stay off in the build this repository makes. Each has its own doc, switch and tests.
+
+- **Report a correction (修正を報告).** Residents and visitors can tell the team what is wrong in the town: a sheet with an
+  automatic screenshot of the view, a category, a note, optional photos taken on the spot, a nickname and an optional
+  クルーNo. Accepted reports earn points on a public ranking. It needs its own backend, `server/contrib/` (a small Bun
+  service with a moderation page), and a privacy notice with a contact, which this repository does not name. The flow
+  stays hidden until a team deploys the backend, fills in the contact and flips `CONTRIB_DEFAULT_ON` in
+  `src/anime/ui/contrib-lib.js`; on localhost it is always shown, and `?contrib=1` turns it on for one device. Docs:
+  [docs/contrib/](docs/contrib/README.md).
+- **Shops that take JPYC.** ☰ → 「JPYCで買えるお店」 lists the shops that sell on [JPYC EC](https://ec.jpyc-service.com), a
+  JPYC marketplace, with their products and prices in JPYC; 「JPYCで買う」 opens the product page there, where the buyer's
+  wallet pays. The app only reads (through a cached, allow-listed proxy in the production server) and links out: it takes
+  no payment and keeps nothing about a purchase. A real shop appears only with its owner's consent on record; alcohol only
+  when the shop's row declares its mail-order licence and an age check; the printed flyer's link (`?src=chirashi`) hides
+  the whole feature. `data/shops/jpyc.json` ships with the demo shop switched off (`"enabled": false`), so the production
+  server answers 404 to `/api/jpyc` and nothing shows. Docs: [docs/jpyc/README.md](docs/jpyc/README.md).
 
 ## Accuracy
 
@@ -153,17 +194,27 @@ footprints the IoU is measured against, so the IoU shows how faithfully the town
 the roof colours, heights, landmarks and roads are checked against independent sources. The audit predates the 2026-10-03
 survey rebuilds, which are checked against their own survey ([docs/anime/survey/](docs/anime/survey/)).
 
+## Deploy
+
+The production server is `server/app/server.js`: Bun, storing nothing, serving the build, `data/` (with brotli and gzip copies
+made ahead of time), `GET /api/live` and, when a shop is switched on, `/api/jpyc`. Its one write route, for a local AIS receiver,
+answers 404 unless `AIS_INGEST_TOKEN` is set. `railway.json` builds and starts it on
+[Railway](https://railway.com) straight from this repository: `bun run build:railway` builds the app and assembles the
+bundle (`bundle/`), and `cd bundle && bun server.js` serves it. The recipe, the checks and the roll-back are in
+[server/app/README.md](server/app/README.md).
+
 ## Project layout
 
 | Path | What is in it |
 |---|---|
 | `src/anime/` | The app: the engine (`core/`), the world modules (`world/`: environment, water, town, harbor, landmarks, life, ship, explore) and the UI (`ui/`) |
 | `src/core/`, `src/server/` | Geo and sun maths shared by the app and the scripts; the `/api/live` endpoint |
+| `server/` | `app/`: the production server, its JPYC proxy and the bundle script; `contrib/`: the report backend (off by default) |
 | `src/web/` | Shared libraries and dev fixtures kept from the earlier viewer |
 | `scripts/` | The data pipeline (GSI tiles to terrain, buildings and the layout; the OSM enrichment), the live-data fetchers, the bundler and the local server |
 | `tools/` | QA and survey tools: headless-Chrome QA, the accuracy audit, screenshots, and the photo-survey (structure from motion) tools |
 | `data/` | The built city data the app loads at run time (layout, terrain, aerial crops, i18n strings, the survey results) |
-| `docs/` | Architecture, data sources, landmark reference sheets, the surveys and the ship guide |
+| `docs/` | Architecture, data sources, landmark reference sheets, the surveys, the ship guide, the touch pad, and the report and JPYC modules |
 | `test/` | The `bun test` suites |
 
 Start with [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -173,12 +224,18 @@ Start with [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the engine, how the layout is derived from real data, the modules,
   streaming, the live layer and the tools.
 - [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md): every dataset, with its licence and attribution.
+- [docs/CRAFT.md](docs/CRAFT.md): the craft standard (ものづくり基準): colour, type, motion, copy, the 3D world and the pre-ship checklist.
 - [docs/PLAN.md](docs/PLAN.md): the roadmap.
 - [docs/DEMO.md](docs/DEMO.md): a 3-minute walkthrough, with an offline fallback.
-- [docs/MOBILE-CONTROLS.md](docs/MOBILE-CONTROLS.md): the touch pad.
-- [docs/anime/](docs/anime/): the town package, per-cell overrides, the landmark reference sheets and the photo surveys.
+- [docs/MOBILE-CONTROLS.md](docs/MOBILE-CONTROLS.md): the touch pad, its modes, the portrait phone HUD and the photo card.
+- [docs/contrib/](docs/contrib/README.md): the report sheet and its backend (off by default).
+- [docs/jpyc/README.md](docs/jpyc/README.md): the JPYC shop sheet and its switch (off by default).
+- [server/app/README.md](server/app/README.md): the production server and the Railway deploy.
+- [docs/anime/](docs/anime/): the town package, per-cell overrides, the landmark reference sheets, the photo surveys and
+  [how to survey a new street](docs/anime/SURVEY.md).
 - [docs/ship/](docs/ship/): 第一昭福丸, the model, the three acts and how to run them.
 - [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+- [CLAUDE.md](CLAUDE.md): working instructions for AI coding agents.
 
 ## The ship
 
@@ -194,7 +251,8 @@ repository. Without it the app paints a plain livery.
   14 M triangles). Measured on one Apple M2 Max with the browser throttled to background priority, a 1080p frame took
   20 to 32 ms on high and the first load took 45 to 55 s; a quieter run is faster, but 60 fps on high has not yet been
   measured on an idle machine. The low tier is faster.
-- **4K.** Photo mode and the stills at 3840×2160 have only been tested at 1920×1080 or smaller.
+- **4K.** The computer's photo mode and the stills at 3840×2160 have only been tested at 1920×1080 or smaller. A phone takes
+  a 1920-pixel picture.
 - **Interiors.** Three buildings have interiors; every other building is solid.
 - **Street detail.** Buildings beyond the 100 m kit radius are simplified. 唐桑 and the far parts of the city have terrain,
   footprints and roads but no street-level streaming.
@@ -209,7 +267,7 @@ repository. Without it the app paints a plain livery.
 - **Weather and tide:** 出典：気象庁ホームページ.
 - **Today's arrivals:** the 気仙沼漁業協同組合 (the Kesennuma fishing co-op)'s public 入船情報 pages.
 
-The in-app credit line reads: © OpenStreetMap contributors · 出典：国土地理院, 気象庁, 気仙沼漁協 · Sakuragaoka Station (MIT)
+The in-app credit line reads: © OpenStreetMap contributors · 出典：国土地理院、気象庁、気仙沼漁協 · Sakuragaoka Station (MIT)
 by Kenton-GMI. Terms, full credit lines and the list of derived files are in [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md).
 
 ## Credits
@@ -226,6 +284,9 @@ by Kenton-GMI. Terms, full credit lines and the list of derived files are in [do
   [sharp](https://sharp.pixelplumbing.com). Licences: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 - **Fonts:** Noto Sans JP, Noto Serif JP, Zen Maru Gothic, Yusei Magic and Yuji Syuku from Google Fonts, under the SIL Open
   Font License.
+- **JPYC EC and JPYC.** [JPYC EC](https://ec.jpyc-service.com) is operated by MAMETA; JPYC is a registered trademark of
+  JPYC Inc.; KesenMemento is not affiliated with either. The app shows a shop's products from JPYC EC's public read API
+  and links to the product pages (see [Optional modules](#optional-modules-off-by-default)).
 - **Hackatsuon 2026**, organised by the Hackatsuon executive committee (Kesennuma City, NPO Women's Eye, Centrum and
   others).
 

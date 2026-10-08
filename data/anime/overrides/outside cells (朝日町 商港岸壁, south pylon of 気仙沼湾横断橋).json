@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "cell": "asahi",
+  "bbox": [
+    1040,
+    1450,
+    1560,
+    1810
+  ],
+  "note": "outside the 12 cells: 朝日町 商港岸壁 around the south pylon of the かなえ大橋. OSM has the whole area as landuse=construction (48,014 m2); the east part is a finished paved quay apron in 2026. The west part (x < ~1062) is still bare-earth works with a crane barge and a silt fence (vfy-asahi-w), so the OSM construction polygon is kept and the apron draws over it.",
+  "sources": [
+    {
+      "id": "earth",
+      "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/lm/lm-kanae, raw/ref/earth/vfy-asahi-w)",
+      "date": "2026-03-11"
+    }
+  ],
+  "landuse": [
+    {
+      "use": "apron",
+      "name": "商港岸壁",
+      "ring": [
+        [
+          1068.2,
+          1551.7
+        ],
+        [
+          1110.1,
+          1559.3
+        ],
+        [
+          1135.4,
+          1568.6
+        ],
+        [
+          1250.1,
+          1639
+        ],
+        [
+          1513.8,
+          1804.3
+        ],
+        [
+          1543.8,
+          1757
+        ],
+        [
+          1092.6,
+          1471.2
+        ],
+        [
+          1061.5,
+          1488.9
+        ]
+      ],
+      "src": "earth 2026-03-11: finished concrete 商港岸壁 apron with parked cars, timber stacks and containers, from the jetty at x≈1062 to the quay end (lm-kanae top/o0/o90, vfy-asahi-w top)"
+    }
+  ]
+}

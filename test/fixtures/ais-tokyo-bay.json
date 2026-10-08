@@ -1,0 +1,439 @@
+{
+  "type": "FeatureCollection",
+  "attribution": {
+    "aishub": "Open Waters AIS (https://openwaters.io/ais/). AISHub (https://www.aishub.net)",
+    "aisstream": "Open Waters AIS (https://openwaters.io/ais/). aisstream.io"
+  },
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          139.77896333333334,
+          35.649903333333334
+        ],
+        "type": "Point"
+      },
+      "id": 431899000,
+      "properties": {
+        "beam": 14,
+        "callsign": "7KMX",
+        "cog": 168.5,
+        "destination": ">JP TYO T",
+        "draught": 5.6,
+        "eta": "10-06 04:30",
+        "flag": "JP",
+        "heading": 51,
+        "imo": 9928671,
+        "kind": "vessel",
+        "length": 88,
+        "mmsi": 431899000,
+        "msg_type": "PositionReport",
+        "name": "KAIYO MARU",
+        "nav_status": 5,
+        "seen": "2026-10-07T11:04:54Z",
+        "sog": 0,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 26,
+        "to_port": 12,
+        "to_starboard": 2,
+        "to_stern": 62,
+        "type": 30
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.971745,
+          35.67462333333334
+        ],
+        "type": "Point"
+      },
+      "id": 431007327,
+      "properties": {
+        "beam": 12,
+        "callsign": "JD3983",
+        "cog": 213.5,
+        "destination": ">JP FNB / FS",
+        "draught": 4.8,
+        "eta": "10-05 17:00",
+        "flag": "JP",
+        "heading": 352,
+        "imo": 9781231,
+        "kind": "vessel",
+        "length": 74,
+        "mmsi": 431007327,
+        "msg_type": "PositionReport",
+        "name": "NISSHO MARU NO.8",
+        "nav_status": 5,
+        "seen": "2026-10-07T11:03:14Z",
+        "sog": 0,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 61,
+        "to_port": 8,
+        "to_starboard": 4,
+        "to_stern": 13,
+        "type": 70
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.77195166666667,
+          35.44058
+        ],
+        "type": "Point"
+      },
+      "id": 432809000,
+      "properties": {
+        "beam": 32,
+        "callsign": "7JJC",
+        "cog": 193.5,
+        "destination": "JP YOK XX NGI/NNX",
+        "draught": 8.5,
+        "eta": "10-07 11:30",
+        "flag": "JP",
+        "heading": 195,
+        "imo": 9473729,
+        "kind": "vessel",
+        "length": 182,
+        "mmsi": 432809000,
+        "msg_type": "PositionReport",
+        "name": "AKATSUKI MARU",
+        "nav_status": 0,
+        "seen": "2026-10-07T11:05:47Z",
+        "sog": 10.7,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 151,
+        "to_port": 22,
+        "to_starboard": 10,
+        "to_stern": 31,
+        "type": 80
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.75642166666665,
+          35.43251
+        ],
+        "type": "Point"
+      },
+      "id": 248992000,
+      "properties": {
+        "beam": 44,
+        "callsign": "9HA4902",
+        "cog": 234.8,
+        "destination": "JPHKP",
+        "draught": 8.8,
+        "eta": "10-08 17:48",
+        "flag": "MT",
+        "heading": 234,
+        "imo": 9760524,
+        "kind": "vessel",
+        "length": 316,
+        "mmsi": 248992000,
+        "msg_type": "PositionReport",
+        "name": "MSC BELLISSIMA",
+        "nav_status": 0,
+        "seen": "2026-10-07T11:05:41Z",
+        "sog": 13.2,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 38,
+        "to_port": 22,
+        "to_starboard": 22,
+        "to_stern": 278,
+        "type": 60
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.9043,
+          35.56706666666666
+        ],
+        "type": "Point"
+      },
+      "id": 431301547,
+      "properties": {
+        "beam": 18,
+        "callsign": "JI3683",
+        "cog": 335,
+        "destination": "JP WAK 2ND A",
+        "draught": 5.1,
+        "eta": "10-09 12:00",
+        "flag": "JP",
+        "heading": 250,
+        "imo": 9238557,
+        "kind": "vessel",
+        "length": 118,
+        "mmsi": 431301547,
+        "msg_type": "PositionReport",
+        "name": "TAIKO MARU",
+        "nav_status": 1,
+        "seen": "2026-10-07T11:03:16Z",
+        "sog": 0,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 80,
+        "to_port": 12,
+        "to_starboard": 6,
+        "to_stern": 38,
+        "type": 79
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.75347666666667,
+          35.629014999999995
+        ],
+        "type": "Point"
+      },
+      "id": 431024248,
+      "properties": {
+        "beam": 4,
+        "cog": 161.5,
+        "flag": "JP",
+        "kind": "vessel",
+        "length": 13,
+        "mmsi": 431024248,
+        "msg_type": "PositionReport",
+        "name": "TAKUYOUMARU NO.26",
+        "seen": "2026-10-07T07:56:56Z",
+        "sog": 0,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 9,
+        "to_port": 2,
+        "to_starboard": 2,
+        "to_stern": 4,
+        "type": 31
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.84513833333332,
+          35.46779
+        ],
+        "type": "Point"
+      },
+      "id": 636019770,
+      "properties": {
+        "beam": 30,
+        "callsign": "D5WB7",
+        "cog": 43.3,
+        "destination": "JP TYO R",
+        "draught": 10.2,
+        "eta": "10-07 09:35",
+        "flag": "LR",
+        "heading": 42,
+        "imo": 9224958,
+        "kind": "vessel",
+        "length": 195,
+        "mmsi": 636019770,
+        "msg_type": "PositionReport",
+        "name": "MANET",
+        "nav_status": 0,
+        "seen": "2026-10-07T11:05:30Z",
+        "sog": 15.2,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 151,
+        "to_port": 18,
+        "to_starboard": 12,
+        "to_stern": 44,
+        "type": 72
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.77295666666666,
+          35.40688
+        ],
+        "type": "Point"
+      },
+      "id": 431013698,
+      "properties": {
+        "beam": 10,
+        "callsign": "JD4643",
+        "cog": 20.5,
+        "destination": ">JP TYO",
+        "draught": 3,
+        "eta": "12-31 15:00",
+        "flag": "JP",
+        "heading": 18,
+        "kind": "vessel",
+        "length": 38,
+        "mmsi": 431013698,
+        "msg_type": "PositionReport",
+        "name": "SHIMA MARU",
+        "nav_status": 0,
+        "seen": "2026-10-07T11:05:33Z",
+        "sog": 13.4,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 15,
+        "to_port": 6,
+        "to_starboard": 4,
+        "to_stern": 23,
+        "type": 52
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.77866666666665,
+          35.606964999999995
+        ],
+        "type": "Point"
+      },
+      "id": 431000377,
+      "properties": {
+        "beam": 9,
+        "callsign": "JD2498",
+        "cog": 129.7,
+        "destination": "SHIBAURA",
+        "draught": 3.7,
+        "eta": "03-26 11:00",
+        "flag": "JP",
+        "heading": 124,
+        "kind": "vessel",
+        "length": 37,
+        "mmsi": 431000377,
+        "msg_type": "PositionReport",
+        "name": "ASAHI",
+        "nav_status": 0,
+        "seen": "2026-10-07T11:05:29Z",
+        "sog": 11.1,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 15,
+        "to_port": 2,
+        "to_starboard": 7,
+        "to_stern": 22,
+        "type": 52
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.78686666666667,
+          35.58871666666666
+        ],
+        "type": "Point"
+      },
+      "id": 431029222,
+      "properties": {
+        "beam": 10,
+        "callsign": "JD5618",
+        "cog": 153.3,
+        "destination": ">JP TYO",
+        "draught": 3,
+        "eta": "03-06 06:00",
+        "flag": "JP",
+        "heading": 154,
+        "kind": "vessel",
+        "length": 33,
+        "mmsi": 431029222,
+        "msg_type": "PositionReport",
+        "name": "WAKASHIO MARU",
+        "nav_status": 0,
+        "seen": "2026-10-07T11:05:26Z",
+        "sog": 7.9,
+        "source": "aishub",
+        "station": "aishub",
+        "to_bow": 13,
+        "to_port": 3,
+        "to_starboard": 7,
+        "to_stern": 20,
+        "type": 52
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.97740833333333,
+          35.673469999999995
+        ],
+        "type": "Point"
+      },
+      "id": 356345000,
+      "properties": {
+        "beam": 18,
+        "callsign": "3FNI2",
+        "cog": 0,
+        "destination": "JP FNB OFF",
+        "draught": 7.4,
+        "eta": "10-04 16:30",
+        "flag": "PA",
+        "heading": 101,
+        "imo": 9425306,
+        "kind": "vessel",
+        "length": 108,
+        "mmsi": 356345000,
+        "msg_type": "PositionReport",
+        "name": "WOOYANG LEADER",
+        "nav_status": 5,
+        "seen": "2026-10-07T11:07:03Z",
+        "sog": 0,
+        "source": "aisstream",
+        "station": "aisstream",
+        "to_bow": 90,
+        "to_port": 9,
+        "to_starboard": 9,
+        "to_stern": 18,
+        "type": 70
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.77881,
+          35.64449833333333
+        ],
+        "type": "Point"
+      },
+      "id": 432804000,
+      "properties": {
+        "beam": 8,
+        "callsign": "JG5683",
+        "cog": 329.7,
+        "flag": "JP",
+        "kind": "vessel",
+        "length": 45,
+        "mmsi": 432804000,
+        "msg_type": "StandardClassBPositionReport",
+        "name": "YAHATAMARU NO.1",
+        "seen": "2026-10-07T11:13:31Z",
+        "sog": 0,
+        "source": "aisstream",
+        "station": "aisstream",
+        "to_bow": 31,
+        "to_port": 6,
+        "to_starboard": 2,
+        "to_stern": 14,
+        "type": 70
+      },
+      "type": "Feature"
+    }
+  ],
+  "captured": "2026-10-07T11:05:00Z",
+  "note": "Real Open Waters snapshot of Tokyo Bay. Tests may translate a copy into the Kesennuma bbox. The app must not."
+}

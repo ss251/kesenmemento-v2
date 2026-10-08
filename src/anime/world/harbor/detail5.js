@@ -1,6 +1,6 @@
 // [v5:detail] The facade detail kit for the photo-matched waterfront (minami5.js): lit shop interiors behind mullioned
 // glazing, nobori banners, bicycles, A-board menus, planters, lamp posts, café tables, seated and standing people, and the
-// sign boards the author's photos show (raw/photos-sailesh, 2026-10-01 17:07-17:22 JST). Everything is toon-shaded and
+// sign boards the author's photos show (raw/author-photos, 2026-10-01 17:07-17:22 JST). Everything is toon-shaded and
 // outlined like the rest of the town; interiors are small painted canvases (256 px) so the phone tier stays light.
 //
 //   const D = detailKit(ctx, k);                      // k = the world kit of the caller (ctx.kit(group))

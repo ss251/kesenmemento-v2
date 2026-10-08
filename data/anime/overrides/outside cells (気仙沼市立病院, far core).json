@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "cell": "outside-hospital",
+  "bbox": [
+    -860,
+    2020,
+    -760,
+    2130
+  ],
+  "note": "outside the 12 cells: the front of 気仙沼市立病院 on the roundabout r17966-r17969 (far core). The two GSI lots 144 and 145 are the hospital's own entrance canopy, not warehouses (src/anime/world/landmarks/sites.js HOSPITAL_FRONT_LOTS tags them as the hospital landmark; the canopy itself is built in landmarks/hospitals.js). These patches keep their data honest: a 1-storey flat concrete canopy, no saw roof. [r3] The hospital's massing is a landmark model, not a lot patch: the 6-storey wing is on the roundabout (SW) face, the NE strip is low terraces (src/anime/world/landmarks/hospitals.js hospitalParts; docs/anime/landmarks/AUDIT.md). Lots 144 and 145 (the canopy) are unchanged.",
+  "sources": [
+    {
+      "id": "earth",
+      "what": "Google Earth 3D, imagery dated 2026-03-11 (raw/ref/earth/lm/lm-hospital: top_annot #22 and #23, pair_o0, pair_o180)",
+      "date": "2026-03-11"
+    },
+    {
+      "id": "commons",
+      "what": "Wikimedia Commons 65676447 Kesennuma City Hospital (raw/ref/commons, reference only): the front with the long curved concrete canopy on square piers"
+    },
+    {
+      "id": "ortho",
+      "what": "GSI aerial photo data/ortho/core.jpg (about 2020-22), crop x -900..-680, z 1960..2140: the SW wing's bright roof and its broad west shadow, the NE strip's mid-grey terraced deck, the thin 5 m west arm",
+      "date": "2021-01-01"
+    }
+  ],
+  "lots": [
+    {
+      "id": "16/58539/25072/144",
+      "storeys": 1,
+      "height": 5,
+      "roof": {
+        "shape": "flat",
+        "color": "#b9b9b5"
+      },
+      "src": "earth: top_annot #22 is the hospital's light-grey canopy / roof terrace band on the roundabout (Earth roof #bab2b4), no shed; commons: exposed-concrete canopy about 4 m clear + 1 m fascia"
+    },
+    {
+      "id": "16/58539/25072/145",
+      "storeys": 1,
+      "height": 5,
+      "roof": {
+        "shape": "flat",
+        "color": "#b9b9b5"
+      },
+      "src": "earth: top_annot #23 is the curved entrance canopy along the roundabout; commons: exposed-concrete canopy about 4 m clear + 1 m fascia"
+    }
+  ]
+}

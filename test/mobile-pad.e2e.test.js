@@ -4,7 +4,7 @@
 //   tools/anime/gate.sh chrome env -u NODE_OPTIONS KLC_E2E=1 bun test test/mobile-pad.e2e.test.js
 // Port 8981 (this package's). `bun test` alone skips it.
 import { test, expect, describe, beforeAll, afterAll } from "bun:test";
-import { buildAndServe, launch, phonePage, setViewport, enterTown, fingers, center, layoutReport, gameState, dAngle, buttonIds, sleep } from "../tools/anime/pad-lib.mjs";
+import { buildAndServe, launch, phonePage, setViewport, enterTown, fingers, center, layoutReport, gameState, dAngle, buttonIds, sleep, waitGo } from "../tools/anime/pad-lib.mjs";
 
 const RUN = process.env.KLC_E2E === "1" && process.env.KLC_GATE === "1";
 const PORT = Number(process.env.KLC_E2E_PORT || 8981);
@@ -39,7 +39,7 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
   });
 
   T("leave the intro card with a tap; the pad shows and the first-run coach mark appears once", async () => {
-    const g = await center(page, "#go"); await f.tap(g.x, g.y);
+    await waitGo(page); const g = await center(page, "#go"); await f.tap(g.x, g.y);
     await page.waitFor("document.body.classList.contains('playing')", { timeout: 20000 });
     await page.eval("window.__camSpec('walk')");
     await page.waitFor("!window.__pad.hidden", { timeout: 20000 });
@@ -73,7 +73,7 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     await hold(700);
     const c = await gameState(page);
     expect(Math.hypot(c.move[0], c.move[1])).toBe(0);
-    expect(await page.eval("document.querySelector('#klc-pad .stick').dataset.on")).toBe("0");   // the spring is home, the ghost is back
+    await page.waitFor("document.querySelector('#klc-pad .stick').dataset.on === '0'", { timeout: 6000 });   // the spring is home, the ghost is back (it runs on frame time: slower on a loaded machine with the ship's scene in it)
   });
 
   T("a gentle push walks (no run ring), and the dead zone does nothing", async () => {
@@ -223,41 +223,40 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     await f.release(); await hold(300);
   });
 
-  T("B1: a thumb that lands on the places strip or the dock still gets the stick or the look; a quick tap still reaches the panel", async () => {
+  T("B1: a thumb that lands on the places strip or the dock (landscape) or on the bottom pills (portrait) still gets the stick or the look; a quick tap still reaches the panel", async () => {
     await setMode('walk');   // (an earlier failure must not leave the car or the flight on)
     await page.eval("window.__camSpec('walk')"); await settle(900);
-    const pl = await center(page, '#klc-ui .places'), dk = await center(page, '#klc-ui .dock');
-    expect(pl).not.toBeNull(); expect(dk).not.toBeNull();
-    // 1. stick from a thumb that lands on the places strip (left half), dragged 70 px up
+    const vis = (sel) => page.eval(`(() => { const e = document.querySelector(${JSON.stringify(sel)}); return !!e && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 1; })()`);
+    // [integrate] portrait 390x844 with the pad: the places strip and the time dock are folded behind two pills (a sheet each); they are a panel to grab too
+    expect({ places: await vis('#klc-ui .places'), dock: await vis('#klc-ui .dock'), pbar: await vis('#klc-ui .pbar') }).toEqual({ places: false, dock: false, pbar: true });
+    const lp = await center(page, '#klc-ui .pbar button[data-sheet="places"]'), rp = await center(page, '#klc-ui .pbar button[data-sheet="time"]');
+    // 1. stick from a thumb that lands on the left pill, dragged 70 px up
     const a = await gameState(page);
-    await f.down1(1, 60, pl.y); await f.drag(1, 60, pl.y - 70, 8); await hold(250);
+    await f.down1(1, 60, lp.y); await f.drag(1, 60, lp.y - 70, 8); await hold(250);
     const mid = await page.eval("({ stick: window.__pad.stickActive, len: Math.hypot(window.__pad.move.x, window.__pad.move.y) })");
     await hold(1000); await f.up(1); await hold(300);
     const b = await gameState(page);
     expect(mid.stick).toBe(true); expect(mid.len).toBeGreaterThan(0.5);
     expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeGreaterThan(2);
     expect(await page.eval("window.__pad.stickActive")).toBe(false);
-    // 2. stick from the dock's left half (turned about: step 1 may have walked up to a wall)
-    await page.eval("window.__ctx.playerObj.yaw += Math.PI"); await hold(300);
-    const c = await gameState(page);
-    await f.down1(1, 100, dk.y); await f.drag(1, 100, dk.y - 70, 8); await hold(1000); await f.up(1); await hold(300);
-    const d1 = await gameState(page);
-    expect(Math.hypot(d1.x - c.x, d1.z - c.z)).toBeGreaterThan(2);
-    // 1b. the stick is anchored where the thumb LANDED on the strip, not where the 10 px of travel ended: the base is centred on the
-    // landing point and a 52 px drag (93 % of the 56 px travel) is already RUN
-    await f.down1(1, 90, pl.y); await f.drag(1, 90, pl.y - 52, 8); await hold(250);
+    expect(await page.eval("document.querySelector('#klc-ui').dataset.sheet")).toBe("");   // a drag is not a click: no sheet opened
+    // 1b. the stick is anchored where the thumb LANDED on the pill, not where the 10 px of travel ended
+    await f.down1(1, 90, lp.y); await f.drag(1, 90, lp.y - 52, 8); await hold(250);
     const anc = await page.eval("(() => { const r = document.querySelector('#klc-pad .stick').getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, run: window.__pad.running, stick: window.__pad.stickActive }; })()");
     await f.up(1); await hold(300);
     expect(anc.stick).toBe(true); expect(anc.run).toBe(true);
-    expect(Math.abs(anc.cx - 90)).toBeLessThan(2); expect(Math.abs(anc.cy - pl.y)).toBeLessThan(2);
-    // 3. look from the dock's right half: one 190 px swipe turns about 85 degrees (B2)
+    expect(Math.abs(anc.cx - 90)).toBeLessThan(2); expect(Math.abs(anc.cy - lp.y)).toBeLessThan(2);
+    // 3. look from the right pill: one 190 px swipe turns about 85 degrees (B2)
     await page.eval("window.__ctx.playerObj.pitch = 0"); await hold(200);
     const e0 = await gameState(page);
-    await f.down1(2, 330, dk.y); await f.drag(2, 140, dk.y, 12); await f.up(2); await hold(900);
+    await f.down1(2, 330, rp.y); await f.drag(2, 140, rp.y, 12); await f.up(2); await hold(900);
     const e1 = await gameState(page);
     const deg = Math.abs(dAngle(e0.yaw, e1.yaw)) * 180 / Math.PI;
     expect(deg).toBeGreaterThan(70); expect(deg).toBeLessThan(100);
-    // 4. a quick tap on the panel still works: a time-of-day button on the dock presses
+    expect(await page.eval("document.querySelector('#klc-ui').dataset.sheet")).toBe("");
+    // 4. a quick tap on a pill opens its sheet (and the pad steps aside); a time-of-day button on the dock presses; the pill closes it
+    await f.tap(rp.x, rp.y); await hold(600);
+    expect(await page.eval("({ sheet: document.querySelector('#klc-ui').dataset.sheet, dock: getComputedStyle(document.querySelector('#klc-ui .dock')).display, hidden: window.__pad.hidden, exp: document.querySelector('#klc-ui .pbar button[data-sheet=\"time\"]').getAttribute('aria-expanded') })")).toMatchObject({ sheet: "time", dock: "flex", hidden: true, exp: "true" });
     const presets = await page.eval("[...document.querySelectorAll('#klc-ui .dock .seg button[data-act=\"preset\"]')].map((b) => ({ id: b.dataset.id, on: b.getAttribute('aria-pressed') === 'true' }))");
     const idle = presets.filter((p) => !p.on).map((p) => p.id);
     expect(idle.length).toBeGreaterThan(2);
@@ -265,10 +264,26 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     const t1 = await center(page, `#klc-ui .dock button[data-id="${idle[0]}"]`);
     await f.tap(t1.x, t1.y); await hold(600);
     expect(await pressed(idle[0])).toBe(true);
-    // 5. a drag that starts on a panel button does not click it (it is the stick or the look)
+    await f.tap(rp.x, rp.y); await hold(600);
+    expect(await page.eval("({ sheet: document.querySelector('#klc-ui').dataset.sheet, hidden: window.__pad.hidden })")).toEqual({ sheet: "", hidden: false });
+    // 5. the places sheet: the strip of places; picking one flies there and folds the sheet
+    await f.tap(lp.x, lp.y); await hold(600);
+    expect(await page.eval("({ sheet: document.querySelector('#klc-ui').dataset.sheet, shown: getComputedStyle(document.querySelector('#klc-ui .places')).display })")).toEqual({ sheet: "places", shown: "flex" });
+    await f.tap(lp.x, lp.y); await hold(500);
+    // 6. landscape keeps the strip and the dock as they were: a thumb on either still drives, a drag does not click the dock button
+    await setViewport(page, { width: 844, height: 390, dpr: 3, insets: { top: 0, bottom: 21, left: 47, right: 47 } }); await settle(1200);
+    await page.eval("window.__camSpec('walk')"); await settle(700);
+    expect({ places: await vis('#klc-ui .places'), dock: await vis('#klc-ui .dock'), pbar: await vis('#klc-ui .pbar') }).toEqual({ places: true, dock: true, pbar: false });
+    const pl = await center(page, '#klc-ui .places'), dk = await center(page, '#klc-ui .dock');
+    const c0 = await gameState(page);
+    await f.down1(1, 110, pl.y); await f.drag(1, 110, pl.y - 70, 8); await hold(1000); await f.up(1); await hold(300);
+    const c1 = await gameState(page);
+    expect(Math.hypot(c1.x - c0.x, c1.z - c0.z)).toBeGreaterThan(2);
     const t2 = await center(page, `#klc-ui .dock button[data-id="${idle[1]}"]`);
     await f.down1(1, t2.x, t2.y); await f.drag(1, t2.x, t2.y - 60, 6); await f.up(1); await hold(500);
     expect(await pressed(idle[1])).toBe(false);
+    void dk;
+    await setViewport(page, { width: 390, height: 844, dpr: 3, insets: { top: 47, bottom: 34, left: 0, right: 0 } }); await settle(900);
   });
 
   const MODES = ["walk", "fly", "drive"];
@@ -297,7 +312,7 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
           expect(r.pad.ghost.l).toBeGreaterThanOrEqual(insets.left); expect(r.pad.ghost.b).toBeLessThanOrEqual(r.vh - insets.bottom + 0.5);
           // sides: the stick's ghost and the buttons are on opposite halves
           const gx = (r.pad.ghost.l + r.pad.ghost.r) / 2, bx = btns.reduce((s, [, b]) => s + (b.l + b.r) / 2, 0) / btns.length;
-          expect(lefty ? gx > r.vw / 2 && bx < r.vw / 2 : gx < r.vw / 2 && bx > r.vw / 2).toBe(true);
+          expect({ tag, gx, bx, ok: lefty ? gx > r.vw / 2 && bx < r.vw / 2 : gx < r.vw / 2 && bx > r.vw / 2 }).toMatchObject({ tag, ok: true });
         }
         await setMode("walk");
       }
@@ -350,11 +365,11 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     await page.eval("window.__pad.setSetting('invertY', false); window.__pad.setSetting('leftHanded', false)");
   });
 
-  T("it fades to 35 % after 4 s idle and comes back at once on any touch", async () => {
+  T("it fades to 70 % after 4 s idle and comes back at once on any touch", async () => {   // [ui-b2:14] it was 35 %: a button label measured 2.1:1 on the sky
     await page.eval("window.__pad.setSetting('sens', 1)");
     await hold(5600);
     const faded = await page.eval("({ idle: document.getElementById('klc-pad').dataset.idle, op: +getComputedStyle(document.querySelector('#klc-pad .cluster')).opacity })");
-    expect(faded.idle).toBe("1"); expect(faded.op).toBeGreaterThan(0.3); expect(faded.op).toBeLessThan(0.4);
+    expect(faded.idle).toBe("1"); expect(faded.op).toBeGreaterThan(0.65); expect(faded.op).toBeLessThan(0.75);
     await f.down1(8, 200, 200);   // a touch on the sky
     const back = await page.eval("document.getElementById('klc-pad').dataset.idle");
     await f.up(8);

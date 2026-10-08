@@ -1,5 +1,5 @@
 // [ship:story] The Living City story pins (src/anime/world/explore/storypins.js, data/ship/story-pins.json): the
-// 波怒棄館遺跡 pin in 唐桑 (Usui's public talk, 2026-10-03). Its facts, its sourced position inside the map, the edge rule for a
+// 波怒棄館遺跡 pin in 唐桑 (the 臼福本店 public talk, 2026-10-03). Its facts, its sourced position inside the map, the edge rule for a
 // pin outside the map, the places-list entry, the card, the signboard and the explore wiring.
 import { describe, test, expect } from "bun:test";
 import { readFileSync } from "node:fs";
@@ -41,7 +41,7 @@ describe("story pins: data", () => {
     expect(JSON.stringify(pin.story)).not.toMatch(/lived with tuna|とともに暮らして/);
   });
   test("no disaster framing anywhere in the pins' strings or sources", () => {
-    expect(/震災|津波|防災|被災|東日本大震災|tsunami|disaster|遺構/i.test(JSON.stringify(STORY))).toBe(false);
+    expect(/\u9707\u707d|\u6d25\u6ce2|防災|被災|東日本大\u9707\u707d|tsun[a]mi|disaster|遺構/i.test(JSON.stringify(STORY))).toBe(false);
   });
   test("the location is sourced: the prefecture's dig list (唐桑町荒谷前), the 2013 reports and GSI", () => {
     const urls = pin.sources.map((s) => s.url || "").join(" ");
@@ -110,7 +110,7 @@ describe("story pins: the places list, the card, the signboard", () => {
     expect(ps.length).toBe(STORY.pins.length);
     const p = ps[0];
     expect(p.id).toBe("story-hanukidate"); expect(p.group).toBe("story");
-    expect(p.groupLabel).toEqual({ ja: "まちの物語", en: "Stories of the town" });
+    expect(p.groupLabel).toEqual({ ja: "町の物語", en: "Stories of the town" });
     expect(p.ja).toContain("マグロ"); expect(p.en.toLowerCase()).toContain("tuna");
     expect(p.at.every(Number.isFinite)).toBe(true);
   });

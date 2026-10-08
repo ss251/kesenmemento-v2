@@ -49,17 +49,18 @@ each with its own licence file.
 | [@mapbox/vector-tile](https://github.com/mapbox/vector-tile-js) | 2.0.5 | BSD-3-Clause | © 2024 Mapbox | Decodes the GSI vector tiles in the data scripts. |
 | [pbf](https://github.com/mapbox/pbf) | 4.0.2 | BSD-3-Clause | © 2024 Mapbox | Protocol-buffer reader for the vector tiles, in the data scripts. |
 | [sharp](https://sharp.pixelplumbing.com) | 0.35.5 | Apache-2.0 | Lovell Fuller and contributors | Image processing in the data and tool scripts. It installs prebuilt libvips binaries (the `@img/sharp-libvips-*` packages, LGPL-3.0-or-later); these are not part of the app. |
-| [@sparkjsdev/spark](https://sparkjs.dev) | 2.2.0 | MIT | © 2025 World Labs Technologies, Inc. | Gaussian-splat rendering in the code kept from the earlier viewer (`src/web/scene`, `scripts/splat`). Not part of the app bundle. |
+| [@sparkjsdev/spark](https://sparkjs.dev) | 2.2.0 | MIT | © 2025 World Labs Technologies, Inc. | Gaussian-splat rendering in the code kept from the earlier viewer (`src/web/scene`). Not part of the app bundle. |
 | [postprocessing](https://github.com/pmndrs/postprocessing) | 6.39.5 | Zlib | © 2015 Raoul van Rüschen | Post-processing in the code kept from the earlier viewer (`src/web/scene`). Not part of the app bundle. |
 | [@takram/three-atmosphere](https://github.com/takram-design-engineering/three-geospatial) | 0.19.1 | MIT | Shota Matsuda (takram) | Atmosphere library; `scripts/serve.js` serves its precomputed textures under `/vendor/`. |
 | [@takram/three-clouds](https://github.com/takram-design-engineering/three-geospatial) | 0.7.6 | MIT | Shota Matsuda (takram) | Cloud library; `scripts/serve.js` serves its precomputed textures under `/vendor/`. |
 | [@takram/three-geospatial](https://github.com/takram-design-engineering/three-geospatial) | 0.9.1 | MIT | Shota Matsuda (takram) | Geospatial helpers, a dependency of the two takram packages above. |
+| QR Code generator algorithm ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library)) | n/a | MIT | © Project Nayuki | `src/anime/ui/qr.js` is a small encoder of its own (byte mode, versions 1 to 10) that follows the algorithm of Project Nayuki's QR Code generator library, for the device-transfer code of the report sheet. |
 | [3d-tiles-renderer](https://github.com/NASA-AMMOS/3DTilesRendererJS) | 0.5.3 | Apache-2.0 | NASA-AMMOS; Garrett Johnson | Listed in `package.json` from an earlier viewer. Not used by the current code. |
 
 ## Fonts: SIL Open Font License 1.1
 
-The app loads these fonts from [Google Fonts](https://fonts.google.com) at run time (`src/anime/index.html`). They are
-not stored in this repository. All five are licensed under the
+The HUD loads these fonts from [Google Fonts](https://fonts.google.com) at run time (`src/anime/index.html`); the full
+families are not stored in this repository. All five are licensed under the
 [SIL Open Font License, Version 1.1](https://openfontlicense.org).
 
 - Noto Sans JP
@@ -68,6 +69,10 @@ not stored in this repository. All five are licensed under the
 - Yusei Magic
 - Yuji Syuku
 
+The title screen also self-hosts glyph subsets of Zen Maru Gothic and Dela Gothic One (`src/anime/assets/loader/*.woff2`),
+and its logo is drawn from outlines of Dela Gothic One. Those files are in this repository, so their copyright lines and
+the licence text are in [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES), the file next to this one.
+
 ## Data
 
 The data the app is built from is covered by its own terms and credit lines, which the app shows on screen:
@@ -75,6 +80,7 @@ The data the app is built from is covered by its own terms and credit lines, whi
 - 国土地理院 (Geospatial Information Authority of Japan): 出典：国土地理院（地理院タイル）を加工して作成
 - © OpenStreetMap contributors (ODbL)
 - 気象庁: 出典：気象庁ホームページ
+- 政府統計の総合窓口 (e-Stat): 出典：政府統計の総合窓口(e-Stat)の境界データ（令和2年国勢調査 小地域）を加工して作成
 - 気仙沼漁業協同組合 (the fishing co-op): 入船情報
 
 The full terms and the list of derived files are in [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md) and in

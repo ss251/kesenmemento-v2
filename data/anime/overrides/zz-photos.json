@@ -2,25 +2,25 @@
   "version": 1,
   "cell": "photos",
   "bbox": [-120, -20, 100, 170],
-  "note": "[v5:photos] The author's ground-truth photos of the 内湾 / 南町 waterfront (Sailesh, 2026-10-01 17:18-17:22 JST, raw/photos-sailesh IMG_0799-0842 with GPS and compass). Applies last (zz-), over the accuracy sweep's cell files. The buildings themselves (PIER7, 迎, 結, 拓, the plaza, the store) are modelled in src/anime/world/harbor/minami5.js; this file carries the layout data they imply. Photo/app pairs are not included.",
+  "note": "[v5:photos] The author's ground-truth photos of the 内湾 / 南町 waterfront (2026-10-01, raw/author-photos IMG_0799-0842 with GPS and compass). Applies last (zz-), over the accuracy sweep's cell files. The buildings themselves (PIER7, 迎, 結, 拓, the plaza, the store) are modelled in src/anime/world/harbor/minami5.js; this file carries the layout data they imply. Photo/app pairs are not included.",
   "sources": [
-    { "id": "sailesh", "what": "author photos raw/photos-sailesh/jpg (IMG_0799-0842; GPS, heading and 35 mm focal length in raw/photos-sailesh/index.json), the highest-priority source (docs/anime/OVERRIDES.md)", "date": "2026-10-01" }
+    { "id": "photos", "what": "author photos raw/author-photos/jpg (IMG_0799-0842; GPS, heading and 35 mm focal length in raw/author-photos/index.json), the highest-priority source (docs/anime/OVERRIDES.md)", "date": "2026-10-01" }
   ],
   "lots": [
-    { "id": "ovr:c6:minami-solar", "remove": true, "src": "sailesh IMG_0822, 0829, 0820: the single-storey shed with a solar roof in the car park is the convenience store (striped fascia, brick end wall, pole sign); harbor/minami5.js KONBINI builds it" },
-    { "id": "16/58540/25068/375", "storeys": 1, "height": 4.4, "src": "sailesh IMG_0834-0838: 結 is single-storey cedar shops under a white corrugated fascia (4.4 m), not 2 storeys" },
-    { "id": "16/58540/25068/377", "storeys": 1, "height": 4.4, "src": "sailesh IMG_0834-0838, 0842: single-storey 結 shop block" },
-    { "id": "16/58540/25068/378", "storeys": 1, "height": 4.4, "src": "sailesh IMG_0834-0838, 0842: single-storey 結 shop block" },
-    { "id": "16/58540/25068/379", "storeys": 1, "height": 3.7, "src": "sailesh IMG_0836-0838: the thin strip is the colonnade canopy on timber posts" },
-    { "id": "16/58540/25068/383", "storeys": 1, "height": 3.7, "src": "sailesh IMG_0834-0838: the thin strip is the colonnade canopy on timber posts" },
-    { "id": "16/58540/25068/376", "storeys": 2, "height": 7.6, "src": "sailesh IMG_0821, 0830, 0834: single-storey shops (BLACK TIDE BREWING) round a taller white corrugated back volume, 7.6 m" }
+    { "id": "ovr:c6:minami-solar", "remove": true, "src": "photos IMG_0822, 0829, 0820: the single-storey shed with a solar roof in the car park is the convenience store (striped fascia, brick end wall, pole sign); harbor/minami5.js KONBINI builds it" },
+    { "id": "16/58540/25068/375", "storeys": 1, "height": 4.4, "src": "photos IMG_0834-0838: 結 is single-storey cedar shops under a white corrugated fascia (4.4 m), not 2 storeys" },
+    { "id": "16/58540/25068/377", "storeys": 1, "height": 4.4, "src": "photos IMG_0834-0838, 0842: single-storey 結 shop block" },
+    { "id": "16/58540/25068/378", "storeys": 1, "height": 4.4, "src": "photos IMG_0834-0838, 0842: single-storey 結 shop block" },
+    { "id": "16/58540/25068/379", "storeys": 1, "height": 3.7, "src": "photos IMG_0836-0838: the thin strip is the colonnade canopy on timber posts" },
+    { "id": "16/58540/25068/383", "storeys": 1, "height": 3.7, "src": "photos IMG_0834-0838: the thin strip is the colonnade canopy on timber posts" },
+    { "id": "16/58540/25068/376", "storeys": 2, "height": 7.6, "src": "photos IMG_0821, 0830, 0834: single-storey shops (BLACK TIDE BREWING) round a taller white corrugated back volume, 7.6 m" }
   ],
   "landuse": [
-    { "use": "plaza", "name": "南町海岸の広場", "ring": [[-0.1, 33], [16.8, 24.5], [40.2, 64.8], [23.9, 72.6], [7.6, 67.8], [-4.5, 74.9], [-9.5, 50.1], [-3.9, 47.4]], "src": "sailesh IMG_0800-0813, 0820: a flat plaza at quay level (grey-beige pavers with granite-sett bands, three ring benches with young trees), passing under the walkway to the street; not a T.P. 6.2 m stepped garden" },
-    { "use": "plaza", "name": "気仙沼スローストリート", "ring": [[-21.9, 70.7], [-70.5, 117.0], [-61.5, 126.2], [-13.1, 80.2]], "src": "sailesh IMG_0831, 0833-0841: the slow street between 結 and 拓 is a paved pedestrian plaza (pavers with red and dark bands, string lights overhead, banners, bollards at the mouth)" },
-    { "use": "plaza", "name": "南町海岸の広場 (前庭)", "ring": [[-0.1, 33], [-9.6, 31.4], [-9.2, 14.5], [4, 10.5], [16.8, 24.5]], "src": "sailesh IMG_0808, 0809 via the photo survey (data/survey/minami, docs/anime/survey/minami.md) [v6:rebuild]: flat paving at T.P. 1.83 from the plaza up to the bleachers' far block; the lawn bank begins west of x -9.5" }
+    { "use": "plaza", "name": "南町海岸の広場", "ring": [[-0.1, 33], [16.8, 24.5], [29.8, 23.8], [35, 32.2], [41.4, 45.7], [42.5, 45], [48.6, 55.3], [40.2, 64.8], [23.9, 72.6], [7.6, 67.8], [-4.5, 74.9], [-9.5, 50.1], [-3.9, 47.4]], "src": "photos IMG_0800-0813, 0820: a flat plaza at quay level (grey-beige pavers with granite-sett bands, three ring benches with young trees), passing under the walkway to the street; not a T.P. 6.2 m stepped garden" },
+    { "use": "plaza", "name": "気仙沼スローストリート", "ring": [[-21.9, 70.7], [-70.5, 117.0], [-61.5, 126.2], [-13.1, 80.2]], "src": "photos IMG_0831, 0833-0841: the slow street between 結 and 拓 is a paved pedestrian plaza (pavers with red and dark bands, string lights overhead, banners, bollards at the mouth)" },
+    { "use": "plaza", "name": "南町海岸の広場 (前庭)", "ring": [[-0.1, 33], [-9.6, 31.4], [-9.2, 14.5], [4, 10.5], [16.8, 24.5]], "src": "photos IMG_0808, 0809 via the photo survey (data/survey/minami, docs/anime/survey/minami.md) [v6:rebuild]: flat paving at T.P. 1.83 from the plaza up to the bleachers' far block; the lawn bank begins west of x -9.5" }
   ],
   "roads": [
-    { "id": "r12645", "remove": true, "src": "sailesh IMG_0831, 0834-0841: 海の見える道 between 結 and 拓 is the pedestrian slow street (paved plaza, bollards at the junction), not a carriageway" }
+    { "id": "r12645", "remove": true, "src": "photos IMG_0831, 0834-0841: 海の見える道 between 結 and 拓 is the pedestrian slow street (paved plaza, bollards at the junction), not a carriageway" }
   ]
 }

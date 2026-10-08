@@ -1,6 +1,7 @@
 {
  "generated": "scripts/anime/enrich/sources.js",
- "osmBase": "2026-05-06T03:25:00Z",
+ "osmBase": "2026-10-04T22:33:21Z",
+ "osmFetched": "2026-10-04T22:37:12.000Z",
  "sources": [
   {
    "id": "osm",
@@ -182,7 +183,7 @@
   },
   {
    "id": "explore-refs",
-   "name": "Explore package references (src/anime/world/explore): the street data of the far core and the two walk-in interiors",
+   "name": "Explore package references (src/anime/world/explore): the street data of the far core and the three modelled walk-in interiors",
    "url": "https://kesennuma-uoichiba.jp/tourroute/",
    "licence": "facts (layout, floors, what visitors see) cited from the pages below; no text or image is copied into the app. Street data: GSI optimal_bvmap-v1 (RdCL, RdEdg, BldA) and OSM, as above",
    "attribution": "出典：国土地理院 · © OpenStreetMap contributors",
@@ -191,12 +192,15 @@
     "27 more real places for the tour, the places list, search and labels: OSM names / GSI annotations and their positions (data/anime/layout.json PLACES)",
     "魚市場 C棟 visitors' side: the 2F 水産情報等発信施設 with the three-screen theatre (longline tuna fishing) and the electric forklift, the 1F and 2F viewing of the swordfish landings and auction (https://kesennuma-uoichiba.jp/tourroute/; https://kesennuma-kanko.jp/uoishiba_suisanhasshin/; https://4travel.jp/dm_shisetsu/11296910)",
     "気仙沼図書館: RC 3 storeys, 笹が陣3-30, the junior high to the west and the elementary school to the north, opened 2018-03-31 (https://current.ndl.go.jp/car/35776)",
-    "男山本店 魚町店舗: 1930, 木筋コンクリート造 3 storeys, 173 m², washed-aggregate walls, moulded bands at every floor, parapet with pilasters, balustrade and gable; rebuilt 2020; 1F shop and tasting counter; the brewery's labels 蒼天伝, 美禄, 男山 (https://online.bunka.go.jp/heritages/detail/138818; https://kesennuma-kanko.jp/otokoyama-new2020/; https://www.tohokukanko.jp/attractions/detail_1009337.html; https://www.kesennuma.co.jp/)"
+    "男山本店 魚町店舗: 1930, 木筋コンクリート造 3 storeys, 173 m², washed-aggregate walls, moulded bands at every floor, parapet with pilasters, balustrade and gable; rebuilt 2020; 1F shop and tasting counter; the brewery's labels 蒼天伝, 美禄, 男山 (https://online.bunka.go.jp/heritages/detail/138818; https://kesennuma-kanko.jp/otokoyama-new2020/; https://www.tohokukanko.jp/attractions/detail_1009337.html; https://www.kesennuma.co.jp/)",
+    "café RST (迎 1F, 南町海岸1-14), with Lander Blue's shark goods in the same room: redrawn from the project owner's own walk-through video of the room (2026-10-06) and the surveyed ANCHOR face, no photograph copied; the shop agreed to be shown on 2026-10-07 (verbal, written form pending); credited 「協力：café RST」 in the room and in the interior's record (src/anime/world/explore/cafe-rst.js CAFE_RST_CONSENT, CAFE_RST_CREDIT)"
    ],
    "files": [
     "data/anime/explore.json",
     "src/anime/world/explore/places.js",
-    "src/anime/world/explore/interiors.js"
+    "src/anime/world/explore/interiors.js",
+    "src/anime/world/explore/cafe-rst.js",
+    "src/anime/world/harbor/cafe-front.js"
    ]
   },
   {

@@ -8,10 +8,10 @@ export const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** Build into a private dist for this port and serve it (+ /data/). Returns { srv, dist }. */
-export async function buildAndServe(port, { minify = false } = {}) {
+export async function buildAndServe(port, { minify = false, files = null } = {}) {
   if ([8787, 8790, 8791].includes(port)) throw new Error('port reserved');
   const dist = join(ROOT, `dist/anime-${port}`);
-  await build({ outdir: dist, minify, strict: true });
+  await build({ outdir: dist, minify, strict: true, files });   // [jpyc] files: in-memory overrides of source files (see build() in cdp.mjs)
   return { srv: serve({ port, dist }), dist };
 }
 
@@ -65,15 +65,16 @@ export async function layoutReport(page) {
     const R = (e) => { const b = e.getBoundingClientRect(); return { l: +b.left.toFixed(1), t: +b.top.toFixed(1), r: +b.right.toFixed(1), b: +b.bottom.toFixed(1), w: +b.width.toFixed(1), h: +b.height.toFixed(1) }; };
     const vis = (e) => { const b = e.getBoundingClientRect(); const s = getComputedStyle(e); return b.width > 1 && b.height > 1 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > 0.01; };
     const pad = {};
-    const g = document.querySelector('#klc-pad .ghost'); if (g) pad.ghost = R(g);
-    document.querySelectorAll('#klc-pad .cluster .btn').forEach((e) => { if (e.dataset.show !== '0' && vis(e)) pad['btn:' + e.dataset.id] = R(e); });
-    const c = document.querySelector('#klc-pad .chip'); if (c) pad.chip = R(c);
-    const gear = document.querySelector('#klc-pad .gear'); if (gear) pad.gear = R(gear);
+    const padHidden = document.querySelector('#klc-pad')?.dataset.hidden === '1';   // (hidden behind a sheet / the intro / a cutscene: nothing of it is on screen)
+    const g = !padHidden && document.querySelector('#klc-pad .ghost'); if (g) pad.ghost = R(g);
+    document.querySelectorAll('#klc-pad .cluster .btn').forEach((e) => { if (!padHidden && e.dataset.show !== '0' && vis(e)) pad['btn:' + e.dataset.id] = R(e); });
+    const c = !padHidden && document.querySelector('#klc-pad .chip'); if (c && vis(c)) pad.chip = R(c);
+    const gear = !padHidden && document.querySelector('#klc-pad .gear'); if (gear) pad.gear = R(gear);
     const st = document.querySelector('#klc-pad .settings'); if (st && !st.hidden) pad.settings = R(st);
     const co = document.querySelector('#klc-pad .coach'); if (co && !co.hidden) pad.coach = R(co);
     const panels = {};
     const add = (name, sel) => document.querySelectorAll(sel).forEach((e, i) => { if (vis(e)) panels[name + (i ? i : '')] = R(e); });
-    add('dock', '#klc-ui .dock'); add('places', '#klc-ui .places'); add('credit', '#klc-ui .attr'); add('brand', '#klc-ui .brand'); add('tools', '#klc-ui .tools');
+    add('dock', '#klc-ui .dock'); add('pbar', '#klc-ui .pbar'); add('mbtn', '#klc-ui .mbtn'); add('shiptop', '#klc-ship .top'); add('shippanel', '#klc-ship .panel'); add('places', '#klc-ui .places'); add('credit', '#klc-ui .attr'); add('brand', '#klc-ui .brand'); add('tools', '#klc-ui .tools');
     add('mini', '#klc-x .mini'); add('xbar', '#klc-x .xbar'); add('xdrive', '#klc-x .xdrive'); add('arrivals', '#klc-ui .arrivals'); add('search', '#klc-x .xsearch');
     const hit = [];
     for (const [pn, p] of Object.entries(pad)) for (const [qn, q] of Object.entries(panels)) {
@@ -97,12 +98,18 @@ export async function layoutReport(page) {
   })()`);
 }
 
+/** Wait until 「まちへ出る」 is on screen to tap: since deploy #7 the title hands over to the prompt only when the bar's solid edge
+ *  reaches 100 %, so for about a second after 'loaded' #go has no box yet (a tap at its centre would land on the scene, as a person never would). */
+export async function waitGo(page, { timeout = 30000 } = {}) {
+  await page.waitFor("(() => { const g = document.getElementById('go'); if (!g || g.disabled) return false; const r = g.getBoundingClientRect(); return r.width > 0 && r.height > 0; })()", { timeout });
+}
+
 /** Open the app on a phone page, leave the intro card with a real tap, wait until the pad shows. */
 export async function enterTown(page, url, { timeout = 280000, tap = true } = {}) {
   await page.goto(url);
   await page.waitFor("document.body.classList.contains('loaded')", { timeout });
   const f = fingers(page);
-  if (tap) { const g = await center(page, '#go'); await f.tap(g.x, g.y); } else await page.eval("document.getElementById('go').click()");
+  if (tap) { await waitGo(page); const g = await center(page, '#go'); await f.tap(g.x, g.y); } else await page.eval("document.getElementById('go').click()");
   await page.waitFor("document.body.classList.contains('playing')", { timeout: 20000 });
   return f;
 }
