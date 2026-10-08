@@ -23,8 +23,27 @@ scene.add(amb);
 const key = new THREE.DirectionalLight(0xffffff, KEY * Math.PI);
 scene.add(key, key.target);
 
-const hoya = buildHoya(THREE, { quality });
+const hoya = buildHoya(THREE, { quality, calm: params.get('calm') === '1' });   // ?calm=1: reduced motion (prefers-reduced-motion)
 scene.add(hoya.root);
+
+// [hoya-accuracy] the town's own light (core/sky.js palettes, MeshToon units, NoToneMapping as main.js): world: 'day'
+// (09:00), 'dusk' (17:20), 'night' (00:00, with the avatar lane's setLift(night) = 1)
+const WORLD = {
+  day: { sun: '#fff2df', sunI: 2.75, sky: '#a9b3ee', ground: '#d9c6c8', hemiI: 1.62, lift: 0, bg: '#cfe3f5' },
+  dusk: { sun: '#ff9d62', sunI: 2.05, sky: '#9c8fce', ground: '#d99f9a', hemiI: 1.38, lift: 0.05, bg: '#d9a7ad' },
+  night: { sun: '#8fa6e6', sunI: 0.6, sky: '#51639e', ground: '#2b2842', hemiI: 1.05, lift: 1, bg: '#27315a' },
+};
+const hemi = new THREE.HemisphereLight(0xffffff, 0xffffff, 0);
+scene.add(hemi);
+function worldLight(mode) {
+  const w = WORLD[mode];
+  if (!w) { hemi.intensity = 0; return null; }
+  amb.intensity = 0;
+  hemi.color.set(w.sky); hemi.groundColor.set(w.ground); hemi.intensity = w.hemiI;
+  key.color.set(w.sun); key.intensity = w.sunI;
+  hoya.setLift(w.lift);
+  return w;
+}
 
 // a soft contact shadow so he stands on something (viewer only)
 const shadowTex = (() => {
@@ -55,11 +74,13 @@ function aim(cam, az, el = 0, dist = 6, cy = 0.56, cx = 0) {
 }
 function size(w, h) { renderer.setSize(w, h, false); canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; }
 /** Render one frame: view az/el, pose at time t, ortho (half-height hh) or perspective. */
-function frame({ az = 0, el = 4, pose = 'idle', t = 0.5, w = 600, h = 800, cam = 'ortho', hh = 0.66, dist = 6, cy = 0.56, cx = 0, bg = '#ffffff', blink = false, speed, line = true, lift = 0, light = 1 } = {}) {
+function frame({ az = 0, el = 4, pose = 'idle', t = 0.5, w = 600, h = 800, cam = 'ortho', hh = 0.66, dist = 6, cy = 0.56, cx = 0, bg = '#ffffff', blink = false, speed, line = true, lift = 0, light = 1, world = null } = {}) {
   size(w, h);
   hoya.hull.visible = line;
   hoya.setLift(lift);
-  key.intensity = KEY * Math.PI * light; amb.intensity = FILL * Math.PI * light;
+  key.color.set(0xffffff); key.intensity = KEY * Math.PI * light; amb.intensity = FILL * Math.PI * light;
+  const wl = worldLight(world);
+  if (wl && bg === '#ffffff') bg = wl.bg;
   scene.background = bg ? new THREE.Color(bg) : null;
   hoya.poseAt(pose, t, { speed });
   if (blink) hoya.blink(1);
@@ -220,12 +241,52 @@ async function clip(prefix, seconds, inputs, { w = 720, h = 960, fps = 30, cam =
   return n;
 }
 
+// [hoya-accuracy] a film of real play: update() frame by frame, the cadence from his own gait() as the movement lane
+// drives it, the town's light, a ground grid (1 m tiles) that scrolls at his speed (a planted boot moves with it: no
+// slide), and a camera path cam(t) -> { az, el, dist, fov, cy } (az round him as in frame()).
+const groundTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = '#e6e1d6'; g.fillRect(0, 0, 256, 256); g.fillStyle = '#d8d1c3'; g.fillRect(0, 0, 128, 128); g.fillRect(128, 128, 128, 128);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(20, 20); t.magFilter = THREE.NearestFilter; return t;
+})();
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshBasicMaterial({ map: groundTex }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.001; ground.visible = false; scene.add(ground);
+const filmCam = new THREE.PerspectiveCamera(50, 1, 0.05, 200); filmCam.layers.enableAll();
+let filmZ = 0;
+/** first: the first frame's number (a long film is made in parts, each well inside one WebKit step); part 0 resets him. */
+async function film(prefix, seconds, inputs, cam, { w = 720, h = 960, fps = 30, world = 'day', first = 0 } = {}) {
+  if (first === 0) { hoya.poseAt('idle', 0.2); hoya.setPose('auto'); filmZ = 0; }
+  ground.visible = true;
+  const n = Math.round(seconds * fps); let z = filmZ;
+  for (let j = 0; j < n; j++) {
+    const i = first + j, t = i / fps, inp = inputs(t), g = hoya.gait(inp.speed || 0, inp.run);
+    hoya.update(1 / fps, { ...inp, cadence: (inp.speed || 0) > 0.03 ? g.hz : 0 });
+    z += (inp.speed || 0) / fps;   // he walks toward -Z: the ground goes by toward +Z
+    groundTex.offset.set(0, (z / 2) % 1);   // 2 m per texture repeat (40 m / 20)
+    hoya.root.position.y = inp.y || 0;
+    blob.scale.setScalar(1 / (1 + 2.5 * (inp.y || 0)));
+    size(w, h);
+    const wl = worldLight(world); scene.background = new THREE.Color(wl ? wl.bg : '#FBFAF5');
+    const k = cam(t); const a = (k.az * Math.PI) / 180, e = ((k.el ?? 8) * Math.PI) / 180, d = k.dist ?? 4.5, cy = k.cy ?? 0.6;
+    filmCam.fov = k.fov ?? 50; filmCam.aspect = w / h; filmCam.updateProjectionMatrix();
+    filmCam.position.set(-Math.sin(a) * Math.cos(e) * d, cy + Math.sin(e) * d + (inp.y || 0) * 0.5, -Math.cos(a) * Math.cos(e) * d);
+    filmCam.lookAt(0, cy + (inp.y || 0) * 0.5, 0);
+    key.position.set(-2.5, 5, -2); key.target.position.set(0, 0.5, 0);   // a fixed sun, up and in front of him
+    hoya.root.updateMatrixWorld(true);
+    renderer.render(scene, filmCam);
+    await post(`${prefix}${String(i).padStart(4, '0')}.png`, canvas, { credit: k.credit !== false });
+  }
+  filmZ = z;
+  ground.visible = false; hoya.root.position.y = 0; blob.scale.setScalar(1); worldLight(null);
+  return n;
+}
+
 window.hoya3d = {
-  clip,
+  clip, film,
   hoya, frame, post, compare, strip, VIEWS, HOYA_HEIGHT, measures: () => JSON.stringify(measures),
   stats: () => hoya.stats,
   /** a single view as a file */
-  async shot(name, opts) { const cv = frame(opts); return post(name, cv); },
+  async shot(name, opts) { const cv = frame(opts); return post(name, cv, { credit: opts.credit !== false }); },
   /** the turntable: n frames, one full turn, idle (he breathes and blinks), perspective */
   async turntable(prefix, n = 120, { w = 720, h = 960, el = 8, seconds = 4 } = {}) {
     for (let i = 0; i < n; i++) {

@@ -27,7 +27,7 @@
 //   own main-thread work was light: a frame held up by the main thread (a long task, the GC, a build slice) says nothing about the GPU.
 
 export function createDynRes({ min = 0.6, max = 1.0, step = 0.1, budgetMs = 1000 / 60, window = 30, hi = 0.85, upFit = 0.8, fit = 0.75, upAfter = 2, hold = 3, maxWait = 64, start = null, warm = 20,
-  softMin = null, slowMs = 38, okMs = 33, span = 2000 } = {}) {   // [mobile-perf] the adaptive floor: see below
+  softMin = null, slowMs = 38, okMs = 33, span = 2000, helpK = 0.97, stuckMs = 60000 } = {}) {   // [mobile-perf] the adaptive floor: see below
   const q = (s) => Math.round(Math.min(max, Math.max(min, s)) / step) * step;
   const qDown = (s) => Math.max(min, Math.floor(Math.min(max, s) / step + 1e-6) * step);   // a step down never rounds up
   let scale = +q(Number.isFinite(start) && start > 0 ? start : max).toFixed(2), changed = 0, last = null;
@@ -37,8 +37,10 @@ export function createDynRes({ min = 0.6, max = 1.0, step = 0.1, budgetMs = 1000
   // slow stretch does: the median frame over the last `span` ms (the GPU timer's figures where it has them, else the frames' pacing) past
   // slowMs takes it one step down toward min, and at or under okMs one step back up toward softMin; between the two it holds. Each move waits
   // for a whole new span. So a phone holds 1.5x down to 30 fps, and an older one settles at the second floor rather than at 20 fps.
+  // A slow step that did not help (the next window's median not under helpK of the one before it: the frames were the main thread's, not
+  // the GPU's, and are as slow at any scale) is undone, and the slow rule rests for stuckMs: sharpness is not traded for nothing.
   const recF = [], recG = [];
-  let recMs = 0;
+  let recMs = 0, lastDown = null, stuck = 0;
   const p = (arr, k, qq) => { if (!k) return null; const s = Array.from(arr.subarray(0, k)).sort((a, b) => a - b); return s[Math.min(k - 1, Math.floor(qq * k))]; };
   function set(s, why, round = q) { const v = +round(s).toFixed(2); if (v === scale) return false; scale = v; changed++; last = why; return true; }
   function down(to, why) { let t = Math.min(to, scale - step); if (softMin !== null) t = Math.max(t, softMin); const ok = set(t, why, qDown); holdLeft = wait; lowRun = 0; cleanRun = 0; return ok; }
@@ -47,8 +49,14 @@ export function createDynRes({ min = 0.6, max = 1.0, step = 0.1, budgetMs = 1000
     if (softMin === null || recMs < span) return null;
     const gs = recG.filter((g) => Number.isFinite(g)), m = gs.length >= recF.length / 2 ? med(gs) : med(recF);
     let moved = null;
-    if (m > slowMs && scale > min + 1e-6) moved = set(Math.max(min, scale - step), 'slow', qDown);
-    else if (m <= okMs && scale < softMin - 1e-6) moved = set(Math.min(softMin, scale + step), 'slow-up');
+    if (lastDown) {   // the first whole window after a slow step down: did it help?
+      const was = lastDown; lastDown = null;
+      if (!(m < was.m * helpK) && m > okMs) { moved = set(was.scale, 'slow-undo'); stuck = stuckMs; }
+    }
+    if (moved === null) {
+      if (m > slowMs && scale > min + 1e-6 && !(stuck > 0)) { const s0 = scale; moved = set(Math.max(min, scale - step), 'slow', qDown); if (moved) lastDown = { m, scale: s0 }; }
+      else if (m <= okMs && scale < softMin - 1e-6) moved = set(Math.min(softMin, scale + step), 'slow-up');
+    }
     if (moved !== null) { recF.length = 0; recG.length = 0; recMs = 0; holdLeft = Math.max(holdLeft, hold); }
     return moved;
   }
@@ -103,7 +111,7 @@ export function createDynRes({ min = 0.6, max = 1.0, step = 0.1, budgetMs = 1000
       if (g !== null && g !== undefined && Number.isFinite(g)) gpu[nGpu++] = g;
       n++;
       if (softMin !== null && frame > 0) {   // [mobile-perf] the last `span` ms of frames, for the adaptive floor
-        recF.push(frame); recG.push(g !== null && g !== undefined && Number.isFinite(g) ? g : NaN); recMs += frame;
+        recF.push(frame); recG.push(g !== null && g !== undefined && Number.isFinite(g) ? g : NaN); recMs += frame; if (stuck > 0) stuck -= frame;
         while (recF.length > 1 && recMs - recF[0] >= span) { recMs -= recF.shift(); recG.shift(); }
       }
       if (n < window) return false;
@@ -118,7 +126,7 @@ export function createDynRes({ min = 0.6, max = 1.0, step = 0.1, budgetMs = 1000
     set(s) { return set(s, 'set'); },
     /** [mobile-perf] Settle behind the title (fast, symmetric steps; the first `warm` frames not judged), or end it: the scale found is kept
      *  and the normal controller starts from it with a fresh back-off. */
-    settle(on = true) { settling = !!on; n = 0; nGpu = 0; cleanRun = 0; lowRun = 0; probe = 0; holdLeft = 0; wait = hold; ceil = max; recF.length = 0; recG.length = 0; recMs = 0; if (on) skip = warm; },
+    settle(on = true) { settling = !!on; n = 0; nGpu = 0; cleanRun = 0; lowRun = 0; probe = 0; holdLeft = 0; wait = hold; ceil = max; recF.length = 0; recG.length = 0; recMs = 0; lastDown = null; stuck = 0; if (on) skip = warm; },
     get settling() { return settling; },
   };
 }

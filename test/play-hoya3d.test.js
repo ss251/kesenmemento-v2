@@ -2,7 +2,7 @@
 // (colours, line weight, no deformation), switches poses, and holds its budgets (triangles, draw calls).
 import { describe, test, expect } from "bun:test";
 import * as THREE from "three";
-import { buildHoya, POSES, HOYA_COLORS, HOYA_LINE, HOYA_SCALE, HOYA_HEIGHT, HOYA_QUALITIES } from "../src/anime/play/avatar/hoya-model.js";
+import { buildHoya, POSES, HOYA_COLORS, HOYA_LINE, HOYA_SCALE, HOYA_HEIGHT, HOYA_QUALITIES, FACE_VIEW, faceWarp, faceViewK, faceEyeK, faceWarpRow, HOYA_TONE, HOYA_GAIT, hoyaGait } from "../src/anime/play/avatar/hoya-model.js";
 
 // DOM stubs (canvas drawing is a no-op), as in test/ship-sail.test.js: the model itself draws no canvas, but the
 // world's material helpers may, and nothing here may need a browser.
@@ -157,15 +157,35 @@ describe("poses", () => {
     const snap = () => ({ legR: B.legR.quaternion.clone(), shinR: B.shinR.quaternion.clone(), spine: B.spine.quaternion.clone(), cape1: B.cape1.quaternion.clone() });
     const ang = (a, b) => a.angleTo(b) * 180 / Math.PI;
     h.poseAt("idle", 1); const idle = snap();
+    // the walk's knee: the largest bend over one cycle (a cycle is two steps; the cadence is the pose's own)
+    let knee = 0; h.poseAt("walk", 1); const hz = h.cadence;
+    for (let i = 0; i < 16; i++) { h.poseAt("walk", 1 + i / 16 / hz); knee = Math.max(knee, ang(B.shinR.quaternion.clone(), idle.shinR)); }
+    expect(hz).toBeGreaterThan(2);
+    expect(knee).toBeGreaterThan(40);
     h.poseAt("walk", 1.1); const walk = snap();
     h.poseAt("run", 1.05); const run = snap();
     h.poseAt("jump", 0.4); const jump = snap();
     h.poseAt("fall", 0.4); const fall = snap();
-    expect(ang(walk.shinR, idle.shinR)).toBeGreaterThan(20);    // the knee bends in the swing
     expect(ang(run.spine, idle.spine)).toBeGreaterThan(5);      // he leans into the run
     expect(ang(run.cape1, idle.cape1)).toBeGreaterThan(8);      // and the cape lifts behind him
     expect(ang(jump.shinR, idle.shinR)).toBeGreaterThan(60);    // tucked (NO.1-16)
+    h.poseAt("jump", 0.4);
+    expect(ang(B.legR.quaternion.clone(), B.legL.quaternion.clone())).toBeGreaterThan(35);   // NO.1-16: one knee up in front, the other leg back
+    expect(B.eyeCL.scale.x > 0.5 && B.eyeR.scale.x > 0.5).toBe(true);                        // and his left eye winks (the manual's own ⌒)
     expect(ang(fall.shinR, jump.shinR)).toBeGreaterThan(30);    // the fall is not the jump
+    h.dispose();
+  });
+
+  test("the cape: NO.1-1's at rest, its sides flaring out in motion as NO.9-1 draws it from behind", () => {
+    const h = buildHoya(THREE, { quality: "phone" }), B = h.bones, I = new THREE.Quaternion(), deg = (q) => (q.angleTo(I) * 180) / Math.PI;
+    h.poseAt("idle", 1);
+    expect(deg(B.capeL.quaternion)).toBeLessThan(1e-3);
+    expect(deg(B.capeR.quaternion)).toBeLessThan(1e-3);
+    h.poseAt("walk", 1.2);
+    expect(deg(B.capeL.quaternion)).toBeGreaterThan(10);
+    expect(deg(B.capeR.quaternion)).toBeGreaterThan(10);
+    h.poseAt("run", 1.2);
+    expect(deg(B.capeL.quaternion)).toBeGreaterThan(20);
     h.dispose();
   });
 
@@ -230,4 +250,164 @@ describe("budgets", () => {
     h.dispose();
     expect(h.root.parent).toBe(null);
   });
+});
+
+// ---------------------------------------------------------------------------------------------------- [hoya-accuracy]
+const DEG = Math.PI / 180;
+/** The face view on the CPU, as the vertex shader does it: the warped bind-space position of vertex i at boost k. */
+function warped(h, i, k) {
+  const g = h.mesh.geometry, P = g.attributes.position, W = g.attributes.hoyaW, K = HOYA_SCALE;
+  const x = P.getX(i), y = P.getY(i), z = P.getZ(i), m = W.getX(i);
+  if (m < 0.5) return [x, y, z];
+  const RX = 1.0 * K, RZ = 0.95 * K, HY = 2.632 * K;
+  const a = m > 1.5 ? W.getY(i) : Math.atan2(-x / RX, -z / RZ), yy = m > 1.5 ? W.getZ(i) : (y - HY) / K;
+  const d = (faceWarp(a, m > 2.5 ? faceEyeK(k) : k) - a) * faceWarpRow(yy), ex = -x / RX, ez = -z / RZ, c = Math.cos(d), s = Math.sin(d);
+  return [-(ex * c + ez * s) * RX, y, -(ez * c - ex * s) * RZ];
+}
+
+describe("the face view (the manual's off-axis drawings)", () => {
+  test("the boost: 1 from the front and the back (NO.1-1, NO.9-1 exact), 1.07 at NO.16-15's 12.5 deg, 2.45 in profile", () => {
+    expect(faceViewK(0)).toBe(1);
+    expect(faceViewK(Math.PI)).toBeCloseTo(1, 9);
+    expect(faceViewK(-Math.PI)).toBeCloseTo(1, 9);
+    expect(faceViewK(12.5 * DEG)).toBeCloseTo(1.068, 3);
+    expect(faceEyeK(faceViewK(12.5 * DEG))).toBeCloseTo(1.08, 2);
+    expect(faceViewK(90 * DEG)).toBeCloseTo(2.45, 9);
+    expect(faceViewK(-90 * DEG)).toBeCloseTo(2.45, 9);
+    expect(faceViewK(90 * DEG, 90 * DEG)).toBeCloseTo(1, 9);   // from straight above: none
+    expect(faceViewK(135 * DEG)).toBeLessThan(1.4);            // behind him it eases off
+  });
+
+  test("the warp: monotonic, the face's centre line and the back stay put", () => {
+    for (const k of [1, 1.08, 1.85, 2.7]) {
+      expect(faceWarp(0, k)).toBe(0);
+      expect(faceWarp(Math.PI - 1e-9, k)).toBeCloseTo(Math.PI, 5);
+      let prev = -Infinity;
+      for (let a = -179; a <= 179; a += 1) { const w = faceWarp(a * DEG, k); expect(w).toBeGreaterThan(prev); prev = w; }
+    }
+    expect(faceWarpRow(0)).toBe(1);                       // the eyes' row: all of it
+    expect(faceWarpRow(-0.9)).toBe(0);                    // under the chin: none
+  });
+
+  test("it fits the manual: NO.16-15 (12.5 deg) and the profile NO.15-31 (90 deg)", () => {
+    // NO.16-15, eye row, measured at 321 px/U: face edges -0.893 / +0.555 U, eyes -0.52 / +0.10 U (screen, from the head centre)
+    const k = faceViewK(12.5 * DEG), ke = faceEyeK(k), at = (phi, kk) => Math.sin(faceWarp(phi, kk) - 12.5 * DEG) * 0.99;   // the head's radius at the eye row
+    const edge = Math.asin(0.68 / 0.99), eye = Math.asin(0.295 / 0.99);
+    expect(Math.abs(at(-edge, k) - -0.893)).toBeLessThan(0.06);
+    expect(Math.abs(at(edge, k) - 0.555)).toBeLessThan(0.03);
+    expect(Math.abs(at(-eye, ke) - -0.52)).toBeLessThan(0.02);
+    expect(Math.abs(at(eye, ke) - 0.10)).toBeLessThan(0.02);
+    // NO.15-31 / NO.10-7, as a share of the head's depth from its front at the eye row: the eye 0.146-0.195, the face's
+    // edge 0.472 (both drawings). Here (1 - cos W) / 2 on the head's circle (the renders measure 0.16 and 0.475)
+    const k90 = faceViewK(90 * DEG), share = (w) => (1 - Math.cos(w)) / 2;
+    expect(share(faceWarp(eye, faceEyeK(k90)))).toBeGreaterThan(0.13);
+    expect(share(faceWarp(eye, faceEyeK(k90)))).toBeLessThan(0.195);
+    expect(Math.abs(share(faceWarp(edge, k90)) - 0.472)).toBeLessThan(0.025);
+  });
+
+  test("it never changes his shape: every point of the head stays on the head, at any boost (no deformation)", () => {
+    for (const q of HOYA_QUALITIES) {
+      const h = buildHoya(THREE, { quality: q }), g = h.mesh.geometry, P = g.attributes.position, W = g.attributes.hoyaW, K = HOYA_SCALE;
+      const e = (p) => (p[0] / K) ** 2 + ((p[1] / K - 2.632) / 0.866) ** 2 + (p[2] / (0.95 * K)) ** 2;
+      let n = 0;
+      for (let i = 0; i < P.count; i++) {
+        if (W.getX(i) !== 1) continue;
+        const p0 = [P.getX(i), P.getY(i), P.getZ(i)], e0 = e(p0);
+        for (const k of [1.5, 2.7]) { const p1 = warped(h, i, k); expect(Math.abs(e(p1) - e0)).toBeLessThan(1e-6); expect(p1[1]).toBe(p0[1]); }
+        n++;
+      }
+      expect(n).toBeGreaterThan(300);
+      h.dispose();
+    }
+  });
+
+  test("the eyes and the nose move whole (never stretched); the parts off the head never move", () => {
+    const h = buildHoya(THREE, { quality: "high" }), W = h.mesh.geometry.attributes.hoyaW, col = h.mesh.geometry.attributes.color;
+    const nose = new THREE.Color(HOYA_COLORS.nose), anchors = new Set();
+    for (let i = 0; i < W.count; i++) {
+      if (Math.abs(col.getX(i) - nose.r) < 1e-3 && Math.abs(col.getY(i) - nose.g) < 1e-3 && Math.abs(col.getZ(i) - nose.b) < 1e-3) {
+        expect(W.getX(i)).toBe(2); anchors.add(W.getY(i));
+      }
+    }
+    expect([...anchors]).toEqual([0]);   // the nose sits on the face's centre line: it never moves
+    // every vertex weighted to an eye bone moves as one (mode 2, one anchor per eye)
+    const SI = h.mesh.geometry.attributes.skinIndex, eyeBones = new Set(["eyeOpenR", "eyeOpenL", "eyeShutR", "eyeShutL"].map((n) => h.skeleton.bones.findIndex((b) => b.name === n)));
+    const per = new Map();
+    for (let i = 0; i < W.count; i++) if (eyeBones.has(SI.getX(i))) { expect(W.getX(i)).toBe(3); const b = SI.getX(i); (per.get(b) || per.set(b, new Set()).get(b)).add(W.getY(i).toFixed(6)); }
+    for (const s of per.values()) expect(s.size).toBe(1);
+    // nothing below the head (body, arms, legs, cape, sword) is part of the head's drawing
+    const P = h.mesh.geometry.attributes.position;
+    for (let i = 0; i < W.count; i++) if (P.getY(i) < (2.632 - 0.95) * HOYA_SCALE) expect(W.getX(i)).toBe(0);
+    h.dispose();
+  });
+});
+
+describe("the manual's flat colour (two tones, no gradients)", () => {
+  test("two tones only; no soft shadow on him; his own ramp", () => {
+    const h = buildHoya(THREE, { quality: "phone" }), ramp = h.mesh.material.gradientMap;
+    expect(new Set(ramp.image.data).size).toBe(2);
+    expect([...new Set(ramp.image.data)].sort((a, b) => a - b)).toEqual([Math.round(HOYA_TONE.shade * 255), 255]);
+    expect(ramp.minFilter).toBe(THREE.NearestFilter);
+    expect(h.mesh.receiveShadow).toBe(false);
+    expect(h.mesh.castShadow).toBe(true);
+    h.dispose();
+  });
+
+  test("setFaceView(false) gives the rigid head (the boost stays 1)", () => {
+    const h = buildHoya(THREE, { quality: "phone" });
+    const cam = new THREE.PerspectiveCamera(50, 1, 0.1, 50); cam.position.set(-4, 0.8, 0); cam.lookAt(0, 0.8, 0); cam.updateMatrixWorld(true);
+    h.root.updateMatrixWorld(true);
+    h.mesh.onBeforeRender(null, null, cam);
+    expect(h.faceK).toBeGreaterThan(2.3);   // he faces -Z; the camera is at his left: a profile
+    h.setFaceView(false);
+    h.mesh.onBeforeRender(null, null, cam);
+    expect(h.faceK).toBe(1);
+    h.dispose();
+  });
+});
+
+describe("the gait the movement lane drives (cadence in, hoyaGait out)", () => {
+  test("hoyaGait: a walk stride of ~0.20 m and a run of ~0.20 m per stance, 0 standing; run can be chosen", () => {
+    expect(hoyaGait(0).travel).toBe(0);
+    const w = hoyaGait(1.3), r = hoyaGait(4.2);
+    expect(w.travel).toBeGreaterThan(0.18); expect(w.travel).toBeLessThan(0.22);
+    expect(w.stance).toBeCloseTo(HOYA_GAIT.walk.stance, 6);
+    expect(r.travel).toBeGreaterThan(0.18); expect(r.travel).toBeLessThan(0.22);
+    expect(r.stance).toBeCloseTo(HOYA_GAIT.run.stance, 6);
+    expect(hoyaGait(1.3, 1).run).toBe(1);                 // an explicit run at a walking speed
+    expect(hoyaGait(1.3, 1).stance).toBeCloseTo(HOYA_GAIT.run.stance, 6);
+    expect(w.hz).toBeCloseTo((1.3 * w.stance) / w.travel, 9);
+  });
+
+  test("update() takes the caller's cadence (cycles per second); the model carries gait() (the movement lane's driver)", () => {
+    const h = buildHoya(THREE, { quality: "phone" });
+    expect(h.gait(1.3)).toEqual(hoyaGait(1.3));
+    h.setPose("auto");
+    for (let i = 0; i < 30; i++) h.update(1 / 60, { speed: 1.2, cadence: 3.25 });
+    expect(h.cadence).toBe(3.25);
+    for (let i = 0; i < 30; i++) h.update(1 / 60, { speed: 1.2 });
+    expect(h.cadence).toBeCloseTo(hoyaGait(1.2).rate, 3);  // without one: his own (no slide, capped): hoyaGait().rate
+    h.dispose();
+  });
+
+  for (const [name, v, run] of [["walk", 1.1, undefined], ["run", 3.0, 1]]) {
+    test(`${name}: with cadence = hoyaGait(${v}).hz the planted boot sweeps back at his speed (no slide), and never sideways`, () => {
+      const h = buildHoya(THREE, { quality: "phone" }), g = hoyaGait(v, run), dt = 1 / 240, p = new THREE.Vector3();
+      h.setPose("auto");
+      for (let i = 0; i < 480; i++) h.update(dt, { speed: v, cadence: g.hz, run });
+      const xs = [], ys = [], zs = [];
+      for (let i = 0; i < Math.ceil(240 / g.hz); i++) { h.update(dt, { speed: v, cadence: g.hz, run }); h.root.updateMatrixWorld(true); h.bones.footR.getWorldPosition(p); xs.push(p.x); ys.push(p.y); zs.push(p.z); }
+      // the planted stretch: the ankle within 1.2 cm of its lowest (the heel roll, the mid-stance rise and the toe roll stay
+      // under that; the swing is far above it)
+      const lo = Math.min(...ys), v2 = [], side = [];
+      for (let i = 1; i < ys.length; i++) if (ys[i] < lo + 0.012 && ys[i - 1] < lo + 0.012) { v2.push((zs[i] - zs[i - 1]) / dt); side.push(Math.abs(xs[i] - xs[i - 1]) / dt); }
+      expect(v2.length).toBeGreaterThanOrEqual(3);
+      const mean = v2.reduce((a, b) => a + b, 0) / v2.length;
+      expect(Math.abs(mean - v) / v).toBeLessThan(0.12);   // backward (+Z) at his own speed
+      // the hips turn 17-18 deg with the stride, and the thighs turn back against it: the planted boot stays in its line
+      // (it was carried sideways at ~0.5 m/s, 1.4-2.1 cm a stance, when the leg swung in the hips' plane)
+      expect(side.reduce((a, b) => a + b, 0) / side.length).toBeLessThan(0.2);
+      h.dispose();
+    });
+  }
 });

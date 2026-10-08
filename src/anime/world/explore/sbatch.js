@@ -53,6 +53,9 @@ const _views = new WeakMap();
 // [mobile-perf] A pool's slot fades in and out (a tile's full detail replacing its simplified buildings, StreamBatch.fade): the slot's instance
 // colour carries the fade in its alpha (BatchedMesh per-instance colours: vColor.a in the shader) and a screen-door dither (interleaved gradient
 // noise) keeps that share of the fragments. Opaque materials stay opaque: no blending, no sorting, the depth buffer as before.
+// FADE.on = false (main.js: ?fade=0): no fades, no instance colours, and no dither in the pools' programs. A fragment shader that can discard
+// keeps an Apple GPU's hidden-surface removal from rejecting its fragments before they are shaded, whether or not a fade is running.
+export const FADE = { on: true };
 export const FADE_GLSL = /* glsl */`
 #ifdef USE_BATCHING_COLOR
   if ( vColor.a < 0.999 ) { float klcFz = fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) ); if ( klcFz >= vColor.a ) discard; }
@@ -62,8 +65,10 @@ export function batchedView(m) {
   if (!v) {
     v = Object.create(m);
     const base = m.onBeforeCompile, key = m.customProgramCacheKey;
-    v.onBeforeCompile = function (sh, r) { base.call(this, sh, r); sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>' + FADE_GLSL); };
-    v.customProgramCacheKey = function () { return key.call(this) + '|fade'; };
+    if (FADE.on) {
+      v.onBeforeCompile = function (sh, r) { base.call(this, sh, r); sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>' + FADE_GLSL); };
+      v.customProgramCacheKey = function () { return key.call(this) + '|fade'; };
+    }
     _views.set(m, v);
   }
   return v;
@@ -91,7 +96,7 @@ class Pool {
   removePart(slotKey, entryKey) { const s = this.slots.get(slotKey), p = s?.parts.get(entryKey); if (p && s.parts.delete(entryKey)) { this.partsV -= p.geo.attributes.position.count; this.mark(this, s); } }
   setPartVisible(slotKey, entryKey, v) { const s = this.slots.get(slotKey), p = s?.parts.get(entryKey); if (p && p.visible !== v) { p.visible = v; this.mark(this, s); } }
   /** [mobile-perf] A slot's fade (0 hidden .. 1 whole), kept for its next instance. */
-  setFade(slotKey, a) { const s = this.slots.get(slotKey); if (!s) return; s.fadeA = a; if (s.iid >= 0) this.bm.setColorAt(s.iid, _c4.set(1, 1, 1, a)); }
+  setFade(slotKey, a) { const s = this.slots.get(slotKey); if (!s || !FADE.on) return; s.fadeA = a; if (s.iid >= 0) this.bm.setColorAt(s.iid, _c4.set(1, 1, 1, a)); }
   /** [mobile-perf] Nothing left in it (every tile that used it unloaded). */
   get empty() { return this.slots.size === 0 && this.partsV === 0; }
   /** [mobile-perf] Far below its capacity: its buffers grew for a place the session has left. */
@@ -139,7 +144,7 @@ class Pool {
       this._ensure(rv, ri);
       if (this.used + 1 >= this.inst) { this.inst *= 2; this.bm.setInstanceCount(this.inst); }
       s.gid = this.bm.addGeometry(g, rv, ri); s.iid = this.bm.addInstance(s.gid);
-      this.bm.setColorAt(s.iid, _c4.set(1, 1, 1, s.fadeA ?? 1));   // [mobile-perf] the slot's fade (1: opaque)
+      if (FADE.on) this.bm.setColorAt(s.iid, _c4.set(1, 1, 1, s.fadeA ?? 1));   // [mobile-perf] the slot's fade (1: opaque)
       if (this.onFirst) { const f = this.onFirst; this.onFirst = null; f(); }   // [smooth] its geometry has its attributes now: compile ahead (StreamBatch._warm)
       s.resV = rv; s.resI = ri; this.liveV += rv; this.liveI += ri; this.used++; s.shown = true;
     }
@@ -369,7 +374,7 @@ export class StreamBatch {
     if (!e) { done?.(); return false; }
     if (e.fade) { e.fade = null; this._fading.delete(key); }
     const own = e.slot === key;
-    if (!(ms > 0) || !own) { this._applyFade(e, to); done?.(); return false; }
+    if (!(ms > 0) || !own || !FADE.on) { this._applyFade(e, to); done?.(); return false; }
     this._applyFade(e, from);
     e.fade = { from, to, t0: performance.now(), ms, done };
     this._fading.add(key);

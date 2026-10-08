@@ -6,22 +6,28 @@ The owner, 2026-10-08: "the walking and movement physics should be more crisper 
 
 Measured in the town by `tools/anime/feel-probe.mjs` (headless Chrome through the gate): the same scripted walk on the phone tier (390×844 @3, real touches on the stick) and on a desktop (1440×900, real key events), at 60 and 30 fps. The script: stand 1.5 s, walk 2.5 s, run 2 s, the stick straight back 1.6 s, let go, forward then 45° right, let go; then a kerb route the probe finds by itself near PIER7 (+0.15, +0.09, −0.26, +0.20 m); then the PIER7 timber stair; then 歩く from the opening drone over the bay. Before is main `8882864`; after is this branch. Raw frames go to `dist/feel/<label>/`; the summaries are `docs/play/shots/feel/<label>-metrics.json`.
 
-| | target | before (phone / desktop) | after (phone / desktop) |
+| | target | before: main `8882864` (phone / desktop) | after: deploy #8 (phone / desktop) |
 |---|---|---|---|
 | first visible motion | the first frame of input | frame 1 / 1 | frame 1 / 1 |
-| 90 % of walking speed | 0.10–0.15 s, eased | 0.250 / 0.200 s | 0.150 / 0.100 s (the phone's includes the thumb's 33 ms push) |
-| stop (under 5 %) | ~0.10 s, a settle, no slide | 0.267 s, 0.27–0.31 m | 0.100 s, 0.16 m, no overshoot, a 1.5 cm settle |
+| 90 % of walking speed | 0.10–0.15 s, eased | 0.250 / 0.200 s (walking 2.7 / 3.1 m/s) | 0.150 / 0.100 s (walking 1.5 m/s; the phone's includes the thumb's 33 ms push) |
+| standing to 90 % of the run | ≤ 0.15 s | — | 0.067 s (3.0 m/s) |
+| stop (under 5 %) | ~0.10 s, a settle, no slide | 0.267 s, 0.27–0.31 m | 0.100 s, 0.08 m, no overshoot, a 1.5 cm settle |
 | 180° turn (stick straight back) | 0.12–0.20 s, no snap | never: he walked backwards (95–98 % of the frames) | 0.167 s, never backwards |
-| 45° change | a smooth curve | never faced it: he crabbed | follows it (desktop 0.10 s; on the phone 0.33–0.45 s from the start of a 0.24 s thumb arc) |
+| 45° change | a smooth curve | never faced it: he crabbed | follows it (desktop 0.10 s; on the phone 0.33–0.42 s from the start of a 0.24 s thumb arc) |
+| the boot's slide while it is down, per stance, walk / run | 0 | 17.6–22.7 / 25 cm (+ 4 / 9 cm skidding at touch-down) | 0.00 / 0.02 cm (touch-down 0.13 / 0.06 cm) |
+| his cycle, walk / run | locked to his speed | 3.0–3.2 / 3.5–3.6 Hz | 4.1 / 5.5 Hz = speed × stance / travel |
 | camera behind its place, walking / running | none | 0.62–0.72 / 1.43–1.48 m | 0.00 / 0.00 m |
-| camera still moving after he stops | none | 0.47–0.57 s | 0.05–0.10 s, under 1 cm |
-| look-ahead | slight | none | 0.43 m walking, up to ~10° of the view |
+| camera still moving after he stops | none | 0.47–0.57 s | 0.03–0.05 s, under 1 cm |
+| camera jitter (high-frequency acceleration) | ~0 | up to 0.42 / 0.48 m/s² | 0 / 0, at 60 and 30 fps |
+| look-ahead | slight | none | 0.21 m walking, 0.42 m running (the view turns, ≤ ~10°) |
+| the run's sense of speed | subtle | — | the view widens 3.5° (≤ 0.19° a frame at 60 fps) and comes back |
 | kerbs: body jump in one frame / frames airborne | an eased lift / 0 | 0.15–0.20 m / 5–10 | 0.04 m / 0 |
 | his height on screen | 15–25 % | 11.8 % / 21.8 % | 20.0 % / 21.8 % |
 | 歩く from the opening drone | he starts on land | on the sea after a 98–158 m fall (4–5 s) | on the quay, 3–4 m in from the edge, an eased 1.2–1.7 s descent |
 | the stick | dead zone, curve, run | full walk never reachable (91 %); 2 % speed at 20 % travel | full walk at 80 % travel; 0.25 u + 0.75 u² |
-| foot slip (planted foot / body) | 0 | 73–80 % walk, 84–88 % run | unchanged: deploy #8 (below) |
-| 30 vs 60 fps | the same | the same (the fixed step) | the same (all springs are exact over the step) |
+| 30 vs 60 fps | the same | the same (the fixed step) | the same: starts, stops, turns, slides and the camera match |
+
+Deploy #7 (`e1be2c1`) shipped everything above at the walker's 3.1 / 6.4 m/s and main's stride (the feet still slid then); deploy #8 adds his own speeds, the hoya-accuracy lane's stride and the cadence lock. The boot's slide is measured as the hoya lane does (`test/play-hoya3d.test.js`): its ankle within 1.2 cm of its lowest, the travel along his heading from the frame after touch-down to lift-off. Across his heading over the same frames a planted boot moves 0 cm walking and 0.3–0.4 cm a stance running (the hoya lane's offline numbers: 0.15 / 0.55 cm). At 30 fps no walking stance has two sampled frames within 1.2 cm of the lowest, so the per-stance numbers there are the run's (0 cm slide, 0 cm across); the coarser median speed of the lower ankle is the same at 30 and 60 fps (0.44 m/s, most of it the swing).
 
 ## The body (`src/anime/core/player.js`, `FEEL`)
 
@@ -44,12 +50,29 @@ Measured in the town by `tools/anime/feel-probe.mjs` (headless Chrome through th
 
 Past the 12 % dead zone (6.7 px of the 56 px travel) the push u, reaching 1 at 80 % of the travel, gives `0.25 u + 0.75 u²`: a quarter of linear's slope at the start (a small push is a slow walk you can steer), steepening to full walking speed at 80 %, before RUN at 85 % (with its 5 % hysteresis). The smoothstep before gave 2 % of the speed at 20 % travel and topped out at 91 % of walking speed. The car, the boat, the swim and the gull read the same `pad.move`.
 
-## His walk cycle (deploy #8)
+## His speeds and his walk cycle (deploy #8)
 
-His planted foot slides because his legs are short for his speed: the manual's legs are 0.114 m long, and at 3.1 m/s a cycle that keeps the foot planted would need ~15 Hz with the old stride. The hoya-accuracy lane's model (`0ce9a47`) gives the manual's stride (0.17 m a stance walking, 0.19 m running) and `gait(speed)`; `play/avatar/index.js` `gaitCadence` then drives `update(dt, { …, cadence })` with `speed × stance / travel`, held to 1.6–5.5 Hz, and the footsteps follow it. It is dormant until the model offers `gait()`. Planting the feet at 5.5 Hz also needs his third-person speeds near 1.7 m/s walking and 2.9 m/s running; that decision is the conductor's for deploy #8.
+**Decided by the conductor (2026-10-08 10:00): ホヤぼーや walks at 1.5 m/s and runs at 3.0 m/s in third person, with his feet planted.** First person and the original walker keep 3.1 / 6.4. The numbers live in one place, `HOYA_SPEED` in `src/anime/play/avatar/index.js`; `?hoyaSpeed=walk,run` tries others (`?hoyaSpeed=0` gives him the walker's).
+
+Why those two numbers: the manual's legs are 0.114 m long. With the manual's stride (hoya-accuracy: 0.204 m a stance walking at stance 0.56, 0.196 m running at 0.36) and the poses' readable cycle rates (walk ≤ 4.2 Hz, run ≤ 5.5 Hz), the fastest no-slide speeds are 1.5 and 3.0 m/s. The trade-off (the planted foot's slide as a share of his speed):
+
+| walk / run (m/s) | walk slide | run slide | cycle walk / run |
+|---|---|---|---|
+| 3.1 / 6.4, main's stride (before) | 73–80 % | 84–88 % | 3.2 / 3.6 Hz |
+| 3.1 / 6.4, the new stride, locked | 51 % | 53 % | 4.2 / 5.5 Hz |
+| 2.4 / 4.0 | 36 % | 25 % | 4.2 / 5.5 Hz |
+| 2.0 / 3.0 | 24 % | 0 % | 4.2 / 5.5 Hz |
+| 1.8 / 3.0 | 15 % | 0 % | 4.2 / 5.5 Hz |
+| **1.5 / 3.0 (chosen)** | **0 %** | **0 %** | 4.1 / 5.5 Hz |
+
+The run stays lively: from standing to 3.0 m/s in at most 0.15 s, ダッシュ is the run, and at a run the view widens by 3.5° (90 % in 0.65 s, back within 0.45 s; `RUN_FOV`), measured from the screen's own field of view and given back when the walk ends (none under reduced motion).
+
+## His walk cycle
+
+His planted foot slid because his legs are short for his speed: the manual's legs are 0.114 m long, and at 3.1 m/s a cycle that keeps the foot planted would need ~15 Hz with main's stride. The hoya-accuracy lane's model gives the manual's stride (0.204 m a stance walking at stance 0.56, 0.196 m running at 0.36) and `gait(speed, run)`. `play/avatar/index.js` `gaitCadence` drives `update(dt, { …, cadence, run })` with the model's own no-slide `rate` (`speed × stance / travel`, held to the pose's readable ceiling), within 1.6–5.5 Hz; `run` is 0 walking and 1 running (eased over 0.12 s), so the model shows the pose the player chose. The footsteps follow the same cadence and soften as the patter quickens (`footstepGain`). A model without `gait()` keeps its own speed-driven cycle.
 
 ## Checking it
 
-- `env -u NODE_OPTIONS bun test test/feel-player.test.js test/feel-camera.test.js test/feel-metrics.test.js`: the numbers above through the real `Player` and camera, and the probe's metrics against synthetic motion with known answers.
+- `env -u NODE_OPTIONS bun test ./test/feel-player.test.js ./test/feel-camera.test.js ./test/feel-metrics.test.js ./test/feel-gait.test.js ./test/feel-credit.test.js`: the numbers above through the real `Player` and camera, the probe's metrics against synthetic motion with known answers, his planted feet through the model's gait at his speeds, and the credit's place per screen.
 - `tools/anime/gate.sh chrome --fg env -u NODE_OPTIONS bun tools/anime/feel-probe.mjs --label <name> [--fps 60,30] [--clip] [--throttle 4]`: the town numbers (and clips into `docs/play/shots/feel/`).
 - `tools/anime/gate.sh chrome --fg env -u NODE_OPTIONS bun tools/anime/feel-modes.mjs`: every mode that shares the player (fly, gull, drive, swim, 一本釣り, かつお), each followed by a walk.

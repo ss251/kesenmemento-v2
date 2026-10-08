@@ -133,7 +133,7 @@ d("integrate fix 2: the second phone review's blockers", () => {
     await page.waitFor("window.__pad && !window.__pad.hidden", { timeout: 20000 });
     const before = await layoutReport(page);
     expect(Object.keys(before.panels).some((k) => k.startsWith("dock") || k.startsWith("places"))).toBe(true);   // they are there when the popover is shut
-    await tap("#klc-pad .gear"); await settle(700);
+    await tap("#klc-pad .gear"); await settle(700);   // (landscape keeps the gear; a portrait phone opens the settings from ☰ 操作設定, below)
     const r = await layoutReport(page);
     expect(r.pad.settings).toBeDefined();
     expect(r.overlaps.filter((o) => o.startsWith("settings"))).toEqual([]);
@@ -145,10 +145,10 @@ d("integrate fix 2: the second phone review's blockers", () => {
     expect(Object.keys(after.panels).some((k) => k.startsWith("dock"))).toBe(true);
     // portrait stays clean
     await setViewport(page, PORTRAIT); await settle(900);
-    await tap("#klc-pad .gear"); await settle(600);
+    await tap("#klc-ui .mbtn"); await tap('#klc-ui .tools [data-act="padset"]'); await settle(600);   // [emil-ui] ☰ then 操作設定
     expect((await layoutReport(page)).overlaps.filter((o) => o.startsWith("settings"))).toEqual([]);
     await shot("settings_portrait");
-    await tap("#klc-pad .gear");
+    await ui("window.__pad.openSettings(false)");
   });
 
   T("B6: the 44 px restore eye is phone-only (body.klc-pad); without the pad it is the 38 px eye at 18 / 18", async () => {

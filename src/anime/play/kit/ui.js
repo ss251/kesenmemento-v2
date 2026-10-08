@@ -143,6 +143,13 @@ body.klc-pad #klc-play .topbar { left: calc(10px + env(safe-area-inset-left, 0px
 }
 body.playing.klc-ui #toast { top: calc(78px + env(safe-area-inset-top, 0px)); }
 #klc-play.timing .topbar { visibility: hidden; }
+/* [emil-ui] A landscape phone: the row starts under the minimap and its caption (top centre, to about 130 px), where #7 had it (132 px). With the wordmark and the
+   歩く / 飛ぶ / 運転 row gone it rose to 112 px, level with the minimap, so layoutChrome() found no room beside it for 金のカツオ 0/50 and put the chip under it, on
+   the stick (at 128 px the caption's last 2 px still blocked it). */
+@media (orientation: landscape) and (max-height: 520px) { body.klc-pad #klc-play .topbar { top: calc(132px + env(safe-area-inset-top, 0px)); } }
+/* [emil-ui] The ☰ menu is modal (the pad steps aside): the row and its chips step aside with it. layoutChrome() counts the open menu as an obstacle, so the row
+   jumped to just under it, low on the screen, and back when it closed. */
+body:has(#klc-ui[data-menu="1"]) #klc-play :is(.topbar, .counters) { visibility: hidden; }
 #klc-play .cluster.arc .act { position: absolute; }
 #klc-play .cluster.arc kbd { display: none; }
 @media (pointer: coarse) { #klc-play .cluster kbd { display: none; } }
@@ -347,7 +354,7 @@ const CSS = /* css */`
 }
 @media (max-width: 720px) {
   #klc-play .counters { top: calc(80px + env(safe-area-inset-top, 0px)); left: 12px; }
-  #klc-play .prompt { bottom: calc(168px + env(safe-area-inset-bottom, 0px)); min-width: 168px; }
+  #klc-play .prompt { bottom: auto; top: calc(188px + env(safe-area-inset-top, 0px)); min-width: 168px; }   /* [emil-ui] the context prompts' one place on a phone: the top-centre slot under the HUD's rows (the gull's .prompt.top, the board chip's, もぐる's: ui/ship.js). At 168 px it sat on the stick's top edge; above the thumbs, on ホヤぼーや */
   #klc-play .timer { top: calc(132px + env(safe-area-inset-top, 0px)); font-size: 40px; }
   #klc-play .split { top: calc(180px + env(safe-area-inset-top, 0px)); }
   #klc-play .prompt.top { bottom: auto; top: calc(188px + env(safe-area-inset-top, 0px)); }   /* [integration] avatar's top prompt (the gull), under the kit's row (which ends near 172 px on a phone) */
@@ -359,7 +366,7 @@ const CSS = /* css */`
   #klc-play .toast.ono.show { transform: rotate(-6deg); }
 }
 
-body:has(#klc-ui[data-menu="1"]) #klc-play .prompt { visibility: hidden; pointer-events: none; }   /* [integration] the ☰ menu is open: kit prompts step back */
+body:has(#klc-ui[data-menu="1"]) #klc-play .prompt, body:has(#klc-ui[data-sheet="time"]) #klc-play .prompt, body:has(#klc-ui[data-sheet="places"]) #klc-play .prompt, body:has(#klc-ui[data-credits="1"]) #klc-play .prompt { visibility: hidden; pointer-events: none; }   /* [integration] the ☰ menu is open: kit prompts step back ([emil-ui] and while a HUD sheet or the credits are open) */
 /* [mobile-play] the phone's first screen shows one thing: while the touch pad's first-run coach (左で移動・右で視点 / はじめる)
    is up, the kit's prompts (the gull's 「ウミネコになる」) and the ship's boarding chip step back; はじめる brings them back */
 body:has(#klc-pad .coach:not([hidden])) #klc-play .prompt,

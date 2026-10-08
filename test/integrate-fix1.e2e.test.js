@@ -132,7 +132,8 @@ d("integrate fix 1: the phone review's blockers", () => {
 
   T("B5: portrait, 自動で巡る is in the places sheet (44 px) and runs the tour; the strip fades the edge with more stops", async () => {
     await page.eval("window.__camSpec('walk')"); await settle(600);
-    await tap('#klc-ui .pbar button[data-sheet="places"]');
+    const openPlaces = async () => { await tap("#klc-ui .mbtn"); await tap('#klc-ui .tools [data-sheet="places"]'); };   // [emil-ui] ☰ then 名所 (the bottom pills are gone)
+    await openPlaces();
     const a = await R("#klc-ui .places .auto");
     expect(a.vis).toBe(true); expect(a.h).toBeGreaterThanOrEqual(44);
     expect(await ui("document.querySelector('#klc-ui .places').dataset.fade")).toContain("r");
@@ -144,10 +145,10 @@ d("integrate fix 1: the phone review's blockers", () => {
     expect(await ui("document.querySelector('#klc-ui .places').dataset.fade")).toContain("l");
     await tap("#klc-ui .places .auto");
     expect(await ui("window.__life.tour.playing")).toBe(true);
-    if (!(await R("#klc-ui .places .auto")).vis) await tap('#klc-ui .pbar button[data-sheet="places"]');
+    if (!(await R("#klc-ui .places .auto")).vis) await openPlaces();
     await tap("#klc-ui .places .auto");
     expect(await ui("window.__life.tour.playing")).toBe(false);
-    if ((await R("#klc-ui .places .auto")).vis) await tap('#klc-ui .pbar button[data-sheet="places"]');
+    if ((await R("#klc-ui .places .auto")).vis) await ui("document.querySelector('#klc-ui .tools [data-sheet=\"places\"]').click()");   // (folds it: the ☰ row toggles the sheet)
     await page.eval("window.__camSpec('walk')"); await settle(600);
   });
 
@@ -166,17 +167,17 @@ d("integrate fix 1: the phone review's blockers", () => {
     await shot("credits_portrait");
     await tap("#klc-ui .credits .cx");
     expect(await ui("({ sheet: getComputedStyle(document.querySelector('#klc-ui .credits')).display, hud: document.body.classList.contains('klc-hud-open'), pad: window.__pad.hidden })")).toEqual({ sheet: "none", hud: false, pad: false });
-    // the arrivals panel: the minimap is hidden while it is open, back when it closes
-    await tap("#klc-ui .brand .chip");
+    // the arrivals panel ([emil-ui] the chip, then the time sheet's 今日の入船): the minimap is hidden while it is open, back when the chip closes it
+    await tap("#klc-ui .brand .chip"); await tap("#klc-ui .dock .arr");
     expect(await ui("getComputedStyle(document.querySelector('#klc-x .mini')).display")).toBe("none");
     await shot("arrivals_portrait");
     await tap("#klc-ui .brand .chip");
     expect(await ui("getComputedStyle(document.querySelector('#klc-x .mini')).display")).not.toBe("none");
     // the time sheet's view and photo buttons, the search close, the map's zoom and close
-    await tap('#klc-ui .pbar button[data-sheet="time"]');
+    await tap('#klc-ui .brand .chip');   // [emil-ui] the chip opens the time sheet
     for (const sel of ['#klc-ui .dock [data-act="view"]', '#klc-ui .dock [data-act="photo"]']) { const r = await R(sel); expect(r.h).toBeGreaterThanOrEqual(44); expect(r.w).toBeGreaterThanOrEqual(44); }
     await shot("time_sheet_portrait");
-    await tap('#klc-ui .pbar button[data-sheet="time"]');
+    await tap('#klc-ui .brand .chip');
     await tap('#klc-x .xbar button[data-act="search"]');
     const sx = await R("#klc-x .xsearch .x"); expect(sx.h).toBeGreaterThanOrEqual(44); expect(sx.w).toBeGreaterThanOrEqual(44);
     await tap("#klc-x .xsearch .x");

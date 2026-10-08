@@ -18,7 +18,7 @@
   const T = ctx.pipeline.targets, rr = r.render.bind(r);
   r.render = function (scene, camera) {
     const rt = r.getRenderTarget();
-    const name = rt === T.rtND ? 'outline pre-pass' : rt === T.rtColor ? 'colour' : rt === null ? 'composite' : 'bloom';
+    const name = rt === T.rtND ? 'outline pre-pass' : rt === T.rtColor ? 'colour' : rt === null ? 'composite' : T.rtEdge && rt === T.rtEdge ? 'edge' : 'bloom';   // [mobile-perf] edge: the outlines' own pass
     begin(name); try { return rr(scene, camera); } finally { end(); }
   };
   const sm = r.shadowMap, sr = sm.render.bind(sm);

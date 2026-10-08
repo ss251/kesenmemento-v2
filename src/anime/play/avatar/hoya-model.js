@@ -12,7 +12,13 @@
 // The manual's NG list (p.5) and how this model keeps it: his colours exactly (p.2), the black (K100) line never
 // thicker than drawn, no deformation (no squash-and-stretch scaling: poses only), the サンマ sword and nothing else in
 // his hand, no hat, his proportions, no parts apart, his face as drawn (the only other eye is the closed ⌒ the manual
-// itself draws, NO.15-3 and the wink NO.1-29), no text on him, never filled in dark (a lift keeps his colours at night).
+// itself draws, NO.15-3, and the jump's wink as NO.1-16 / NO.1-29 draw it), no text on him, never filled in dark (a
+// lift keeps his colours at night).
+//
+// v2 (2026-10-08, measured against the manual's own files; docs/play/HOYA3D.md "v2"): the face as the manual draws him
+// off-axis (FACE_VIEW: the head's drawing moves round the head by view, the head's shape never), two-tone flat colour
+// (HOYA_TONE), the walk, run and jump from the manual's drawings (HOYA_GAIT; cadence in, hoyaGait()/gait() out), the
+// cape flaring in motion (NO.9-1), the サンマ's two edges and the back marks as measured.
 //
 // Units: the design numbers are in U = half the width of his head (its surface; 393 px in the city's NO.1-1.png). The
 // model is in metres: 1.10 m from the soles to the top of the siphon knobs (3.845 U). Origin between the soles, +Y up,
@@ -57,7 +63,10 @@ const FACE_HALF = [[0, 0.279], [0.058, 0.297], [0.118, 0.324], [0.179, 0.347], [
   [0.678, -0.06], [0.666, -0.125], [0.65, -0.19], [0.627, -0.251], [0.612, -0.315], [0.615, -0.383], [0.645, -0.441],
   [0.696, -0.485], [0.757, -0.508], [0.805, -0.541]];
 const FACE_O = [0, -0.15];          // the face contour is star-shaped round this point (used for the bulge)
-const FACE_BULGE = 0.06;            // interpretation: the face stands a little proud of the hood (the profile NO.15-31)
+// The face lies on the head itself. (v1 raised it 0.06 U to bring the profile toward NO.15-31; NO.15-31 measures the
+// face's front 0.93 U from the head centre at the eye row, which is the plain head (0.938), and the face view now gives
+// the profile its face. A raised face also creased the line where it met the hood.)
+const FACE_BULGE = 0;
 // Face features (front view, U from the head centre; NO.1-1, mirrored to symmetry).
 const EYE = { x: 0.295, y: -0.137, r: 0.057 };
 const NOSE = { y: -0.272, rx: 0.0547, ry: 0.0471, rz: 0.045 };        // the pink inside the black ring (M40)
@@ -70,10 +79,12 @@ const MARKS_FRONT = [
   [[0.469, 0.605], [0.614, 0.597], [0.644, 0.459]],                      // the upper corners
   [[0.829, 0.118], [0.909, 0.001], [0.829, -0.112]],                     // > on the sides
 ];
+// v2: re-measured on NO.9-1 at its own scale (172 px/U, the head centre from its top and its widest row): the ^ centres
+// 0.17 U above the head centre, the corners 0.45 U, the chevrons 0.18 U below; v1 sat all three ~0.13 U lower
 const MARKS_BACK = [
-  [[-0.13, -0.02], [0, 0.1], [0.13, -0.02]],                             // ^ in the middle of the back
-  [[0.385, 0.394], [0.585, 0.382], [0.6, 0.235]],                        // the upper corners
-  [[0.62, -0.19], [0.726, -0.321], [0.65, -0.417]],                      // the lower chevrons
+  [[-0.16, 0.08], [0, 0.22], [0.16, 0.08]],                              // ^ in the middle of the back
+  [[0.385, 0.53], [0.585, 0.518], [0.6, 0.37]],                          // the upper corners
+  [[0.62, -0.05], [0.726, -0.181], [0.65, -0.277]],                      // the lower chevrons
 ];
 // The two siphons (入水孔 "+" on his right, 出水孔 "-" on his left, as on a real ホヤ). Front view NO.1-1: the knob
 // centres 0.870 U out and 1.014 U above the head centre, radius 0.198 U (surface); the stalks lean 37 deg out and aim at
@@ -109,10 +120,15 @@ const CAPE = { top: 1.735, bottom: 0.86, w0: 0.46, w1: 0.84, z0: 0.235, z1: 0.42
 // The サンマ sword (the colour page p.2 / NO.1-1): a straight blade 1.62 U from the guard to the snout, widest a quarter of
 // the way down from the snout; a yellow crescent guard; the fish is held by its tail, whose fork shows below the fist.
 // Strokes on the blade: [s from the snout (0) to the guard (1), f across the blade (-1..1, + toward his right)].
+// v2: the blade's two edges measured on NO.1-1 (the grey's edges, row by row, against the line from the snout to the
+// guard's middle): the fish is widest (0.31 U) about halfway, its back (the inner edge, toward his head) bulging near the
+// head end and its belly (the outer edge) through the middle; v1's symmetric blade was 0.07 U too wide near the snout.
+// [s from the snout (0) to the guard (1), the edge's distance from that line, U]
 const SWORD = {
   len: 1.62, base: 0.33, thick: 0.38,
-  half: [[0, 0], [0.03, 0.052], [0.08, 0.1], [0.15, 0.138], [0.25, 0.16], [0.4, 0.155], [0.55, 0.14], [0.7, 0.115], [0.85, 0.088], [1, 0.07]],
-  guard: { w: 0.42, h: 0.115, d: 0.15 },
+  outer: [[0, 0], [0.03, 0.026], [0.08, 0.056], [0.15, 0.089], [0.23, 0.119], [0.31, 0.143], [0.39, 0.155], [0.48, 0.163], [0.56, 0.161], [0.64, 0.154], [0.72, 0.141], [0.8, 0.121], [0.89, 0.093], [1, 0.058]],
+  inner: [[0, 0], [0.03, 0.04], [0.08, 0.081], [0.15, 0.117], [0.23, 0.146], [0.31, 0.155], [0.39, 0.155], [0.48, 0.15], [0.56, 0.142], [0.64, 0.129], [0.72, 0.116], [0.8, 0.1], [0.89, 0.08], [1, 0.062]],
+  guard: { w: 0.44, h: 0.115, d: 0.15 },   // NO.1-1: a straight top edge, a curved underside
   eye: [0.12, -0.1, 0.034],
   strokes: [[[0.124, 0.66], [0.2, 0.27]], [[0.26, 0.76], [0.3, 0.35], [0.26, -0.41]], [[0.37, 0.07], [0.97, -0.28]]],
   tail: [[0, -0.16], [0.045, -0.19], [0.2, -0.47], [0.1, -0.43], [0, -0.35], [-0.1, -0.43], [-0.2, -0.47], [-0.045, -0.19]],
@@ -121,9 +137,81 @@ const SWORD = {
 // animator turns the fist so it stands as in NO.1-1 (6.8 deg out) whatever the arm does.
 const SWORD_GRIP = -(125 + 8) * Math.PI / 180;
 
+// The face as the manual draws him off-axis (顔の見せ方). Every off-axis drawing slides the face round the head more than a
+// rigid head can: NO.16-15 (a 12.5 deg turn, measured from the nose and the eyes) draws the face 8 % wider than a rigid
+// head, and the profiles NO.15-31 / NO.10-7 put the eye 37-50 deg and the face's edge 85-87 deg round from the front
+// (a rigid head: 17 and 43 deg). So the head's DRAWING (the face, its features, the hood's marks) is carried round the
+// head's vertical axis by tan(W/2) = k tan(phi/2), phi = the azimuth from the face's centre, with
+// k = 1 + FACE_VIEW.k sin^2(camera azimuth) cos^2(camera elevation): 1 from the front and the back (NO.1-1, NO.9-1 exact),
+// 2.45 in profile, where the face's edge then lies 0.475 of the head's depth back from its front (NO.15-31 and NO.10-7:
+// 0.472). The eyes move with `eyes` times the boost (1.08 at NO.16-15's 12.5 deg, where that fits its eyes to 0.01 U; in
+// profile 0.16 of the depth back, the manual 0.146-0.195). The head's SHAPE never changes (every point stays on the ellipsoid, so
+// the silhouette, the proportions and the line are the same from every side: no deformation); the eyes and the nose
+// move whole, never stretched, and every ink stroke moves by its own centre line (its width never shears). Under the
+// chin (below `bottom`, U from the head centre), where the face's edge already sits mid-head, the rows stay put (the
+// head has extra rows across that band, so no triangle shears); behind him (`back`, degrees) the boost eases off, so
+// the back view NO.9-1 is exact and a 3/4 back shows only the cheek's edge.
+export const FACE_VIEW = Object.freeze({ k: 1.45, eyes: 1.2, bottom: [-0.7, -0.3], back: [90, 165] });
+/** The azimuth phi (radians from the face's centre, + toward his left) carried to W for the boost k. */
+export function faceWarp(phi, k) { return 2 * Math.atan(k * Math.tan(phi / 2)); }
+/** The eyes' boost for the face's boost k (they move a little further round than the face, as the profiles draw them). */
+export function faceEyeK(k) { return 1 + (k - 1) * FACE_VIEW.eyes; }
+/** The boost for a camera at azimuth az round the head (0 = in front, + toward his left) and elevation el (radians). */
+export function faceViewK(az, el = 0) {
+  const s = Math.sin(az), c = Math.cos(el), b = 1 - smooth(FACE_VIEW.back[0] * DEG, FACE_VIEW.back[1] * DEG, Math.abs(az));
+  return 1 + FACE_VIEW.k * s * s * c * c * b;
+}
+/** How much a row of the head (y in U from the head centre) takes part: 1 across the face, 0 at the siphons and under the chin. */
+export function faceWarpRow(y) { return smooth(FACE_VIEW.bottom[0], FACE_VIEW.bottom[1], y); }
+
+// Cel shading as the manual's flat colour: two tones only. Lit = the official colour; shade = one step (SHADE of the
+// key light kept), the terminator at SHADE_AT of n.l. The sky's fill is the same from every side (a hemisphere light's
+// sky-to-ground gradient would be a soft gradient on him), and he takes no shadow from the shadow map (his own big head
+// would print a soft dark blot on his chest): only the clean step and the K100 line. The light's own colour reaches him
+// at `hue` strength (its brightness in full): a sunset warms him as it warms the town, but his white stays white-ish and
+// his colours stay his (p.5 NG: 色を変える).
+export const HOYA_TONE = Object.freeze({ shade: 0.55, at: 0.1, hue: 0.4 });
+
+// The walk and the run as the manual draws them: big strides on his short legs (NO.1-3, NO.1-8, NO.16-19, NO.16-20;
+// from behind NO.9-1; the run NO.1-5, NO.1-11). The stance: the planted boot sweeps back exactly as far as the body
+// travels (it never slides), rolling heel (toe up, `heel` deg) to toe (heel up, `toe` deg); the hips turn with the step
+// (`hipYaw` deg) and the pelvis drops into the stride (`drop` U) so the leg can reach (`reach` U from its hip). The swing:
+// the back boot kicks up (`kick` U, its orange sole to the back, `kickPitch` deg: NO.9-1, NO.1-5), the knee comes up
+// (`lift` U, NO.16-20); late in the swing the front boot rises toe-up (`highStep` U) so its sole shows to the front, as
+// NO.1-3 and NO.1-8 catch him, and the heel strikes toe-up (NO.16-19). A bounce from pose alone: the planted heel rises
+// (`rise` deg) through the middle of the stance so the body goes up (`bounce` U) as the other leg passes. The run has a
+// flight (`flight` U up). Legs 0.4 U: a walk stride of 0.20 m, a run of 0.20 m. Never a squash or a stretch: only the
+// joints turn.
+export const HOYA_GAIT = Object.freeze({
+  walk: { stance: 0.56, reach: 0.27, hipYaw: 18, drop: 0.11, lift: 0.22, kick: 0.16, heel: 40, toe: 42, kickPitch: 40, highStep: 0.1, rise: 16, bounce: 0.08, flight: 0, maxHz: 4.2 },
+  run: { stance: 0.36, reach: 0.26, hipYaw: 17, drop: 0.1, lift: 0.26, kick: 0.32, heel: 20, toe: 45, kickPitch: 60, highStep: 0.04, rise: 0, bounce: 0, flight: 0.06, maxHz: 5.5 },
+  runFrom: 2.3, runTo: 3.6, walkFrom: 0.08, walkTo: 0.9,   // m/s: the walk -> run blend when the caller gives no `run`
+});
+/** [walk weight, run weight] for a speed (or an explicit run blend 0..1); they sum to the movement. Into `out` (no garbage). */
+const gaitW = (speed, run, out = [0, 0]) => {
+  const m = smooth(HOYA_GAIT.walkFrom, HOYA_GAIT.walkTo, speed), r = Number.isFinite(run) ? clamp(run, 0, 1) : smooth(HOYA_GAIT.runFrom, HOYA_GAIT.runTo, speed);
+  out[0] = m * (1 - r); out[1] = m * r;
+  return out;
+};
+const GAIT_W = [0, 0], GAIT_MIX = {};   // hoyaGait()'s scratch (it is called every frame by the cadence driver)
+const gaitMix = (wR, out = {}) => { for (const k of Object.keys(HOYA_GAIT.walk)) out[k] = lerp(HOYA_GAIT.walk[k], HOYA_GAIT.run[k], wR); return out; };
+/**
+ * His stride at a speed, for the caller that drives the cycle (the movement lane): { travel, stance, run, hz }.
+ * travel: metres the planted boot sweeps back in one stance (= how far the body may go per stance with no slide);
+ * stance: the stance's share of a cycle; run: the run blend; hz: the cycle rate (cycles/s) with no slide, before any
+ * clamp; rate: the cycle rate the animator uses when update() is given no cadence (hz capped at maxHz, so the steps
+ * still read). A cycle is two steps (two footfalls). Pass `run` (0..1) to choose walk or run yourself (update() too).
+ */
+export function hoyaGait(speed, run) {
+  const v = Math.max(0, speed || 0), w = gaitW(v, run, GAIT_W), wW = w[0], wR = w[1], wM = Math.min(1, wW + wR), r = wM > 1e-6 ? wR / wM : 0, G = gaitMix(r, GAIT_MIX);
+  const travel = 2 * (G.reach + HIP.x * Math.sin(G.hipYaw * DEG)) * HOYA_SCALE * wM;
+  const hz = travel > 1e-6 && v > 0.03 ? (v * G.stance) / travel : 0;
+  return { travel, stance: G.stance, run: r, hz, rate: Math.min(G.maxHz, hz) };
+}
+
 const QUALITY = {
-  high: { inkTol: 0.0035, shell: 2, head: [34, 20], knob: [14, 9], stalk: 8, nose: [8, 5], torso: 14, collar: 22, limb: 8, limbRings: 6, hand: [10, 7], boot: 12, cape: [12, 5], blade: [8, 10], inkStep: 0.045, capSeg: 4 },
-  phone: { inkTol: 0.008, shell: 1, head: [18, 10], knob: [8, 5], stalk: 6, nose: [6, 4], torso: 10, collar: 14, limb: 6, limbRings: 3, hand: [8, 5], boot: 9, cape: [8, 3], blade: [6, 6], inkStep: 0.09, capSeg: 2 },
+  high: { inkTol: 0.0035, shell: 2, head: [34, 20], headBand: 6, knob: [14, 9], stalk: 8, nose: [8, 5], torso: 14, collar: 22, limb: 8, limbRings: 6, hand: [10, 7], boot: 12, cape: [12, 5], blade: [8, 10], inkStep: 0.045, capSeg: 4 },
+  phone: { inkTol: 0.008, shell: 1, head: [18, 10], headBand: 4, knob: [8, 5], stalk: 6, nose: [6, 4], torso: 10, collar: 14, limb: 6, limbRings: 3, hand: [8, 5], boot: 9, cape: [8, 3], blade: [6, 6], inkStep: 0.09, capSeg: 2 },
 };
 export const HOYA_QUALITIES = Object.freeze(Object.keys(QUALITY));
 export const POSES = Object.freeze(['idle', 'walk', 'run', 'jump', 'fall']);
@@ -253,9 +341,13 @@ function headPoint(x, y, back = false) {
 
 // ------------------------------------------------------------------ the mesher
 class Mesher {
-  constructor() { this.P = []; this.N = []; this.C = []; this.SI = []; this.SW = []; this.HW = []; this.I = []; this.IL = []; this.nv = 0; }
-  /** p in metres, w: bone index or [[bone, weight], ...], hw: hull width in metres (0: no line) */
+  constructor() { this.P = []; this.N = []; this.C = []; this.SI = []; this.SW = []; this.HW = []; this.WV = []; this.I = []; this.IL = []; this.nv = 0; this.warp = null; }
+  /** p in metres, w: bone index or [[bone, weight], ...], hw: hull width in metres (0: no line). The current `warp` tag
+   *  (the face view, FACE_VIEW) goes with the vertex: null = not part of the head's drawing; [1] = moves with its own
+   *  place; [2, az, y] = moves whole, as its centre (azimuth az, row y in U) does; [3, az, y] = an eye (moves whole, with
+   *  the eyes' boost, faceEyeK). */
   vert(p, n, col, w, hw) {
+    const t = this.warp; this.WV.push(t ? t[0] : 0, t && t[0] >= 2 ? t[1] : 0, t && t[0] >= 2 ? t[2] : 0);
     this.P.push(p[0], p[1], p[2]); this.N.push(n[0], n[1], n[2]); this.C.push(col[0], col[1], col[2]);
     const ws = typeof w === 'number' ? [[w, 1]] : w.filter((e) => e[1] > 1e-4).sort((a, b) => b[1] - a[1]).slice(0, 4);
     const tot = ws.reduce((s, e) => s + e[1], 0) || 1;
@@ -320,6 +412,10 @@ export function buildHoya(THREE, opts = {}) {
   B.cape0 = bone('cape0', B.spine, [0, CAPE.top, CAPE.z0]);
   B.cape1 = bone('cape1', B.cape0, [0, lerp(CAPE.top, CAPE.bottom, 0.36), lerp(CAPE.z0, CAPE.z1, 0.36)]);
   B.cape2 = bone('cape2', B.cape1, [0, lerp(CAPE.top, CAPE.bottom, 0.7), lerp(CAPE.z0, CAPE.z1, 0.7)]);
+  // the cape's two sides: they swing out from its top corners in motion (NO.9-1 draws the hem flared ~±1.45 U mid-stride;
+  // at rest NO.1-1 keeps it at ±0.79). Children of cape2, so the sides keep the cape's whole lift.
+  B.capeL = bone('capeL', B.cape2, [-CAPE.w0, CAPE.top, CAPE.z0]);
+  B.capeR = bone('capeR', B.cape2, [CAPE.w0, CAPE.top, CAPE.z0]);
   const bi = (b) => b.userData.i;
 
   // ---------------- generic parts (U, model space, bind pose)
@@ -413,7 +509,7 @@ export function buildHoya(THREE, opts = {}) {
   }
   /** Ink ribbon through surface points (U) with their normals; width w; round caps. The polyline is first simplified
    *  (Douglas-Peucker, Q.inkTol): a straight run is one quad, a curve keeps the points it needs. */
-  function ribbon(pts0, nrms0, w, wb, caps = true) {
+  function ribbon(pts0, nrms0, w, wb, caps = true, anchor = null) {
     // a closed loop (first point = last): no caps, and the seam is mitred like any other bend
     const closed = len(sub(pts0[0], pts0[pts0.length - 1])) < 1e-6;
     const keep = dpKeep(pts0, Q.inkTol), pts = keep.map((i) => pts0[i]), nrms = keep.map((i) => nrms0[i]);
@@ -431,6 +527,7 @@ export function buildHoya(THREE, opts = {}) {
       }
       const p = add(pts[i], mul(nrms[i], INK_LIFT));
       side.push(s);
+      if (anchor) M.warp = anchor(pts[i]);   // the face view moves the stroke by its centre line: its width never shears
       L.push(M.vert(S(add(p, mul(s, h * k))), nrms[i], COL.ink, wb, 0));
       R.push(M.vert(S(add(p, mul(s, -h * k))), nrms[i], COL.ink, wb, 0));
     }
@@ -440,6 +537,7 @@ export function buildHoya(THREE, opts = {}) {
     for (const end of [0, n - 1]) {
       const tOut = end === 0 ? norm(sub(pts[0], pts[1])) : norm(sub(pts[n - 1], pts[n - 2]));
       const s = side[end], p = add(pts[end], mul(nrms[end], INK_LIFT));
+      if (anchor) M.warp = anchor(pts[end]);
       const c = M.vert(S(p), nrms[end], COL.ink, wb, 0), ring = [L[end]];
       for (let k = 1; k < segs; k++) { const a = (k / segs) * Math.PI; ring.push(M.vert(S(add(p, mul(add(mul(s, Math.cos(a)), mul(tOut, Math.sin(a))), h))), nrms[end], COL.ink, wb, 0)); }
       ring.push(R[end]);
@@ -457,22 +555,37 @@ export function buildHoya(THREE, opts = {}) {
   function headInk(pts2, back, w, wb, step = Q.inkStep * 0.8, caps = true) {
     const P = [], N = [];
     for (const [x, y] of step ? resample(pts2, step) : pts2) { const h = headPoint(x, y, back); P.push(add(h.p, H0)); N.push(h.n); }
-    ribbon(P, N, w, wb, caps);
+    const keep = M.warp, rigid = keep && keep[0] >= 2;   // a stroke of a feature that moves whole keeps its tag
+    // above the face view's lower band a stroke's cross-sections move whole (its drawn width, never thicker); in the band,
+    // where the view eases off row by row, the stroke follows the surface like the colours under it (it cannot twist)
+    const anchorOf = (q) => (q[1] - H0[1] < FACE_VIEW.bottom[1] + 0.05 ? [1] : [2, Math.atan2(-q[0] / HEAD.rx, -(q[2] - H0[2]) / HEAD.rz), q[1] - H0[1]]);
+    ribbon(P, N, w, wb, caps, keep && !rigid ? anchorOf : null);
+    M.warp = keep;
   }
 
   M.part('head');
   // ================================================================== HEAD (the hood and the face)
   const hb = bi(B.head);
+  const azOf = (p) => Math.atan2(-p[0] / HEAD.rx, -p[2] / HEAD.rz);   // head frame (U): the azimuth from the face's centre
+  M.warp = [1];   // the head's drawing follows the face view (FACE_VIEW); the eyes and the nose re-tag themselves below
   {
     // one ellipsoid, the face opening cut exactly along its contour: triangles that straddle it are split on it and each
     // side keeps its own colour and normal, so the edge under the ink is crisp at any distance, never a gradient
-    const [nu, nv] = Q.head;
+    const [nu, nv0] = Q.head;
+    // the rows' polar angles: uniform, plus Q.headBand more across the face view's lower band (FACE_VIEW.bottom), where
+    // the face view eases off row by row: thin rows there keep every triangle whole whatever the camera does
+    const ths = [...Array(nv0 + 1).keys()].map((j) => (j / nv0) * Math.PI);
+    { const t0 = Math.acos(FACE_VIEW.bottom[1] / HEAD.ry), t1 = Math.acos(FACE_VIEW.bottom[0] / HEAD.ry);
+      for (let e = 1; e <= Q.headBand; e++) ths.push(t0 + ((t1 - t0) * e) / (Q.headBand + 1)); }
+    ths.sort((a, b) => a - b);
+    for (let j = ths.length - 1; j > 0; j--) if (ths[j] - ths[j - 1] < 0.02) ths.splice(j - (j === ths.length - 1 ? 1 : 0), 1);
+    const nv = ths.length - 1;
     const fOf = (p) => (p[2] < 0 ? faceSd(p[0], p[1]) : -0.5 - p[2]);
     const g2 = [];
     for (let j = 0; j <= nv; j++) {
       const row = [];
       for (let i = 0; i <= nu; i++) {
-        const ph = (i / nu) * TAU, th = (j / nv) * Math.PI;
+        const ph = (i / nu) * TAU, th = ths[j];
         const p = [HEAD.rx * Math.sin(th) * Math.sin(ph), HEAD.ry * Math.cos(th), HEAD.rz * Math.sin(th) * Math.cos(ph)];
         row.push({ p, f: fOf(p) });
       }
@@ -529,19 +642,24 @@ export function buildHoya(THREE, opts = {}) {
     // eyes: open dots; the closed ⌒ (the manual's own) on their own groups, folded away until a blink
     for (const s of [1, -1]) {
       const h = headPoint(s * EYE.x, EYE.y);
+      M.warp = [3, azOf(h.p), EYE.y];   // an eye moves whole: always the manual's round dot (or its ⌒)
       inkDisc(add(h.p, H0), h.n, EYE.r, Q.capSeg * 4, bi(B['eye' + (s > 0 ? 'R' : 'L')]));
       const arc = [];
       for (let k = 0; k <= 8; k++) { const a = Math.PI * (k / 8); arc.push([s * EYE.x - Math.cos(a) * CLOSED_EYE.w, EYE.y - CLOSED_EYE.h * 0.35 + Math.sin(a) * CLOSED_EYE.h]); }
       headInk(arc, false, HOYA_LINE.mouth, bi(B['eyeC' + (s > 0 ? 'R' : 'L')]), Q.inkStep * 0.4);
     }
+    M.warp = [1];
     headInk(spline(MOUTH, 4), false, HOYA_LINE.mouth, hb, Q.inkStep * 0.6);
-    // nose: a small pink rise; its black ring is ink on the face (the hull rings it from the side)
+    // nose: a small pink rise; its black ring is ink on the face (the hull rings it from the side). It sits on the face's
+    // centre line, which the face view never moves: it stays the front of his profile (NO.15-31)
+    M.warp = [2, 0, NOSE.y];
     const hn = headPoint(0, NOSE.y), c = add(add(hn.p, H0), mul(hn.n, NOSE.rz * 0.35));
     ellipsoid(c, [NOSE.rx, NOSE.ry, NOSE.rz], Q.nose[0], Q.nose[1], { col: COL.nose, w: hb, hw: HOYA_LINE.nose * 0.5, line: true });
     const ring = [];
     for (let k = 0; k <= 32; k++) { const a = (k / 32) * TAU; ring.push([Math.cos(a) * (NOSE.rx + HOYA_LINE.nose / 2), NOSE.y + Math.sin(a) * (NOSE.ry + HOYA_LINE.nose / 2)]); }
     headInk(ring, false, HOYA_LINE.nose, hb, Q.inkStep * 0.5, false);
   }
+  M.warp = null;
 
   M.part('siphons');
   // ================================================================== SIPHONS (入水孔 + / 出水孔 -)
@@ -698,7 +816,13 @@ export function buildHoya(THREE, opts = {}) {
   // ================================================================== CAPE (shark skin, C80 M40)
   {
     const [cu, cv] = Q.cape, c0 = bi(B.cape0), c1 = bi(B.cape1), c2 = bi(B.cape2);
-    const capeW = (v) => (v < 0.36 ? (() => { const t = smooth(0.16, 0.36, v); return [[c0, 1 - t], [c1, t]]; })() : (() => { const t = smooth(0.55, 0.8, v); return [[c1, 1 - t], [c2, t]]; })());
+    const capeW0 = (v) => (v < 0.36 ? (() => { const t = smooth(0.16, 0.36, v); return [[c0, 1 - t], [c1, t]]; })() : (() => { const t = smooth(0.55, 0.8, v); return [[c1, 1 - t], [c2, t]]; })());
+    // the outer, lower part of each half goes with its side bone (the flare); the middle and the top never do
+    const cL = bi(B.capeL), cR = bi(B.capeR);
+    const capeW = (v, u = 0.5) => {
+      const a = Math.pow(clamp(Math.abs(u - 0.5) * 2, 0, 1), 1.5) * smooth(0.12, 0.85, v) * 0.95;
+      return a < 1e-4 ? capeW0(v) : [...capeW0(v).map(([b, w]) => [b, w * (1 - a)]), [u < 0.5 ? cL : cR, a]];
+    };
     const at = (u, v, side) => {
       const y = lerp(CAPE.top, CAPE.bottom, v), hw = lerp(CAPE.w0, CAPE.w1, v), x = (u - 0.5) * 2 * hw;
       const arc = Math.cos((u - 0.5) * Math.PI * 0.9);   // wraps round the back, flares as it falls
@@ -707,8 +831,8 @@ export function buildHoya(THREE, opts = {}) {
       return [x, y + wave, z + (side * CAPE.thick) / 2];
     };
     const nAt = (u, v) => { const e = 1e-3, p = at(u, v, 0); return norm(cross(sub(at(u, v + e, 0), p), sub(at(u + e, v, 0), p))); };   // +Z: away from his back
-    grid(cu, cv, (u, v) => ({ p: at(u, v, 1), n: nAt(u, v), w: capeW(v) }), { col: COL.cape, hw: OUT, line: true });
-    grid(cu, cv, (u, v) => ({ p: at(u, v, -1), n: mul(nAt(u, v), -1), w: capeW(v) }), { col: COL.cape, hw: OUT, line: true, flip: true });
+    grid(cu, cv, (u, v) => ({ p: at(u, v, 1), n: nAt(u, v), w: capeW(v, u) }), { col: COL.cape, hw: OUT, line: true });
+    grid(cu, cv, (u, v) => ({ p: at(u, v, -1), n: mul(nAt(u, v), -1), w: capeW(v, u) }), { col: COL.cape, hw: OUT, line: true, flip: true });
     // the rim: its own vertices whose normals point out of the cape's edge (so the hull draws the edge's line, as the
     // manual draws every edge of the cape), each strip turned to face away from the cape's middle
     const mid = S(at(0.5, 0.5, 0)), e = 1e-3;
@@ -717,8 +841,8 @@ export function buildHoya(THREE, opts = {}) {
       for (const [u, v] of pts) {
         const n = nAt(u, v), p = at(u, v, 0);
         const outw = norm(sub(p, at(clamp(u + (u <= 0 ? e : u >= 1 ? -e : 0), 0, 1), clamp(v + (v <= 0 ? e : v >= 1 ? -e : 0), 0, 1), 0)));
-        A.push(M.vert(S(at(u, v, 1)), outw, COL.cape, capeW(v), HW(OUT)));
-        Bv.push(M.vert(S(at(u, v, -1)), outw, COL.cape, capeW(v), HW(OUT)));
+        A.push(M.vert(S(at(u, v, 1)), outw, COL.cape, capeW(v, u), HW(OUT)));
+        Bv.push(M.vert(S(at(u, v, -1)), outw, COL.cape, capeW(v, u), HW(OUT)));
       }
       for (let k = 0; k < A.length - 1; k++) {
         const pa = M.pos(A[k]), pb = M.pos(Bv[k]), pc = M.pos(A[k + 1]);
@@ -738,29 +862,32 @@ export function buildHoya(THREE, opts = {}) {
     const ca = Math.cos(SWORD_GRIP), sa = Math.sin(SWORD_GRIP);
     const R = (p) => [p[0] * ca - p[1] * sa, p[0] * sa + p[1] * ca, p[2]];
     const W = (p) => add(hc, R(p));
-    const halfAt = (s) => {
-      for (let i = 1; i < SWORD.half.length; i++) if (s <= SWORD.half[i][0]) { const t = (s - SWORD.half[i - 1][0]) / (SWORD.half[i][0] - SWORD.half[i - 1][0]); return lerp(SWORD.half[i - 1][1], SWORD.half[i][1], t); }
-      return SWORD.half[SWORD.half.length - 1][1];
+    const edgeAt = (E, s) => {
+      for (let i = 1; i < E.length; i++) if (s <= E[i][0]) { const t = (s - E[i - 1][0]) / (E[i][0] - E[i - 1][0]); return lerp(E[i - 1][1], E[i][1], t); }
+      return E[E.length - 1][1];
     };
+    // local +x is the outer edge (his right, away from his head, in every pose: swordUp keeps the blade's frame)
+    const halfAt = (s) => (edgeAt(SWORD.outer, s) + edgeAt(SWORD.inner, s)) / 2;
+    const midAt = (s) => (edgeAt(SWORD.outer, s) - edgeAt(SWORD.inner, s)) / 2;
     const y0 = SWORD.base, y1 = SWORD.base + SWORD.len;
     // the blade: elliptical sections, the flat side to the front, the snout a soft point
     grid(Q.blade[0], Q.blade[1], (u, v) => {
       const s = Math.pow(v, 1.15), y = lerp(y1, y0, s), hw = Math.max(0.003, halfAt(s)), ht = hw * SWORD.thick, ph = u * TAU;
-      return { p: W([Math.cos(ph) * hw, y, Math.sin(ph) * ht]) };
+      return { p: W([midAt(s) + Math.cos(ph) * hw, y, Math.sin(ph) * ht]) };
     }, { col: COL.sanma, w: hR, hw: OUT, line: true, wrapU: true, orient: 'out' });
     // the grip through the fist (the saury's tail stalk) and the forked tail below it
     tube([W([0, y0 + 0.02, 0]), W([0, 0, 0]), W([0, -0.2, 0])], [[0.07, 0.035], [0.065, 0.032], [0.055, 0.03]], 6, { col: COL.sanma, w: hR, hw: OUT, line: true });
     slab(SWORD.tail, [W([0, 0, 0]), R([1, 0, 0]), R([0, 1, 0])], 0.04, { col: COL.sanma, w: hR, hw: OUT, line: true });
-    // the yellow guard: a crescent across the blade's foot
+    // the yellow guard across the blade's foot: a straight top edge, a curved underside (NO.1-1)
     const g = SWORD.guard, gs = [];
-    for (let k = 0; k <= 10; k++) { const x = (k / 10 - 0.5) * g.w; gs.push([x, y0 - 0.015 + 0.05 * Math.pow(Math.abs(x) / (g.w / 2), 2.2)]); }
-    for (let k = 10; k >= 0; k--) { const x = (k / 10 - 0.5) * g.w * 0.92; gs.push([x, y0 - 0.015 - g.h * (1 - Math.pow(Math.abs(x) / (g.w * 0.46), 2)) * 0.9 + 0.05 * Math.pow(Math.abs(x) / (g.w / 2), 2.2)]); }
+    for (let k = 0; k <= 10; k++) { const x = (k / 10 - 0.5) * g.w; gs.push([x, y0 - 0.015]); }
+    for (let k = 10; k >= 0; k--) { const x = (k / 10 - 0.5) * g.w * 0.92; gs.push([x, y0 - 0.015 - g.h * (1 - Math.pow(Math.abs(x) / (g.w * 0.46), 2)) * 0.9 - 0.01]); }
     slab(gs, [W([0, 0, 0]), R([1, 0, 0]), R([0, 1, 0])], g.d, { col: COL.legs, w: hR, hw: OUT, line: true });
     // the fish's face and its lateral line, on both flanks (a saury has two)
     for (const side of [-1, 1]) {
       const onBlade = (s, f) => {
         const y = lerp(y1, y0, s), hw = halfAt(s), ht = hw * SWORD.thick, c = Math.sqrt(Math.max(0, 1 - f * f));
-        return { p: W([f * hw, y, side * ht * c]), n: norm(R([f / hw, 0, (side * c) / ht])) };
+        return { p: W([midAt(s) + f * hw, y, side * ht * c]), n: norm(R([f / hw, 0, (side * c) / ht])) };
       };
       for (const st of SWORD.strokes) {
         const P = [], Nn = [];
@@ -781,16 +908,18 @@ export function buildHoya(THREE, opts = {}) {
   g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(M.SW, 4));
   g.setAttribute('hullW', new THREE.Float32BufferAttribute(M.HW, 1));
   g.setAttribute('hullN', new THREE.Float32BufferAttribute(hullDirections(M), 3));
+  g.setAttribute('hoyaW', new THREE.Float32BufferAttribute(M.WV, 3));
   const Idx = (a) => (M.nv > 65535 ? new THREE.Uint32BufferAttribute(a, 1) : new THREE.Uint16BufferAttribute(a, 1));
   g.setIndex(Idx(M.I));
   const gl = new THREE.BufferGeometry();   // the line pass shares every buffer; only the outlined triangles
-  for (const k of ['position', 'normal', 'skinIndex', 'skinWeight', 'hullW', 'hullN']) gl.setAttribute(k, g.attributes[k]);
+  for (const k of ['position', 'normal', 'skinIndex', 'skinWeight', 'hullW', 'hullN', 'hoyaW']) gl.setAttribute(k, g.attributes[k]);
   gl.setIndex(Idx(M.IL));
   const sphere = new THREE.Sphere(new THREE.Vector3(0, 0.6, 0), 1.5);   // every pose fits (the sword up, the run)
   g.boundingSphere = sphere; gl.boundingSphere = sphere.clone();
   g.boundingBox = new THREE.Box3(new THREE.Vector3(-1.2, -0.3, -1.2), new THREE.Vector3(1.2, 1.9, 1.2)); gl.boundingBox = g.boundingBox.clone();
 
-  const body = makeBodyMaterial(THREE, opts), line = makeLineMaterial(THREE);
+  const faceK = { value: 1 };   // the face view's boost, shared by both passes; set per camera just before each draw
+  const body = makeBodyMaterial(THREE, faceK, K), line = makeLineMaterial(THREE, faceK, K);
   const root = new THREE.Group(); root.name = 'hoya3d';
   root.add(B.root);
   const mesh = new THREE.SkinnedMesh(g, body); mesh.name = 'hoya3d-body';
@@ -799,7 +928,17 @@ export function buildHoya(THREE, opts = {}) {
   root.updateMatrixWorld(true);
   const skeleton = new THREE.Skeleton(bones);
   mesh.bind(skeleton, mesh.matrixWorld); hull.bind(skeleton, hull.matrixWorld);
-  mesh.castShadow = true; mesh.receiveShadow = true; hull.castShadow = false; hull.receiveShadow = false;
+  // he casts his shadow on the town; he takes none (HOYA_TONE: the manual's flat colour, no soft blots)
+  mesh.castShadow = true; mesh.receiveShadow = false; hull.castShadow = false; hull.receiveShadow = false;
+  // the face view (FACE_VIEW): where the drawing camera stands round his head, just before each pass draws him
+  let faceOn = opts.faceView !== false;
+  const camH = new THREE.Vector3(), invHead = new THREE.Matrix4(), headUp = (HEAD.y - 1.78) * K;   // head bone (neck) -> head centre
+  const faceView = (r, s, camera) => {
+    if (!faceOn || !camera) { faceK.value = 1; return; }
+    camH.setFromMatrixPosition(camera.matrixWorld).applyMatrix4(invHead.copy(B.head.matrixWorld).invert());
+    faceK.value = faceViewK(Math.atan2(-camH.x, -camH.z), Math.atan2(camH.y - headUp, Math.hypot(camH.x, camH.z)));
+  };
+  mesh.onBeforeRender = faceView; hull.onBeforeRender = faceView;
   hull.layers.set(1);   // LAYER_NO_OUTLINE (core/materials.js): the world's edge pre-pass renders layer 0 only
   for (const o of [root, mesh, hull]) { o.userData.dynamic = true; o.userData.noBatch = true; }
   // fixed, generous bounds in mesh space: a SkinnedMesh would otherwise measure its first pose once and cull the run's
@@ -814,7 +953,7 @@ export function buildHoya(THREE, opts = {}) {
   // ------------------------------------------------------------------ animation
   const anim = createAnimator(THREE, B, K, { blink: opts.blink !== false, calm: !!opts.calm });
   let forced = null;
-  const live = { speed: 0, onGround: true, vy: 0 };   // reused every frame (no garbage)
+  const live = { speed: 0, onGround: true, vy: 0, cadence: undefined, run: undefined };   // reused every frame (no garbage)
   /** Force a pose ('idle' | 'walk' | 'run' | 'jump' | 'fall'); 'auto' or null hands it back to update()'s inputs. */
   function setPose(name) {
     if (name == null || name === 'auto') { forced = null; return; }
@@ -822,11 +961,12 @@ export function buildHoya(THREE, opts = {}) {
     forced = name;
   }
   /** Advance by dt seconds and pose: speed (m/s along the ground) blends idle -> walk -> run; off the ground, vy (m/s,
-   *  + up) picks jump or fall. Returns the pose shown. */
-  function update(dt, { speed = 0, onGround = true, vy = 0 } = {}) {
+   *  + up) picks jump or fall. Optional: cadence (cycles/s, a cycle is two steps: the caller locks it to the ground speed,
+   *  hoyaGait() gives the no-slide rate) and run (0 = walk .. 1 = run, instead of the blend by speed). Returns the pose. */
+  function update(dt, { speed = 0, onGround = true, vy = 0, cadence, run } = {}) {
     let inp;
-    if (forced) inp = forcedInputs(forced, speed > 0.05 ? speed : undefined);
-    else { live.speed = speed; live.onGround = onGround; live.vy = vy; inp = live; }
+    if (forced) inp = forcedInputs(forced, speed > 0.05 ? speed : undefined, cadence);
+    else { live.speed = speed; live.onGround = onGround; live.vy = vy; live.cadence = cadence; live.run = run; inp = live; }
     anim.step(clamp(dt || 0, 0, 0.1), inp);
     return anim.state.pose;
   }
@@ -847,12 +987,20 @@ export function buildHoya(THREE, opts = {}) {
     root, mesh, hull, bones: B, skeleton, stats, materials: { body, line }, colors: HOYA_COLORS,
     setPose, update, poseAt, dispose,
     get pose() { return anim.state.pose; },
+    /** The cycle rate in use (cycles/s; a cycle is two steps). */
+    get cadence() { return anim.state.cadence || 0; },
+    /** His stride at a speed (hoyaGait): { travel, stance, run, hz, rate }; the caller sets cadence = speed x stance / travel. */
+    gait: (speed, run) => hoyaGait(speed, run),
     /** 0..1: he lights his own colours (night): never a dark silhouette (manual p.5, 「塗りつぶす」). */
     setLift(v) { body.userData.uLift.value = clamp(v, 0, 1); },
     /** Show the manual's closed eye (⌒) for sec seconds. */
     blink: (sec) => anim.blink(sec),
     /** Reduced motion (prefers-reduced-motion): calmer bob, sway, flutter; blinking off. */
     setCalm(v) { anim.opts.calm = !!v; },
+    /** The face view (FACE_VIEW) on or off: off = the rigid head (the face fixed on the front). On by default. */
+    setFaceView(v) { faceOn = !!v; if (!faceOn) faceK.value = 1; },
+    /** The face view's boost as last drawn (1 = the front or the back). */
+    get faceK() { return faceK.value; },
   };
 }
 
@@ -864,9 +1012,10 @@ const FORCED = {
   fall: { speed: 0, onGround: false, vy: -3, forced: 'fall', base: 0 },
 };
 /** The inputs that show a named pose (speed: the caller's, when it gives one). Reused objects: no garbage. */
-function forcedInputs(name, speed) {
+function forcedInputs(name, speed, cadence) {
   const f = FORCED[name] || FORCED.idle;
   f.speed = name === 'walk' || name === 'run' ? speed ?? f.base : speed ?? 0;
+  f.cadence = cadence;   // the caller's, this call only (the objects are shared)
   return f;
 }
 
@@ -896,42 +1045,101 @@ function hullDirections(M) {
 }
 
 // ------------------------------------------------------------------ materials
-const RAMP = [0.42, 0.8, 1.0];   // the world's cel ramp (core/materials.js makeGradientMap): grazing / mid / lit
-function makeBodyMaterial(THREE, opts) {
-  let ramp = opts.mat?.gradientMap || null, own = null;
-  if (!ramp) {
-    const n = 16, data = new Uint8Array(n);
-    for (let i = 0; i < n; i++) { const d = ((i + 0.5) / n) * 2 - 1; data[i] = Math.round((d < 0 ? 0 : d < 0.12 ? RAMP[0] : d < 0.42 ? RAMP[1] : RAMP[2]) * 255); }
-    own = ramp = new THREE.DataTexture(data, n, 1, THREE.RedFormat);
-    ramp.minFilter = THREE.NearestFilter; ramp.magFilter = THREE.NearestFilter; ramp.generateMipmaps = false; ramp.needsUpdate = true;
-  }
-  const m = new THREE.MeshToonMaterial({ color: 0xffffff, vertexColors: true, gradientMap: ramp });
+/** The face view in GLSL (FACE_VIEW; faceWarp / faceWarpRow above are the same maths for tests): a vertex of the head's
+ *  drawing is carried round the head's vertical axis along its own row of the ellipsoid, so it never leaves the head. */
+function faceViewGLSL(K) {
+  const f = (v) => (Number.isInteger(v) ? v.toFixed(1) : String(v));
+  return `
+uniform float hoyaFaceK;
+attribute vec3 hoyaW;
+float hoyaFaceDelta(vec3 p) {
+  if (hoyaW.x < 0.5 || hoyaFaceK < 1.0001) return 0.0;
+  vec3 h = p - vec3(0.0, ${f(HEAD.y * K)}, 0.0);
+  if (hoyaW.x < 1.5 && abs(h.x) + abs(h.z) < 1e-6) return 0.0;   // the head's poles: atan(0, 0) is undefined in GLSL
+  float a = hoyaW.x > 1.5 ? hoyaW.y : atan(-h.x / ${f(HEAD.rx * K)}, -h.z / ${f(HEAD.rz * K)});
+  float y = hoyaW.x > 1.5 ? hoyaW.z : h.y / ${f(K)};
+  float k = hoyaW.x > 2.5 ? 1.0 + (hoyaFaceK - 1.0) * ${f(FACE_VIEW.eyes)} : hoyaFaceK;   // the eyes: faceEyeK
+  float w = 2.0 * atan(k * tan(0.5 * a));
+  return (w - a) * smoothstep(${f(FACE_VIEW.bottom[0])}, ${f(FACE_VIEW.bottom[1])}, y);
+}
+vec3 hoyaFaceDir(vec3 n, float d) { float c = cos(d), s = sin(d); return vec3(n.x * c + n.z * s, n.y, n.z * c - n.x * s); }
+vec3 hoyaFacePoint(vec3 p, float d) {
+  vec3 h = p - vec3(0.0, ${f(HEAD.y * K)}, 0.0);
+  vec2 e = vec2(-h.x / ${f(HEAD.rx * K)}, -h.z / ${f(HEAD.rz * K)});
+  float c = cos(d), s = sin(d);
+  vec2 r = vec2(e.x * c + e.y * s, e.y * c - e.x * s);
+  return vec3(-r.x * ${f(HEAD.rx * K)}, p.y, -r.y * ${f(HEAD.rz * K)});
+}
+`;
+}
+function makeBodyMaterial(THREE, faceK, K) {
+  // his own two-tone ramp (HOYA_TONE): shade below the terminator, the official colour above it
+  const n = 16, data = new Uint8Array(n);
+  for (let i = 0; i < n; i++) { const d = ((i + 0.5) / n) * 2 - 1; data[i] = Math.round((d < HOYA_TONE.at ? HOYA_TONE.shade : 1) * 255); }
+  const ramp = new THREE.DataTexture(data, n, 1, THREE.RedFormat);
+  ramp.minFilter = THREE.NearestFilter; ramp.magFilter = THREE.NearestFilter; ramp.generateMipmaps = false; ramp.needsUpdate = true;
+  // two-sided with the outward normal kept: where the face view turns a hair-thin sliver of the face's cut edge over,
+  // it is drawn in its own colour and light, never a pinhole into the head
+  const m = new THREE.MeshToonMaterial({ color: 0xffffff, vertexColors: true, gradientMap: ramp, side: THREE.DoubleSide });
   m.name = 'hoya3d-body';
   const uLift = { value: 0 };
   m.onBeforeCompile = (sh) => {
     sh.uniforms.uLift = uLift;
+    sh.uniforms.hoyaFaceK = faceK;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\n' + faceViewGLSL(K))
+      .replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\n  float hoyaD = hoyaFaceDelta(position);\n  objectNormal = hoyaFaceDir(objectNormal, hoyaD);')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed = hoyaFacePoint(transformed, hoyaD);');
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', '#include <common>\nuniform float uLift;')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += diffuseColor.rgb * uLift;');
+      // the light chunk, expanded here: the sky's fill is the same from every side (no sky-to-ground gradient on him) and
+      // every light's colour is kept at HOYA_TONE.hue of its hue
+      .replace('#include <common>', '#include <common>\nvec3 hoyaHue(vec3 c) { return mix(vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), c, ' + HOYA_TONE.hue.toFixed(3) + '); }')
+      .replace('#include <lights_fragment_begin>', THREE.ShaderChunk.lights_fragment_begin
+        .replace('getHemisphereLightIrradiance( hemisphereLights[ i ], geometryNormal )', 'hoyaHue( getHemisphereLightIrradiance( hemisphereLights[ i ], vec3( 0.0 ) ) )')
+        .replace('getAmbientLightIrradiance( ambientLightColor )', 'hoyaHue( getAmbientLightIrradiance( ambientLightColor ) )')
+        .replace(/(get(?:Point|Spot|Directional)LightInfo\( [^;]*\);)/g, '$1\n\t\tdirectLight.color = hoyaHue( directLight.color );'))
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += diffuseColor.rgb * uLift;')
+      .replace('#include <normal_fragment_begin>', THREE.ShaderChunk.normal_fragment_begin.replace(/normal \*= faceDirection;/g, '').replace(/nonPerturbedNormal \*= faceDirection;/g, ''));
   };
-  m.customProgramCacheKey = () => 'hoya3d-body';
+  m.customProgramCacheKey = () => 'hoya3d-body-2';
   m.userData.uLift = uLift;
   const d0 = m.dispose.bind(m);
-  m.dispose = () => { own?.dispose(); d0(); };
+  m.dispose = () => { ramp.dispose(); d0(); };
   return m;
 }
-function makeLineMaterial(THREE) {
+function makeLineMaterial(THREE, faceK, K) {
   // the inverted hull: back faces pushed out along the (bind-space) normal by the per-vertex width; 0 = no line (ink)
   const m = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide });
   m.name = 'hoya3d-line';
   m.onBeforeCompile = (sh) => {
+    sh.uniforms.hoyaFaceK = faceK;
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nattribute float hullW;\nattribute vec3 hullN;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += hullN * hullW;');
+      .replace('#include <common>', '#include <common>\nattribute float hullW;\nattribute vec3 hullN;\n' + faceViewGLSL(K))
+      // the face view keeps every point of the head on the head, so the head's silhouette (all this pass draws there) is
+      // the same unmoved: only the parts that move whole (the nose) move here. No line triangle can fold.
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n  float hoyaD = hoyaW.x > 1.5 ? hoyaFaceDelta(position) : 0.0;\n  transformed = hoyaFacePoint(transformed, hoyaD) + hoyaFaceDir(hullN, hoyaD) * hullW;');
   };
-  m.customProgramCacheKey = () => 'hoya3d-line';
+  m.customProgramCacheKey = () => 'hoya3d-line-2';
   return m;
 }
+
+/** How far the ankle rises (U) so a boot pitched by p (radians, + = toe up) still touches the ground with its lowest
+ *  point: the heel when the toe is up, the toe when the heel is up. From the boot's own shape (BOOT), the ankle 0.3 U up. */
+const BOOT_LIFT = (() => {
+  const ankleY = HIP.y - LEG.thigh - LEG.shin, out = new Float32Array(91);
+  for (let i = 0; i <= 90; i++) {
+    const p = ((i - 45) * 2) * DEG, c = Math.cos(p), s = Math.sin(p);
+    let lo = Infinity;
+    for (let j = 0; j <= 24; j++) {
+      const y = (BOOT.cy + BOOT.ry) * (j / 24), k = Math.sqrt(Math.max(0, 1 - ((y - BOOT.cy) / BOOT.ry) ** 2));
+      for (const cz of [-1, 1]) { const z = BOOT.cz + cz * BOOT.rz * k, dy = y - ankleY; lo = Math.min(lo, dy * c - z * s); }
+    }
+    out[i] = Math.max(0, -lo - ankleY);
+  }
+  return out;
+})();
+const bootLift = (p) => { const f = clamp(p / DEG / 2 + 45, 0, 90), i = Math.min(89, Math.floor(f)); return lerp(BOOT_LIFT[i], BOOT_LIFT[i + 1], f - i); };
 
 // ------------------------------------------------------------------ the animator: procedural, rotations of the groups only
 function createAnimator(THREE, B, K, opts = { blink: true, calm: false }) {
@@ -966,12 +1174,16 @@ function createAnimator(THREE, B, K, opts = { blink: true, calm: false }) {
     B.handR.quaternion.copy(q2.copy(q1).invert().multiply(qGrip));
   }
 
+  const gmix = {}, gw = [0, 0], legT = [{}, {}];   // reused every frame (no garbage)
+  /** Soft minimum (the pelvis follows the lower of its limits without a kink). */
+  const smin = (a, b, w = 0.012) => { const h = clamp(0.5 + (0.5 * (b - a)) / w, 0, 1); return lerp(b, a, h) - w * h * (1 - h); };
+
   function step(dt, inp) {
     st.t += dt;
     const speed = Math.max(0, inp.speed || 0), ground = inp.onGround !== false;
     st.speed = speed;
     const k = dt > 0 ? 1 - Math.exp(-dt * 10) : 1;
-    const wRunT = smooth(2.3, 3.6, speed), wWalkT = smooth(0.08, 0.9, speed) * (1 - wRunT);
+    gaitW(speed, inp.run, gw); const wWalkT = gw[0], wRunT = gw[1];
     if (inp.forced && dt === 0) { st.wRun = wRunT; st.wWalk = wWalkT; st.air = ground ? 0 : 1; }
     st.wRun = lerp(st.wRun, wRunT, k); st.wWalk = lerp(st.wWalk, wWalkT, k);
     st.air = lerp(st.air, ground ? 0 : 1, dt > 0 ? 1 - Math.exp(-dt * 16) : 0);
@@ -979,76 +1191,108 @@ function createAnimator(THREE, B, K, opts = { blink: true, calm: false }) {
     if (ground && !st.prevGround) { st.land = 1; st.sipV -= 3.5; }   // landing: the knees take it, the siphons bob
     st.prevGround = ground;
     st.land = Math.max(0, st.land - dt * 4.5);
-    // gait: quick short steps (his legs are 0.11 m long: a cute とことこ); the cadence rises with speed
-    const cadence = speed > 0.03 ? clamp(1.9 + speed * 0.42, 1.9, 3.6) : 0;
+    const wW = st.wWalk, wR = st.wRun, wM = Math.min(1, wW + wR), rr = wM > 1e-4 ? wR / wM : 0;   // rr: the run's share
+    const G = gaitMix(rr, gmix);
+    const R = G.reach + HIP.x * Math.sin(G.hipYaw * DEG);   // half the planted boot's sweep (U), at full gait
+    // the cycle rate: the caller's `cadence` (cycles/s; the movement lane locks it to the ground speed), or else the rate
+    // at which the planted boot does not slide, capped where it still reads (HOYA_GAIT maxHz)
+    let cadence;
+    if (Number.isFinite(inp.cadence) && inp.cadence >= 0) cadence = inp.cadence;
+    else { const travel = 2 * R * K * wM; cadence = speed > 0.03 && travel > 1e-5 ? Math.min(G.maxHz, (speed * G.stance) / travel) : 0; }
+    st.cadence = cadence;
     st.phase = (st.phase + cadence * dt) % 1;
     st.pose = inp.forced || (!ground ? (st.vy > 0.3 ? 'jump' : 'fall') : st.wRun > 0.5 ? 'run' : st.wWalk > 0.35 ? 'walk' : 'idle');
 
-    const ph = st.phase * TAU, wW = st.wWalk, wR = st.wRun, wM = Math.min(1, wW + wR), air = st.air, gd = 1 - air;
-    const wI = (1 - wM) * gd, br = Math.sin((st.t * TAU) / 3.6), swing = Math.sin(ph), cm = opts.calm ? 0.35 : 1;   // cm: reduced motion
+    const ph = st.phase * TAU, air = st.air, gd = 1 - air, gm = wM * gd;
+    const wI = (1 - wM) * gd, br = Math.sin((st.t * TAU) / 3.6), cm = opts.calm ? 0.35 : 1;   // cm: reduced motion
     const up = st.vy > 0 ? 1 : 0, wJ = air * up, wF = air * (1 - up);
+    const cs = Math.cos(ph), sn = Math.sin(ph), swing = cs;   // his right boot strikes at phase 0, his left at 0.5
 
-    // ---- body: a bob twice a cycle (higher in the run's flight), a waddle, a lean into the run
-    const stanceW = 0.56, stanceR = 0.4;
-    const bobW = (Math.abs(Math.cos(ph)) - 0.5) * 0.05, bobR = (Math.abs(Math.sin(ph * 2 / 2 * 2 + 0.6)) - 0.45) * 0.08;
-    const bob = (bobW * wW + bobR * wR) * gd * cm;
-    const dip = (0.035 * wW + 0.06 * wR) * gd;                                   // knees soften while moving
+    // ---- the legs' targets (HOYA_GAIT): F forward of his centre line (U, his own frame), H the ankle's rise, the boot's pitch
+    const yaw = G.hipYaw * DEG * cs * gm;   // the hips turn with the stride: his right hip forward as his right boot strikes
+    for (let li = 0; li < 2; li++) {
+      const s = li === 0 ? 1 : -1, T = legT[li], p = (st.phase + (s > 0 ? 0 : 0.5)) % 1;
+      let F, H, pitch, planted = 0;
+      if (p < G.stance) {   // stance: the planted boot sweeps back exactly as far as the body goes, heel -> flat -> toe
+        const u = p / G.stance;
+        F = R * (1 - 2 * u);
+        pitch = G.heel * DEG * (1 - smooth(0, 0.28, u)) - G.toe * DEG * smooth(0.62, 1, u) - G.rise * DEG * Math.sin(Math.PI * clamp((u - 0.22) / 0.5, 0, 1));
+        H = bootLift(pitch);
+        planted = 1;
+      } else {              // swing: the kick (the sole to the back), the knee up, the reach, the heel strikes toe-up
+        const t = (p - G.stance) / (1 - G.stance), kick = Math.sin(Math.PI * clamp(t / 0.6, 0, 1)), late = Math.sin(Math.PI * clamp((t - 0.5) / 0.46, 0, 1));
+        F = lerp(-R, R, smooth(0.15, 0.86, t)) + 0.06 * R * late;   // a little over-reach before the heel comes down
+        pitch = lerp(-G.toe * DEG - G.kickPitch * DEG * kick, G.heel * DEG, smooth(0.45, 0.86, t)) + 10 * DEG * late;
+        H = bootLift(-G.toe * DEG) * (1 - smooth(0, 0.3, t)) + G.kick * kick * (1 - t) + G.lift * Math.pow(Math.sin(Math.PI * t), 1.2) + G.highStep * late + bootLift(G.heel * DEG) * smooth(0.7, 1, t);
+      }
+      F *= gm; H *= gm; pitch *= gm;
+      // in the air (NO.1-16, NO.1-6): his right knee comes up in front, the boot flexed toe-up so its orange sole faces
+      // forward; his left leg reaches down and back; falling, both dangle
+      F = lerp(F, up ? (s > 0 ? 0.22 : -0.14) : 0.06 * s, air); H = lerp(H, up ? (s > 0 ? 0.33 : 0.1) : 0.05, air);
+      pitch = lerp(pitch, up ? (s > 0 ? 48 : -34) * DEG : -14 * DEG, air);
+      T.F = F; T.H = H; T.pitch = pitch; T.planted = planted * gd;
+      T.hipF = s * HIP.x * Math.sin(yaw);   // how far his hip is forward of its rest (the turn of the hips)
+    }
+
+    // ---- the pelvis: drops into each contact and rises through the passing (running: lowest mid-stance, up in the flight),
+    //      never higher than the planted legs can reach; a lean into the run
+    // 1 where the gait is lowest: walking, the "down" just after each contact (the knees take the step) and the "up" just
+    // after the passing, on the planted toe; running, lowest mid-stance and up in the flight
+    const c2 = Math.cos(2 * (ph - lerp(0.07, G.stance / 2, rr) * TAU));
+    const bobY = (-G.drop * (0.5 + 0.5 * c2) + (G.flight + G.bounce) * (0.5 - 0.5 * c2)) * gm * (opts.calm ? 0.6 : 1);
     const drop = -0.11 * st.land * gd;
     const splayDrop = -0.4 * (1 - Math.cos(17 * DEG * wI + 5 * DEG * wM * gd));   // the A-stance leans the legs: lower him so the soles stay down
-    const pdy = -dip + bob + drop + splayDrop * gd + 0.003 * br * wI;
-    pos(B.pelvis, swing * (0.03 * wW + 0.012 * wR) * cm, pdy, 0);
-    const lean = 5 * DEG * wW + 15 * DEG * wR - 4 * DEG * wJ + 5 * DEG * wF;
-    rot(B.pelvis, -lean * 0.45, swing * (7 * DEG * wW + 9 * DEG * wR), swing * (-4.5 * DEG * wW - 2 * DEG * wR));
-    rot(B.spine, -lean * 0.55 - 0.6 * DEG * br * wI, swing * (-6 * DEG * wW - 11 * DEG * wR), swing * 3 * DEG * wW);
+    let pdy = bobY + drop + splayDrop * gd + 0.003 * br * wI;
+    const Lr = (LEG.thigh + LEG.shin) * 0.995;
+    for (let li = 0; li < 2; li++) { const T = legT[li]; if (T.planted > 0.5) { const fh = T.F - T.hipF; pdy = smin(pdy, Math.sqrt(Math.max(0, Lr * Lr - fh * fh)) - (LEG.thigh + LEG.shin) + T.H + splayDrop * gd); } }
+    st.pdy = pdy;
+    pos(B.pelvis, sn * 0.012 * gm * cm, pdy, 0);   // a little sway over the planted boot
+    const lean = 4 * DEG * wW + 11 * DEG * wR - 4 * DEG * wJ + 5 * DEG * wF;
+    rot(B.pelvis, -lean * 0.45, yaw, -sn * 3 * DEG * gm);
+    rot(B.spine, -lean * 0.55 - 0.6 * DEG * br * wI, -yaw * 0.8, sn * 2 * DEG * gm);   // the shoulders stay square
     pos(B.spine, 0, 0.004 * br * wI, 0);
-    rot(B.head, lean * 0.45 + Math.cos(ph * 2) * 2 * DEG * wM + 1.0 * DEG * br * wI + 6 * DEG * st.land - 4 * DEG * wJ, swing * 2.5 * DEG * wW, swing * 3 * DEG * wW + 1.6 * DEG * Math.sin(st.t * 0.7) * wI);
+    rot(B.head, lean * 0.45 + Math.cos(2 * (ph - 0.12 * TAU)) * 2.5 * DEG * gm + 1.0 * DEG * br * wI + 6 * DEG * st.land - 4 * DEG * wJ, -yaw * 0.15, sn * 2 * DEG * gm + 1.6 * DEG * Math.sin(st.t * 0.7) * wI);
     // ---- the siphons: a soft spring after the body (they sway; they never stretch)
-    const sipT = -bob * 14 * DEG - wJ * 0.06 + wF * 0.08;
+    const sipT = -bobY * 9 * DEG - wJ * 0.06 + wF * 0.08;
     st.sipV += (-(st.sipJ - sipT) * 140 - st.sipV * 11) * dt;
     st.sipJ += st.sipV * dt;
     const sj = clamp(st.sipJ, -0.22, 0.22);
     rot(B.sipR, 0, 0, sj); rot(B.sipL, 0, 0, -sj);
 
-    // ---- legs: stance (flat, sliding back) and swing (lifts, kicks back, reaches); level feet in his frame
-    const L1 = 0.2, L2 = 0.2, reach = 0.2 * wW + 0.3 * wR, lift = 0.15 * wW + 0.28 * wR, stance = lerp(stanceW, stanceR, wR);
-    for (const s of [1, -1]) {
-      const n = s > 0 ? 'R' : 'L', p = (st.phase + (s > 0 ? 0 : 0.5)) % 1;
-      let f, h, pitch;
-      if (p < stance) { f = lerp(1, -1, p / stance); h = 0; pitch = 0; }
-      else {
-        const t = (p - stance) / (1 - stance);
-        f = lerp(-1, 1, smooth(0.08, 0.92, t)); h = Math.pow(Math.sin(t * Math.PI), 0.8);
-        pitch = -(28 * DEG * wW + 70 * DEG * wR) * Math.sin(Math.min(1, t * 1.8) * Math.PI) * (t < 0.55 ? 1 : 0.2) + (16 * DEG * wW + 20 * DEG * wR) * smooth(0.6, 0.95, t);
-      }
-      f *= reach * wM; h *= lift * wM;
-      // air: tucked (knees up, boots back, toes down: NO.1-16) on the way up, dangling on the way down
-      f = lerp(f, up ? -0.06 : 0.07 * s, air); h = lerp(h, up ? 0.27 : 0.04, air);
-      pitch = lerp(pitch, up ? -32 * DEG : -14 * DEG, air);
-      const { hip, knee } = legIK(f * gd + f * air, (h - pdy * gd), L1, L2);
+    // ---- the legs: two-bone IK to the targets, the boots level in his frame, pitched as above; the A-stance (p.2).
+    //      Each thigh turns back against the hips' turn (-yaw about the pelvis's up axis, 'YXZ'), so the leg swings in his
+    //      own heading, not the hips': the knee and the boot keep pointing where he goes, and a planted boot is no longer
+    //      carried sideways by the turn (it swung ~1.4-2.1 cm across each stance before; the movement lane saw it in town).
+    for (let li = 0; li < 2; li++) {
+      const s = li === 0 ? 1 : -1, n = s > 0 ? 'R' : 'L', T = legT[li];
+      const { hip, knee } = legIK(T.F - T.hipF, T.H - pdy, LEG.thigh, LEG.shin);
       const splay = s * (17 * DEG * wI + 5 * DEG * wM * gd + 9 * DEG * air);   // the A-stance (p.2): boots wide, toes out
-      rot(B['leg' + n], hip, 0, splay);
+      E.set(hip, -yaw, splay, 'YXZ'); B['leg' + n].quaternion.setFromEuler(E);
       rot(B['shin' + n], knee, 0, 0);
-      footWorld(n, s * (-20 * DEG * wI - 6 * DEG * wM * gd - 8 * DEG * air), pitch);
+      footWorld(n, s * (-20 * DEG * wI - 6 * DEG * wM * gd - 8 * DEG * air), T.pitch);
     }
 
     // ---- the sword arm keeps the サンマ up: raised out (p.2), held up while walking (NO.1-3), up and ahead while
-    //      running, high in the jump (NO.1-16)
-    // (NO.1-1 measured: the guard's centre at (1.33, 2.34) U, the tip at 3.97: the arm at 118 deg, the shoulder lifted out 0.05)
+    //      running (NO.1-11), high in the jump (NO.1-16)
+    // (NO.1-1 measured: the guard's centre 1.32 U out at 2.34 U up, the tip at 3.97: the arm at 118 deg, the shoulder 0.12 out)
     const armRz = 118 * DEG * wI + 114 * DEG * wW + 104 * DEG * wR + 136 * DEG * wJ + 120 * DEG * wF;
-    pos(B.armR, 0.05 * wI + 0.03 * (wW + air), 0.02 * wI, 0);
-    const armRx = -swing * 6 * DEG * wW + (30 * DEG - swing * 8 * DEG) * wR - 12 * DEG * wJ + 0.8 * DEG * br * wI;
+    pos(B.armR, 0.12 * wI + 0.05 * (wW + air), 0.02 * wI, 0);   // v2: NO.1-1's guard is centred 1.32 U out (v1's 0.05: 1.23)
+    const armRx = -swing * 12 * DEG * wW + (30 * DEG - swing * 8 * DEG) * wR - 12 * DEG * wJ + 0.8 * DEG * br * wI;
     rot(B.armR, armRx, 0, armRz);
     rot(B.foreR, 6 * DEG * wW + 16 * DEG * wR, 0, 4 * DEG * wW - 4 * DEG * wR - 6 * DEG * wJ);
     swordUp(-swing * 5 * DEG * wW + (24 * DEG + swing * 6 * DEG) * wR - 8 * DEG * wJ, 2 * DEG * Math.sin(st.t * 0.9) * wI - swing * 4 * DEG * wW);
-    // ---- the free arm: out with the fist at the hip (p.2), swings with the step, pumps when running, out in the air
+    // ---- the free arm: out with the fist at the hip (p.2); walking it swings wide and forward with his right step (NO.1-8,
+    //      NO.16-15), running it pumps, out in the air (NO.1-16)
     // (NO.1-1 measured: the elbow at (-0.72, 1.40) U, the fist at the hip (-0.82, 1.02): upper arm 62 deg, the elbow bent 48)
-    const armLz = -(62 * DEG * wI + 26 * DEG * wW + 22 * DEG * wR + 96 * DEG * wJ + 72 * DEG * wF);
-    rot(B.armL, swing * (34 * DEG * wW + 58 * DEG * wR) * gd + 0.8 * DEG * br * wI, 0, armLz);
-    rot(B.foreL, 4 * DEG * wI + 18 * DEG * wW + 74 * DEG * wR + 16 * DEG * air, 0, 48 * DEG * wI - 14 * DEG * wJ);
+    // (the jump, NO.1-16: the free arm bent in front, the fist at his chest)
+    const armLz = -(62 * DEG * wI + 30 * DEG * wW + 22 * DEG * wR + 38 * DEG * wJ + 72 * DEG * wF);
+    rot(B.armL, swing * (56 * DEG * wW + 58 * DEG * wR) * gd + 12 * DEG * wW * gd + 0.8 * DEG * br * wI + 48 * DEG * wJ, 0, armLz);
+    rot(B.foreL, 4 * DEG * wI + (20 + 18 * Math.max(0, swing)) * DEG * wW + 78 * DEG * wR + 96 * DEG * wJ + 16 * DEG * wF, 0, 48 * DEG * wI - 10 * DEG * wJ);
     rot(B.handL, 0, 0, 0);
 
     // ---- the cape: a damped spring, lifted behind by speed, a stiff flutter (shark skin)
-    const liftT = 10 * DEG * wW + 50 * DEG * wR - 8 * DEG * wJ + 42 * DEG * wF;
+    // (running it lifts less than it flares: from behind, the game's view, it stays a cape, not an edge)
+    const liftT = 10 * DEG * wW + 30 * DEG * wR - 8 * DEG * wJ + 42 * DEG * wF;
     st.capeV += ((liftT - st.capeLift) * 38 - st.capeV * 9) * dt;
     st.capeLift += st.capeV * dt;
     if (inp.forced && dt === 0) { st.capeLift = liftT; st.capeV = 0; }
@@ -1056,14 +1300,22 @@ function createAnimator(THREE, B, K, opts = { blink: true, calm: false }) {
     rot(B.cape0, -st.capeLift * 0.25, 0, swing * 2.5 * DEG * wW);
     rot(B.cape1, -st.capeLift * 0.45 - flutter, 0, -swing * 3.5 * DEG * wM);
     rot(B.cape2, -st.capeLift * 0.55 - flutter * 1.6, 0, swing * 4.5 * DEG * wM);
+    // the sides flare out in motion, toward NO.9-1 (a little more on the side of the leg that is swinging)
+    const flare = (16 * DEG * wW + 28 * DEG * wR + 12 * DEG * wF - 4 * DEG * wJ) * (opts.calm ? 0.6 : 1);
+    rot(B.capeL, 0, 0, -(flare + swing * 4 * DEG * wM * cm)); rot(B.capeR, 0, 0, flare - swing * 4 * DEG * wM * cm);
 
     // ---- blink: the manual's own closed eye (⌒) for 0.12 s every 2.5-5.5 s
     st.blinkT -= dt;
     if (st.blinkT <= 0) { st.blinking = opts.blink && !opts.calm ? 0.12 : 0; st.blinkT = 2.5 + rnd() * 3; }
     st.blinking = Math.max(0, st.blinking - dt);
-    eyes(st.blinking > 0);
+    // the jump's wink (NO.1-16: his left eye, the manual's own closed ⌒); not with blink: false or reduced motion
+    eyes(st.blinking > 0, opts.blink && !opts.calm && wJ > 0.6);
   }
-  function eyes(shut) { for (const n of ['R', 'L']) { B['eye' + n].scale.setScalar(shut ? 1e-4 : 1); B['eyeC' + n].scale.setScalar(shut ? 1 : 1e-4); } }
+  function eyes(shut, winkL = false) {
+    const cR = shut, cL = shut || winkL;
+    B.eyeR.scale.setScalar(cR ? 1e-4 : 1); B.eyeCR.scale.setScalar(cR ? 1 : 1e-4);
+    B.eyeL.scale.setScalar(cL ? 1e-4 : 1); B.eyeCL.scale.setScalar(cL ? 1 : 1e-4);
+  }
   eyes(false);
   return { step, reset, state: st, opts, blink(sec = 0.12) { st.blinking = sec; eyes(true); } };
 }

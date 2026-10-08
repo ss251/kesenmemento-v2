@@ -231,7 +231,10 @@ export class Player {
     const running = k.has('ShiftLeft') || k.has('ShiftRight') || (!this.pad && this.touchMove.length() > 0.95)
       || (!!this.pad && (this.pad.running || (this.fly ? this.pad.boost : this.pad.dash && this.touchMove.lengthSq() > 0)));
     // [v4:polish3] fly: 25 m/s, Shift 70 m/s (a 5 km city; walk x 2.6 was 8 m/s)
-    let speed = this.fly ? (running ? FLY_RUN : FLY) : (running ? this.run : this.walk);
+    // [feel] third person can walk at the character's own speeds (walk3 / run3: his legs' no-slide speeds), first person keeps walk / run
+    const own = !this.fly && !this.gull && chaseOwns(this);
+    let speed = this.fly ? (running ? FLY_RUN : FLY) : (running ? (own && this.run3 > 0 ? this.run3 : this.run) : (own && this.walk3 > 0 ? this.walk3 : this.walk));
+    this.running = !!running && !this.fly;   // [feel] the gait the walk cycle shows (avatar/index.js passes it to the model as run)
     const fx = -Math.sin(this.yaw), fz = -Math.cos(this.yaw); // forward
     const rx = Math.cos(this.yaw), rz = -Math.sin(this.yaw);  // right
     let mx = fx * f + rx * s, mz = fz * f + rz * s;

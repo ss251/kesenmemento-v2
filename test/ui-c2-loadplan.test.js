@@ -39,9 +39,10 @@ describe("row 9: the loading plan (core/loadplan.js)", () => {
     });
   }
   test("[mobile-perf] the phone's weights are its measured times (the iOS Simulator, cold, 2026-10-08): the bar no longer sits at 99 % through the compile", () => {
-    // stats.finish (ms) of two cold loads of the deploy #7 candidate; ~180: the conductor's "150-200 each". compile carries main()'s work after build() (stats.finish.post)
-    const MEASURED = { fonts: 358, environment: 618, water: 180, town: 1505, harbor: 905, landmarks: 438, life: 330, ship: 180, explore: 1184, wires: 180, prep: 180, batch: 1122, compile: 3506 };
-    for (const [k, ms] of Object.entries(MEASURED)) { expect(Math.abs(WEIGHTS.phone[k] - ms / 100)).toBeLessThanOrEqual(k === "compile" ? 2 : 1); }
+    // stats.finish (ms) of two cold loads of the deploy #7 candidate; ~180: the conductor's "150-200 each"; boot: the first mark's page clock. compile carries main()'s
+    // work after build() up to the title (stats.finish.post; the simulator's klc:ready mark minus the old 100 %: 444, 457, 485 ms)
+    const MEASURED = { boot: 760, fonts: 358, environment: 618, water: 180, town: 1505, harbor: 905, landmarks: 438, life: 330, ship: 180, explore: 1184, wires: 180, prep: 180, batch: 1122, compile: 3506 + 450 };
+    for (const [k, ms] of Object.entries(MEASURED)) expect(Math.abs(WEIGHTS.phone[k] - ms / 100)).toBeLessThanOrEqual(1);
     const p = loadPlan(MODS, { phone: true });
     expect(p.start("compile")).toBeGreaterThan(0.55); expect(p.start("compile")).toBeLessThan(0.8);   // it was 0.99: 3/334 of the plan, ~4.5 s on an iPhone
     expect(p.span("compile")).toBeGreaterThan(0.25);

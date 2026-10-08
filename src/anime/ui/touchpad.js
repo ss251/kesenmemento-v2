@@ -72,7 +72,7 @@ export function touchZone(x, y, vw, vh, { leftHanded = false, stick = 'analog' }
 /** HUD panels a thumb may land on: a drag that starts on one still drives the pad (the stick or the look); a tap still reaches the panel. */
 export const HUD_GRAB = {
   move: 10,   // CSS px of travel before a touch on a panel becomes a stick / look touch
-  selector: '#klc-places, #klc-ui .places, #klc-ui .dock, #klc-ui .pbar, #klc-ui .attr, #klc-x .mini, #klc-x .xdrive, #klc-pad .chip, #klc-pad .gear',
+  selector: '#klc-places, #klc-ui .places, #klc-ui .dock, #klc-ui .attr, #klc-x .mini, #klc-x .xdrive, #klc-pad .chip, #klc-pad .gear',
   skip: 'input, select, textarea, .xsearch, .arrivals, .xmap, [data-scroll], #klc-pad .settings',   // (these keep their own drags)
 };
 /** What a touch that began on a HUD panel does at its current offset: 'wait' (still a tap), 'promote' (a drag: the pad takes it) or
@@ -119,6 +119,8 @@ export function layoutBounds(boxes) {
 }
 export const rectsOverlap = (a, b, pad = 0) => a.l < b.r + pad && a.r > b.l - pad && a.t < b.b + pad && a.b > b.t - pad;
 /** Lift a box (anchored at the bottom) until it clears the given panel rects { l, t, r, b }: returns its bottom edge. */
+/** [emil-ui] A portrait phone's bottom band (CSS px above the safe area's bottom): the pad's floor, where the pill row was (34 + 44), and ホヤぼーや's credit's place under it. */
+export const PHONE_BAND = 78;
 export function liftClear(box, bottom, panels, gap = 8, floor = -Infinity) {
   let y1 = bottom;
   for (let i = 0; i < 12; i++) {
@@ -394,7 +396,7 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
   }
 
   // ---- layout (measured against the other panels: nothing of the pad sits on them)
-  const PANELS = ['#klc-ui .dock', '#klc-ui .places', '#klc-ui .pbar', '#klc-ui .attr', '#klc-x .xdrive', '#klc-x .mini', '#klc-x .xbar', '#klc-ship .panel', '#klc-ship .card .inner', '#klc-ship .facts'];   // (the last two only matter on a desktop with ?touch=1: on a phone they sit up top)
+  const PANELS = ['#klc-ui .dock', '#klc-ui .places', '#klc-ui .attr', '#klc-x .xdrive', '#klc-x .mini', '#klc-x .xbar', '#klc-ship .panel', '#klc-ship .card .inner', '#klc-ship .facts'];   // (the last two only matter on a desktop with ?touch=1: on a phone they sit up top)
   // [ui-b2:7] a panel that is fading out (the HUD's sheets keep their display for 200 ms while they leave: a display transition that ends in none) is already gone for the layout: the pad
   // comes back in the frame the sheet closes and would lift its buttons clear of a panel that is about to vanish, and drop them again at the next signature check
   const leaving = (el) => { try { return el.getAnimations().some((a) => a.transitionProperty === 'display' && a.effect.getKeyframes().at(-1).display === 'none'); } catch { return false; } };
@@ -422,6 +424,9 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     root.style.setProperty('--knob', (geom.knobR * 2) + 'px');
     const sa = safe.getBoundingClientRect();
     const panels = panelRects();
+    // [emil-ui] a portrait phone lost its bottom pill row (hud.js); its band, the 78 px above the safe area's bottom, stays the pad's floor. The stick and the buttons
+    // sit where they did on #7, and the band under them is ホヤぼーや's credit's (play/avatar/index.js; touchpad-style.js keeps the HUD's sheets above it).
+    if (win.matchMedia?.('(max-width: 720px) and (orientation: portrait)')?.matches) panels.push({ l: sa.left, t: sa.bottom - PHONE_BAND, r: sa.right, b: sa.bottom });
     const M = 12 * sc + 4, floor = sa.top + 56;
     // the action cluster: bottom corner of the thumb's side, lifted clear of the panels
     const specs = currentButtons(), lay = clusterLayout(specs.length, { scale: sc, hand: lefty ? 'left' : 'right' }), bb = layoutBounds(lay);
@@ -658,6 +663,8 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
       const sw = e.target.closest('.sw'); if (sw) setSetting(sw.dataset.set, !pad.settings[sw.dataset.set]);
     });
     root.querySelector('input[data-set="sens"]').addEventListener('input', (e) => setSetting('sens', e.target.value));
+    // [emil-ui] the settings open from the HUD's ☰ (操作設定) on a phone, so they close like any popover: a touch anywhere outside them (the scene, a button)
+    doc.addEventListener('pointerdown', (e) => { if (settingsEl && !settingsEl.hidden && !e.target.closest?.('#klc-pad .settings, #klc-pad .gear, #klc-ui [data-act="padset"]')) setSettingsOpen(false); }, true);   // (操作設定 itself toggles them: hud.js)
     // iOS: a touch on a button or the chip never scrolls, zooms or fires a ghost click; the settings keep their native sliders
     root.addEventListener('touchstart', (e) => { if (e.target.closest('.cluster')) e.preventDefault(); }, { passive: false });
     root.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -754,6 +761,9 @@ export function createTouchpad({ canvas, ctx, player = null, doc = typeof docume
     /** Set a toggle button's pressed state from the game (a toggle that something else can also change, like the autopilot). */
     setToggle(id, on) { id = String(id); if (on === toggled.has(id)) return; if (on) toggled.add(id); else toggled.delete(id); syncButtons(); },
     registerMode, setMode, mount, update, layout: () => { dirty.layout = true; if (root) layout(); }, takeLook, activate, deactivate, setSetting, note, showCoach, dismissCoach,
+    /** [emil-ui] The touch settings popover, opened from the HUD's ☰ (操作設定): the gear no longer sits on a phone's screen. */
+    openSettings(on = true) { setSettingsOpen(!!on); },
+    get settingsOpen() { return !!settingsEl && !settingsEl.hidden; },
     suppress(reason, on = true) { if (on) suppress.add(reason); else suppress.delete(reason); },
     get suppressed() { return [...suppress]; },
     get vertical() { return (held.has('up') ? 1 : 0) - (held.has('down') ? 1 : 0); },

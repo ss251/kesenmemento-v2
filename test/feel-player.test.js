@@ -108,6 +108,27 @@ describe('feel: turns (third person)', () => {
   });
 });
 
+describe('feel: his own third-person speeds (deploy #8)', () => {
+  test('walk3 / run3 apply in third person only; first person keeps walk / run; running is reported', () => {
+    const p = mk(); p.walk3 = 1.5; p.run3 = 3.0;
+    p.keys.add('KeyW'); until(p, () => false, 1);
+    expect(speed(p)).toBeCloseTo(1.5, 2); expect(p.running).toBe(false);
+    p.keys.add('ShiftLeft'); until(p, () => false, 1);
+    expect(speed(p)).toBeCloseTo(3.0, 2); expect(p.running).toBe(true);
+    const q = mk(world(), { third: false }); q.walk3 = 1.5; q.keys.add('KeyW'); until(q, () => false, 1);
+    expect(speed(q)).toBeCloseTo(q.walk, 2);
+    const r = mk(); r.walk3 = null; r.keys.add('KeyW'); until(r, () => false, 1);
+    expect(speed(r)).toBeCloseTo(r.walk, 2);
+  });
+  test('from standing to his run (3.0 m/s) in at most 0.15 s, and to his walk as fast', () => {
+    for (const [keys, want] of [[['KeyW', 'ShiftLeft'], 3.0], [['KeyW'], 1.5]]) {
+      const p = mk(); p.walk3 = 1.5; p.run3 = 3.0; for (const k of keys) p.keys.add(k);
+      const t90 = until(p, (q) => speed(q) >= 0.9 * want) + DT;
+      expect(t90).toBeLessThanOrEqual(0.15);
+    }
+  });
+});
+
 describe('feel: kerbs, stairs and slopes', () => {
   test('a 0.2 m kerb up: the physics feet take it, the drawn feet ease over ~0.15 s (no step over 5.5 cm)', () => {
     const p = mk(world({ ground: (x, z) => (z < -2 ? 0.2 : 0) })); p.keys.add('KeyW');

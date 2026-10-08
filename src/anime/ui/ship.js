@@ -318,6 +318,15 @@ const BOARD_CSS = /* css */`
 #klc-board button:active{transform:scale(.97)}   /* [ui-b2:6] the press layer (ui/style.js) */
 #klc-board button:focus-visible{outline:2px solid var(--ring-ink, #1f3a68);outline-offset:2px;box-shadow:0 0 0 5px var(--ring-halo, rgba(255, 255, 255, 0.92))}
 body:not(.playing):not(.shotui) #klc-board,body.noui #klc-board{display:none!important}
+/* [emil-ui] One context prompt at a time, in one place (above the thumbs on a phone). A game's start (the kit's prompt: 話す, スタート) wins over the boat in front of you
+   (乗船する), which wins over the bay (もぐる); the one that gave way comes back when the other goes. */
+body:has(#klc-play .prompt:not([hidden]):not(.top)) #klc-board,body:has(#klc-play .prompt:not([hidden]):not(.top)) .swim-dive,body:has(#klc-board.show) .swim-dive{display:none!important}
+/* [emil-ui] ... and with the pad on, もぐる (play/underwater's chip) takes this chip's place: at 96 px it sat on the stick's edge, under ホヤぼーや's credit. The desktop keeps its own 96 px.
+   On a phone the place is the top-centre slot under the HUD's rows (the gull's prompt's, play/kit/ui.js): above the thumbs they sat on ホヤぼーや himself (no text on him: CRAFT 2).
+   While the HUD's ☰, a sheet or the credits are open (modal; the pad steps aside too), the prompts step back. */
+body.klc-pad .swim-dive{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+@media (max-width:720px){#klc-board{top:calc(188px + env(safe-area-inset-top,0px));bottom:auto}body.klc-pad .swim-dive{top:calc(188px + env(safe-area-inset-top,0px));bottom:auto}}
+body:has(#klc-ui:is([data-menu="1"],[data-sheet="time"],[data-sheet="places"],[data-credits="1"])) :is(#klc-board,.swim-dive){visibility:hidden!important;pointer-events:none!important}
 @media (max-width:720px){#klc-board{bottom:calc(262px + env(safe-area-inset-bottom,0px));padding:6px 6px 6px 14px;gap:8px}#klc-board b{font-size:13px}#klc-board b .full{display:none}#klc-board b .short{display:inline}#klc-board small{display:none}}
 @media (prefers-reduced-motion:reduce){#klc-board{transition:none}}
 `;

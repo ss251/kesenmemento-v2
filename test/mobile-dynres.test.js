@@ -150,6 +150,23 @@ describe('the adaptive floor (a phone: softMin 1.0 = 1.5x, min 0.85 = 1.275x)', 
     expect(s.some((x) => x[1] === 1)).toBe(true);
     expect(dr.scale).toBeGreaterThan(1);
   });
+  test('a slow step that does not help (the main thread\'s frames: as slow at any scale) is undone, and the rule rests for a minute', () => {
+    const dr = createDynRes(opts);
+    const s = run2(dr, 20, () => 45);   // 45 ms whatever the scale: the CPU, not the GPU (probe at ~2.7 s, undone at ~5.4 s)
+    const ch = []; for (let i = 1; i < s.length; i++) if (s[i][1] !== s[i - 1][1]) ch.push(s[i]);
+    expect(Math.min(...s.map((x) => x[1]))).toBeCloseTo(0.95, 6);   // one probe step ...
+    expect(ch.length).toBe(2); expect(ch[1][1]).toBe(1); expect(dr.why).toBe('slow-undo');   // ... taken back
+    expect(dr.scale).toBe(1);
+    run2(dr, 30, () => 45);   // inside the minute's rest (to ~65 s): no new probe
+    expect(dr.scale).toBe(1); expect(dr.changes).toBe(2);
+    run2(dr, 25, () => 45);   // after it: one more probe, undone again
+    expect(dr.changes).toBe(4); expect(dr.scale).toBe(1);
+  });
+  test('a slow step that helps a little (2 %) is undone too; the GPU-bound phone above (8-9 % a step) walks on down', () => {
+    const dr = createDynRes(opts);
+    run2(dr, 12, (sc) => 45 * (sc === 1 ? 1 : 0.98));
+    expect(dr.scale).toBe(1); expect(dr.why).toBe('slow-undo');
+  });
   test('without softMin (desktop, a lite boot) nothing changes: the 60 Hz controller can go to min', () => {
     const dr = createDynRes({ min: 0.6, max: 1, step: 0.1 });
     run2(dr, 20, () => 33.4);

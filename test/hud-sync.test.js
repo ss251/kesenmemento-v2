@@ -12,7 +12,7 @@ import { STRINGS } from "../src/anime/ui/i18n.js";
 import PLAY from "../data/play-i18n.json";
 
 const ROOT = resolve(import.meta.dir, "..");
-const GLOBALS = ["document", "location", "localStorage", "addEventListener", "MutationObserver", "requestAnimationFrame", "setTimeout"];
+const GLOBALS = ["document", "location", "localStorage", "addEventListener", "MutationObserver", "requestAnimationFrame", "setTimeout", "matchMedia"];
 const PRESETS = [{ id: "asa", h: 6.5 }, { id: "hiru", h: 12 }, { id: "yugata", h: 16.5 }, { id: "yuyake", h: 17 + 20 / 60 }, { id: "yoru", h: 19.5 }];
 const SEASON_ORDER = ["autumn", "winter", "spring", "summer"];
 const ARRIVALS = [
@@ -21,7 +21,8 @@ const ARRIVALS = [
 ];
 
 /** A HUD on a mini DOM with fake time / tour / live / season / planet / audio services. Always call cleanup() (it restores the globals). */
-function world({ search = "", stops = 8, quality = false, ambient = null, bare = false, stored = {} } = {}) {
+// ([emil-ui] phone: a portrait phone with the pad, body.klc-pad and a matching (max-width: 720px) and (orientation: portrait): the chip opens the time sheet there)
+function world({ search = "", stops = 8, quality = false, ambient = null, bare = false, stored = {}, phone = false } = {}) {
   const dom = makeDom({ search });
   for (const [k, v] of Object.entries(stored)) dom.localStorage.setItem(k, v);   // (what this device remembered from an earlier visit)
   const saved = Object.fromEntries(GLOBALS.map((k) => [k, Object.getOwnPropertyDescriptor(globalThis, k)]));
@@ -31,8 +32,10 @@ function world({ search = "", stops = 8, quality = false, ambient = null, bare =
     put("document", dom.document); put("location", dom.location); put("localStorage", dom.localStorage); put("addEventListener", dom.window.addEventListener);
     put("MutationObserver", dom.MutationObserver); put("requestAnimationFrame", (f) => { f(); return 1; });
     put("setTimeout", (f, ms, ...a) => { const id = realST(f, ms, ...a); timers.add(id); return id; });
+    put("matchMedia", () => ({ matches: phone, addEventListener() {} }));
   };
   use();
+  if (phone) dom.document.body.classList.add("klc-pad");
   const cleanup = () => { for (const id of timers) clearTimeout(id); for (const k of GLOBALS) { if (saved[k]) Object.defineProperty(globalThis, k, saved[k]); else delete globalThis[k]; } };
   try {
     const emitter = () => { const fns = new Set(); return { on: (f) => (fns.add(f), () => fns.delete(f)), emit: (...a) => { for (const f of [...fns]) f(...a); } }; };
@@ -48,7 +51,7 @@ function world({ search = "", stops = 8, quality = false, ambient = null, bare =
     const season = { id: "autumn", next() { this.id = SEASON_ORDER[(SEASON_ORDER.indexOf(this.id) + 1) % SEASON_ORDER.length]; } };
     const audio = { muted: false };
     const planet = { active: false, enter() { this.active = true; }, exit() { this.active = false; } };
-    const pad = { calls: [], suppress(r, on) { this.calls.push([r, on]); } };
+    const pad = { calls: [], settings: false, suppress(r, on) { this.calls.push([r, on]); }, openSettings(on) { this.settings = !!on; }, get settingsOpen() { return this.settings; } };
     let amb = ambient;
     const explore = ambient === null ? null : { setAmbientLabels(on) { amb = !!on; }, get ambientLabels() { return amb; } };
     const ctx = bare ? { services: {} } : { planet, audio, pad, time: 0, services: { explore } };   // (bare: the services life or explore may not have built: no planet, audio, pad or explore)
@@ -162,7 +165,7 @@ describe("syncState() patches in place: a patched HUD is the HUD a rebuild would
     step("planet on", () => w.click(w.act("planet"))); step("planet off (key O)", () => w.key("KeyO"));
     step("sound off", () => w.click(w.act("sound"))); step("sound on", () => w.click(w.act("sound")));
     step("labels on", () => w.click(w.act("labels"))); step("labels off", () => w.click(w.act("labels")));
-    step("menu", () => w.click(w.act("menu"))); step("time sheet", () => w.click(w.act("sheet", '[data-sheet="time"]'))); step("places sheet", () => w.click(w.act("sheet", '[data-sheet="places"]')));
+    step("menu", () => w.click(w.act("menu"))); step("places sheet (☰ 名所)", () => w.click(w.act("sheet", '[data-sheet="places"]')));
     step("credits", () => w.click(w.act("credits"))); step("credits close", () => w.click(w.act("credits-close")));
     step("menu then outside tap", () => { w.click(w.act("menu")); w.dom.fire(w.dom.document.body, "pointerdown"); });
     step("digit key", () => w.key("Digit3")); step("cycle preset (key T)", () => w.key("KeyT"));
@@ -172,6 +175,34 @@ describe("syncState() patches in place: a patched HUD is the HUD a rebuild would
     step("live is gone", () => { w.live.state = { status: "error" }; w.live.emit(); });
   }));
 
+  test("[emil-ui] a portrait phone has no bottom pills: the chip opens the time sheet, its 今日の入船 the arrivals, the ☰ 名所 and 操作設定; patched equals rebuilt at every step", () => withWorld({ phone: true, ambient: false }, (w) => {
+    const diff = (a, b) => { let i = 0; while (i < a.length && a[i] === b[i]) i++; return `patched: …${a.slice(Math.max(0, i - 80), i + 140)}\n   rebuilt: …${b.slice(Math.max(0, i - 80), i + 140)}`; };
+    const step = (name, fn) => { fn(); const patched = w.snap(), r = w.renders(); w.hud.render(); const rebuilt = w.snap(); if (rebuilt !== patched) throw new Error(`${name}: the patched HUD differs from a rebuilt one\n   ${diff(patched, rebuilt)}`); expect(w.renders()).toBe(r + 1); };
+    const chip = () => w.q(".brand .chip"), arr = () => w.q(".dock .arr");
+    expect([chip().getAttribute("aria-controls"), chip().getAttribute("aria-expanded")]).toEqual(["klc-time", "false"]);
+    step("the chip opens the time sheet", () => w.click(chip()));
+    expect([w.el.dataset.sheet, chip().getAttribute("aria-expanded"), w.q(".arrivals").hidden, w.pad.calls.at(-1)]).toEqual(["time", "true", true, ["hud-sheet", true]]);
+    step("a preset in the sheet", () => w.click(w.q('[data-act="preset"][data-id="yoru"]')));
+    step("今日の入船 closes the sheet and opens the arrivals", () => w.click(arr()));
+    expect([w.el.dataset.sheet, w.q(".arrivals").hidden, arr().getAttribute("aria-expanded"), chip().getAttribute("aria-expanded"), w.pad.calls.at(-1)]).toEqual(["", false, "true", "true", ["hud-sheet", true]]);   // (the arrivals are the time sheet's on a phone: the chip says they are open)
+    step("the chip closes the arrivals (it does not open the sheet over them)", () => w.click(chip()));
+    expect([w.q(".arrivals").hidden, w.el.dataset.sheet, chip().getAttribute("aria-expanded")]).toEqual([true, "", "false"]);
+    step("a touch outside closes them too, a touch on them does not", () => { w.click(chip()); w.click(arr()); w.dom.fire(w.q(".arrivals"), "pointerdown"); });
+    expect(w.q(".arrivals").hidden).toBe(false);
+    step("outside", () => w.dom.fire(w.dom.document.body, "pointerdown"));
+    expect([w.q(".arrivals").hidden, w.pad.calls.at(-1)]).toEqual([true, ["hud-sheet", false]]);
+    step("the chip twice: open, close", () => { w.click(chip()); w.click(chip()); });
+    expect([w.el.dataset.sheet, chip().getAttribute("aria-expanded")]).toEqual(["", "false"]);
+    step("a touch on the chip is not outside the sheet (it toggles it, it does not reopen it)", () => { w.click(chip()); w.dom.fire(chip(), "pointerdown"); w.click(chip()); });
+    expect(w.el.dataset.sheet).toBe("");
+    step("☰ then 名所", () => { w.click(w.act("menu")); w.click(w.act("sheet", '[data-sheet="places"]')); });
+    expect([w.el.dataset.sheet, w.el.dataset.menu, w.act("sheet", '[data-sheet="places"]').getAttribute("aria-expanded")]).toEqual(["places", "0", "true"]);
+    step("☰ then 操作設定", () => { w.click(w.act("menu")); w.click(w.act("padset")); });
+    expect([w.el.dataset.menu, w.el.dataset.sheet, w.pad.settings]).toEqual(["0", "", true]);
+    step("操作設定 again shuts them (a toggle: the landscape toolbar's icon)", () => w.click(w.act("padset")));
+    expect(w.pad.settings).toBe(false);
+  }));
+
   test("an idle sync writes nothing: the second syncState() after any state is a no-op for the DOM", () => withWorld({ ambient: true }, (w) => {
     w.click(w.act("season")); w.click(w.act("view")); w.click(w.act("auto")); w.click(w.act("arrivals")); w.click(w.act("planet")); w.click(w.act("sound"));
     const n = w.dom.writes.length;
@@ -179,13 +210,12 @@ describe("syncState() patches in place: a patched HUD is the HUD a rebuild would
     expect(w.dom.writes.length).toBe(n);
   }));
 
-  test("a preset click writes the two preset buttons and the time label, and nothing else", () => withWorld({}, (w) => {
+  test("a preset click writes the two preset buttons, and nothing else", () => withWorld({}, (w) => {   // ([emil-ui] the bottom pill that repeated the time is gone: one clock, the chip's)
     const old = w.q('[data-act="preset"][aria-pressed="true"]'), next = w.q('[data-act="preset"][data-id="yoru"]');
     const n = w.dom.writes.length; w.click(next);
     const touched = new Set(w.dom.writes.slice(n).map((x) => x.node));
-    expect([...touched].every((x) => x === old || x === next || x === w.q('[data-f="ptime"]'))).toBe(true);
+    expect([...touched].every((x) => x === old || x === next)).toBe(true);
     expect(next.getAttribute("aria-pressed")).toBe("true"); expect(old.getAttribute("aria-pressed")).toBe("false");
-    expect(w.q('[data-f="ptime"]').textContent).toContain(STRINGS.ja["v3.time.yoru"]);
     const n2 = w.dom.writes.length; w.click(next); expect(w.dom.writes.length).toBe(n2);   // the same preset again: nothing changes, nothing is written
   }));
 
@@ -205,8 +235,7 @@ describe("syncState() patches in place: a patched HUD is the HUD a rebuild would
     w.click(w.act("menu")); expect([w.el.dataset.menu, w.act("menu").getAttribute("aria-expanded"), w.dom.document.body.classList.contains("klc-hud-open")]).toEqual(["1", "true", true]);
     w.click(w.act("credits")); expect([w.el.dataset.credits, w.q(".credits").hidden, w.el.dataset.menu, w.act("menu").getAttribute("aria-expanded")]).toEqual(["1", false, "0", "false"]);
     w.click(w.act("credits-close")); expect([w.el.dataset.credits, w.q(".credits").hidden, w.dom.document.body.classList.contains("klc-hud-open")]).toEqual(["0", true, false]);
-    w.click(w.act("sheet", '[data-sheet="time"]')); expect([w.el.dataset.sheet, w.act("sheet", '[data-sheet="time"]').getAttribute("aria-expanded"), w.act("sheet", '[data-sheet="places"]').getAttribute("aria-expanded")]).toEqual(["time", "true", "false"]);
-    w.click(w.act("sheet", '[data-sheet="places"]')); expect([w.el.dataset.sheet, w.act("sheet", '[data-sheet="time"]').getAttribute("aria-expanded")]).toEqual(["places", "false"]);
+    w.click(w.act("sheet", '[data-sheet="places"]')); expect([w.el.dataset.sheet, w.act("sheet", '[data-sheet="places"]').getAttribute("aria-expanded")]).toEqual(["places", "true"]);   // ([emil-ui] the ☰ 名所 row; the time sheet's button is the chip on a phone: the phone test below)
     w.click(w.act("menu")); expect([w.el.dataset.sheet, w.el.dataset.menu]).toEqual(["", "1"]);   // the menu closes the sheet
     expect(w.pad.calls.at(-1)).toEqual(["hud-sheet", true]);
     w.dom.fire(w.q(".tools"), "pointerdown"); expect(w.el.dataset.menu).toBe("1");   // inside: stays open
@@ -221,7 +250,6 @@ describe("syncState() patches in place: a patched HUD is the HUD a rebuild would
     expect(w.dom.localStorage.getItem("klc.places")).toBe("1");   // the stored preference stays
     expect(w.tour.current).toBe(target.dataset.id);
     expect(w.all('[data-act="stop"][aria-current="true"]').map((b) => b.dataset.id)).toEqual([target.dataset.id]);
-    expect(w.q('[data-f="cur"]').textContent).toBe(w.q('[data-f="pcur"]').textContent);
     expect(w.q('[data-f="cur"]').textContent).toBe("場所3");
     w.click(w.act("view")); const walkTo = w.tour.walkTo; let walked = null; w.tour.walkTo = (id) => { walked = id; return walkTo.call(w.tour, id); };
     w.click(w.all('[data-act="stop"]')[5]); expect(walked).toBe(w.all('[data-act="stop"]')[5].dataset.id);
@@ -274,7 +302,7 @@ describe("focus: blur only after a pointer click; a keyboard activation keeps th
     chip.focus(); w.click(chip, { pointer: false });   // keyboard: it is focused already, the click has detail 0
     expect(w.dom.document.blurs).toEqual([]); expect(w.dom.document.activeElement).toBe(chip); expect(w.act("arrivals")).toBe(chip);
     for (const a of ["places", "auto", "view", "season", "sound"]) { const b = w.act(a); b.focus(); w.click(b, { pointer: false }); expect([a, w.dom.document.activeElement === b]).toEqual([a, true]); }
-    for (const [a, extra] of [["menu", ""], ["sheet", '[data-sheet="time"]'], ["credits", ""]]) { const b = w.act(a, extra); w.click(b, { pointer: true }); expect([a, w.dom.document.blurs.includes(b)]).toEqual([a, true]); }
+    for (const [a, extra] of [["menu", ""], ["sheet", '[data-sheet="places"]'], ["credits", ""]]) { const b = w.act(a, extra); w.click(b, { pointer: true }); expect([a, w.dom.document.blurs.includes(b)]).toEqual([a, true]); }
   }));
 
   test("a keyboard user who toggles the language lands on the new language button; a pointer user does not get focus", () => withWorld({}, (w) => {
@@ -424,7 +452,7 @@ describe("a HUD without the optional services still mounts, syncs and survives e
     expect(w.q('[data-f="cur"]').textContent).toBe("");
     w.T.preset = "photo"; expect(() => w.hud.syncState()).not.toThrow();
     expect(w.all('[data-act="preset"][aria-pressed="true"]').length).toBe(0);
-    expect(w.q('[data-f="ptime"]').textContent).toBe("16:30");   // no preset: just the clock
+    expect(w.q('[data-f="clock"]').textContent).toBe("16:30");   // no preset: the chip's clock
     w.click(w.act("arrivals")); w.click(w.act("places")); expect(w.renders()).toBe(1);
     w.tour.add([{ id: "x", ja: "一", en: "One" }]); expect(w.renders()).toBe(2); expect(w.all('[data-act="stop"]').length).toBe(1);
   }));
@@ -455,7 +483,9 @@ describe("what the plan said not to touch", () => {
     expect(code).toMatch(/tour\.stops\.length !== stopsDrawn\) \{ render\(\); return; \}/);
   });
   test("markup, class names, data-act values and aria attributes are the ones the e2e suites read", () => {
-    for (const a of ["menu", "arrivals", "lang", "season", "sound", "planet", "credits", "labels", "hide", "places", "stop", "auto", "preset", "view", "photo", "sheet", "credits-close"]) expect(src).toContain(`data-act="${a}"`);
-    for (const c of ['class="chip glass"', 'class="arrivals glass"', 'class="places glass"', 'class="dock glass"', 'class="pbar"', 'class="note glass"', 'id="klc-places"', 'id="klc-menu"']) expect(src).toContain(c);
+    for (const a of ["menu", "arrivals", "lang", "season", "sound", "planet", "credits", "labels", "hide", "places", "stop", "auto", "preset", "view", "photo", "sheet", "credits-close", "padset"]) expect(src).toContain(`data-act="${a}"`);
+    // ([emil-ui] class="pbar" went with the bottom pill row; the time sheet is #klc-time and holds 今日の入船, the ☰ holds 名所 and 操作設定)
+    for (const c of ['class="chip glass"', 'class="arrivals glass"', 'class="places glass"', 'class="dock glass"', 'id="klc-time"', 'class="pill arr"', 'class="round glass prow"', 'class="round glass pset"', 'class="note glass"', 'id="klc-places"', 'id="klc-menu"']) expect(src).toContain(c);
+    expect(src).not.toContain('class="pbar"');
   });
 });

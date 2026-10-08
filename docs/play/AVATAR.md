@@ -73,12 +73,19 @@ The root faces −Z with its feet at y = 0, so it is placed at the player's yaw 
 - `?hoya3d=0` forces the original even when the record allows him.
 - `?hoya3d=1` asks for him when the record and the mesh both exist.
 
-The notebook tab 姿 has the three looks and 「ホヤぼーや／オリジナル」. While he is on screen the credit sits under him, not on him:
+The notebook tab 姿 has the three looks and 「ホヤぼーや／オリジナル」. While he is on screen the credit is on screen too, never on him:
 
 気仙沼市観光キャラクター
 「海の子 ホヤぼーや」
 
-It sits bottom centre (96 px up). The city's rules (取扱要綱 第5条) want it on screen, uncovered, whenever he is shown, and two chips use the same place: the もぐる chip (`.swim-dive`, 96 px, by the water) and the kit's prompt (108 px on a desktop, 168 px on a phone). While one of them shows, the credit moves above it: 148 px over もぐる, 160 px over a desktop prompt, 220 px over both on a phone. It eases over 200 ms, and moves at once under reduced motion. `test/feel-credit.test.js` pins the rules; `tools/anime/feel-modes.mjs` checks the rects in Chrome.
+The city's rules (取扱要綱 第5条) want it on screen, uncovered, whenever he is shown, and it must not sit on him or on the thumbs:
+- **A desktop (wider than 720 px):** on the right, under the search button (112 px down), as on a landscape phone. Bottom centre it sat on his legs: his soles are 82 % of the way down the picture, so 96 px up cleared them only in windows at least ~843 px tall, and lifted over もぐる (148 px, the chip shows at the start spot by the water) it covered his legs at 1600×900.
+- **A narrow window without the pad:** bottom centre, 96 px up, lifted to 148 px while the もぐる chip shows and to 232 px over it and the kit's prompt together. It eases over 200 ms, and moves at once under reduced motion.
+- **A portrait phone with the pad:** the band the emil-ui lane keeps free for it, 24 px above the safe bottom, between the credits line and the pad's 78 px floor. Nothing is bottom centre there any more, so there is no lift.
+- **A landscape phone:** one line on the right, under the search button (112 px down). He stands mid-screen there, where the centred credit covered him, and the pad's action cluster owns the bottom-right corner (at 844×390 the search ends at 96 px and the cluster starts at 227 px; `tools/anime/feel-stills.mjs` measured five places and this one alone touched nothing).
+- **While the あそぶ hub's sheet covers him,** the credit steps back with him.
+
+`test/feel-credit.test.js` pins the rules; `tools/anime/feel-stills.mjs` checks the rects in Chrome against every HUD piece and his projected box, and `feel-modes.mjs` against the chips and the pad.
 
 The use to ask the city for is in the application text (not included), section 7.
 

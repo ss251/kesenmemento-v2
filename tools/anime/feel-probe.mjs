@@ -14,8 +14,8 @@
 import { mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { buildAndServe, launch, phonePage, fingers, center, sleep, ROOT } from './pad-lib.mjs';
-import { FIELDS, CLIPS, toFrames, startResponse, stopResponse, turnResponse, cameraMetrics, catchUp, trail, footMetrics, stepMetrics, framing, pacing, inputMag, inputHeading } from './feel-metrics.mjs';
+import { buildAndServe, launch, phonePage, fingers, center, sleep, waitGo, ROOT } from './pad-lib.mjs';
+import { FIELDS, CLIPS, toFrames, analyseRun, framing } from './feel-metrics.mjs';
 import { STICK, stickMath, padScale } from '../../src/anime/ui/touchpad.js';
 
 const arg = (k, d = null) => { const i = process.argv.indexOf('--' + k); return i > 0 ? (process.argv[i + 1] ?? true) : d; };
@@ -24,8 +24,11 @@ const PORT = Number(arg('port', 9560));
 const LABEL = String(arg('label', 'before'));
 const ONLY = String(arg('only', 'phone,desktop')).split(',');
 const FPS = String(arg('fps', '60')).split(',').map(Number);
-const CLIP = has('clip');
-const THROTTLE = Number(arg('throttle', 0));   // CDP CPU throttling during the walk (a phone's dropped frames): 0 = off
+const CLIP = has('clip') || has('clip-only');
+const CLIP_ONLY = has('clip-only');   // only the clip pass (a measurement already saved)
+const THROTTLE = Number(arg('throttle', 0));
+const STEPS_HOLD = Number(arg('stepsHold', 3.5)) * 1000;   // seconds walked along the kerb route and up the stair (a slower walk needs longer)
+const PARAMS = arg('params') ? '&' + String(arg('params')) : '';   // extra URL parameters for the page (e.g. hoyaSpeed=1.8,3.2)   // CDP CPU throttling during the walk (a phone's dropped frames): 0 = off
 const OUT = join(ROOT, 'docs/play/shots/feel');
 const RAW = join(ROOT, 'dist/feel', LABEL);
 mkdirSync(OUT, { recursive: true }); mkdirSync(RAW, { recursive: true });
@@ -84,6 +87,7 @@ const RECORDER = `(() => {
     D[j++] = ctx.physics.groundHeight(P.pos.x, P.pos.z, P.pos.y);
     const aim = av && av.aim;
     D[j++] = aim && Number.isFinite(aim.tx) ? aim.tx : NaN; D[j++] = aim && Number.isFinite(aim.tz) ? aim.tz : NaN;
+    D[j++] = cam.fov;
     n++;
   });
   window.__feel = {
@@ -179,11 +183,11 @@ async function stairScript(page, dev, id = 'stair') {
   await M('Settle'); await sleep(1200);
   if (dev === 'phone') {
     const f = fingers(page), T = STICK.travel * padScale(390, 844);
-    await f.down1(1, 90, 560); await M(''); await f.drag(1, 90, 560 - 0.8 * T, 2); await sleep(3500);
+    await f.down1(1, 90, 560); await M(''); await f.drag(1, 90, 560 - 0.8 * T, 2); await sleep(STEPS_HOLD);
     await M('Stop'); await f.up(1); await sleep(1200);
   } else {
     const k = keyboard(page);
-    await M(''); await k.down('KeyW'); await sleep(3500);
+    await M(''); await k.down('KeyW'); await sleep(STEPS_HOLD);
     await M('Stop'); await k.up('KeyW'); await sleep(1200);
   }
   await M('End');
@@ -191,65 +195,7 @@ async function stairScript(page, dev, id = 'stair') {
 let STEPS = null;
 
 // ------------------------------------------------------------------ analysis
-function bracket(marks, id, next) {
-  const a = marks.find((m) => m[0] === id), b = marks.find((m) => m[0] === next);
-  return a && b ? [a[1], b[1]] : null;
-}
-const inputHeadingAt = (fr, i) => (fr[i] ? inputHeading(fr[i]) : null);
-/** The first frame in [a, b) where `pred` holds (the input's onset inside a bracket), else a. */
-const onset = (fr, a, b, pred) => { for (let i = a; i < Math.min(b, fr.length); i++) if (pred(fr[i])) return i; return a; };
-
-function analyse(fr, marks) {
-  const B = (id, next) => bracket(marks, id, next);
-  const out = {};
-  const settle = B('settle', 'walk'), walk = B('walk', 'run'), run = B('run', 'reverse'), rev = B('reverse', 'stop'), stop = B('stop', 'curve0');
-  const curve = B('curve', 'curveStop');
-  if (settle) out.framing = framing(fr, settle[0], settle[1]);
-  if (walk) {
-    const a = onset(fr, walk[0], walk[1] + 8, (f) => inputMag(f) > 0.01);
-    const b = run ? onset(fr, run[0], run[1], (f) => f.run) : walk[1];
-    out.walkStart = startResponse(fr, a, b);
-    out.walkFeet = footMetrics(fr, Math.max(a, b - 60), b);
-    out.walkCam = { ...cameraMetrics(fr, Math.max(a, b - 90), b), ...trail(fr, a - 1, Math.max(a, b - 30), b) };
-  }
-  if (run) {
-    const a = onset(fr, run[0], run[1] + 8, (f) => f.run);
-    const b = onset(fr, a + 1, rev ? rev[1] : run[1], (f) => !f.run || inputMag(f) < 0.5);   // the run window ends with the run input (a thumb's flick passes the dead zone on its way back)
-    out.runStart = startResponse(fr, a, b);
-    const brev = rev ? onset(fr, rev[0], rev[1], (f) => f.inF < -0.01) : run[1];
-    void brev;
-    out.runFeet = footMetrics(fr, Math.max(a, b - 60), b);
-    const rest = walk ? onset(fr, walk[0], walk[1] + 8, (f) => inputMag(f) > 0.01) - 1 : a - 1;
-    out.runCam = { ...cameraMetrics(fr, Math.max(a, b - 60), b), ...trail(fr, rest, Math.max(a, b - 20), b) };
-  }
-  if (rev) {
-    const a = onset(fr, rev[0], rev[1] + 8, (f) => f.inF < -0.01);
-    const b = stop ? onset(fr, stop[0], stop[1] + 8, (f) => inputMag(f) < 0.01) : rev[1];
-    out.turn180 = turnResponse(fr, a, b);
-    out.reverseStart = startResponse(fr, a, b);
-  }
-  if (stop) {
-    const a = onset(fr, stop[0], stop[1] + 8, (f) => inputMag(f) < 0.01);
-    out.stop = stopResponse(fr, a, stop[1]);
-    out.stopCam = { ...cameraMetrics(fr, a, stop[1]), ...catchUp(fr, a, stop[1]) };
-  }
-  if (curve) {
-    const a = onset(fr, curve[0], curve[1] + 8, (f) => Math.abs(f.inS) > 0.01);
-    const want = inputHeadingAt(fr, curve[1] - 1);
-    out.curve45 = turnResponse(fr, a, curve[1], 10 * Math.PI / 180, want);
-  }
-  for (const id of ['steps', 'stair']) {
-    const st = B(id, id + 'Stop');
-    if (!st) continue;
-    const a = onset(fr, st[0], st[1] + 8, (f) => inputMag(f) > 0.01);
-    const end = B(id + 'Stop', id + 'End');
-    out[id] = stepMetrics(fr, a, end ? end[1] : st[1]);
-    out[id + 'Cam'] = cameraMetrics(fr, a, st[1]);
-  }
-  const all = B('settle', 'end');
-  if (all) { out.pacing = pacing(fr, all[0], all[1]); out.camAll = cameraMetrics(fr, all[0], all[1]); }
-  return out;
-}
+const analyse = analyseRun;
 
 async function pull(page) {
   const n = await page.eval('window.__feel.stop()');
@@ -262,13 +208,13 @@ async function pull(page) {
 // ------------------------------------------------------------------ sessions
 async function open(browser, srv, dev, fps) {
   const page = dev === 'phone' ? await phonePage(browser, { width: 390, height: 844, dpr: 3 }) : await browser.page({ width: 1440, height: 900, dpr: 1 });
-  await page.goto(`${srv.url}index.html?lang=ja${fps !== 60 ? '&fps=' + fps : ''}`);
+  await page.goto(`${srv.url}index.html?lang=ja${fps !== 60 ? '&fps=' + fps : ''}${PARAMS}`);
   await page.waitFor("document.body.classList.contains('loaded')", { timeout: 280000 });
   return page;
 }
 async function enter(page, dev) {
-  if (dev === 'phone') { const f = fingers(page); const g = await center(page, '#go'); await f.tap(g.x, g.y); }
-  else await page.eval("document.getElementById('go').click()");
+  if (dev === 'phone') { const f = fingers(page); await waitGo(page); const g = await center(page, '#go'); await f.tap(g.x, g.y); }
+  else { await waitGo(page); await page.eval("document.getElementById('go').click()"); };
   await page.waitFor("document.body.classList.contains('playing')", { timeout: 30000 });
   await page.waitFor(`(() => { let r = null; window.__ctx.scene.traverse((o) => { if (o.name === 'hoya3d') r = o; }); return !!r; })()`, { timeout: 60000 });
   await page.eval(RECORDER);
@@ -385,7 +331,7 @@ browser.on('Page.screencastFrame', (params) => { for (const fn of castHandlers.v
 const report = { label: LABEL, at: new Date().toISOString(), stick, sessions: [] };
 try {
   for (const dev of ONLY) {
-    for (const fps of FPS) {
+    for (const fps of CLIP_ONLY ? [] : FPS) {
       log('session', dev, fps);
       const t0 = Date.now();
       try { report.sessions.push(await walkSession(browser, srv, dev, fps)); }
@@ -400,5 +346,5 @@ try {
 } finally {
   await browser.close(); srv.stop();
 }
-writeFileSync(join(OUT, `${LABEL}-metrics.json`), JSON.stringify(report, null, 1));
+if (!CLIP_ONLY) writeFileSync(join(OUT, `${LABEL}-metrics.json`), JSON.stringify(report, null, 1));
 console.log(JSON.stringify(report, null, 1));

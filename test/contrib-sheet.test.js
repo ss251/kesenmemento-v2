@@ -341,7 +341,7 @@ describe("the HUD: the button is added without moving anything that was there", 
   const hud = read("src/anime/ui/hud.js");
   test("it is the LAST item of the toolbar (the ☰ menu keeps every item where it was; the wide toolbar is right-anchored, so an in-flow item at the end would push the others: it is absolute there)", () => {
     const tools = hud.slice(hud.indexOf('<div class="tools" id="klc-menu">'), hud.indexOf("</div>", hud.indexOf('data-act="hide"')) + 6);
-    const acts = [...tools.matchAll(/data-act="(\w+)"/g)].map((m) => m[1]); expect(acts).toEqual(["jpyc", "lang", "season", "sound", "planet", "credits", "labels", "hide", "multi", "report"]);   // [integration] みんなであそぶ joined before 修正を報告 so the phone ☰ keeps every item where it was (ship-pad.e2e taps by position)   // ([play] みんなであそぶ then [jpyc] sit on the left of the right-anchored toolbar, so the older items stay; labels is a .cbtn ☰-menu item like credits)
+    const acts = [...tools.matchAll(/data-act="(\w+)"/g)].map((m) => m[1]); expect(acts).toEqual(["jpyc", "sheet", "lang", "season", "sound", "planet", "padset", "credits", "labels", "hide", "multi", "report"]);   // [emil-ui] 名所 (the ☰ row after JPYC, data-act="sheet") and 操作設定 (padset, the pad's gear) joined; 修正を報告 is still the last   // [integration] みんなであそぶ joined before 修正を報告 so the phone ☰ keeps every item where it was (ship-pad.e2e taps by position)   // ([play] みんなであそぶ then [jpyc] sit on the left of the right-anchored toolbar, so the older items stay; labels is a .cbtn ☰-menu item like credits)
     expect(tools).toContain('aria-haspopup="dialog"'); expect(tools).toContain('class="round glass rep"');
     expect(CSS).toMatch(/#klc-ui \.tools \.rep \{ position: absolute; top: 0; right: calc\(100% \+ 8px\);/);
     expect(CSS).toMatch(/@media \(max-width: 720px\) \{ #klc-ui \.tools \.rep \{ position: static; width: 44px; height: 44px; \} \}/);
@@ -351,7 +351,7 @@ describe("the HUD: the button is added without moving anything that was there", 
     expect(CSS.indexOf("(max-width: 839px)")).toBeGreaterThan(CSS.indexOf("body.klc-pad #klc-ui .tools .rep { top: -3px"));   // (declared after the rules it overrides)
   });
   test("the rules the HUD already had are untouched (the phone-hud tests pin them) and the pad's CSS has no knowledge of the sheet", () => {
-    expect(CSS).toMatch(/#klc-ui \.mbtn, #klc-ui \.pbar, #klc-ui \.mhead, #klc-ui \.tools \.lbl \{ display: none; \}/);
+    expect(CSS).toMatch(/#klc-ui \.mbtn, #klc-ui \.mhead, #klc-ui \.tools \.lbl, #klc-ui \.tools \.prow, #klc-ui \.tools \.pset, #klc-ui \.dock \.arr \{ display: none; \}/);   // ([emil-ui] the pill row went; 名所, 操作設定 and 今日の入船 joined the rule)
     expect(PAD_CSS).not.toMatch(/klc-contrib|\.rep\b|kc-/);
     expect(CSS).toMatch(/@media \(min-width: 721px\) \{ body\.klc-pad #klc-ui \.tools \.rep/);   // (the 44 px override is not in the portrait menu, where the pad's own item rules apply)
   });

@@ -34,7 +34,7 @@ d("integrated app on a phone: portrait HUD and the ship on the pad", () => {
   }, 330000);
   afterAll(async () => { await f?.release?.().catch(() => {}); await browser?.close(); srv?.stop(); }, 60000);
 
-  T("portrait: one compact top bar (time + weather chip, search, ☰), the mode chip under it, a small minimap, two pills, the credit line", async () => {
+  T("portrait: one compact top bar (time + weather chip, search, ☰), a small minimap, the credit line; no mode chip, gear or bottom pills ([emil-ui]: the pad's own buttons change the mode, ☰ holds 名所 and 操作設定, the chip opens the time sheet)", async () => {
     const r = await page.eval(`(() => {
       const R = (s) => { const e = document.querySelector(s); if (!e) return null; const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return null; const b = e.getBoundingClientRect(); return b.width > 1 ? { l: b.left, t: b.top, r: b.right, b: b.bottom, w: b.width, h: b.height } : null; };
       return { chip: R('#klc-ui .brand .chip'), search: R('#klc-x .xbar button[data-act="search"]'), menuBtn: R('#klc-ui .mbtn'), mark: R('#klc-ui .mark'), mapBtn: R('#klc-x .xbar button[data-act="map"]'), driveBtn: R('#klc-x .xbar button[data-act="drive"]'),
@@ -48,11 +48,10 @@ d("integrated app on a phone: portrait HUD and the ship on the pad", () => {
     expect(r.chipText).toMatch(/\d\d:\d\d/);
     // gone from the screen: the big wordmark, the map and drive buttons, the five-icon column, the dock and the strip
     expect({ mark: r.mark, mapBtn: r.mapBtn, driveBtn: r.driveBtn, tools: r.tools, dock: r.dock, places: r.places }).toEqual({ mark: null, mapBtn: null, driveBtn: null, tools: null, dock: null, places: null });
-    // the mode chip and the gear sit under the bar; the minimap is small
-    expect(r.modeChip.t).toBeGreaterThan(r.chip.b); expect(r.gear.t).toBeGreaterThan(r.chip.b);
+    // [emil-ui] no 歩く / 飛ぶ / 運転 chip, no gear, no bottom pills; the minimap is small
+    expect({ modeChip: r.modeChip, gear: r.gear, pbar: r.pbar }).toEqual({ modeChip: null, gear: null, pbar: null });
     expect(r.mini.w).toBeLessThanOrEqual(90); expect(r.mini.t).toBeGreaterThan(r.menuBtn.b);
-    // the bottom: two pills, the credit line below them, small but there
-    expect(r.pbar.h).toBeGreaterThanOrEqual(44); expect(r.pbar.b).toBeLessThan(r.attr.t + 2);
+    // the bottom: the credit line, small but there
     expect(r.attr.b).toBeLessThanOrEqual(r.vh); expect(r.attrFont).toBeLessThanOrEqual(9);
     expect((await page.eval("document.querySelector('#klc-ui .attr').textContent")).includes("OpenStreetMap")).toBe(true);
     const lay = await layoutReport(page);
@@ -60,10 +59,10 @@ d("integrated app on a phone: portrait HUD and the ship on the pad", () => {
     expect(lay.scrollW).toBeLessThanOrEqual(lay.vw);
   });
 
-  T("every feature is within two taps (real touches): ☰ then language, season, sound, planet; the pills then a place, an hour, the photo; the minimap, search, arrivals, settings", async () => {
+  T("every feature is within two taps (real touches): ☰ then language, season, sound, planet, 名所, 操作設定; the chip then an hour, the photo, 今日の入船; the minimap, search", async () => {
     // ☰ -> language (EN / 日本語), and back
     await tap("#klc-ui .mbtn");
-    expect(await ui("({ menu: document.querySelector('#klc-ui').dataset.menu, hidden: window.__pad.hidden, labels: [...document.querySelectorAll('#klc-ui .tools .lbl')].map((e) => e.textContent.trim()).filter(Boolean).length })")).toEqual({ menu: "1", hidden: true, labels: 9 });   // language, season, sound, planet, credits, 地名ラベル, hide, [play] みんなであそぶ, and [contrib] 修正を報告 (the last item: nothing above it moved); it said 7 until 地名ラベル joined the menu (c8d1826), 8 until みんなで joined (after hide) and aborted this test before it reached the taps below
+    expect(await ui("({ menu: document.querySelector('#klc-ui').dataset.menu, hidden: window.__pad.hidden, labels: [...document.querySelectorAll('#klc-ui .tools .lbl')].map((e) => e.textContent.trim()).filter(Boolean).length })")).toEqual({ menu: "1", hidden: true, labels: 11 });   // [emil-ui] 名所 and 操作設定 joined (11, was 9); language, season, sound, planet, credits, 地名ラベル, hide, [play] みんなであそぶ, and [contrib] 修正を報告 (the last item: nothing above it moved); it said 7 until 地名ラベル joined the menu (c8d1826), 8 until みんなで joined (after hide) and aborted this test before it reached the taps below
     await tap('#klc-ui .tools [data-act="lang"]');
     expect(await ui("document.querySelector('#klc-ui').getAttribute('lang')")).toBe("en");
     await tap('#klc-ui .tools [data-act="lang"]');
@@ -85,14 +84,18 @@ d("integrated app on a phone: portrait HUD and the ship on the pad", () => {
     await tap("#klc-ui .mbtn");
     await f.tap(40, 520); await settle(500);
     expect(await ui("({ menu: document.querySelector('#klc-ui').dataset.menu, padHidden: window.__pad.hidden })")).toEqual({ menu: "0", padHidden: false });
-    // the pills: the time sheet (the photo button is in it), the places sheet
-    await tap('#klc-ui .pbar button[data-sheet="time"]');
+    // [emil-ui] the chip opens the time sheet (the photo button is in it) and closes it; ☰ then 名所 opens the places sheet, a touch outside closes it
+    await tap('#klc-ui .brand .chip');
+    expect(await ui("document.querySelector('#klc-ui').dataset.sheet")).toBe("time");
     expect(await ui("[...document.querySelectorAll('#klc-ui .dock [data-act]')].map((b) => b.dataset.act)")).toContain("photo");
     expect(await ui("document.querySelectorAll('#klc-ui .dock [data-act=\"preset\"]').length")).toBe(5);
-    await tap('#klc-ui .pbar button[data-sheet="time"]');
-    await tap('#klc-ui .pbar button[data-sheet="places"]');
+    await tap('#klc-ui .brand .chip');
+    expect(await ui("document.querySelector('#klc-ui').dataset.sheet")).toBe("");
+    await tap("#klc-ui .mbtn"); await tap('#klc-ui .tools [data-sheet="places"]');
+    expect(await ui("({ sheet: document.querySelector('#klc-ui').dataset.sheet, menu: document.querySelector('#klc-ui').dataset.menu })")).toEqual({ sheet: "places", menu: "0" });
     expect(await ui("document.querySelectorAll('#klc-ui .places li button').length")).toBeGreaterThan(3);
-    await tap('#klc-ui .pbar button[data-sheet="places"]');
+    await f.tap(40, 300); await settle(500);
+    expect(await ui("document.querySelector('#klc-ui').dataset.sheet")).toBe("");
     // the minimap opens the full map (its close button is not under the minimap); search opens and closes
     await tap("#klc-x .mini");
     expect(await ui("({ map: !document.querySelector('#klc-x .xmap').hidden, mini: getComputedStyle(document.querySelector('#klc-x .mini')).display, padHidden: window.__pad.hidden })")).toEqual({ map: true, mini: "none", padHidden: true });
@@ -101,22 +104,24 @@ d("integrated app on a phone: portrait HUD and the ship on the pad", () => {
     await tap('#klc-x .xbar button[data-act="search"]');
     expect(await ui("!document.querySelector('#klc-x .xsearch').hidden")).toBe(true);
     await tap("#klc-x .xsearch .x");
-    // the arrivals panel (the chip), the pad's settings (the gear)
+    // [emil-ui] the arrivals: the chip, then the time sheet's 今日の入船 (the chip closes them); the pad's settings: ☰ then 操作設定 (a touch outside closes them)
+    await tap("#klc-ui .brand .chip"); await tap("#klc-ui .dock .arr");
+    expect(await ui("({ arr: !document.querySelector('#klc-ui .arrivals').hidden, sheet: document.querySelector('#klc-ui').dataset.sheet })")).toEqual({ arr: true, sheet: "" });
     await tap("#klc-ui .brand .chip");
-    expect(await ui("!document.querySelector('#klc-ui .arrivals').hidden")).toBe(true);
-    await tap("#klc-ui .brand .chip");
-    await tap("#klc-pad .gear");
+    expect(await ui("document.querySelector('#klc-ui .arrivals').hidden")).toBe(true);
+    await tap("#klc-ui .mbtn"); await tap('#klc-ui .tools [data-act="padset"]');
     expect(await ui("({ set: !document.querySelector('#klc-pad .settings').hidden, hidden: window.__pad.hidden, sup: window.__pad.suppressed, arr: !document.querySelector('#klc-ui .arrivals').hidden, search: !document.querySelector('#klc-x .xsearch').hidden, map: !document.querySelector('#klc-x .xmap').hidden, menu: document.querySelector('#klc-ui').dataset.menu })")).toMatchObject({ set: true });
-    await tap("#klc-pad .gear");
+    await f.tap(195, 420); await settle(500);
+    expect(await ui("document.querySelector('#klc-pad .settings').hidden")).toBe(true);
     await page.eval("window.__pad.dismissCoach()");
     expect(await ui("({ hidden: window.__pad.hidden, sup: window.__pad.suppressed })")).toEqual({ hidden: false, sup: [] });
   });
 
-  T("landscape 844x390 is as before: the brand, the five tools, the strip and the dock; no ☰ and no pills", async () => {
+  T("landscape 844x390: the tools, the strip, the dock and the pad's gear; no ☰, no pills, and ([emil-ui]) no wordmark, mode chip, 地図 or 運転", async () => {
     await setViewport(page, LANDSCAPE); await settle(1300);
     const r = await page.eval(`(() => { const sh = (s) => { const e = document.querySelector(s); return !!e && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 1; };
-      return { mbtn: sh('#klc-ui .mbtn'), pbar: sh('#klc-ui .pbar'), tools: sh('#klc-ui .tools'), dock: sh('#klc-ui .dock'), places: sh('#klc-ui .places'), mark: sh('#klc-ui .mark'), map: sh('#klc-x .xbar button[data-act="map"]'), drive: sh('#klc-x .xbar button[data-act="drive"]'), lbl: sh('#klc-ui .tools .lbl'), chip: sh('#klc-pad .chip') }; })()`);
-    expect(r).toEqual({ mbtn: false, pbar: false, tools: true, dock: true, places: true, mark: true, map: true, drive: true, lbl: false, chip: true });
+      return { mbtn: sh('#klc-ui .mbtn'), pbar: sh('#klc-ui .pbar'), tools: sh('#klc-ui .tools'), dock: sh('#klc-ui .dock'), places: sh('#klc-ui .places'), mark: sh('#klc-ui .mark'), map: sh('#klc-x .xbar button[data-act="map"]'), drive: sh('#klc-x .xbar button[data-act="drive"]'), lbl: sh('#klc-ui .tools .lbl'), chip: sh('#klc-pad .chip'), pset: sh('#klc-ui .tools .pset'), gear: sh('#klc-pad .gear') }; })()`);
+    expect(r).toEqual({ mbtn: false, pbar: false, tools: true, dock: true, places: true, mark: false, map: false, drive: false, lbl: false, chip: false, pset: false, gear: true });   // [emil-ui] the wordmark, the 歩く / 飛ぶ / 運転 chip and the xbar's 地図 / 運転 went (the minimap opens the map, the pad has 乗る / 降りる); the gear stays in landscape (the toolbar has no room: #9 brings the ☰)
     const lay = await layoutReport(page);
     expect(lay.overlaps).toEqual([]); expect(lay.panelOverlaps).toEqual([]); expect(lay.outside).toEqual([]);
     await setViewport(page, PORTRAIT); await settle(1000);

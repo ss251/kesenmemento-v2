@@ -2,7 +2,7 @@
 // and ホヤぼーや as the default walker. His mesh is hoya-model.js and is not edited here.
 
 import { sfx, ui } from '../kit/index.js';
-import { chaseOwns, createWalkCam, placeWalk, thirdFor, THIRD } from './camera.js';
+import { chaseOwns, createWalkCam, damp1, placeWalk, thirdFor, THIRD } from './camera.js';
 import { createBuildingProbe } from './boxes.js';
 import { armHandoff, blendHandoff, createHandoff } from './handoff.js';
 import { hoyaPermitted, resolveModel, setModel } from './approval.js';
@@ -13,11 +13,19 @@ import { createFigure, poseFigure } from './figure.js';
 import { loadHoya } from './hoya-slot.js';
 import { registerGullAudio } from '../gull/voice.js';
 
-// [feel] The credit (気仙沼市観光キャラクター「海の子 ホヤぼーや」) must be on screen, uncovered, whenever he is shown (取扱要綱 第5条). It sits
-// bottom centre, where the もぐる chip (.swim-dive: bottom 96 px, 44 px tall) and the kit's prompt (.prompt: bottom 108 px on a desktop,
-// 168 px on a phone, 44 px) also appear: while one of them shows, the credit moves above it (200 ms; at once under reduced motion).
-// Pinned by test/feel-credit.test.js (the rules) and tools/anime/feel-modes.mjs (the rects in Chrome).
-export const CREDIT_LIFT = { base: 96, chip: 44, gap: 8, promptDesk: 108, promptPhone: 168 };
+// [feel] The credit (気仙沼市観光キャラクター「海の子 ホヤぼーや」) must be on screen, uncovered, whenever he is shown (取扱要綱 第5条).
+// - A desktop (no pad, wider than 720 px): on the right under the search button (112 px down). Bottom centre it sat on his legs: his
+//   soles are 82 % of the way down, so at 96 px it cleared them only in windows at least ~843 px tall, and lifted over もぐる (148 px) it
+//   covered his legs at 1600x900 at the start spot (measured, tools/anime/feel-stills.mjs).
+// - A narrow window without the pad: bottom centre at 96 px, lifted while the もぐる chip (.swim-dive: bottom 96 px, 44 px tall) shows,
+//   and over it and the kit's prompt (168 px, 56 px tall) together (200 ms; at once under reduced motion).
+// - A portrait phone with the pad: the band the emil-ui lane keeps free for it between the credits line and the thumbs (24-78 px above the
+//   safe bottom); nothing is bottom centre there any more (もぐる, 乗船する and the prompts sit in one slot above the thumbs), so no lift.
+// - A landscape phone: one line on the right under the search button (112 px down), off him (he stands mid-screen) and above the
+//   pad's action cluster, which owns the bottom-right corner (measured at 844x390: the search ends at 96 px, the cluster starts at 227).
+// - While the あそぶ hub's sheet covers him, the credit steps back with him.
+// Pinned by test/feel-credit.test.js (the rules); tools/anime/feel-stills.mjs and feel-modes.mjs check the rects in Chrome.
+export const CREDIT_LIFT = { base: 96, chip: 44, promptH: 56, gap: 8, promptDesk: 108, promptPhone: 168 };
 export const CSS = `
 #klc-play .avatar-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
 #klc-play .avatar-row button { border-radius: 999px; padding: 0 16px; background: rgba(255,255,255,.78); color: #223A70; font: 700 14px/1 "Zen Maru Gothic", "Noto Sans JP", sans-serif; }
@@ -30,12 +38,22 @@ export const CSS = `
 #klc-play .hoya-credit span { display: block; }
 #klc-play .hoya-credit[hidden] { display: none !important; }
 #klc-play .hoya-credit { transition: bottom .2s cubic-bezier(.2, .8, .2, 1); }
-body:has(.swim-dive:not([hidden])) #klc-play .hoya-credit { bottom: calc(148px + env(safe-area-inset-bottom, 0px)); }
-#klc-play:has(.prompt:not([hidden]):not(.top)) .hoya-credit { bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
-@media (max-width: 720px) {
-  #klc-play:has(.prompt:not([hidden]):not(.top)) .hoya-credit { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
-  body:has(.swim-dive:not([hidden])) #klc-play:has(.prompt:not([hidden]):not(.top)) .hoya-credit { bottom: calc(220px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 721px) {
+  body:not(.klc-pad) #klc-play .hoya-credit { left: auto; right: calc(18px + env(safe-area-inset-right, 0px)); transform: none; bottom: auto; top: calc(112px + env(safe-area-inset-top, 0px)); }
 }
+@media (max-width: 720px) {
+  body:not(.klc-pad):has(.swim-dive:not([hidden])) #klc-play .hoya-credit { bottom: calc(148px + env(safe-area-inset-bottom, 0px)); }
+  body:not(.klc-pad):has(.swim-dive:not([hidden])) #klc-play:has(.prompt:not([hidden]):not(.top)) .hoya-credit { bottom: calc(232px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 720px) and (orientation: portrait) {
+  body.klc-pad #klc-play .hoya-credit { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  body.klc-pad #klc-play .hoya-credit { left: auto; right: calc(14px + env(safe-area-inset-right, 0px)); transform: none;
+    bottom: auto; top: calc(112px + env(safe-area-inset-top, 0px)); padding: 4px 10px; border-radius: 10px; font-size: 11.5px; line-height: 1.4; }
+  body.klc-pad #klc-play .hoya-credit span { display: inline; }
+}
+#klc-play.hub-open .hoya-credit { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { #klc-play .hoya-credit { transition: none; } }
 `;
 
@@ -45,12 +63,56 @@ body:has(.swim-dive:not([hidden])) #klc-play .hoya-credit { bottom: calc(148px +
  * readable 1.6–5.5 Hz. Undefined until the model offers `gait`: then the animator keeps its own cadence (hoya-model.js is not edited here).
  */
 export const CADENCE = { min: 1.6, max: 5.5 };
-export function gaitCadence(model, speed) {
+/**
+ * [feel] ホヤぼーや's speeds in third person, m/s: THE place for them (the conductor, 2026-10-08 10:00: walk 1.5, run 3.0, feet planted).
+ * His legs (the manual's: 0.114 m) carry a planted stride of 0.204 m walking and 0.196 m running (hoya-model.js hoyaGait); at the poses'
+ * readable cycle rates (walk ≤ 4.2 Hz, run ≤ 5.5 Hz) that is 1.5 and 3.0 m/s with no slide. First person and the original walker keep the
+ * walker's 3.1 / 6.4. The trade-off table is in docs/play/FEEL.md. For trying others: ?hoyaSpeed=walk,run (e.g. 1.8,3.2); ?hoyaSpeed=0
+ * gives him the walker's speeds.
+ */
+export const HOYA_SPEED = Object.freeze({ walk: 1.5, run: 3.0 });
+/** The speeds in force: HOYA_SPEED unless ?hoyaSpeed= says otherwise (null = the walker's). */
+export function hoyaSpeedFrom(search) {
+  let raw = null;
+  try { raw = new URLSearchParams(search || '').get('hoyaSpeed'); } catch (e) { raw = null; }
+  if (raw === null || raw === '') return { walk: HOYA_SPEED.walk, run: HOYA_SPEED.run };
+  const [w, r] = String(raw).split(',').map(Number);
+  if (!(w > 0)) return { walk: null, run: null };
+  return { walk: w, run: r > 0 ? r : HOYA_SPEED.run * w / HOYA_SPEED.walk };
+}
+const SPEED3 = hoyaSpeedFrom(typeof location !== 'undefined' ? location.search : '');
+export function gaitCadence(model, speed, run) {
   if (!model || typeof model.gait !== 'function' || !(speed > 0.05)) return undefined;
-  let g = null; try { g = model.gait(speed); } catch (e) { return undefined; }
+  let g = null; try { g = model.gait(speed, run); } catch (e) { return undefined; }
   if (!g || !(g.travel > 0) || !(g.stance > 0)) return undefined;
-  const c = speed * g.stance / g.travel;
+  // the model's own readable ceiling for the pose it shows (rate = min(maxHz, no-slide hz): the walk ≤ 4.2 Hz, the run ≤ 5.5), else no-slide
+  const c = Number.isFinite(g.rate) ? g.rate : speed * g.stance / g.travel;
   return c < CADENCE.min ? CADENCE.min : c > CADENCE.max ? CADENCE.max : c;
+}
+
+/** [feel] A footfall's gain: 0.5 up to 5 footfalls a second (his old patter), then softer in proportion, down to 0.25 (CRAFT §4: gentle,
+ *  never a drum roll), so a run's 11 footfalls a second stay a light patter, each still in time with a foot. */
+export function footstepGain(cadence) {
+  const perS = cadence > 0 ? 2 * cadence : 0;
+  return perS > 5 ? Math.max(0.25, 0.5 * 5 / perS) : 0.5;
+}
+
+/** [feel] Run fn with the physics' moving colliders (the townspeople's boxes) left out, then put them back (even if fn throws): the walker's
+ *  camera answers walls, not passers-by. Allocation-free; a physics without moving colliders is left alone. */
+const NO_MOVING = Object.freeze([]);
+export function withoutMoving(physics, fn) {
+  const dyn = physics && physics._dynItems, skip = Array.isArray(dyn) && dyn.length > 0;
+  if (skip) physics._dynItems = NO_MOVING;
+  try { return fn(); } finally { if (skip) physics._dynItems = dyn; }
+}
+
+/** [feel] The run's sense of speed: the field of view widens by `deg` at a run (critically damped: in at 6 /s, 90 % in 0.65 s; out at
+ *  9 /s, back within 0.45 s). */
+export const RUN_FOV = Object.freeze({ deg: 3.5, wIn: 6, wOut: 9 });
+/** One step of the run's widening (0..1) toward `want`, critically damped, into out { x, v }; dt 0 (a still) lets go at once. */
+export function runFovStep(x, v, want, dt, out) {
+  if (dt > 0) { damp1(x, v, want, dt, want > x ? RUN_FOV.wIn : RUN_FOV.wOut, out); out.x = Math.min(1, Math.max(0, out.x)); return out; }
+  out.x = want ? x : 0; out.v = want ? v : 0; return out;
 }
 
 /** [feel] The stop's settle: seconds, and its dip (metres, ≤ 0: the figure's root moves down, never scales). */
@@ -88,14 +150,36 @@ export function mountAvatar(ctx) {
 
   player.chase = (pl, frame) => {
     boxes.prepare(frame.x, frame.z);
-    // [feel] the rig by screen shape: a portrait phone gets the closer boom that frames him at ~20 % (camera.js thirdFor)
-    placeWalk(chase, frame, pl.yaw, solid, ground, reducedMotion() || !(frame.dt > 0), thirdFor(pl.camera?.aspect));
+    // [feel] the rig by screen shape: a portrait phone gets the closer boom that frames him at ~20 % (camera.js thirdFor). The boom answers
+    // walls, not passers-by: the townspeople's moving boxes (world/life/cast.js, 0.46 m) are left out while it is solved, so one walking
+    // past no longer collapses it and hides him (the walker himself still bumps into them: only the camera's query skips them)
+    withoutMoving(physics, () => placeWalk(chase, frame, pl.yaw, solid, ground, reducedMotion() || !(frame.dt > 0), thirdFor(pl.camera?.aspect)));
     const cam = pl.camera;
     cam.up.set(0, 1, 0);
     cam.position.set(chase.x, chase.y, chase.z);
     cam.lookAt(chase.tx, chase.ty, chase.tz);
     boomDist = chase.dist;
+    runFov(cam, frame.dt, pl.running && !frame.landing && frame.sp > 0.6 * (pl.run3 > 0 ? pl.run3 : pl.run));
   };
+  // [feel] a sense of speed at a run: the view widens by RUN_FOV degrees (90 % in 0.65 s, back within 0.45 s), always measured from
+  // the screen's own field of view (ctx.fovFor), so nothing accumulates; given back the moment the walker stops owning the camera; none
+  // under reduced motion
+  let fovRun = 0, fovRunV = 0, fovApplied = 0;
+  const _fv = { x: 0, v: 0 };
+  function baseFov(cam) { return typeof ctx.fovFor === 'function' ? ctx.fovFor(cam.aspect) : cam.fov - fovApplied; }
+  function runFov(cam, dt, running) {
+    if (!cam) return;
+    const want = running && !reducedMotion() ? 1 : 0;
+    runFovStep(fovRun, fovRunV, want, dt, _fv); fovRun = _fv.x; fovRunV = _fv.v;
+    const add = RUN_FOV.deg * fovRun, fov = baseFov(cam) + add;
+    if (Math.abs(cam.fov - fov) > 1e-4) { cam.fov = fov; cam.updateProjectionMatrix(); }
+    fovApplied = add;
+  }
+  function dropRunFov(cam) {
+    if (!cam || !(fovApplied > 0)) return;
+    cam.fov = baseFov(cam); cam.updateProjectionMatrix();
+    fovApplied = 0; fovRun = 0; fovRunV = 0;
+  }
   player.cameraBlend = (cam, dt) => blendHandoff(hand, cam, dt);
   // [feel] a flight that ends over the sea lands on the nearest quay (core/player.js): ease the picture from the drone's view down to him
   player.onLanding = (l) => {
@@ -113,7 +197,7 @@ export function mountAvatar(ctx) {
   const stepOpt = { gain: 0.5, pitch: 0, position: stepAt };
   const poseOpt = { speed: 0, lean: 0, squash: null };
   const squash = { y: 1, xz: 1 };
-  const hoyaIn = { speed: 0, onGround: true, vy: 0, cadence: undefined };
+  const hoyaIn = { speed: 0, onGround: true, vy: 0, cadence: undefined, run: undefined };
   const figures = new Map();
   let broken = false;
   const cost = { n: 0, sum: 0, max: 0 };
@@ -151,6 +235,7 @@ export function mountAvatar(ctx) {
     const fig = figure();
     for (const f of figures.values()) if (f !== fig) f.group.visible = false;
     if (hoya?.root) hoya.root.visible = false;
+    if (!walkingThird()) dropRunFov(player.camera);   // (a mode that took the camera keeps the screen's own field of view)
     if (!show || !playing) {
       if (fig) fig.group.visible = false;
       if (credit) credit.hidden = true;
@@ -175,7 +260,11 @@ export function mountAvatar(ctx) {
       if (typeof night === 'number') { try { hoya.setLift(night); } catch (e) { /* */ } }
       if (!hoya._auto) { try { hoya.setPose('auto'); } catch (e) { /* */ } hoya._auto = true; }
       hoyaIn.speed = sp; hoyaIn.onGround = !!player.onGround; hoyaIn.vy = player.vy || 0;
-      hoyaIn.cadence = gaitCadence(hoya, sp);   // [feel] undefined (its own cadence) until the model offers gait()
+      // [feel] his gait: the run pose when the player runs (eased 0.12 s), else the walk pose; the cycle locked to the ground speed
+      body.runW = easeScalar(body.runW || 0, player.running && sp > 0.5 ? 1 : 0, reducedMotion() ? 0 : dt, 0.12);
+      hoyaIn.run = typeof hoya.gait === 'function' ? body.runW : undefined;
+      hoyaIn.cadence = gaitCadence(hoya, sp, hoyaIn.run);   // [feel] undefined (its own cadence) until the model offers gait()
+      player.walk3 = SPEED3.walk; player.run3 = SPEED3.run;   // [feel] his own third-person speeds (null: the walker's)
       try { hoya.update(dt, hoyaIn); } catch (e) { /* the model worker owns update */ }
       const calm = reducedMotion();
       placeHoyaRoot(hoya.root, x, y, z, yaw, calm ? 0 : body.hoyaLean, calm ? 0 : landBob(body.land, 0.2) + settleBob(body.settle));
@@ -183,6 +272,7 @@ export function mountAvatar(ctx) {
       return;
     }
     if (credit) credit.hidden = true;
+    player.walk3 = player.run3 = null;   // the original walker strides at the walker's speeds
     if (!fig) return;
     fig.group.visible = true;
     fig.driver.place(x, y, z, yaw + Math.PI);
@@ -302,6 +392,7 @@ export function mountAvatar(ctx) {
       stepAt.x = player.pos.x; stepAt.y = player.pos.y; stepAt.z = player.pos.z;
       stepSt.flip = stepSt.flip ? 0 : 1;
       stepOpt.pitch = stepSt.flip ? 1.4 : -1.2;
+      stepOpt.gain = footstepGain(hoyaIn.cadence);   // [feel] softer as the patter quickens (in time with every footfall)
       try { sfx.play('step-' + kind, stepOpt); } catch (e) { /* */ }
     }
     if (t0) { const ms = performance.now() - t0; cost.n++; cost.sum += ms; if (ms > cost.max) cost.max = ms; }

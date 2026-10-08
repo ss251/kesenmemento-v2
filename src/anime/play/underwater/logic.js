@@ -75,15 +75,42 @@ export function quayStart(x, z, env, T = TUNE) {
       const s = env.shore(qx, qz);
       if (s > -0.6 && s < 0.4) {
         const sea = seaward(qx, qz, env.shore);
-        const yaw = Math.atan2(-sea.x, -sea.z);
-        // 7.5 m out, so the follow camera (3.5 m behind) is in the water, with the quay at its back
-        const px = qx + sea.x * 7.5, pz = qz + sea.z * 7.5;
-        const y = Math.min(-0.9, Math.max(env.bed(px, pz) + T.clearance + 0.35, -1.7));
-        return { x: px, y, z: pz, yaw, pitch: -0.08, species: speciesAt(px, pz, T.mouth) };
+        const yaw0 = Math.atan2(-sea.x, -sea.z);
+        // 7.5 m out, so the follow camera (3.5 m behind) is in the water, with the quay at its back.
+        // [fish-fix] With env.clearAhead (metres of open view), facing the open water: the heading nearest the sea with 10 m
+        // clear; if none is, a little further out (10.5, then 13.5 m); else the clearest found. The first frame is not a pile.
+        const check = typeof env.clearAhead === 'function';
+        let best = null;
+        for (const out of check ? [7.5, 10.5, 13.5] : [7.5]) {
+          const px = qx + sea.x * out, pz = qz + sea.z * out;
+          const y = Math.min(-0.9, Math.max(env.bed(px, pz) + T.clearance + 0.35, -1.7));
+          const yaw = check ? clearestYaw(px, y, pz, yaw0, env.clearAhead) : yaw0;
+          const free = check ? env.clearAhead(px, y, pz, yaw) : Infinity;
+          if (!best || free > best.free) best = { free, pose: { x: px, y, z: pz, yaw, pitch: -0.08, species: speciesAt(px, pz, T.mouth) } };
+          if (free >= 10) break;
+        }
+        return best.pose;
       }
     }
   }
   return null;
+}
+
+/**
+ * [fish-fix] The heading nearest `yaw` (seaward) with the most open water ahead: offsets up to ±0.9 rad in 0.15 steps, each
+ * scored by clearAhead(x, y, z, yaw) (metres free, capped at 14) minus a little for turning away from the sea. Seaward wins
+ * whenever it is clear for 10 m.
+ */
+export function clearestYaw(x, y, z, yaw, clearAhead) {
+  let best = yaw, score = -Infinity;
+  for (let i = 0; i <= 12; i++) {
+    const off = (i % 2 ? 1 : -1) * Math.ceil(i / 2) * 0.15;
+    const free = Math.min(14, clearAhead(x, y, z, yaw + off));
+    if (off === 0 && free >= 10) return yaw;
+    const sc = free - Math.abs(off) * 3;
+    if (sc > score + 1e-9) { score = sc; best = yaw + off; }
+  }
+  return best;
 }
 
 const W = { wx: 0, wy: 0, wz: 0, wl: 0 };
@@ -140,7 +167,9 @@ function cruiseStep(s, input, dt, env, T) {
       s.y = Math.max(s.y, 0.05);
     } else {
       s.y = T.surfaceHold;
-      if (s.vy > 0) s.vy *= 0.15;
+      // [fish-fix] a dash keeps its climb while the body is held under the skin of the water, so ダッシュ + 上へ leaps from the
+      // surface too (it used to be damped every step, and a fish resting at the top could never leave it)
+      if (s.vy > 0 && !s.dashing) s.vy *= 0.15;
     }
   }
   s.tail += dt * (6.2 + sp * 1.35);

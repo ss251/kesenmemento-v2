@@ -456,5 +456,5 @@ ${EDGE_BODY}
     return d * camera.far * Math.sqrt(1 + x * x + y * y);
   }
 
-  return { render, setSize, setView, setViewMax, setProxies, compMat, ndMat, targets: { rtColor, rtND }, size, nearShare, depthAt };
+  return { render, setSize, setView, setViewMax, setProxies, compMat, ndMat, targets: { rtColor, rtND, rtEdge }, size, nearShare, depthAt };
 }

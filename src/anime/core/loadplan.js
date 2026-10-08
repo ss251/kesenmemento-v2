@@ -42,13 +42,14 @@ export const FINISH_LABELS = {
  * (the page, the bundle and the data files): the bar starts there, not at zero. `compile` also carries main()'s own work after build() up to the title (play's mount, the first
  * update, the title's camera: stats.finish.post), because the bar's 100 % is set when the title is ready.
  *   phone (2026-10-08, [mobile-perf]: the iOS Simulator, cold, two loads of the deploy #7 candidate with the movement and play lanes; stats.finish, ms):
- *            fonts 358, environment 618, water ~180, town 1505, harbor 905, landmarks 438, life 330, ship ~180, explore 1184, wires ~180, slimming ~180, batch 1122,
- *            compile 3506 (the programs: Metal pipelines, a third of the load now that the phone's batch writes its cells directly: it was 10.3 s, compile 0.3 s)
+ *            boot ~760, fonts 358, environment 618, water ~180, town 1505, harbor 905, landmarks 438, life 330, ship ~180, explore 1184, wires ~180, slimming ~180,
+ *            batch 1122, compile 3506 (the programs: Metal pipelines, a third of the load now that the phone's batch writes its cells directly: it was 10.3 s, compile
+ *            0.3 s) + main()'s work before the title ~450 (the klc:ready mark minus the old 100 %: 444, 457, 485)
  *   desktop  boot 3.8 s, fonts 0.3, environment 1.7, water 0.2, town 10.0, harbor 5.8, landmarks 1.3, life 1.7, ship 0.3, explore 2.8, wires 0.55, batch 19.9, compile 0.3 (ui-c2, the build machine)
  */
 export const WEIGHTS = {
   desktop: { boot: 38, fonts: 3, environment: 17, water: 2, town: 100, harbor: 58, landmarks: 13, life: 17, ship: 3, explore: 28, wires: 6, batch: 199, compile: 3, other: 10 },
-  phone: { boot: 9, fonts: 4, environment: 6, water: 2, town: 15, harbor: 9, landmarks: 4, life: 3, ship: 2, explore: 12, wires: 2, prep: 2, batch: 11, compile: 36, other: 4 },
+  phone: { boot: 8, fonts: 4, environment: 6, water: 2, town: 15, harbor: 9, landmarks: 4, life: 3, ship: 2, explore: 12, wires: 2, prep: 2, batch: 11, compile: 40, other: 4 },
 };
 
 /** The plan for these modules on this tier. A stage that is not in the table weighs `other` (a module added later still moves the bar). */

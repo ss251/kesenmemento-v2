@@ -246,13 +246,13 @@ d("the HUD syncs in place (real Chrome)", () => {
     });
 
     T("the time sheet: tapping an hour keeps its button, the sheet and its press state; the places strip keeps its scroll position through a tap on 自動で巡る", async () => {
-      await tap('#klc-ui .pbar button[data-sheet="time"]');
+      await tap('#klc-ui .brand .chip');   // [emil-ui] the chip is the time sheet's button on a phone (the bottom pills are gone)
       const idle = await page.eval(`[...document.querySelectorAll('#klc-ui .dock [data-act="preset"]')].filter((b) => b.getAttribute('aria-pressed') !== 'true').map((b) => b.dataset.id)`);
       await page.eval(`window.__hour = document.querySelector('#klc-ui .dock [data-act="preset"][data-id="${idle[0]}"]'); 0`);
       await tap(`#klc-ui .dock [data-act="preset"][data-id="${idle[0]}"]`);
       const t = await page.eval(`({ same: document.querySelector('#klc-ui .dock [data-act="preset"][data-id="${idle[0]}"]') === window.__hour, pressed: document.querySelector('#klc-ui .dock [data-act="preset"][data-id="${idle[0]}"]').getAttribute('aria-pressed'), sheet: document.getElementById('klc-ui').dataset.sheet, renders: window.__renders })`);
-      await tap('#klc-ui .pbar button[data-sheet="time"]');
-      await tap('#klc-ui .pbar button[data-sheet="places"]');
+      await tap('#klc-ui .brand .chip');
+      await tap("#klc-ui .mbtn"); await tap('#klc-ui .tools [data-sheet="places"]');   // [emil-ui] ☰ then 名所
       await page.eval(`(() => { const ul = document.querySelector('#klc-ui .places ul'); ul.scrollLeft = 320; window.__ul = ul; window.__auto = document.querySelector('#klc-ui .places [data-act="auto"]'); })()`); await sleep(300);
       const before = await page.eval("window.__ul.scrollLeft");
       await tap('#klc-ui .places [data-act="auto"]');
@@ -263,7 +263,8 @@ d("the HUD syncs in place (real Chrome)", () => {
       expect(before).toBeGreaterThan(100);
       expect(s).toMatchObject({ sameUl: true, sameAuto: true, pressed: "true", playing: true, renders: 0 });
       expect(s.scrollLeft).toBe(before);
-      await tap('#klc-ui .pbar button[data-sheet="places"]');
+      await f.tap(40, 300); await sleep(450);   // [emil-ui] a touch outside closes the sheet (its pill is gone)
+      expect(await page.eval("document.getElementById('klc-ui').dataset.sheet")).toBe("");
     });
 
     T("the ☰ menu: language is the one rebuild; season, sound and 地名ラベル keep their nodes and the menu stays open", async () => {

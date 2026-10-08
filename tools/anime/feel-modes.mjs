@@ -1,10 +1,10 @@
-// [feel] Every mode that shares core/player.js, entered and left in one Chrome session, and a walk after each: he moves (> 2.5 m in 1.2 s),
+// [feel] Every mode that shares core/player.js, entered and left in one Chrome session, and a walk after each: he moves (75 % of his walk in 1.2 s),
 // the camera follows (boom > 0.7 m, he is drawn), he stands on land, and no console error appeared. Phone tier by default (the iPhone
 // shape the conductor checks); --desktop for 1440x900. The movement-feel lane's check that drive, fly, swim, gull and 一本釣り still work.
 //   tools/anime/gate.sh chrome --fg env -u NODE_OPTIONS bun tools/anime/feel-modes.mjs [--port 9561] [--desktop] [--no-build]
 import { join } from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { buildAndServe, launch, phonePage, fingers, center, sleep, ROOT } from './pad-lib.mjs';
+import { buildAndServe, launch, phonePage, fingers, center, sleep, waitGo, ROOT } from './pad-lib.mjs';
 
 const arg = (k, d = null) => { const i = process.argv.indexOf('--' + k); return i > 0 ? (process.argv[i + 1] ?? true) : d; };
 const has = (k) => process.argv.includes('--' + k);
@@ -21,7 +21,7 @@ try {
   const page = DESKTOP ? await browser.page({ width: 1440, height: 900, dpr: 1 }) : await phonePage(browser, { width: 390, height: 844, dpr: 3 });
   await page.goto(`${srv.url}index.html?lang=ja`);
   await page.waitFor("document.body.classList.contains('loaded')", { timeout: 280000 });
-  if (DESKTOP) await page.eval("document.getElementById('go').click()"); else { const f = fingers(page); const g = await center(page, '#go'); await f.tap(g.x, g.y); }
+  if (DESKTOP) { await waitGo(page); await page.eval("document.getElementById('go').click()"); } else { const f = fingers(page); await waitGo(page); const g = await center(page, '#go'); await f.tap(g.x, g.y); }
   await page.waitFor("document.body.classList.contains('playing')", { timeout: 30000 });
   await page.waitFor('!window.__ctx.services.life?.tour?.flying', { timeout: 30000 }).catch(() => {});
   const key = async (code, ms) => {
@@ -41,11 +41,12 @@ try {
   async function walkCheck(name, extra = {}) {
     await sleep(600);
     const a = await state();
+    const want = 0.75 * 1.2 * (await page.eval('(() => { const p = window.__ctx.playerObj; return p.walk3 > 0 && p.person === "third" ? p.walk3 : p.walk; })()'));   // 75 % of his walk over 1.2 s
     await key('KeyW', 1200);
     await sleep(500);
     let b = await state();
     let moved = Math.hypot(b.x - a.x, b.z - a.z);
-    if (moved < 2.5) {   // facing the quay edge (the sea is a wall): the other way round
+    if (moved < want) {   // facing the quay edge (the sea is a wall): the other way round
       const KS = { code: 'KeyS', key: 's', windowsVirtualKeyCode: 83, nativeVirtualKeyCode: 83 };
       await page.S('Input.dispatchKeyEvent', { type: 'keyDown', ...KS }); await sleep(1200); await page.S('Input.dispatchKeyEvent', { type: 'keyUp', ...KS });
       await sleep(500);
@@ -53,8 +54,8 @@ try {
       if (m2 > moved) { moved = m2; b = c; }
     }
     const e = errs(); const fresh = e.slice(seen); seen = e.length;
-    const ok = moved > 2.5 && b.finite && !b.fly && b.boom > 0.7 && b.drawn && !b.water && b.gnd && fresh.length === 0;
-    const row = { mode: name, ok, moved: +moved.toFixed(2), boom: b.boom === null ? null : +b.boom.toFixed(2), drawn: b.drawn, water: b.water, onGround: b.gnd, fly: b.fly, errors: fresh.map((x) => x.text.slice(0, 160)), ...extra };
+    const ok = moved > want && b.finite && !b.fly && b.boom > 0.7 && b.drawn && !b.water && b.gnd && fresh.length === 0;
+    const row = { mode: name, ok, moved: +moved.toFixed(2), wanted: +want.toFixed(2), boom: b.boom === null ? null : +b.boom.toFixed(2), drawn: b.drawn, water: b.water, onGround: b.gnd, fly: b.fly, errors: fresh.map((x) => x.text.slice(0, 160)), ...extra };
     out.checks.push(row); log(JSON.stringify(row));
     return row;
   }
@@ -103,10 +104,14 @@ try {
   }
 
   // 一本釣り: the trip on the katsuo boat, then Escape back to the quay
-  for (const id of ['ippon', 'katsuo'].filter(want)) {
+  for (const [id, label, hold] of [['ippon', 'ippon', 4000], ['ippon', 'ippon underway', 14000], ['katsuo', 'katsuo', 4000]].filter(([, l]) => want(l))) {
     await page.eval("window.__camSpec('walk')"); await sleep(400);
     const started = await page.eval(`(async () => { const m = ${modes(id)}; if (!m) return 'no mode ' + ${JSON.stringify(id)}; await m.prepare?.(); await m.start?.(); return true; })()`).catch((e) => 'start threw: ' + e.message);
-    await sleep(4000);
+    // underway: give the boat time to leave the quay, so leaving her strands him in the air over the bay (歩く must land him on a quay)
+    if (hold > 5000) {   // the helm: W is the throttle while she is under way (the walker is not enabled on board)
+      const KW = { code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87, nativeVirtualKeyCode: 87 };
+      await page.S('Input.dispatchKeyEvent', { type: 'keyDown', ...KW }); await sleep(hold); await page.S('Input.dispatchKeyEvent', { type: 'keyUp', ...KW });
+    } else await sleep(hold);
     const onBoat = await page.eval('!!window.__ctx.services.sail?.active');
     // leaving the boat (the ship layer's way out; Escape on the 一本釣り trip asks for 帰港, a sail home, instead)
     await page.eval("(() => { try { const s = window.__ctx.services.sail; if (s?.active) s.exit(); } catch (e) {} try { window.__explore?.drive?.active && window.__explore.drive.exit(); } catch (e) {} })()");
@@ -118,11 +123,11 @@ try {
       await sleep(2800);
       const s2 = await state(); landed = { onLand: !s2.water && s2.gnd, fly: s2.fly };
     }
-    await walkCheck(id + ' → walk', { started, onBoat, afterExit: { fly: after.fly, water: after.water, onGround: after.gnd, finite: after.finite, enabled: after.enabled }, landed });
+    await walkCheck(label + ' → walk', { started, onBoat, afterExit: { fly: after.fly, water: after.water, onGround: after.gnd, finite: after.finite, enabled: after.enabled }, landed });
   }
   if (want('credit')) {
-    // ホヤぼーや's credit (取扱要綱 第5条): never covered by a bottom-centre chip. Show the もぐる chip and the kit prompt (alone and together)
-    // and compare the rects once the credit's 200 ms move is done. The pad's buttons and stick ring are reported too.
+    // ホヤぼーや's credit (取扱要綱 第5条): never covered by a chip. Show the もぐる chip and the kit prompt (alone and together) and compare
+    // the rects once the credit's 200 ms move is done.
     await page.eval("window.__camSpec('walk')"); await sleep(900);
     const rects = () => page.eval(`(() => {
       const R = (e) => { if (!e || e.hidden) return null; const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 ? { l: b.left, t: b.top, r: b.right, b: b.bottom } : null; };
@@ -144,9 +149,10 @@ try {
     for (const [name, d, pr] of [['none', false, false], ['dive', true, false], ['prompt', false, true], ['both', true, true]]) { await setChips(d, pr); await sleep(450); rows[name] = await rects(); }
     await setChips(false, false);
     await page.eval("document.getElementById('feel-swim-ui')?.remove()");
-    const ok = !!rows.none.credit && Object.values(rows).every((r) => r.credit && !r.overDive && !r.overPrompt);
-    const row = { mode: 'credit vs bottom-centre chips', ok, rows };
-    out.checks.push(row); log(JSON.stringify({ mode: row.mode, ok, dive: rows.dive.credit, prompt: rows.prompt.credit, both: rows.both.credit, overPad: Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, v.overPad])), overRing: rows.none.overRing }));
+    // and never on the thumbs' controls: a pad button or the stick's ring (the conductor's #7 report: it covered 乗る and the ring at the quay)
+    const ok = !!rows.none.credit && Object.values(rows).every((r) => r.credit && !r.overDive && !r.overPrompt && !r.overPad && !r.overRing);
+    const row = { mode: 'credit vs the chips, the pad and the stick', ok, rows };
+    out.checks.push(row); log(JSON.stringify({ mode: row.mode, ok, dive: rows.dive.credit, prompt: rows.prompt.credit, both: rows.both.credit, overPad: Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, v.overPad])), overRing: Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, v.overRing])) }));
   }
   out.ok = out.checks.every((c) => c.ok);
 } finally {

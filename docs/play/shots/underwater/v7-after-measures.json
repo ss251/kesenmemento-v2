@@ -1,0 +1,6374 @@
+{
+ "phone-ja": {
+  "set": "phone-ja",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-phone-ja-enter.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     175,
+     487
+    ],
+    "spanPx": 269,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 86,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "なぞって、泳ごう",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 293,
+     "r": 363,
+     "b": 402
+    },
+    "coachHole": {
+     "l": 30,
+     "t": 636,
+     "r": 146,
+     "b": 752
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 198,
+     "t": 124,
+     "r": 285,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-phone-ja-coach.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     175,
+     487
+    ],
+    "spanPx": 269,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 86,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "なぞって、泳ごう",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 293,
+     "r": 363,
+     "b": 402
+    },
+    "coachHole": {
+     "l": 30,
+     "t": 636,
+     "r": 146,
+     "b": 752
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 198,
+     "t": 124,
+     "r": 285,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 921,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-phone-ja-swim.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     175,
+     487
+    ],
+    "spanPx": 269,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 86,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "chip": {
+     "l": 16,
+     "t": 180,
+     "r": 240,
+     "b": 240
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 198,
+     "t": 124,
+     "r": 285,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-phone-ja-drag.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -1.48,
+    "z": -13.1,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    350.29,
+    -0.52,
+    -15.2
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -1.48,
+    "z": -13.1,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -1.48,
+     -13.16
+    ],
+    "dist": 2.41,
+    "ndc": [
+     -0.096,
+     -0.16,
+     0.916
+    ],
+    "onScreen": true,
+    "screen": [
+     176,
+     489
+    ],
+    "spanPx": 257,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 86,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "水面へ勢いよく上がると、跳ねます。",
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "hint": {
+     "l": 60,
+     "t": 546,
+     "r": 330,
+     "b": 588
+    },
+    "chip": {
+     "l": 16,
+     "t": 180,
+     "r": 240,
+     "b": 240
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 198,
+     "t": 124,
+     "r": 285,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 841,
+   "errors": 0
+  },
+  "moved": 7.76,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-phone-ja-shore.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-pad klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    310,
+    160,
+    70
+   ],
+   "fov": 88,
+   "player": {
+    "x": 310,
+    "y": 158.48,
+    "z": 70,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": false,
+     "builds": 1,
+     "frees": 1,
+     "buildMs": 86,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "up:上昇",
+    "down:下降",
+    "boost:加速",
+    "land:歩く"
+   ],
+   "rects": {
+    "board": {
+     "l": 103,
+     "t": 526,
+     "r": 288,
+     "b": 582
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:boost": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:land": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 198,
+     "t": 124,
+     "r": 285,
+     "b": 164
+    },
+    "prompt": {
+     "l": 99,
+     "t": 188,
+     "r": 291,
+     "b": 244
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 648,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/notosansjp/v57/-F62fjtqLzI2JPCgQBnw7HFowwII2lcnk-AFfrgQrvWXpdFg3KXxAMsKMbdN.64.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/notosansjp/v57/-F62fjtqLzI2JPCgQBnw7HFowwII2lcnk-AFfrgQrvWXpdFg3KXxAMsKMbdN.72.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/notosansjp/v57/-F62fjtqLzI2JPCgQBnw7HFowwII2lcnk-AFfrgQrvWXpdFg3KXxAMsKMbdN.12.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/notosansjp/v57/-F62fjtqLzI2JPCgQBnw7HFowwII2lcnk-AFfrgQrvWXpdFg3KXxAMsKMbdN.62.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/notosansjp/v57/-F62fjtqLzI2JPCgQBnw7HFowwII2lcnk-AFfrgQrvWXpdFg3KXxAMsKMbdN.68.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/notosansjp/v57/-F62fjtqLzI2JPCgQBnw7HFowwII2lcnk-AFfrgQrvWXpdFg3KXxAMsKMbdN.5.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/notosansjp/v57/-F62fjtqLzI2JPCgQBnw7HFowwII2lcnk-AFfrgQrvWXpdFg3KXxAMsKMbdN.77.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-caW9COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.92.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-caW9COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.90.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-caW9COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.98.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/yuseimagic/v17/yYLt0hbAyuCmoo5wlhPkpjHU-tFfcd7qL4ofqrEnIe7zgfxsisV7FaK7LG8.115.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/yuseimagic/v17/yYLt0hbAyuCmoo5wlhPkpjHU-tFfcd7qL4ofqrEnIe7zgfxsisV7FaK7LG8.111.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-cUW1COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.95.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-cUW1COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.115.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-cUW1COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.109.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-cUW1COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.107.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-caW9COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.102.woff2",
+   "Failed to load resource: net::ERR_CERT_VERIFIER_CHANGED https://fonts.gstatic.com/s/zenmarugothic/v20/o-0XIpIxzW5b-RxT-6A8jWAtCp-caW9COZqc_am_qlmzXUwN6k5QM5oCrTKUrBY1uqOu.108.woff2",
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ },
+ "phone-en": {
+  "set": "phone-en",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-phone-en-enter.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     175,
+     487
+    ],
+    "spanPx": 269,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 95,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "Drag to swim",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 293,
+     "r": 363,
+     "b": 402
+    },
+    "coachHole": {
+     "l": 30,
+     "t": 636,
+     "r": 146,
+     "b": 752
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 921,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-phone-en-coach.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     175,
+     487
+    ],
+    "spanPx": 269,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 95,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "Drag to swim",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 293,
+     "r": 363,
+     "b": 402
+    },
+    "coachHole": {
+     "l": 30,
+     "t": 636,
+     "r": 146,
+     "b": 752
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-phone-en-swim.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     175,
+     487
+    ],
+    "spanPx": 269,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 95,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "chip": {
+     "l": 16,
+     "t": 180,
+     "r": 280,
+     "b": 240
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 921,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-phone-en-drag.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -1.48,
+    "z": -13.18,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    350.29,
+    -0.51,
+    -15.28
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -1.48,
+    "z": -13.18,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -1.47,
+     -13.24
+    ],
+    "dist": 2.41,
+    "ndc": [
+     -0.096,
+     -0.16,
+     0.916
+    ],
+    "onScreen": true,
+    "screen": [
+     176,
+     489
+    ],
+    "spanPx": 257,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 95,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "Swim up fast and you leap clear.",
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "hint": {
+     "l": 79,
+     "t": 546,
+     "r": 311,
+     "b": 588
+    },
+    "chip": {
+     "l": 16,
+     "t": 180,
+     "r": 280,
+     "b": 240
+    },
+    "btn:swim-up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:swim-down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:swim-dash": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:swim-out": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 841,
+   "errors": 0
+  },
+  "moved": 7.68,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-phone-en-shore.jpg",
+   "vw": 390,
+   "vh": 844,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-pad klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    310,
+    160,
+    70
+   ],
+   "fov": 88,
+   "player": {
+    "x": 310,
+    "y": 158.48,
+    "z": 70,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": false,
+     "builds": 1,
+     "frees": 1,
+     "buildMs": 85,
+     "warmMs": 95,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "up:Rise",
+    "down:Dive",
+    "boost:Boost",
+    "land:Walk"
+   ],
+   "rects": {
+    "board": {
+     "l": 83,
+     "t": 526,
+     "r": 307,
+     "b": 582
+    },
+    "stick": {
+     "l": 24,
+     "t": 630,
+     "r": 152,
+     "b": 758
+    },
+    "btn:up": {
+     "l": 298,
+     "t": 682,
+     "r": 374,
+     "b": 758
+    },
+    "btn:down": {
+     "l": 303,
+     "t": 598,
+     "r": 363,
+     "b": 658
+    },
+    "btn:boost": {
+     "l": 238,
+     "t": 628,
+     "r": 298,
+     "b": 688
+    },
+    "btn:land": {
+     "l": 214,
+     "t": 696,
+     "r": 274,
+     "b": 756
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    },
+    "prompt": {
+     "l": 102,
+     "t": 188,
+     "r": 288,
+     "b": 244
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 492,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ },
+ "land-ja": {
+  "set": "land-ja",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-land-ja-enter.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -23.45
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.02,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     233
+    ],
+    "spanPx": 162,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 91,
+     "warmMs": 110,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "なぞって、泳ごう",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 70,
+     "r": 392,
+     "b": 179
+    },
+    "coachHole": {
+     "l": 23,
+     "t": 197,
+     "r": 139,
+     "b": 313
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 76,
+     "r": 142,
+     "b": 132
+    },
+    "book": {
+     "l": 150,
+     "t": 80,
+     "r": 245,
+     "b": 128
+    },
+    "counters": {
+     "l": 16,
+     "t": 142,
+     "r": 185,
+     "b": 182
+    }
+   },
+   "covers": {
+    "coach": [
+     "button.play-btn 「あそぶ」",
+     "button.gear 「操作設定」",
+     "button.book 「手帳」",
+     "div.mini 「N 魚町二丁目」"
+    ],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 855,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-land-ja-coach.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -23.45
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.02,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     233
+    ],
+    "spanPx": 162,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 91,
+     "warmMs": 110,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "なぞって、泳ごう",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 70,
+     "r": 392,
+     "b": 179
+    },
+    "coachHole": {
+     "l": 23,
+     "t": 197,
+     "r": 139,
+     "b": 313
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 142,
+     "b": 188
+    },
+    "book": {
+     "l": 150,
+     "t": 136,
+     "r": 245,
+     "b": 184
+    },
+    "counters": {
+     "l": 253,
+     "t": 140,
+     "r": 422,
+     "b": 180
+    }
+   },
+   "covers": {
+    "coach": [
+     "button.gear 「操作設定」",
+     "button.play-btn 「あそぶ」",
+     "button.book 「手帳」",
+     "div.mini 「N 魚町二丁目」"
+    ],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 855,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-land-ja-swim.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -23.45
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.02,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     233
+    ],
+    "spanPx": 162,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 91,
+     "warmMs": 110,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "chip": {
+     "l": 604,
+     "t": 104,
+     "r": 828,
+     "b": 164
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 142,
+     "b": 188
+    },
+    "book": {
+     "l": 150,
+     "t": 136,
+     "r": 245,
+     "b": 184
+    },
+    "counters": {
+     "l": 253,
+     "t": 140,
+     "r": 422,
+     "b": 180
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 855,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-land-ja-drag.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -1.49,
+    "z": -13.03,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    350.29,
+    -0.45,
+    -16.19
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -1.49,
+    "z": -13.03,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -1.48,
+     -13.1
+    ],
+    "dist": 3.37,
+    "ndc": [
+     -0.019,
+     -0.206,
+     0.94
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     235
+    ],
+    "spanPx": 157,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 91,
+     "warmMs": 110,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "水面へ勢いよく上がると、跳ねます。",
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "hint": {
+     "l": 287,
+     "t": 256,
+     "r": 557,
+     "b": 298
+    },
+    "chip": {
+     "l": 604,
+     "t": 104,
+     "r": 828,
+     "b": 164
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 142,
+     "b": 188
+    },
+    "book": {
+     "l": 150,
+     "t": 136,
+     "r": 245,
+     "b": 184
+    },
+    "counters": {
+     "l": 253,
+     "t": 140,
+     "r": 422,
+     "b": 180
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 853,
+   "errors": 0
+  },
+  "moved": 7.89,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-land-ja-shore.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-pad klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    361.04,
+    100.08,
+    75.28
+   ],
+   "fov": 55,
+   "player": {
+    "x": 361.04,
+    "y": 98.56,
+    "z": 75.28,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": false,
+     "builds": 1,
+     "frees": 1,
+     "buildMs": 91,
+     "warmMs": 110,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "up:上昇",
+    "down:下降",
+    "boost:加速",
+    "land:歩く"
+   ],
+   "rects": {
+    "board": {
+     "l": 235,
+     "t": 180,
+     "r": 609,
+     "b": 240
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:boost": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:land": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 142,
+     "b": 188
+    },
+    "book": {
+     "l": 150,
+     "t": 136,
+     "r": 245,
+     "b": 184
+    },
+    "counters": {
+     "l": 253,
+     "t": 140,
+     "r": 422,
+     "b": 180
+    },
+    "prompt": {
+     "l": 326,
+     "t": 226,
+     "r": 518,
+     "b": 282
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 806,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ },
+ "land-en": {
+  "set": "land-en",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-land-en-enter.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -23.45
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.02,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     233
+    ],
+    "spanPx": 162,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 81,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "Drag to swim",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 70,
+     "r": 392,
+     "b": 179
+    },
+    "coachHole": {
+     "l": 23,
+     "t": 197,
+     "r": 139,
+     "b": 313
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 125,
+     "b": 188
+    },
+    "book": {
+     "l": 133,
+     "t": 136,
+     "r": 266,
+     "b": 184
+    },
+    "counters": {
+     "l": 274,
+     "t": 140,
+     "r": 461,
+     "b": 180
+    }
+   },
+   "covers": {
+    "coach": [
+     "button.gear 「Touch controls」",
+     "button.play-btn 「Play」",
+     "button.book 「Notebook」",
+     "div.mini 「N 魚町二丁目」"
+    ],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 932,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-land-en-coach.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -23.45
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.02,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     233
+    ],
+    "spanPx": 162,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 81,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "Drag to swim",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 70,
+     "r": 392,
+     "b": 179
+    },
+    "coachHole": {
+     "l": 23,
+     "t": 197,
+     "r": 139,
+     "b": 313
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 125,
+     "b": 188
+    },
+    "book": {
+     "l": 133,
+     "t": 136,
+     "r": 266,
+     "b": 184
+    },
+    "counters": {
+     "l": 274,
+     "t": 140,
+     "r": 461,
+     "b": 180
+    }
+   },
+   "covers": {
+    "coach": [
+     "button.gear 「Touch controls」",
+     "button.play-btn 「Play」",
+     "button.book 「Notebook」",
+     "div.mini 「N 魚町二丁目」"
+    ],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 855,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-land-en-swim.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -23.45
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.02,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     233
+    ],
+    "spanPx": 162,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 81,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "chip": {
+     "l": 564,
+     "t": 104,
+     "r": 828,
+     "b": 164
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 125,
+     "b": 188
+    },
+    "book": {
+     "l": 133,
+     "t": 136,
+     "r": 266,
+     "b": 184
+    },
+    "counters": {
+     "l": 274,
+     "t": 140,
+     "r": 461,
+     "b": 180
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 855,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-land-en-drag.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -1.49,
+    "z": -13.03,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    350.29,
+    -0.45,
+    -16.19
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -1.49,
+    "z": -13.03,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -1.48,
+     -13.1
+    ],
+    "dist": 3.37,
+    "ndc": [
+     -0.019,
+     -0.206,
+     0.94
+    ],
+    "onScreen": true,
+    "screen": [
+     414,
+     235
+    ],
+    "spanPx": 157,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 85,
+     "warmMs": 81,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "Swim up fast and you leap clear.",
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "hint": {
+     "l": 306,
+     "t": 256,
+     "r": 538,
+     "b": 298
+    },
+    "chip": {
+     "l": 564,
+     "t": 104,
+     "r": 828,
+     "b": 164
+    },
+    "btn:swim-up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:swim-down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:swim-dash": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:swim-out": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 125,
+     "b": 188
+    },
+    "book": {
+     "l": 133,
+     "t": 136,
+     "r": 266,
+     "b": 184
+    },
+    "counters": {
+     "l": 274,
+     "t": 140,
+     "r": 461,
+     "b": 180
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 928,
+   "errors": 0
+  },
+  "moved": 7.82,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-land-en-shore.jpg",
+   "vw": 844,
+   "vh": 390,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-pad klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    361.04,
+    100.08,
+    75.28
+   ],
+   "fov": 55,
+   "player": {
+    "x": 361.04,
+    "y": 98.56,
+    "z": 75.28,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": false,
+     "builds": 1,
+     "frees": 1,
+     "buildMs": 85,
+     "warmMs": 81,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "up:Rise",
+    "down:Dive",
+    "boost:Boost",
+    "land:Walk"
+   ],
+   "rects": {
+    "board": {
+     "l": 224,
+     "t": 180,
+     "r": 620,
+     "b": 240
+    },
+    "stick": {
+     "l": 22,
+     "t": 196,
+     "r": 140,
+     "b": 314
+    },
+    "btn:up": {
+     "l": 759,
+     "t": 305,
+     "r": 829,
+     "b": 375
+    },
+    "btn:down": {
+     "l": 763,
+     "t": 227,
+     "r": 819,
+     "b": 283
+    },
+    "btn:boost": {
+     "l": 703,
+     "t": 255,
+     "r": 759,
+     "b": 311
+    },
+    "btn:land": {
+     "l": 682,
+     "t": 318,
+     "r": 738,
+     "b": 374
+    },
+    "playPill": {
+     "l": 10,
+     "t": 132,
+     "r": 125,
+     "b": 188
+    },
+    "book": {
+     "l": 133,
+     "t": 136,
+     "r": 266,
+     "b": 184
+    },
+    "counters": {
+     "l": 274,
+     "t": 140,
+     "r": 461,
+     "b": 180
+    },
+    "prompt": {
+     "l": 329,
+     "t": 226,
+     "r": 515,
+     "b": 282
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 655,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ },
+ "desktop-ja": {
+  "set": "desktop-ja",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-ja-enter.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    348.69,
+    -0.28,
+    -22.43
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.027,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     538
+    ],
+    "spanPx": 375,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 112,
+     "warmMs": 89,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "W A S D で泳いで、Space で上へ",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [],
+   "rects": {
+    "coach": {
+     "l": 511,
+     "t": 353,
+     "r": 891,
+     "b": 462
+    },
+    "coachHole": {
+     "l": 643,
+     "t": 480,
+     "r": 759,
+     "b": 596
+    },
+    "playPill": {
+     "l": 601,
+     "t": 10,
+     "r": 733,
+     "b": 66
+    },
+    "book": {
+     "l": 743,
+     "t": 14,
+     "r": 839,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 185,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1194,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-ja-coach.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    348.69,
+    -0.28,
+    -22.43
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.027,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     538
+    ],
+    "spanPx": 375,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 112,
+     "warmMs": 89,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "W A S D で泳いで、Space で上へ",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [],
+   "rects": {
+    "coach": {
+     "l": 511,
+     "t": 353,
+     "r": 891,
+     "b": 462
+    },
+    "coachHole": {
+     "l": 643,
+     "t": 480,
+     "r": 759,
+     "b": 596
+    },
+    "playPill": {
+     "l": 601,
+     "t": 10,
+     "r": 733,
+     "b": 66
+    },
+    "book": {
+     "l": 743,
+     "t": 14,
+     "r": 839,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 185,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1194,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-ja-swim.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    348.69,
+    -0.28,
+    -22.43
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.027,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     538
+    ],
+    "spanPx": 375,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 112,
+     "warmMs": 89,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [],
+   "rects": {
+    "chip": {
+     "l": 16,
+     "t": 168,
+     "r": 240,
+     "b": 228
+    },
+    "playPill": {
+     "l": 601,
+     "t": 10,
+     "r": 733,
+     "b": 66
+    },
+    "book": {
+     "l": 743,
+     "t": 14,
+     "r": 839,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 185,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1194,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-ja-drag.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 355.23,
+    "y": -1.48,
+    "z": -14.39,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    352.74,
+    -0.45,
+    -16.51
+   ],
+   "fov": 55,
+   "player": {
+    "x": 355.23,
+    "y": -1.48,
+    "z": -14.39,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     355.19,
+     -1.48,
+     -14.44
+    ],
+    "dist": 3.37,
+    "ndc": [
+     -0.026,
+     -0.206,
+     0.94
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     543
+    ],
+    "spanPx": 363,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 112,
+     "warmMs": 89,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "水面へ勢いよく上がると、跳ねます。",
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [],
+   "rects": {
+    "hint": {
+     "l": 585,
+     "t": 766,
+     "r": 855,
+     "b": 808
+    },
+    "chip": {
+     "l": 16,
+     "t": 168,
+     "r": 240,
+     "b": 228
+    },
+    "playPill": {
+     "l": 601,
+     "t": 10,
+     "r": 733,
+     "b": 66
+    },
+    "book": {
+     "l": 743,
+     "t": 14,
+     "r": 839,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 185,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1186,
+   "errors": 0
+  },
+  "moved": 7.6,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-ja-shore.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    361.04,
+    100.08,
+    75.28
+   ],
+   "fov": 55,
+   "player": {
+    "x": 361.04,
+    "y": 98.56,
+    "z": 75.28,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 112,
+     "warmMs": 89,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [],
+   "rects": {
+    "board": {
+     "l": 533,
+     "t": 690,
+     "r": 907,
+     "b": 750
+    },
+    "playPill": {
+     "l": 601,
+     "t": 10,
+     "r": 733,
+     "b": 66
+    },
+    "book": {
+     "l": 743,
+     "t": 14,
+     "r": 839,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 185,
+     "b": 159
+    },
+    "prompt": {
+     "l": 624,
+     "t": 736,
+     "r": 816,
+     "b": 792
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1334,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ },
+ "desktop-en": {
+  "set": "desktop-en",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-en-enter.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    348.69,
+    -0.28,
+    -22.43
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.027,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     538
+    ],
+    "spanPx": 375,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 114,
+     "warmMs": 83,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "W A S D to swim, Spac",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [],
+   "rects": {
+    "coach": {
+     "l": 511,
+     "t": 353,
+     "r": 891,
+     "b": 462
+    },
+    "coachHole": {
+     "l": 643,
+     "t": 480,
+     "r": 759,
+     "b": 596
+    },
+    "playPill": {
+     "l": 591,
+     "t": 10,
+     "r": 706,
+     "b": 66
+    },
+    "book": {
+     "l": 716,
+     "t": 14,
+     "r": 849,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 203,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1194,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-en-coach.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    348.69,
+    -0.28,
+    -22.43
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.027,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     538
+    ],
+    "spanPx": 375,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 114,
+     "warmMs": 83,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "W A S D to swim, Space to rise",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [],
+   "rects": {
+    "coach": {
+     "l": 511,
+     "t": 353,
+     "r": 891,
+     "b": 462
+    },
+    "coachHole": {
+     "l": 643,
+     "t": 480,
+     "r": 759,
+     "b": 596
+    },
+    "playPill": {
+     "l": 591,
+     "t": 10,
+     "r": 706,
+     "b": 66
+    },
+    "book": {
+     "l": 716,
+     "t": 14,
+     "r": 849,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 203,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1194,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-en-swim.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    348.69,
+    -0.28,
+    -22.43
+   ],
+   "fov": 55,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 3.26,
+    "ndc": [
+     -0.027,
+     -0.196,
+     0.938
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     538
+    ],
+    "spanPx": 375,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 114,
+     "warmMs": 83,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [],
+   "rects": {
+    "chip": {
+     "l": 16,
+     "t": 168,
+     "r": 280,
+     "b": 228
+    },
+    "playPill": {
+     "l": 591,
+     "t": 10,
+     "r": 706,
+     "b": 66
+    },
+    "book": {
+     "l": 716,
+     "t": 14,
+     "r": 849,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 203,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1194,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-en-drag.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 355.19,
+    "y": -1.48,
+    "z": -14.44,
+    "yaw": -2.542,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    352.71,
+    -0.44,
+    -16.57
+   ],
+   "fov": 55,
+   "player": {
+    "x": 355.19,
+    "y": -1.48,
+    "z": -14.44,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     355.15,
+     -1.47,
+     -14.5
+    ],
+    "dist": 3.37,
+    "ndc": [
+     -0.026,
+     -0.206,
+     0.94
+    ],
+    "onScreen": true,
+    "screen": [
+     701,
+     543
+    ],
+    "spanPx": 363,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 114,
+     "warmMs": 83,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "Swim up fast and you leap clear.",
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [],
+   "rects": {
+    "hint": {
+     "l": 604,
+     "t": 766,
+     "r": 836,
+     "b": 808
+    },
+    "chip": {
+     "l": 16,
+     "t": 168,
+     "r": 280,
+     "b": 228
+    },
+    "playPill": {
+     "l": 591,
+     "t": 10,
+     "r": 706,
+     "b": 66
+    },
+    "book": {
+     "l": 716,
+     "t": 14,
+     "r": 849,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 203,
+     "b": 159
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1186,
+   "errors": 0
+  },
+  "moved": 7.6,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-desktop-en-shore.jpg",
+   "vw": 1440,
+   "vh": 900,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    361.04,
+    100.08,
+    75.28
+   ],
+   "fov": 55,
+   "player": {
+    "x": 361.04,
+    "y": 98.56,
+    "z": 75.28,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 114,
+     "warmMs": 83,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [],
+   "rects": {
+    "board": {
+     "l": 522,
+     "t": 690,
+     "r": 918,
+     "b": 750
+    },
+    "playPill": {
+     "l": 591,
+     "t": 10,
+     "r": 706,
+     "b": 66
+    },
+    "book": {
+     "l": 716,
+     "t": 14,
+     "r": 849,
+     "b": 62
+    },
+    "counters": {
+     "l": 16,
+     "t": 119,
+     "r": 203,
+     "b": 159
+    },
+    "prompt": {
+     "l": 627,
+     "t": 736,
+     "r": 813,
+     "b": 792
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 1334,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ },
+ "p360-ja": {
+  "set": "p360-ja",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-p360-ja-enter.jpg",
+   "vw": 360,
+   "vh": 780,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     162,
+     450
+    ],
+    "spanPx": 249,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 92,
+     "warmMs": 92,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "なぞって、泳ごう",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 266,
+     "r": 336,
+     "b": 375
+    },
+    "coachHole": {
+     "l": 24,
+     "t": 577,
+     "r": 140,
+     "b": 693
+    },
+    "stick": {
+     "l": 23,
+     "t": 576,
+     "r": 141,
+     "b": 694
+    },
+    "btn:swim-up": {
+     "l": 275,
+     "t": 624,
+     "r": 345,
+     "b": 694
+    },
+    "btn:swim-down": {
+     "l": 279,
+     "t": 546,
+     "r": 335,
+     "b": 602
+    },
+    "btn:swim-dash": {
+     "l": 219,
+     "t": 574,
+     "r": 275,
+     "b": 630
+    },
+    "btn:swim-out": {
+     "l": 197,
+     "t": 637,
+     "r": 253,
+     "b": 693
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 12,
+     "t": 182,
+     "r": 99,
+     "b": 222
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 924,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-p360-ja-coach.jpg",
+   "vw": 360,
+   "vh": 780,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     162,
+     450
+    ],
+    "spanPx": 249,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 92,
+     "warmMs": 92,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "なぞって、泳ごう",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 266,
+     "r": 336,
+     "b": 375
+    },
+    "coachHole": {
+     "l": 24,
+     "t": 577,
+     "r": 140,
+     "b": 693
+    },
+    "stick": {
+     "l": 23,
+     "t": 576,
+     "r": 141,
+     "b": 694
+    },
+    "btn:swim-up": {
+     "l": 275,
+     "t": 624,
+     "r": 345,
+     "b": 694
+    },
+    "btn:swim-down": {
+     "l": 279,
+     "t": 546,
+     "r": 335,
+     "b": 602
+    },
+    "btn:swim-dash": {
+     "l": 219,
+     "t": 574,
+     "r": 275,
+     "b": 630
+    },
+    "btn:swim-out": {
+     "l": 197,
+     "t": 637,
+     "r": 253,
+     "b": 693
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 12,
+     "t": 182,
+     "r": 99,
+     "b": 222
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-p360-ja-swim.jpg",
+   "vw": 360,
+   "vh": 780,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     162,
+     450
+    ],
+    "spanPx": 249,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 92,
+     "warmMs": 92,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "chip": {
+     "l": 16,
+     "t": 232,
+     "r": 240,
+     "b": 292
+    },
+    "stick": {
+     "l": 23,
+     "t": 576,
+     "r": 141,
+     "b": 694
+    },
+    "btn:swim-up": {
+     "l": 275,
+     "t": 624,
+     "r": 345,
+     "b": 694
+    },
+    "btn:swim-down": {
+     "l": 279,
+     "t": 546,
+     "r": 335,
+     "b": 602
+    },
+    "btn:swim-dash": {
+     "l": 219,
+     "t": 574,
+     "r": 275,
+     "b": 630
+    },
+    "btn:swim-out": {
+     "l": 197,
+     "t": 637,
+     "r": 253,
+     "b": 693
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 12,
+     "t": 182,
+     "r": 99,
+     "b": 222
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-p360-ja-drag.jpg",
+   "vw": 360,
+   "vh": 780,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -1.47,
+    "z": -13.23,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    350.29,
+    -0.51,
+    -15.33
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -1.47,
+    "z": -13.23,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -1.47,
+     -13.3
+    ],
+    "dist": 2.41,
+    "ndc": [
+     -0.096,
+     -0.16,
+     0.916
+    ],
+    "onScreen": true,
+    "screen": [
+     163,
+     452
+    ],
+    "spanPx": 237,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 92,
+     "warmMs": 92,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "水面へ勢いよく上がると、跳ねます。",
+   "chipText": "アイナメ 湾の中は、アイナメです。",
+   "buttons": [
+    "swim-up:上へ",
+    "swim-down:下へ",
+    "swim-dash:ダッシュ",
+    "swim-out:あがる"
+   ],
+   "rects": {
+    "hint": {
+     "l": 45,
+     "t": 494,
+     "r": 315,
+     "b": 536
+    },
+    "chip": {
+     "l": 16,
+     "t": 232,
+     "r": 240,
+     "b": 292
+    },
+    "btn:swim-up": {
+     "l": 275,
+     "t": 624,
+     "r": 345,
+     "b": 694
+    },
+    "btn:swim-down": {
+     "l": 279,
+     "t": 546,
+     "r": 335,
+     "b": 602
+    },
+    "btn:swim-dash": {
+     "l": 219,
+     "t": 574,
+     "r": 275,
+     "b": 630
+    },
+    "btn:swim-out": {
+     "l": 197,
+     "t": 637,
+     "r": 253,
+     "b": 693
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 12,
+     "t": 182,
+     "r": 99,
+     "b": 222
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 841,
+   "errors": 0
+  },
+  "moved": 7.62,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-p360-ja-shore.jpg",
+   "vw": 360,
+   "vh": 780,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-pad klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    310,
+    160,
+    70
+   ],
+   "fov": 88,
+   "player": {
+    "x": 310,
+    "y": 158.48,
+    "z": 70,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": false,
+     "builds": 1,
+     "frees": 1,
+     "buildMs": 92,
+     "warmMs": 92,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "up:上昇",
+    "down:下降",
+    "boost:加速",
+    "land:歩く"
+   ],
+   "rects": {
+    "board": {
+     "l": 88,
+     "t": 462,
+     "r": 273,
+     "b": 518
+    },
+    "stick": {
+     "l": 23,
+     "t": 576,
+     "r": 141,
+     "b": 694
+    },
+    "btn:up": {
+     "l": 275,
+     "t": 624,
+     "r": 345,
+     "b": 694
+    },
+    "btn:down": {
+     "l": 279,
+     "t": 546,
+     "r": 335,
+     "b": 602
+    },
+    "btn:boost": {
+     "l": 219,
+     "t": 574,
+     "r": 275,
+     "b": 630
+    },
+    "btn:land": {
+     "l": 197,
+     "t": 637,
+     "r": 253,
+     "b": 693
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 134,
+     "b": 172
+    },
+    "book": {
+     "l": 142,
+     "t": 120,
+     "r": 190,
+     "b": 168
+    },
+    "counters": {
+     "l": 12,
+     "t": 182,
+     "r": 99,
+     "b": 222
+    },
+    "prompt": {
+     "l": 84,
+     "t": 188,
+     "r": 276,
+     "b": 244
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 648,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ },
+ "p430-en": {
+  "set": "p430-en",
+  "enter": {
+   "file": "docs/play/shots/underwater/v7-after-p430-en-enter.jpg",
+   "vw": 430,
+   "vh": 932,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     193,
+     538
+    ],
+    "spanPx": 298,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 87,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "Drag to swim",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 335,
+     "r": 392,
+     "b": 444
+    },
+    "coachHole": {
+     "l": 39,
+     "t": 718,
+     "r": 155,
+     "b": 834
+    },
+    "stick": {
+     "l": 26,
+     "t": 705,
+     "r": 167,
+     "b": 846
+    },
+    "btn:swim-up": {
+     "l": 329,
+     "t": 762,
+     "r": 413,
+     "b": 846
+    },
+    "btn:swim-down": {
+     "l": 334,
+     "t": 670,
+     "r": 400,
+     "b": 736
+    },
+    "btn:swim-dash": {
+     "l": 262,
+     "t": 703,
+     "r": 329,
+     "b": 769
+    },
+    "btn:swim-out": {
+     "l": 237,
+     "t": 778,
+     "r": 303,
+     "b": 844
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "coach": {
+   "file": "docs/play/shots/underwater/v7-after-p430-en-coach.jpg",
+   "vw": 430,
+   "vh": 932,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     193,
+     538
+    ],
+    "spanPx": 298,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 87,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": "Drag to swim",
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "coach": {
+     "l": 12,
+     "t": 335,
+     "r": 392,
+     "b": 444
+    },
+    "coachHole": {
+     "l": 39,
+     "t": 718,
+     "r": 155,
+     "b": 834
+    },
+    "stick": {
+     "l": 26,
+     "t": 705,
+     "r": 167,
+     "b": 846
+    },
+    "btn:swim-up": {
+     "l": 329,
+     "t": 762,
+     "r": 413,
+     "b": 846
+    },
+    "btn:swim-down": {
+     "l": 334,
+     "t": 670,
+     "r": 400,
+     "b": 736
+    },
+    "btn:swim-dash": {
+     "l": 262,
+     "t": 703,
+     "r": 329,
+     "b": 769
+    },
+    "btn:swim-out": {
+     "l": 237,
+     "t": 778,
+     "r": 303,
+     "b": 844
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "swim": {
+   "file": "docs/play/shots/underwater/v7-after-p430-en-swim.jpg",
+   "vw": 430,
+   "vh": 932,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 0
+   },
+   "cam": [
+    350.29,
+    -0.28,
+    -22.4
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -0.9,
+    "z": -20.36,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -0.9,
+     -20.36
+    ],
+    "dist": 2.29,
+    "ndc": [
+     -0.101,
+     -0.155,
+     0.912
+    ],
+    "onScreen": true,
+    "screen": [
+     193,
+     538
+    ],
+    "spanPx": 298,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 87,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "chip": {
+     "l": 16,
+     "t": 180,
+     "r": 280,
+     "b": 240
+    },
+    "stick": {
+     "l": 26,
+     "t": 705,
+     "r": 167,
+     "b": 846
+    },
+    "btn:swim-up": {
+     "l": 329,
+     "t": 762,
+     "r": 413,
+     "b": 846
+    },
+    "btn:swim-down": {
+     "l": 334,
+     "t": 670,
+     "r": 400,
+     "b": 736
+    },
+    "btn:swim-dash": {
+     "l": 262,
+     "t": 703,
+     "r": 329,
+     "b": 769
+    },
+    "btn:swim-out": {
+     "l": 237,
+     "t": 778,
+     "r": 303,
+     "b": 844
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 846,
+   "errors": 0
+  },
+  "drag": {
+   "file": "docs/play/shots/underwater/v7-after-p430-en-drag.jpg",
+   "vw": 430,
+   "vh": 932,
+   "active": true,
+   "padMode": "swim",
+   "body": "klc-pad klc-ui loaded klc-live playing klc-swim",
+   "state": {
+    "x": 351.14,
+    "y": -1.49,
+    "z": -12.96,
+    "yaw": -3.142,
+    "pitch": -0.08,
+    "mode": "swim",
+    "species": "ainame",
+    "v": 4
+   },
+   "cam": [
+    350.29,
+    -0.53,
+    -15.07
+   ],
+   "fov": 88,
+   "player": {
+    "x": 351.14,
+    "y": -1.49,
+    "z": -12.96,
+    "fly": true,
+    "enabled": false
+   },
+   "fish": {
+    "visible": true,
+    "chain": true,
+    "inScene": true,
+    "pos": [
+     351.14,
+     -1.49,
+     -13.03
+    ],
+    "dist": 2.41,
+    "ndc": [
+     -0.096,
+     -0.16,
+     0.916
+    ],
+    "onScreen": true,
+    "screen": [
+     194,
+     541
+    ],
+    "spanPx": 284,
+    "radius": 0.71
+   },
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": true,
+     "builds": 1,
+     "frees": 0,
+     "buildMs": 87,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": "Swim up fast and you leap clear.",
+   "chipText": "Greenling Inside the bay, you are a greenling.",
+   "buttons": [
+    "swim-up:Up",
+    "swim-down:Down",
+    "swim-dash:Dash",
+    "swim-out:Get out"
+   ],
+   "rects": {
+    "hint": {
+     "l": 99,
+     "t": 614,
+     "r": 331,
+     "b": 656
+    },
+    "chip": {
+     "l": 16,
+     "t": 180,
+     "r": 280,
+     "b": 240
+    },
+    "btn:swim-up": {
+     "l": 329,
+     "t": 762,
+     "r": 413,
+     "b": 846
+    },
+    "btn:swim-down": {
+     "l": 334,
+     "t": 670,
+     "r": 400,
+     "b": 736
+    },
+    "btn:swim-dash": {
+     "l": 262,
+     "t": 703,
+     "r": 329,
+     "b": 769
+    },
+    "btn:swim-out": {
+     "l": 237,
+     "t": 778,
+     "r": 303,
+     "b": 844
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 920,
+   "errors": 0
+  },
+  "moved": 7.96,
+  "shore": {
+   "file": "docs/play/shots/underwater/v7-after-p430-en-shore.jpg",
+   "vw": 430,
+   "vh": 932,
+   "active": false,
+   "padMode": "fly",
+   "body": "klc-pad klc-ui loaded klc-live playing",
+   "state": null,
+   "cam": [
+    310,
+    160,
+    70
+   ],
+   "fov": 88,
+   "player": {
+    "x": 310,
+    "y": 158.48,
+    "z": 70,
+    "fly": true,
+    "enabled": true
+   },
+   "fish": null,
+   "worlds": {
+    "ippon": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "swim": {
+     "built": false,
+     "builds": 1,
+     "frees": 1,
+     "buildMs": 87,
+     "warmMs": 99,
+     "objects": 15
+    },
+    "courses": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "race": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    },
+    "gull": {
+     "built": false,
+     "builds": 0,
+     "frees": 0,
+     "buildMs": 0,
+     "warmMs": 0,
+     "objects": 0
+    }
+   },
+   "coachText": null,
+   "hintText": null,
+   "chipText": null,
+   "buttons": [
+    "up:Rise",
+    "down:Dive",
+    "boost:Boost",
+    "land:Walk"
+   ],
+   "rects": {
+    "board": {
+     "l": 103,
+     "t": 614,
+     "r": 327,
+     "b": 670
+    },
+    "stick": {
+     "l": 26,
+     "t": 705,
+     "r": 167,
+     "b": 846
+    },
+    "btn:up": {
+     "l": 329,
+     "t": 762,
+     "r": 413,
+     "b": 846
+    },
+    "btn:down": {
+     "l": 334,
+     "t": 670,
+     "r": 400,
+     "b": 736
+    },
+    "btn:boost": {
+     "l": 262,
+     "t": 703,
+     "r": 329,
+     "b": 769
+    },
+    "btn:land": {
+     "l": 237,
+     "t": 778,
+     "r": 303,
+     "b": 844
+    },
+    "playPill": {
+     "l": 10,
+     "t": 116,
+     "r": 117,
+     "b": 172
+    },
+    "book": {
+     "l": 125,
+     "t": 120,
+     "r": 173,
+     "b": 168
+    },
+    "counters": {
+     "l": 181,
+     "t": 124,
+     "r": 268,
+     "b": 164
+    },
+    "prompt": {
+     "l": 122,
+     "t": 188,
+     "r": 308,
+     "b": 244
+    }
+   },
+   "covers": {
+    "coach": [],
+    "chip": [],
+    "hint": []
+   },
+   "calls": 492,
+   "errors": 0
+  },
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:9580/api/live"
+  ]
+ }
+}

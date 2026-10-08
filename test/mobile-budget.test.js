@@ -312,6 +312,26 @@ describe('the street-detail swap fades by dither (world/explore/sbatch.js fade, 
     expect(v.customProgramCacheKey()).toBe('paint|swim|fade');
     expect(FADE_GLSL).toContain('if ( vColor.a < 0.999 )');
   });
+  test('?fade=0 (FADE.on false): no instance colours, no fades (their end at once), and plain programs (no discard for the GPU to honour)', () => {
+    const { FADE, batchedView } = require('../src/anime/world/explore/sbatch.js');
+    FADE.on = false;
+    try {
+      const sb = new StreamBatch(ctx, { name: 'f3' });
+      const mat = new THREE.MeshPhongMaterial({ color: '#abc' });
+      sb.add('k0:z', grp(mat, 0)); sb.flush();
+      for (const p of sb.pools.values()) expect(p.bm._colorsTexture).toBe(null);
+      let n = 0; expect(sb.fade('k0:z', 0, 1, () => n++)).toBe(false); expect(n).toBe(1); expect(sb._fading.size).toBe(0);
+      const m = new THREE.MeshToonMaterial(); m.customProgramCacheKey = () => 'paint|plain';
+      const v = batchedView(m), sh = { fragmentShader: 'a\n#include <color_fragment>\nb', vertexShader: '' };
+      v.onBeforeCompile(sh, null);
+      expect(sh.fragmentShader).not.toContain('discard');
+      expect(v.customProgramCacheKey()).toBe('paint|plain');
+      const main = read('src/anime/main.js');
+      expect(main).toContain("FADE.on = params.get('fade') === '1' || (params.get('fade') !== '0' && !quality.phone);");   // a phone pops (no discard), ?fade=1 forces them
+      expect(main.indexOf('FADE.on = ')).toBeGreaterThan(main.indexOf('const quality = { ...TIER.quality };'));
+      expect(main.indexOf('FADE.on = ')).toBeLessThan(main.indexOf('async function build() {'));
+    } finally { FADE.on = true; }
+  });
   test('stream.js: the kit fades in over the simplified buildings and they go at its end; on unload they come back at once and the kit fades out', () => {
     const st = read('src/anime/world/explore/stream.js');
     expect(st).toContain("sb.fade('k0:' + t.key, 0, 1, () => sb.group(() => { sb.setVisible('m1:' + t.key, false); sb.setVisible('f1:' + t.key, false); }));");

@@ -46,6 +46,8 @@ One Japanese term per concept, the same in the UI (`data/i18n.json`, `data/ui-*-
 | 朝 昼 夕方 夕焼け 夜 | あさ ひる ゆうがた ゆうやけ よる | Morning, Noon, Afternoon, Sunset, Night | the time presets | ok |
 | 歩く / 飛ぶ / 運転 | あるく / とぶ / うんてん | Walk / Fly / Drive | the pad's modes | ok |
 | ダッシュ / ジャンプ | — | Dash / Jump | pad buttons (walking) | ok |
+| もぐる / あがる | — | Dive / Get out | into the water from the shore / out of it (海の中) | ok |
+| 上へ / 下へ | うえへ / したへ | Up / Down | the dive's pad buttons (rise / sink). Not 上がる / 下がる: 「上がる」 beside 「あがる」 reads the same | ok |
 | 加速 / ブースト | かそく | Boost | 加速 = flying faster, ブースト = the car's boost | ok (one English word, two Japanese ones by design) |
 | 場所を探す | ばしょをさがす | Find a place | search | ok |
 | 地図 | ちず | Map | the full map and the minimap | ok |

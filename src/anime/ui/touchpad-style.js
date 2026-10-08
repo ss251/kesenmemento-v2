@@ -79,6 +79,11 @@ export const CSS = /* css */`
 #klc-pad .gear { width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--k-glass); color: var(--k-navy); pointer-events: auto; cursor: pointer;
   -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2); box-shadow: 0 8px 26px rgba(35, 40, 70, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.55); touch-action: manipulation; }
 #klc-pad .gear[aria-expanded="true"] { background: var(--k-navy); color: #fff; }
+/* [emil-ui] No mode switch on the screen. 飛ぶ, 歩く, 乗る (shown when a road is within 14 m) and 降りる are each mode's own action buttons, under the thumb, the way a
+   game does it; the 歩く / 飛ぶ / 運転 chip said the same a second time at the top of the screen. On a portrait phone the gear goes too: the settings open from the
+   HUD's ☰ (操作設定, hud.js) and keep their place under the top bar, which stays as their anchor. Elsewhere (a landscape phone, a tablet) the gear stays: the
+   landscape toolbar has no room for another icon (it would reach the minimap), and landscape gets the ☰ in #9. */
+#klc-pad .topbar .chip { display: none; }
 #klc-pad .settings { z-index: 5; position: absolute; top: calc(100% + 8px); left: 0; width: min(272px, calc(100vw - 28px)); max-height: calc(100dvh - 120px); overflow: auto; padding: 12px 14px 8px; border-radius: 16px; background: var(--k-glass); pointer-events: auto; touch-action: pan-y;
   -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2); box-shadow: 0 14px 40px rgba(35, 40, 70, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.55); }
 #klc-pad .settings[hidden] { display: none; }
@@ -139,16 +144,17 @@ html.klc-pad-root { touch-action: manipulation; }
   body.klc-pad #klc-ui .mbtn { display: grid; position: absolute; top: calc(8px + env(safe-area-inset-top, 0px)); right: 10px; width: 44px; height: 44px; z-index: 2; }
   body.klc-pad #klc-ui .mbtn[aria-expanded="true"] { background: var(--k-navy); color: #fff; }
   body.klc-pad #klc-x .xbar { top: calc(8px + env(safe-area-inset-top, 0px)); bottom: auto; left: auto; right: 62px; flex-direction: row; gap: 8px; }
-  body.klc-pad #klc-x .xbar button[data-act="map"], body.klc-pad #klc-x .xbar button[data-act="drive"] { display: none; }   /* the minimap opens the map; the mode chip and 乗る drive */
+  body.klc-pad #klc-x .xbar button[data-act="map"], body.klc-pad #klc-x .xbar button[data-act="drive"] { display: none; }   /* the minimap opens the map; the pad's 乗る / 降りる drive */
   /* the ☰ menu: the old right-hand column of five round icons, as a labelled list under the button */
   body.klc-pad #klc-ui .tools { display: none; position: absolute; top: calc(60px + env(safe-area-inset-top, 0px)); right: 10px; width: min(268px, calc(100vw - 20px)); flex-direction: column; align-items: stretch; gap: 2px; padding: 8px;
     border-radius: 22px; background: var(--k-glass-2); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); box-shadow: 0 16px 44px rgba(35, 40, 70, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.6) inset; z-index: 3; }
   body.klc-pad #klc-ui[data-menu="1"] .tools { display: flex; }
+  body.klc-pad #klc-ui .tools { max-height: calc(100dvh - 72px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow-y: auto; overscroll-behavior: contain; }   /* [emil-ui] 11 rows (名所, 操作設定 joined), 44 px each (the touch minimum; they were 48): at 390 x 844 the menu ends above ホヤぼーや's credit, and on a 667 px phone it scrolls inside itself */
   body.klc-pad #klc-ui[data-menu="1"], body.klc-pad #klc-ui:not([data-sheet=""]) { z-index: 5; }   /* above the minimap while the menu or a sheet is open */
   body.klc-pad #klc-ui .tools .mhead { display: grid; gap: 4px; padding: 6px 10px 10px; border-bottom: 1px solid var(--k-line); margin-bottom: 4px; }
   body.klc-pad #klc-ui .tools .mhead b { font: 900 17px/1.1 var(--k-round); letter-spacing: .05em; color: var(--k-navy); }
   body.klc-pad #klc-ui .tools .mhead small { font: 800 8.5px/1 var(--k-sans); letter-spacing: .3em; color: var(--k-muted); }
-  body.klc-pad #klc-ui .tools .round, body.klc-pad #klc-ui .tools .round.txt { width: auto; height: 48px; border-radius: 12px; justify-content: flex-start; justify-items: start; display: flex; align-items: center; gap: 12px; padding: 0 12px; background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; font: 700 14px/1 var(--k-round); text-align: left; }
+  body.klc-pad #klc-ui .tools .round, body.klc-pad #klc-ui .tools .round.txt { width: auto; height: 44px; border-radius: 12px; justify-content: flex-start; justify-items: start; display: flex; align-items: center; gap: 12px; padding: 0 12px; background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; font: 700 14px/1 var(--k-round); text-align: left; }
   body.klc-pad #klc-ui .tools .round.txt { font-size: 13px; }
   body.klc-pad #klc-ui .tools .round > svg { width: 20px; height: 20px; }
   body.klc-pad #klc-ui .tools .round.txt:first-of-type { min-width: 0; }
@@ -167,20 +173,24 @@ html.klc-pad-root { touch-action: manipulation; }
   /* the car's speed chip: under the mode chip, left */
   body.klc-pad #klc-x .xdrive { top: calc(116px + env(safe-area-inset-top, 0px)); bottom: auto; left: 10px; transform: none; max-width: calc(100vw - 124px); }
   body.klc-pad #klc-x .xdrive .rd { max-width: 92px; }
-  /* the bottom row: the place and the time of day, each one pill; the strip and the dock open as a bottom sheet above it */
-  body.klc-pad #klc-ui .pbar { display: flex; gap: 8px; position: absolute; left: 10px; right: 10px; bottom: calc(34px + env(safe-area-inset-bottom, 0px)); }
-  body.klc-pad #klc-ui .pbar button { flex: 1 1 0; min-width: 0; height: 44px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; font: 700 13px/1 var(--k-round); color: var(--k-navy); }
-  body.klc-pad #klc-ui .pbar button > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  body.klc-pad #klc-ui .pbar button[aria-expanded="true"] { background: var(--k-navy); color: #fff; }
-  body.klc-pad #klc-ui .pbar button[aria-expanded="true"] .caret { transform: rotate(180deg); }
-  body.klc-pad #klc-ui .dock, body.klc-pad #klc-ui .places { display: none; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
+  /* [emil-ui] No bottom row: the time chip opens the time sheet, the ☰ opens 名所, and the time sheet holds 今日の入船 (hud.js). The bottom of the screen is the thumbs'.
+     The band just above the credit line (24 to 72 px) is ホヤぼーや's credit's (play/avatar/index.js), which nothing may cover while he is shown: the sheets rise above it
+     (80 px), and the pad steps aside while one is open. */
+  body.klc-pad #klc-ui .brand .chip[aria-expanded="true"] { background: var(--k-navy); color: #fff; }
+  body.klc-pad #klc-ui .brand .chip[aria-expanded="true"] :is(.clock, .wx) { color: #fff; }
+  body.klc-pad #klc-ui .brand .chip[aria-expanded="true"] .caret { transform: rotate(180deg); }
+  body.klc-pad #klc-ui .tools .prow, body.klc-pad #klc-ui .tools .pset { display: flex; }
+  body.klc-pad #klc-pad .gear { display: none; }
+  body.klc-pad #klc-ui .dock .arr { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px 0 12px; }
+  body.klc-pad #klc-ui .dock .arr[aria-expanded="true"] { background: var(--k-navy); color: #fff; }
+  body.klc-pad #klc-ui .dock, body.klc-pad #klc-ui .places { display: none; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
   body.klc-pad #klc-ui[data-sheet="time"] .dock { display: flex; }
   body.klc-pad #klc-ui[data-sheet="places"] .places { display: block; }
   body.klc-pad #klc-ui .attr { font-size: 8px; padding: 1px 8px; pointer-events: none; }
   body.klc-pad #klc-ui .attr .lic { display: none; }   /* the 8 px licence link was a 40 x 11 px target: the ⓘ item in the ☰ menu opens the credits and the licence at 44 px */
   /* [integrate:fix] the credits sheet (☰ > ⓘ) */
   body.klc-pad #klc-ui .tools .cbtn { display: flex; }
-  body.klc-pad #klc-ui[data-credits="1"] .credits { display: block; position: absolute; left: 10px; right: 10px; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); padding: 10px 12px 12px 16px; border-radius: 22px; z-index: 3; pointer-events: auto; }
+  body.klc-pad #klc-ui[data-credits="1"] .credits { display: block; position: absolute; left: 10px; right: 10px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); padding: 10px 12px 12px 16px; border-radius: 22px; z-index: 3; pointer-events: auto; }
   body.klc-pad #klc-ui .credits .ch { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   body.klc-pad #klc-ui .credits h3 { margin: 0; font: 900 15px/1.2 var(--k-round); color: var(--k-navy); letter-spacing: .04em; }
   body.klc-pad #klc-ui .credits .cx { width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--k-navy); }
@@ -231,6 +241,8 @@ html.klc-pad-root { touch-action: manipulation; }
   body.klc-pad #klc-ui .tools { top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(14px + env(safe-area-inset-right, 0px)); }
   body.klc-pad #klc-ui #quality { display: none; }   /* a phone is forced to the phone tier: the selector has nothing else to offer */
   body.klc-pad #klc-x .xbar { top: calc(58px + env(safe-area-inset-top, 0px)); right: calc(14px + env(safe-area-inset-right, 0px)); }
+  /* [emil-ui] search only: the minimap opens the map, and 乗る / 降りる are the pad's (運転 / 降りる here was the third copy) */
+  body.klc-pad #klc-x .xbar button[data-act="map"], body.klc-pad #klc-x .xbar button[data-act="drive"] { display: none; }
   body.klc-pad #klc-x .mini { top: calc(8px + env(safe-area-inset-top, 0px)); bottom: auto; left: 50%; right: auto; transform: translateX(-50%); width: 96px; gap: 4px; }
   body.klc-pad #klc-x .mini canvas { width: 96px; height: 96px; }
   body.klc-pad #klc-x .mini .cap { max-width: 150px; padding: 3px 8px; font-size: 10.5px; }

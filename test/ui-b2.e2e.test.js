@@ -112,8 +112,12 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
   const ev = (x) => page.eval(x);
   const settle = (ms = 600) => sleep(ms);
   const tap = async (sel, ms = 450) => { const c = await center(page, sel); expect(c).not.toBeNull(); expect(c.w).toBeGreaterThan(1); await f.tap(c.x, c.y); await settle(ms); return c; };
+  // [emil-ui] no bottom pills: the chip opens and closes the time sheet; ☰ then 名所 opens the places sheet, a touch outside closes it
+  const openPlaces = async (ms = 700) => { await tap("#klc-ui .mbtn", 600); await tap('#klc-ui .tools [data-sheet="places"]', ms); };
+  const outside = async (ms = 700) => { await f.tap(40, 300); await settle(ms); };
+  const go = (x, ms) => (typeof x === "function" ? x(ms) : tap(x, ms));
   const st = () => ev("({ menu: document.querySelector('#klc-ui').dataset.menu, sheet: document.querySelector('#klc-ui').dataset.sheet, credits: document.querySelector('#klc-ui').dataset.credits, padHidden: window.__pad.hidden })");
-  const closeAll = async () => { await ev("(() => { const u = document.querySelector('#klc-ui'); if (u.dataset.menu === '1') document.querySelector('[data-act=\"menu\"]').click(); })()"); await ev("(() => { const u = document.querySelector('#klc-ui'); if (u.dataset.sheet) document.querySelector('[data-act=\"sheet\"][data-sheet=\"' + u.dataset.sheet + '\"]').click(); })()"); await ev("(() => { if (document.querySelector('#klc-ui').dataset.credits === '1') document.querySelector('[data-act=\"credits-close\"]').click(); })()"); await settle(500); };
+  const closeAll = async () => { await ev("(() => { const u = document.querySelector('#klc-ui'); if (u.dataset.menu === '1') document.querySelector('[data-act=\"menu\"]').click(); })()"); await ev("(() => { const u = document.querySelector('#klc-ui'); if (u.dataset.sheet === 'time') document.querySelector('#klc-ui .brand .chip').click(); else if (u.dataset.sheet) document.querySelector('[data-act=\"sheet\"][data-sheet=\"' + u.dataset.sheet + '\"]').click(); })()"); await ev("(() => { if (document.querySelector('#klc-ui').dataset.credits === '1') document.querySelector('[data-act=\"credits-close\"]').click(); })()"); await settle(500); };
   const enter = async () => {
     if (await ev("document.body.classList.contains('playing')")) return;
     await waitGo(page); const g = await center(page, "#go"); await f.tap(g.x, g.y);
@@ -142,7 +146,7 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
     const tokens = await ev(`(() => { const cs = getComputedStyle(document.documentElement), out = {}; for (const k of ['--ease-out', '--ease-in-out', '--ease-drawer', '--dur-press', '--dur-fast', '--dur-enter', '--dur-exit', '--dur-sheet', '--dur-sheet-exit', '--shift', '--pop-scale', '--ring-ink', '--ring-halo']) out[k] = cs.getPropertyValue(k).trim().replace(/\\s+/g, ' ');
       out.overscroll = cs.overscrollBehaviorY + '/' + cs.overscrollBehaviorX; return out; })()`);
     await enter();
-    await tap('#klc-ui .pbar button[data-sheet="places"]', 600);
+    await openPlaces(600);
     const rowHover = await looked(page, '#klc-ui .places li button[aria-current="false"]', ["hover"], 400);
     const rowHoverBefore = await ev("getComputedStyle(document.querySelector('#klc-ui .places li button[aria-current=\"false\"]')).backgroundColor");
     await closeAll();
@@ -159,10 +163,9 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
     await reset();
     const out = {};
     out.mbtn = await looked(page, "#klc-ui .mbtn");
-    out.pbarTime = await looked(page, '#klc-ui .pbar button[data-sheet="time"]');
+    out.chipTime = await looked(page, '#klc-ui .brand .chip');   // [emil-ui] the time sheet's button (the pill is gone)
     out.xbarSearch = await looked(page, '#klc-x .xbar button[data-act="search"]');
     out.padBtn = await looked(page, '#klc-pad .btn[data-show="1"]');
-    out.padChip = await looked(page, "#klc-pad .chip button");
     // the ☰ menu: its rows press by background, not by scale
     await tap("#klc-ui .mbtn", 600);
     out.menuRow = await looked(page, '#klc-ui .tools [data-act="lang"]');
@@ -172,10 +175,10 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
     out.creditsLink = await looked(page, "#klc-ui .credits .clink");
     await closeAll();
     // the time sheet and the places sheet
-    await tap('#klc-ui .pbar button[data-sheet="time"]', 700);
+    await tap('#klc-ui .brand .chip', 700);
     out.dockPreset = await looked(page, '#klc-ui .dock .seg button[aria-pressed="false"]');
     out.dockShoot = await looked(page, "#klc-ui .dock .pill.shoot");
-    await tap('#klc-ui .pbar button[data-sheet="places"]', 700);
+    await openPlaces(700);
     out.placesRow = await looked(page, "#klc-ui .places li button");
     out.placesAuto = await looked(page, "#klc-ui .places .auto");
     await closeAll();
@@ -196,8 +199,8 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
     out.shipCardBtn = await looked(page, "#klc-ship .card button");
     await ev("window.__voyage.active && window.__voyage.exit()"); await settle(900);
     M.row6press = out;
-    for (const k of ["mbtn", "pbarTime", "xbarSearch", "creditsClose", "creditsLink", "dockPreset", "dockShoot", "placesAuto", "searchClose", "storyClose", "boardGo", "shipTool", "shipCardBtn"]) { expect([k, out[k] !== null]).toEqual([k, true]); expect([k, scaleOf(out[k].transform)]).toEqual([k, 0.97]); }
-    for (const k of ["padBtn", "padChip"]) { expect([k, out[k] !== null]).toEqual([k, true]); expect([k, scaleOf(out[k].transform)]).toEqual([k, 0.95]); }
+    for (const k of ["mbtn", "chipTime", "xbarSearch", "creditsClose", "creditsLink", "dockPreset", "dockShoot", "placesAuto", "searchClose", "storyClose", "boardGo", "shipTool", "shipCardBtn"]) { expect([k, out[k] !== null]).toEqual([k, true]); expect([k, scaleOf(out[k].transform)]).toEqual([k, 0.97]); }
+    for (const k of ["padBtn"]) { expect([k, out[k] !== null]).toEqual([k, true]); expect([k, scaleOf(out[k].transform)]).toEqual([k, 0.95]); }   // ([emil-ui] the 歩く / 飛ぶ / 運転 chip is gone)
     for (const k of ["menuRow", "menuRowCredits", "placesRow", "searchRow"]) { expect([k, out[k] !== null]).toEqual([k, true]); expect([k, out[k].transform]).toEqual([k, "none"]); }
     for (const k of ["placesRow", "searchRow"]) expect([k, out[k].bg]).toEqual([k, "rgba(31, 58, 104, 0.12)"]);
     expect(out.menuRow.bg).toBe("rgba(31, 58, 104, 0.08)");
@@ -208,7 +211,7 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
     const ring = {};
     ring.mbtn = await looked(page, "#klc-ui .mbtn", ["focus-visible"]);
     ring.padBtn = await looked(page, '#klc-pad .btn[data-show="1"]', ["focus-visible"]);
-    await tap('#klc-ui .pbar button[data-sheet="places"]', 700);
+    await openPlaces(700);
     ring.placesRow = await looked(page, "#klc-ui .places li button", ["focus-visible"]);
     await closeAll();
     M.row6ring = ring;
@@ -220,9 +223,9 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
   T("row 7: five points inside each open panel hit the panel (the time sheet and the menu: 1 of 5 and 0 of 5 before); a tap inside keeps it open", async () => {
     await reset();
     const out = {};
-    const panels = [["time", '#klc-ui .pbar button[data-sheet="time"]', "#klc-ui .dock"], ["places", '#klc-ui .pbar button[data-sheet="places"]', "#klc-ui .places"], ["menu", "#klc-ui .mbtn", "#klc-ui .tools"]];
+    const panels = [["time", '#klc-ui .brand .chip', "#klc-ui .dock"], ["places", openPlaces, "#klc-ui .places"], ["menu", "#klc-ui .mbtn", "#klc-ui .tools"]];
     for (const [name, opener, panel] of panels) {
-      await tap(opener, 800);
+      await go(opener, 800);
       const now = await ev(HIT_JS(panel));
       await style(page, "__old", OLD_HOLES); await settle(150);
       const before = await ev(HIT_JS(panel));
@@ -230,7 +233,7 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
       const c = { x: now.rect.l + now.rect.w / 2, y: now.rect.t + 3 };
       await f.tap(c.x, c.y); await settle(700);
       const tapOld = await st();
-      await unstyle(page, "__old"); await closeAll(); await tap(opener, 800);
+      await unstyle(page, "__old"); await closeAll(); await go(opener, 800);
       await f.tap(c.x, c.y); await settle(700);
       const tapNow = await st();
       await shot(page, `row7-${name}-open-390x844`);
@@ -305,19 +308,20 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
     await reset();
     const out = {}, pad = {};
     const clusterTop = () => ev("+document.querySelector('#klc-pad .cluster').getBoundingClientRect().top.toFixed(1)");
-    const run = async (name, opener, panel, closer = opener) => {
+    const run = async (name, opener, panel, closer = opener, pre = null) => {
       const rest0 = await clusterTop();
+      if (pre) await pre();
       await ev(TRACE_START({ panel, pad: "#klc-pad", cluster: "#klc-pad .cluster" })); await settle(250);
-      await tap(opener, 1300);
+      await go(opener, 1300);
       const open = await ev(TRACE_STOP); pad[name + "Open"] = await padCss();
       await ev(TRACE_START({ panel, pad: "#klc-pad", cluster: "#klc-pad .cluster" })); await settle(250);
-      await tap(closer, 1300);
+      await go(closer, 1300);
       const close = await ev(TRACE_STOP); pad[name + "Closed"] = await padCss();
       const rest1 = await clusterTop();
       out[name] = { open: traceStats(open, "panel"), close: traceStats(close, "panel"), cluster: { rest0, rest1 } };
     };
-    await run("time", '#klc-ui .pbar button[data-sheet="time"]', "#klc-ui .dock");
-    await run("places", '#klc-ui .pbar button[data-sheet="places"]', "#klc-ui .places");
+    await run("time", '#klc-ui .brand .chip', "#klc-ui .dock");   // [emil-ui] the chip opens and closes it
+    await run("places", '#klc-ui .tools [data-sheet="places"]', "#klc-ui .places", outside, () => tap("#klc-ui .mbtn", 700));   // ☰ (before the trace), then 名所; a touch outside closes it
     await run("menu", "#klc-ui .mbtn", "#klc-ui .tools");
     // the credits: open from the menu (the ⓘ row), close with the sheet's own ✕
     await tap("#klc-ui .mbtn", 900);
@@ -370,12 +374,13 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
   T("row 7: the curves of the transitions, read by seeking the running transition (not by frames): the sheets' opacity 0 to 1 and 24 px to 0 over 280 ms, the menu's from 0.95 over 220 ms, the exits reversed over 200 and 140 ms", async () => {
     await reset();
     const curves = {};
-    const cycle = async (name, opener, panel, closer = opener) => {
-      await ev(PROBE(panel)); await tap(opener, 1300); curves[name + "Open"] = await ev("window.__probe");
-      await ev(PROBE(panel)); await tap(closer, 1300); curves[name + "Close"] = await ev("window.__probe");
+    const cycle = async (name, opener, panel, closer = opener, pre = null) => {
+      if (pre) await pre();   // (before the probe: it reads the first state change after it is set)
+      await ev(PROBE(panel)); await go(opener, 1300); curves[name + "Open"] = await ev("window.__probe");
+      await ev(PROBE(panel)); await go(closer, 1300); curves[name + "Close"] = await ev("window.__probe");
     };
-    await cycle("time", '#klc-ui .pbar button[data-sheet="time"]', "#klc-ui .dock");
-    await cycle("places", '#klc-ui .pbar button[data-sheet="places"]', "#klc-ui .places");
+    await cycle("time", '#klc-ui .brand .chip', "#klc-ui .dock");   // [emil-ui] the chip; ☰ then 名所, a touch outside
+    await cycle("places", '#klc-ui .tools [data-sheet="places"]', "#klc-ui .places", outside, () => tap("#klc-ui .mbtn", 700));
     await cycle("menu", "#klc-ui .mbtn", "#klc-ui .tools");
     M.row7curves = curves;
     const mono = (pts, i, dir) => pts.every((p, k) => k === 0 || (dir > 0 ? p[i] >= pts[k - 1][i] - 0.002 : p[i] <= pts[k - 1][i] + 0.002));
@@ -392,10 +397,10 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
 
   T("row 7: a sheet replaced by the other leaves at once; reduced motion shows them without a transition; a rebuild does not replay an open menu's entry once data-still guards it", async () => {
     await reset();
-    // time -> places: in the task that opens the strip the dock is already display: none (no transition on it), while the strip starts its 280 ms entry
-    await tap('#klc-ui .pbar button[data-sheet="time"]', 1000);
-    await ev(TRACE_START({ panel: "#klc-ui .places", other: "#klc-ui .dock" })); await settle(250);
-    await tap('#klc-ui .pbar button[data-sheet="places"]', 1300);
+    // places -> time ([emil-ui] ☰ then 名所, then the chip): in the task that opens the dock the strip is already display: none (no transition on it), while the dock starts its 280 ms entry
+    await openPlaces(1000);
+    await ev(TRACE_START({ panel: "#klc-ui .dock", other: "#klc-ui .places" })); await settle(250);
+    await tap('#klc-ui .brand .chip', 1300);
     const sw = await ev(TRACE_STOP), swapStats = traceStats(sw, "panel");
     const swap = { otherAt: sw.at[0].other, panelAt: swapStats.at };
     await closeAll();
@@ -403,7 +408,7 @@ d("ui-b2, a phone: the press layer, the menu, the sheets and the credits (touch,
     await page.S("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] }); await settle(500);
     const rm = await ev(`(() => { const cs = getComputedStyle(document.documentElement); return { shift: cs.getPropertyValue('--shift').trim(), pop: cs.getPropertyValue('--pop-scale').trim(), press: cs.getPropertyValue('--dur-press').trim(), sheet: cs.getPropertyValue('--dur-sheet').trim() }; })()`);
     await ev(TRACE_START({ panel: "#klc-ui .dock" })); await settle(250);
-    await tap('#klc-ui .pbar button[data-sheet="time"]', 1200);
+    await tap('#klc-ui .brand .chip', 1200);
     const rmOpen = traceStats(await ev(TRACE_STOP), "panel");
     await closeAll();
     await page.S("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "no-preference" }] }); await settle(400);
@@ -552,55 +557,19 @@ d("ui-b2, a desktop (1440x900, mouse): the press layer, the focus ring, the arri
   });
 
 
-  T("row 14 (desktop): the wordmark over the real sky, by pixels: the scrim and the heavier subtitle against the wordmark of main; the accent, the credit pill and the hide-UI eye as cascaded", async () => {
-    const px = async (clip) => { const { data } = await page.S("Page.captureScreenshot", { format: "png", clip: { ...clip, scale: 1 } }); return sharp(Buffer.from(data, "base64")).removeAlpha().raw().toBuffer({ resolveWithObject: true }); };
-    const out = {};
-    for (const [name, preset] of [["noon", "hiru"], ["golden", "yugata"]]) {
-      await ev(`window.__lifeSet('${preset}')`); await settle(1500);
-      const geo = await ev(`(() => { const m = document.querySelector('#klc-ui .mark'), s = m.querySelector('small'), a = m.getBoundingClientRect(), b = s.getBoundingClientRect(); return { x: a.left, y: a.top, w: a.width, h: a.height, sy: b.top, sh: b.height }; })()`);
-      const clip = { x: Math.floor(geo.x) - 2, y: Math.floor(geo.y) - 2, width: Math.ceil(geo.w) + 4, height: Math.ceil(geo.h) + 4 }, subTop = Math.floor(geo.sy) - clip.y - 1;
-      const A = await px(clip);   // as it ships: white text over its shadow and the scrim
-      await style(page, "__wm_t", "#klc-ui .mark, #klc-ui .mark small { color: transparent !important; }");
-      const B = await px(clip);   // the same without the white: what is under the glyphs (the sky, the scrim, the text's own shadow)
-      await style(page, "__wm_s", "#klc-ui .mark::before { display: none !important; }");
-      const C = await px(clip);   // ... and without the scrim
-      await style(page, "__wm_o", OLD_SUB + "#klc-ui .mark small { color: transparent !important; }");
-      const D = await px(clip);   // ... with the old subtitle's shadow too: the wordmark of main
-      const maskT = [], maskS = [];
-      for (let y = 0; y < A.info.height; y++) for (let x = 0; x < A.info.width; x++) { const i = y * A.info.width + x, k = i * 3; if (Math.min(A.data[k], A.data[k + 1], A.data[k + 2]) >= 240) (y < subTop ? maskT : maskS).push(i); }
-      const ringT = ringOf(maskT, A.info.width, A.info.height).filter((i) => Math.floor(i / A.info.width) < subTop), ringS = ringOf(maskS, A.info.width, A.info.height).filter((i) => Math.floor(i / A.info.width) >= subTop);
-      out[name] = { geo, glyphPixels: { title: maskT.length, subtitle: maskS.length },
-        title: { after: against(B, maskT), noScrim: against(C, maskT), main: against(D, maskT), edge: { after: against(B, ringT), noScrim: against(C, ringT), main: against(D, ringT) } },
-        subtitle: { after: against(B, maskS), noScrim: against(C, maskS), main: against(D, maskS), edge: { after: against(B, ringS), noScrim: against(C, ringS), main: against(D, ringS) } } };
-      await unstyle(page, "__wm_t"); await unstyle(page, "__wm_s"); await unstyle(page, "__wm_o");
-      // the veil is under the chip and the panel below the wordmark, not over them: the chip looks the same with and without it (the glass shows the sky behind it, so a few levels of difference are the veil seen through 16 % of transparency)
-      const cg = await ev(`(() => { const b = document.querySelector('#klc-ui .brand .chip').getBoundingClientRect(); return { x: Math.ceil(b.left) + 22, y: Math.ceil(b.top) + 4, width: Math.floor(b.width) - 44, height: Math.floor(b.height) - 8 }; })()`);   // (the interior: the pill's rounded ends show the scene itself)
-      const E = await px(cg); await style(page, "__wm_s2", "#klc-ui .mark::before { display: none !important; }"); const F = await px(cg); await unstyle(page, "__wm_s2");
-      let chipMax = 0; for (let k = 0; k < Math.min(E.data.length, F.data.length); k++) chipMax = Math.max(chipMax, Math.abs(E.data[k] - F.data[k]));
-      out[name].chipMaxDiff = chipMax;
-      const big = { x: Math.max(0, clip.x - 30), y: Math.max(0, clip.y - 20), width: clip.width + 200, height: clip.height + 40 };
-      await shot(page, `row14-wordmark-${name}-after`, big);
-      await style(page, "__wm_b", "#klc-ui .mark::before { display: none !important; }" + OLD_SUB); await settle(300);
-      await shot(page, `row14-wordmark-${name}-before`, big);
-      await unstyle(page, "__wm_b");
-    }
+  T("row 14 (desktop): [emil-ui] no wordmark over the town during play; the accent, the credit pill and the hide-UI eye as cascaded", async () => {
+    // [emil-ui] the wordmark (and its scrim, whose legibility this row measured by pixels) left the play HUD: a game prints no logo over its world (the title screen
+    // carries the name), and 気仙沼リビングシティ was the old one. Its CSS stays in ui/style.js, so the cascaded values below still read.
+    expect(await ev("getComputedStyle(document.querySelector('#klc-ui .mark')).display")).toBe("none");
     const v = await ev(`(() => { const cs = (s) => getComputedStyle(document.querySelector(s)); return { shoot: cs('#klc-ui .pill.shoot').backgroundColor, shootColor: cs('#klc-ui .pill.shoot').color, attrBg: cs('#klc-ui .attr').backgroundColor, muted: cs('#klc-ui').getPropertyValue('--k-muted').trim(),
       scrim: getComputedStyle(document.querySelector('#klc-ui .mark'), '::before').backgroundImage.slice(0, 120), scrimZ: getComputedStyle(document.querySelector('#klc-ui .mark'), '::before').zIndex, subW: cs('#klc-ui .mark small').fontWeight }; })()`);
     await ev("document.body.classList.add('noui')"); await settle(500);
     const eye = await ev(`(() => { const e = document.querySelector('#klc-ui-restore'), cs = getComputedStyle(e); return { opacity: cs.opacity, bg: cs.backgroundColor, display: cs.display }; })()`);
     await shot(page, "row14-restore-eye-1440x900", { x: 1440 - 120, y: 0, width: 120, height: 90 });
     await ev("document.body.classList.remove('noui')"); await settle(400);
-    M.row14desktop = { wordmark: out, cascaded: v, eye };
+    M.row14desktop = { wordmark: null, cascaded: v, eye };   // ([emil-ui] no wordmark to measure)
     expect(v.shoot).toBe("rgb(196, 82, 31)"); expect(v.shootColor).toBe("rgb(255, 255, 255)"); expect(v.attrBg).toBe("rgba(18, 26, 52, 0.62)"); expect(v.muted).toBe("#55596f"); expect(v.scrimZ).toBe("-1"); expect(v.scrim).toContain("radial-gradient"); expect(v.subW).toBe("900");
     expect(eye).toEqual({ opacity: "0.8", bg: "rgba(250, 247, 241, 0.9)", display: "grid" });
-    for (const name of ["noon", "golden"]) {
-      const o = out[name];
-      expect(o.glyphPixels.title).toBeGreaterThan(500); expect(o.glyphPixels.subtitle).toBeGreaterThan(50); expect([name, o.chipMaxDiff <= 10, o.chipMaxDiff]).toEqual([name, true, o.chipMaxDiff]);
-      // the scrim: the glyphs of the title sit on a darker sky (median contrast up), and the wordmark as a whole beats main's
-      expect([name, o.title.after.median - o.title.noScrim.median >= 0.3, o.title.after.median, o.title.noScrim.median]).toEqual([name, true, o.title.after.median, o.title.noScrim.median]);
-      expect([name, o.title.after.median > o.title.main.median, o.subtitle.after.median >= o.subtitle.main.median]).toEqual([name, true, true]);
-      expect([name, o.title.edge.after.median - o.title.edge.noScrim.median >= 0.2, o.title.edge.after.median, o.title.edge.noScrim.median]).toEqual([name, true, o.title.edge.after.median, o.title.edge.noScrim.median]);   // (beside the letters too, not only under them)
-    }
   });
 
   T("row 7: the arrivals popover grows out of its chip: 0.95 and opacity 0 at its first instant, 220 ms in, 140 ms out with its display held", async () => {

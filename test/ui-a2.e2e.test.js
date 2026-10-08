@@ -326,9 +326,9 @@ d("row 4: a key, a press or a touch ends a flight (real Chrome)", () => {
   d("phone 390x844, real touches", () => {
     let page, f;
     const tap = async (sel, wait = 450) => { const c = await center(page, sel); expect(c && c.w > 1).toBeTruthy(); await f.tap(c.x, c.y); await sleep(wait); return c; };
-    /** Pick a place the way a visitor does: the pill opens the places sheet, the stop's button is scrolled into view and tapped. The sheet folds, the flight starts. */
+    /** Pick a place the way a visitor does: ☰ then 名所 opens the places sheet ([emil-ui]: the pill is gone), the stop's button is scrolled into view and tapped. The sheet folds, the flight starts. */
     const tapPlace = async (id) => {
-      await tap('#klc-ui .pbar button[data-sheet="places"]');
+      await tap("#klc-ui .mbtn"); await tap('#klc-ui .tools [data-sheet="places"]');
       await page.eval(`document.querySelector('#klc-places [data-act="stop"][data-id="${id}"]').scrollIntoView({ inline: 'center', block: 'nearest' }); 0`); await sleep(350);
       await tap(`#klc-places [data-act="stop"][data-id="${id}"]`, 100);
       expect(await page.eval("window.__life.tour.flying")).toBe(true);
@@ -412,12 +412,12 @@ d("row 4: a key, a press or a touch ends a flight (real Chrome)", () => {
       expect(r.a.cuts).toBe(1); expect(r.a.skips).toBe(1); expect(r.a.veilAtEnd).toBeGreaterThanOrEqual(0.9); expect(r.flying).toBe(false); expect(r.rest).toBeLessThan(0.5);
     });
 
-    T("a touch on a HUD button does not end a flight (the time pill opens its sheet, the flight flies on and arrives by itself); the sheet closes again", async () => {
+    T("a touch on a HUD button does not end a flight (the time chip opens its sheet, the flight flies on and arrives by itself); the sheet closes again", async () => {
       await page.eval(RESET); await sleep(900);
       await tapPlace("kanae"); await page.eval(RECORDER); await sleep(400); await page.eval("window.__rec.arm()");
-      await tap('#klc-ui .pbar button[data-sheet="time"]', 300);
+      await tap('#klc-ui .brand .chip', 300);   // [emil-ui] the chip is the time sheet's button
       const mid = await page.eval("({ flying: window.__life.tour.flying, skips: window.__rec.skips, cuts: window.__rec.cuts.length, sheet: document.getElementById('klc-ui').dataset.sheet })");
-      await tap('#klc-ui .pbar button[data-sheet="time"]', 200);   // close it
+      await tap('#klc-ui .brand .chip', 200);   // close it
       await page.eval(WAIT("!window.__life.tour.flying", 12000));
       const rest = await page.eval(REST("kanae"));
       await page.eval("window.__rec.stop(); 0");

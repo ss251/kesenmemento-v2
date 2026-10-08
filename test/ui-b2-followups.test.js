@@ -59,10 +59,10 @@ describe("a language rebuild does not replay an open panel", () => {
     } finally { w.cleanup(); }
   });
 
-  test("an open time sheet is the same guard", () => {
+  test("an open sheet is the same guard", () => {   // ([emil-ui] the time sheet's pill is gone, its button is the chip on a phone; the ☰ 名所 row opens a sheet the same way)
     const w = hudWorld();
     try {
-      w.click(w.el.querySelector('[data-act="sheet"][data-sheet="time"]'));
+      w.click(w.el.querySelector('[data-act="sheet"][data-sheet="places"]'));
       w.drain();
       w.click(w.el.querySelector('[data-act="lang"]'));
       expect(w.el.getAttribute("data-still")).toBe("1");

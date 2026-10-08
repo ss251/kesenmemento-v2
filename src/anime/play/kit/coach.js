@@ -69,6 +69,74 @@ export function resolveCoachTarget(target, query, into) {
 
 const NO = { done() {}, hide() {} };
 
+/** [fish-fix] What the bubble must never cover: the controls a coach teaches (the touch pad's stick and buttons, the kit's
+ *  action cluster). `soft`: the rest of the HUD, avoided when there is room. */
+export const COACH_HARD = '#klc-pad .ghost, #klc-pad .cluster .btn, #klc-play .cluster .act';
+export const COACH_SOFT = '#klc-ui .brand, #klc-ui .tools, #klc-ui .mbtn, #klc-ui .pbar, #klc-ui .dock, #klc-ui .places, #klc-ui .attr, #klc-x .xbar, #klc-x .mini, #klc-x .xdrive, #klc-play .topbar, #klc-play .counters, #klc-pad .topbar, #klc-pad .gear, .swim-ui .swim-chip';
+
+const overlap = (x, y, w, h, list) => {
+  let a = 0;
+  for (const q of list) {
+    const ox = Math.min(x + w, q.r) - Math.max(x, q.l), oy = Math.min(y + h, q.b) - Math.max(y, q.t);
+    if (ox > 0 && oy > 0) a += ox * oy;
+  }
+  return a;
+};
+
+/**
+ * [fish-fix] Where the speech bubble goes (top-left, CSS px). It sits next to the spotlight and never on it, nor on a `hard`
+ * rect (the controls the coach teaches); `soft` rects (the rest of the HUD) cost area. Four ways out from the target, in this
+ * order: above, right, left, below; each slides away from the target in 8 px steps until it is clear of every hard rect.
+ * Among the clear ones the cheapest wins (soft area + 20 per px from the target). With nothing clear, the least covered spot.
+ * The bubble used to sit 108 px above the target whatever its height, so a two-line bubble lay on its own target and its
+ * 90vw width on the buttons beside it (the swim coach on a phone: the stick, あがる and 上がる).
+ *   placeBubble({ target: { x, y }, size: { w, h }, view: { w, h }, hole, hard: [{ l, t, r, b }], soft, margin, gap })
+ */
+export function placeBubble({ target, size, view, hole = 66, hard = [], soft = [], margin = 12, gap = 10 }) {
+  const bw = Math.min(size.w, view.w - margin * 2), bh = size.h;
+  const L = margin, R = view.w - margin - bw, T = margin, B = view.h - margin - bh;
+  const spot = { l: target.x - hole, t: target.y - hole, r: target.x + hole, b: target.y + hole };
+  const block = [spot, ...hard];
+  const cx = Math.max(L, Math.min(R, target.x - bw / 2)), cy = Math.max(T, Math.min(B, target.y - bh / 2));
+  const ways = [
+    { x: cx, y: spot.t - gap - bh, dx: 0, dy: -8 },
+    { x: spot.r + gap, y: cy, dx: 8, dy: 0 },
+    { x: spot.l - gap - bw, y: cy, dx: -8, dy: 0 },
+    { x: cx, y: spot.b + gap, dx: 0, dy: 8 },
+  ];
+  let best = null, least = null;
+  ways.forEach((wy, i) => {
+    for (let k = 0; k < 240; k++) {
+      const x = wy.x + wy.dx * k, y = wy.y + wy.dy * k;
+      if (x < L - 0.5 || x > R + 0.5 || y < T - 0.5 || y > B + 0.5) break;
+      const hit = overlap(x, y, bw, bh, block);
+      if (!least || hit < least.hit) least = { x, y, hit };
+      if (hit > 0) continue;
+      const cost = overlap(x, y, bw, bh, soft) + 20 * Math.hypot(x + bw / 2 - target.x, y + bh / 2 - target.y) + i;
+      if (!best || cost < best.cost) best = { x, y, cost };
+      break;
+    }
+  });
+  if (best) return { x: best.x, y: best.y, clear: true };
+  if (least) return { x: least.x, y: least.y, clear: false };
+  return { x: cx, y: Math.max(T, Math.min(B, spot.t - gap - bh)), clear: false };
+}
+
+function rectsOf(sel, skip) {
+  if (!sel || typeof document === 'undefined') return [];
+  const out = [];
+  const els = typeof sel === 'string' ? document.querySelectorAll(sel) : sel;
+  for (const e of els) {
+    if (!e || (skip && skip.contains(e)) || typeof e.getBoundingClientRect !== 'function') continue;
+    const r = e.getBoundingClientRect();
+    if (!(r.width > 1 && r.height > 1)) continue;
+    const cs = getComputedStyle(e);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05 || e.dataset?.show === '0') continue;
+    out.push({ l: r.left, t: r.top, r: r.right, b: r.bottom });
+  }
+  return out;
+}
+
 export function mountCoach({ root, store, t, reduced }) {
   const el = document.createElement('div');
   el.className = 'coach';
@@ -91,12 +159,38 @@ export function mountCoach({ root, store, t, reduced }) {
   const ok = bubble.querySelector('.ok');
   const into = { x: 0, y: 0 };
   let target = null;
+  let avoid = null;
   let full = '';
   let shown = 0;
   let acc = 0;
   let active = null;
   let typing = false;
   let gen = 0;
+  // [fish-fix] the bubble's final size and the rects it keeps clear of, read when a coach opens, on resize and twice a second
+  // (never per frame: place() runs every tick while the target moves)
+  const size = { w: 0, h: 0 };
+  let hard = [], soft = [], seenAcc = 0, measured = 0;
+  const last = { x: NaN, y: NaN, gen: -1, w: 0, h: 0 };
+
+  function measure() {
+    if (el.hidden) return;
+    measured++;
+    // the full line sets the size: the typewriter fills a bubble that never grows (no shift, and it is placed for its final size)
+    say.style.minHeight = '';
+    const typed = say.textContent;
+    say.textContent = full;
+    say.style.minHeight = say.offsetHeight + 'px';
+    say.textContent = typed;
+    size.w = bubble.offsetWidth; size.h = bubble.offsetHeight;
+    hard = rectsOf(COACH_HARD, el);
+    if (avoid) {
+      try {
+        const more = typeof avoid === 'function' ? avoid() : rectsOf(avoid, el);
+        if (Array.isArray(more)) for (const q of more) if (q && Number.isFinite(q.l)) hard.push(q);
+      } catch (e) { /* a mode's avoid list is advice */ }
+    }
+    soft = rectsOf(COACH_SOFT, el);
+  }
 
   function place(x, y) {
     const w = window.innerWidth || 393;
@@ -107,14 +201,12 @@ export function mountCoach({ root, store, t, reduced }) {
     el.style.setProperty('--cx', cx.toFixed(1) + 'px');
     el.style.setProperty('--cy', cy.toFixed(1) + 'px');
     hand.style.transform = 'translate3d(' + (cx + 8).toFixed(1) + 'px,' + (cy + 18).toFixed(1) + 'px,0)';
-    const bw = Math.min(380, Math.round(w * 0.9));
-    let bx = cx + 28;
-    let by = cy - 108;
-    if (bx > w - bw - 12) bx = Math.max(12, cx - bw - 8);
-    if (by < 72) by = Math.min(h - 180, cy + 48);
-    if (by > h - 168) by = Math.max(72, h - 180);
-    bx = Math.max(12, Math.min(w - bw - 12, bx));
-    bubble.style.transform = 'translate3d(' + bx.toFixed(1) + 'px,' + by.toFixed(1) + 'px,0)';
+    if (!size.h) measure();
+    // the bubble moves only when the spotlight moved or the rects were read again (no work, no garbage, on a still frame)
+    if (Math.abs(cx - last.x) < 0.5 && Math.abs(cy - last.y) < 0.5 && last.gen === measured && last.w === w && last.h === h) return;
+    last.x = cx; last.y = cy; last.gen = measured; last.w = w; last.h = h;
+    const b = placeBubble({ target: { x: cx, y: cy }, size: { w: size.w || Math.min(380, Math.round(w * 0.9)), h: size.h || 150 }, view: { w, h }, hard, soft });
+    bubble.style.transform = 'translate3d(' + b.x.toFixed(1) + 'px,' + b.y.toFixed(1) + 'px,0)';
   }
 
   function paintText(n) {
@@ -123,6 +215,9 @@ export function mountCoach({ root, store, t, reduced }) {
     caret.hidden = !more;
   }
 
+  const relayout = () => { if (el.hidden) return; size.h = 0; measure(); const p = target ? resolveCoachTarget(target, null, into) : null; if (p) place(p.x, p.y); else place((window.innerWidth || 400) * 0.5, (window.innerHeight || 800) * 0.45); };
+  try { window.addEventListener('resize', () => requestAnimationFrame(relayout)); } catch (e) { /* not a browser */ }
+
   const offTick = onPlayTick((dt) => {
     if (el.hidden) return;
     if (typing && !reduced()) {
@@ -130,6 +225,8 @@ export function mountCoach({ root, store, t, reduced }) {
       const n = Math.min(full.length, Math.floor(acc / 0.028));
       if (n !== shown) { shown = n; paintText(n); if (n >= full.length) typing = false; }
     }
+    seenAcc += dt > 0 ? dt : 0.016;
+    if (seenAcc >= 0.5) { seenAcc = 0; measure(); if (!target) place((window.innerWidth || 400) * 0.5, (window.innerHeight || 800) * 0.45); }
     if (!target) return;
     const p = resolveCoachTarget(target, null, into);
     if (!p) return;
@@ -141,6 +238,7 @@ export function mountCoach({ root, store, t, reduced }) {
     el.hidden = true;
     el.classList.remove('dim', 'ok');
     target = null;
+    avoid = null;
     typing = false;
     active = null;
   }
@@ -178,12 +276,21 @@ export function mountCoach({ root, store, t, reduced }) {
     hand.hidden = g === 'none';
     glove.className = 'glove ' + g;
     say.textContent = '';
-    paintText(shown);
     ok.textContent = t('play.kit.coach.ok');
     target = o.target || null;
+    // [fish-fix] o.avoid (optional): more rects the bubble keeps off, as a selector, a list of elements, or () => [{ l, t, r, b }]
+    avoid = o.avoid || null;
+    seenAcc = 0;
+    size.h = 0;
+    measure();
+    paintText(shown);
     const p = target ? resolveCoachTarget(target, null, into) : null;
     if (p) place(p.x, p.y);
     else place((window.innerWidth || 400) * 0.5, (window.innerHeight || 800) * 0.45);
+    // [fish-fix] a mode that opens its coach in the frame it starts has not laid out its controls yet (the pad shows its new
+    // buttons a frame later): measure again once they are there, so the bubble is never placed against stale rects
+    const token = gen;
+    try { requestAnimationFrame(() => requestAnimationFrame(() => { if (token === gen && !el.hidden) relayout(); })); } catch (e) { /* not a browser */ }
     const api = { done, hide };
     active = api;
     ok.focus({ preventScroll: true });

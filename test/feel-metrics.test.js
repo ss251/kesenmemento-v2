@@ -1,6 +1,6 @@
 // [feel] The probe's measurements (tools/anime/feel-metrics.mjs) against synthetic motion with known answers.
 import { test, expect, describe } from "bun:test";
-import { FIELDS, toFrames, startResponse, stopResponse, turnResponse, cameraMetrics, footMetrics, stepMetrics, inputHeading, idealCam, jitter } from "../tools/anime/feel-metrics.mjs";
+import { FIELDS, toFrames, startResponse, stopResponse, turnResponse, cameraMetrics, footMetrics, stanceSlide, stepMetrics, inputHeading, idealCam, jitter } from "../tools/anime/feel-metrics.mjs";
 
 /** Frames of a body on a straight line along -z (yaw 0), its speed driven by `speed(t)`, facing by `face(t)`, the camera on its ideal spot. */
 function synth({ dur = 3, hz = 60, speed, face = () => 0, input = () => [1, 0], camOff = () => [0, 0, 0], feet = null, y = () => 0 }) {
@@ -94,6 +94,25 @@ describe("feel metrics", () => {
     const dragged = synth({ dur: 3, hz, speed: () => 1.5 });
     const d = footMetrics(dragged, 1, dragged.length);
     expect(d.slipShare).toBeCloseTo(1, 2);
+  });
+
+  test("per stance: a boot held in the world slides 0 cm; one that creeps 3 cm forward and 2 cm sideways while down measures 13/15 of each", () => {
+    const hz = 60, cad = 2, stride = 1.5 / cad;   // 1.5 m/s, 2 cycles/s: each stance is 15 frames, measured from its 2nd frame to its 15th
+    const feet = (along, across) => (t, z) => {
+      const ph = (t * cad) % 1, c0 = Math.floor(t * cad), uR = ph / 0.5, uL = (ph - 0.5) / 0.5;
+      const R = ph < 0.5 ? [0.1 + across * uR, 0, -(c0 * stride) - along * uR] : [0.1, 0.1, z];
+      const L = ph >= 0.5 ? [-0.1 + across * uL, 0, -(c0 * stride + stride / 2) - along * uL] : [-0.1, 0.1, z];
+      return { R, L };
+    };
+    const held = synth({ dur: 3, hz, speed: () => 1.5, feet: feet(0, 0) });
+    const h = stanceSlide(held, 1, held.length);
+    expect(h.stances).toBeGreaterThanOrEqual(10);
+    expect(h.slideCm).toBeCloseTo(0, 6); expect(h.acrossCm).toBeCloseTo(0, 6);
+    const creep = synth({ dur: 3, hz, speed: () => 1.5, feet: feet(0.03, 0.02) });
+    const c = stanceSlide(creep, 1, creep.length);
+    expect(Math.abs(c.slideCm - 3 * 13 / 15)).toBeLessThan(0.01);   // he walks along -z: forward is -z, the creep is along his heading
+    expect(Math.abs(c.acrossCm - 2 * 13 / 15)).toBeLessThan(0.01);
+    expect(stanceSlide(synth({ dur: 1, hz, speed: () => 0 }), 1, 60).stances).toBe(0);   // standing: nothing to measure
   });
 
   test("steps: a 0.3 m snap is a 0.3 m per-frame jump; an eased 0.3 m rise over 0.15 s peaks at 5 cm a frame (smoothstep: 1.5x the mean slope)", () => {

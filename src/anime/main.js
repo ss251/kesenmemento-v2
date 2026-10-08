@@ -23,7 +23,8 @@ import { capturePose } from './core/pose.js';   // [ui-c] the pose a lost WebGL 
 import { createLossGuard, createLostCard, sessionStore, takeResume, resumeView, placeCamera, resumeClock, resumeSeason } from './core/survive.js';   // [ui-c] iPhone survival: a lost WebGL context -> a reload card, a reload, the visitor's pose back
 import { fovFor } from './core/fov.js';   // [ui-c2] the one field-of-view function: the screen (resize() below) and photo mode (ui/photo.js, through ctx.fovFor) both use it
 import { afterPaint } from './core/paint.js';   // [ui-c2] a label is on the glass before the long task that follows it
-import { loadPlan } from './core/loadplan.js';   // [ui-c2] the loading plan: a weight and a Japanese label for every stage of build()
+import { loadPlan } from './core/loadplan.js';
+import { FADE } from './world/explore/sbatch.js';   // [mobile-perf] ?fade=0 below   // [ui-c2] the loading plan: a weight and a Japanese label for every stage of build()
 import { createLoadBar } from './core/loadbar.js';   // [ui-c2] the intro card's bar, its creeping layer and its label
 import { posterForQuery, POSTER_HOURS } from './ui/loader/sky.js';   // [title] the still behind the title (the world behind it is the real hour)
 import { jstNow } from './world/life/clock.js';
@@ -68,6 +69,11 @@ const LITE = (() => {
 })();
 window.__lite = LITE;
 const quality = { ...TIER.quality };
+// [mobile-perf] The street-detail fades (world/explore/sbatch.js) put a discard in every stream pool's program, and a fragment shader that can
+// discard keeps an Apple GPU's hidden-surface removal from rejecting its fragments before they are shaded: in a street, where the kit's
+// buildings stand behind each other, that is shading for every layer. A phone has no frame time to spare for a 0.35 s nicety, so it pops
+// as before deploy #7 (?fade=1 forces the fades on, ?fade=0 off anywhere).
+FADE.on = params.get('fade') === '1' || (params.get('fade') !== '0' && !quality.phone);
 if (quality.phone) { ATLAS.page = PHONE.atlasPage; ATLAS.tileMax = PHONE.canvasMax; ATLAS.trim = PHONE.atlasTrim && params.get('atlas') !== 'square'; ATLAS.quantum = PHONE.atlasQuantum; ATLAS.release = params.get('release') !== '0'; ATLAS.density = params.has('density') ? Number(params.get('density')) : PHONE.atlasDensity; }   // [v6:phone-budget] ?atlas=square: the old square pages (A/B)
 if (SHOT) quality.pixelRatio = 1;
 

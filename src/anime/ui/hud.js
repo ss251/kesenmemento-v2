@@ -36,7 +36,12 @@ const ICON = {
   flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 21V4"/><path d="M5.5 4.5h11l-2.2 4 2.2 4h-11"/></svg>',
   caret: '<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M6 9l6 6 6-6"/></svg>',
   people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.2"/><circle cx="16" cy="9" r="1.8"/><path d="M4.5 18.5c.6-2.4 2.4-3.6 4.5-3.6s3.9 1.2 4.5 3.6"/><path d="M13.2 15.2c.7-.3 1.6-.5 2.6-.5 1.7 0 3.1.9 3.7 2.8"/></svg>',
+  sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',   // [emil-ui] 操作設定 in the ☰ (the pad's gear, ui/touchpad.js)
 };
+// [emil-ui] A portrait phone with the pad has no bottom pill row: the time chip at the top opens the time sheet (the time is where the time is changed), the
+// ☰ opens 名所, and the time sheet holds 今日の入船. The same query as touchpad-style.js's portrait block, so the routing and the CSS never disagree.
+const PHONE_PORTRAIT = '(max-width: 720px) and (orientation: portrait)';
+const phonePortrait = () => typeof document !== 'undefined' && document.body.classList.contains('klc-pad') && !!globalThis.matchMedia?.(PHONE_PORTRAIT).matches;
 const WX = { clear: '☀', partly: '⛅', cloudy: '☁', rain: '☂', snow: '❄' };
 const PRESET_DOT = { asa: '#ffd6ae', hiru: '#8fbde9', yugata: '#ffc996', yuyake: '#ff8f5c', yoru: '#2a3a70' };
 const stopName = (s, lang) => STRINGS[lang]?.['v3.stop.' + s.id] ?? (lang === 'en' ? s.en : s.ja);
@@ -136,10 +141,12 @@ export function mountHud(ctx, life, o = {}) {
       <div class="tools" id="klc-menu">
         <div class="mhead"><b>${esc(t('v3.wordmark'))}</b><small>${esc(t('v3.wordmarkSub'))}</small></div>
         ${jpycOn ? `<button class="round glass jpyc" data-act="jpyc" aria-haspopup="dialog" aria-label="${esc(jt('jpyc.menu'))}" title="${esc(jt('jpyc.menu.hint'))}">${JPYC_ICON.bag}<span class="lbl">${esc(jt('jpyc.menu'))}</span></button>` : ''}
+        <button class="round glass prow" data-act="sheet" data-sheet="places" aria-expanded="${ui.sheet === 'places'}" aria-controls="klc-places" aria-label="${esc(t('v3.tour.title'))}">${ICON.pin}<span class="lbl">${esc(t('v3.tour.title'))}</span></button>
         <button class="round txt glass" data-act="lang" aria-label="${esc(t('lang.toggle'))}">${esc(t('v3.lang'))}<span class="lbl">${esc(t('lang.toggle'))}</span></button>
         ${life.season ? `<button class="round txt glass season" data-act="season" aria-label="${esc(t('v3.season'))}: ${esc(t('v3.season.' + life.season.id))}" title="${esc(withKey(t('v3.season'), 'K'))}">${esc(t('v3.season.short.' + life.season.id))}<span class="lbl">${esc(t('v3.season'))} · ${esc(t('v3.season.' + life.season.id))}</span></button>` : ''}
         <button class="round glass" data-act="sound" aria-pressed="false" aria-label="${esc(t('v3.sound'))}" title="${esc(withKey(t('v3.sound'), 'M'))}">${ICON.sound}<span class="lbl">${esc(t('v3.sound'))}</span></button>
         <button class="round glass" data-act="planet" aria-pressed="${!!ctx.planet?.active}" aria-label="${esc(t('v3.planet'))}" title="${esc(withKey(t('v3.planet'), 'O'))}">${ICON.planet}<span class="lbl">${esc(t('v3.planet'))}</span></button>
+        <button class="round glass pset" data-act="padset" aria-haspopup="dialog" aria-label="${esc(tt('touch.settings'))}">${ICON.sliders}<span class="lbl">${esc(tt('touch.settings'))}</span></button>
         <button class="round glass cbtn" data-act="credits" aria-label="${esc(tt('touch.hud.credits'))}">${ICON.info}<span class="lbl">${esc(tt('touch.hud.credits'))}</span></button>
         <button class="round glass cbtn" data-act="labels" aria-pressed="${!!ctx.services?.explore?.ambientLabels}" aria-label="${esc(tt('touch.hud.labels'))}">${ICON.tag}<span class="lbl">${esc(tt('touch.hud.labels'))}</span></button>
         <button class="round glass" data-act="hide" aria-label="${esc(t('v3.hide'))}" title="${esc(withKey(t('v3.hide'), 'H'))}">${ICON.eye}<span class="lbl">${esc(t('v3.hide'))}</span></button>
@@ -151,12 +158,13 @@ export function mountHud(ctx, life, o = {}) {
         <ul id="klc-places">${tour.stops.map((s, i) => `<li><button data-act="stop" data-id="${s.id}" aria-current="${tour.current === s.id}"><span class="n">${i + 1}</span><span>${esc(stopName(s, I.lang))}<small>${esc(stopName(s, I.lang === 'en' ? 'ja' : 'en'))}</small></span></button></li>`).join('')}</ul>
         <button class="pill auto" data-act="auto" aria-pressed="${tour.playing}">${tour.playing ? ICON.pause : ICON.play}<span>${esc(tour.playing ? t('v3.tour.stopAuto') : t('v3.tour.auto'))}</span></button>
       </nav>
-      <div class="dock glass" role="toolbar" aria-label="${esc(t('time.label'))}">
+      <div class="dock glass" id="klc-time" role="toolbar" aria-label="${esc(t('time.label'))}">
         <div class="livebar">
           <span class="dclock" data-f="dclock">${esc(T.clock())}</span>
           <span class="livechip" data-f="livechip"${T.live && !T.pinned ? '' : ' hidden'}><i aria-hidden="true"></i><b>${esc(t('v3.live.mark'))}</b></span>
           <button type="button" class="wxbtn" data-act="wxsrc" data-f="dwx"></button>
           <button type="button" class="pill back" data-act="unlive"${T.live && !T.pinned ? ' hidden' : ''}>${esc(t('v3.live.back'))}</button>
+          <button type="button" class="pill arr" data-act="arrivals" aria-controls="klc-arr" aria-expanded="${ui.arrivalsOpen}">${ICON.boat}<span>${esc(t('v3.arrivals.title'))}</span></button>
         </div>
         <p class="wxpop glass" data-f="wxpop" hidden></p>
         <div class="seg" role="group" aria-label="${esc(t('time.label'))}">
@@ -165,10 +173,6 @@ export function mountHud(ctx, life, o = {}) {
         <span class="div"></span>
         <button class="pill" data-act="view" aria-pressed="false" title="V">${viewButtonHTML()}</button>
         <button class="pill shoot" data-act="photo" title="${esc(t('v3.photo.hint'))}">${ICON.camera}<span>${esc(t('v3.photo'))}</span></button>
-      </div>
-      <div class="pbar">
-        <button class="glass" data-act="sheet" data-sheet="places" aria-expanded="${ui.sheet === 'places'}" aria-label="${esc(t('v3.tour.title'))}">${ICON.pin}<span data-f="pcur">${esc(curName())}</span>${ICON.caret}</button>
-        <button class="glass" data-act="sheet" data-sheet="time" aria-expanded="${ui.sheet === 'time'}" aria-label="${esc(t('time.label'))}">${ICON.clock}<span data-f="ptime">${esc(timeLabel())}</span>${ICON.caret}</button>
       </div>
       <div class="help"><span class="desk">${esc(t('v3.help'))}</span><span class="touch">${esc(t('v3.help.touch'))}</span></div>
       <div class="attr">${esc(t('v3.attribution'))}<span class="lic"> · <a href="licenses/sakuragaoka-station.txt" target="_blank" rel="noopener">${esc(t('v3.license'))}</a></span></div>
@@ -208,10 +212,13 @@ export function mountHud(ctx, life, o = {}) {
     setData(el.querySelector('.places'), 'open', String(ui.placesOpen));
     setAttr(el.querySelector('[data-act="places"]'), 'aria-expanded', ui.placesOpen);
     setHidden(el.querySelector('.arrivals'), !ui.arrivalsOpen);
-    setAttr(el.querySelector('[data-act="arrivals"]'), 'aria-expanded', ui.arrivalsOpen);
+    // [emil-ui] the chip says what it opens: the time sheet on a portrait phone, the arrivals panel everywhere else (the time sheet's 今日の入船 opens them there)
+    const chip = el.querySelector('.brand .chip'), timeChip = phonePortrait();
+    setAttr(chip, 'aria-controls', timeChip ? 'klc-time' : 'klc-arr'); setAttr(chip, 'aria-expanded', timeChip ? ui.sheet === 'time' || ui.arrivalsOpen : ui.arrivalsOpen);
+    setAttr(el.querySelector('.dock .arr'), 'aria-expanded', ui.arrivalsOpen);
     // the stop the camera is at, and the tour button
     for (const b of el.querySelectorAll('[data-act="stop"]')) setAttr(b, 'aria-current', b.dataset.id === tour.current);
-    setText($('cur'), curName()); setText($('pcur'), curName());
+    setText($('cur'), curName());
     const au = el.querySelector('[data-act="auto"]');
     if (au) { setAttr(au, 'aria-pressed', tour.playing); paint('auto', tour.playing, () => { au.innerHTML = (tour.playing ? ICON.pause : ICON.play) + `<span>${esc(tour.playing ? t('v3.tour.stopAuto') : t('v3.tour.auto'))}</span>`; }); }
     // the 歩く / 飛ぶ button names the view it switches to
@@ -261,14 +268,11 @@ export function mountHud(ctx, life, o = {}) {
     syncFade(); requestAnimationFrame(syncFade);   // the strip has no width while its sheet is closed: measure once it is shown
   }
   const $ = (f) => el.querySelector(`[data-f="${f}"]`);
-  /** 夕方 16:30 (the time sheet's button). */
-  function timeLabel() { const p = T.presets.find((x) => x.id === T.preset); return p ? `${I.t('v3.time.' + p.id)} ${T.clock()}` : T.clock(); }
   function curName() { const s = tour.stops.find((x) => x.id === tour.current) || tour.stops[0]; return s ? stopName(s, I.lang) : ''; }
   function fill() {
     const t = I.t, s = live?.state || {}, w = s.weather;
     setText($('clock'), T.clock());
     setText($('dclock'), T.clock());
-    setText($('ptime'), timeLabel());
     const liveOn = !!(T.live && !T.pinned);
     const chip = $('livechip');
     if (chip) { setHidden(chip, !liveOn); setText(chip.querySelector('b'), t('v3.live.mark')); }
@@ -420,7 +424,13 @@ export function mountHud(ctx, life, o = {}) {
     else if (act === 'sound') { if (ctx.audio) ctx.audio.muted = !ctx.audio.muted; syncSound(); document.getElementById('mute')?.setAttribute('aria-pressed', String(!!ctx.audio?.muted)); }
     else if (act === 'lang') { I.set(I.lang === 'ja' ? 'en' : 'ja'); render(); ctx.services?.multi?.setLang(I.lang); if (e.detail === 0) el.querySelector('[data-act="lang"]')?.focus(); }   // the one click that rebuilds every string; a keyboard user lands back on the button (the old node is gone)
     else if (act === 'season') { life.season?.next(); syncState(); note(I.t('v3.season') + ' · ' + I.t('v3.season.' + life.season.id)); }   // [v3:integrate]
-    else if (act === 'arrivals') { ui.arrivalsOpen = !ui.arrivalsOpen; syncState(); }
+    else if (act === 'arrivals') {
+      // [emil-ui] on a portrait phone the chip is the time sheet's button (one time on the screen, and it is where the time is changed); the sheet's own 今日の入船 opens the arrivals
+      // (the arrivals panel is the time sheet's on a phone: the chip closes whichever of the two is open)
+      if (b.classList.contains('chip') && phonePortrait()) { if (ui.arrivalsOpen) { ui.arrivalsOpen = false; ui.sheet = ''; syncSheets(); } else setSheet('time'); syncState(); blur(); return; }
+      ui.arrivalsOpen = !ui.arrivalsOpen; if (ui.arrivalsOpen && phonePortrait()) ui.sheet = ''; syncState();
+    }
+    else if (act === 'padset') { ui.menu = false; syncSheets(); ctx.pad?.openSettings?.(!ctx.pad?.settingsOpen); }   // [emil-ui] 操作設定: the pad's gear, a ☰ row on a portrait phone; it opens and closes the settings
     else if (act === 'places') { ui.placesOpen = !ui.placesOpen; store.set('klc.places', ui.placesOpen ? '1' : '0'); syncState(); }
     blur();
   });
@@ -449,9 +459,10 @@ export function mountHud(ctx, life, o = {}) {
 
   // a touch outside the ☰ menu / a sheet closes it (pointerdown reaches here before the pad's touch handling)
   document.addEventListener('pointerdown', (e) => {
-    if (!ui.menu && !ui.sheet && !ui.credits) return;
-    const inside = e.target.closest?.('#klc-ui .tools, #klc-ui .mbtn, #klc-ui .pbar, #klc-ui .dock, #klc-ui .places, #klc-ui .credits');
-    if (!inside) { ui.menu = false; ui.sheet = ''; ui.credits = false; syncState(); }
+    const arr = ui.arrivalsOpen && phonePortrait();   // [emil-ui] on a phone the arrivals panel is the time sheet's, and closes like it
+    if (!ui.menu && !ui.sheet && !ui.credits && !arr) return;
+    const inside = e.target.closest?.('#klc-ui .tools, #klc-ui .mbtn, #klc-ui .brand .chip, #klc-ui .arrivals, #klc-ui .dock, #klc-ui .places, #klc-ui .credits');   // [emil-ui] the chip opens and closes the time sheet on a phone: its own touch is not "outside"
+    if (!inside) { ui.menu = false; ui.sheet = ''; ui.credits = false; if (arr) ui.arrivalsOpen = false; syncState(); }
   }, true);
   // [ui-a2] a press on the scene takes the camera back from a flight (a mouse or a pen on the canvas). A touch is the pad's (ui/touchpad.js onTouchStart, while it is out of the way): one
   // touch fires pointerdown and touchstart, and the flight must be ended once, so with the pad on the pointer event of a finger is left to it. The auto tour has its own pause button and G.
@@ -459,6 +470,8 @@ export function mountHud(ctx, life, o = {}) {
     if (e.target?.id !== 'scene' || (e.pointerType === 'touch' && ctx.pad?.active)) return;
     interruptFlight(tour, ctx.veil);
   }, true);
+  // [emil-ui] a turned phone: the chip changes what it opens (time sheet / arrivals), and a portrait sheet or ☰ menu does not stay open in landscape (it would keep the pad suppressed there)
+  try { matchMedia(PHONE_PORTRAIT).addEventListener('change', () => { ui.sheet = ''; ui.menu = false; syncState(); }); } catch (e) { /* no matchMedia */ }
   // visibility: after "Enter the town", or forced (?ui=1)
   const show = () => { el.hidden = !(o.force || document.body.classList.contains('playing')); };
   new MutationObserver(show).observe(document.body, { attributes: true, attributeFilter: ['class'] });
@@ -470,7 +483,7 @@ export function mountHud(ctx, life, o = {}) {
     if (acc > 0.5) {
       acc = 0;
       const c = T.clock();
-      setText($('clock'), c); setText($('dclock'), c); setText($('ptime'), timeLabel());
+      setText($('clock'), c); setText($('dclock'), c);
       if (c !== minute) { minute = c; fill(); }   // 予定 / 入港済み flips when the minute crosses an ETA
     }
   } };

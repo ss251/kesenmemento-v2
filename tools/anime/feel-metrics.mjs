@@ -5,7 +5,7 @@
 
 export const FIELDS = ['t', 'dt', 'alpha', 'px', 'py', 'pz', 'vx', 'vz', 'vy', 'gnd', 'fly', 'yaw', 'pitch',
   'rx', 'ry', 'rz', 'rface', 'cx', 'cy', 'cz', 'lx', 'ly', 'lz', 'fRx', 'fRy', 'fRz', 'fLx', 'fLy', 'fLz',
-  'inF', 'inS', 'run', 'boom', 'top', 'bot', 'clip', 'simT', 'water', 'ground', 'ax', 'az'];
+  'inF', 'inS', 'run', 'boom', 'top', 'bot', 'clip', 'simT', 'water', 'ground', 'ax', 'az', 'fov'];
 
 /** The chase boom the camera aims for on open ground (play/avatar/camera.js THIRD at main 8882864). */
 export const THIRD_BEFORE = { dist: 4.5, height: 1.6, pitch: -8 * Math.PI / 180, shoulder: 0.35 };
@@ -210,20 +210,22 @@ export function catchUp(frames, a, b) {
 }
 
 /**
- * Feet over steady walking [a, b): the planted foot (the lower ankle) and its ground speed (slip, m/s), the slip as a share of the body's
- * speed, and the cycle rate measured from the feet (cycles/s, zero crossings of the right foot's lead along the facing).
+ * Feet over steady walking [a, b): the planted foot's ground speed (slip, m/s) and its share of the body's speed, and the cycle rate
+ * measured from the feet (cycles/s, zero crossings of the right foot's lead along the facing). The planted foot is the lower ankle; its
+ * slip is the MEDIAN of its horizontal world speed over the window, so the few hand-over frames (one boot still landing while the other
+ * lifts) do not count as a slide, and neither does the heel-to-toe roll (the ankle holds still over a planted boot through mid-stance:
+ * measured in town, -0.08..+0.11 m/s for ~7 frames a stance at 1.5 m/s). p90 is reported beside it to show the hand-overs.
  */
 export function footMetrics(frames, a, b) {
-  const slip = [], share = [];
+  const slip = [];
   let cross = 0, tA = null, tB = null, prevU = null;
   for (let i = Math.max(a, 1); i < b; i++) {
     const f = frames[i], p = frames[i - 1];
     const dt = f.simT - p.simT; if (!(dt > 1e-6)) continue;
-    if (!Number.isFinite(f.fRx)) continue;
+    if (!Number.isFinite(f.fRx) || !Number.isFinite(p.fRx)) continue;
     const lowR = f.fRy <= f.fLy;
     const vx = lowR ? (f.fRx - p.fRx) / dt : (f.fLx - p.fLx) / dt, vz = lowR ? (f.fRz - p.fRz) / dt : (f.fLz - p.fLz) / dt;
-    const s = Math.hypot(vx, vz), body = speedOf(f);
-    slip.push(s); if (body > 0.3) share.push(s / body);
+    slip.push(Math.hypot(vx, vz));
     const fx = -Math.sin(f.rface), fz = -Math.cos(f.rface);
     const u = (f.fRx - f.rx) * fx + (f.fRz - f.rz) * fz;
     if (prevU !== null && prevU < 0 && u >= 0) { cross++; if (tA === null) tA = f.simT; tB = f.simT; }
@@ -231,7 +233,39 @@ export function footMetrics(frames, a, b) {
   }
   const cadence = cross > 1 && tB > tA ? (cross - 1) / (tB - tA) : null;
   const body = steadySpeed(frames, a, b);
-  return { body: r3(body), slipMean: r3(mean(slip)), slipShare: r3(mean(share)), cadence: r3(cadence), stride: cadence ? r3(body / cadence) : null };
+  const s = slip.slice().sort((x, y) => x - y), med = median(slip), p90 = s.length ? s[Math.floor(s.length * 0.9)] : NaN;
+  return { body: r3(body), slipMean: r3(med), slipShare: body > 0.3 ? r3(med / body) : null, slipP90: r3(p90), cadence: r3(cadence), stride: cadence ? r3(body / cadence) : null };
+}
+
+/**
+ * The slide per stance over steady walking [a, b): for each foot, every stretch where its ankle is down (within 1.2 cm of its lowest, the
+ * hoya lane's definition); the boot's travel along his heading from the frame after it touched down to the frame it lifts (slideCm), and
+ * in the touch-down frame itself (skidCm), and across his heading over the same frames (acrossCm), medians over the stances. A planted
+ * foot slides 0 cm however its heel and toe roll. acrossMs is the lower ankle's sideways speed at every frame, its swing included (the
+ * median of |v|): a coarse number kept for comparison with earlier runs, not a planted foot's.
+ */
+export function stanceSlide(frames, a, b) {
+  const q = frames[b - 1]; const body = speedOf(q);
+  if (!(body > 0.3)) return { slideCm: null, skidCm: null, acrossCm: null, stances: 0 };
+  const dx = q.vx / body, dz = q.vz / body, slides = [], skids = [], sides = [], across = [];
+  for (const k of ['R', 'L']) {
+    let lo = Infinity; for (let i = a; i < b; i++) { const y = frames[i]['f' + k + 'y']; if (Number.isFinite(y)) lo = Math.min(lo, y - frames[i].ground); }
+    let run = [];
+    const along = (i) => frames[i]['f' + k + 'x'] * dx + frames[i]['f' + k + 'z'] * dz;
+    const side = (i) => -frames[i]['f' + k + 'x'] * dz + frames[i]['f' + k + 'z'] * dx;
+    const flush = () => {
+      if (run.length >= 2) { const e = run[run.length - 1]; slides.push(Math.abs(along(e) - along(run[1]))); skids.push(Math.abs(along(run[1]) - along(run[0]))); sides.push(Math.abs(side(e) - side(run[1]))); }
+      run = [];
+    };
+    for (let i = a; i < b; i++) { const y = frames[i]['f' + k + 'y']; if (Number.isFinite(y) && y - frames[i].ground < lo + 0.012) run.push(i); else flush(); }
+    flush();
+  }
+  for (let i = Math.max(a, 1); i < b; i++) {
+    const f = frames[i], p = frames[i - 1], dt = f.simT - p.simT; if (!(dt > 1e-6) || !Number.isFinite(f.fRx)) continue;
+    const lowR = f.fRy <= f.fLy, vx = lowR ? (f.fRx - p.fRx) / dt : (f.fLx - p.fLx) / dt, vz = lowR ? (f.fRz - p.fRz) / dt : (f.fLz - p.fLz) / dt;
+    across.push(Math.abs(-vx * dz + vz * dx));
+  }
+  return { slideCm: r3(median(slides) * 100), skidCm: r3(median(skids) * 100), acrossCm: r3(median(sides) * 100), stances: slides.length, acrossMs: r3(median(across)) };
 }
 
 /**
@@ -264,6 +298,17 @@ export function framing(frames, a, b) {
   return { share: r3(median(v)) };
 }
 
+/** The field of view over [a, b) (the run's widening): its range, the largest change in one frame (deg), and its value at the end. */
+export function fovMetrics(frames, a, b) {
+  let lo = Infinity, hi = -Infinity, step = 0;
+  for (let i = a; i < b; i++) {
+    const f = frames[i]; if (!Number.isFinite(f.fov)) continue;
+    lo = Math.min(lo, f.fov); hi = Math.max(hi, f.fov);
+    const p = frames[i - 1]; if (p && Number.isFinite(p.fov)) step = Math.max(step, Math.abs(f.fov - p.fov));
+  }
+  return { min: r3(lo), max: r3(hi), widen: r3(hi - lo), maxStep: r3(step), end: r3(frames[b - 1]?.fov) };
+}
+
 /** Frame pacing over [a, b): the frame interval (ms) mean / p95 / max on the page clock and the simulated seconds per real second. */
 export function pacing(frames, a, b) {
   const g = [];
@@ -271,3 +316,70 @@ export function pacing(frames, a, b) {
   const s = g.slice().sort((x, y) => x - y);
   return { meanMs: r3(mean(g)), p95Ms: r3(s[Math.floor(s.length * 0.95)] ?? NaN), maxMs: r3(s[s.length - 1] ?? NaN), n: g.length };
 }
+
+// ------------------------------------------------------------------ the probe's script, scored (feel-probe.mjs and feel-score.mjs)
+function bracket(marks, id, next) {
+  const a = marks.find((m) => m[0] === id), b = marks.find((m) => m[0] === next);
+  return a && b ? [a[1], b[1]] : null;
+}
+const inputHeadingAt = (fr, i) => (fr[i] ? inputHeading(fr[i]) : null);
+/** The first frame in [a, b) where `pred` holds (the input's onset inside a bracket), else a. */
+const onset = (fr, a, b, pred) => { for (let i = a; i < Math.min(b, fr.length); i++) if (pred(fr[i])) return i; return a; };
+
+/** The first frame of the last `secs` seconds of [a, b) (windows in time, not frames: 90 frames is 1.5 s at 60 fps but 3 s at 30). */
+function lastSecs(fr, a, b, secs) { const t1 = fr[b - 1].simT; let i = b - 1; while (i > a && t1 - fr[i - 1].simT <= secs + 1e-9) i--; return i; }
+
+/** The probe's scripted walk, scored: every number above over its brackets (marks from tools/anime/feel-probe.mjs). */
+export function analyseRun(fr, marks) {
+  const B = (id, next) => bracket(marks, id, next);
+  const out = {};
+  const settle = B('settle', 'walk'), walk = B('walk', 'run'), run = B('run', 'reverse'), rev = B('reverse', 'stop'), stop = B('stop', 'curve0');
+  const curve = B('curve', 'curveStop');
+  if (settle) out.framing = framing(fr, settle[0], settle[1]);
+  if (walk) {
+    const a = onset(fr, walk[0], walk[1] + 8, (f) => inputMag(f) > 0.01);
+    const b = run ? onset(fr, run[0], run[1], (f) => f.run) : walk[1];
+    out.walkStart = startResponse(fr, a, b);
+    out.walkFeet = { ...footMetrics(fr, lastSecs(fr, a, b, 1), b), ...stanceSlide(fr, lastSecs(fr, a, b, 1.5), b) };
+    out.walkCam = { ...cameraMetrics(fr, lastSecs(fr, a, b, 1.5), b), ...trail(fr, a - 1, lastSecs(fr, a, b, 0.5), b) };
+  }
+  if (run) {
+    const a = onset(fr, run[0], run[1] + 8, (f) => f.run);
+    const b = onset(fr, a + 1, rev ? rev[1] : run[1], (f) => !f.run || inputMag(f) < 0.5);   // the run window ends with the run input (a thumb's flick passes the dead zone on its way back)
+    out.runStart = startResponse(fr, a, b);
+    const brev = rev ? onset(fr, rev[0], rev[1], (f) => f.inF < -0.01) : run[1];
+    void brev;
+    out.runFeet = { ...footMetrics(fr, lastSecs(fr, a, b, 1), b), ...stanceSlide(fr, lastSecs(fr, a, b, 1.15), b) };
+    const rest = walk ? onset(fr, walk[0], walk[1] + 8, (f) => inputMag(f) > 0.01) - 1 : a - 1;
+    out.runCam = { ...cameraMetrics(fr, lastSecs(fr, a, b, 1), b), ...trail(fr, rest, lastSecs(fr, a, b, 0.33), b) };
+  }
+  if (rev) {
+    const a = onset(fr, rev[0], rev[1] + 8, (f) => f.inF < -0.01);
+    const b = stop ? onset(fr, stop[0], stop[1] + 8, (f) => inputMag(f) < 0.01) : rev[1];
+    out.turn180 = turnResponse(fr, a, b);
+    out.reverseStart = startResponse(fr, a, b);
+  }
+  if (stop) {
+    const a = onset(fr, stop[0], stop[1] + 8, (f) => inputMag(f) < 0.01);
+    out.stop = stopResponse(fr, a, stop[1]);
+    out.stopCam = { ...cameraMetrics(fr, a, stop[1]), ...catchUp(fr, a, stop[1]) };
+  }
+  if (curve) {
+    const a = onset(fr, curve[0], curve[1] + 8, (f) => Math.abs(f.inS) > 0.01);
+    const want = inputHeadingAt(fr, curve[1] - 1);
+    out.curve45 = turnResponse(fr, a, curve[1], 10 * Math.PI / 180, want);
+  }
+  for (const id of ['steps', 'stair']) {
+    const st = B(id, id + 'Stop');
+    if (!st) continue;
+    const a = onset(fr, st[0], st[1] + 8, (f) => inputMag(f) > 0.01);
+    const end = B(id + 'Stop', id + 'End');
+    out[id] = stepMetrics(fr, a, end ? end[1] : st[1]);
+    out[id + 'Cam'] = cameraMetrics(fr, a, st[1]);
+  }
+  if (walk && stop) out.fov = { walkToStop: fovMetrics(fr, walk[0], stop[1]), atRest: fovMetrics(fr, Math.max(stop[0], stop[1] - 30), stop[1]) };
+  const all = B('settle', 'end');
+  if (all) { out.pacing = pacing(fr, all[0], all[1]); out.camAll = cameraMetrics(fr, all[0], all[1]); }
+  return out;
+}
+

@@ -1,0 +1,1172 @@
+{
+ "label": "r8",
+ "scored": "2026-10-08T07:36:27.660Z",
+ "from": "saved recordings (tools/anime/feel-score.mjs)",
+ "sessions": [
+  {
+   "dev": "desktop",
+   "fps": 30,
+   "file": "desktop-30.json",
+   "frames": 1162,
+   "metrics": {
+    "framing": {
+     "share": 0.218
+    },
+    "walkStart": {
+     "steady": 1.5,
+     "t90": 0.1,
+     "t50": 0.033,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.893,
+      "ms100": 0.962,
+      "ms150": 0.996,
+      "ms250": 1
+     }
+    },
+    "walkFeet": {
+     "body": 1.5,
+     "slipMean": 0.442,
+     "slipShare": 0.295,
+     "slipP90": 1.528,
+     "cadence": 4.091,
+     "stride": 0.367,
+     "slideCm": null,
+     "skidCm": null,
+     "acrossCm": null,
+     "stances": 0,
+     "acrossMs": 0.312
+    },
+    "walkCam": {
+     "lagMean": 0,
+     "lagMax": 0,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 46,
+     "trail": 0,
+     "lookLead": 0.21
+    },
+    "runStart": {
+     "steady": 3,
+     "t90": 0.067,
+     "t50": 0,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.946,
+      "ms100": 0.981,
+      "ms150": 0.998,
+      "ms250": 1
+     }
+    },
+    "runFeet": {
+     "body": 3,
+     "slipMean": 1.49,
+     "slipShare": 0.497,
+     "slipP90": 5.196,
+     "cadence": 5.455,
+     "stride": 0.55,
+     "slideCm": 0,
+     "skidCm": 0.057,
+     "acrossCm": 0,
+     "stances": 5,
+     "acrossMs": 0.287
+    },
+    "runCam": {
+     "lagMean": 0,
+     "lagMax": 0,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 31,
+     "trail": 0,
+     "lookLead": 0.419
+    },
+    "turn180": {
+     "swingDeg": 180,
+     "tTurn": 0.167,
+     "endErrDeg": 0,
+     "minSpeed": 0.334,
+     "backwardsShare": 0,
+     "maxRateDegS": 1900.641
+    },
+    "reverseStart": {
+     "steady": 1.5,
+     "t90": 0,
+     "t50": 0,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.47,
+      "ms100": 0.801,
+      "ms150": 0.976,
+      "ms250": 0.999
+     }
+    },
+    "stop": {
+     "from": 1.5,
+     "tStop": 0.1,
+     "slide": 0.078,
+     "overshoot": 0
+    },
+    "stopCam": {
+     "lagMean": 0.002,
+     "lagMax": 0.025,
+     "jitter": {
+      "rms": 2.204,
+      "rmsY": 0,
+      "max": 12.583
+     },
+     "lookJitter": {
+      "rms": 0.024,
+      "rmsY": 0.024,
+      "max": 0.116
+     },
+     "n": 49,
+     "after": 0.033,
+     "travel": 0.003
+    },
+    "curve45": {
+     "swingDeg": 45,
+     "tTurn": 0.1,
+     "endErrDeg": 0,
+     "minSpeed": 0,
+     "backwardsShare": 0,
+     "maxRateDegS": 475.16
+    },
+    "steps": {
+     "bodyMaxDy": 0.077,
+     "camMaxDy": 0.024,
+     "jumps5cm": 2,
+     "airFrames": 0,
+     "hiddenFrames": 0,
+     "climbed": 0.212,
+     "camPop": 0.014,
+     "boomJump": 0
+    },
+    "stepsCam": {
+     "lagMean": 0.016,
+     "lagMax": 0.169,
+     "jitter": {
+      "rms": 1.123,
+      "rmsY": 0.36,
+      "max": 11.416
+     },
+     "lookJitter": {
+      "rms": 0.001,
+      "rmsY": 0.001,
+      "max": 0.012
+     },
+     "n": 211
+    },
+    "stair": {
+     "bodyMaxDy": 0.28,
+     "camMaxDy": 0.681,
+     "jumps5cm": 19,
+     "airFrames": 20,
+     "hiddenFrames": 23,
+     "climbed": 2.935,
+     "camPop": 3.335,
+     "boomJump": 3.54
+    },
+    "stairCam": {
+     "lagMean": 0.288,
+     "lagMax": 1.223,
+     "jitter": {
+      "rms": 279.987,
+      "rmsY": 49.756,
+      "max": 3109.775
+     },
+     "lookJitter": {
+      "rms": 41.526,
+      "rmsY": 28.079,
+      "max": 311.934
+     },
+     "n": 58
+    },
+    "fov": {
+     "walkToStop": {
+      "min": 55,
+      "max": 58.5,
+      "widen": 3.5,
+      "maxStep": 0.384,
+      "end": 55
+     },
+     "atRest": {
+      "min": 55,
+      "max": 55,
+      "widen": 0,
+      "maxStep": 0,
+      "end": 55
+     }
+    },
+    "pacing": {
+     "meanMs": 33.265,
+     "p95Ms": 35.8,
+     "maxMs": 37.6,
+     "n": 406
+    },
+    "camAll": {
+     "lagMean": 0.002,
+     "lagMax": 0.057,
+     "jitter": {
+      "rms": 5.551,
+      "rmsY": 0,
+      "max": 55.694
+     },
+     "lookJitter": {
+      "rms": 0.11,
+      "rmsY": 0.035,
+      "max": 1.193
+     },
+     "n": 407
+    }
+   }
+  },
+  {
+   "dev": "desktop",
+   "fps": 60,
+   "file": "desktop-60.json",
+   "frames": 9000,
+   "metrics": {
+    "framing": {
+     "share": 0.218
+    },
+    "walkStart": {
+     "steady": 1.5,
+     "t90": 0.1,
+     "t50": 0.033,
+     "firstMoveFrames": 1,
+     "curve": {
+      "ms50": 0.719,
+      "ms100": 0.935,
+      "ms150": 0.987,
+      "ms250": 1
+     }
+    },
+    "walkFeet": {
+     "body": 1.5,
+     "slipMean": 0.42,
+     "slipShare": 0.28,
+     "slipP90": 0.949,
+     "cadence": 4.091,
+     "stride": 0.367,
+     "slideCm": 0,
+     "skidCm": 0.125,
+     "acrossCm": 0,
+     "stances": 12,
+     "acrossMs": 0.324
+    },
+    "walkCam": {
+     "lagMean": 0,
+     "lagMax": 0,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 91,
+     "trail": 0,
+     "lookLead": 0.21
+    },
+    "runStart": {
+     "steady": 3,
+     "t90": 0.067,
+     "t50": 0,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.86,
+      "ms100": 0.968,
+      "ms150": 0.993,
+      "ms250": 1
+     }
+    },
+    "runFeet": {
+     "body": 3,
+     "slipMean": 1.176,
+     "slipShare": 0.392,
+     "slipP90": 4.753,
+     "cadence": 5.455,
+     "stride": 0.55,
+     "slideCm": 0.018,
+     "skidCm": 0.061,
+     "acrossCm": 0.305,
+     "stances": 13,
+     "acrossMs": 0.359
+    },
+    "runCam": {
+     "lagMean": 0,
+     "lagMax": 0,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 61,
+     "trail": 0,
+     "lookLead": 0.419
+    },
+    "turn180": {
+     "swingDeg": 180,
+     "tTurn": 0.167,
+     "endErrDeg": 0,
+     "minSpeed": 0.252,
+     "backwardsShare": 0,
+     "maxRateDegS": 1921.682
+    },
+    "reverseStart": {
+     "steady": 1.5,
+     "t90": 0,
+     "t50": 0,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.222,
+      "ms100": 0.671,
+      "ms150": 0.93,
+      "ms250": 0.997
+     }
+    },
+    "stop": {
+     "from": 1.5,
+     "tStop": 0.1,
+     "slide": 0.078,
+     "overshoot": 0
+    },
+    "stopCam": {
+     "lagMean": 0.002,
+     "lagMax": 0.023,
+     "jitter": {
+      "rms": 3.477,
+      "rmsY": 0,
+      "max": 17.327
+     },
+     "lookJitter": {
+      "rms": 0.033,
+      "rmsY": 0.032,
+      "max": 0.165
+     },
+     "n": 99,
+     "after": 0.05,
+     "travel": 0.007
+    },
+    "curve45": {
+     "swingDeg": 45,
+     "tTurn": 0.1,
+     "endErrDeg": 0,
+     "minSpeed": 0,
+     "backwardsShare": 0,
+     "maxRateDegS": 480.42
+    },
+    "steps": {
+     "bodyMaxDy": 0.04,
+     "camMaxDy": 0.012,
+     "jumps5cm": 0,
+     "airFrames": 0,
+     "hiddenFrames": 0,
+     "climbed": 0.212,
+     "camPop": 0.008,
+     "boomJump": 0
+    },
+    "stepsCam": {
+     "lagMean": 0.019,
+     "lagMax": 0.175,
+     "jitter": {
+      "rms": 1.439,
+      "rmsY": 0.395,
+      "max": 16.302
+     },
+     "lookJitter": {
+      "rms": 0.002,
+      "rmsY": 0.002,
+      "max": 0.025
+     },
+     "n": 493
+    },
+    "stair": {
+     "bodyMaxDy": 0,
+     "camMaxDy": 0,
+     "jumps5cm": 0,
+     "airFrames": 0,
+     "hiddenFrames": 0,
+     "climbed": 0,
+     "camPop": 0,
+     "boomJump": 0
+    },
+    "stairCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": null,
+      "rmsY": null,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": null,
+      "rmsY": null,
+      "max": 0
+     },
+     "n": 0
+    },
+    "fov": {
+     "walkToStop": {
+      "min": 55,
+      "max": 58.5,
+      "widen": 3.5,
+      "maxStep": 0.193,
+      "end": 55
+     },
+     "atRest": {
+      "min": 55,
+      "max": 55,
+      "widen": 0,
+      "maxStep": 0,
+      "end": 55
+     }
+    },
+    "pacing": {
+     "meanMs": 16.649,
+     "p95Ms": 18.6,
+     "maxMs": 20.1,
+     "n": 808
+    },
+    "camAll": {
+     "lagMean": 0.002,
+     "lagMax": 0.054,
+     "jitter": {
+      "rms": 6.135,
+      "rmsY": 0,
+      "max": 95.778
+     },
+     "lookJitter": {
+      "rms": 0.128,
+      "rmsY": 0.038,
+      "max": 1.857
+     },
+     "n": 809
+    }
+   }
+  },
+  {
+   "dev": "phone",
+   "fps": 30,
+   "file": "phone-30.json",
+   "frames": 976,
+   "metrics": {
+    "framing": {
+     "share": 0.2
+    },
+    "walkStart": {
+     "steady": 1.5,
+     "t90": 0.133,
+     "t50": 0.1,
+     "firstMoveFrames": 1,
+     "curve": {
+      "ms50": 0.484,
+      "ms100": 0.775,
+      "ms150": 0.97,
+      "ms250": 0.999
+     }
+    },
+    "walkFeet": {
+     "body": 1.5,
+     "slipMean": 0.44,
+     "slipShare": 0.293,
+     "slipP90": 2.163,
+     "cadence": 4.091,
+     "stride": 0.367,
+     "slideCm": null,
+     "skidCm": null,
+     "acrossCm": null,
+     "stances": 0,
+     "acrossMs": 0.313
+    },
+    "walkCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.002
+     },
+     "n": 0,
+     "trail": 0,
+     "lookLead": 0.21
+    },
+    "runStart": {
+     "steady": 3,
+     "t90": 0.067,
+     "t50": 0,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.946,
+      "ms100": 0.981,
+      "ms150": 0.998,
+      "ms250": 1
+     }
+    },
+    "runFeet": {
+     "body": 3,
+     "slipMean": 1.796,
+     "slipShare": 0.599,
+     "slipP90": 5.495,
+     "cadence": 5.357,
+     "stride": 0.56,
+     "slideCm": 0,
+     "skidCm": 0.081,
+     "acrossCm": 0,
+     "stances": 3,
+     "acrossMs": 0.276
+    },
+    "runCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 0,
+     "trail": 0,
+     "lookLead": 0.419
+    },
+    "turn180": {
+     "swingDeg": 180,
+     "tTurn": 0.167,
+     "endErrDeg": 0,
+     "minSpeed": 0.169,
+     "backwardsShare": 0,
+     "maxRateDegS": 1900.641
+    },
+    "reverseStart": {
+     "steady": 1.5,
+     "t90": 0.133,
+     "t50": 0.067,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.537,
+      "ms100": 0.807,
+      "ms150": 0.975,
+      "ms250": 0.999
+     }
+    },
+    "stop": {
+     "from": 1.5,
+     "tStop": 0.1,
+     "slide": 0.078,
+     "overshoot": 0
+    },
+    "stopCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 2.856,
+      "rmsY": 0,
+      "max": 16.213
+     },
+     "lookJitter": {
+      "rms": 0.102,
+      "rmsY": 0.098,
+      "max": 0.467
+     },
+     "n": 0,
+     "after": 0.033,
+     "travel": 0.003
+    },
+    "curve45": {
+     "swingDeg": 45,
+     "tTurn": 0.333,
+     "endErrDeg": 0,
+     "minSpeed": 1.494,
+     "backwardsShare": 0,
+     "maxRateDegS": 122.811
+    },
+    "steps": {
+     "bodyMaxDy": 0.077,
+     "camMaxDy": 0.025,
+     "jumps5cm": 3,
+     "airFrames": 0,
+     "hiddenFrames": 0,
+     "climbed": 0.211,
+     "camPop": 0.014,
+     "boomJump": 0
+    },
+    "stepsCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 1.236,
+      "rmsY": 0.365,
+      "max": 10.689
+     },
+     "lookJitter": {
+      "rms": 0.006,
+      "rmsY": 0.006,
+      "max": 0.053
+     },
+     "n": 0
+    },
+    "stair": {
+     "bodyMaxDy": 0.032,
+     "camMaxDy": 0.035,
+     "jumps5cm": 0,
+     "airFrames": 0,
+     "hiddenFrames": 185,
+     "climbed": 1.558,
+     "camPop": 0.102,
+     "boomJump": 0.035
+    },
+    "stairCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 223.882,
+      "rmsY": 54.074,
+      "max": 2263.071
+     },
+     "lookJitter": {
+      "rms": 14.111,
+      "rmsY": 13.959,
+      "max": 142.886
+     },
+     "n": 0
+    },
+    "fov": {
+     "walkToStop": {
+      "min": 88,
+      "max": 91.5,
+      "widen": 3.5,
+      "maxStep": 0.384,
+      "end": 88
+     },
+     "atRest": {
+      "min": 88,
+      "max": 88,
+      "widen": 0,
+      "maxStep": 0,
+      "end": 88
+     }
+    },
+    "pacing": {
+     "meanMs": 33.275,
+     "p95Ms": 35,
+     "maxMs": 35.7,
+     "n": 403
+    },
+    "camAll": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 4.41,
+      "rmsY": 0,
+      "max": 37.777
+     },
+     "lookJitter": {
+      "rms": 0.121,
+      "rmsY": 0.077,
+      "max": 1.383
+     },
+     "n": 0
+    }
+   }
+  },
+  {
+   "dev": "phone",
+   "fps": 60,
+   "file": "phone-60-clip.json",
+   "frames": 1978,
+   "metrics": {
+    "framing": {
+     "share": 0.2
+    },
+    "walkStart": {
+     "steady": 1.5,
+     "t90": 0.15,
+     "t50": 0.1,
+     "firstMoveFrames": 2,
+     "curve": {
+      "ms50": 0.166,
+      "ms100": 0.651,
+      "ms150": 0.914,
+      "ms250": 0.997
+     }
+    },
+    "walkFeet": {
+     "body": 1.5,
+     "slipMean": 0.437,
+     "slipShare": 0.291,
+     "slipP90": 1.046,
+     "cadence": 4.091,
+     "stride": 0.367,
+     "slideCm": 0,
+     "skidCm": 0.127,
+     "acrossCm": 0,
+     "stances": 11,
+     "acrossMs": 0.308
+    },
+    "walkCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 0,
+     "trail": 0,
+     "lookLead": 0.21
+    },
+    "runStart": {
+     "steady": 3,
+     "t90": 0.067,
+     "t50": 0,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.86,
+      "ms100": 0.968,
+      "ms150": 0.993,
+      "ms250": 1
+     }
+    },
+    "runFeet": {
+     "body": 3,
+     "slipMean": 1.225,
+     "slipShare": 0.408,
+     "slipP90": 4.826,
+     "cadence": 5.581,
+     "stride": 0.537,
+     "slideCm": 0.021,
+     "skidCm": 0.067,
+     "acrossCm": 0.42,
+     "stances": 13,
+     "acrossMs": 0.356
+    },
+    "runCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 0,
+     "trail": 0,
+     "lookLead": 0.419
+    },
+    "turn180": {
+     "swingDeg": 180,
+     "tTurn": 0.167,
+     "endErrDeg": 0,
+     "minSpeed": 0.05,
+     "backwardsShare": 0,
+     "maxRateDegS": 1921.682
+    },
+    "reverseStart": {
+     "steady": 1.5,
+     "t90": 0.15,
+     "t50": 0.083,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.126,
+      "ms100": 0.695,
+      "ms150": 0.928,
+      "ms250": 0.997
+     }
+    },
+    "stop": {
+     "from": 1.5,
+     "tStop": 0.1,
+     "slide": 0.078,
+     "overshoot": 0
+    },
+    "stopCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 3.517,
+      "rmsY": 0,
+      "max": 17.327
+     },
+     "lookJitter": {
+      "rms": 0.106,
+      "rmsY": 0.102,
+      "max": 0.537
+     },
+     "n": 0,
+     "after": 0.05,
+     "travel": 0.007
+    },
+    "curve45": {
+     "swingDeg": 45,
+     "tTurn": 0.417,
+     "endErrDeg": 0,
+     "minSpeed": 1.495,
+     "backwardsShare": 0,
+     "maxRateDegS": 111.476
+    },
+    "steps": {
+     "bodyMaxDy": 0.04,
+     "camMaxDy": 0.012,
+     "jumps5cm": 0,
+     "airFrames": 0,
+     "hiddenFrames": 0,
+     "climbed": 0.211,
+     "camPop": 0.008,
+     "boomJump": 0
+    },
+    "stepsCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 1.347,
+      "rmsY": 0.37,
+      "max": 13.277
+     },
+     "lookJitter": {
+      "rms": 0.007,
+      "rmsY": 0.006,
+      "max": 0.058
+     },
+     "n": 0
+    },
+    "stair": {
+     "bodyMaxDy": 0.016,
+     "camMaxDy": 0.018,
+     "jumps5cm": 0,
+     "airFrames": 0,
+     "hiddenFrames": 372,
+     "climbed": 1.558,
+     "camPop": 0.123,
+     "boomJump": 0.017
+    },
+    "stairCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 624.299,
+      "rmsY": 150.765,
+      "max": 9050.625
+     },
+     "lookJitter": {
+      "rms": 39.354,
+      "rmsY": 38.93,
+      "max": 571.514
+     },
+     "n": 0
+    },
+    "fov": {
+     "walkToStop": {
+      "min": 88,
+      "max": 91.5,
+      "widen": 3.5,
+      "maxStep": 0.193,
+      "end": 88
+     },
+     "atRest": {
+      "min": 88,
+      "max": 88,
+      "widen": 0,
+      "maxStep": 0,
+      "end": 88
+     }
+    },
+    "pacing": {
+     "meanMs": 16.638,
+     "p95Ms": 18.5,
+     "maxMs": 23.5,
+     "n": 825
+    },
+    "camAll": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 4.334,
+      "rmsY": 0,
+      "max": 45.631
+     },
+     "lookJitter": {
+      "rms": 0.139,
+      "rmsY": 0.083,
+      "max": 1.631
+     },
+     "n": 0
+    }
+   }
+  },
+  {
+   "dev": "phone",
+   "fps": 60,
+   "file": "phone-60.json",
+   "frames": 1982,
+   "metrics": {
+    "framing": {
+     "share": 0.2
+    },
+    "walkStart": {
+     "steady": 1.5,
+     "t90": 0.15,
+     "t50": 0.1,
+     "firstMoveFrames": 2,
+     "curve": {
+      "ms50": 0.166,
+      "ms100": 0.651,
+      "ms150": 0.914,
+      "ms250": 0.997
+     }
+    },
+    "walkFeet": {
+     "body": 1.5,
+     "slipMean": 0.437,
+     "slipShare": 0.291,
+     "slipP90": 1.046,
+     "cadence": 4.091,
+     "stride": 0.367,
+     "slideCm": 0,
+     "skidCm": 0.127,
+     "acrossCm": 0,
+     "stances": 11,
+     "acrossMs": 0.308
+    },
+    "walkCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 0,
+     "trail": 0,
+     "lookLead": 0.21
+    },
+    "runStart": {
+     "steady": 3,
+     "t90": 0.067,
+     "t50": 0,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.86,
+      "ms100": 0.968,
+      "ms150": 0.993,
+      "ms250": 1
+     }
+    },
+    "runFeet": {
+     "body": 3,
+     "slipMean": 1.225,
+     "slipShare": 0.408,
+     "slipP90": 4.826,
+     "cadence": 5.581,
+     "stride": 0.537,
+     "slideCm": 0.021,
+     "skidCm": 0.067,
+     "acrossCm": 0.42,
+     "stances": 13,
+     "acrossMs": 0.356
+    },
+    "runCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0
+     },
+     "lookJitter": {
+      "rms": 0,
+      "rmsY": 0,
+      "max": 0.001
+     },
+     "n": 0,
+     "trail": 0,
+     "lookLead": 0.419
+    },
+    "turn180": {
+     "swingDeg": 180,
+     "tTurn": 0.167,
+     "endErrDeg": 0,
+     "minSpeed": 0.05,
+     "backwardsShare": 0,
+     "maxRateDegS": 1921.682
+    },
+    "reverseStart": {
+     "steady": 1.5,
+     "t90": 0.15,
+     "t50": 0.083,
+     "firstMoveFrames": 0,
+     "curve": {
+      "ms50": 0.126,
+      "ms100": 0.695,
+      "ms150": 0.928,
+      "ms250": 0.997
+     }
+    },
+    "stop": {
+     "from": 1.5,
+     "tStop": 0.1,
+     "slide": 0.078,
+     "overshoot": 0
+    },
+    "stopCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 3.468,
+      "rmsY": 0,
+      "max": 17.327
+     },
+     "lookJitter": {
+      "rms": 0.103,
+      "rmsY": 0.099,
+      "max": 0.537
+     },
+     "n": 0,
+     "after": 0.05,
+     "travel": 0.007
+    },
+    "curve45": {
+     "swingDeg": 45,
+     "tTurn": 0.417,
+     "endErrDeg": 0,
+     "minSpeed": 1.495,
+     "backwardsShare": 0,
+     "maxRateDegS": 111.476
+    },
+    "steps": {
+     "bodyMaxDy": 0.04,
+     "camMaxDy": 0.012,
+     "jumps5cm": 0,
+     "airFrames": 0,
+     "hiddenFrames": 0,
+     "climbed": 0.211,
+     "camPop": 0.008,
+     "boomJump": 0
+    },
+    "stepsCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 1.369,
+      "rmsY": 0.368,
+      "max": 13.198
+     },
+     "lookJitter": {
+      "rms": 0.007,
+      "rmsY": 0.007,
+      "max": 0.059
+     },
+     "n": 0
+    },
+    "stair": {
+     "bodyMaxDy": 0.016,
+     "camMaxDy": 0.018,
+     "jumps5cm": 0,
+     "airFrames": 0,
+     "hiddenFrames": 372,
+     "climbed": 1.558,
+     "camPop": 0.123,
+     "boomJump": 0.017
+    },
+    "stairCam": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 624.294,
+      "rmsY": 150.765,
+      "max": 9050.62
+     },
+     "lookJitter": {
+      "rms": 39.354,
+      "rmsY": 38.93,
+      "max": 571.514
+     },
+     "n": 0
+    },
+    "fov": {
+     "walkToStop": {
+      "min": 88,
+      "max": 91.5,
+      "widen": 3.5,
+      "maxStep": 0.193,
+      "end": 88
+     },
+     "atRest": {
+      "min": 88,
+      "max": 88,
+      "widen": 0,
+      "maxStep": 0,
+      "end": 88
+     }
+    },
+    "pacing": {
+     "meanMs": 16.639,
+     "p95Ms": 18.4,
+     "maxMs": 24.9,
+     "n": 825
+    },
+    "camAll": {
+     "lagMean": null,
+     "lagMax": null,
+     "jitter": {
+      "rms": 4.337,
+      "rmsY": 0,
+      "max": 45.631
+     },
+     "lookJitter": {
+      "rms": 0.14,
+      "rmsY": 0.084,
+      "max": 1.631
+     },
+     "n": 0
+    }
+   }
+  }
+ ]
+}

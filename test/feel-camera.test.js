@@ -181,10 +181,68 @@ describe('feel: the walk cycle locked to speed (the hoya model API, when it is t
     expect(gaitCadence({}, 3)).toBeUndefined(); expect(gaitCadence(null, 3)).toBeUndefined();
     expect(stepSpacing(3, 'hoya')).toBeCloseTo(3 / (hoyaCadence(3) * 2), 9);
   });
+  test('with gait(): the model\u2019s own rate for the pose (walk or run), passed through gait(speed, run)', () => {
+    const seen = [];
+    const m = { gait: (v, run) => { seen.push(run); return { travel: 0.2, stance: 0.5, rate: run ? 5.5 : 4.2 }; } };
+    expect(gaitCadence(m, 3, 1)).toBe(5.5); expect(gaitCadence(m, 3, 0)).toBe(4.2);
+    expect(seen).toEqual([1, 0]);
+  });
   test('with gait(): speed × stance / travel, held to 1.6–5.5 Hz; the footsteps follow it', () => {
     const m = { gait: () => ({ travel: 0.2, stance: 0.5 }) };
     expect(gaitCadence(m, 1.2)).toBeCloseTo(3, 9);           // 1.2 × 0.5 / 0.2
     expect(gaitCadence(m, 0.2)).toBe(CADENCE.min); expect(gaitCadence(m, 9)).toBe(CADENCE.max);
     expect(stepSpacing(1.2, 'hoya', undefined, 3)).toBeCloseTo(0.2, 9);   // two footfalls a cycle
+  });
+});
+
+import { HOYA_SPEED, hoyaSpeedFrom, RUN_FOV, runFovStep } from '../src/anime/play/avatar/index.js';
+describe('feel: his speeds and the run (deploy #8)', () => {
+  test('HOYA_SPEED is 1.5 / 3.0 (planted feet); ?hoyaSpeed= overrides it for trying, 0 gives him the walker\u2019s', () => {
+    expect(HOYA_SPEED).toEqual({ walk: 1.5, run: 3.0 });
+    expect(hoyaSpeedFrom('')).toEqual({ walk: 1.5, run: 3.0 });
+    expect(hoyaSpeedFrom('?hoyaSpeed=1.8,3.2')).toEqual({ walk: 1.8, run: 3.2 });
+    expect(hoyaSpeedFrom('?hoyaSpeed=2')).toEqual({ walk: 2, run: 4 });
+    expect(hoyaSpeedFrom('?hoyaSpeed=0')).toEqual({ walk: null, run: null });
+  });
+  test('the run widens the view by 3.5° in ~0.4 s and gives it back in ~0.3 s, never past either end', () => {
+    const o = { x: 0, v: 0 }; let t90 = null, max = 0;
+    for (let i = 1; i <= 90; i++) { runFovStep(o.x, o.v, 1, 1 / 60, o); max = Math.max(max, o.x); if (t90 === null && o.x >= 0.9) t90 = i / 60; }
+    expect(t90).toBeGreaterThan(0.5); expect(t90).toBeLessThan(0.75);   // ~0.65 s to 90 %: a gentle swell, not a punch
+    expect(max).toBeLessThanOrEqual(1);
+    let t10 = null; for (let i = 1; i <= 90; i++) { runFovStep(o.x, o.v, 0, 1 / 60, o); expect(o.x).toBeGreaterThanOrEqual(0); if (t10 === null && o.x <= 0.1) t10 = i / 60; }
+    expect(t10).toBeLessThan(0.5);
+    expect(RUN_FOV.deg).toBeGreaterThanOrEqual(3); expect(RUN_FOV.deg).toBeLessThanOrEqual(4);
+    expect(runFovStep(0.7, 0.2, 0, 0, o).x).toBe(0);   // a still: at once
+  });
+});
+
+import { footstepGain } from '../src/anime/play/avatar/index.js';
+describe('feel: the footsteps at his new patter', () => {
+  test('0.5 up to 5 footfalls a second, softer in proportion above, never under 0.25', () => {
+    expect(footstepGain(undefined)).toBe(0.5); expect(footstepGain(2.5)).toBe(0.5);
+    expect(footstepGain(4.1)).toBeCloseTo(0.5 * 5 / 8.2, 6);   // his walk: 8.2 a second
+    expect(footstepGain(5.5)).toBeCloseTo(0.25, 6);            // his run: 11 a second
+    expect(footstepGain(9)).toBe(0.25);
+  });
+});
+
+import { withoutMoving } from '../src/anime/play/avatar/index.js';
+import { Physics } from '../src/anime/core/physics.js';
+describe('feel camera: a passer-by does not collapse the boom', () => {
+  test('the walker camera solves its boom without the townspeople\u2019s moving boxes, and gives them back', () => {
+    const P = new Physics(() => 0);
+    // a townsperson 1.2 m behind him, where a portrait phone's low boom runs (from his chest at 0.9 m to 1.53 m)
+    const person = { cx: 0.15, cz: 1.2, w: 0.46, d: 0.46, y0: 0, y1: 1.5 };
+    P.addDynamic(() => [person]); P.refreshDynamic();
+    expect(P.solidAt(0.15, 1.2, 1)).toBe(true);
+    const solid = (x, y, z) => P.solidAt(x, z, y), C = thirdFor(390 / 844, {});
+    const st = createWalkCam(), f = { x: 0, y: 0, z: 0, vx: 0, vz: 0, dt: 0, landing: false };
+    placeWalk(st, f, 0, solid, () => 0, true, C);
+    expect(st.boom).toBeLessThan(1.3);                                   // with him counted, the boom stops at the person (and hides him)
+    withoutMoving(P, () => placeWalk(st, f, 0, solid, () => 0, true, C));
+    expect(st.boom).toBeCloseTo(C.dist, 1);                              // the walker's camera ignores him
+    expect(P.solidAt(0.15, 1.2, 1)).toBe(true);                          // and he is back for the walker's own collisions
+    expect(() => withoutMoving(P, () => { throw new Error('x'); })).toThrow();
+    expect(P.solidAt(0.15, 1.2, 1)).toBe(true);                          // even after a throw
   });
 });

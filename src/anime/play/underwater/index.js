@@ -32,6 +32,8 @@ let apexMarked = 0;
 let mounting = null;
 const beat = { back: 0, up: 0, fov: 0, roll: 0 };
 const look = new THREE.Vector3();
+/** [fish-fix] where the fish is drawn this frame: between the last two simulation steps (ctx.alpha), as the walker is */
+const drawn = { x: 0, y: 0, z: 0 };
 const keys = new Set();
 const _hullBox = new THREE.Box3();
 const MOVE = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyE', 'KeyQ', 'ShiftLeft', 'ShiftRight', 'ControlLeft']);
@@ -97,6 +99,60 @@ async function mountInner(ctx, kit) {
   if (!kit) kit = (await loadKit()) || shimKit(ctx);
   const L = ctx.L;
   const env = { bed: (x, z) => L.heightAt(x, z), shore: (x, z) => L.shoreDist(x, z) };
+  // [fish-fix] metres of open water ahead of (x, y, z) along a heading, in the fish's lane and the camera's (1.2 m either side):
+  // no bank, no physics solid, no mesh (the quay's piles are drawn, not colliders). Used once per start, behind the title card.
+  const ray = new THREE.Raycaster();
+  const _ro = new THREE.Vector3(), _rd = new THREE.Vector3(), _bc = new THREE.Vector3();
+  let near = null;
+  function meshesNear(x, z, r) {
+    const out = [];
+    ctx.scene?.traverse((o) => {
+      if (!(o.isMesh || o.isInstancedMesh || o.isBatchedMesh) || !o.visible || o.userData?.play || o.userData?.sky) return;
+      let bs = null;
+      if (o.isInstancedMesh || o.isBatchedMesh) { if (!o.boundingSphere) o.computeBoundingSphere?.(); bs = o.boundingSphere; }
+      else if (o.geometry) { if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); bs = o.geometry.boundingSphere; }
+      if (!bs || !(bs.radius < 5000)) return;
+      _bc.copy(bs.center).applyMatrix4(o.matrixWorld);
+      const rad = bs.radius * o.matrixWorld.getMaxScaleOnAxis();
+      if (Math.hypot(_bc.x - x, _bc.z - z) < r + rad) out.push(o);
+    });
+    return out;
+  }
+  // The view is the camera's: a fan of rays from where the camera sits (BACK behind the fish, CAM_SIDE to its right) across the
+  // widest lens the dive is seen through (a desktop's ±40°). Straight ahead must be open for 14 m; to the sides less is enough
+  // (CAP): a pile 5 m off at 25° fills a wide screen, the town 30 m off does not. Each ray also walks the banks and the physics.
+  // -> metres of open view, 0 to 14 (14 × the tightest ray's free / its cap).
+  const BACK = 2.6, FAN = [[0, 14], [-0.21, 12], [0.21, 12], [-0.44, 8], [0.44, 8], [-0.7, 6], [0.7, 6]];
+  env.clearAhead = (x, y, z, yaw) => {
+    const P = ctx.physics, fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
+    const cx = x - fx * BACK + rx * TUNE.camSide, cz = z - fz * BACK + rz * TUNE.camSide;
+    let score = 14;
+    for (const [a, cap] of FAN) {
+      const dx = fx * Math.cos(a) + rx * Math.sin(a), dz = fz * Math.cos(a) + rz * Math.sin(a);
+      let free = cap;
+      for (let d = 0.5; d <= free; d += 0.5) {
+        const qx = cx + dx * d, qz = cz + dz * d;
+        if (L.shoreDist(qx, qz) < TUNE.shoreKeep) { free = d; break; }
+        if (typeof P?.solidAt === 'function' && (P.solidAt(qx, qz, y) || P.solidAt(qx, qz, y + 0.6))) { free = d; break; }
+      }
+      if (near) {
+        _rd.set(dx, 0, dz);
+        for (const h of [0, 0.6]) {
+          _ro.set(cx, y + h, cz);
+          ray.set(_ro, _rd);
+          ray.far = free;
+          let hit = null;
+          try { hit = ray.intersectObjects(near, false)[0]; } catch (e) { hit = null; }
+          if (hit) free = Math.min(free, hit.distance);
+        }
+      }
+      // anything between the camera and the fish blocks the heading outright
+      if (a === 0 && free < BACK + 0.5) return 0;
+      score = Math.min(score, 14 * free / cap);
+      if (score <= 0) return 0;
+    }
+    return score;
+  };
   const reduced = reducedMotion(params);
   let state = null;
   let saved = null;
@@ -106,7 +162,6 @@ async function mountInner(ctx, kit) {
   let booted = false;
   let baseFov = ctx.camera.fov;
   let acc = 0;
-  let nudged = false;
 
   const api = {
     get active() { return !!state; },
@@ -120,7 +175,7 @@ async function mountInner(ctx, kit) {
     exit() { end(); },
     pose(p) {
       if (!state) { begin('shot', p); return; }
-      state.x = p.x; state.y = p.y; state.z = p.z;
+      state.x = state.px = p.x; state.y = state.py = p.y; state.z = state.pz = p.z;   // a placed pose is not blended from the last one
       if (p.yaw != null) state.yaw = p.yaw;
       if (p.pitch != null) state.pitch = p.pitch;
       if (p.mode) state.mode = p.mode;
@@ -142,6 +197,8 @@ async function mountInner(ctx, kit) {
   Object.defineProperty(api, 'hero', { get: () => built().crops.hero });
   Object.defineProperty(api, 'crops', { get: () => built().crops });
   api.swimU = swimU;
+  /** the numbers the dive runs on (the framing tools read and try them) */
+  api.tune = TUNE;
   /** Probe switches for the shot tools: no caustics, or no water chunk at all. */
   api.debug = { noCaustic: false, noWater: false };
   api.airTap = () => airTap(state, TUNE, reduced);
@@ -316,14 +373,48 @@ async function mountInner(ctx, kit) {
     pl.lookSink = (dx, dy) => { state.yaw -= dx; state.pitch = Math.max(-1.15, Math.min(1.15, state.pitch - dy)); };
     ctx.services.life?.tour?.stop?.();
     try { ctx.pad?.setMode('swim'); } catch (e) { /* pad not up yet */ }
+    hud.swimming(true);
     show(true);
-    if (!nudged) { nudged = true; hud.nudge(); }
-    if (from === 'mode') coachFirstSwim();
+    lesson.from.x = state.x; lesson.from.z = state.z; lesson.t = 0;
+    lesson.touch = !!ctx.pad?.active || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
     fish.setSpecies(state.species);
     hud.species(state.species);
     shown = state.species;
     place(0);
+    if (from !== 'shot') { coachFirstSwim(); deskActions(true); }
+    hud.wait(!!(coach && coachEl && !coachEl.hidden));   // the chip comes in once the coach has gone
     if (pose.ring) { api.splash('out'); bits.step(0.2, reduced); }
+  }
+
+  // [fish-fix] Teach one thing at a time. The coach (first dive only) teaches the swim; the leap line comes once the fish is
+  // swimming and nothing else is teaching; the spin line comes in the air, on the first leap. Each once per visit. They used
+  // to come together: the coach said 「勢いよく上がると、跳ねます」 and the old hint, printed on the coach, said it again.
+  const lesson = { from: { x: 0, z: 0 }, t: 0, leap: false, spin: false, saying: '', left: 0, touch: false };
+  function teach(dt) {
+    if (state.mode === 'breach') {
+      if (!lesson.spin && state.y > 0.3) { lesson.spin = true; lesson.leap = true; say(lesson.touch ? 'play.swim.lesson.spin.touch' : 'play.swim.lesson.spin.keys', 2.4); }
+    } else if (!lesson.leap && !coach && !lesson.saying) {
+      lesson.t += dt;
+      if (lesson.t > 1.2 && Math.hypot(state.x - lesson.from.x, state.z - lesson.from.z) > 3) { lesson.leap = true; say('play.swim.lesson.leap', 6); }
+    }
+    if (lesson.saying) { lesson.left -= dt; if (lesson.left <= 0 || (lesson.saying === 'play.swim.lesson.leap' && state.mode === 'breach')) say(null); }
+  }
+  function say(key, secs = 0) {
+    lesson.saying = key || '';
+    lesson.left = secs;
+    hud.say(key || null);
+  }
+
+  // [fish-fix] A desktop has no pad: the way out is a button with its key (V, as the gull's 「歩く」), so it is never only a secret key.
+  let desk = null;
+  function deskActions(on) {
+    const touch = ctx.pad?.active || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
+    if (on && !touch && typeof kit?.ui?.actions === 'function' && !kit.shim) {
+      try { desk = kit.ui.actions([{ id: 'swim-out', icon: 'back', key: 'KeyV', label: t('play.swim.surface'), onPress: () => end() }]); } catch (e) { desk = null; }
+    } else if (!on && desk) {
+      try { desk.clear(); } catch (e) { /* */ }
+      desk = null;
+    }
   }
 
   /** keep: the world stays built (a restart from inside the dive builds nothing). */
@@ -333,6 +424,9 @@ async function mountInner(ctx, kit) {
     clearHulls(ctx.camera.position, false);
     keys.clear();
     dashOn = false;
+    say(null);
+    deskActions(false);
+    hud.swimming(false);
     show(false);
     if (bits) bits.ring.visible = false;
     // a first-swim coach still up (the fish never moved) goes with the dive; not marked done, so the next dive shows it again
@@ -345,7 +439,7 @@ async function mountInner(ctx, kit) {
     if (!pl || !saved) return;
     pl.lookCapture = saved.lookCapture || null;
     pl.lookSink = saved.lookSink || null;
-    ctx.camera.fov = baseFov;
+    ctx.camera.fov = typeof ctx.fovFor === 'function' && ctx.camera.aspect > 0 ? ctx.fovFor(ctx.camera.aspect) : baseFov;
     ctx.camera.up.set(0, 1, 0);
     ctx.camera.updateProjectionMatrix();
     if (saved.from === 'sail') {
@@ -406,7 +500,9 @@ async function mountInner(ctx, kit) {
       } catch (e) { /* audio not started */ }
       if (out) hud.leapt();
     }
-    if (coach && Math.hypot(state.x - coachFrom.x, state.z - coachFrom.z) > 3) { try { coach.done?.(); } catch (e) { /* */ } coach = null; }
+    if (coach && Math.hypot(state.x - coachFrom.x, state.z - coachFrom.z) > 3) { try { coach.done?.(); } catch (e) { /* */ } coach = null; hud.wait(false); }
+    if (coach && coachEl && coachEl.hidden) { coach = null; hud.wait(false); }   // わかった closed it
+    teach(dt);
     if (state.slowLeft > 0 && !apexMarked) { apexMarked = 1; if (punch < 0.75) punch = 0.75; }
     if (state.trick && !state.trickShown) {
       state.trickShown = 1;
@@ -427,34 +523,42 @@ async function mountInner(ctx, kit) {
     if (pl?.pos) { pl.pos.set(s.x, s.y, s.z); pl.vel?.set(0, 0, 0); }
     if (ctx.player?.position) ctx.player.position.set(s.x, s.y, s.z);
     const cam = ctx.camera;
+    // [fish-fix] the lens follows the engine's rule for the screen now (core/fov.js), so a phone turned mid-dive gets its
+    // landscape lens; it used to keep the lens it had when the dive began
+    if (typeof ctx.fovFor === 'function' && cam.aspect > 0) baseFov = ctx.fovFor(cam.aspect);
     cameraBeat(s.mode, s.breachT, reduced, TUNE, beat);
     if (!reduced && punch > 0 && dt > 0) punch = Math.max(0, punch - dt / TUNE.punchDur);
+    // the simulation steps at a fixed rate; the picture blends its last two steps, so a 120 Hz screen or an uneven frame never
+    // shows a step twice (the dive drew the latest step as is, and the fish and the camera juddered)
+    const a = Math.max(0, Math.min(1, Number.isFinite(ctx.alpha) ? ctx.alpha : 1));
+    drawn.x = s.px + (s.x - s.px) * a; drawn.y = s.py + (s.y - s.py) * a; drawn.z = s.pz + (s.z - s.pz) * a;
+    const X = drawn.x, Y = drawn.y, Z = drawn.z;
     const aim = s.mode === 'breach' ? Math.atan2(s.vy, Math.hypot(s.vx, s.vz) || 0.001) : s.pitch;
     const cp = Math.cos(aim), sp = Math.sin(aim);
     const breach = s.mode === 'breach';
-    const side = breach ? 0.45 : 1.15;
-    const dist = breach ? 2.65 : beat.back;
+    const side = breach ? 0.45 : TUNE.camSide;
+    const dist = breach ? 2.65 : beat.back * framing(cam);
     let camY = breach
-      ? Math.max(0.42, s.y - 1.55)
-      : Math.min(-0.28, s.y - sp * dist * 0.85 + beat.up * (0.35 + 0.65 * Math.max(0, cp)));
+      ? Math.max(0.42, Y - 1.55)
+      : Math.min(-0.28, Y - sp * dist * 0.85 + beat.up * (0.35 + 0.65 * Math.max(0, cp)));
     if (s.frame) {
       cam.position.set(s.frame.cx, s.frame.cy, s.frame.cz);
       look.set(s.frame.lx, s.frame.ly, s.frame.lz);
     } else {
       cam.position.set(
-        s.x + Math.sin(s.yaw) * (breach ? 1 : cp) * dist + Math.cos(s.yaw) * side,
+        X + Math.sin(s.yaw) * (breach ? 1 : cp) * dist + Math.cos(s.yaw) * side,
         camY,
-        s.z + Math.cos(s.yaw) * (breach ? 1 : cp) * dist - Math.sin(s.yaw) * side,
+        Z + Math.cos(s.yaw) * (breach ? 1 : cp) * dist - Math.sin(s.yaw) * side,
       );
-      const ahead = breach ? 0.35 : 2.6;
+      const ahead = breach ? 0.35 : TUNE.camAhead;
       look.set(
-        s.x - Math.sin(s.yaw) * (breach ? 0 : cp) * ahead,
-        s.y + (breach ? 0.15 : sp * ahead + 0.12),
-        s.z - Math.cos(s.yaw) * (breach ? 0 : cp) * ahead,
+        X - Math.sin(s.yaw) * (breach ? 0 : cp) * ahead,
+        Y + (breach ? 0.15 : sp * ahead + TUNE.camAim),
+        Z - Math.cos(s.yaw) * (breach ? 0 : cp) * ahead,
       );
-      keepCamera(cam.position, s, breach);
+      keepCamera(cam.position, drawn, breach);
     }
-    fish.mesh.position.set(s.x, s.y, s.z);
+    fish.mesh.position.set(X, Y, Z);
     fish.mesh.rotation.order = 'YXZ';
     const roll = breach ? beat.roll * 0.35 + (reduced ? 0 : s.spin) : 0;
     fish.mesh.rotation.set(aim, s.yaw, roll);
@@ -464,12 +568,18 @@ async function mountInner(ctx, kit) {
     if (Math.abs(cam.fov - fov) > 0.04) { cam.fov = fov; cam.updateProjectionMatrix(); }
     if (s.glow) bits.focus.value.set(s.glow.x, s.glow.y, s.glow.z);
     else if (s.frame) bits.focus.value.set(s.frame.lx, s.frame.ly, s.frame.lz);
-    else bits.focus.value.set(s.x, s.y, s.z);
+    else bits.focus.value.set(X, Y, Z);
     bits.mesh.visible = s.y < 0.8;
     bits.rush.value = s.dashing ? 1 : 0;
     hud.stamina(s.stamina / TUNE.staminaMax);
     hud.tick(dt);
     life.beat.value = fish.beat.value;
+  }
+
+  /** [fish-fix] The boom for this lens: the fish keeps its share of the screen when the vertical FOV is wide (a portrait phone). */
+  function framing() {
+    const k = Math.tan(TUNE.camFovRef * Math.PI / 360) / Math.tan(Math.max(20, Math.min(120, baseFov)) * Math.PI / 360);
+    return Math.max(TUNE.camFit[0], Math.min(TUNE.camFit[1], k));
   }
 
   // The follow camera must stay in the water and off the bed (under the surface), or clear of the land (in the leap).
@@ -563,21 +673,52 @@ async function mountInner(ctx, kit) {
   let coach = null;
   const coachFrom = { x: 0, z: 0 };
   function quay() {
-    if (!quayPose) quayPose = quayStart(348, 8, env) || { x: 368, y: -1.4, z: 8, yaw: 0.4, pitch: 0 };
+    if (!quayPose) {
+      // the meshes around the start, once: the heading check rays them (the hub calls this in prepare(), behind its title card)
+      try { near = meshesNear(348, 8, 60); } catch (e) { near = null; }
+      try { quayPose = quayStart(348, 8, env); } finally { near = null; }
+      if (!quayPose) quayPose = { x: 368, y: -1.4, z: 8, yaw: 0.4, pitch: 0 };
+    }
     return { ...quayPose };
+  }
+  // [fish-fix] One line, then わかった. On a phone the spotlight is the stick itself (it was a guessed point, a quarter in from
+  // the left at 78 % down); on a desktop it rings the fish. No dim: the fish is the subject (dimmed to 60 % it read as a grey
+  // shape for as long as the coach was up). kit/coach.js keeps the bubble off the stick and the buttons.
+  const fishOnScreen = new THREE.Vector3();
+  const coachAt = { x: 0, y: 0 };   // (the desktop coach's target, read every frame: one object, reused)
+  let coachEl = null;
+  /** The fish's box on screen (CSS px), from its drawn position and a 0.6 m radius: the coach's bubble keeps off it. */
+  function fishRect() {
+    if (!state || typeof innerWidth !== 'number') return [];
+    const cam = ctx.camera;
+    fishOnScreen.set(drawn.x, drawn.y, drawn.z);
+    const d = fishOnScreen.distanceTo(cam.position);
+    fishOnScreen.project(cam);
+    if (!(d > 0.1) || fishOnScreen.z > 1) return [];
+    const x = (fishOnScreen.x + 1) * 0.5 * innerWidth, y = (1 - fishOnScreen.y) * 0.5 * innerHeight;
+    const r = (innerHeight * 0.5) * 0.6 / (d * Math.tan(cam.fov * Math.PI / 360));
+    return [{ l: x - r, t: y - r * 0.7, r: x + r, b: y + r * 0.7 }];
   }
   function coachFirstSwim() {
     if (coach || typeof kit?.ui?.coach !== 'function' || !state) return;
     coachFrom.x = state.x; coachFrom.z = state.z;
-    const touch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+    const touch = !!ctx.pad?.active || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
     try {
       coach = kit.ui.coach({
         id: 'swim-first',
         text: t(touch ? 'play.swim.coach.touch' : 'play.swim.coach.keys'),
         gesture: touch ? 'drag' : 'none',
-        target: () => (typeof innerWidth === 'number' ? { x: innerWidth * 0.25, y: innerHeight * 0.78 } : { x: 0, y: 0 }),
-        dim: true,
+        target: touch ? '#klc-pad .ghost' : () => {
+          if (!state || typeof innerWidth !== 'number') return null;
+          fishOnScreen.set(drawn.x, drawn.y, drawn.z).project(ctx.camera);
+          coachAt.x = (fishOnScreen.x + 1) * 0.5 * innerWidth; coachAt.y = (1 - fishOnScreen.y) * 0.5 * innerHeight;
+          return coachAt;
+        },
+        dim: false,
+        // on a phone the bubble also keeps off the fish (on a desktop the spotlight is the fish, so it already does)
+        avoid: touch ? fishRect : null,
       }) || null;
+      coachEl = typeof document !== 'undefined' ? document.querySelector('#klc-play .coach') : null;
     } catch (e) { coach = null; }
   }
   function registerMode() {
@@ -596,7 +737,8 @@ async function mountInner(ctx, kit) {
         progress: () => null,
         isNew: () => !(kit.store?.get?.('swim.played')),
         // [mobile-play] the hub calls this behind its title card: the dive's world is built and its programs are ready before start()
-        prepare: () => world.prepare(),
+        // [fish-fix] and the start's heading is found here too (one pass of rays), so the first frame pays nothing for it
+        prepare: async () => { const p = await world.prepare(); quay(); return p; },
         start: async () => {
           if (state) end(true);
           begin('mode');

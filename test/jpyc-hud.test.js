@@ -58,7 +58,7 @@ describe("PRODUCTION DEFAULT: the data file ships the demo switched off, so ther
     expect([w.hud.jpyc.enabled, w.hud.jpyc.kids, w.hud.jpyc.mode]).toEqual([false, false, "normal"]);   // (not kids: there is just nothing switched on)
     expect(w.hud.jpyc.openList()).toBe(false); expect(w.hud.jpyc.open("jpyc-demo")).toBe(false); expect(w.hud.jpyc.open("otameshi")).toBe(false); expect(w.root()).toBeNull();
     expect(w.hud.jpyc.entries()).toEqual([]); expect(w.hud.jpyc.has("jpyc-demo")).toBe(false);
-    expect(w.all('.tools [data-act]').map((x) => x.getAttribute("data-act"))).toEqual(["lang", "season", "sound", "planet", "credits", "labels", "hide", "multi"]);
+    expect(w.all('.tools [data-act]').map((x) => x.getAttribute("data-act"))).toEqual(["sheet", "lang", "season", "sound", "planet", "padset", "credits", "labels", "hide", "multi"]);   // ([emil-ui] 名所 and 操作設定 joined the ☰)
     expect(w.dom.document.getElementById("klc-jpyc-css")).toBeNull(); expect(w.dom.document.getElementById("klc-jpyc-btn-css")).toBeNull();
     w.key("Escape");   // (and no key handler of the sheet's is on the page)
     expect(w.ctx.services.jpyc).toBe(w.hud.jpyc);   // (the service itself is published, disabled: ctx.services.jpyc?.open(...) is safe for the splat lane's button)
@@ -81,7 +81,7 @@ describe("the ☰ menu item", () => {
     const b = w.q('[data-act="jpyc"]');
     expect([b.tagName, b.getAttribute("class"), b.getAttribute("aria-haspopup"), b.getAttribute("aria-label")]).toEqual(["BUTTON", "round glass jpyc", "dialog", "JPYCで買えるお店"]);
     expect(b.querySelector(".lbl").textContent).toBe("JPYCで買えるお店"); expect(b.getAttribute("title")).toBe(JPYC.ja["jpyc.menu.hint"]); expect(b.querySelector("svg")).not.toBeNull();
-    expect(w.all('.tools [data-act]').map((x) => x.getAttribute("data-act"))).toEqual(["jpyc", "lang", "season", "sound", "planet", "credits", "labels", "hide", "multi"]);
+    expect(w.all('.tools [data-act]').map((x) => x.getAttribute("data-act"))).toEqual(["jpyc", "sheet", "lang", "season", "sound", "planet", "padset", "credits", "labels", "hide", "multi"]);   // ([emil-ui] 名所 right after JPYC, 操作設定 before the credits)
   }));
   test("it is not a .cbtn (those are the phone menu's only): the desktop toolbar has it too", () => withWorld({ dev: true }, (w) => {
     expect(w.q('[data-act="jpyc"]').getAttribute("class")).not.toContain("cbtn");
@@ -130,7 +130,7 @@ describe("the flyer's kids gate (?src=chirashi)", () => {
   test("no menu item, no credits line, no sheet: nothing of the feature is on the page (even with the developer's ?jpyc=dev: the flyer's kids come first)", () => withWorld({ search: "?src=chirashi", dev: true }, (w) => {
     expect(w.q('[data-act="jpyc"]')).toBeNull(); expect(w.q(".jpyc-credit")).toBeNull(); expect(JSON.stringify(w.el.innerHTML)).not.toMatch(/JPYC|jpyc/);
     expect(w.hud.jpyc.enabled).toBe(false); expect(w.hud.jpyc.openList()).toBe(false); expect(w.hud.jpyc.open("otameshi")).toBe(false); expect(w.root()).toBeNull();
-    expect(w.all('.tools [data-act]').map((x) => x.getAttribute("data-act"))).toEqual(["lang", "season", "sound", "planet", "credits", "labels", "hide", "multi"]);   // (the toolbar is exactly what it was; みんなであそぶ sits after 表示を隠す)
+    expect(w.all('.tools [data-act]').map((x) => x.getAttribute("data-act"))).toEqual(["sheet", "lang", "season", "sound", "planet", "padset", "credits", "labels", "hide", "multi"]);   // (the toolbar is exactly what it was, [emil-ui] plus 名所 and 操作設定; みんなであそぶ sits after 表示を隠す)
     expect(w.dom.document.getElementById("klc-jpyc-css")).toBeNull(); expect(w.dom.document.getElementById("klc-jpyc-btn-css")).toBeNull();
   }));
   test("it holds for the rest of the session and in English, and ?jpyc=off does the same without the flyer", async () => {
