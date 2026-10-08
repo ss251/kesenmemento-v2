@@ -89,42 +89,73 @@ export function solveBoom(from, to, solidAt, groundAt, out, C = THIRD) {
   return out;
 }
 
-/** [feel] What may shorten the walker's boom. A wall or an eave does. A passer-by (0.46 m), a pole, a sign, a wire,
- *  a tree's thin trunk (about 0.5 m) and a car whose roof is under the camera do not. `maxIn` is the most the boom
- *  may shorten in one frame. `floor` is the camera's clearance above the ground under it. */
-export const BOOM = Object.freeze({ wide: 0.7, over: 0.35, floor: 0.6, maxIn: 0.24 });
+/** [feel] What shortens the walker's boom at once: a wall or an eave (a solid at least `wide` across), wherever it rises above the line from
+ *  the camera to his head. A thin solid (a passer-by, a pole, a sign, a wire, a street tree's trunk, about 0.5 m) does not: it is SIGHT's.
+ *  `maxIn` is the most the boom may shorten in one frame (a cut is not a frame of walking). `floor` is the camera's clearance above the
+ *  ground under it. */
+export const BOOM = Object.freeze({ wide: 0.7, floor: 0.6, maxIn: 0.24 });
 
-/** How far a solid reaches from (x,y,z) along ±(dx,dz), in metres. */
+/**
+ * [sight] The camera keeps him in sight. He is 1.15 m tall: "him" is five lines from the camera, to his head, chest and hip and a shoulder
+ * each side ([height above his feet, metres to his right]), walked from him toward the camera in `step` samples.
+ * - A wall on the line to his head shortens the boom (BOOM: eased, `maxIn` a frame). The camera stops `margin` in front of it.
+ * - A thin solid does not, unless it hides him: every line blocked. That is geometry: the lines are 0.4 m apart at his body and meet at the
+ *   camera, so a pole 1.5 m from the lens hides all five, a pole beside him hides none. He may be hidden for `brief` seconds (a pole going
+ *   by); after that the boom comes in over `ramp` seconds, on a quicker spring (`wHide`). It does not come in below `minThin`: a pole at his
+ *   heels is not worth his head.
+ * - The forest's trunks (placeWalk's `softAt`: no collider, he walks through them) count here only, never as a wall.
+ * - A cut (a placed pose, a jump of his feet over `cut` metres) has no history: it solves straight to the clear distance.
+ */
+export const SIGHT = Object.freeze({
+  lines: Object.freeze([[0.85, 0], [0.5, 0], [0.2, 0], [0.65, 0.2], [0.65, -0.2]]),
+  step: 0.15, margin: 0.3, brief: 0.4, ramp: 0.3, relax: 3, wHide: 36, minThin: 1.2, cut: 2,
+});
+
+/** How far a solid reaches from (x,y,z) along ±(dx,dz), in metres (0.2 m steps, 1 m each way). */
 function span(solidAt, x, y, z, dx, dz) {
   let a = 0, b = 0;
   for (let s = 0.2; s <= 1.01; s += 0.2) { if (solidAt(x + dx * s, y, z + dz * s)) a = s; else break; }
   for (let s = 0.2; s <= 1.01; s += 0.2) { if (solidAt(x - dx * s, y, z - dz * s)) b = s; else break; }
   return a + b;
 }
-
-/** True when the solid at this sample is a wall or an eave. Thin and low solids return false. */
-export function occludesBoom(solidAt, x, y, z, px, pz, ux, uz, camY) {
-  if (!solidAt || !solidAt(x, y, z)) return false;
-  const wide = Math.max(span(solidAt, x, y, z, px, pz), span(solidAt, x, y, z, ux, uz));
-  if (wide < BOOM.wide) return false;
-  let top = y;
-  for (let s = 0.15; s <= 3.01; s += 0.15) { if (!solidAt(x, y + s, z)) break; top = y + s; }
-  if (Number.isFinite(camY) && top <= camY + BOOM.over) return false;
-  return true;
+// eight lines through the point, 22.5 degrees apart (the axes first: most walls are on them)
+const DIRS = [0, 4, 2, 6, 1, 5, 3, 7].map((i) => [Math.cos(i * Math.PI / 8), Math.sin(i * Math.PI / 8)]);
+/**
+ * How wide the solid at this sample is: its longest reach through the point, over eight lines, to 2 m (it stops as soon as it is
+ * `BOOM.wide`). The reach along the ray and across it was not enough: a 0.3 m wall met at 45 degrees is 0.42 m deep either way, and read as a
+ * pole. A pole, a trunk of 0.5 m, a passer-by are under 0.5 m whichever way you cross them.
+ */
+function solidWidth(solidAt, x, y, z) {
+  let w = 0;
+  for (let i = 0; i < DIRS.length; i++) {
+    const v = span(solidAt, x, y, z, DIRS[i][0], DIRS[i][1]);
+    if (v > w) { w = v; if (w >= BOOM.wide) return w; }
+  }
+  return w;
 }
 
-function walkBlocked(solidAt, x, y, z, px, pz, ux, uz, camY, C) {
+/** True when the solid at this sample is a wall or an eave: at least BOOM.wide across (any heading), whatever its height. Thin solids return false.
+ *  (The heading arguments of the old test are kept for the callers.) */
+export function occludesBoom(solidAt, x, y, z) {
+  if (!solidAt || !solidAt(x, y, z)) return false;
+  return solidWidth(solidAt, x, y, z) >= BOOM.wide;
+}
+
+function walkBlocked(solidAt, x, y, z, px, pz, C) {
   if (!solidAt) return false;
-  if (occludesBoom(solidAt, x, y, z, px, pz, ux, uz, camY)) return true;
+  if (occludesBoom(solidAt, x, y, z)) return true;
   const r = C.boomRadius > 0 ? C.boomRadius : 0;
   if (!(r > 0)) return false;
-  return occludesBoom(solidAt, x + px * r, y, z + pz * r, px, pz, ux, uz, camY)
-    || occludesBoom(solidAt, x - px * r, y, z - pz * r, px, pz, ux, uz, camY);
+  return occludesBoom(solidAt, x + px * r, y, z + pz * r)
+    || occludesBoom(solidAt, x - px * r, y, z - pz * r);
 }
 
-/** The walker's boom. Same march as solveBoom, but the ground does not count (a slope or a stair keeps the framing)
- *  and a thin or low solid does not either. */
-export function solveWalkBoom(from, to, solidAt, out, C = THIRD) {
+/**
+ * The walker's boom. Same march as solveBoom, but the ground does not count (a slope or a stair keeps the framing) and a thin solid does
+ * not either. With `head` (the point of his head) it also walks the line from his head to the ideal camera: a wall that rises above that
+ * line anywhere along it shortens the boom, however low it is under the camera (the old "top <= camera + 0.35" let a 2.4 m wall hide him).
+ */
+export function solveWalkBoom(from, to, solidAt, out, C = THIRD, head = null) {
   const dx = to.x - from.x, dy = to.y - from.y, dz = to.z - from.z;
   const len = Math.hypot(dx, dy, dz);
   out.x = from.x; out.y = from.y; out.z = from.z; out.dist = 0;
@@ -132,16 +163,15 @@ export function solveWalkBoom(from, to, solidAt, out, C = THIRD) {
   const ux = dx / len, uy = dy / len, uz = dz / len;
   const px = -uz, pz = ux;
   const step = C.boomStep;
-  const camY = to.y;
   let reach = 0;
   let hit = false;
   // a ray that starts inside a building (the phone's solid footprint over a stair) must not collapse:
   // stay inside that solid until the ray leaves it, then occlude on the next wall
-  let embedded = walkBlocked(solidAt, from.x, from.y, from.z, px, pz, ux, uz, camY, C);
+  let embedded = walkBlocked(solidAt, from.x, from.y, from.z, px, pz, C);
   for (let d = step; d <= len + 1e-4; d += step) {
     const s = Math.min(d, len);
     const x = from.x + ux * s, y = from.y + uy * s, z = from.z + uz * s;
-    const blocked = walkBlocked(solidAt, x, y, z, px, pz, ux, uz, camY, C);
+    const blocked = walkBlocked(solidAt, x, y, z, px, pz, C);
     if (embedded) {
       if (blocked) { reach = s; continue; }
       embedded = false;
@@ -152,11 +182,99 @@ export function solveWalkBoom(from, to, solidAt, out, C = THIRD) {
   }
   if (!hit && reach < len - 1e-3) reach = len;
   if (reach <= 0) reach = Math.min(0.08, len);
+  if (head && solidAt) {
+    const hx = to.x - head.x, hy = to.y - head.y, hz = to.z - head.z, hl = Math.hypot(hx, hy, hz);
+    if (hl > SIGHT.step * 2) {
+      const ex = hx / hl, ey = hy / hl, ez = hz / hl;
+      let emb = embedded || !!solidAt(head.x, head.y, head.z);   // (as the ray: from inside a solid, leave it first; a few centimetres of height must not decide)
+      for (let d = SIGHT.step; d < hl - 0.05; d += SIGHT.step) {
+        const x = head.x + ex * d, y = head.y + ey * d, z = head.z + ez * d;
+        if (!solidAt(x, y, z)) { emb = false; continue; }
+        if (emb || solidWidth(solidAt, x, y, z) < BOOM.wide) continue;   // (a thin thing is SIGHT's)
+        const b = Math.max((d - SIGHT.margin) * len / hl, Math.min(0.08, len));
+        if (b < reach) reach = b;
+        break;
+      }
+    }
+  }
   out.x = from.x + ux * reach;
   out.y = from.y + uy * reach;
   out.z = from.z + uz * reach;
   out.dist = reach;
   return out;
+}
+
+/**
+ * [sight] Walk one line from his body point (tx,ty,tz) toward the camera (cx,cy,cz). Returns the metres from his body to the first solid
+ * (0 when the line is clear). A line that starts inside a solid (he stands in a forest trunk, or in a footprint the phone tier draws
+ * solid) skips that solid. `len` receives the line's length.
+ */
+const _sl = { len: 0 };
+function sightLine(solidAt, tx, ty, tz, cx, cy, cz) {
+  const dx = cx - tx, dy = cy - ty, dz = cz - tz, L = Math.hypot(dx, dy, dz);
+  _sl.len = L;
+  if (!(L > SIGHT.step * 2)) return 0;
+  const ux = dx / L, uy = dy / L, uz = dz / L;
+  let emb = !!solidAt(tx, ty, tz);
+  for (let d = SIGHT.step; d < L - 0.05; d += SIGHT.step) {
+    if (!solidAt(tx + ux * d, ty + uy * d, tz + uz * d)) { emb = false; continue; }
+    if (!emb) return d;
+  }
+  return 0;
+}
+
+/**
+ * [sight] Is he hidden from a camera at (cx,cy,cz): every one of the five lines blocked? Returns the largest boom fraction (0..1 of the
+ * line) at which his head or chest is clear again, or 1 when he is not hidden. `feet` is where he is drawn, `yaw` the view's heading
+ * (the shoulders are to its right). Cheap when he is seen: the first clear line ends the scan.
+ */
+export function sightClear(solidAt, feet, yaw, cx, cy, cz) {
+  if (!solidAt) return 1;
+  const rx = Math.cos(yaw), rz = -Math.sin(yaw), n = SIGHT.lines.length;
+  let best = 0;   // the farthest first hit, of the head and the chest
+  for (let k = 0; k < n; k++) {
+    const l = SIGHT.lines[k];
+    const s = sightLine(solidAt, feet.x + rx * l[1], feet.y + l[0], feet.z + rz * l[1], cx, cy, cz);
+    if (s === 0) return 1;
+    if (k < 2) { const f = (s - SIGHT.margin) / _sl.len; if (f > best) best = f; }
+  }
+  return best < 0 ? 0 : best;
+}
+
+/**
+ * [sight] The ground he is drawn on. Physics stands him on the DEM; the terrain skin is triangles on coarse grids away from the hero
+ * zone, and there it can lie about a metre above the DEM (大島の船着場, 警察署, パールシティ: he stood in the drawn ground to his chest, and the
+ * camera 4.5 m back saw only the top of his head). Where a road is cut into a slope the skin lies below the DEM instead, and a road mesh
+ * is drawn at the DEM: so the drawn ground is the higher of the two, and only on bare terrain (nothing walkable under him).
+ * `surfaceAt(x, z)` is environment's rendered surface. Metres to lift him (and the camera's picture of him), 0 to `max`.
+ */
+export function terrainLift(heightAt, groundHeight, surfaceAt, x, y, z, max = 1.5) {
+  if (typeof surfaceAt !== 'function' || typeof heightAt !== 'function') return 0;
+  const dem = heightAt(x, z);
+  if (!(Math.abs(y - dem) < 0.3)) return 0;                                  // a deck, a stair, a roof: not the terrain
+  if (typeof groundHeight === 'function' && groundHeight(x, z, y) > dem + 0.05) return 0;   // a walk box is under him
+  const lift = surfaceAt(x, z) - dem;
+  return lift > 0.02 ? Math.min(max, lift) : 0;
+}
+
+/**
+ * [sight] An arrival with a wall or a trunk at his back has no room for the boom (the 気仙沼ハリストス正教会 spot: a 1.1 m trunk 0.4 m behind
+ * him; the boom collapsed to his head and the picture looked straight down). Of the places `steps` metres ahead of the spot, along the view,
+ * take the nearest where the boom is at least `good` of its length; failing that the one that gains most (at least `gain` metres),
+ * else the spot itself. `boomAt(s)` is the boom there (a negative number: he cannot stand there). -> metres ahead.
+ */
+export const ARRIVE = Object.freeze({ steps: Object.freeze([0.75, 1.5, 2.25, 3, 3.75]), good: 0.7, gain: 0.5 });
+export function chooseArrival(boomAt, C, A = ARRIVE) {
+  const here = boomAt(0);
+  if (here >= A.good * C.dist) return 0;
+  let best = 0, bestBoom = here;
+  for (const s of A.steps) {
+    const b = boomAt(s);
+    if (!(b >= 0)) continue;
+    if (b >= A.good * C.dist) return s;
+    if (b > bestBoom) { best = s; bestBoom = b; }
+  }
+  return bestBoom >= here + A.gain ? best : 0;
 }
 
 /** The ground the walker is on. `groundHeight(x, z, 1e9)` is the highest deck in the column: on PIER7 that is an upper
@@ -304,11 +422,12 @@ export function thirdFor(aspect, out = _rig) {
 
 export function createWalkCam() {
   return { ready: false, sx: 0, sy: 0, sz: 0, vx: 0, vy: 0, vz: 0, lx: 0, lz: 0, lvx: 0, lvz: 0, sk: 1, skV: 0, boom: 0, boomV: 0, rise: 0, riseV: 0,
+    hid: 0, hideW: 0, seen: true, fx: NaN, fy: NaN, fz: NaN, cut: false,
     x: 0, y: 2, z: 0, tx: 0, ty: 0, tz: 0, dist: 0 };
 }
 
 const _w = { x: 0, v: 0 };
-const _wFrom = { x: 0, y: 0, z: 0 }, _wWant = { x: 0, y: 0, z: 0 }, _wHard = { x: 0, y: 0, z: 0, dist: 0 }, _wCam = { x: 0, y: 0, z: 0, dist: 0 };
+const _wFrom = { x: 0, y: 0, z: 0 }, _wWant = { x: 0, y: 0, z: 0 }, _wHard = { x: 0, y: 0, z: 0, dist: 0 }, _wCam = { x: 0, y: 0, z: 0, dist: 0 }, _head = { x: 0, y: 0, z: 0 };
 
 /** Track (pos, vel) toward a target moving at `V`: predict at its own speed, then damp the error and the speed difference. Writes _w. */
 function trackFF(pos, vel, T, V, dt, w) {
@@ -320,11 +439,23 @@ function trackFF(pos, vel, T, V, dt, w) {
 /**
  * One walker camera sample. `f` is the player's frame { x, y, z (drawn feet), vx, vz, dt, landing }; `yaw` the view's heading; `solidAt`
  * and `groundAt` as for placeChase; `snap` lands on the target (reduced motion, a still, a placed pose); C = thirdFor(aspect).
- * Writes st.x/y/z (camera), st.tx/ty/tz (look point) and st.boom.
+ * Writes st.x/y/z (camera), st.tx/ty/tz (look point) and st.boom, and st.cut when this frame was a cut: a placed pose, the first frame, a
+ * frame with no time, or his feet more than SIGHT.cut metres from where the last frame had them (a teleport, an arrival, a door, a car's
+ * exit). A cut solves straight to the clear distance; walking eases (see the walls and SIGHT above). `snap` alone (reduced motion) lands
+ * every frame on its target with no easing, but is not a cut: a pole going by still gets its moment. A caller that tells the frame
+ * which it is (`f.cut`) says whether `snap` is a cut; without it, a snap is a cut.
+ * `softAt` (optional) is a solid the walls never see but that can hide him: the forest's trunks, which he walks through (no collider).
+ * It counts in SIGHT only (hidden for a moment, and not below SIGHT.minThin), never as a wall. Writes st.seen: he is seen from where the
+ * boom is going (false: hidden and nothing to be done, e.g. a trunk at his heels).
  */
-export function placeWalk(st, f, yaw, solidAt, groundAt, snap, C = THIRD, W = WALK) {
+let _anyA = null, _anyB = null;
+function anyAt(x, y, z) { return _anyA(x, y, z) || _anyB(x, y, z); }
+export function placeWalk(st, f, yaw, solidAt, groundAt, snap, C = THIRD, W = WALK, softAt = null) {
   const dt = f.dt > 0 ? f.dt : 0;
-  const hard = snap || !st.ready || !(dt > 0);
+  const jumped = st.ready && Number.isFinite(st.fx) && Math.hypot(f.x - st.fx, (f.y || 0) - st.fy, f.z - st.fz) > SIGHT.cut;
+  const hard = snap || !st.ready || !(dt > 0) || jumped;
+  const cut = f.cut === undefined ? hard : (!!f.cut || !st.ready || !(dt > 0) || jumped);
+  st.cut = cut;
   const rx = Math.cos(yaw), rz = -Math.sin(yaw);
   // the look-ahead: where he is going, eased (a landing has none)
   let ax = f.landing ? 0 : (f.vx || 0) * W.lead, az = f.landing ? 0 : (f.vz || 0) * W.lead;
@@ -360,23 +491,42 @@ export function placeWalk(st, f, yaw, solidAt, groundAt, snap, C = THIRD, W = WA
     trackFF(st.sz, st.vz, Tz, Vz, dt, W.wXZ); st.sz = _w.x; st.vz = _w.v;
     damp1(st.sy, st.vy, Ty, dt, W.wY, _w); st.sy = _w.x; st.vy = _w.v;
   }
-  // the boom: from the look point back along the view. Walls and eaves shorten it; the ground, a passer-by, a pole,
-  // a sign, a wire, a thin trunk and a car under the camera do not. A real wall eases in, at most BOOM.maxIn a frame.
+  // the boom: from the look point back along the view. A wall or an eave on the ray, or above the line from his head to the camera,
+  // shortens it (eased, at most BOOM.maxIn a frame; a cut goes straight to it). The ground, a passer-by, a pole, a sign, a wire
+  // and a thin trunk do not, unless they hide him (below).
   const fx = -Math.sin(yaw), fz = -Math.cos(yaw), cp = Math.cos(C.pitch), sp = Math.sin(C.pitch);
-  if (solidAt && occludesBoom(solidAt, st.sx, st.sy, st.sz, fz, -fx, -fx, -fz, st.sy)) { st.sx = f.x; st.sz = f.z; st.vx = Vx; st.vz = Vz; }
+  if (solidAt && occludesBoom(solidAt, st.sx, st.sy, st.sz)) { st.sx = f.x; st.sz = f.z; st.vx = Vx; st.vz = Vz; }
   _wFrom.x = st.sx; _wFrom.y = st.sy; _wFrom.z = st.sz;
   _wWant.x = st.sx - fx * C.dist * cp; _wWant.y = st.sy - C.dist * sp; _wWant.z = st.sz - fz * C.dist * cp;
-  solveWalkBoom(_wFrom, _wWant, solidAt, _wHard, C);
-  if (hard) { st.boom = _wHard.dist; st.boomV = 0; }
-  else if (!(dt > 0)) { /* a frame with no time keeps the boom: damp1 treats dt 0 as a snap */ }
+  const len = C.dist > 1e-6 ? C.dist : 1;
+  _head.x = f.x; _head.y = (f.y || 0) + SIGHT.lines[0][0]; _head.z = f.z;
+  solveWalkBoom(_wFrom, _wWant, solidAt, _wHard, C, _head);
+  // [sight] hidden by a thin thing: from the camera the walls leave him, every line to his body is blocked. A moment of it (a pole going by)
+  // changes nothing; a cut has no moment. After SIGHT.brief the boom comes in over SIGHT.ramp, to where his head or chest is clear again.
+  let aim = _wHard.dist, hideW = 0, seen = true;
+  if ((solidAt || softAt) && aim > SIGHT.minThin + 0.05) {
+    const kk = aim / len;
+    let any = solidAt;
+    if (solidAt && softAt) { _anyA = solidAt; _anyB = softAt; any = anyAt; } else if (softAt) any = softAt;
+    const clear = sightClear(any, f, yaw, st.sx + (_wWant.x - st.sx) * kk, st.sy + (_wWant.y - st.sy) * kk, st.sz + (_wWant.z - st.sz) * kk);
+    const hidden = clear < 1 && aim * clear >= SIGHT.minThin;
+    if (cut) st.hid = hidden ? SIGHT.brief + SIGHT.ramp : 0;
+    else st.hid = hidden ? st.hid + dt : Math.max(0, st.hid - SIGHT.relax * dt);
+    const q = Math.min(1, Math.max(0, (st.hid - SIGHT.brief) / SIGHT.ramp));
+    hideW = q * q * (3 - 2 * q);
+    if (hidden && hideW > 0) aim += (aim * clear - aim) * hideW;
+    seen = clear >= 1 || (hidden && hideW >= 1 - 1e-6);
+  } else st.hid = 0;
+  st.hideW = hideW; st.seen = seen;
+  if (hard) { st.boom = aim; st.boomV = 0; }
   else {
     const prevBoom = st.boom;
-    damp1(st.boom, st.boomV, _wHard.dist, dt, _wHard.dist < st.boom ? W.wIn : W.wOut, _w); st.boom = _w.x; st.boomV = _w.v;
+    damp1(st.boom, st.boomV, aim, dt, aim < st.boom ? W.wIn + (SIGHT.wHide - W.wIn) * hideW : W.wOut, _w); st.boom = _w.x; st.boomV = _w.v;
     const cap = W.maxIn > 0 ? W.maxIn : BOOM.maxIn;
     if (prevBoom - st.boom > cap) { st.boom = prevBoom - cap; st.boomV = 0; }
     else if (st.boom - prevBoom > cap) { st.boom = prevBoom + cap; st.boomV = 0; }
   }
-  const len = C.dist > 1e-6 ? C.dist : 1, k = st.boom / len;
+  const k = st.boom / len;
   _wCam.x = st.sx + (_wWant.x - st.sx) * k; _wCam.y = st.sy + (_wWant.y - st.sy) * k; _wCam.z = st.sz + (_wWant.z - st.sz) * k;
   _wCam.dist = st.boom;
   // a short boom rises over his head (a door, a stair), eased, and never into a ceiling
@@ -391,7 +541,7 @@ export function placeWalk(st, f, yaw, solidAt, groundAt, snap, C = THIRD, W = WA
   st.x = _wCam.x; st.y = y0 + st.rise; st.z = _wCam.z;
   // a low solid the boom rode over (a car roof just above the ray): step up out of it, at most one frame's cap.
   // a wall is left for the boom ease — the old snap to the solved point dropped the picture in one frame
-  if (solidAt && solidAt(st.x, st.y, st.z) && !occludesBoom(solidAt, st.x, st.y, st.z, fz, -fx, -fx, -fz, _wWant.y)) {
+  if (solidAt && solidAt(st.x, st.y, st.z) && !occludesBoom(solidAt, st.x, st.y, st.z)) {
     const cap = W.maxIn > 0 ? W.maxIn : BOOM.maxIn;
     for (let s = 0.05; s <= cap + 1e-6; s += 0.05) if (!solidAt(st.x, st.y + s, st.z)) { st.y += s; break; }
   }
@@ -419,6 +569,7 @@ export function placeWalk(st, f, yaw, solidAt, groundAt, snap, C = THIRD, W = WA
     if (st.y < st.ty) st.y = st.ty;
   }
   st.camY = st.y; st.feetY = f.y || 0;
+  st.fx = f.x; st.fy = f.y || 0; st.fz = f.z;
   st.dist = st.boom;
   st.ready = true;
   return st;

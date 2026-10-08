@@ -4,6 +4,8 @@
 // Steps: load / -> intro board -> "Enter the town" -> HUD; time presets (buttons + T); drone/walk (V + button); tour stop +
 // auto tour (G); live chip + arrivals panel; arriving boats at 06:30; characters; audio toggle (button + M); photo mode
 // (1920x1080: the machine caps forbid 4K until 2026-10-01 00:00Z; scale 1 = 3840x2160 is the same path); hide UI (H).
+// Every tour stop's walk spot is measured twice: in first person (the eye's view of the place) and in third person, the default view,
+// where the camera is 4.5 m behind メメ ("walk3" in the report: 3 m near-share, his head clear, the top colour share).
 // --phone 1 also runs the 390x844 touch layout. --bench 1 measures GPU ms/frame per quality tier on the wow cameras.
 // [v4:explore] then the explorable core: streaming in the far core, search (JA / EN), the full map, the car on the real
 // roads, the fish market, 男山本店 and café RST interiors, POI labels (--noexplore skips it; --dist <dir> builds privately).
@@ -230,6 +232,46 @@ try {
     const v = await page.eval('window.__explore.stream.sb.validate()');
     check('stream: after the walk loop the court spot draws as on the early visit (frame, near-depth) and every pool is intact', diff < 10 && Math.abs(near - courtRef.near) <= 0.03 && v.nBad === 0, { meanAbsDiff: +diff.toFixed(2), near, nearRef: courtRef.near, pools: v.pools, slots: v.slots, bad: v.bad.slice(0, 4) });
   }
+  // [walkcam] the same spots in the default view: third person, メメ behind his boom. The pass above frames each place from his eye; a
+  // person who taps a place lands BEHIND him, with the camera 4.5 m back. The arrival is a cut (the camera solves straight to the clear
+  // distance, play/avatar/camera.js SIGHT), and the picture must be a view of him in front of the place, not a wall or a trunk:
+  //   - at most 35 % of a 16 x 9 grid of the pre-pass depth closer than 3 m, the ground not counted (メメ draws on the no-outline layer: his
+  //     own pixels are not in that pass);
+  //   - his head projects onto the screen and nothing is in front of it: the depth there (the best of five pixels, so a wire does not fail
+  //     it) is at least his distance - 0.3 m;
+  //   - the top colour share is at most 0.45, as above.
+  // Every spot's numbers go to report.walk3 and to the log.
+  await page.eval("window.__ctx.playerObj.person = 'third'");
+  const view3 = () => page.eval(`(() => {
+    const ctx = window.__ctx, P = ctx.playerObj, cam = ctx.camera, V = cam.position.constructor, av = ctx.services.play && ctx.services.play.avatar;
+    cam.updateMatrixWorld();
+    // his head: above where his feet are drawn (he stands on the drawn ground: camera.js terrainLift)
+    const fp = av && av.feet ? av.feet : P.pos, shown = !!(av && av.boom > 0.7 && P.person === 'third');
+    const head = new V(fp.x, fp.y + 0.85, fp.z), dist = head.distanceTo(cam.position), pr = head.clone().project(cam), u = (pr.x + 1) / 2, v = (1 - pr.y) / 2;
+    const on = pr.z < 1 && u > 0.02 && u < 0.98 && v > 0.02 && v < 0.98;
+    let depth = null;
+    if (on) { depth = 0; for (const [du, dv] of [[0, 0], [0.012, 0], [-0.012, 0], [0, 0.02], [0, -0.02]]) depth = Math.max(depth, ctx.pipeline.depthAt(cam, u + du, v + dv)); }
+    return { near3: +ctx.pipeline.nearShare(cam, 3, 16, 9).toFixed(3), on, u: +u.toFixed(3), v: +v.toFixed(3), dist: +dist.toFixed(2), depth: depth === null ? null : (Number.isFinite(depth) ? +depth.toFixed(2) : 9999), boom: av ? +av.boom.toFixed(2) : null, person: P.person, shown };
+  })()`);
+  report.walk3 = {};
+  for (const sp of spots) {
+    if (!sp.walk) continue;
+    await page.eval(`void window.__life.tour.walkTo(${JSON.stringify(sp.id)})`);
+    await page.eval(settled);
+    await page.eval('new Promise((r) => setTimeout(r, 450))');   // (a boom eases at most 0.24 m a frame toward what the stream has just built)
+    await page.frames(8);
+    const buf3 = await page.shot(`${out}_walk3_${sp.id}.png`);
+    const { data: d3, info: i3 } = await sharp(buf3).resize(160, 90, { fit: 'fill' }).raw().toBuffer({ resolveWithObject: true });
+    const bins3 = new Map(); const n3 = i3.width * i3.height;
+    for (let i = 0; i < n3; i++) { const k = ((d3[i * i3.channels] >> 5) << 6) | ((d3[i * i3.channels + 1] >> 5) << 3) | (d3[i * i3.channels + 2] >> 5); bins3.set(k, (bins3.get(k) || 0) + 1); }
+    const top3 = Math.max(...bins3.values()) / n3;
+    const v3 = await view3();
+    const row = { ...v3, topColourShare: +top3.toFixed(2) };
+    report.walk3[sp.id] = row;
+    console.log(`  3rd ${sp.id.padEnd(20)} near3 ${String(v3.near3).padEnd(5)} head u ${v3.u} v ${v3.v} depth ${v3.depth} / dist ${v3.dist}  boom ${v3.boom}  top ${row.topColourShare}`);
+    check(`walk spot ${sp.id}: third person: he is in view and clear, at most 35 % within 3 m, a real picture`, v3.person === 'third' && v3.shown && v3.on && v3.depth >= v3.dist - 0.3 && v3.near3 <= 0.35 && top3 <= 0.45, row);
+  }
+  await page.eval("window.__ctx.playerObj.person = 'first'");   // (the checks below are first person)
   await page.eval("document.body.classList.remove('noui')");
   await page.eval("void window.__life.tour.walkTo('hero')"); await page.frames(10);   // back on the promenade, still in walk view
 

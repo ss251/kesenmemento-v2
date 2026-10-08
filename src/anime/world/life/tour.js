@@ -167,7 +167,10 @@ export function createTour(ctx) {
     const s = byId.get(id); if (!s?.walk) return false;
     state.flight = null; state.playing = false; state.orbit = null; state.velN = -99;
     const p = player();
-    if (p) { p.fly = false; p.setPose(s.walk.x, s.walk.z, s.walk.yaw, s.walk.pitch); }
+    if (p) {
+      p.fly = false; p.setPose(s.walk.x, s.walk.z, s.walk.yaw, s.walk.pitch);
+      try { p.arrive?.(s.walk); } catch (e) { /* the arrival's courtesy to the third-person camera (avatar.js) must never fail the walk */ }
+    }
     state.current = id; emit(); return true;
   }
   const _p = new THREE.Vector3();

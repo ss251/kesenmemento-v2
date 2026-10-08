@@ -242,11 +242,31 @@ export const WALK_SET = {
   'lm-ikkeijima': { x: 538.3, z: 1057.4, yaw: -150, pitch: 0, dist: 43.4 },             // the former islet's grove from the park lawn, the halls inside
 };
 
+/**
+ * [walkcam] Where the third-person camera wants him at a walk spot: `ahead` metres down the view, then the view turned `turn` degrees (the
+ * spot itself is the eye's: first person is not touched). The boom sits 4.5 m back, where the eye never looks, and some spots have a wall,
+ * a trunk or a lane's houses there. Chosen like the spots, with the renderer's depth (qa3's third-person check: near-depth <= 0.35, his head
+ * clear); the avatar's arrival applies it (play/avatar/index.js, tour.walkTo).
+ */
+export const WALK_THIRD = {
+  // 3 m between the houses either side of the camera at every distance down the slope (near-depth 0.6), a 1.1 m trunk 0.4 m behind him at the
+  // spot: 1.5 m down the lane with the view turned 30 degrees up it opens (0.18)
+  catholic: { ahead: 1.5, turn: 30 },
+  // a wall the camera's world does not hold (a mid lot's concrete plinth: no collider) stands 1.3 m in front of the lens at the camera's place and fills the
+  // picture; 2.25 m ahead the camera is on the near side of it
+  'lm-shorinji': { ahead: 2.25 },
+  // the third-person picture is mostly one colour (qa3's top colour share, at the evening preset): the shaded road and bank 0.46 at the spot, 0.30 1.5 m up the road
+  'lm-murasaki': { ahead: 1.5 },
+  // the lookout's forest path under dark cedars, 0.48 at the spot (one bin of shaded green); turned 20 degrees toward the clearing, 0.42
+  atago: { turn: 20 },
+};
+
 /** The places as tour stops: { id, ja, en, cat, at, src, drone, walk }. */
 export function placeStops(L, net, list, { inLot, lotAt, solidAt, treeAt } = {}) {
   return list.map((p) => {
     const [x, z] = p.at;
-    return { ...p, extra: true, drone: droneFraming(L, x, z), walk: WALK_SET[p.id] || p.walk || walkFraming(L, net, x, z, { inLot, lotAt, solidAt, treeAt }) };
+    const walk = WALK_SET[p.id] || p.walk || walkFraming(L, net, x, z, { inLot, lotAt, solidAt, treeAt });
+    return { ...p, extra: true, drone: droneFraming(L, x, z), walk: walk && WALK_THIRD[p.id] ? { ...walk, third: WALK_THIRD[p.id] } : walk };
   });
 }
 

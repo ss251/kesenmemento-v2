@@ -2,9 +2,10 @@
 // and a character slot. The default id is meme. Until that module loads, the original figure walks.
 
 import { sfx, ui } from '../kit/index.js';
-import { createWalkCam, damp1, placeWalk, thirdFor, THIRD } from './camera.js';
+import { chooseArrival, createWalkCam, damp1, placeWalk, terrainLift, thirdFor, THIRD } from './camera.js';
 import { bodyOccupy, walkerShown } from './shown.js';
 import { createBuildingProbe } from './boxes.js';
+import { createTrunkProbe } from './trunks.js';
 import { armHandoff, blendHandoff, createHandoff } from './handoff.js';
 import { characterById, loadCharacter, pickerIds } from './characters.js';
 import { LOOKS, readPrefs, writePrefs } from './prefs.js';
@@ -48,6 +49,7 @@ export function footstepGain(cadence) {
 /** [feel] Run fn with the physics' moving colliders (the townspeople's boxes) left out, then put them back (even if fn throws): the walker's
  *  camera answers walls, not passers-by. Allocation-free; a physics without moving colliders is left alone. */
 const NO_MOVING = Object.freeze([]);
+const _lift = { x: 0, v: 0 };
 export function withoutMoving(physics, fn) {
   const dyn = physics && physics._dynItems, skip = Array.isArray(dyn) && dyn.length > 0;
   if (skip) physics._dynItems = NO_MOVING;
@@ -92,19 +94,42 @@ export function mountAvatar(ctx) {
     () => ctx.services?.town?.kit?.T?.lotIdx,
     () => ({ phone: !!ctx.quality?.phone, hero: ctx.L?.ZONES?.hero, scale: ctx.quality?.heroR }),
   );
+  // [sight] the forest's trunks have no collider (physics only has the street's trees) and he walks through them: they are not walls for the
+  // boom, but they can hide him (camera.js placeWalk's softAt, trunks.js)
+  const trunks = createTrunkProbe(() => ctx.services?.environment?.trees);
+  const trunkAt = (x, y, z) => trunks.hit(x, y, z);
   const solid = (x, y, z) => physics.solidAt(x, z, y) || boxes.hit(x, y, z);
   // the surface just under the camera. groundHeight(x, z, 1e9) is the highest landing in the column: on PIER7 that
   // read as the ground and collapsed the boom. A y of the camera's own height is the tread it is actually over.
-  const ground = (x, z, y) => physics.groundHeight(x, z, Number.isFinite(y) ? y : player.pos.y);
+  // [sight] And never under the drawn terrain: on the coarse grids it lies above the DEM that physics stands him on (terrainLift)
+  const drawn = () => ctx.services?.environment?.surfaceAt;
+  const ground = (x, z, y) => {
+    const g = physics.groundHeight(x, z, Number.isFinite(y) ? y : player.pos.y), sf = drawn();
+    if (typeof sf !== 'function') return g;
+    const s = sf(x, z);
+    return s > g && s - g < 1.6 ? s : g;
+  };
+  const drawnFeet = { x: 0, y: 0, z: 0 };   // where his feet are drawn (read only: tools/anime/qa3.mjs measures his head from it)
+  const lift3 = { v: 0, vv: 0 };   // how far the drawn terrain lifts him above the DEM, eased (a cut takes it at once)
+  const groundH = (x, z, y) => physics.groundHeight(x, z, y);
   const handDur = () => (reducedMotion() ? 0 : 0.42);
 
   player.chase = (pl, frame) => {
     boxes.prepare(frame.x, frame.z);
+    trunks.prepare(frame.x, frame.z);
+    // [sight] he stands on the drawn ground: lifted over the DEM where the terrain skin is above it (placeFigure lifts the figure by the same)
+    {
+      const want = terrainLift(physics.heightAt, groundH, drawn(), pl.pos.x, pl.pos.y, pl.pos.z);
+      if (pl._placed || !chase.ready || !(frame.dt > 0)) { lift3.v = want; lift3.vv = 0; }
+      else { damp1(lift3.v, lift3.vv, want, frame.dt, 8, _lift); lift3.v = _lift.x; lift3.vv = _lift.v; }
+      frame.y += lift3.v;
+    }
+    frame.cut = !!pl._placed;   // (a placed pose is a cut; reduced motion only snaps)
     // [feel] the rig by screen shape: a portrait phone gets the closer boom that frames him at ~20 % (camera.js thirdFor). The boom answers
     // walls, not passers-by: the townspeople's moving boxes (world/life/cast.js, 0.46 m) are left out while it is solved, so one walking
     // past no longer collapses it and hides him (the walker himself still bumps into them: only the camera's query skips them)
     // a placed pose snaps. A rendered frame whose clock did not move must not: that used to snap the boom to the solved length
-    withoutMoving(physics, () => placeWalk(chase, frame, pl.yaw, solid, ground, reducedMotion() || !!pl._placed, thirdFor(pl.camera?.aspect)));
+    withoutMoving(physics, () => placeWalk(chase, frame, pl.yaw, solid, ground, reducedMotion() || !!pl._placed, thirdFor(pl.camera?.aspect), undefined, trunkAt));
     const cam = pl.camera;
     cam.up.set(0, 1, 0);
     cam.position.set(chase.x, chase.y, chase.z);
@@ -112,6 +137,51 @@ export function mountAvatar(ctx) {
     boomDist = chase.dist;
     runFov(cam, frame.dt, pl.running && !frame.landing && frame.sp > 0.6 * (pl.run3 > 0 ? pl.run3 : pl.run));
   };
+  // [sight] An arrival (tour.walkTo, a place in the list, the digit keys) in third person. A spot may say how the camera wants him: its `third`
+  // = { ahead, turn } (metres down the view, degrees to turn it: places.js WALK_THIRD, chosen with the depth pass like the spot itself),
+  // because the boom sits 4.5 m back where the first-person eye never looks (カトリック: houses 3 m either side of the camera, near-depth 0.6).
+  // Otherwise, with a wall or a trunk at his back there is no room for the boom: stand a little way ahead where it has (camera.js
+  // chooseArrival). First person, the drone and every other placed pose (a door, the car's exit) are left where they are put.
+  const scratch = createWalkCam(), sf = { x: 0, y: 0, z: 0, vx: 0, vz: 0, dt: 0, landing: false };
+  player.arrive = (spot) => {
+    if (!walkingThird() || !(player.pos.y > -50)) return false;
+    const P = player.pos, yaw = player.yaw, fx = -Math.sin(yaw), fz = -Math.cos(yaw), C = thirdFor(player.camera?.aspect);
+    boxes.prepare(P.x, P.z); trunks.prepare(P.x, P.z);
+    const at = { x: P.x, y: P.y, z: P.z }, third = spot && spot.third;
+    const standAt = (s, up = 0.45) => {   // can he stand s metres ahead: not above `up` (a step: the walker's limit; a spot's own data may ask more), a drop only as the slope (the カトリック lane falls 0.7 m in 0.75 m), nothing solid at his body, no trunk in him
+      const x = P.x + fx * s, z = P.z + fz * s;
+      const y = physics.groundHeight(x, z, P.y);
+      if (!(y - P.y <= up && P.y - y <= 3) || (physics.standable && !physics.standable(x, z, y))) return NaN;
+      for (const h of [0.3, 0.9, 1.4]) for (const [dx, dz] of [[0, 0], [0.3, 0], [-0.3, 0], [0, 0.3], [0, -0.3]]) if (physics.solidAt(x + dx, z + dz, y + h)) return NaN;
+      if (trunks.hit(x, y + 0.5, z)) return NaN;
+      return y;
+    };
+    const boomAt = (s) => {
+      const x = P.x + fx * s, z = P.z + fz * s;
+      const y = s > 0 ? standAt(s, third && s === third.ahead ? 1 : 0.45) : P.y;
+      if (!(y === y)) return -1;
+      sf.x = x; sf.z = z; sf.y = y + terrainLift(physics.heightAt, groundH, drawn(), x, y, z);
+      createWalkCamInto(scratch);
+      withoutMoving(physics, () => placeWalk(scratch, sf, yaw, solid, ground, true, C, undefined, trunkAt));
+      at.x = x; at.y = y; at.z = z;
+      return scratch.seen ? scratch.boom : Math.min(scratch.boom, 0.4);   // hidden with nothing to be done (a trunk at his heels) is no boom
+    };
+    let s = 0, turn = 0;
+    if (third && (third.ahead > 0 || third.turn)) {
+      const ys = third.ahead > 0 ? standAt(third.ahead, 1) : NaN;   // (chosen with the depth pass: the 紫神社 road rises 0.5 m in 1.5 m)
+      s = ys === ys ? third.ahead : 0;   // (he cannot stand there: only the turn)
+      turn = (third.turn || 0) * Math.PI / 180;
+    }
+    else s = chooseArrival(boomAt, C);
+    if (!(s > 0) && !turn) return false;
+    boomAt(s);
+    player.pos.set(at.x, at.y, at.z); player.prevPos.copy(player.pos);
+    player.yaw += turn; player.face = player.prevFace = player.yaw; player.faceV = 0;
+    player.lift = player.prevLift = 0; player.liftV = 0; player.smoothY = null;
+    player.applyCamera(0);
+    return true;
+  };
+  function createWalkCamInto(st) { st.ready = false; st.hid = 0; st.fx = st.fy = st.fz = NaN; st.sk = 1; st.skV = 0; return st; }
   // [feel] a sense of speed at a run: the view widens by at most RUN_FOV.deg (2°, ~1.3 s to 90 %), always measured from
   // the screen's own field of view (ctx.fovFor), so nothing accumulates. dropRunFov gives that addition back in one frame when a
   // mode takes the camera (the other mode keeps its own lens). It does not run while he is walking. None under reduced motion.
@@ -205,7 +275,8 @@ export function mountAvatar(ctx) {
     const P = player.pos, Q = player.prevPos || P;
     // [feel] the drawn feet: blended between the last two steps, with the step's eased lift; the facing blended the same way
     const l0 = player.prevLift || 0, l1 = player.lift || 0;
-    const x = Q.x + (P.x - Q.x) * a, y = Q.y + (P.y - Q.y) * a + l0 + (l1 - l0) * a, z = Q.z + (P.z - Q.z) * a;
+    const x = Q.x + (P.x - Q.x) * a, y = Q.y + (P.y - Q.y) * a + l0 + (l1 - l0) * a + lift3.v, z = Q.z + (P.z - Q.z) * a;
+    drawnFeet.x = x; drawnFeet.y = y; drawnFeet.z = z;
     const f0 = player.prevFace ?? player.face ?? player.yaw, f1 = player.face ?? player.yaw;
     const yaw = f0 + wrapPi(f1 - f0) * a;
     body.face = yaw;
@@ -355,6 +426,8 @@ export function mountAvatar(ctx) {
     get face() { return body.face; },
     /** [feel] The walker camera's state (read only: tools/anime/feel-probe.mjs reads its look point tx / ty / tz). */
     get aim() { return chase; },
+    /** [sight] Where his feet are drawn now (the drawn ground included), in world metres. */
+    get feet() { return drawnFeet; },
     get lean() { return body.lean; },
     get characterLean() { return body.characterLean; },
     prefs, setLook: chooseLook, setModel: choose,
@@ -363,8 +436,10 @@ export function mountAvatar(ctx) {
     adoptBoom() {
       armHandoff(hand, player.camera, handDur());
       boxes.prepare(player.pos.x, player.pos.z);
-      aim.x = player.pos.x; aim.y = player.pos.y; aim.z = player.pos.z;
-      placeWalk(chase, aim, player.yaw, solid, ground, true, thirdFor(player.camera?.aspect));
+      trunks.prepare(player.pos.x, player.pos.z);
+      lift3.v = terrainLift(physics.heightAt, groundH, drawn(), player.pos.x, player.pos.y, player.pos.z); lift3.vv = 0;
+      aim.x = player.pos.x; aim.y = player.pos.y + lift3.v; aim.z = player.pos.z;
+      placeWalk(chase, aim, player.yaw, solid, ground, true, thirdFor(player.camera?.aspect), undefined, trunkAt);
     },
     cost: () => (cost.n ? { mean: cost.sum / cost.n, max: cost.max, n: cost.n } : { mean: 0, max: 0, n: 0 }),
   };
