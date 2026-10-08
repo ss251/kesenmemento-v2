@@ -26,7 +26,9 @@ describe("buildinfo", () => {
   });
   test("buildDefines are JSON string literals for the two identifiers", () => {
     const d = buildDefines(ROOT, { git: () => "df15fdd" });
-    expect(Object.keys(d).sort()).toEqual(["__KLC_APP_VERSION__", "__KLC_LAYOUT_VERSION__"]);
+    expect(Object.keys(d).filter((k) => k !== "KLC_NENDO").sort()).toEqual(["__KLC_APP_VERSION__", "__KLC_LAYOUT_VERSION__"]);
+    // a checkout without the livery files (the public tree) also defines KLC_NENDO "0" (test/livery-define.test.js)
+    if ("KLC_NENDO" in d) expect(d.KLC_NENDO).toBe('"0"');
     expect(JSON.parse(d.__KLC_APP_VERSION__)).toBe(`${pkg.version}+df15fdd`); expect(JSON.parse(d.__KLC_LAYOUT_VERSION__)).toMatch(/^v\d+\.[0-9a-f]{8}$/);
   });
   test("gitShort never throws (a sandbox may return nothing) and is a short hash or empty", () => {

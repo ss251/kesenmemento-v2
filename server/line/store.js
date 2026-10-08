@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS reports (
   text          TEXT NOT NULL DEFAULT '',
   lang          TEXT NOT NULL DEFAULT 'ja',
   photo_consent INTEGER NOT NULL DEFAULT 0 CHECK (photo_consent IN (0, 1)),
-  notes         TEXT NOT NULL DEFAULT ''
+  notes         TEXT NOT NULL DEFAULT '',
+  view_id       TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_ref, created_at);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status, created_at);
@@ -149,6 +150,8 @@ export function openStore({ dataDir, storeKey }) {
   db.exec("PRAGMA foreign_keys = ON");
   db.exec("PRAGMA busy_timeout = 5000");
   db.exec(SCHEMA);
+  const reportCols = db.query("PRAGMA table_info(reports)").all();
+  if (!reportCols.some((c) => c.name === "view_id")) db.exec("ALTER TABLE reports ADD COLUMN view_id TEXT");
   db.exec("PRAGMA user_version = 1");
 
   function insideMedia(relPath) {
@@ -180,8 +183,8 @@ export function openStore({ dataDir, storeKey }) {
     const info = db.query(`
       INSERT INTO reports (
         code, kind, status, created_at, updated_at, user_ref, device, mode, fix_what,
-        place_name, lat, lon, text, lang, photo_consent, notes
-      ) VALUES (?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '')
+        place_name, lat, lon, text, lang, photo_consent, notes, view_id
+      ) VALUES (?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?)
     `).run(
       code, kind, at, at, userRef,
       draft.device || null, draft.mode || null, draft.fixWhat || null,
@@ -191,6 +194,7 @@ export function openStore({ dataDir, storeKey }) {
       String(draft.text || "").slice(0, 4000),
       draft.lang === "en" ? "en" : "ja",
       draft.photoConsent ? 1 : 0,
+      /^V\d{2}$/.test(draft.viewId || "") ? draft.viewId : null,
     );
     const reportId = Number(info.lastInsertRowid);
     for (const m of draft.media || []) {

@@ -3,6 +3,7 @@
 // until then a 手帳 button opens the same log.
 
 import { DIALOGUE_DESK_PX, DIALOGUE_PHONE_PX } from './logic.js';
+import { VIEW_CSS, mountViews } from './viewcard.js';
 
 const CSS = `
 #klc-m {
@@ -10,7 +11,7 @@ const CSS = `
   font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif;
   color: #17184b; line-break: strict; word-break: normal; -webkit-font-smoothing: antialiased;
 }
-#klc-m button, #klc-m .m-sheet, #klc-m .m-card, #klc-m .m-log { pointer-events: auto; }
+#klc-m button, #klc-m .m-sheet, #klc-m .m-card, #klc-m .m-log, #klc-m .m-view { pointer-events: auto; }
 #klc-m h2 {
   font-family: "Zen Maru Gothic", "Noto Sans JP", "Hiragino Sans", sans-serif;
   font-weight: 700; font-size: 15px; line-height: 1.3; margin: 16px 0 8px;
@@ -183,7 +184,7 @@ const CSS = `
   top: calc(72px + env(safe-area-inset-top));
   max-height: calc(100% - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
-#klc-m :is(.m-log, .m-card, .m-stamps, .m-sheet, .m-track, .m-book, .m-prompt, .m-edge, .m-dim, .m-balloon, .m-ring, .m-coach, .m-hub)[hidden] {
+#klc-m :is(.m-log, .m-card, .m-view, .m-stamps, .m-sheet, .m-track, .m-book, .m-prompt, .m-edge, .m-dim, .m-balloon, .m-ring, .m-coach, .m-hub)[hidden] {
   display: none !important;
 }
 #klc-m .m-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 8px 0 20px; }
@@ -367,8 +368,17 @@ export function mountUi(o) {
   if (reduce) root.classList.add('m-reduce');
   if (o.kit) root.classList.add('m-kit');
   const style = el(doc, 'style');
-  style.textContent = CSS;
+  style.textContent = CSS + VIEW_CSS;
   root.appendChild(style);
+  const views = mountViews(doc, root, {
+    reduce,
+    closeLabel: 'とじる',
+    onClose() { syncDim(); o.onViewClose?.(); },
+    onReport(id) { o.onViewReport?.(id); },
+    onSent(id) { o.onViewSent?.(id); },
+    onShare(id, node) { o.onViewShare?.(id, node); },
+    onOpen(id) { o.onViewOpen?.(id); },
+  });
 
   const track = el(doc, 'div', 'm-track');
   track.hidden = true;
@@ -560,8 +570,8 @@ export function mountUi(o) {
 
   function syncDim() {
     const hubOn = !hub.hidden;
-    dim.hidden = log.hidden && card.hidden && stamps.hidden && !hubOn;
-    dim.classList.toggle('m-hub-on', hubOn && log.hidden && card.hidden && stamps.hidden);
+    dim.hidden = log.hidden && card.hidden && stamps.hidden && !views.isOpen() && !hubOn;
+    dim.classList.toggle('m-hub-on', hubOn && log.hidden && card.hidden && stamps.hidden && !views.isOpen());
   }
   function hideLog() {
     const was = !log.hidden;
@@ -571,10 +581,26 @@ export function mountUi(o) {
     if (was) o.onLogClose?.();
   }
   function hideCard() {
-    const was = !card.hidden;
+    const was = !card.hidden || views.isOpen();
     card.hidden = true;
+    views.hide();
     syncDim();
     if (was) o.onCardClose?.();
+  }
+  function showHunt(model) {
+    card.hidden = true;
+    views.showHunt(model);
+    syncDim();
+  }
+  function showReveal(model) {
+    card.hidden = true;
+    views.showReveal(model);
+    syncDim();
+  }
+  function quietHide() {
+    card.hidden = true;
+    views.hide();
+    syncDim();
   }
   function hideTalk() {
     sheet.hidden = true;
@@ -871,6 +897,7 @@ export function mountUi(o) {
   }
 
   function showCard(m) {
+    views.hide();
     card.hidden = false;
     card.dataset.kind = m.kind || 'game';
     cardHead.textContent = m.rewardLabel || '';
@@ -932,6 +959,8 @@ export function mountUi(o) {
     setPrompt(on, label) { prompt.hidden = !on; if (label) prompt.textContent = label; },
     setTracker, flashTracker, setBearing, syncBalloons, setEdge, showPage, paintLine, hideTalk,
     showLog, hideLog, fillLog, showCard, hideCard, fillStamps, showStamps,
+    showHunt, showReveal, quietHide, fillAlbum: views.fillAlbum,
+    viewOpen: views.isOpen, viewerOpen: views.viewerOpen, closeViewer: views.closeViewer,
     showCoach, hideCoach, showHub, hideHub,
     isLog: () => !log.hidden,
     isHub: () => !hub.hidden,

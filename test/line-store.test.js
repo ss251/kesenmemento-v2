@@ -114,6 +114,15 @@ describe("store", () => {
     expect(store.markEvent("evt-new", t0 + 181 * 86400000)).toBe(false);
   });
 
+  test("a view tag is stored only as V plus two digits", () => {
+    const { store } = setup();
+    const ref = store.userRef("Uview");
+    const ok = store.createReport({ kind: "photo", text: "岸壁", lang: "ja", photoConsent: 1, viewId: "V07", media: [] }, ref, 1_700_000_000_000);
+    const bad = store.createReport({ kind: "photo", text: "だめ", lang: "ja", photoConsent: 1, viewId: "../V07", media: [] }, ref, 1_700_000_000_100);
+    expect(store.getByCode(ok.code).view_id).toBe("V07");
+    expect(store.getByCode(bad.code).view_id).toBe(null);
+  });
+
   test("sessions round-trip and duplicate webhook ids are ignored", () => {
     const { store } = setup();
     expect(store.markEvent("evt-1", 10)).toBe(true);

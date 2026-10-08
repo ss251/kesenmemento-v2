@@ -1,0 +1,19 @@
+{
+  "about": "Privacy blur for the view-quest photos (tools/play/views-build.mjs ship). Boxes are [x0, y0, x1, y1] as fractions of the frame. Every person the eye review found is blurred, even with no face: a passer-by, crew, someone behind a shop window. Reviewed 2026-10-08 on the 960 px WebPs.",
+  "masks": {
+    "IMG_0792": [
+      { "box": [0.72, 0.52, 0.76, 0.57], "why": "a passer-by in red between the parked cars" }
+    ],
+    "IMG_0831": [
+      { "box": [0.88, 0.55, 0.925, 0.595], "why": "a person behind the shop window on the right" }
+    ],
+    "IMG_0853": [
+      { "box": [0.12, 0.455, 0.18, 0.505], "why": "crew on the boat's deck" },
+      { "box": [0.605, 0.435, 0.665, 0.48], "why": "two people on the gangway" }
+    ],
+    "IMG_0890": [
+      { "box": [0.14, 0.57, 0.18, 0.61], "why": "a person walking on the far quay" },
+      { "box": [0.235, 0.56, 0.275, 0.61], "why": "a second person, in white, at the quay edge by the bow, and a figure crouched beside them" }
+    ]
+  }
+}

@@ -3,7 +3,7 @@
 import * as L from '../../world/layout.js';
 import NPCS from '../../../../data/play/npcs.json';
 import { makeTreeAt } from '../../world/explore/places.js';
-import { clearStance, standingClear } from '../missions/place.js';
+import { clearStance, standingClear, standHeight } from '../missions/place.js';
 import { buildFigure, poseFigure, lookPoint } from './figures.js';
 import { freeTree } from '../kit/lazy.js';
 
@@ -65,8 +65,11 @@ export function mountNpcs(ctx) {
   let sample = () => false;
   let sampleReady = false;
 
+  // [npc-stand] feet on the deck a walker would stand on (a quay, a promenade, a pier), not the terrain under it
+  const standY = (x, z) => standHeight(x, z, ground, ctx.physics);
+
   function worldSample(x, z, y) {
-    if (L.isWater?.(x, z) && ground(x, z) < 0.35) return true;
+    if (L.isWater?.(x, z) && standY(x, z) < 0.35) return true;   // open water blocks; a deck over it does not
     return sample(x, z, y);
   }
 
@@ -89,8 +92,9 @@ export function mountNpcs(ctx) {
 
   function placeOne(n) {
     ensureSample();
+    n.y = standY(n.x, n.z);   // (again on each settle pass: the harbour's decks reach physics after the first frames)
     if (standingClear(n.x, n.z, n.y, worldSample)) return;
-    const next = clearStance(n, worldSample, ground);
+    const next = clearStance(n, worldSample, standY);
     if (!next.moved) return;
     n.x = next.x;
     n.z = next.z;

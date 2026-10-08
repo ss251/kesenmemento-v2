@@ -5,6 +5,8 @@
 // Port 8981 (this package's). `bun test` alone skips it.
 import { test, expect, describe, beforeAll, afterAll } from "bun:test";
 import { buildAndServe, launch, phonePage, setViewport, enterTown, fingers, center, layoutReport, gameState, dAngle, buttonIds, sleep, waitGo } from "../tools/anime/pad-lib.mjs";
+import NPCS from "../data/play/npcs.json";
+import { FISHER } from "../src/anime/play/missions/arrive.js";
 
 const RUN = process.env.KLC_E2E === "1" && process.env.KLC_GATE === "1";
 const PORT = Number(process.env.KLC_E2E_PORT || 8981);
@@ -123,7 +125,27 @@ d("mobile pad: headless Chrome, 390x844 @3x, iPhone UA, CDP touches", () => {
     expect((await gameState(page)).onGround).toBe(true);
   });
 
+  // [missions-9] beside 話す the phone pad keeps ジャンプ and ダッシュ only; 飛ぶ sits on the ordinary walk row (kit/ui.js promptPadIds).
+  // The arrival fisherman stands by the start, so the talk row is checked there, then the walker steps onto open ground clear of everyone.
+  const clearOfPeople = async () => {
+    if ((await page.eval("window.__pad.mode")) !== "play-prompt") return;
+    expect(await buttonIds(page)).toEqual(["play-go", "jump", "dash"]);
+    const s = await gameState(page);
+    const people = [...NPCS.npcs.map((n) => [n.x, n.z]), [FISHER.x, FISHER.z]];
+    for (const r of [15, 22, 30, 40]) for (let k = 0; k < 16; k++) {
+      const x = s.x + Math.sin((k * Math.PI) / 8) * r, z = s.z + Math.cos((k * Math.PI) / 8) * r;
+      if (people.some(([px, pz]) => Math.hypot(px - x, pz - z) < 12)) continue;
+      const open = await page.eval(`(() => { const P = window.__ctx.physics; if (P.isWater && P.isWater(${x}, ${z})) return false; return !P.solidAt(${x}, ${z}, P.groundHeight(${x}, ${z}, 1e9) + 0.9); })()`);
+      if (!open) continue;
+      await page.eval(`window.__ctx.playerObj.setPose(${x}, ${z}, 0, 0)`);
+      await page.waitFor("window.__pad.mode === 'walk'", { timeout: 4000 });
+      return;
+    }
+    throw new Error("no open ground clear of the townspeople near the start");
+  };
+
   T("飛ぶ switches to fly (the buttons change) and holding 上昇 raises the altitude; 下降 lowers it; 歩く lands", async () => {
+    await clearOfPeople();
     await tapBtn("fly");
     await page.waitFor("window.__pad.mode === 'fly'", { timeout: 4000 });
     await settle(600);

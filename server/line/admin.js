@@ -1,6 +1,8 @@
 // Team pages. HTTP Basic, user `team`, password ADMIN_TOKEN.
 // no-store, noindex, no CORS. The map link is OpenStreetMap.
 
+import { existsSync, readFileSync } from "node:fs";
+import { relative, resolve, sep } from "node:path";
 import { KIND_JA, STATUS_JA, fixedText, privacyParts } from "./strings.js";
 import { safeEqual } from "./signature.js";
 import { quotaLeft } from "./api.js";
@@ -26,6 +28,16 @@ const HTML_HEADERS = {
   "content-type": "text/html; charset=utf-8",
   "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
 };
+
+/** A shipped game thumbnail, or null. The id is only `V` plus two digits, so the path cannot leave the folder. */
+export function viewThumbPath(id) {
+  if (!/^V\d{2}$/.test(id || "")) return null;
+  const dir = resolve(import.meta.dir, "../../data/play/views");
+  const full = resolve(dir, `${id}.webp`);
+  const rel = relative(dir, full);
+  if (!rel || rel.startsWith("..") || rel.startsWith(sep)) return null;
+  return existsSync(full) ? full : null;
+}
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -316,12 +328,17 @@ ${cards}
         ? `<p>今月のプッシュは上限です。報告の状態は変えられますが、お知らせは送れません。</p>`
         : "";
     const place = row.place_name ? `<p>場所: ${esc(row.place_name)}</p>` : "";
+    const viewId = /^V\d{2}$/.test(row.view_id || "") ? row.view_id : "";
+    const viewBlock = viewId
+      ? `<p>けしき ${esc(viewId)}</p>${viewThumbPath(viewId) ? `<img src="/admin/view/${esc(viewId)}.webp" alt="ゲームのけしき ${esc(viewId)}">` : ""}`
+      : "";
     return html(page(code, `
 <nav><a href="/admin">報告</a></nav>
 <h1>${esc(code)}</h1>
 <p class="row">${badge(row.status)} <span>${esc(kindLabel(row.kind))}</span> <span class="meta">${esc(jstLabel(row.created_at))}</span></p>
 ${banner}
 ${place}
+${viewBlock}
 ${mapLink(row.lat, row.lon)}
 <p class="meta">端末 ${esc(row.device || "—")} · 遊び方 ${esc(row.mode || "—")} · ちがい ${esc(row.fix_what || "—")}</p>
 <p class="meta">言語 ${esc(row.lang)} · 写真の確認 ${row.photo_consent ? "あり" : "なし"} · 参照 ${esc(row.user_ref)}</p>
@@ -347,7 +364,7 @@ ${notify}
     const kind = KINDS.includes(url.searchParams.get("kind") || "") ? url.searchParams.get("kind") : "";
     const status = STATUSES.includes(url.searchParams.get("status") || "") ? url.searchParams.get("status") : "";
     const rows = store.listReports({ kind, status, limit: 500 });
-    const header = ["code", "kind", "status", "created_at", "updated_at", "device", "mode", "fix_what", "place_name", "lat", "lon", "lang", "photo_consent", "photo_count", "text", "notes", "user_ref"];
+    const header = ["code", "kind", "status", "created_at", "updated_at", "device", "mode", "fix_what", "place_name", "lat", "lon", "lang", "photo_consent", "photo_count", "text", "notes", "user_ref", "view_id"];
     const lines = [header.join(",")];
     for (const r of rows) {
       lines.push(header.map((k) => csvCell(r[k])).join(","));
@@ -429,6 +446,12 @@ ${notify}
       if (req.method === "GET" && path === "/admin/export.csv") return exportCsv(url);
       const mediaMatch = /^\/admin\/media\/(\d{1,12})$/.exec(path);
       if (req.method === "GET" && mediaMatch) return media(mediaMatch[1]);
+      const viewMatch = /^\/admin\/view\/(V\d{2})\.webp$/.exec(path);
+      if (req.method === "GET" && viewMatch) {
+        const file = viewThumbPath(viewMatch[1]);
+        if (!file) return new Response(null, { status: 404, headers: NO_STORE });
+        return new Response(readFileSync(file), { headers: { ...NO_STORE, "content-type": "image/webp" } });
+      }
       const detailMatch = /^\/admin\/r\/(KM-\d{1,8})$/.exec(path);
       if (req.method === "GET" && detailMatch) return detail(detailMatch[1], url);
       const statusMatch = /^\/admin\/r\/(KM-\d{1,8})\/status$/.exec(path);

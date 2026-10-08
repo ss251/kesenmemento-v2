@@ -290,6 +290,23 @@ describe("flows", () => {
     expect(out.session.draft.lat).toBe(38.9);
   });
 
+  test("けしき V07 starts a photo and keeps the view id off the caption", () => {
+    const idle = step(null, ev({ type: "message", message: { type: "text", text: "けしき Ｖ０７" } }));
+    expect(idle.session.flow).toBe("photo");
+    expect(idle.session.step).toBe("consent");
+    expect(idle.session.draft.viewId).toBe("V07");
+    expect(idle.session.draft.texts).toEqual([]);
+    const yes = step(idle.session, ev({ type: "message", message: { type: "text", text: "はい、だいじょうぶ" } }, 1));
+    expect(yes.session.step).toBe("collect");
+    expect(yes.session.draft.viewId).toBe("V07");
+    const again = step(yes.session, ev({ type: "message", message: { type: "text", text: "けしき V08" } }, 2));
+    expect(again.session.draft.viewId).toBe("V08");
+    expect(again.session.draft.texts || []).toEqual([]);
+    const post = step(freshSession(), ev({ type: "postback", postback: { data: "view=V03" } }));
+    expect(post.session.flow).toBe("photo");
+    expect(post.session.draft.viewId).toBe("V03");
+  });
+
   test("an image outside a flow asks for consent and does not keep the image", () => {
     const out = step(null, ev({ type: "message", message: { type: "image", id: "x" } }));
     expect(out.session.flow).toBe("photo");

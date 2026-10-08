@@ -126,7 +126,11 @@ export function presentReward(quest, partners, state, now, deviceId, opts) {
     code: null,
     partner: null,
   };
-  if (quest.voucher) {
+  if (quest.album === 'views') {
+    const send = (quest.steps || []).some((s) => s.type === 'viewSend');
+    view.kind = send ? 'view-sent' : 'view';
+    view.viewId = quest.view || null;
+  } else if (quest.voucher) {
     const partner = typeof quest.voucher === 'string' ? (partners || []).find((x) => x.id === quest.voucher) : null;
     if (partnerLive(partner, now)) {
       view.kind = 'voucher';

@@ -15,6 +15,23 @@ const SHIFTS = [
   [1.4, 4.2], [-1.4, 4.2],
 ];
 
+/**
+ * Where a person's feet go at (x, z): the highest walkable top a walker could step onto there (a quay deck, a promenade,
+ * a pier or a ramp: physics.groundHeight, the player's own rule) when it is at most `reach` m above the terrain, else the
+ * terrain. People used the terrain alone, so the oyster farmer on the 南町 promenade (terrain 1.45 m, deck 2.92 m) stood
+ * waist-deep in it. A roof or an upper floor is out of reach; a broken or missing physics falls back to the terrain.
+ */
+export function standHeight(x, z, groundAt, physics, reach = 3) {
+  const g = groundAt(x, z);
+  if (!physics || typeof physics.groundHeight !== 'function') return g;
+  try {
+    const h = physics.groundHeight(x, z, g + reach);
+    return Number.isFinite(h) && h > g ? h : g;
+  } catch {
+    return g;
+  }
+}
+
 /** True when a sample along the segment hits a blocker. The ends themselves are not tested. */
 export function sightBlocked(ax, az, bx, bz, y, sample, step = SAMPLE_STEP) {
   if (!sample) return false;

@@ -1,4 +1,5 @@
-// [play] The 14 quests, on a desktop and a phone, through the buttons a person presses.
+// [play] The 14 stamp-book quests, on a desktop and a phone, through the buttons a person presses.
+// The 12 view quests (album "views") are test/play-views.e2e.test.js.
 // A walk longer than 300 m is one placement at the end of it. Anything shorter is walked.
 // Heavy: tools/anime/gate.sh chrome --fg env KLC_E2E=1 env -u NODE_OPTIONS bun test ./test/play-missions-9.e2e.test.js
 import { test, describe, beforeAll, afterAll } from 'bun:test';
@@ -214,6 +215,7 @@ async function satisfy(page, step) {
 async function playQuests(page, tag) {
   const out = [];
   for (const q of QUESTS.quests) {
+    if (q.album === 'views') continue;   // the 12 view quests are play-views.e2e.test.js
     const t0 = Date.now();
     let path = '';
     let status = 'fail';

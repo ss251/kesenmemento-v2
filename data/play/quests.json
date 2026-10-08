@@ -261,6 +261,257 @@
       "steps": [
         { "type": "race", "course": "race-minato", "ms": 480000, "hint": "play.quest.quay-run.s0" }
       ]
+    },
+    {
+      "id": "view-a-01",
+      "code": "V01",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V01",
+      "title": "play.view.q.V01.title",
+      "offer": "play.view.offer.a",
+      "active": "play.view.active.a",
+      "done": "play.view.done.a",
+      "fact": "play.quest.golden-three.fact",
+      "factFrom": "play.quest.golden-three.from",
+      "source": "https://kesennuma-kanko.jp/ukimido/",
+      "minutes": [4, 6],
+      "voucher": false,
+      "reward": { "stamp": "v01", "title": "play.view.q.V01.title" },
+      "steps": [
+        { "type": "view", "view": "V01", "hint": "play.view.area.V01" }
+      ]
+    },
+    {
+      "id": "view-a-02",
+      "code": "V02",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V02",
+      "title": "play.view.q.V02.title",
+      "offer": "play.view.offer.next",
+      "active": "play.view.active.a",
+      "done": "play.view.done.a",
+      "fact": "play.quest.quay-photo.fact",
+      "factFrom": "play.quest.quay-photo.from",
+      "source": "https://kesennuma-kanko.jp/kesennumagyokou_uoichiba/",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-a-01",
+      "reward": { "stamp": "v02", "title": "play.view.q.V02.title" },
+      "steps": [
+        { "type": "view", "view": "V02", "hint": "play.view.area.V02" }
+      ]
+    },
+    {
+      "id": "view-a-03",
+      "code": "V03",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V03",
+      "title": "play.view.q.V03.title",
+      "offer": "play.view.offer.next",
+      "active": "play.view.active.a",
+      "done": "play.view.done.a",
+      "fact": "play.quest.quay-photo.fact",
+      "factFrom": "play.quest.quay-photo.from",
+      "source": "https://kesennuma-kanko.jp/kesennumagyokou_uoichiba/",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-a-02",
+      "reward": { "stamp": "v03", "title": "play.view.q.V03.title" },
+      "steps": [
+        { "type": "view", "view": "V03", "hint": "play.view.area.V03" }
+      ]
+    },
+    {
+      "id": "view-a-04",
+      "code": "V04",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V04",
+      "title": "play.view.q.V04.title",
+      "offer": "play.view.offer.next",
+      "active": "play.view.active.a",
+      "done": "play.view.done.a",
+      "fact": "play.quest.ferry-view.fact",
+      "factFrom": "play.quest.ferry-view.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-a-03",
+      "reward": { "stamp": "v04", "title": "play.view.q.V04.title" },
+      "steps": [
+        { "type": "view", "view": "V04", "hint": "play.view.area.V04" }
+      ]
+    },
+    {
+      "id": "view-a-05",
+      "code": "V05",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V05",
+      "title": "play.view.q.V05.title",
+      "offer": "play.view.offer.next",
+      "active": "play.view.active.a",
+      "done": "play.view.done.a",
+      "fact": "play.quest.port-medal.fact",
+      "factFrom": "play.quest.port-medal.from",
+      "source": "https://kesennuma-kanko.jp/kesennumagyokou_uoichiba/",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-a-04",
+      "reward": { "stamp": "v05", "title": "play.view.q.V05.title" },
+      "steps": [
+        { "type": "view", "view": "V05", "hint": "play.view.area.V05" }
+      ]
+    },
+    {
+      "id": "view-a-06",
+      "code": "V06",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V06",
+      "title": "play.view.q.V06.title",
+      "offer": "play.view.offer.next",
+      "active": "play.view.active.a",
+      "done": "play.view.done.a",
+      "fact": "play.quest.quay-run.fact",
+      "factFrom": "play.quest.quay-run.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-a-05",
+      "reward": { "stamp": "v06", "title": "play.view.q.V06.title" },
+      "steps": [
+        { "type": "view", "view": "V06", "hint": "play.view.area.V06" }
+      ]
+    },
+    {
+      "id": "view-b-01",
+      "code": "V07",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V07",
+      "title": "play.view.q.V07.title",
+      "offer": "play.view.offer.b",
+      "active": "play.view.active.b",
+      "done": "play.view.done.b",
+      "fact": "play.quest.ferry-view.fact",
+      "factFrom": "play.quest.ferry-view.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-a-06",
+      "reward": { "stamp": "v07", "title": "play.view.q.V07.title" },
+      "steps": [
+        { "type": "viewSend", "view": "V07", "hint": "play.view.area.V07" }
+      ]
+    },
+    {
+      "id": "view-b-02",
+      "code": "V08",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V08",
+      "title": "play.view.q.V08.title",
+      "offer": "play.view.offer.nextb",
+      "active": "play.view.active.b",
+      "done": "play.view.done.b",
+      "fact": "play.quest.quay-run.fact",
+      "factFrom": "play.quest.quay-run.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-b-01",
+      "reward": { "stamp": "v08", "title": "play.view.q.V08.title" },
+      "steps": [
+        { "type": "viewSend", "view": "V08", "hint": "play.view.area.V08" }
+      ]
+    },
+    {
+      "id": "view-b-03",
+      "code": "V09",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V09",
+      "title": "play.view.q.V09.title",
+      "offer": "play.view.offer.nextb",
+      "active": "play.view.active.b",
+      "done": "play.view.done.b",
+      "fact": "play.quest.quay-photo.fact",
+      "factFrom": "play.quest.quay-photo.from",
+      "source": "https://kesennuma-kanko.jp/kesennumagyokou_uoichiba/",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-b-02",
+      "reward": { "stamp": "v09", "title": "play.view.q.V09.title" },
+      "steps": [
+        { "type": "viewSend", "view": "V09", "hint": "play.view.area.V09" }
+      ]
+    },
+    {
+      "id": "view-b-04",
+      "code": "V10",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V10",
+      "title": "play.view.q.V10.title",
+      "offer": "play.view.offer.nextb",
+      "active": "play.view.active.b",
+      "done": "play.view.done.b",
+      "fact": "play.quest.shrine-visit.fact",
+      "factFrom": "play.quest.shrine-visit.from",
+      "source": "https://ja.wikipedia.org/wiki/%E4%BA%94%E5%8D%81%E9%88%B4%E7%A5%9E%E7%A4%BE_(%E6%B0%97%E4%BB%99%E6%B2%BC%E5%B8%82)",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-b-03",
+      "reward": { "stamp": "v10", "title": "play.view.q.V10.title" },
+      "steps": [
+        { "type": "viewSend", "view": "V10", "hint": "play.view.area.V10" }
+      ]
+    },
+    {
+      "id": "view-b-05",
+      "code": "V11",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V11",
+      "title": "play.view.q.V11.title",
+      "offer": "play.view.offer.nextb",
+      "active": "play.view.active.b",
+      "done": "play.view.done.b",
+      "fact": "play.quest.ferry-view.fact",
+      "factFrom": "play.quest.ferry-view.from",
+      "source": "http://www.kesennuma-gyokyou.or.jp/html/uoichiba.html",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-b-04",
+      "reward": { "stamp": "v11", "title": "play.view.q.V11.title" },
+      "steps": [
+        { "type": "viewSend", "view": "V11", "hint": "play.view.area.V11" }
+      ]
+    },
+    {
+      "id": "view-b-06",
+      "code": "V12",
+      "giver": "photographer",
+      "album": "views",
+      "view": "V12",
+      "title": "play.view.q.V12.title",
+      "offer": "play.view.offer.nextb",
+      "active": "play.view.active.b",
+      "done": "play.view.done.b",
+      "fact": "play.quest.golden-three.fact",
+      "factFrom": "play.quest.golden-three.from",
+      "source": "https://kesennuma-kanko.jp/ukimido/",
+      "minutes": [4, 6],
+      "voucher": false,
+      "requires": "view-b-05",
+      "reward": { "stamp": "v12", "title": "play.view.q.V12.title" },
+      "steps": [
+        { "type": "viewSend", "view": "V12", "hint": "play.view.area.V12" }
+      ]
     }
   ]
 }

@@ -205,6 +205,8 @@ describe('quest steps', () => {
         if (step.type === 'gull') notePerch(s, { x: step.x, z: step.z, id: step.perch || null, perched: true });
         if (step.type === 'swim') { noteSwim(s, { x: step.x, y: step.y || 0, z: step.z }); s.diving = true; }
         if (step.type === 'race') noteRace(s, step.ms, step.course || null);
+        if (step.type === 'view') s.viewReady = step.view;
+        if (step.type === 'viewSend') s.viewSent[step.view] = now;
         const w = world(s, pos, { katsuo, courses });
         if (step.type === 'talk') onTalk(s, quests, step.npc, now);
         else if (step.type === 'deliver') onTalk(s, quests, step.to, now);
@@ -422,7 +424,10 @@ describe('what people say', () => {
     expect(log.active.map((q) => q.id)).toEqual(['golden-three']);
     expect(log.done.map((q) => q.id)).toEqual(['quay-run']);
     expect(log.available.some((q) => q.id === 'golden-three')).toBe(false);
-    expect(log.available.length + log.active.length + log.done.length).toBe(quests.length);
+    const book = quests.filter((q) => q.album !== 'views');
+    const shown = [...log.available, ...log.active, ...log.done];
+    expect(shown.filter((q) => q.album !== 'views').length).toBe(book.length);
+    expect(shown.filter((q) => q.album === 'views').length).toBe(1);
   });
 });
 
@@ -490,9 +495,12 @@ describe('vouchers', () => {
 
 describe('the book of quests', () => {
   test('twelve to sixteen quests, one source each, every step kind, people on land', () => {
-    expect(quests.length).toBeGreaterThanOrEqual(12);
-    expect(quests.length).toBeLessThanOrEqual(16);
-    expect(npcs.length).toBe(quests.length + 1);
+    const book = quests.filter((q) => q.album !== 'views');
+    expect(book.length).toBe(14);
+    expect(quests.filter((q) => q.album === 'views').length).toBe(12);
+    const givers = new Set(quests.map((q) => q.giver));
+    expect(npcs.length).toBe(givers.size + 1);
+    expect(givers.has('captain')).toBe(false);
     expect(npcs.some((n) => n.id === 'captain')).toBe(true);
     const types = new Set();
     const ids = new Set();
@@ -717,12 +725,14 @@ describe('round 2: marks, voices, stamps, a clear stance', () => {
     const s = emptyProgress();
     forceComplete(s, questById(quests, 'shrine-visit'), now);
     const rows = stampRows(quests, s, (q) => t('ja', q.reward?.title || q.title), { 'shrine-visit': 1 });
-    expect(rows.length).toBe(quests.length);
+    const book = quests.filter((q) => q.album !== 'views');
+    expect(rows.length).toBe(book.length);
+    expect(rows.some((r) => String(r.id).startsWith('view-'))).toBe(false);
     const shrine = rows.find((r) => r.id === 'shrine-visit');
     expect(shrine.got).toBe(true);
     expect(shrine.fresh).toBe(true);
     expect(shrine.glyph).toBe(stampGlyph(shrine.title));
-    expect(rows.filter((r) => !r.got).length).toBe(quests.length - 1);
+    expect(rows.filter((r) => !r.got).length).toBe(book.length - 1);
   });
 
   test('a tree on the approach moves the person sideways, still facing you', () => {
@@ -757,7 +767,9 @@ describe('round 2: marks, voices, stamps, a clear stance', () => {
     expect(balloonPx(6, 900, 55)).toBeLessThanOrEqual(BALLOON_CAP_PX);
     expect(balloonPx(6, 900, 55)).toBeGreaterThan(desk);
     const s = emptyProgress();
-    expect(stampLine(countStamps(quests, s), quests.length, 'ja')).toBe('スタンプ 0/' + quests.length);
+    const bookN = quests.filter((q) => q.album !== 'views').length;
+    expect(bookN).toBe(14);
+    expect(stampLine(countStamps(quests, s), bookN, 'ja')).toBe('スタンプ 0/14');
     expect(stampLine(3, 14, 'en')).toBe('Stamps 3/14');
     expect(modeIsNew(s)).toBe(true);
     acceptQuest(s, questById(quests, 'shrine-visit'), now);

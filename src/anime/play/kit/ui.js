@@ -349,7 +349,7 @@ const CSS = /* css */`
 #klc-play .arrow svg { width: 24px; height: 24px; margin-left: 3px; }
 #klc-play .card, #klc-play .sheet { pointer-events: auto; }
 #klc-play :is(.sheet, .veil)[hidden] { display: none !important; }   /* author display:grid would otherwise beat [hidden] and cover the HUD */
-#klc-play .veil { position: absolute; inset: 0; display: grid; place-items: end center; padding: 16px;
+#klc-play .veil { position: absolute; inset: 0; display: grid; place-items: end center; padding: 16px; grid-template-columns: minmax(0, 1fr);
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: rgba(23, 24, 75, 0.28); }
 #klc-play .panel { width: min(420px, 100%); background: var(--k-paper); border-radius: 22px; padding: 22px 22px 16px;
   box-shadow: 0 18px 50px rgba(23, 24, 75, 0.28); transform: translateY(12px); opacity: 0;
@@ -372,8 +372,9 @@ const CSS = /* css */`
 #klc-play .acts .pri { background: var(--accent-fill, #c4521f); color: #fff; }
 #klc-play .acts .sec { background: rgba(34, 58, 112, 0.08); color: var(--k-navy); }
 #klc-play .sheet { position: absolute; inset: 0; display: grid; place-items: end center; background: rgba(23, 24, 75, 0.34);
-  padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
-#klc-play .sheet .panel { width: min(440px, 100%); max-height: min(78vh, 680px); display: flex; flex-direction: column; padding: 16px 16px 12px;
+  padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  grid-template-columns: minmax(0, 1fr); }   /* [phone-sheet] the one column is the screen, not the panel's widest row: the 手帳's tabs made it 764 px on a 390 px phone */
+#klc-play .sheet .panel { width: min(440px, 100%); min-width: 0; max-height: min(78vh, 680px); display: flex; flex-direction: column; padding: 16px 16px 12px;
   transform: none; opacity: 1; }
 #klc-play .shead { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 #klc-play .shead h2 { flex: 1; margin: 0; font-size: 20px; }
@@ -1017,8 +1018,10 @@ export function mountUi(ctx) {
     topbar.style.top = '';
     counters.style.top = '';
     counters.style.left = '';
-    natural.top = parseFloat(getComputedStyle(topbar).top) || 10;
-    natural.chips = parseFloat(getComputedStyle(counters).top) || 108;
+    // a page without a style engine (the tests' small DOM, where the 600 ms layout timer can fire after the test) keeps the defaults
+    const cs = typeof getComputedStyle === 'function' ? getComputedStyle : null;
+    natural.top = (cs && parseFloat(cs(topbar).top)) || 10;
+    natural.chips = (cs && parseFloat(cs(counters).top)) || 108;
   }
   function liftCluster() {
     if (cluster.hidden || !cluster.children.length) return;
@@ -1035,6 +1038,7 @@ export function mountUi(ctx) {
     if (lift !== was) cluster.style.setProperty('--lift', lift + 'px');
   }
   function layoutChrome(fresh) {
+    if (typeof topbar.getBoundingClientRect !== 'function') return;   // no layout engine (the tests' small DOM, after its test ended)
     if (fresh || !Number.isFinite(natural.top)) readNatural();
     const H = window.innerHeight || 852;
     const t = topbar.getBoundingClientRect();

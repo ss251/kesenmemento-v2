@@ -35,8 +35,14 @@ function cloneSession(input) {
 function emptyDraft(kind) {
   return {
     kind, device: null, mode: null, fixWhat: null, placeName: null,
-    lat: null, lon: null, texts: [], media: [], photoConsent: 0,
+    lat: null, lon: null, texts: [], media: [], photoConsent: 0, viewId: null,
   };
+}
+
+/** 「けしき V07」 on a photo report. Full-width digits fold in normalizeText. */
+export function viewTagOf(text) {
+  const m = /^けしき\s+(V\d{2})$/.exec(normalizeText(text));
+  return m ? m[1] : null;
 }
 
 function joined(draft) {
@@ -219,6 +225,7 @@ function commitAction(session) {
       text: joined(d),
       lang: session.lang,
       photoConsent: d.photoConsent ? 1 : 0,
+      viewId: /^V\d{2}$/.test(d.viewId || "") ? d.viewId : null,
       media: (d.media || []).map((m) => ({ ...m })),
     },
   };
@@ -334,6 +341,14 @@ function onPostback(session, data, now) {
   if (key === "flow" && value === "bug") return startBug(session, now);
   if (key === "flow" && value === "fix") return startFix(session, now);
   if (key === "flow" && value === "photo") return startPhoto(session, now);
+  if (key === "view" && /^V\d{2}$/.test(value)) {
+    if (!session.flow) startPhoto(session, now);
+    if (session.flow === "photo" && session.draft) {
+      session.draft.viewId = value;
+      return done(session, now, [promptFor(session)]);
+    }
+    if (session.flow) return reask(session, now);
+  }
   if (key === "flow" && value === "idea") return startIdea(session, now);
   if (key === "flow" && value === "help") return showHelp(session, now);
   if (key === "action" && value === "cancel") return cancel(session, now);
@@ -389,7 +404,24 @@ function onText(session, text, now) {
   const cmd = command(session, text, now);
   if (cmd) return cmd;
   const n = normalizeText(text);
-  if (!session.flow) return startFree(session, text, now);
+  if (!session.flow) {
+    const tag = viewTagOf(text);
+    if (tag) {
+      const out = startPhoto(session, now);
+      session.draft.viewId = tag;
+      return out;
+    }
+    return startFree(session, text, now);
+  }
+  if (session.flow === "photo" && session.draft) {
+    const tag = viewTagOf(text);
+    if (tag && (session.step === "consent" || session.step === "collect" || session.step === "confirm")) {
+      session.draft.viewId = tag;
+      if (session.step === "confirm") return done(session, now, [promptFor(session)]);
+      if (session.step === "consent") return reask(session, now);
+      return got(session, now);
+    }
+  }
   if (session.flow === "delete") {
     if (n === "消す" || n.toLowerCase() === "delete") return done(session, now, [], [{ type: "erase" }]);
     return reask(session, now);

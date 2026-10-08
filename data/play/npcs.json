@@ -195,6 +195,19 @@
       "lookI": 2,
       "seed": 1414,
       "lines": ["play.npc.guide.line.0", "play.npc.guide.line.1"]
+    },
+    {
+      "id": "photographer",
+      "role": "play.npc.photographer.role",
+      "color": "#165E83",
+      "x": 48,
+      "z": 78,
+      "yaw": 2.2,
+      "idle": "scan",
+      "look": "townWoman",
+      "lookI": 1,
+      "seed": 1416,
+      "lines": ["play.npc.photographer.line.0", "play.npc.photographer.line.1"]
     }
   ]
 }

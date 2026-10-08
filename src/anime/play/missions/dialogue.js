@@ -101,6 +101,7 @@ export const VOICE = {
   auctioneer: 4,
   gull: 3,
   visitor: 2,
+  photographer: 2,
   ferry: 1,
   guide: 1,
   farmer: -1,

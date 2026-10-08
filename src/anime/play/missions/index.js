@@ -11,7 +11,11 @@ import {
   acceptQuest, noteIppon, notePhoto, notePerch, noteSwim, noteRace, absorbCourses, tracker, fillWorld,
   markerFor, mapLabel, activeIds, cycleActive, balloonOpacity, balloonMark, bearingDeg, stampRows, stampGlyph, forceComplete,
   balloonPx, ringWidth, markIsBang, handoffOf, countStamps, stampLine, modeIsNew, nearestBang, questMode,
+  viewMatch, viewDwell, hintCentre, viewWarmth, viewDistance, noteViewSent, stampBook,
 } from './logic.js';
+import { viewById, lineViewUrl, formatTaken, VIEWS_LIST } from './views.js';
+import { anglesFromQuaternion, yawFromHeading } from '../../core/pose.js';
+import { deliverPhoto, dataUrlToBlob } from '../../ui/photo-share.js';
 import { scriptFor, heardAmbient, openLine, stepLine, skipLine, visible, blipFor, voicePitch } from './dialogue.js';
 import { sightBlocked } from './place.js';
 import { presentReward, deviceIdOf, formatWhen, inkOn, glyphOnPaper } from './voucher.js';
@@ -63,6 +67,7 @@ export function mount(ctx, kit) {
   let enabledWas = true;
   let dirty = false;
   let acc = 0;
+  let viewHold = 0;
   let clock = 0;
   let cardUp = false;
   let easing = 0;
@@ -124,6 +129,11 @@ export function mount(ctx, kit) {
     },
     onPick: pickLog,
     onCardClose() { cardUp = false; drain(); },
+    onViewClose() { cardUp = false; drain(); },
+    onViewReport(id) { reportView(id); },
+    onViewSent(id) { markSent(id); },
+    onViewShare(id, node) { shareView(id, node); },
+    onViewOpen(id) { openFound(id); },
   });
   ui.setBook(!!kit.__shim, tr('play.quest.notebook'));
 
@@ -441,9 +451,182 @@ export function mount(ctx, kit) {
     };
   }
 
+  function readCam() {
+    const cam = ctx.camera;
+    if (!cam?.quaternion) return null;
+    const a = anglesFromQuaternion(cam.quaternion);
+    return {
+      x: cam.position.x, y: cam.position.y, z: cam.position.z,
+      yaw: yawFromHeading(a.heading), pitch: a.pitch,
+    };
+  }
+
+  function activeViewQuest() {
+    const q = questById(quests, state.active);
+    const p = q && state.progress[q.id];
+    const step = p && !p.done ? q.steps[p.step] : null;
+    if (!step || (step.type !== 'view' && step.type !== 'viewSend')) return null;
+    return { quest: q, step, view: viewById(step.view) };
+  }
+
+  function langSide(bag) {
+    if (!bag) return '';
+    return lang === 'en' ? (bag.en || bag.ja || '') : (bag.ja || bag.en || '');
+  }
+
+  function huntModel(view, send) {
+    const basic = lineViewUrl(view.id);
+    return {
+      id: view.id,
+      kind: send ? 'send' : 'hunt',
+      title: tr(send ? 'play.view.seriesB' : 'play.view.seriesA'),
+      lead: send ? tr('play.view.sendLead') : '',
+      image: view.image,
+      area: langSide(view.area),
+      meta: [formatTaken(view.taken, lang), view.credit].filter(Boolean).join(' · '),
+      zoom: tr('play.view.zoom'),
+      close: tr('play.quest.close'),
+      lineUrl: send ? basic : '',
+      lineLabel: tr('play.view.line'),
+      sentLabel: send ? tr('play.view.sent') : '',
+      wait: send && !basic ? tr('play.view.lineWait') : '',
+    };
+  }
+
+  function revealModel(viewRec) {
+    const view = viewById(viewRec.viewId);
+    const send = viewRec.kind === 'view-sent';
+    const shot = state.viewShots?.[viewRec.viewId] || '';
+    const pair = [];
+    if (view && !send) {
+      pair.push({ src: view.image, alt: tr('play.view.photo'), caption: [formatTaken(view.taken, lang), view.credit].filter(Boolean).join(' · ') });
+      if (shot) pair.push({ src: shot, alt: tr('play.view.game'), caption: tr('play.view.game') });
+    } else if (view) {
+      pair.push({ src: view.image, alt: tr('play.view.game'), caption: tr('play.view.game') });
+    }
+    return {
+      id: viewRec.viewId,
+      kind: send ? 'sent' : 'reveal',
+      title: tr(send ? 'play.view.arrived' : 'play.view.found'),
+      ask: tr('play.view.ask'),
+      pair,
+      zoom: tr('play.view.zoom'),
+      close: tr('play.quest.close'),
+      keepLabel: tr('play.view.keep'),
+      reportLabel: tr('play.view.report'),
+      shareLabel: tr('play.view.share'),
+    };
+  }
+
+  function openHunt(view) {
+    let cur = null;
+    if (view) cur = { view, send: view.kind === 'game' };
+    else {
+      const live = activeViewQuest();
+      if (live?.view) cur = { view: live.view, send: live.step.type === 'viewSend' };
+    }
+    if (!cur?.view) return false;
+    cardUp = true;
+    ui.showHunt(huntModel(cur.view, cur.send));
+    return true;
+  }
+
+  function openFound(id) {
+    const q = quests.find((row) => row.view === id && row.album === 'views');
+    if (!q) return false;
+    const saved = state.rewards[q.id];
+    if (saved) { openCard(saved); return true; }
+    openCard(presentReward(q, partners, state, Date.now(), deviceId, { preview: true }));
+    return true;
+  }
+
+  function grabShot(id) {
+    // The drawing buffer is cleared at the end of the task (preserveDrawingBuffer is off in play).
+    // Draw the frame again and read it in this same turn, the way a report screenshot does.
+    try {
+      const r = ctx.renderer;
+      const pipe = ctx.pipeline;
+      const cam = ctx.camera;
+      const src = r?.domElement;
+      if (!r || !pipe || !cam || !src || src.width < 2) return;
+      ctx.sky?.update?.(ctx.time, cam);
+      pipe.render(ctx.scene, cam, ctx.sunDir, ctx.time);
+      const max = 480;
+      const scale = Math.min(1, max / Math.max(src.width, src.height));
+      const c = doc.createElement('canvas');
+      c.width = Math.max(2, Math.round(src.width * scale));
+      c.height = Math.max(2, Math.round(src.height * scale));
+      c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+      const url = c.toDataURL('image/jpeg', 0.62);
+      c.width = 0;
+      c.height = 0;
+      if (url && url.length > 64 && url.length < 160000) state.viewShots[id] = url;
+    } catch { /* a lost buffer still leaves the real photo on the card */ }
+  }
+
+  function tickView(dt) {
+    const cur = activeViewQuest();
+    if (!cur || cur.step.type !== 'view') { viewHold = 0; return; }
+    if (state.viewReady === cur.step.view) return;
+    const cam = readCam();
+    const matched = !!(cur.view && cam && viewMatch(cam, cur.view.pose, cur.view));
+    const held = viewDwell(viewHold, matched, dt);
+    viewHold = held.held;
+    if (!held.done) return;
+    state.viewReady = cur.step.view;
+    grabShot(cur.step.view);
+    dirty = true;
+  }
+
+  function markSent(id) {
+    const viewId = id || activeViewQuest()?.step?.view;
+    if (!noteViewSent(state, viewId, Date.now())) return false;
+    dirty = true;
+    pump(Date.now());
+    saveIf();
+    refreshTracker();
+    if (cardUp || ui.viewOpen?.()) ui.hideCard();
+    else drain();
+    return true;
+  }
+
+  function reportView(id) {
+    try {
+      const open = ctx.services?.life?.hud?.contrib?.open;
+      if (typeof open === 'function') { open({ opener: 'view', claim: id }); return; }
+    } catch { /* the report sheet is not mounted */ }
+    const url = lineViewUrl(id);
+    if (url) { try { win.open(url, '_blank', 'noopener'); } catch { /* popup blocked */ } return; }
+    try { kit.ui?.toast?.(tr('play.view.lineWait')); } catch { /* no toast */ }
+  }
+
+  function shareView(id, node) {
+    try {
+      const imgs = node ? [...node.querySelectorAll('img')] : [];
+      const c = doc.createElement('canvas');
+      const w = 960;
+      const h = 540;
+      c.width = w;
+      c.height = h;
+      const g = c.getContext('2d');
+      g.fillStyle = '#FBFAF5';
+      g.fillRect(0, 0, w, h);
+      const n = Math.max(1, Math.min(2, imgs.length));
+      const gap = 16;
+      const pw = (w - gap * (n + 1)) / n;
+      for (let i = 0; i < n; i++) {
+        const img = imgs[i];
+        if (img && img.complete && img.naturalWidth) g.drawImage(img, gap + i * (pw + gap), 48, pw, h - 96);
+      }
+      const file = new File([dataUrlToBlob(c.toDataURL('image/jpeg', 0.85))], 'keshiki-' + (id || 'view') + '.jpg', { type: 'image/jpeg' });
+      deliverPhoto(file, { nav: win.navigator, doc });
+    } catch { /* the card stays; sharing is best-effort */ }
+  }
+
   function openCard(view) {
     cardUp = true;
-    ui.showCard(cardModel(view));
+    if (view.kind === 'view' || view.kind === 'view-sent') ui.showReveal(revealModel(view));
+    else ui.showCard(cardModel(view));
     try { kit.sfx?.play?.('fanfare', { gain: 0.9 }); } catch { /* mute */ }
     try { kit.sfx?.play?.('stamp', { gain: 0.6 }); } catch { /* mute */ }
     if (!kit.__shim && kit.fx?.burst) {
@@ -555,6 +738,7 @@ export function mount(ctx, kit) {
     else if (act.id === 'boat') { try { win.__ippon?.start?.(); } catch { /* */ } }
     else if (act.id === 'race') startBoundRace(info.step);
     else if (act.id === 'fly') flyToward(info.target);
+    else if (act.id === 'view') openHunt();
   }
 
   function refreshTracker(opt) {
@@ -580,6 +764,12 @@ export function mount(ctx, kit) {
     if (info.target) { _bear.x = info.target.x; _bear.z = info.target.z; _bear.on = true; }
     else _bear.on = false;
     let dist = distLabel(info.dist);
+    if (info.step?.type === 'view') {
+      const v = viewById(info.step.view);
+      const cam = readCam();
+      const warm = viewWarmth(v && cam ? viewDistance(cam, v.pose) : Infinity);
+      dist = warm === 'near' ? tr('play.view.near') : warm === 'closer' ? tr('play.view.closer') : '';
+    } else if (info.step?.type === 'viewSend') dist = '';
     if (info.modeKey) {
       const word = tr(info.modeKey);
       dist = dist ? word + ' · ' + dist : word;
@@ -814,12 +1004,19 @@ export function mount(ctx, kit) {
   function simTick(dt) {
     acc += dt || 0;
     if ((dt || 0) !== 0 && acc < SIM) return;
+    const stepDt = acc;
     acc = 0;
+    const pendingBefore = state.pending.length;
+    tickView(stepDt);
     refreshLang();
     bindAll();
     poll();
     refreshNear();
     pump(Date.now());
+    if (state.pending.length > pendingBefore && (cardUp || ui.viewOpen?.())) {
+      cardUp = false;
+      ui.quietHide();
+    }
     saveIf();
     refreshTracker();
     drain();
@@ -917,7 +1114,8 @@ export function mount(ctx, kit) {
     // does not also turn the page.
     const wasTalking = !!talk;
     if (e.key === 'Escape') {
-      if (cardUp) { ui.hideCard(); e.preventDefault(); return; }
+      if (ui.viewerOpen?.()) { ui.closeViewer(); e.preventDefault(); return; }
+      if (cardUp || ui.viewOpen?.()) { ui.hideCard(); e.preventDefault(); return; }
       if (ui.isLog()) { ui.hideLog(); e.preventDefault(); return; }
       if (ui.isHub()) { ui.hideHub(); e.preventDefault(); return; }
       if (coachOn) { dismissCoach(); e.preventDefault(); return; }
@@ -1062,7 +1260,7 @@ export function mount(ctx, kit) {
         art: ART,
         progress() {
           const n = countStamps(quests, state);
-          const total = quests.length;
+          const total = stampBook(quests).length;
           return { ja: stampLine(n, total, 'ja'), en: stampLine(n, total, 'en') };
         },
         isNew() { return modeIsNew(state); },
@@ -1078,7 +1276,7 @@ export function mount(ctx, kit) {
     return {
       title: ja ? 'クエスト' : 'Quests',
       hook: ja ? '町の人に、話しかけよう' : 'Talk to someone in town',
-      progress: stampLine(n, quests.length, ja ? 'ja' : 'en'),
+      progress: stampLine(n, stampBook(quests).length, ja ? 'ja' : 'en'),
       start: ja ? 'はじめる' : 'Start',
       isNew: modeIsNew(state),
       art: ART,
@@ -1107,7 +1305,22 @@ export function mount(ctx, kit) {
       beginTalk(npc);
       return npc.id;
     },
-    close() { if (talk) endTalk(); ui.hideLog(); if (cardUp) ui.hideCard(); },
+    close() { if (talk) endTalk(); ui.hideLog(); ui.closeViewer?.(); if (cardUp || ui.viewOpen?.()) ui.hideCard(); },
+    hunt(id) { return openHunt(viewById(id)); },
+    reveal(id) {
+      const v = viewById(id);
+      if (!v) return false;
+      openCard({ kind: v.kind === 'game' ? 'view-sent' : 'view', viewId: v.id, quest: '' });
+      return true;
+    },
+    album() {
+      try {
+        kit.ui?.notebook?.open?.('views');
+        doc.querySelector('#klc-play .tabs button[data-tab="views"]')?.scrollIntoView?.({ inline: 'nearest', block: 'nearest' });
+        return true;
+      } catch { return false; }
+    },
+    sent(id) { return markSent(id); },
     accept(id) {
       const q = questById(quests, id);
       if (!q || !acceptQuest(state, q, Date.now())) return false;
@@ -1116,6 +1329,7 @@ export function mount(ctx, kit) {
       saveIf();
       refreshTracker();
       drain();
+      if (q.album === 'views') openHunt();
       return true;
     },
     complete(id) {
@@ -1288,6 +1502,23 @@ export function mount(ctx, kit) {
     };
   }
 
+  function albumModel() {
+    const cells = [];
+    for (let i = 0; i < VIEWS_LIST.length; i++) {
+      const v = VIEWS_LIST[i];
+      const q = quests.find((row) => row.album === 'views' && row.view === v.id);
+      const found = !!(q && (state.progress[q.id]?.done || state.rewards[q.id] || state.viewSent?.[v.id] != null));
+      cells.push({
+        id: v.id,
+        found,
+        image: found ? v.image : '',
+        title: found ? langSide(v.area) : '',
+        alt: found ? langSide(v.area) : '',
+      });
+    }
+    return { lead: tr('play.view.bookLead'), blank: tr('play.view.blank'), cells };
+  }
+
   function playInk(ink) {
     if (!ink) return;
     try { kit.sfx?.play?.('stamp', { gain: 0.72 }); } catch { /* mute */ }
@@ -1332,6 +1563,26 @@ export function mount(ctx, kit) {
       g.fillStyle = '#F8B500';
     }
     const aim = tracker(state, quests, people.list, world, placeBag());
+    if (aim?.step?.type === 'view') {
+      const v = viewById(aim.step.view);
+      if (v) {
+        const centre = hintCentre(v.id, v.pose.x, v.pose.z);
+        const xy = P(centre.x, centre.z);
+        const origin = P(0, 0);
+        const east = P(10, 0);
+        const ppm = origin && east ? Math.hypot(east[0] - origin[0], east[1] - origin[1]) / 10 : 0;
+        if (xy && ppm > 0) {
+          const rad = centre.r * ppm;
+          g.beginPath();
+          g.arc(xy[0], xy[1], rad, 0, Math.PI * 2);
+          g.fillStyle = 'rgba(0, 163, 175, 0.22)'; // 浅葱色 #00A3AF, the hint wash
+          g.fill();
+          g.strokeStyle = '#00A3AF';
+          g.lineWidth = full ? 2 : 1.5;
+          g.stroke();
+        }
+      }
+    }
     const target = aim?.target;
     if (target) {
       const xy = P(target.x, target.z);
@@ -1372,6 +1623,10 @@ export function mount(ctx, kit) {
         label: tr('play.quest.stamps'),
         render(el) { playInk(ui.fillStamps(el, stampModel(heldPreview))); },
       });
+      kit.ui?.notebook?.register?.('views', {
+        label: tr('play.view.book'),
+        render(el) { ui.fillAlbum(el, albumModel()); },
+      });
     } catch { /* the notebook is not up yet */ }
   }
 
@@ -1401,6 +1656,9 @@ export function mount(ctx, kit) {
     else if (q === 'hub') api.hub();
     else if (q === 'start') api.startMode();
     else if (q && q.startsWith('flash:')) api.flash(q.slice(6));
+    else if (q && q.startsWith('viewcard:')) api.hunt(q.slice(9));
+    else if (q && q.startsWith('reveal:')) api.reveal(q.slice(7));
+    else if (q === 'viewsbook') api.album();
   } catch { /* no query */ }
 
   // [mobile-play] the figure pool: how many are built now, how many were freed (tools/anime/play-census.mjs)

@@ -1,6 +1,6 @@
 # Quests and the people who give them
 
-Fourteen quests. Fifteen people stand in the town: fourteen give a quest, and the skipper (漁労長) stands on the market quay beside 第五凪丸. The skipper does not give a quest of their own. The auctioneer's morning catch sends you to them. A quest is a few minutes of the town you are already in: a walk, a photograph, a swim, a catch, a drive. Nothing is timed out, and nothing is failed. Leaving a quest and coming back continues it.
+Fourteen quests fill the stamp book. A photographer near the seventh quay offers twelve more, one at a time: six to find a real photo in the game, and six to find a game view in town. Those twelve live in the けしき帳, not in the stamp book. Sixteen people stand in the town: fourteen give a stamp-book quest, the photographer gives the view quests, and the skipper (漁労長) stands on the market quay beside 第五凪丸. The skipper does not give a quest of their own. The auctioneer's morning catch sends you to them. A quest is a few minutes of the town you are already in: a walk, a photograph, a swim, a catch, a drive. Nothing is timed out, and nothing is failed. Leaving a quest and coming back continues it.
 
 The people are generic roles from the town's own cast (painted faces, a blink, a look toward you). They are not portraits and they are not named.
 
@@ -10,9 +10,9 @@ The people are generic roles from the town's own cast (painted faces, a blink, a
 - While you are playing on a phone, the window sits 108 px above the home indicator so the stick and the buttons stay reachable.
 - 「！」 over a person means they still have a quest. 「？」 means the quest is ready to hand back. 「…」 means they only have a line, or a quest that is not ready to hand in. A 「！」 or 「？」 is a 山吹 balloon with a 紺 outline and a white glyph. It is 1.05 m tall in the world, never under 22 px and never over 64 px, so it stays readable at 60 m. It bobs up and down, with no squash, and a faint ring sits on the ground under the person. It stays full opacity out to 60 m and is gone at 108 m. 「…」 stays a small glyph and fades out by 48 m. Quest givers are also small pins on the minimap and the full map.
 - The current quest sits under the wordmark, and below the play HUD once that is open: the step, how far is left, and an arrow in the chip. A step that needs a way of travelling shows one button on that chip (写真を撮る, もぐる, ウミネコになる, 船に乗る, 車で挑戦, 飛んで行く). A medal, a race, the boat and the nearest unfound charm still have an arrow. With more than one quest open, ◀ ▶ cycles them and the last choice is remembered. Finishing a step plays a chime and flashes the chip gold.
-- 「手帳」, or the クエスト tab of the みなと手帳 once the kit is mounted, lists what is open, what you can still hear, and what is done. A finished quest opens its card again. The スタンプ tab is the stamp book: every quest's 判子, faint until you earn it, then stamped with the seal's thud.
+- 「手帳」, or the クエスト tab of the みなと手帳 once the kit is mounted, lists what is open, what you can still hear, and what is done. A finished quest opens its card again. The スタンプ tab is the stamp book: the fourteen stamp-book quests, faint until you earn them, then stamped with the seal's thud. The けしき帳 tab keeps the twelve view cards.
 
-`?play=0` turns the whole play layer off. `?missions=open:barista`, `?missions=near:barista`, `?missions=away:barista`, `?missions=coach`, `?missions=hub`, `?missions=start`, `?missions=stamps:shrine-visit,cape-trees`, `?missions=flash:shrine-visit`, `?missions=card:cape-trees`, `?missions=log` and `?missions=track:shrine-visit` are for stills. `card:` and `stamps:` do not write the save. `flash:` accepts the quest and holds the chip gold. `away:` stands 60 m off and keeps the balloon in frame. `hub` draws the クエスト card. `coach` points at the nearest 「！」 and says 「話しかけて みよう」.
+`?play=0` turns the whole play layer off. `?missions=open:barista`, `?missions=near:barista`, `?missions=away:barista`, `?missions=coach`, `?missions=hub`, `?missions=start`, `?missions=stamps:shrine-visit,cape-trees`, `?missions=flash:shrine-visit`, `?missions=card:cape-trees`, `?missions=log`, `?missions=track:shrine-visit`, `?missions=viewcard:V01`, `?missions=reveal:V01` and `?missions=viewsbook` are for stills. `card:`, `stamps:`, `viewcard:` and `reveal:` do not write the save. `flash:` accepts the quest and holds the chip gold. `away:` stands 60 m off and keeps the balloon in frame. `hub` draws the クエスト card. `coach` points at the nearest 「！」 and says 「話しかけて みよう」.
 
 ## Entering from あそぶ
 
@@ -34,6 +34,18 @@ Quests do not import other lanes. They read the kit store, and they listen for t
 | `swim` | `window.__swim.on('pos', { x, y, z })`, or `window.__swim.pos`. | Waiting on the underwater lane. |
 | `race` | `window.__race.on('finish', { ms })`, or the same on `__courses` and `__car`. The best (smallest) time is kept. The car lane does not emit that event; it writes `store` section `courses` key `race-minato` with `{ best, medal }`, and that best time is read the same way. | The car lane's store row is wired. There is no `__car.on('finish')`. |
 | `reach`, `talk`, `deliver` | The player, inside this lane. | Live. |
+| `view` | The camera, held inside the view's radius and angle for 0.6 s. | Live. |
+| `viewSend` | The player taps 「送ったよ」. The picture itself is not checked. | Live. |
+
+## このけしき、どこ？
+
+The photographer stands on dry ground at x 48, z 78, near the seventh quay. She offers one view at a time. The next one waits until the current one is done.
+
+A real view (`kind: real`) shows the team's photo. The match uses the camera, not the walker: within 12 m, within 6 m of height, within 20° of yaw and within 15° of pitch, held for 0.6 s. Walk and fly both count. The tracker hides the arrow. Within 40 m it says 「ちかい！」, and within 100 m 「もうすこし」. The map draws a soft circle of 120 m whose centre sits 30–60 m off the true spot, the same place every time for that id. When it matches, a flash, then the photo beside the game frame, with 「見つけた！」.
+
+A game view (`kind: game`) shows a frame from this app. 「LINEで送る」 opens the official account with 「けしき V07」 filled in, once `data/play/line.json` has a `basicId`. Until then the card says 「LINE は準備中」, and 「送ったよ」 still gives the stamp. There is no account and no name.
+
+Both cards ask 「ちがうところ、あった？」 and offer a report. The けしき帳 shows a blank until a view is found, then the card again. A tap on the photo opens it full screen. Esc closes that. Nothing here ranks anyone, and nothing is for sale.
 
 `window.__missions.noteRace(ms)` records a finish the same way, for a lane that does not have the event yet.
 

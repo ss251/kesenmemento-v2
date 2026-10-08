@@ -68,6 +68,9 @@ export function emptyProgress() {
     swim: null,
     diving: false,
     photos: [],
+    viewReady: null,
+    viewSent: {},
+    viewShots: {},
     raceMs: null,
     races: {},
     rewards: {},
@@ -92,6 +95,16 @@ export function hydrate(saved) {
   if (saved.perch && typeof saved.perch === 'object') s.perch = saved.perch;
   if (saved.swim && typeof saved.swim === 'object') s.swim = saved.swim;
   if (Array.isArray(saved.photos)) s.photos = saved.photos.slice(-24);
+  if (typeof saved.viewReady === 'string') s.viewReady = saved.viewReady;
+  if (saved.viewSent && typeof saved.viewSent === 'object') {
+    for (const k in saved.viewSent) if (/^V\d{2}$/.test(k)) s.viewSent[k] = +saved.viewSent[k] || 0;
+  }
+  if (saved.viewShots && typeof saved.viewShots === 'object') {
+    for (const k in saved.viewShots) {
+      const shot = saved.viewShots[k];
+      if (/^V\d{2}$/.test(k) && typeof shot === 'string' && shot.startsWith('data:image/') && shot.length < 160000) s.viewShots[k] = shot;
+    }
+  }
   if (Number.isFinite(saved.raceMs)) s.raceMs = saved.raceMs;
   if (saved.races && typeof saved.races === 'object') {
     for (const k in saved.races) if (Number.isFinite(+saved.races[k])) s.races[k] = +saved.races[k];
@@ -115,6 +128,9 @@ export function serialize(state) {
     perch: state.perch,
     swim: state.swim,
     photos: state.photos.slice(-24),
+    viewReady: state.viewReady || null,
+    viewSent: state.viewSent || {},
+    viewShots: state.viewShots || {},
     raceMs: state.raceMs,
     races: state.races,
     rewards: state.rewards,
@@ -260,13 +276,22 @@ export function countStamps(quests, state) {
   let n = 0;
   if (!quests || !state) return 0;
   for (let i = 0; i < quests.length; i++) {
+    if (quests[i].album === 'views') continue;
     const id = quests[i].id;
     if (state.progress[id]?.done || state.rewards?.[id]) n++;
   }
   return n;
 }
 
-/** Hub progress line. The total is the quest list, which is 14. */
+/** Quests that take a 判子 in the stamp book. View stamps live in the けしき帳. */
+export function stampBook(quests) {
+  const out = [];
+  if (!quests) return out;
+  for (let i = 0; i < quests.length; i++) if (quests[i].album !== 'views') out.push(quests[i]);
+  return out;
+}
+
+/** Hub progress line. The total is the stamp book, not the view album. */
 export function stampLine(n, total, lang) {
   const a = n | 0;
   const b = total | 0;
@@ -335,6 +360,7 @@ export function stampRows(quests, state, titleOf, fresh) {
   const rows = [];
   for (let i = 0; i < quests.length; i++) {
     const q = quests[i];
+    if (q.album === 'views') continue;
     const got = !!(state.progress[q.id]?.done || state.rewards[q.id]);
     const title = titleOf ? titleOf(q) : (q.title || '');
     rows.push({
@@ -358,6 +384,88 @@ export function nearest(npcs, x, z, r) {
     if (d <= bestD) { best = n; bestD = d; }
   }
   return best;
+}
+
+/** A view match: within 12 m, 6 m of height, 20° of yaw, 15° of pitch. Yaw is degrees, wrapped. */
+export const VIEW_HEIGHT_M = 6;
+export const VIEW_PITCH_DEG = 15;
+export const VIEW_DWELL_S = 0.6;
+export const HINT_R_M = 120;
+
+/** Absolute difference of two angles, in degrees, in 0..180. */
+export function angleDeltaDeg(a, b) {
+  let d = a - b;
+  d -= 360 * Math.floor((d + 180) / 360);
+  return d < 0 ? -d : d;
+}
+
+/**
+ * Does this camera see the view? `cam` and `pose` are { x, y, z, yaw, pitch } with yaw and pitch in degrees
+ * (the engine's yaw: 0 is north). The walker is not an input: third person matches the camera.
+ */
+export function viewMatch(cam, pose, rule) {
+  if (!cam || !pose) return false;
+  const radius = rule?.radius_m ?? 12;
+  const yawTol = rule?.angle_deg ?? 20;
+  const height = rule?.height_m ?? VIEW_HEIGHT_M;
+  const pitchTol = rule?.pitch_deg ?? VIEW_PITCH_DEG;
+  const dx = (+cam.x || 0) - (+pose.x || 0);
+  const dz = (+cam.z || 0) - (+pose.z || 0);
+  if (dx * dx + dz * dz > radius * radius) return false;
+  if (Math.abs((+cam.y || 0) - (+pose.y || 0)) > height) return false;
+  if (angleDeltaDeg(+cam.yaw || 0, +pose.yaw || 0) > yawTol) return false;
+  if (Math.abs((+cam.pitch || 0) - (+pose.pitch || 0)) > pitchTol) return false;
+  return true;
+}
+
+/** The player says the real photo was sent. The stamp does not check the picture. */
+export function noteViewSent(state, id, now) {
+  if (!state || !/^V\d{2}$/.test(id || '')) return false;
+  if (!state.viewSent) state.viewSent = {};
+  if (state.viewSent[id] == null) state.viewSent[id] = now || Date.now();
+  return true;
+}
+
+/** Hold a match for `need` seconds. A miss clears the hold. */
+export function viewDwell(held, matched, dt, need = VIEW_DWELL_S) {
+  if (!matched) return { held: 0, done: false };
+  const step = dt > 0 ? dt : 0;
+  const next = (held > 0 ? held : 0) + step;
+  return { held: next, done: next >= need };
+}
+
+function hashId(id) {
+  let h = 2166136261;
+  const s = String(id || '');
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** The soft circle's centre: 30–60 m from the true spot, the same place every time for an id. */
+export function hintCentre(id, x, z) {
+  const h = hashId(id);
+  const u = (h % 10001) / 10000;
+  const u2 = ((Math.imul(h, 2246822519) >>> 0) % 10001) / 10000;
+  const dist = 30 + u * 30;
+  const ang = u2 * Math.PI * 2;
+  return { x: x + Math.cos(ang) * dist, z: z + Math.sin(ang) * dist, r: HINT_R_M };
+}
+
+/** Horizontal metres between two poses. */
+export function viewDistance(a, b) {
+  if (!a || !b) return Infinity;
+  return Math.hypot((+a.x || 0) - (+b.x || 0), (+a.z || 0) - (+b.z || 0));
+}
+
+/** 「ちかい！」 within 40 m, 「もうすこし」 within 100 m. Farther than that says nothing. */
+export function viewWarmth(dist) {
+  if (!(dist >= 0)) return 'far';
+  if (dist <= 40) return 'near';
+  if (dist <= 100) return 'closer';
+  return 'far';
 }
 
 /** Absolute difference of two angles, in radians, in 0..π. */
@@ -392,6 +500,10 @@ export function stepMet(step, world) {
       if (step.cm != null && !(ip.maxCm >= step.cm)) return false;
       return step.kg != null || step.count != null || step.cm != null;
     }
+    case 'view':
+      return !!step.view && world.viewReady === step.view;
+    case 'viewSend':
+      return !!step.view && !!world.viewSent && world.viewSent[step.view] != null;
     case 'photo': {
       const list = world.photos;
       if (!list) return false;
@@ -589,6 +701,7 @@ function nearestCharm(step, places) {
 /** Where the tracker arrow points. A medal, a race, a boat and a charm still have a place. */
 export function stepTarget(step, npcs, places) {
   if (!step) return null;
+  if (step.type === 'view' || step.type === 'viewSend') return null;
   if (step.type === 'talk' || step.type === 'deliver') {
     const n = findNpc(npcs, step.type === 'talk' ? step.npc : step.to);
     return n ? { x: n.x, y: (n.y || 0) + 1.7, z: n.z } : null;
@@ -614,6 +727,7 @@ export function trackerAction(step, world) {
   if (!step) return null;
   const pos = world?.pos;
   const dist = (x, z) => (pos ? Math.hypot((x || 0) - pos.x, (z || 0) - pos.z) : Infinity);
+  if (step.type === 'view' || step.type === 'viewSend') return { id: 'view', key: 'play.view.open' };
   if (step.type === 'photo' && step.x != null && dist(step.x, step.z) <= (step.r || 0)) {
     return { id: 'photo', key: 'play.quest.go.photo' };
   }
@@ -658,6 +772,8 @@ export function fillWorld(world, state, pos, katsuo, courses, now) {
   world.courses = courses || {};
   world.ippon = state.ippon;
   world.photos = state.photos;
+  world.viewReady = state.viewReady || null;
+  world.viewSent = state.viewSent || {};
   world.perch = state.perch;
   world.swim = state.swim;
   world.diving = !!state.diving;
