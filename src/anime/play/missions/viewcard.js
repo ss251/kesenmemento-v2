@@ -39,6 +39,8 @@ body:has(#klc-play .sheet:not([hidden])) #klc-m :is(.m-rings, .m-balloons, .m-ed
   background: #223A70; color: #FBFAF5; text-decoration: none; text-align: center; white-space: nowrap;
   font-family: "Zen Maru Gothic", "Noto Sans JP", sans-serif; font-weight: 700; font-size: 16px; line-height: 1.3;
 }
+/* the LINE link is an <a>: border-box and a centred flex row, so it matches the buttons (it overflowed the card at 393 px) */
+#klc-m .m-view-acts a { box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
 #klc-m .m-view-acts .m-view-soft { background: #FBFAF5; color: #223A70; box-shadow: inset 0 0 0 2px #223A70; }
 #klc-m .m-view-acts a:active, #klc-m .m-view-acts button:active { transform: scale(0.94); }
 #klc-m .m-view-flash { animation: m-view-flash 420ms ease-out; }
