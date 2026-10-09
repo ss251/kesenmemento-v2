@@ -8,7 +8,9 @@ Japanese first. The sentences in the spec are used word for word, with an Englis
 env -u NODE_OPTIONS bun server/line/index.js
 ```
 
-`POST /webhook` takes LINE events. `GET /healthz` and `GET /health` return `{ ok: true }`. `GET /privacy` is the follow text plus the data rules, in Japanese and English. `GET /admin` is the team page. `POST /admin/setup` (same password) points the channel at this service: webhook, rich menu, add-friend link.
+`POST /webhook` takes LINE events. `GET /healthz` and `GET /health` return `{ ok: true }`. `GET /privacy` is the follow text plus the data rules, in Japanese and English. `GET /admin` is the team page. `POST /admin/setup` (same password) points the channel at this service: webhook, rich menu, add-friend link. `GET /admin/status` (same password) names the channel this deployment runs on: `channelId`, `tokenSource`, `publicBaseUrl` and where it came from, `startedAt`. Nothing secret.
+
+Connecting a new LINE Official Account is one command: `tools/line/connect.mjs` (see [connect.mjs](#connectmjs-a-new-official-account-in-one-command)).
 
 ## Environment
 
@@ -22,7 +24,7 @@ Everything comes from the environment. A missing or bad value stops the process 
 | `LINE_STORE_KEY` | yes | 32 random bytes, base64 or base64url. HMAC for `user_ref`, AES-256-GCM for the LINE user id. |
 | `ADMIN_TOKEN` | yes | Password for HTTP Basic user `team`. At least 24 characters, no whitespace. |
 | `DATA_DIR` | no | SQLite file and `media/`. Default `./data/line`. On Railway, `/data`. |
-| `PUBLIC_BASE_URL` | no | Public origin, no trailing slash. Used for admin links and the webhook setup. Example `https://line.kesenmemento.com`. |
+| `PUBLIC_BASE_URL` | no | Public origin, no trailing slash. Used for admin links and the webhook setup. Example `https://line.kesenmemento.com`. Unset on Railway, it is `https://$RAILWAY_PUBLIC_DOMAIN` (the service's own domain, which Railway injects). |
 | `PORT` | no | Default `8093`. Railway sets this. |
 | `HOST` | no | Default `127.0.0.1`. On Railway (`RAILWAY_ENVIRONMENT` or a Railway project id) the default is `0.0.0.0`. |
 | `DISCORD_WEBHOOK_URL` | no | One line per new report: code, Japanese kind, first 80 characters, admin link. No photo and no user id. |
@@ -76,7 +78,7 @@ The walkthrough sends more than 20 events. The script spaces their timestamps by
 env -u NODE_OPTIONS bun test test/line-*.test.js
 ```
 
-Signature, every flow, the store, admin auth, mocked media download, and the push-quota guard. No network.
+Signature, every flow, the store, admin auth, mocked media download, the push-quota guard, the setup and its error messages, `/admin/status`, and `connect.mjs` against a fake LINE, Railway and phone. No network.
 
 ## Deploy on Railway
 
@@ -114,7 +116,38 @@ set -a && . ~/.config/kesenmemento/line.env && set +a
 curl -s -u "team:$ADMIN_TOKEN" -X POST https://line.kesenmemento.com/admin/setup
 ```
 
-It answers the same JSON as `setup.mjs` (below), plus `webhookActive` (the console's 「Webhookの利用」 switch, which has no API: `false` means turn it on), `tokenSource` (`minted` or `static`) and `todo` (what is left for a person to click). A LINE failure is a 502 with the reason.
+Before it touches the channel, the setup checks that `$PUBLIC_BASE_URL/healthz` answers as this service. A custom domain whose DNS is not set yet fails there, with what to do, and the channel keeps its old webhook. On 2026-10-09 `line.kesenmemento.com` had no DNS record, and the service answered at `https://kesenmemento-line-production.up.railway.app`.
+
+It answers the same JSON as `setup.mjs` (below), plus `webhookActive` (the console's 「Webhookの利用」 switch, which has no API: `false` means turn it on), `tokenSource` (`minted` or `static`) and `todo` (what is left for a person to click). A failure is a 502 whose `error` names the LINE call and what to do:
+
+| `error` starts with | Meaning |
+|---|---|
+| `line api 400 (token)` | The channel ID and secret do not match. Copy both again from チャネル基本設定. |
+| `line api 403 (set webhook)` | No active Official Account behind the channel, or its Messaging API is off: LINE Official Account Manager → 設定 → Messaging API → 「Messaging APIを利用する」. |
+| `line api 429 (…)` | LINE is rate-limiting the channel; wait a minute. |
+| `PUBLIC_BASE_URL … is unreachable` | The base has no DNS or TLS yet. Point it at the service, or set `PUBLIC_BASE_URL` to the Railway domain. |
+| `webhook test failed: …` | LINE reached the base, but the webhook did not answer 200. |
+
+## connect.mjs: a new Official Account in one command
+
+Issue #5, path B, from a laptop that can reach `api.line.me` and is logged in to Railway with access to the project:
+
+```
+env -u NODE_OPTIONS bun tools/line/connect.mjs --check    # LINE only: is the channel ready? No Railway access needed
+env -u NODE_OPTIONS bun tools/line/connect.mjs            # everything below
+```
+
+It asks for the チャネルID and the チャネルシークレット (the secret without echo), or reads `LINE_CHANNEL_ID` and `LINE_CHANNEL_SECRET` from the environment. Then:
+
+1. **LINE.** It mints a token with the ID and secret and reads the bot's info: basic ID, name, the webhook switch, the push quota. A wrong pair, a channel without an Official Account (the 403), and the Reel Deal / UMI account stop it here, before Railway changes.
+2. **Railway.** It reads the service's variables in memory, finds a base that answers as this service (`PUBLIC_BASE_URL`, else the Railway domain), shows what it will change and asks first (`--yes` skips the question). It sets `LINE_CHANNEL_ID`, sets `LINE_CHANNEL_SECRET` through `railway variable set --stdin` (never argv), points `PUBLIC_BASE_URL` at the working base, removes a stale `LINE_CHANNEL_ACCESS_TOKEN`, and redeploys once. `--deploy` uploads this checkout's bot instead, which also ships this server code. It stages only `server/line`, `tools/line/richmenu.png` and the service's own `package.json` and `railway.json` (`bun server/line/index.js`, health check `/healthz`) in a temporary folder, then runs `railway up <folder> --path-as-root`. Never run `railway up` from the checkout's root: the root `railway.json` belongs to the app (`cd bundle && bun server.js`), so the LINE service would build and start the app.
+3. **Wait.** It polls `GET /admin/status` until the deployment runs the new channel. On an older build without that route, it retries the setup while LINE still refuses the old token.
+4. **Setup.** `POST /admin/setup`: webhook, rich menu, add-friend link. It refuses a basic ID that is not the channel's.
+5. **App.** It writes the basic ID to `data/play/line.json`, which turns on 「LINE で送る」 on the 「まちで見つけよう」 cards once that change is merged and deployed.
+6. **Live test.** It prints the add-friend QR in the terminal, then watches `/admin/export.csv` until a bug report and a 「けしき V07」 photo arrive (15 minutes at most; `--no-watch` skips this), and asks whether the greeting and the メニュー bar showed.
+7. **Handoff.** It prints the issue's handoff comment, filled in. Blanks stay blank, nothing is guessed. `--handoff file.md` saves it.
+
+Neither the secret nor `ADMIN_TOKEN` is printed, logged, written, or passed as an argument (`test/line-connect.test.js` checks every output). Other flags: `--service`, `--project`, `--environment`, `--provider`. The exit code is 0 when nothing is left open, 2 when the handoff lists open items, and 1 on an error.
 
 ## setup.mjs (the same setup from a machine that can reach LINE)
 
@@ -125,7 +158,7 @@ env -u NODE_OPTIONS bun tools/line/setup.mjs
 env -u NODE_OPTIONS bun tools/line/setup.mjs --qr add-friend.svg
 ```
 
-It sets the webhook to `$PUBLIC_BASE_URL/webhook`, tests that endpoint, reads the webhook switch, creates the rich menu, uploads the image, and sets it as the default. It prints JSON: `basicId`, the add-friend URL `https://line.me/R/ti/p/…`, the rich menu id, the webhook, `webhookActive`, `tokenSource` and `todo`. It does not print the secret or a token. With `--qr`, it writes an SVG using `src/anime/ui/qr.js`. The default name `add-friend.svg` is gitignored.
+It checks that `$PUBLIC_BASE_URL/healthz` answers as this service, sets the webhook to `$PUBLIC_BASE_URL/webhook`, tests that endpoint, reads the webhook switch, creates the rich menu, uploads the image, and sets it as the default. It prints JSON: `basicId`, the add-friend URL `https://line.me/R/ti/p/…`, the rich menu id, the webhook, `webhookActive`, `tokenSource` and `todo`. It does not print the secret or a token. With `--qr`, it writes an SVG using `src/anime/ui/qr.js`. The default name `add-friend.svg` is gitignored.
 
 The image is `tools/line/richmenu.png` when that file exists (2500×1686, at most 1 MB). Otherwise setup generates a plain six-tile placeholder. Re-running setup deletes older menus that are also named `kesenmemento`, after the new one is the default.
 
@@ -148,7 +181,7 @@ About 10 minutes. It needs his LINE identity and LINE's terms.
 3. In 応答設定: 応答メッセージ OFF, あいさつメッセージ OFF (the bot sends its own), Webhook ON.
 4. In LINE Developers (https://developers.line.biz/console/) → the channel → チャネル基本設定: copy the チャネルID and the チャネルシークレット into the Railway variables `LINE_CHANNEL_ID` and `LINE_CHANNEL_SECRET` (service kesenmemento-line). Never paste them into a chat. No access token has to be issued.
 
-Everything else is scripted (`POST /admin/setup`): the webhook URL, the rich menu, and the add-friend link and QR.
+Everything else is scripted (`POST /admin/setup`, or all of it with `tools/line/connect.mjs`): the webhook URL, the rich menu, and the add-friend link and QR. `tools/line/connect.mjs --check` confirms that steps 1–3 took, without Railway access.
 
 ## Where this build differs
 

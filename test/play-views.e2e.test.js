@@ -6,6 +6,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildAndServe, launch, phonePage, enterTown, sleep } from '../tools/anime/pad-lib.mjs';
 import VIEWS from '../data/play/views.json' with { type: 'json' };
+import LINE from '../data/play/line.json' with { type: 'json' };
 
 const RUN = process.env.KLC_E2E === '1' && process.env.KLC_GATE === '1';
 const PORT = Number(process.env.KLC_E2E_PORT || 9636);
@@ -177,7 +178,13 @@ async function playViews(page, tag) {
       await sleep(300);
       const b = await cardText(page);
       expect(b).toContain('本物のこの場所で');
-      expect(b).toContain('LINE は準備中');
+      // with the bot's basic ID in data/play/line.json the card links to LINE with 「けしき V07」; without it, it waits
+      const lineId = (LINE.basicId || '').trim();
+      if (lineId) {
+        expect(b).toContain('LINE で送る');
+        const href = await page.eval(`document.querySelector('#klc-m .m-view-acts a')?.href || ''`);
+        expect(href).toBe('https://line.me/R/oaMessage/' + encodeURIComponent(lineId) + '/?' + encodeURIComponent('けしき V07'));
+      } else expect(b).toContain('LINE は準備中');
       await shot(page, `${tag}-b-card.png`);
       await page.eval(`window.__missions.close()`);
       await sleep(200);

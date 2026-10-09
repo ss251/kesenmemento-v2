@@ -74,7 +74,12 @@ export function loadConfig(env = process.env, overrides = {}) {
   const channelId = str("channelId", "LINE_CHANNEL_ID", "");
   const storeKeyRaw = str("storeKey", "LINE_STORE_KEY", "");
   const adminToken = str("adminToken", "ADMIN_TOKEN", "");
-  const publicBaseUrl = str("publicBaseUrl", "PUBLIC_BASE_URL", "").replace(/\/+$/, "");
+  // [base] Railway injects the service's own domain; it stands in until a custom domain is pointed at the service
+  const explicitBase = str("publicBaseUrl", "PUBLIC_BASE_URL", "").replace(/\/+$/, "");
+  const railwayDomain = String(env.RAILWAY_PUBLIC_DOMAIN || "").trim().toLowerCase();
+  const railwayBase = /^[a-z0-9.-]+\.[a-z]{2,}$/.test(railwayDomain) ? `https://${railwayDomain}` : "";
+  const publicBaseUrl = explicitBase || railwayBase;
+  const publicBaseUrlSource = explicitBase ? "env" : railwayBase ? "railway" : null;
   const discordWebhookUrl = str("discordWebhookUrl", "DISCORD_WEBHOOK_URL", "");
   const teamLineTo = str("teamLineTo", "TEAM_LINE_TO", "");
   const sim = flag("sim", "LINE_SIM");
@@ -122,7 +127,7 @@ export function loadConfig(env = process.env, overrides = {}) {
   return Object.freeze({
     version: VERSION,
     port, host, dataDir, channelSecret, channelAccessToken, channelId,
-    storeKey, adminToken, publicBaseUrl, discordWebhookUrl, teamLineTo,
+    storeKey, adminToken, publicBaseUrl, publicBaseUrlSource, discordWebhookUrl, teamLineTo,
     sim, syncWebhook, eventsPerMinute, reportsPerDay, onRailway,
     apiBase: str("apiBase", "LINE_API_BASE", "https://api.line.me"),
     dataBase: str("dataBase", "LINE_DATA_BASE", "https://api-data.line.me"),
@@ -138,6 +143,7 @@ export function describeConfig(c) {
     host: c.host,
     dataDir: c.dataDir,
     publicBaseUrl: c.publicBaseUrl || null,
+    publicBaseUrlSource: c.publicBaseUrlSource || null,
     sim: c.sim,
     channelSecret: "set",
     channelId: c.channelId ? "set" : "unset",

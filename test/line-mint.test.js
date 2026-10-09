@@ -35,7 +35,7 @@ function fakeLine({ expiresIn = 899, reject = () => false, mintStatus = 200 } = 
 describe("minted channel tokens", () => {
   test("the ID and secret mint a token with the documented form body, and calls carry it", async () => {
     const line = fakeLine();
-    const api = createLineApi({ channelId: "2011700001", channelSecret: SECRET, fetch: line.fetch });
+    const api = createLineApi({ channelId: "1657000001", channelSecret: SECRET, fetch: line.fetch });
     expect(api.tokenSource).toBe("minted");
     const info = await api.botInfo();
     expect(info.basicId).toBe("@kesen");
@@ -44,7 +44,7 @@ describe("minted channel tokens", () => {
     expect(mint.opts.method).toBe("POST");
     expect(mint.opts.headers["content-type"]).toBe("application/x-www-form-urlencoded");
     expect(Object.fromEntries(new URLSearchParams(mint.opts.body))).toEqual({
-      grant_type: "client_credentials", client_id: "2011700001", client_secret: SECRET,
+      grant_type: "client_credentials", client_id: "1657000001", client_secret: SECRET,
     });
     expect(mint.opts.headers.authorization).toBeUndefined();
     expect(call.url).toBe("https://api.line.me/v2/bot/info");
@@ -54,7 +54,7 @@ describe("minted channel tokens", () => {
   test("a token is reused until a minute before it expires, then a new one is minted", async () => {
     let clock = 1_000_000;
     const line = fakeLine({ expiresIn: 900 });
-    const api = createLineApi({ channelId: "2011700001", channelSecret: SECRET, fetch: line.fetch, now: () => clock });
+    const api = createLineApi({ channelId: "1657000001", channelSecret: SECRET, fetch: line.fetch, now: () => clock });
     await api.botInfo();
     clock += 839_000;           // 13 min 59 s: still inside the 14-minute window
     await api.quota();
@@ -67,7 +67,7 @@ describe("minted channel tokens", () => {
 
   test("concurrent calls share one mint", async () => {
     const line = fakeLine();
-    const api = createLineApi({ channelId: "2011700001", channelSecret: SECRET, fetch: line.fetch });
+    const api = createLineApi({ channelId: "1657000001", channelSecret: SECRET, fetch: line.fetch });
     await Promise.all([api.botInfo(), api.quota(), api.consumption(), api.push("Uuser", [{ type: "text", text: "x" }])]);
     expect(line.minted()).toBe(1);
     expect(line.calls.filter((c) => !c.url.endsWith("/oauth2/v3/token")).every((c) => c.opts.headers.authorization === "Bearer tok-1")).toBe(true);
@@ -75,14 +75,14 @@ describe("minted channel tokens", () => {
 
   test("a 401 mints a fresh token once and repeats the call; a second 401 is an error", async () => {
     const once = fakeLine({ reject: (auth) => auth === "Bearer tok-1" });
-    const api = createLineApi({ channelId: "2011700001", channelSecret: SECRET, fetch: once.fetch });
+    const api = createLineApi({ channelId: "1657000001", channelSecret: SECRET, fetch: once.fetch });
     const info = await api.botInfo();
     expect(info.basicId).toBe("@kesen");
     expect(once.minted()).toBe(2);
     expect(once.calls.at(-1).opts.headers.authorization).toBe("Bearer tok-2");
 
     const always = fakeLine({ reject: () => true });
-    const api2 = createLineApi({ channelId: "2011700001", channelSecret: SECRET, fetch: always.fetch });
+    const api2 = createLineApi({ channelId: "1657000001", channelSecret: SECRET, fetch: always.fetch });
     const err = await api2.botInfo().catch((e) => e);
     expect(err).toBeInstanceOf(LineApiError);
     expect(err.status).toBe(401);
@@ -91,7 +91,7 @@ describe("minted channel tokens", () => {
 
   test("the push retry key survives a re-mint (the 401 send was not delivered)", async () => {
     const line = fakeLine({ reject: (auth, url) => auth === "Bearer tok-1" && url.endsWith("/push") });
-    const api = createLineApi({ channelId: "2011700001", channelSecret: SECRET, fetch: line.fetch });
+    const api = createLineApi({ channelId: "1657000001", channelSecret: SECRET, fetch: line.fetch });
     await api.push("Uuser", [{ type: "text", text: "x" }]);
     const pushes = line.calls.filter((c) => c.url.endsWith("/v2/bot/message/push"));
     expect(pushes.length).toBe(2);
@@ -100,7 +100,7 @@ describe("minted channel tokens", () => {
 
   test("a wrong ID or secret is a token error that names neither", async () => {
     const line = fakeLine({ mintStatus: 400 });
-    const api = createLineApi({ channelId: "2011700001", channelSecret: SECRET, fetch: line.fetch });
+    const api = createLineApi({ channelId: "1657000001", channelSecret: SECRET, fetch: line.fetch });
     const err = await api.botInfo().catch((e) => e);
     expect(err).toBeInstanceOf(LineApiError);
     expect(err.status).toBe(400);
@@ -111,7 +111,7 @@ describe("minted channel tokens", () => {
 
   test("the ID wins over a fixed token (another channel's token left in the service is ignored)", async () => {
     const line = fakeLine();
-    const api = createLineApi({ token: "old-channel-token", channelId: "2011700001", channelSecret: SECRET, fetch: line.fetch });
+    const api = createLineApi({ token: "old-channel-token", channelId: "1657000001", channelSecret: SECRET, fetch: line.fetch });
     await api.botInfo();
     expect(line.calls.at(-1).opts.headers.authorization).toBe("Bearer tok-1");
   });
@@ -141,8 +141,8 @@ describe("config with a channel ID", () => {
   const base = { LINE_CHANNEL_SECRET: SECRET, LINE_STORE_KEY: STORE_KEY, ADMIN_TOKEN: ADMIN };
 
   test("the ID and secret are enough; describeConfig says the token is minted and prints no secret", () => {
-    const c = loadConfig({ ...base, LINE_CHANNEL_ID: "2011700001" });
-    expect(c.channelId).toBe("2011700001");
+    const c = loadConfig({ ...base, LINE_CHANNEL_ID: "1657000001" });
+    expect(c.channelId).toBe("1657000001");
     expect(c.channelAccessToken).toBe("");
     const d = describeConfig(c);
     expect(d.channelAccessToken).toBe("minted");
@@ -166,9 +166,35 @@ describe("config with a channel ID", () => {
   });
 
   test("the secret is still required with an ID", () => {
-    try { loadConfig({ LINE_CHANNEL_ID: "2011700001", LINE_STORE_KEY: STORE_KEY, ADMIN_TOKEN: ADMIN }); throw new Error("no error"); } catch (e) {
+    try { loadConfig({ LINE_CHANNEL_ID: "1657000001", LINE_STORE_KEY: STORE_KEY, ADMIN_TOKEN: ADMIN }); throw new Error("no error"); } catch (e) {
       expect(e).toBeInstanceOf(ConfigError);
       expect(e.problems).toContain("LINE_CHANNEL_SECRET is required");
     }
+  });
+});
+
+describe("PUBLIC_BASE_URL on Railway", () => {
+  const base = {
+    LINE_CHANNEL_ID: "1657000001",
+    LINE_CHANNEL_SECRET: "channel-secret-test-value",
+    LINE_STORE_KEY: Buffer.alloc(32, 7).toString("base64"),
+    ADMIN_TOKEN: "admin-token-must-be-24ch",
+    RAILWAY_ENVIRONMENT: "production",
+  };
+
+  test("unset, it is the service's own Railway domain", () => {
+    const c = loadConfig({ ...base, RAILWAY_PUBLIC_DOMAIN: "Kesenmemento-Line-Production.up.railway.app" });
+    expect(c.publicBaseUrl).toBe("https://kesenmemento-line-production.up.railway.app");
+    expect(c.publicBaseUrlSource).toBe("railway");
+    expect(describeConfig(c).publicBaseUrlSource).toBe("railway");
+  });
+
+  test("set, it wins; a malformed Railway domain is ignored", () => {
+    const c = loadConfig({ ...base, PUBLIC_BASE_URL: "https://line.kesenmemento.com/", RAILWAY_PUBLIC_DOMAIN: "x.up.railway.app" });
+    expect(c.publicBaseUrl).toBe("https://line.kesenmemento.com");
+    expect(c.publicBaseUrlSource).toBe("env");
+    const bad = loadConfig({ ...base, RAILWAY_PUBLIC_DOMAIN: "evil.example/path?x" });
+    expect(bad.publicBaseUrl).toBe("");
+    expect(bad.publicBaseUrlSource).toBe(null);
   });
 });

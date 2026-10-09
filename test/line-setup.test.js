@@ -8,11 +8,15 @@ import { join } from "node:path";
 import { loadConfig } from "../server/line/config.js";
 import { createApp } from "../server/line/index.js";
 import { RICH_MENU_HEIGHT, RICH_MENU_NAME, RICH_MENU_WIDTH } from "../server/line/menu.js";
-import { imageSize, RICH_MENU_PNG, runSetup } from "../server/line/setup.js";
+import { LineApiError } from "../server/line/api.js";
+import { checkBase, explainSetupError, imageSize, RICH_MENU_PNG, runSetup } from "../server/line/setup.js";
 
 const TOKEN = "admin-token-must-be-24ch";
 const BASE = "https://line.example.jp";
 const PNG = readFileSync(RICH_MENU_PNG);
+/** GET {base}/healthz as the deployed service answers it. */
+const healthy = async () => Response.json({ ok: true, service: "kesenmemento-line", version: "1.0.0" });
+const lineError = (status, op) => Object.assign(new LineApiError(status), op ? { op } : {});
 
 /** A recording stand-in for the API client. */
 function fakeApi(over = {}) {
@@ -109,6 +113,53 @@ describe("runSetup", () => {
     await expect(runSetup({ api: fakeApi({ createRichMenu: async () => ({}) }).api, publicBaseUrl: BASE, png: PNG })).rejects.toThrow("rich menu was not created");
     await expect(runSetup({ api: fakeApi({ botInfo: async () => ({}) }).api, publicBaseUrl: BASE, png: PNG })).rejects.toThrow("basicId");
   });
+
+  test("with a probe, {base}/healthz is checked before LINE is touched", async () => {
+    const seen = [];
+    const f = fakeApi();
+    const out = await runSetup({ api: f.api, publicBaseUrl: BASE, png: PNG, probe: async (url, init) => { seen.push([url, init.redirect]); return healthy(); } });
+    expect(seen).toEqual([[`${BASE}/healthz`, "error"]]);
+    expect(out.basicId).toBe("@123abcde");
+  });
+
+  test("a base whose DNS is not set yet, or that is another site, leaves the channel untouched", async () => {
+    const dns = fakeApi();
+    const unreachable = async () => { throw new TypeError("fetch failed"); };
+    await expect(runSetup({ api: dns.api, publicBaseUrl: BASE, png: PNG, probe: unreachable }))
+      .rejects.toThrow(`PUBLIC_BASE_URL ${BASE} is unreachable (DNS or TLS)`);
+    expect(dns.calls).toEqual([]);
+    const slow = async () => { throw Object.assign(new Error("timeout"), { name: "TimeoutError" }); };
+    await expect(checkBase(slow, BASE)).rejects.toThrow("no answer in 8 s");
+    const other = fakeApi();
+    const parked = async () => new Response("<html>parked</html>", { status: 200 });
+    await expect(runSetup({ api: other.api, publicBaseUrl: BASE, png: PNG, probe: parked }))
+      .rejects.toThrow("answers, but not as kesenmemento-line (HTTP 200)");
+    await expect(checkBase(async () => Response.json({ service: "kesenmemento-line" }, { status: 503 }), BASE)).rejects.toThrow("HTTP 503");
+    expect(other.calls).toEqual([]);
+  });
+
+  test("a LINE refusal says which call failed and what a person does about it", async () => {
+    const noAccount = fakeApi({ setWebhook: async () => { throw lineError(403); } });
+    const e403 = await runSetup({ api: noAccount.api, publicBaseUrl: BASE, png: PNG }).catch((e) => e.message);
+    expect(e403).toStartWith("line api 403 (set webhook): no active LINE Official Account");
+    expect(e403).toContain("「Messaging APIを利用する」");
+    const badSecret = fakeApi({ setWebhook: async () => { throw lineError(400, "token"); } });
+    expect(await runSetup({ api: badSecret.api, publicBaseUrl: BASE, png: PNG }).catch((e) => e.message))
+      .toStartWith("line api 400 (token): LINE refused the channel ID + secret");
+    const menu = fakeApi({ createRichMenu: async () => { throw lineError(429); } });
+    expect(await runSetup({ api: menu.api, publicBaseUrl: BASE, png: PNG }).catch((e) => e.message))
+      .toStartWith("line api 429 (rich menu): LINE is rate-limiting");
+    const info = fakeApi({ botInfo: async () => { throw lineError(503); } });
+    expect(await runSetup({ api: info.api, publicBaseUrl: BASE, png: PNG }).catch((e) => e.message))
+      .toBe("line api 503 (bot info): LINE had a server error; run the setup again");
+  });
+
+  test("explainSetupError: network, unknown statuses and plain errors", () => {
+    const net = Object.assign(new LineApiError(0), { name: "TimeoutError" });
+    expect(explainSetupError(net, "test webhook")).toBe("line api 0 (test webhook): LINE did not answer (network or timeout); run the setup again");
+    expect(explainSetupError(lineError(418), "rich menu")).toBe("line api 418 (rich menu)");
+    expect(explainSetupError(new Error("rich menu was not created"), "rich menu")).toBe("rich menu was not created");
+  });
 });
 
 describe("POST /admin/setup", () => {
@@ -118,18 +169,18 @@ describe("POST /admin/setup", () => {
     while (apps.length) { try { apps.pop().close(); } catch { /* closed */ } }
     while (dirs.length) rmSync(dirs.pop(), { recursive: true, force: true });
   });
-  function open(api, log = { info() {}, warn() {}, error() {} }) {
+  function open(api, log = { info() {}, warn() {}, error() {} }, probe = healthy) {
     const dir = mkdtempSync(join(tmpdir(), "line-setup-"));
     dirs.push(dir);
     const config = loadConfig({
       LINE_CHANNEL_SECRET: "channel-secret-test-value",
-      LINE_CHANNEL_ID: "2011700001",
+      LINE_CHANNEL_ID: "1657000001",
       LINE_STORE_KEY: Buffer.alloc(32, 7).toString("base64"),
       ADMIN_TOKEN: TOKEN,
       DATA_DIR: dir,
       PUBLIC_BASE_URL: BASE,
     }, { dataDir: dir });
-    const app = createApp(config, { api, logger: log });
+    const app = createApp(config, { api, logger: log, probe });
     apps.push(app);
     return app;
   }
@@ -168,5 +219,69 @@ describe("POST /admin/setup", () => {
     expect(JSON.parse(text).error).toBe("webhook test failed: 401 Unauthorized");
     expect(text).not.toContain("channel-secret-test-value");
     expect(text).not.toContain(TOKEN);
+  });
+
+  test("the server checks its own base first: an unpointed custom domain is a 502 that says so", async () => {
+    const f = fakeApi();
+    const seen = [];
+    const app = open(f.api, undefined, async (url) => { seen.push(url); throw new TypeError("fetch failed"); });
+    const res = await post(app);
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toContain("set PUBLIC_BASE_URL to the Railway domain");
+    expect(seen).toEqual([`${BASE}/healthz`]);
+    expect(f.calls).toEqual([]);
+  });
+});
+
+describe("GET /admin/status", () => {
+  const dirs = [];
+  const apps = [];
+  afterEach(() => {
+    while (apps.length) { try { apps.pop().close(); } catch { /* closed */ } }
+    while (dirs.length) rmSync(dirs.pop(), { recursive: true, force: true });
+  });
+  function open(env) {
+    const dir = mkdtempSync(join(tmpdir(), "line-status-"));
+    dirs.push(dir);
+    const config = loadConfig({
+      LINE_CHANNEL_SECRET: "channel-secret-test-value",
+      LINE_STORE_KEY: Buffer.alloc(32, 7).toString("base64"),
+      ADMIN_TOKEN: TOKEN,
+      ...env,
+    }, { dataDir: dir });
+    const app = createApp(config, { api: fakeApi().api, now: () => Date.UTC(2026, 9, 9, 8, 0, 0) });
+    apps.push(app);
+    return app;
+  }
+  const get = (app, headers = { authorization: `Basic ${Buffer.from(`team:${TOKEN}`).toString("base64")}` }, method = "GET") =>
+    app.fetch(new Request("http://127.0.0.1/admin/status", { method, headers }));
+
+  test("names the channel this deployment runs on, and nothing secret", async () => {
+    const app = open({ LINE_CHANNEL_ID: "1657000001", RAILWAY_ENVIRONMENT: "production", RAILWAY_PUBLIC_DOMAIN: "kesenmemento-line-production.up.railway.app" });
+    const res = await get(app);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("cache-control")).toContain("no-store");
+    const text = await res.text();
+    expect(JSON.parse(text)).toEqual({
+      ok: true,
+      service: "kesenmemento-line",
+      version: "1.0.0",
+      channelId: "1657000001",
+      tokenSource: "minted",
+      publicBaseUrl: "https://kesenmemento-line-production.up.railway.app",
+      publicBaseUrlSource: "railway",
+      startedAt: "2026-10-09T08:00:00.000Z",
+    });
+    expect(text).not.toContain("channel-secret-test-value");
+    expect(text).not.toContain(TOKEN);
+  });
+
+  test("needs the admin password and a GET; a fixed-token deployment has no channel ID", async () => {
+    const app = open({ LINE_CHANNEL_ACCESS_TOKEN: "fixed-access-token-value", PUBLIC_BASE_URL: BASE });
+    expect((await get(app, {})).status).toBe(401);
+    expect((await get(app, undefined, "POST")).status).toBe(405);
+    const body = await (await get(app)).json();
+    expect(body.channelId).toBe(null);
+    expect(body.publicBaseUrlSource).toBe("env");
   });
 });

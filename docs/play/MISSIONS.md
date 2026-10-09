@@ -43,7 +43,7 @@ The photographer stands on dry ground at x 48, z 78, near the seventh quay. She 
 
 A real view (`kind: real`) shows the team's photo. The match uses the camera, not the walker: within 12 m, within 6 m of height, within 20° of yaw and within 15° of pitch, held for 0.6 s. Walk and fly both count. The tracker hides the arrow. Within 40 m it says 「ちかい！」, and within 100 m 「もうすこし」. The map draws a soft circle of 120 m whose centre sits 30–60 m off the true spot, the same place every time for that id. When it matches, a flash, then the photo beside the game frame, with 「見つけた！」.
 
-A game view (`kind: game`) shows a frame from this app. 「LINEで送る」 opens the official account with 「けしき V07」 filled in, once `data/play/line.json` has a `basicId`. Until then the card says 「LINE は準備中」, and 「送ったよ」 still gives the stamp. There is no account and no name.
+A game view (`kind: game`) shows a frame from this app. 「LINE で送る」 opens the official account with 「けしき V07」 filled in, once `data/play/line.json` has a `basicId`. Until then the card says 「LINE は準備中」, and 「送ったよ」 still gives the stamp. There is no account and no name.
 
 Both cards ask 「ちがうところ、あった？」 and offer a report. The けしき帳 shows a blank until a view is found, then the card again. A tap on the photo opens it full screen. Esc closes that. Nothing here ranks anyone, and nothing is for sale.
 
