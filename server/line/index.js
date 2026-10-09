@@ -105,6 +105,7 @@ export function createApp(config, deps = {}) {
   const admin = createAdmin(store, api, config, log);
   let chain = Promise.resolve();
   const timers = [];
+  const startedAt = new Date((deps.now || Date.now)()).toISOString();
 
   function enqueue(fn) {
     const job = new Promise((resolve, reject) => {
@@ -338,13 +339,31 @@ export function createApp(config, deps = {}) {
           if (!adminAuthorized(req, config.adminToken)) return unauthorized();
           try {
             const png = existsSync(RICH_MENU_PNG) ? readFileSync(RICH_MENU_PNG) : null;
-            const out = await runSetup({ api, publicBaseUrl: config.publicBaseUrl, png });
+            // the base is checked from here first, so a domain whose DNS is not set yet never becomes the webhook
+            const probe = deps.probe || deps.fetch || globalThis.fetch;
+            const out = await runSetup({ api, publicBaseUrl: config.publicBaseUrl, png, probe });
             log.info("setup.done", { basicId: out.basicId, richMenuId: out.richMenuId, webhookActive: out.webhookActive, token: out.tokenSource });
             return Response.json(out, { headers: NO_STORE });
           } catch (e) {
             log.warn("setup.failed", { reason: String(e?.message || e).slice(0, 160) });
             return Response.json({ error: String(e?.message || e) }, { status: 502, headers: NO_STORE });
           }
+        }
+        if (url.pathname === "/admin/status") {
+          // [status] which channel this deployment runs on, so a person or tools/line/connect.mjs can tell when
+          // new variables are live. The channel ID is not a secret (it is in every add-friend handoff); nothing else is shown.
+          if (req.method !== "GET") return new Response(null, { status: 405, headers: NO_STORE });
+          if (!adminAuthorized(req, config.adminToken)) return unauthorized();
+          return Response.json({
+            ok: true,
+            service: "kesenmemento-line",
+            version: VERSION,
+            channelId: config.channelId || null,
+            tokenSource: api.tokenSource || null,
+            publicBaseUrl: config.publicBaseUrl || null,
+            publicBaseUrlSource: config.publicBaseUrlSource || null,
+            startedAt,
+          }, { headers: NO_STORE });
         }
         return admin.handle(req, url);
       }

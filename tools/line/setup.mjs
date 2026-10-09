@@ -42,7 +42,7 @@ const api = createLineApi({
 });
 let out;
 try {
-  out = await runSetup({ api, publicBaseUrl: base, png });
+  out = await runSetup({ api, publicBaseUrl: base, png, probe: fetch });
 } catch (e) {
   fail(String(e?.message || e));
 }

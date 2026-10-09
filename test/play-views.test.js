@@ -4,6 +4,7 @@ import { existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { SENSITIVE } from '../scripts/anime/enrich/fold.js';
 import QUESTS from '../data/play/quests.json';
+import I18N from '../data/play-i18n.json';
 import {
   emptyProgress, acceptQuest, questById, offeredQuest, advance, fillWorld, noteViewSent,
   angleDeltaDeg, viewMatch, viewDwell, hintCentre, viewWarmth, viewDistance, stampBook, countStamps,
@@ -13,6 +14,7 @@ import { quaternionFromYawPitch, anglesFromQuaternion, yawFromHeading } from '..
 import { step, freshSession } from '../server/line/flows.js';
 import { viewThumbPath } from '../server/line/admin.js';
 import { mountUi } from '../src/anime/play/missions/ui.js';
+import { VIEW_CSS } from '../src/anime/play/missions/viewcard.js';
 import { makeDom } from './lib/mini-dom.js';
 
 const quests = QUESTS.quests;
@@ -166,6 +168,37 @@ describe('the card', () => {
     expect(host.textContent).toContain('まだ');
     expect(host.textContent).toContain('12枚');
     expect(host.querySelectorAll('img').length).toBe(1);
+  });
+
+  test('まちで見つけよう: with a basic ID the card opens LINE with the tag; without one it says LINE は準備中', () => {
+    const ja = I18N.ja;
+    const label = ja['play.view.line'];
+    // docs/CRAFT.md section 2: a space around Latin words in Japanese, like 「LINE は準備中」 beside it
+    expect(label).toBe('LINE で送る');
+    expect(ja['play.view.lineWait']).toBe('LINE は準備中');
+    const send = (lineUrl, wait) => {
+      const dom = makeDom();
+      const ui = mountUi({ doc: dom.document, win: dom.window, reduce: true });
+      ui.showHunt({
+        id: 'V07', kind: 'send', title: ja['play.view.seriesB'], lead: ja['play.view.sendLead'],
+        image: '/data/play/views/V07.webp', area: '内湾のあたり', close: 'とじる', zoom: '大きく見る',
+        lineUrl, lineLabel: label, sentLabel: ja['play.view.sent'], wait,
+      });
+      return ui.root;
+    };
+    const ready = send(lineViewUrl('V07', '@123abcde'), '');
+    const a = ready.querySelector('.m-view-acts a');
+    expect(a.href).toBe('https://line.me/R/oaMessage/%40123abcde/?%E3%81%91%E3%81%97%E3%81%8D%20V07');
+    expect(a.target).toBe('_blank');
+    expect(a.rel).toBe('noopener noreferrer');
+    expect(a.textContent).toBe('LINE で送る');
+    expect(ready.querySelector('[data-act="wait"]')).toBe(null);
+    const waiting = send(lineViewUrl('V07', ''), ja['play.view.lineWait']);
+    expect(waiting.querySelector('.m-view-acts a')).toBe(null);
+    expect(waiting.querySelector('[data-act="wait"]').textContent).toBe('LINE は準備中');
+    expect(waiting.querySelector('[data-act="sent"]').textContent).toBe('送ったよ');
+    // an <a> is content-box and inline: without this rule width:100% + padding ran 32 px past the card at 393 px wide
+    expect(VIEW_CSS).toMatch(/#klc-m \.m-view-acts a \{ box-sizing: border-box; display: flex; align-items: center; justify-content: center; \}/);
   });
 });
 

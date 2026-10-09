@@ -54,6 +54,7 @@ One Japanese term per concept, the same in the UI (`data/i18n.json`, `data/ui-*-
 | 場所を探す | ばしょをさがす | Find a place | search | ok |
 | 地図 | ちず | Map | the full map and the minimap | ok |
 | 修正を報告 | しゅうせいをほうこく | Report a correction | the report flow (hidden until go-live) | ok; in English text write Crew No., never クルーNo. |
+| LINE で送る ／ LINE は準備中 | — | Send with LINE ／ LINE is not ready yet | the 「まちで見つけよう」 card: the button opens the official account ケセンメメント with 「けしき V07」 filled in, once `data/play/line.json` has a `basicId` (tools/line/connect.mjs writes it); until then the card shows the second line | ok (the button lost its missing space on 2026-10-09) |
 | JPYCで買えるお店 | — | Shops that take JPYC | ☰ menu (switched off in production) | ok; the shops are お店, never 店舗 or ショップ |
 | 協力：店名 | きょうりょく | Thanks to: shop | the credit inside a walk-in interior | ok |
 
